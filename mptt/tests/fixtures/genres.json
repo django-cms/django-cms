@@ -1,0 +1,134 @@
+[
+  {
+    "pk": 1, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 16, 
+      "name": "Action", 
+      "parent": null, 
+      "level": 0, 
+      "lft": 1, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 9, 
+      "name": "Platformer", 
+      "parent": 1, 
+      "level": 1, 
+      "lft": 2, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 4, 
+      "name": "2D Platformer", 
+      "parent": 2, 
+      "level": 2, 
+      "lft": 3, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 6, 
+      "name": "3D Platformer", 
+      "parent": 2, 
+      "level": 2, 
+      "lft": 5, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 8, 
+      "name": "4D Platformer", 
+      "parent": 2, 
+      "level": 2, 
+      "lft": 7, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 15, 
+      "name": "Shootemup", 
+      "parent": 1, 
+      "level": 1, 
+      "lft": 10, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 12, 
+      "name": "Vertical Scrolling Shootemup", 
+      "parent": 6, 
+      "level": 2, 
+      "lft": 11, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 14, 
+      "name": "Horizontal Scrolling Shootemup", 
+      "parent": 6, 
+      "level": 2, 
+      "lft": 13, 
+      "tree_id": 1
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 6, 
+      "name": "Role-playing Game", 
+      "parent": null, 
+      "level": 0, 
+      "lft": 1, 
+      "tree_id": 2
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 3, 
+      "name": "Action RPG", 
+      "parent": 9, 
+      "level": 1, 
+      "lft": 2, 
+      "tree_id": 2
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "tests.genre", 
+    "fields": {
+      "rght": 5, 
+      "name": "Tactical RPG", 
+      "parent": 9, 
+      "level": 1, 
+      "lft": 4, 
+      "tree_id": 2
+    }
+  }
+]

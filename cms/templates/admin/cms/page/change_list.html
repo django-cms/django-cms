@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load adminmedia admin_list i18n pages_tags %}
+{% block title %}List of pages{% endblock %}
+{% block bodyclass %}change-list{% endblock %}
+
+{% if not is_popup %}{% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+    <a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+    </div>
+{% endblock %}{% endif %}
+
+{% block coltype %}flex{% endblock %}
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/rte.css" />
+<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/pages.css" />
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.query.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/change_list.js"></script>
+{% endblock %}
+
+
+{% block content_title %}<h1>{% trans "Select" %} {{ name }} {% trans "to change" %}</h1>{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+{% if has_add_permission %}
+<ul class="object-tools"><li><a href="add/" class="addlink">{% trans "Add" %} {{ name }}</a></li></ul>
+{% endif %}
+
+<div class="module" id="changelist">
+
+{% include "admin/cms/page/change_list_table.html" %}
+
+</div>
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+[
+    {
+        "pk": 1, 
+        "model": "sites.site", 
+        "fields": {
+            "domain": "localhost:8000", 
+            "name": "localhost:8000"
+        }
+    }
+]

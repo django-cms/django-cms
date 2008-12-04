@@ -1,0 +1,30 @@
+{% load debug_toolbar %}
+
+<ul class="tabSet">
+	<li class="close">Close Panel</li>
+</ul>
+
+<h1>Templates</h1>
+<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col width="40px"/>
+		<col/>
+		<col width="70px"/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Time&nbsp;(ms)</th>
+			<th>Path</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for time, template, engine, stack in template_calls_list %}
+		<tr class="{% cycle 'even' 'odd' %}">
+			<td>{{ time|floatformat:"4" }}</td>
+			<td>{{ template|escape }}</td>
+			<td><a href="javascript:djDebugWindow('Templates', {op: 'explain'}, {stack: {{ stack|jsonencode }}});" class="infoIcon">Details</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

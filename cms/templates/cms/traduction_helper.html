@@ -1,0 +1,11 @@
+{% load pages_tags i18n %}
+
+{% if language_error %}<p style="margin-left:0;padding-left:0">
+    <strong>{% trans "Wanted language has not been translated yet." %}</strong></p>
+{% else %}
+    {% for p in placeholders %}
+        <h4>{{ p.name }}</h4>
+        <div style="clear:both">{% show_content page p.name lang %}</div>
+        <br />
+    {% endfor %}
+{% endif %}

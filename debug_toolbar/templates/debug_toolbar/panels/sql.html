@@ -1,0 +1,79 @@
+{% load debug_toolbar %}
+
+<h1>SQL Usage</h1>
+<ul class="tabSet">
+	<li class="close">Close Panel</li>
+	{% if queries %}<li class="filterContainer"><input class="filter" type="text" value="Filter results"></li>{% endif %}
+</ul>
+<ul class="tabSet">
+	<li rel="tab_all" class="current">All Queries</li>
+	<li rel="tab_unique">Unique Queries</li>
+</ul>
+<div id="tab_all" class="queries">
+	<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+		<colgroup>
+			<col width="40px"/>
+			<col/>
+			<col width="70px"/>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Time&nbsp;(ms)</th>
+				<th>Query</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if queries %}
+				{% for time, query, raw_query, params, stack in queries %}
+				<tr class="{% cycle 'even' 'odd' %}">
+					<td>{{ time|floatformat:"4" }}</td>
+					<td class="query">{{ query|escape }}</td>
+					<td><a href="javascript:djDebugWindow('SQL', {op: 'explain', sql: {{ raw_query|jsonencode }}, params: {{ params|jsonencode|jsonencode }}}, {stack: {{ stack|jsonencode }}});" class="infoIcon">Details</a></td>
+				</tr>
+				{% endfor %}
+			{% else %}
+				<tr class="error-message">
+					<td colspan="100">
+						<strong>No SQL queries.</strong>
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+<div id="tab_unique" class="queries" style="display:none;">
+	<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+		<thead>
+			<tr>
+			<th>Time&nbsp;(ms)</th>
+			<th>Executions</th>
+			<th>Query</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% if query_groups %}
+			{% for query, time, number in query_groups %}
+			<tr class="{% cycle 'even' 'odd' %}">
+				<td>{{ time|floatformat:"4" }}</td>
+				<td>{{ number }}</td>
+				<td class="query">{{ query|escape }}</td>
+			</tr>
+		
+			{% endfor %}
+		{% else %}
+			<tr class="error-message">
+				<td colspan="100">
+					<strong>No SQL queries.</strong>
+				</td>
+			</tr>
+		{% endif %}
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	jQuery('.query').each(function()
+	{
+		jQuery(this).css('color','#444').html(jQuery(this).text().replace(/(UNION|ANALYZE|MATCH|AGAINST|ALL|ASC|AS|ALTER|AND|ADD|AUTO_INCREMENT|BETWEEN|BINARY|BOTH|BY|BOOLEAN|CHANGE|CHECK|COLUMNS|COLUMN|CROSS|CREATE|DATABASES|DATABASE|DATA|DELAYED|DESCRIBE|DESC|DISTINCT|DELETE|DROP|DEFAULT|ENCLOSED|ESCAPED|EXISTS|EXPLAIN|FIELDS|FIELD|FLUSH|FOR|FOREIGN|FUNCTION|FROM|GROUP|GRANT|HAVING|IGNORE|INDEX|INFILE|INSERT|INNER JOIN|INTO|IDENTIFIED|IN|IS|IF|JOIN|KEYS|KILL|KEY|LEADING|LIKE|LIMIT|LINES|LOAD|LOCAL|LOCK|LOW_PRIORITY|LEFT|LANGUAGE|MODIFY|NATURAL|NOT|NULL|NEXTVAL|OPTIMIZE|OPTION|OPTIONALLY|ORDER BY|OUTFILE|OR|OUTER|ON|PROCEEDURE|PROCEDURAL|PRIMARY|READ|REFERENCES|REGEXP|RENAME|REPLACE|RETURN|REVOKE|RLIKE|RIGHT|SHOW|SONAME|STATUS|STRAIGHT_JOIN|SELECT|SETVAL|SET|TABLES|TEMINATED|TO|TRAILING|TRUNCATE|TABLE|TEMPORARY|TRIGGER|TRUSTED|UNIQUE|UNLOCK|USE|USING|UPDATE|VALUES|VARIABLES|VIEW|WITH|WRITE|WHERE|ZEROFILL|TYPE|XOR)/g, '<span class="hilight">$1</span>'));
+	});
+</script>

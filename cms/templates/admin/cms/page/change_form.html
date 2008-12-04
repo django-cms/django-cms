@@ -1,0 +1,66 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify adminmedia pages_tags %}
+{% block title %}{% trans "Change a page" %}{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
+{% endblock %}
+
+{% block content_title %}<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>{% endblock %}
+
+{% block content %}
+<!-- Content -->
+<div id="content-main">
+
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+  <!--<li><a href="history/" class="historylink">{% trans "History" %}</a></li>-->
+  {% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+<form action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">
+{% for fieldset in adminform %}
+  {% include "admin/pages/page/includes/fieldset.html" %}
+{% endfor %}
+<br class="clear" />
+{% if not add %}
+<div><fieldset class="module aligned ">
+  <h2>{% trans "Translation helper" %}</h2>
+  <div class="form-row">
+      <label for="traduction-helper-select" class="required">{% trans "Language:" %}</label>
+      <select id="traduction-helper-select">
+      <option value="" selected="selected">------</option>
+      {% for lang in traduction_language %}
+      <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+      {% endfor %}
+      </select>
+      <div id="traduction-helper-content"></div>
+  </div>
+</fieldset>
+</div>
+{% endif %}
+
+
+<div class="submit-row" style="overflow:hidden">
+<input type="submit" value="{% trans "Save" %}" class="default" />
+<p class="deletelink-box"><a href="delete/" class="deletelink">{% trans "Delete" %}</a></p>
+<input type="submit" value="{% trans "Save and continue editing" %}" name="_continue" />
+</div>
+<script type="text/javascript">
+    if(window.$) {
+        $(document).ready(function() {
+            if($.fn.rte)
+                $('.rte').rte('{{ PAGES_MEDIA_URL }}/css/rte.css', '{{ PAGES_MEDIA_URL }}/images/');
+        });
+    }
+</script>
+
+</div>
+</form>
+
+<br class="clear" />
+<!-- END Content -->
+{% endblock %}

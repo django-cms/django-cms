@@ -1,0 +1,156 @@
+{% load cache pages_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
+<head>
+<title>{% show_content "title" %}</title>
+<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js" /></script>
+<style>
+    .placeholder-editable {
+        border:1px #bbb solid;
+        background:#fff;
+        min-height:1em;
+        padding:5px;
+        cursor:text;
+        overflow:hidden;
+        height:1%;
+    }
+
+    .placeholder-editable input {
+        float:right;
+        padding:4px 10px;
+        margin-top:3px;
+    }
+
+    .placeholder-over, .edit {
+        border:1px #999 solid;
+        background:#5c705c;
+        color:#fff;
+        cursor: hand;
+    }
+
+    .edit {
+        padding:5px;
+    }
+
+    body {
+        font-family:sans-serif;
+        font-size:75%;
+        background:#b5b185;
+        color:#333;
+    }
+
+    #main {
+        width:600px;
+        padding:20px;
+        margin:0 auto;
+        border:1px #999 solid;
+        margin-bottom:40px;
+        overflow:hidden;
+        height:1%;
+        background:#fffdca;
+    }
+
+    h1, h2 {
+        border-bottom:1px #ddd solid;
+        color:#a4b854;
+    }
+
+    a {
+        color:#ff7959
+    }
+</style>
+</head>
+<body>
+
+<div id="main">
+<p style="float:right">
+    {% if user.is_authenticated %}
+        <a href="/admin/logout/">log out</a>
+    {% else %}
+        <a href="/admin/">log in</a>
+    {% endif %}
+</p>
+<h1>{% block title %}Django CMS based on page objects{% endblock %}</h1>
+
+<h3>site: {{ site.name }}</h3>
+
+<h2>Complete navigation (as a nested list)</h2>
+
+<ul>
+	{% show_menu 0 %}
+</ul>
+
+<h2>Navigation with active tree(as a nested list)</h2>
+<ul>
+	{% show_menu 1 %}
+</ul>
+
+<h2>Level 1 navigation (as a nested list)</h2>
+<ul>
+	{% show_menu 1 %}
+</ul>
+
+<h2>Display the sub menu of the root page (as a nested list)</h2>
+
+{% if current_page %}
+<ul>
+    {#% show_sub_menu current_page %#}
+</ul>
+{% endif %}
+
+<h2>Content</h2>
+
+{% block content %}
+    <div style="float:right;width:25%">
+    <h3>Right column placeholder</h3>
+    {% placeholder right-column Textarea %}
+    </div>
+
+    {% if current_page %}
+    <div style="width:70%">
+        <h3>title placeholder {% placeholder title TextInput %}</h3>
+        <div>body placeholder {% placeholder body WYMEditor %}</div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+</div>
+
+<script type="text/javascript">
+    // quick and dirty edit in place example
+    {% if user.is_authenticated %}
+        $('.placeholder').addClass('placeholder-editable');
+    {% endif %}
+    $('.placeholder-editable').mouseover(function() {
+        $(this).addClass('placeholder-over');
+    });
+    $('.placeholder-editable').mouseout(function() {
+        $(this).removeClass('placeholder-over');
+    });
+    $('.placeholder-editable').click(function() {
+        var p = $(this);
+        if(p.hasClass('edit')) {
+            return false;
+        }
+        p.addClass('edit');
+        var height = p.height()+20;
+        var width = p.width()-10;
+        p.html('<textarea style="width:'+width+'px;height:'+height+'px">'+ this.innerHTML +'</textarea><input type="submit" value="Save" />');
+        $('input', p).click( function() {
+            var content = $('textarea', p).val();
+            $.post('/admin/cms/page/{{ current_page.id }}/modify-content/'+p.attr('id')+'/{{ lang }}/', {'content':content}, function(response) {
+                if(response=="ok") {
+                    p.html(content);
+                    p.removeClass('edit');
+                    p.removeClass('placeholder-over');
+                } else {
+                    alert("You need to authenticate to the admin to edit the content");
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+
+</body>
+</html>

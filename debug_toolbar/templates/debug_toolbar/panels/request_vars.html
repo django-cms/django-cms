@@ -1,0 +1,178 @@
+<ul class="tabSet">
+	<li class="close">Close Panel</li>
+</ul>
+<h1>request.GET</h1>
+{% if get %}
+<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for key, value in get %}
+		<tr class="{% cycle 'even' 'odd' %}">
+			<td>{{ key|escape }}</td>
+			<td>{{ value|join:", "|escape }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<table class="data" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="error-message">
+			<td colspan="100">
+				<strong>No GET variables.</strong>
+			</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}
+
+<h1>request.POST</h1>
+{% if post %}
+<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for key, value in post %}
+		<tr class="{% cycle 'even' 'odd' %}">
+			<td>{{ key|escape }}</td>
+			<td>{{ value|join:", "|escape }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<table class="data" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="error-message">
+			<td colspan="100">
+				<strong>No POST variables.</strong>
+			</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}
+
+<h1>request.session</h1>
+{% if session %}
+<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for key, value in session %}
+		<tr class="{% cycle 'even' 'odd' %}">
+			<td>{{ key|escape }}</td>
+			<td>{{ value|escape }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<table class="data" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="error-message">
+			<td colspan="100">
+				<strong>No SESSION variables.</strong>
+			</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}
+
+<h1>request.COOKIES</h1>
+{% if cookies %}
+<table class="data sortable" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for key, value in cookies %}
+		<tr class="{% cycle 'even' 'odd' %}">
+			<td>{{ key|escape }}</td>
+			<td>{{ value|escape }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<table class="data" border="0" cellspacing="0" cellpadding="0"> 
+	<colgroup>
+		<col style="width:20%"/>
+		<col/>
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="error-message">
+			<td colspan="100">
+				<strong>No COOKIES variables.</strong>
+			</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}

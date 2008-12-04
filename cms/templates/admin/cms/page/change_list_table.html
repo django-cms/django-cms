@@ -1,0 +1,20 @@
+{% load i18n pages_tags %}
+<table cellspacing="0" id="page-list">
+<thead>
+<tr>
+<th style="width:35%">{% trans "title" %}</th>
+<th>{% trans "quick actions" %}</th>
+<th>{% trans "translations" %}</th>
+<th>{% trans "published" %}</th>
+<th>{% trans "template" %}</th>
+<th>{% trans "creator" %}</th>
+</tr>
+</thead>
+<tbody>
+
+{% for page in pages %}
+    {% show_admin_menu page %}
+{% endfor %}
+
+</tbody>
+</table>

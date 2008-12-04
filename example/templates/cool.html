@@ -1,0 +1,8 @@
+{% extends "index.html" %}
+{% load pages_tags %}
+
+{% block title %}Cool template{% endblock %}
+
+{% block content %}{{ block.super }}
+    {% placeholder fancy-content WYMEditor %}
+{% endblock %}

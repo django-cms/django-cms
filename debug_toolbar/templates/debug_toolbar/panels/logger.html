@@ -1,0 +1,28 @@
+<ul class="tabSet">
+	<li class="close">Close Panel</li>
+</ul>
+<h1>Log Messages</h1>
+{% if records %}
+	<table class="data" border="0" cellspacing="0" cellpadding="0"> 
+		<thead>
+			<tr>
+				<th>Level</th>
+				<th>Time</th>
+				<th>Message</th>
+				<th>Location</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for record in records %}
+				<tr class="{% cycle 'row1' 'row2' %}">
+					<td>{{ record.level }}</td>
+					<td>{{ record.time|date:"h:i:s m/d/Y" }}</td>
+					<td>{{ record.message }}</td>
+					<td>{{ record.file }}:{{ record.line }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<div class="container"><strong>No messages logged.</strong></div>
+{% endif %}
