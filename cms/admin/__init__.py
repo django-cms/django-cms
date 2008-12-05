@@ -135,6 +135,7 @@ class PageAdmin(admin.ModelAdmin):
         placeholder_fieldsets = []
         template = get_template_from_request(request, obj)
         for placeholder in get_placeholders(request, template):
+            print placeholder
             if placeholder.name not in self.mandatory_placeholders:
                 placeholder_fieldsets.append(placeholder.name)
 

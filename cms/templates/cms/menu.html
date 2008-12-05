@@ -10,7 +10,7 @@
 	{% if child.descendant %}descendant{% endif %}</span>
     {% if child.childrens %}
     <ul>
-        {% show_menu from_level to_level render_children child %}
+        {% show_menu from_level to_level extra_inactive extra_active child %}
     </ul>
     {% endif %}
 </li>

@@ -1,0 +1,4 @@
+{% for ance in ancestors %}
+{% if not forloop.first %}<{% endif %}
+{% if not forloop.last %}<a href="">{{ ance }}</a>{% else %}{{ ance }}{% endif %}
+{% endfor %}

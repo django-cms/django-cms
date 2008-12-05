@@ -76,13 +76,19 @@
 <h2>Complete navigation (as a nested list)</h2>
 
 <ul>
-	{% show_menu 0 %}
+	{% show_menu 0 100 100 100 %}
 </ul>
 
 <h2>Navigation with active tree(as a nested list)</h2>
 <ul>
-	{% show_menu 1 %}
+	{% show_menu 0 100 0 100 %}
 </ul>
+
+<h2>Navigation with only 1 active extra level</h2>
+<ul>
+	{% show_menu 0 100 0 1 %}
+</ul>
+
 
 <h2>Level 1 navigation (as a nested list)</h2>
 <ul>
@@ -93,12 +99,14 @@
 
 {% if current_page %}
 <ul>
-    {#% show_sub_menu current_page %#}
+    {% show_sub_menu 1 %}
 </ul>
 {% endif %}
 
-<h2>Content</h2>
+<h2>Show the breadcrumb navigation of the current page</h2>
+{% show_breadcrumb %}
 
+<h2>Content</h2>
 {% block content %}
     <div style="float:right;width:25%">
     <h3>Right column placeholder</h3>
@@ -107,8 +115,10 @@
 
     {% if current_page %}
     <div style="width:70%">
-        <h3>title placeholder {% placeholder title TextInput %}</h3>
+        
+		<h3>title placeholder {% placeholder title TextInput %}</h3>
         <div>body placeholder {% placeholder body WYMEditor %}</div>
+		
     </div>
     {% endif %}
 {% endblock %}
