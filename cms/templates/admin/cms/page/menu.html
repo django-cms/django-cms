@@ -14,11 +14,12 @@
     </a>
     <a href="{{ url }}{{ page.id }}/" class="changelink" style="margin-right:1em;">{{ page.get_slug }}</a>
 </td>
-<td>
-    <a href="#" class="move" id="move-link-{{ page.id }}">{% trans "move" %}</a> |
-    <a href="#" class="addlink" id="add-link-{{ page.id }}">{% trans "add" %}</a> |
-    <a href="{{ page.get_absolute_url }}" class="selector-add">{% trans "view" %}</a> |
-    <a href="{{ page.id }}/delete/" class="deletelink">{% trans "delete" %}</a>
+<td class="actions">
+    <a href="#" class="move" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a> |
+    <a href="{{ page.get_absolute_url }}" class="selector-add"><span>{% trans "view" %}</span></a> |
+	<a href="#" class="addlink" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a> |
+    
+    <a href="{{ page.id }}/delete/" class="deletelink"><span>{% trans "delete" %}</span</a>
 </td>
 <td>
     {% for lang in page.get_languages %} 
@@ -40,6 +41,19 @@
 {% endif %}
 </td>
 <td>
+{% if page.in_navigation %}
+    <label>
+        <img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+        <input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" checked="checked" value="1" />
+    </label>
+{% else %}
+    <label>
+        <img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+        <input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />
+    </label>
+{% endif %}
+</td>
+<td>
 {{ page.get_template }}
 </td>
 <td>
@@ -48,8 +62,7 @@
 </tr>
 {% endif %}
 
-{% if children.count %}
+
 {% for child in children %}
-    {% show_admin_menu child url level %}
+    {% show_admin_menu child level %}
 {% endfor %}
-{% endif %}

@@ -8,7 +8,7 @@ from cms.utils import get_language_from_request, get_page_from_request
 
 register = template.Library()
 
-def get_page_children_for_site(page, site, levels):
+def get_page_children_for_site(page, site, levels=100):
     if page:
         pages = Page.objects.published().filter(in_navigation=True, lft__gt=page.lft, rght__lt=page.rght, tree_id=page.tree_id, level__lte=page.level+levels)
         return pages
@@ -108,7 +108,42 @@ def show_sub_menu(context, levels=100):
     return locals()
 show_sub_menu = register.inclusion_tag('cms/sub_menu.html',
                                        takes_context=True)(show_sub_menu)
-                                       
+
+                                            
+def show_admin_menu(context, page, level=None):
+    """Render the admin table of pages"""
+    request = context['request']
+    site = request.site
+    lang = get_language_from_request(request)
+    if hasattr(page, "childrens"):
+        children = page.childrens
+    else:
+        pages = get_page_children_for_site(page, site)
+        ids = []
+        children = []
+        all_pages = pages[:]
+        for p in pages:# build the tree
+            ids.append(p.pk)
+            if p.parent_id == page.pk:
+                children.append(p)
+                find_children(p, pages, 1000, 1000, [], -1)
+        
+        titles = Title.objects.filter(pk__in=ids, language=lang)
+        for p in all_pages:# add the title and slugs and some meta data
+            for title in titles:
+                if title.page_id == p.pk:
+                    p.title_cache = title
+    has_permission = page.has_page_permission(request)
+    # level is used to add a left margin on table row
+    if has_permission:
+        if level is None:
+            level = 0
+        else:
+            level = level+3
+    return locals()
+show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
+                                         takes_context=True)(show_admin_menu)
+
 def show_breadcrumb(context, start_level=0):
     request = context['request']
     lang = get_language_from_request(request)
@@ -127,22 +162,6 @@ def show_breadcrumb(context, start_level=0):
     return locals()
 show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
                                          takes_context=True)(show_breadcrumb)
-                                            
-def show_admin_menu(context, page, url='/admin/cms/page/', level=None):
-    """Render the admin table of pages"""
-    request = context['request']
-    site = request.site
-    children = get_page_children_for_site(page, site)
-    has_permission = page.has_page_permission(request)
-    # level is used to add a left margin on table row
-    if has_permission:
-        if level is None:
-            level = 0
-        else:
-            level = level+3
-    return locals()
-show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
-                                         takes_context=True)(show_admin_menu)
 
 def has_permission(page, request):
     return page.has_page_permission(request)

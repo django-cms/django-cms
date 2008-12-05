@@ -16,6 +16,10 @@
     background:#fff;
 }
 
+td.actions a{
+	vertical-align:middle;
+}
+
 .placeholder-row textarea, .placeholder-row input {
     float:left;
 }
@@ -125,3 +129,42 @@ a.collapsed span.collapsed{
     background-color: #999;
     color: white;
 }
+
+/* ACTION ICONS */
+a.selector-add {
+	 width:16px;
+	 height:14px;
+	 display:inline-block;
+	 background:url(../images/page_find.gif) 0 -1px no-repeat; 
+	 
+}
+
+a.selector-add span{
+	display:none;
+}
+
+a.move {
+	width:15px;
+	height:13px;
+	display:inline-block;
+	background:url(../images/cut.gif) 0 -2px no-repeat; 
+}
+
+a.move span{
+	display:none;
+}
+
+a.addlink span{
+	display:none
+}
+
+a.deletelink{
+	background-position:0 2px;
+	margin-left:2px;
+}
+
+a.deletelink span{
+	display:none;
+}
+
+

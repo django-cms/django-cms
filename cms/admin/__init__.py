@@ -28,7 +28,7 @@ class PageAdmin(admin.ModelAdmin):
     exclude = ['author', 'parent']
     # these mandatory fields are not versioned
     mandatory_placeholders = ('title', 'slug')
-    general_fields = ['title', 'slug', 'status', 'sites']
+    general_fields = ['title', 'slug', 'status', 'sites', 'in_navigation']
     insert_point = general_fields.index('status') + 1
     
     if settings.CMS_TAGGING:
