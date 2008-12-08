@@ -24,6 +24,24 @@ def change_status(request, page_id):
     raise Http404
 change_status = staff_member_required(change_status)
 
+
+def change_innavigation(request, page_id):
+    """
+    Switch the in_navigation of a page
+    """
+    if request.method == 'POST':
+        page = Page.objects.get(pk=page_id)
+        if page.in_navigation:
+            page.in_navigation = False
+            val = 0
+        else:
+            page.in_navigation = True
+            val = 1
+        page.save()
+        return HttpResponse(unicode(val))
+    raise Http404
+change_status = staff_member_required(change_status)
+
 def modify_content(request, page_id, content_id, language_id):
     if request.method == 'POST':
         content = request.POST.get('content', False)

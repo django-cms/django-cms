@@ -146,7 +146,7 @@ $(document).ready(function() {
 		if(jtarget.hasClass("navigation-checkbox")) {
             var p = jtarget.attr("name").split("navigation-")[1];
             // if I don't put data in the post, django doesn't get it
-            $.post("/admin/cms/page/"+p+"/change-status/", {1:1}, function(val) {
+            $.post("/admin/cms/page/"+p+"/change-navigation/", {1:1}, function(val) {
                 var img = $('img', jtarget.parent())[0];
                 if(val=="0") {
                     jtarget.attr("checked", "");

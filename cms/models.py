@@ -44,7 +44,7 @@ class Page(models.Model):
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
     login_required = models.BooleanField(_('login required'), default=False)
     in_navigation = models.BooleanField(_("in navigation"), default=True)
-    soft_root = models.BooleanField(_("soft root"), default=False, help_text=_("All subpages will not be displayed in the navigation"))
+    soft_root = models.BooleanField(_("soft root"), default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT)
     template = models.CharField(_("template"), max_length=100, null=True, blank=True)
     sites = models.ManyToManyField(Site, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))

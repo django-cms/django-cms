@@ -26,7 +26,7 @@ import widgets
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import traduction, get_content, valid_targets_list, \
-    change_status, modify_content
+    change_status, modify_content, change_innavigation
 
 
 class PageAdmin(admin.ModelAdmin):
@@ -101,6 +101,8 @@ class PageAdmin(admin.ModelAdmin):
             return self.move_page(request, unquote(url[:-10]))
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))
+        elif url.endswith('/change-navigation'):
+            return change_innavigation(request, unquote(url[:-18]))
         return super(PageAdmin, self).__call__(request, url)
 
     def save_model(self, request, obj, form, change):
