@@ -54,7 +54,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             ids = []
             children = []
             ancestors = current_page.get_ancestors().values_list('id', flat=True)
-            pages = list(Page.objects.published().filter(in_navigation=True).order_by('parent','lft', 'tree_id').filter(level__gte=from_level, level__lte=to_level))
+            pages = list(Page.objects.published().filter(in_navigation=True).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level))
             all_pages = pages[:]
             for page in pages:# build the tree
                 ids.append(page.pk)
@@ -110,7 +110,7 @@ show_sub_menu = register.inclusion_tag('cms/sub_menu.html',
                                        takes_context=True)(show_sub_menu)
 
                                             
-def show_admin_menu(context, page, level=None):
+def show_admin_menu(context, page, no_children=False, level=None):
     """Render the admin table of pages"""
     request = context['request']
     site = request.site
@@ -118,21 +118,25 @@ def show_admin_menu(context, page, level=None):
     if hasattr(page, "childrens"):
         children = page.childrens
     else:
-        pages = Page.objects.all()
-        ids = []
         children = []
-        all_pages = pages[:]
-        for p in pages:# build the tree
-            ids.append(p.pk)
-            if p.parent_id == page.pk:
-                children.append(p)
-                find_children(p, pages, 1000, 1000, [], -1)
-        
-        titles = Title.objects.filter(pk__in=ids, language=lang)
-        for p in all_pages:# add the title and slugs and some meta data
-            for title in titles:
-                if title.page_id == p.pk:
-                    p.title_cache = title
+        print no_children
+        if not no_children:
+            print "render children"
+            pages = Page.objects.filter(tree_id=page.tree_id).order_by('tree_id', 'parent', 'lft')
+            ids = []
+            
+            all_pages = pages[:]
+            for p in pages:# build the tree
+                ids.append(p.pk)
+                if p.parent_id == page.pk:
+                    children.append(p)
+                    find_children(p, pages, 1000, 1000, [], -1)
+            
+            titles = Title.objects.filter(pk__in=ids, language=lang)
+            for p in all_pages:# add the title and slugs and some meta data
+                for title in titles:
+                    if title.page_id == p.pk:
+                        p.title_cache = title
     has_permission = page.has_page_permission(request)
     # level is used to add a left margin on table row
     if has_permission:

@@ -207,6 +207,7 @@ if settings.CMS_PERMISSION:
         group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
         
         can_create_pages = models.BooleanField(default=True)
+        can_edit_other_author_pages = models.BooleanField(default=True)
         can_delete_pages = models.BooleanField(default=True)
         can_publish = models.BooleanField(default=True)
         can_change_softroot = models.BooleanField(default=False)

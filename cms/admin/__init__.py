@@ -15,6 +15,12 @@ from cms.models import Page, Content, tagging, Title
 from cms.views import details
 from cms.utils import get_template_from_request, has_page_add_permission, \
     get_language_from_request
+from django.core.exceptions import PermissionDenied
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.shortcuts import render_to_response
+
+from cms.admin.change_list import CMSChangeList
+from django.template.context import RequestContext
 
 import widgets
 from cms.admin.forms import PageForm
@@ -57,8 +63,8 @@ class PageAdmin(admin.ModelAdmin):
         }),
     )
     
-    list_filter = ('soft_root', 'status', 'in_navigation')
-    search_fields = ('status',)
+    list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root',)
+    search_fields = ('title_set__slug', 'title_set__title', 'content__body')
     
       
     class Media:
@@ -239,12 +245,50 @@ class PageAdmin(admin.ModelAdmin):
         if settings.CMS_PERMISSION and obj is not None:
             return obj.has_page_permission(request)
         return super(PageAdmin, self).has_change_permission(request, obj)
+    
+    
+    def changelist_view(self, request, extra_context=None):
+        "The 'change list' admin view for this model."
+        from django.contrib.admin.views.main import ERROR_FLAG
+        opts = self.model._meta
+        app_label = opts.app_label
+        if not self.has_change_permission(request, None):
+            raise PermissionDenied
+        try:
+            cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
+        except IncorrectLookupParameters:
+            # Wacky lookup parameters were given, so redirect to the main
+            # changelist page, without parameters, and pass an 'invalid=1'
+            # parameter via the query string. If wacky parameters were given and
+            # the 'invalid=1' parameter was already in the query string, something
+            # is screwed up with the database, so display an error page.
+            if ERROR_FLAG in request.GET.keys():
+                return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
+            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
 
+        context = {
+            'title': cl.title,
+            'is_popup': cl.is_popup,
+            'cl': cl,
+            'has_add_permission': self.has_add_permission(request),
+            'root_path': self.admin_site.root_path,
+            'app_label': app_label,
+        }
+        context.update(extra_context or {})
+        return render_to_response(self.change_list_template or [
+            'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
+            'admin/%s/change_list.html' % app_label,
+            'admin/change_list.html'
+        ], context, context_instance=RequestContext(request))
+    
+    
     def list_pages(self, request, template_name=None, extra_context=None):
         """
         List root pages
         """
         # HACK: overrides the changelist template and later resets it to None
+        
         if template_name:
             self.change_list_template = template_name
         context = {

@@ -8,9 +8,9 @@
         <a href="#" class="move-target right"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a></a> |
         <a href="#" class="move-target first-child">↘</a>
     </span>
-    <a href="#" {% ifequal 0 page.children.all.count %}style="display: none"{% endifequal %} id="c{{ page.id }}" class="collapse">
+    <a href="#" {% ifequal 0 page.children.all.count %}style="display: none"{% endifequal %} id="c{{ page.id }}" class="collapse">{% if not no_children %}
         <span class="collapsed">+</span>
-        <span>-</span>
+        <span>-</span>{% endif %}
     </a>
     <a href="{{ url }}{{ page.id }}/" class="changelink" style="margin-right:1em;">{{ page.get_slug }}</a>
 </td>
@@ -71,5 +71,5 @@
 
 
 {% for child in children %}
-    {% show_admin_menu child level %}
+    {% show_admin_menu child no_children level %}
 {% endfor %}
