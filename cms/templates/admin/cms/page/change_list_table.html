@@ -7,13 +7,14 @@
 <th>{% trans "translations" %}</th>
 <th>{% trans "published" %}</th>
 <th>{% trans "in navigation" %}</th>
+<th>{% trans "softroot" %}</th>
 <th>{% trans "template" %}</th>
 <th>{% trans "creator" %}</th>
 </tr>
 </thead>
 <tbody>
 
-{% for page in pages %}
+{% for page in cl.get_query_set %}
     {% show_admin_menu page %}
 {% endfor %}
 

@@ -54,6 +54,13 @@
 {% endif %}
 </td>
 <td>
+{% if page.soft_root %}
+    <label>
+        <img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+    </label>
+{% endif %}
+</td>
+<td>
 {{ page.get_template }}
 </td>
 <td>

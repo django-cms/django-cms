@@ -25,9 +25,25 @@
 {% block content %}
 <div id="content-main">
 
+{% block object-tools %}
 {% if has_add_permission %}
-<ul class="object-tools"><li><a href="add/" class="addlink">{% trans "Add" %} {{ name }}</a></li></ul>
+<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
 {% endif %}
+{% endblock %}
+<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+{% block search %}{% search_form cl %}{% endblock %}
+{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+
+{% block filters %}
+{% if cl.has_filters %}
+<div id="changelist-filter">
+<h2>{% trans 'Filter' %}</h2>
+{% for spec in cl.filter_specs %}
+   {% admin_list_filter cl spec %}
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
 
 <div class="module" id="changelist">
 

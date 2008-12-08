@@ -43,7 +43,8 @@ class Page(models.Model):
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
     login_required = models.BooleanField(_('login required'), default=False)
-    in_navigation = models.BooleanField(_("in navigatio"), default=True)
+    in_navigation = models.BooleanField(_("in navigation"), default=True)
+    soft_root = models.BooleanField(_("soft root"), default=False, help_text=_("All subpages will not be displayed in the navigation"))
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT)
     template = models.CharField(_("template"), max_length=100, null=True, blank=True)
     sites = models.ManyToManyField(Site, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
@@ -208,6 +209,8 @@ if settings.CMS_PERMISSION:
         can_create_pages = models.BooleanField(default=True)
         can_delete_pages = models.BooleanField(default=True)
         can_publish = models.BooleanField(default=True)
+        can_change_softroot = models.BooleanField(default=False)
+        can_change_innavigation = models.BooleanField(default=True)
         
         type = models.IntegerField(_("type"), choices=TYPES, default=0)
         

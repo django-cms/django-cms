@@ -28,8 +28,9 @@ class PageAdmin(admin.ModelAdmin):
     exclude = ['author', 'parent']
     # these mandatory fields are not versioned
     mandatory_placeholders = ('title', 'slug')
-    general_fields = ['title', 'slug', 'status', 'sites', 'in_navigation']
+    general_fields = ['title', 'slug', 'status', 'sites', 'in_navigation', 'soft_root']
     insert_point = general_fields.index('status') + 1
+    
     
     if settings.CMS_TAGGING:
         general_fields.insert(insert_point, 'tags')
@@ -55,7 +56,11 @@ class PageAdmin(admin.ModelAdmin):
             'description': _('Note: This page reloads if you change the selection'),
         }),
     )
-        
+    
+    list_filter = ('soft_root', 'status', 'in_navigation')
+    search_fields = ('status',)
+    
+      
     class Media:
         css = {
             'all': [join(settings.CMS_MEDIA_URL, path) for path in (

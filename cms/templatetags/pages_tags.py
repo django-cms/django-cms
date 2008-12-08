@@ -50,33 +50,33 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     lang = get_language_from_request(request)
     if 'current_page' in context:
         current_page = get_page_from_request(context)# TODO: change to request
-    if not next_page: #new menu... get all the data so we can save a lot of queries
-        ids = []
-        children = []
-        ancestors = current_page.get_ancestors().values_list('id', flat=True)
-        pages = list(Page.objects.published().filter(in_navigation=True).order_by('parent','lft', 'tree_id').filter(level__gte=from_level, level__lte=to_level))
-        all_pages = pages[:]
-        for page in pages:# build the tree
-            ids.append(page.pk)
-            if page.level == from_level:
-                children.append(page)
-                find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
-        titles = Title.objects.filter(pk__in=ids, language=lang)
-        for page in all_pages:# add the title and slugs and some meta data
-            for title in titles:
-                if title.page_id == page.pk:
-                    page.title_cache = title
-            
-            if page.pk in ancestors:
-                page.ancestor = True
-            if page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
-                page.sibling = True
-            
-    else:
-        if next_page.childrens:
-            children = next_page.childrens
-        else:
+        if not next_page and current_page: #new menu... get all the data so we can save a lot of queries
+            ids = []
             children = []
+            ancestors = current_page.get_ancestors().values_list('id', flat=True)
+            pages = list(Page.objects.published().filter(in_navigation=True).order_by('parent','lft', 'tree_id').filter(level__gte=from_level, level__lte=to_level))
+            all_pages = pages[:]
+            for page in pages:# build the tree
+                ids.append(page.pk)
+                if page.level == from_level:
+                    children.append(page)
+                    find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
+            titles = Title.objects.filter(pk__in=ids, language=lang)
+            for page in all_pages:# add the title and slugs and some meta data
+                for title in titles:
+                    if title.page_id == page.pk:
+                        page.title_cache = title
+                
+                if page.pk in ancestors:
+                    page.ancestor = True
+                if page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
+                    page.sibling = True
+                
+        else:
+            if current_page and next_page.childrens:
+                children = next_page.childrens
+            else:
+                children = []
     return locals()
 show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
 
@@ -118,7 +118,7 @@ def show_admin_menu(context, page, level=None):
     if hasattr(page, "childrens"):
         children = page.childrens
     else:
-        pages = get_page_children_for_site(page, site)
+        pages = Page.objects.all()
         ids = []
         children = []
         all_pages = pages[:]
@@ -148,17 +148,19 @@ def show_breadcrumb(context, start_level=0):
     request = context['request']
     lang = get_language_from_request(request)
     page = get_page_from_request(context)# TODO: change to request
-    ancestors = list(page.get_ancestors())
-    ancestors.append(page)
-    ids = []
-    for anc in ancestors:
-        ids.append(anc.pk)
-    titles = Title.objects.filter(pk__in=ids, language=lang)
-    for anc in ancestors:
-        for title in titles:
-            if title.page_id == anc.pk:
-                anc.title_cache = title
-    print ancestors
+    if page:
+        ancestors = list(page.get_ancestors())
+        ancestors.append(page)
+        ids = []
+        for anc in ancestors:
+            ids.append(anc.pk)
+        titles = Title.objects.filter(pk__in=ids, language=lang)
+        for anc in ancestors:
+            for title in titles:
+                if title.page_id == anc.pk:
+                    anc.title_cache = title
+    else:
+        ancestors = []
     return locals()
 show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
                                          takes_context=True)(show_breadcrumb)

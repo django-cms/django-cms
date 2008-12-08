@@ -142,6 +142,23 @@ $(document).ready(function() {
             });
             return true;
         }
+		
+		if(jtarget.hasClass("navigation-checkbox")) {
+            var p = jtarget.attr("name").split("navigation-")[1];
+            // if I don't put data in the post, django doesn't get it
+            $.post("/admin/cms/page/"+p+"/change-status/", {1:1}, function(val) {
+                var img = $('img', jtarget.parent())[0];
+                if(val=="0") {
+                    jtarget.attr("checked", "");
+                    img.src = img.src.replace("-yes.gif", "-no.gif");
+                } else {
+                    jtarget.attr("checked", "checked");
+                    img.src = img.src.replace("-no.gif", "-yes.gif");
+                }
+                jtarget.attr("value", val);
+            });
+            return true;
+        }
         
         if(jtarget.hasClass("move-target")) {
             if(jtarget.hasClass("left"))
