@@ -83,9 +83,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 ids.append(page.pk)
                 if page.level == from_level:
                     children.append(page)
-                    if page.pk == current_page.pk and page.soft_root and current_page.soft_root:
-                        page.soft_root = False
+                    if page.pk == current_page.pk and current_page.soft_root:
+                        page.soft_root = False #ugly hack for the recursive function
                     find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
+                    if page.pk == current_page.pk and current_page.soft_root:
+                        page.soft_root = True
             titles = Title.objects.filter(pk__in=ids, language=lang)
             for page in all_pages:# add the title and slugs and some meta data
                 for title in titles:

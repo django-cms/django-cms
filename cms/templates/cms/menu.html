@@ -7,7 +7,8 @@
 	{% if child.selected %}selected{% endif %}
 	{% if child.ancestor %}ancestor{% endif %}
 	{% if child.sibling %}sibling{% endif %}
-	{% if child.descendant %}descendant{% endif %}</span>
+	{% if child.descendant %}descendant{% endif %}
+	{% if child.soft_root %}(softroot}{% endif %}</span>
     {% if child.childrens %}
     <ul>
         {% show_menu from_level to_level extra_inactive extra_active child %}
