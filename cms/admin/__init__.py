@@ -63,7 +63,7 @@ class PageAdmin(admin.ModelAdmin):
         }),
     )
     
-    list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root',)
+    list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
     search_fields = ('title_set__slug', 'title_set__title', 'content__body')
     
       

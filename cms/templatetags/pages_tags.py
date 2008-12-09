@@ -10,12 +10,17 @@ register = template.Library()
 
 def get_page_children_for_site(page, site, levels=100):
     if page:
-        pages = Page.objects.published().filter(in_navigation=True, lft__gt=page.lft, rght__lt=page.rght, tree_id=page.tree_id, level__lte=page.level+levels)
+        pages = Page.objects.published().filter(in_navigation=True, 
+                                                lft__gt=page.lft, 
+                                                rght__lt=page.rght, 
+                                                tree_id=page.tree_id, 
+                                                level__lte=page.level+levels, 
+                                                sites__domain=site)
         return pages
     else:
         return []
     
-def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0):
+def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True):
     if not hasattr(target, "childrens"):
         target.childrens = []
     if ancestors == None:
@@ -25,14 +30,15 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
     if target.pk == selected_pk:
         target.selected = True
         levels = active_levels
-    if levels <= 0 and not target.pk in ancestors:
+    if (levels <= 0 or (target.soft_root and soft_roots)) and not target.pk in ancestors:
         return 
+    
     for page in pages:
         if page.parent_id and page.parent_id == target.pk:
             if hasattr(target, "selected") or hasattr(target, "descendant"):
                 page.descendant = True
             target.childrens.append(page)    
-            find_children(page, pages, levels-1, active_levels, ancestors, selected_pk)
+            find_children(page, pages, levels-1, active_levels, ancestors, selected_pk, soft_roots)
             
                 
     
@@ -53,20 +59,38 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         if not next_page and current_page: #new menu... get all the data so we can save a lot of queries
             ids = []
             children = []
-            ancestors = current_page.get_ancestors().values_list('id', flat=True)
-            pages = list(Page.objects.published().filter(in_navigation=True).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level))
+            ancestors = []
+            alist = current_page.get_ancestors().values_list('id', 'soft_root')
+            soft_root_filter = {}
+            #check the ancestors for softroots
+            for p in alist:
+                ancestors.append(p[0])
+                if p[1]:
+                    soft_root = Page.objects.get(pk=p[0])
+                    soft_root_filter['lft__gte'] = soft_root.lft
+                    soft_root_filter['rght__lte'] = soft_root.rght
+                    soft_root_filter['tree_id'] = soft_root.tree_id
+                    from_level = soft_root.level
+            if current_page.soft_root:
+                soft_root_filter['tree_id'] = current_page.tree_id
+                soft_root_filter['lft__gte'] = current_page.lft
+                soft_root_filter['rght__lte'] = current_page.rght
+                #current_page.soft_root = False
+                from_level = current_page.level
+            pages = list(Page.objects.published().filter(in_navigation=True, sites__domain=site).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter))
             all_pages = pages[:]
             for page in pages:# build the tree
                 ids.append(page.pk)
                 if page.level == from_level:
                     children.append(page)
+                    if page.pk == current_page.pk and page.soft_root and current_page.soft_root:
+                        page.soft_root = False
                     find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
             titles = Title.objects.filter(pk__in=ids, language=lang)
             for page in all_pages:# add the title and slugs and some meta data
                 for title in titles:
                     if title.page_id == page.pk:
                         page.title_cache = title
-                
                 if page.pk in ancestors:
                     page.ancestor = True
                 if page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
@@ -130,7 +154,7 @@ def show_admin_menu(context, page, no_children=False, level=None):
                 ids.append(p.pk)
                 if p.parent_id == page.pk:
                     children.append(p)
-                    find_children(p, pages, 1000, 1000, [], -1)
+                    find_children(p, pages, 1000, 1000, [], -1, soft_roots=False)
             
             titles = Title.objects.filter(pk__in=ids, language=lang)
             for p in all_pages:# add the title and slugs and some meta data
