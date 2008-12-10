@@ -32,7 +32,6 @@ from cms.admin.views import traduction, get_content, valid_targets_list, \
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'parent']
-    # these mandatory fields are not versioned
     mandatory_placeholders = ('title', 'slug')
     general_fields = ['title', 'slug', 'status', 'sites', 'in_navigation', 'soft_root']
     insert_point = general_fields.index('status') + 1
@@ -153,12 +152,15 @@ class PageAdmin(admin.ModelAdmin):
             print placeholder
             if placeholder.name not in self.mandatory_placeholders:
                 placeholder_fieldsets.append(placeholder.name)
-
-        if self.declared_fieldsets:
-            given_fieldsets = list(self.declared_fieldsets)
-        else:
-            form = self.get_form(request, obj)
-            given_fieldsets = [(_('content'), {'fields': form.base_fields.keys()})]
+       
+        given_fieldsets = list(self.declared_fieldsets)
+        given_fieldsets[0][1]['fields'] = given_fieldsets[0][1]['fields'][:]
+        
+        if obj:
+            if not obj.has_publish_permission(request):
+                given_fieldsets[0][1]['fields'].remove('status')
+            if not obj.has_softroot_permission(request):
+                given_fieldsets[0][1]['fields'].remove('soft_root')
         return given_fieldsets + [(_('content'), {'fields': placeholder_fieldsets})]
 
     def save_form(self, request, form, change):
@@ -187,6 +189,11 @@ class PageAdmin(admin.ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
+        if obj:
+            if not obj.has_publish_permission(request):
+                self.exclude.append('status')
+            if not obj.has_softroot_permission(request):
+                self.exclude.append('soft_root')
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
@@ -195,6 +202,7 @@ class PageAdmin(admin.ModelAdmin):
             initial_title = obj.get_title(language=language, fallback=False)
             form.base_fields['slug'].initial = initial_slug
             form.base_fields['title'].initial = initial_title
+            
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)

@@ -127,7 +127,7 @@
 
 <script type="text/javascript">
     // quick and dirty edit in place example
-    {% if user.is_authenticated and has_page_permissions %}
+    {% if has_page_permissions %}
         $('.placeholder').addClass('placeholder-editable');
     {% endif %}
     $('.placeholder-editable').mouseover(function() {
