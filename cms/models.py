@@ -57,9 +57,14 @@ class Page(models.Model):
     class Meta:
         verbose_name = _('page')
         verbose_name_plural = _('pages')
+        ordering = ('tree_id', 'lft')
         
     def __unicode__(self):
-        return self.get_slug()
+        title = u""
+        for t in range(self.level):
+            title += "+ "
+        title += self.get_slug()
+        return title
 
     def save(self):
         if not self.status:
@@ -168,19 +173,40 @@ class Page(models.Model):
         return langs[0:-2]
 
     def has_page_permission(self, request):
+        return self.has_generic_permission(request, "edit")
+
+    def has_publish_permission(self, request):
+        return self.has_generic_permission(request, "publish")
+    
+    def has_softroot_permission(self, request):
+        return self.has_generic_permission(request, "softroot")
+    
+    def has_generic_permission(self, request, type):
         """
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
+        if not request.user.is_authenticated() or not request.user.is_staff:
+            return False
         if not settings.CMS_PERMISSION:
             return True
         else:
-            permission = PagePermission.objects.get_page_id_list(request.user)
-            if permission == "All":
-                return True
-            if self.id in permission:
-                return True
-            return False
+            att_name = "permission_%s_cache" % type
+            if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) or request.user.pk != self.permission_user_cache.pk:
+                func = getattr(PagePermission.objects, "get_%s_id_list" % type)
+                permission = func(request.user)
+                self.permission_user_cache = request.user
+                if permission == "All" or self.id in permission:
+                    setattr(self, att_name, True)
+                    self.permission_edit_cache = True
+                else:
+                    setattr(self, att_name, False)
+            return getattr(self, att_name)
+        
+    
+        
+        
+    
 
     
 
@@ -195,25 +221,27 @@ if settings.CMS_PERMISSION:
         """
         Page permission object
         """
+        
+        ALLPAGES = 0
+        THISPAGE = 1
+        PAGECHILDREN = 2
+        
         TYPES = (
-            (0, _('All')),
-            (1, _('This page only')),
-            (2, _('This page and all childrens')),
+            (ALLPAGES, _('All pages')),
+            (THISPAGE, _('This page only')),
+            (PAGECHILDREN, _('This page and all childrens')),
         )
         
+        type = models.IntegerField(_("type"), choices=TYPES, default=0)
         page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
-        
         user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
         group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
+        everybody = models.BooleanField(_("everybody"), default=False)
+        can_edit = models.BooleanField(_("can edit"), default=True)
+        can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
+        can_publish = models.BooleanField(_("can publish"), default=True)
+        #can_change_innavigation = models.BooleanField(_("can change in-navigation"), default=True)
         
-        can_create_pages = models.BooleanField(default=True)
-        can_edit_other_author_pages = models.BooleanField(default=True)
-        can_delete_pages = models.BooleanField(default=True)
-        can_publish = models.BooleanField(default=True)
-        can_change_softroot = models.BooleanField(default=False)
-        can_change_innavigation = models.BooleanField(default=True)
-        
-        type = models.IntegerField(_("type"), choices=TYPES, default=0)
         
         objects = PagePermissionManager()
         
@@ -241,8 +269,8 @@ class Title(models.Model):
 
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"))
-    position = models.PositiveSmallIntegerField(default=0)
-    slot = models.CharField(max_length=50, default=0)
+    position = models.PositiveSmallIntegerField(_("position"), default=0)
+    slot = models.CharField(_("slot"), max_length=50, default=0, db_index=True)
     language = models.CharField(_("language"), max_length=3, blank=False, db_index=True)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     class Meta:

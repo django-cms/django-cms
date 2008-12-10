@@ -32,6 +32,10 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
             current_page = pages[0]
         template_name = get_template_from_request(request, current_page)
     else:
-        current_page = None
+        raise Http404, "no page found for this site"
+        #current_page = None
+        
+        
+    has_page_permissions = current_page.has_page_permission(request)
     return template_name, locals()
 details = auto_render(details)

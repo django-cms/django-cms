@@ -13,7 +13,7 @@
 </tr>
 </thead>
 <tbody>
-{% for page in cl.get_query_set %}
+{% for page in cl.query_set %}
     {% show_admin_menu page cl.is_filtered %}
 {% endfor %}
 </tbody>

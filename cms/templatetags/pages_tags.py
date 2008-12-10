@@ -3,7 +3,7 @@ from django.core.cache import cache
 from django.utils.safestring import SafeUnicode
 
 from cms import settings
-from cms.models import Content, Page, Title
+from cms.models import Content, Page, Title, PagePermission
 from cms.utils import get_language_from_request, get_page_from_request
 
 register = template.Library()
@@ -145,31 +145,53 @@ def show_admin_menu(context, page, no_children=False, level=None):
         children = page.childrens
     else:
         children = []
-        print no_children
         if not no_children:
-            print "render children"
-            pages = Page.objects.filter(tree_id=page.tree_id).order_by('tree_id', 'parent', 'lft')
+            pages = Page.objects.filter(tree_id=page.tree_id, level__gt=page.level).order_by('tree_id', 'parent', 'lft')
+            if settings.CMS_PERMISSION:
+                perm_edit_ids = PagePermission.objects.get_edit_id_list(request.user)
+                perm_publish_ids = PagePermission.objects.get_publish_id_list(request.user)
+                perm_softroot_ids = PagePermission.objects.get_softroot_id_list(request.user)
+                if perm_edit_ids and perm_edit_ids != "All":
+                    pages = pages.filter(pk__in=perm_edit_ids)
+                
             ids = []
-            
             all_pages = pages[:]
+            has_childrens = False
             for p in pages:# build the tree
                 ids.append(p.pk)
+                if settings.CMS_PERMISSION:# caching the permissions
+                    if perm_edit_ids == "All" or p.pk in perm_edit_ids:
+                        p.permission_edit_cache = True
+                    else:
+                        p.permission_edit_cache = False
+                    if perm_publish_ids == "All" or p.pk in perm_publish_ids:
+                        p.permission_publish_cache = True
+                    else:
+                        p.permission_publish_cache = False
+                    if perm_publish_ids == "All" or p.pk in perm_softroot_ids:
+                        p.permission_softroot_cache = True
+                    else:
+                        p.permission_softroot_cache = False
+                    p.permission_user_cache = request.user
                 if p.parent_id == page.pk:
+                    has_childrens = True
                     children.append(p)
                     find_children(p, pages, 1000, 1000, [], -1, soft_roots=False)
-            
+            if not has_childrens:
+                page.childrens = []
             titles = Title.objects.filter(pk__in=ids, language=lang)
             for p in all_pages:# add the title and slugs and some meta data
                 for title in titles:
                     if title.page_id == p.pk:
                         p.title_cache = title
     has_permission = page.has_page_permission(request)
+    has_publish_permission = page.has_publish_permission(request)
+    
     # level is used to add a left margin on table row
-    if has_permission:
-        if level is None:
-            level = 0
-        else:
-            level = level+3
+    if level is None:
+        level = 0
+    else:
+        level = level+2
     return locals()
 show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)
@@ -313,9 +335,9 @@ class PlaceholderNode(template.Node):
         l = get_language_from_request(context['request'])
         request = context['request']
         if self.name.lower() == "title":
-            c = Title.objects.get_title(self.page, l).title
+            c = Title.objects.get_title(self.page, l, True).title
         elif self.name.lower() == "slug":
-            c = Title.objects.get_title(self.page, l).slug
+            c = Title.objects.get_title(self.page, l, True).slug
         else:
             c = Content.objects.get_content(self.page, l, self.name, True)
         if not c:

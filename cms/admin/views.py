@@ -14,13 +14,13 @@ def change_status(request, page_id):
     """
     if request.method == 'POST':
         page = Page.objects.get(pk=page_id)
-        if page.status == Page.DRAFT:
-            page.status = Page.PUBLISHED
-            page.save()
-        elif page.status == Page.PUBLISHED:
-            page.status = Page.DRAFT
-            page.save()
-        return HttpResponse(unicode(page.status))
+        if page.has_publish_permission(request):
+            if page.status == Page.DRAFT:
+                page.status = Page.PUBLISHED
+            elif page.status == Page.PUBLISHED:
+                page.status = Page.DRAFT
+            page.save()    
+            return HttpResponse(unicode(page.status))
     raise Http404
 change_status = staff_member_required(change_status)
 
@@ -31,14 +31,15 @@ def change_innavigation(request, page_id):
     """
     if request.method == 'POST':
         page = Page.objects.get(pk=page_id)
-        if page.in_navigation:
-            page.in_navigation = False
-            val = 0
-        else:
-            page.in_navigation = True
-            val = 1
-        page.save()
-        return HttpResponse(unicode(val))
+        if page.has_page_permission(request):
+            if page.in_navigation:
+                page.in_navigation = False
+                val = 0
+            else:
+                page.in_navigation = True
+                val = 1
+            page.save()
+            return HttpResponse(unicode(val))
     raise Http404
 change_status = staff_member_required(change_status)
 
@@ -48,6 +49,8 @@ def modify_content(request, page_id, content_id, language_id):
         if not content:
             raise Http404
         page = Page.objects.get(pk=page_id)
+        if not page.has_page_permission(request):
+            raise Http404
         #if settings.CMS_CONTENT_REVISION: #TODO: implement with revisions
         #    Content.objects.create_content_if_changed(page, language_id,
         #                                              content_id, content)
@@ -87,7 +90,7 @@ def valid_targets_list(request, page_id):
         perms = "All"
     else:
         from cms.models import PagePermission
-        perms = PagePermission.objects.get_page_id_list(request.user)
+        perms = PagePermission.objects.get_edit_id_list(request.user)
     query = Page.objects.valid_targets(page_id, request, perms)
     return HttpResponse(",".join([str(p.id) for p in query]))
 valid_targets_list = staff_member_required(valid_targets_list)

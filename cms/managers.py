@@ -5,6 +5,7 @@ from datetime import datetime
 
 from cms import settings
 
+
 class PageManager(models.Manager):
     def on_site(self, site=None):
         if hasattr(site, 'domain'):
@@ -179,21 +180,66 @@ class ContentManager(models.Manager):
 
 class PagePermissionManager(models.Manager):
     
-    def get_page_id_list(self, user):
+    def get_publish_id_list(self, user):
         """
-        Give a list of page where the user has rights or the string "All" if
+        Give a list of page where the user has publish rights or the string "All" if
         the user has all rights.
         """
+        return self.__get_id_list(user, "can_publish")
+    
+    def get_edit_id_list(self, user):
+        """
+        Give a list of page where the user has edit rights or the string "All" if
+        the user has all rights.
+        """
+        return self.__get_id_list(user, "can_edit")
+    
+    def get_softroot_id_list(self, user):
+        """
+        Give a list of page where the user can change the softroot or the string "All" if
+        the user has all rights.
+        """
+        return self.__get_id_list(user, "can_change_softroot")
+    
+    def __get_id_list(self, user, attr):
         if user.is_superuser:
             return 'All'
-        id_list = []
-        for perm in self.filter(user=user):
-            if perm.type == 0:
-                return "All"
-            if perm.page.id not in id_list:
-                id_list.append(perm.page.id)
-            if perm.type == 2:
-                for page in perm.page.get_descendants():
-                    if page.id not in id_list:
-                        id_list.append(page.id)
-        return id_list
+        allow_list = []
+        deny_list = []
+        group_ids = user.groups.all().values_list('id', flat=True)
+        q = Q(user=user)|Q(group__in=group_ids)|Q(everybody=True)
+        perms = self.filter(q).order_by('page__tree_id', 'page__level', 'page__lft')
+        from cms.models import PagePermission, Page
+        for perm in perms:
+            if perm.type == PagePermission.ALLPAGES:
+                if getattr(perm, attr):
+                    allow_list = list(Page.objects.all().values_list('id', flat=True))
+                else:
+                    return []
+            if getattr(perm, attr):
+                if perm.page.id not in allow_list:
+                    allow_list.append(perm.page.id)
+                if perm.page.id in deny_list:
+                    deny_list.remove(perm.page.id)
+            else:
+                if perm.page.id not in deny_list:
+                    deny_list.append(perm.page.id)
+                if perm.page.id in allow_list:
+                    allow_list.remove(perm.page.id)
+            if perm.type == PagePermission.PAGECHILDREN:
+                for id in perm.page.get_descendants().values_list('id', flat=True):
+                    if getattr(perm, attr):
+                        if id not in allow_list:
+                            allow_list.append(id)
+                        if id in deny_list:
+                            deny_list.remove(id)
+                    else:
+                        if id not in deny_list:
+                            deny_list.append(id)
+                        if id in allow_list:
+                            allow_list.remove(id)
+        #allow_list = list(allow_list)
+        #for id in deny_list:
+        #    if id in allow_list:
+        #        allow_list.remove(id)
+        return allow_list

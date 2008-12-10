@@ -1,6 +1,6 @@
 {% load pages_tags i18n adminmedia %}
 
-{% if has_permission %}
+{#%# if has_permission %#}
 <tr id="page-row-{{ page.id }}" class="child-of-{{ page.parent.id }}">
 <td {% if level %}style="padding-left:{{level}}em"{% endif %}>
     <span id="move-target-{{ page.id }}" class="move-target-container" style="display:none;float:right">
@@ -31,12 +31,16 @@
 {% if page.status %}
     <label>
         <img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+		{% if has_publish_permission %}
         <input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" />
+		{% endif %}
     </label>
 {% else %}
     <label>
         <img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+		{% if has_publish_permission %}
         <input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" />
+		{% endif %}
     </label>
 {% endif %}
 </td>
@@ -67,7 +71,7 @@
 {% firstof page.author.get_full_name page.author.first_name page.author.username %}
 </td>
 </tr>
-{% endif %}
+{#% endif %#}
 
 
 {% for child in children %}

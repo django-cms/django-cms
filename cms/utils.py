@@ -78,7 +78,7 @@ def has_page_add_permission(request, page=None):
         return True
     else:
         from cms.models import PagePermission
-        permission = PagePermission.objects.get_page_id_list(request.user)
+        permission = PagePermission.objects.get_edit_id_list(request.user)
         if permission == "All":
             return True
     return False

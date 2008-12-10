@@ -82,7 +82,9 @@ class PageAdmin(admin.ModelAdmin):
         )]
 
     def __call__(self, request, url):
-        # Delegate to the appropriate method, based on the URL.
+        """
+        Delegate to the appropriate method, based on the URL.
+        """
         if url is None:
             return self.list_pages(request)
         elif 'traduction' in url:
@@ -268,11 +270,11 @@ class PageAdmin(admin.ModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
             'cl': cl,
+            'opts':opts,
             'has_add_permission': self.has_add_permission(request),
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
@@ -329,9 +331,30 @@ class ContentAdmin(admin.ModelAdmin):
     list_filter = ('page',)
     search_fields = ('body',)
 
-admin.site.register(Content, ContentAdmin)
-admin.site.register(Title)
+#admin.site.register(Content, ContentAdmin)
+#admin.site.register(Title)
 
 if settings.CMS_PERMISSION:
     from cms.models import PagePermission
-    admin.site.register(PagePermission)
+    
+    class PermissionAdmin(admin.ModelAdmin):
+        list_display = ('user',
+                        'group',
+                        'everybody',
+                        'page', 
+                        'type', 
+                        'can_edit',
+                        'can_publish',
+                        'can_change_softroot'
+                        #'can_change_innavigation',
+                        )
+        list_filter = ('group', 
+                       'user', 
+                       'everybody', 
+                       'type', 
+                       'can_edit',
+                       'can_publish',
+                       'can_change_softroot',
+                       )
+        search_fields = ('user__username', 'user__firstname', 'user__lastname', 'group__name')
+    admin.site.register(PagePermission, PermissionAdmin)

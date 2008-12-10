@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
 <title>{% show_content "title" %}</title>
-<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js" /></script>
+<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script>
 <style>
     .placeholder-editable {
         border:1px #bbb solid;
@@ -127,7 +127,7 @@
 
 <script type="text/javascript">
     // quick and dirty edit in place example
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and has_page_permissions %}
         $('.placeholder').addClass('placeholder-editable');
     {% endif %}
     $('.placeholder-editable').mouseover(function() {
