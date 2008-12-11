@@ -178,6 +178,9 @@ def show_admin_menu(context, page, no_children=False, level=None):
                     p.permission_user_cache = request.user
                 if p.parent_id == page.pk:
                     has_childrens = True
+                    p.last = True
+                    if len(children):
+                        children[-1].last = False
                     children.append(p)
                     find_children(p, pages, 1000, 1000, [], -1, soft_roots=False)
             if not has_childrens:
