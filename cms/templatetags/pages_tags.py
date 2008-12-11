@@ -37,6 +37,9 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
         if page.parent_id and page.parent_id == target.pk:
             if hasattr(target, "selected") or hasattr(target, "descendant"):
                 page.descendant = True
+            page.last = True
+            if len(target.childrens):
+                target.childrens[-1].last = False
             target.childrens.append(page)    
             find_children(page, pages, levels-1, active_levels, ancestors, selected_pk, soft_roots)
             
