@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     #'tagging',
     'cms',
     'cms.plugins.text',
+    'cms.plugins.picture',
     'mptt',
     'debug_toolbar',
     'django_evolution',

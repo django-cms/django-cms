@@ -4,6 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 
 
-class Text(CMSPlugin):
+class Picture(CMSPlugin):
     """A block of content, tied to a page, for a particular language"""
-    body = models.TextField(_("body"))
+    image = models.ImageField(_("image"), upload_to="pictures")

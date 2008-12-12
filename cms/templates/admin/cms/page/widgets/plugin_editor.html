@@ -1,16 +1,12 @@
 {% load i18n %}
-<ul class="plugin-list">
-	{% for plugin in plugin_list %}
-	<li>{{ plugin.name }}</li>
-	{% endfor %}
+<ul class="plugin-list">{% for plugin in plugin_list %}
+	<li class="{{ plugin.value }}">{{ plugin.name }}</li>{% endfor %}
 </ul>
 <select name="plugins">
-	<option value="">{% trans "Available Plugins" %}</option>
-	{% for plugin in installed_plugins %}
-	<option value="{{ plugin }}">{{ plugin.name }}</option>
-	{% endfor %}
+	<option value="" selected="selected">{% trans "Available Plugins" %}</option>{% for p in installed_plugins %}
+	<option value="{{ p.value }}">{{ p.name }}</option>{% endfor %}
 </select>
-<a href="#">{% trans "Add Plugin" %}</a>
+<span class="add-plugin">{% trans "Add Plugin" %}</span>
 <div class="plugin-editor">
 	{% if plugin_list %}
 		{% blocktrans %}No Plugin selected. Selected one on the left side{% endblocktrans %}

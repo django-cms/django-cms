@@ -38,10 +38,11 @@ class PageAdmin(admin.ModelAdmin):
     
     
     top_fields = ['language']
-    general_fields = ['title', 'slug', 'status']
+    general_fields = [('title', 'slug'), 'status']
     advanced_fields = ['sites', 'in_navigation', 'soft_root']
     template_fields = ['template']
-    
+    #prepopulated_fields = {"slug": ("title",)}
+
     if settings.CMS_REVISIONS:
         top_fields = ['revisions']
         
@@ -158,22 +159,19 @@ class PageAdmin(admin.ModelAdmin):
         Add fieldsets of placeholders to the list of already existing
         fieldsets.
         """
-        placeholder_fieldsets = []
         template = get_template_from_request(request, obj)
-        for placeholder in get_placeholders(request, template):
-            print placeholder
-            if placeholder.name not in self.mandatory_placeholders:
-                placeholder_fieldsets.append(placeholder.name)
-       
         given_fieldsets = list(self.declared_fieldsets)
         given_fieldsets[0][1]['fields'] = given_fieldsets[0][1]['fields'][:] #make a copy so we can manipulate it
-        
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[0][1]['fields'].remove('status')
             if not obj.has_softroot_permission(request):
                 given_fieldsets[0][1]['fields'].remove('soft_root')
-        return given_fieldsets + [(_('content'), {'fields': placeholder_fieldsets})]
+        for placeholder in get_placeholders(request, template):
+            print placeholder
+            if placeholder.name not in self.mandatory_placeholders:
+                given_fieldsets += [(placeholder.name, {'fields':[placeholder.name]})]        
+        return given_fieldsets
 
     def save_form(self, request, form, change):
         """
@@ -351,8 +349,11 @@ class ContentAdmin(admin.ModelAdmin):
     list_filter = ('page',)
     search_fields = ('body',)
 
+class TitleAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("title",)}
+
 #admin.site.register(Content, ContentAdmin)
-#admin.site.register(Title)
+admin.site.register(Title, TitleAdmin)
 
 if settings.CMS_PERMISSION:
     from cms.models import PagePermission

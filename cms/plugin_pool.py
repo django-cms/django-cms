@@ -20,6 +20,7 @@ class PluginPool(object):
         if plugin.__name__ in self.plugins.keys():
             raise PluginAllreadyRegistered, "[%s] a plugin with this name is already registered" % plugin.__name__
         print plugin.__name__
+        plugin.value = plugin.__name__
         self.plugins[plugin.__name__] = plugin 
     
     def get_all_plugins(self):

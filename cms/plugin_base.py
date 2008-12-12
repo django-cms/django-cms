@@ -17,8 +17,8 @@ class CMSPluginBase(object):
                     class Meta:
                         model = self.model
                 self.form = DefaultModelForm
-        
-        
+
+      
     def render(self, request, context):
         raise NotImplementedError, "render needs to be implemented"
     

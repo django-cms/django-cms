@@ -1,17 +1,16 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_modify adminmedia pages_tags %}
-{% block title %}{% trans "Change a page" %}{% endblock %}
+{% block title %}hello{% trans "Change a page" %}{% endblock %}
 
-{% block extrahead %}{{ block.super }}
+{% block extrahead %}
 <script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
+{{ block.super }}
+
 {% endblock %}
 
-{% block content_title %}<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>{% endblock %}
+{% block content_title %}<h1>hello{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>{% endblock %}
 
-{% block content %}
-<!-- Content -->
-<div id="content-main">
-
+{% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
@@ -20,47 +19,38 @@
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
-
-<form action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">
-{% for fieldset in adminform %}
-  {% include "admin/pages/page/includes/fieldset.html" %}
-{% endfor %}
-<br class="clear" />
-{% if not add %}
-<div><fieldset class="module aligned ">
-  <h2>{% trans "Translation helper" %}</h2>
-  <div class="form-row">
-      <label for="traduction-helper-select" class="required">{% trans "Language:" %}</label>
-      <select id="traduction-helper-select">
-      <option value="" selected="selected">------</option>
-      {% for lang in traduction_language %}
-      <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-      {% endfor %}
-      </select>
-      <div id="traduction-helper-content"></div>
-  </div>
-</fieldset>
-</div>
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+{% if save_on_top %}{% submit_row %}{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    </p>
+    <ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
 {% endif %}
 
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
 
-<div class="submit-row" style="overflow:hidden">
-<input type="submit" value="{% trans "Save" %}" class="default" />
-<p class="deletelink-box"><a href="delete/" class="deletelink">{% trans "Delete" %}</a></p>
-<input type="submit" value="{% trans "Save and continue editing" %}" name="_continue" />
+{% block after_field_sets %}{% endblock %}
+
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+
+{% block after_related_objects %}{% endblock %}
+
+{% submit_row %}
+
+{% if add %}
+   <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
+{% endif %}
+
+{# JavaScript for prepopulated fields #}
+{% prepopulated_fields_js %}
+
 </div>
-<script type="text/javascript">
-    if(window.$) {
-        $(document).ready(function() {
-            if($.fn.rte)
-                $('.rte').rte('{{ PAGES_MEDIA_URL }}/css/rte.css', '{{ PAGES_MEDIA_URL }}/images/');
-        });
-    }
-</script>
-
-</div>
-</form>
-
-<br class="clear" />
-<!-- END Content -->
+</form></div>
 {% endblock %}

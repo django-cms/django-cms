@@ -27,38 +27,12 @@ $(document).ready(function() {
             e.value = URLify(this.value, 64);
         }
     });
-    $('#traduction-helper-select').change(function() {
-        var index = this.selectedIndex;
-        if(index == 0) {
-            $('#traduction-helper-content').hide(); return;
-        }
-        var array = window.location.href.split('?');
-        $.get(array[0]+'traduction/'+this.options[index].value+'/', function(html) {
-            $('#traduction-helper-content').html(html);
-            $('#traduction-helper-content').show();
-        });
-    });
-    $('.revisions-list a').click( function() {
-        var link = this;
-        $.get(this.href, function(html) {
-            $('a', $(link).parent().parent()).removeClass('selected');
-            $(link).addClass('selected');
-            var form_row = $(link).parents('.form-row')[0];
-            if($('a.disable', form_row).length) {
-                $('iframe', form_row)[0].contentWindow.document.getElementsByTagName("body")[0].innerHTML = html;
-            } else {
-                var formrow_textarea = $('textarea', form_row);
-                formrow_textarea.attr('value', html);
-                // support for WYMeditor
-                if (WYMeditor) {
-                    $(WYMeditor.INSTANCES).each(function(i, wym) {
-                        if (formrow_textarea.attr('id') === wym._element.attr('id')) {
-                            wym.html(html);
-                        }
-                    });
-                }
-            }
-        });
-        return false;
-    });
+    $('span.add-plugin').click(function(){
+		var select = $(this).parent().children("select")
+		var pluginvalue = select.attr('value')
+		if (pluginvalue) {
+			var pluginname = select.children('[@selected]').text()
+			$(this).parent().children("ul.plugin-list").append("<li class=" + pluginvalue + ">" + pluginname + "</li>")
+		}
+	});
 });
