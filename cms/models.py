@@ -182,6 +182,8 @@ class Page(models.Model):
         """
         if not request.user.is_authenticated() or not request.user.is_staff:
             return False
+        if request.user.is_superuser:
+            return True
         if not settings.CMS_PERMISSION:
             return True
         else:

@@ -13,7 +13,7 @@ def get_placeholders(request, template_name):
         temp = loader.get_template(template_name)
     except TemplateDoesNotExist:
         return []
-    context = details(request, only_context=True)
+    context = details(request, no404=True, only_context=True)
     
     temp.render(RequestContext(request, context))
     list = []
