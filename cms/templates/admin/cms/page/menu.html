@@ -3,6 +3,7 @@
 <div class="info">
 <a href="#" {% ifequal 0 page.children.all.count %}style="display: none"{% endifequal %} id="c{{ page.id }}" class="collapse">{% if not no_children %}<span class="collapsed">+</span><span>-</span>{% endif %}</a>
 <a href="{{ url }}{{ page.id }}/" class="titel">{{ page.get_slug }}</a>
+<a href="{{ url }}{{ page.id }}/" class="changelink">edit</a>
 </div>		
 <span id="move-target-{{ page.id }}" class="move-target-container" style="display:none;float:right">
 <a href="#" class="move-target left"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
@@ -60,7 +61,7 @@
 </label>
 {% endif %}				
 </div>
-<div class="col-template">{{ page.get_template }}</div>
+<div class="col-template">{{ page.get_template_name }}</div>
 <div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div></div></div>{% comment %}
 <tr id="page-row-{{ page.id }}" class="child-of-{{ page.parent.id }}">
 <td {% if level %}style="padding-left:{{level}}em"{% endif %}>

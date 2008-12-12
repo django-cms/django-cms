@@ -111,6 +111,7 @@ DEFAULT_CMS_TEMPLATE = 'index.html'
 CMS_TEMPLATES = (
     ('nice.html', 'nice one'),
     ('cool.html', 'cool one'),
+    ('long-folder-long/long-template-name.html', 'long')
 )
 
 try:

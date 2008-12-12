@@ -160,6 +160,26 @@ class Page(models.Model):
                 return p.template
         return settings.DEFAULT_CMS_TEMPLATE
 
+    def get_template_name(self):
+        """
+        get the template of this page if defined or if closer parent if
+        defined or DEFAULT_PAGE_TEMPLATE otherwise
+        """
+        template = None
+        if self.template:
+            template = self.template
+        if not template:
+            for p in self.get_ancestors(ascending=True):
+                if p.template:
+                    template =  p.template
+                    break
+        if not template:
+            template = settings.DEFAULT_CMS_TEMPLATE
+        for t in settings.CMS_TEMPLATES:
+            if t[0] == template:
+                return t[1] 
+        return _("default")
+
     def traductions(self):
         langs = ""
         for lang in self.get_languages():

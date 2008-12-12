@@ -138,7 +138,7 @@ div#sitemap {
 	padding:0px;
 }
 div#sitemap a{text-decoration:none; border:none; outline:none;}
-/*div#sitemap a:hover{text-decoration:underline;}*/
+div#sitemap a:hover{text-decoration:underline;}
 div#sitemap li, div#sitemap ul{
 	padding: 0px 0px 0px 12px;
 	margin: 0px;
@@ -178,7 +178,7 @@ div#sitemap li.last, div#sitemap li:last-child {
 }
 
 #sitemap li .col1 .info{
-	background:url(../images/sitemap-li-drag.gif) no-repeat;
+	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
 	display:block;
 	height:28px;
 	line-height:27px;
@@ -204,6 +204,10 @@ div#sitemap li.last, div#sitemap li:last-child {
 #sitemap li .col1 .info a.titel{
 	padding-left:5px;
 }
+#sitemap li .col1 .info a.changelink{
+	margin-left:10px;
+	display:none;	
+}
 #sitemap li .col-language,
 #sitemap li .col-actions,	
 #sitemap li .col-published,
@@ -214,17 +218,19 @@ div#sitemap li.last, div#sitemap li:last-child {
 	border-left:1px solid #DEDEDC;
 	text-align:center;
 	height:28px;
-	width:100px;	
+	/*width:100px;	*/
+	width:auto;
 	line-height:28px;
 	float:left;
 	display:block;
 	background-color:#fff;
+	padding-left:3px;
+	padding-right:3px;
+	white-space:nowrap;
 	filter: alpha(opacity=70);
 	-moz-opacity: 0.70;
 	opacity: 0.70;
 }
-
-
 
 #sitemap li .col-language{
 	background:none;
@@ -233,12 +239,10 @@ div#sitemap li.last, div#sitemap li:last-child {
 	text-align:right;
 	padding-right:5px;
 }
-#sitemap li .col-language a{
-	text-transform:uppercase;
-}
-
+#sitemap li .col-language a{text-transform:uppercase;}
+#sitemap li .col-language a:hover{text-decoration:underline;}
 #sitemap li .col-actions{
-	width:105px;
+	/*width:105px;*/
 }
 
 #sitemap li .col-published{
@@ -286,6 +290,9 @@ div#sitemap li.last, div#sitemap li:last-child {
 #sitemap li .cont:hover a,
 #sitemap li .cont:hover .col-language,
 #sitemap li .cont:hover .col-language a{color:#fff;}
+
+#sitemap li .cont:hover .col1 .info{ background-position:0px -40px;}
+#sitemap li .cont:hover .col1 .info a.changelink{display:inline;}
 
 #sitemap li .cont:active {background-position:0px -600px; }
 #sitemap li .cont:active a,

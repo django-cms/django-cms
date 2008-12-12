@@ -206,4 +206,22 @@ $(document).ready(function() {
         
         return true;
     });
+	
+	$.fn.syncWidth = function(max) {
+		$(this).each(function() {
+			var val= $(this).width();
+			if(val > max){max = val;}	
+		});
+ 		$(this).each(function() {
+  			$(this).css("width",max+'px');
+		});
+		return this;
+	};	
+	
+	$('#sitemap .col-actions').syncWidth(80);
+	$('#sitemap .col-published').syncWidth(0);
+	$('#sitemap .col-navigation').syncWidth(0);
+	$('#sitemap .col-softroot').syncWidth(0);
+	$('#sitemap .col-template').syncWidth(0);
+	$('#sitemap .col-creator').syncWidth(0);	
 });
