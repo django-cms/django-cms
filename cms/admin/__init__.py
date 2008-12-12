@@ -136,22 +136,22 @@ class PageAdmin(admin.ModelAdmin):
             else:
                 obj.move_to(target, position)
         Title.objects.set_or_create(obj, language, form.cleaned_data['slug'], form.cleaned_data['title'])
-        for placeholder in get_placeholders(request, obj.get_template()):
-            if placeholder.name in form.cleaned_data:
-                if placeholder.name not in self.mandatory_placeholders:
-                    if change:                        
-                            # we need create a new content if revision is enabled
-                            #TODO: implement django-revision
-                            if False and settings.CMS_CONTENT_REVISION and placeholder.name \
-                                    not in settings.CMS_CONTENT_REVISION_EXCLUDE_LIST:
-                                Content.objects.create_content_if_changed(obj, language,
-                                    placeholder.name, form.cleaned_data[placeholder.name])
-                            else:
-                                Content.objects.set_or_create_content(obj, language,
-                                    placeholder.name, form.cleaned_data[placeholder.name])
-                    else:
-                        Content.objects.set_or_create_content(obj, language,
-                            placeholder.name, form.cleaned_data[placeholder.name])
+#        for placeholder in get_placeholders(request, obj.get_template()):
+#            if placeholder.name in form.cleaned_data:
+#                if placeholder.name not in self.mandatory_placeholders:
+#                    if change:                        
+#                            # we need create a new content if revision is enabled
+#                            #TODO: implement django-revision
+#                            if False and settings.CMS_CONTENT_REVISION and placeholder.name \
+#                                    not in settings.CMS_CONTENT_REVISION_EXCLUDE_LIST:
+#                                Content.objects.create_content_if_changed(obj, language,
+#                                    placeholder.name, form.cleaned_data[placeholder.name])
+#                            else:
+#                                Content.objects.set_or_create_content(obj, language,
+#                                    placeholder.name, form.cleaned_data[placeholder.name])
+#                    else:
+#                        Content.objects.set_or_create_content(obj, language,
+#                            placeholder.name, form.cleaned_data[placeholder.name])
 
     def get_fieldsets(self, request, obj=None):
         """
