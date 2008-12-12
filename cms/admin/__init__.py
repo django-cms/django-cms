@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.admin.util import unquote
 
 from cms import settings
-from cms.models import Page, Content, tagging, Title
+from cms.models import Page, Title, CMSPlugin
 from cms.views import details
 from cms.utils import get_template_from_request, has_page_add_permission, \
     get_language_from_request
@@ -22,49 +22,61 @@ from django.shortcuts import render_to_response
 from cms.admin.change_list import CMSChangeList
 from django.template.context import RequestContext
 
-import widgets
+
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
-from cms.admin.views import traduction, get_content, valid_targets_list, \
+from cms.admin.views import get_content, valid_targets_list, \
     change_status, modify_content, change_innavigation
+from cms.plugin_pool import plugin_pool
+from cms.admin.widgets import PluginEditor
 
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'parent']
     mandatory_placeholders = ('title', 'slug')
-    general_fields = ['title', 'slug', 'status', 'sites', 'in_navigation', 'soft_root']
-    insert_point = general_fields.index('status') + 1
     
     
+    top_fields = ['language']
+    general_fields = ['title', 'slug', 'status']
+    advanced_fields = ['sites', 'in_navigation', 'soft_root']
+    template_fields = ['template']
+    
+    if settings.CMS_REVISIONS:
+        top_fields = ['revisions']
+        
     if settings.CMS_TAGGING:
-        general_fields.insert(insert_point, 'tags')
+        advanced_fields.append('tags')
     
-    # Add support for future dating and expiration based on settings.
-    if settings.CMS_SHOW_END_DATE:
-        general_fields.insert(insert_point, 'publication_end_date')
     if settings.CMS_SHOW_START_DATE:
-        general_fields.insert(insert_point, 'publication_date')
-
-    normal_fields = ['language']
-    if settings.CMS_TEMPLATES:
-        normal_fields.append('template')
-
+        advanced_fields.append('publication_date')
+    
+    if settings.CMS_SHOW_END_DATE:
+        advanced_fields.append( 'publication_end_date')
+    
     fieldsets = (
+        (_('Top'), {
+            'fields': top_fields,
+            'classes': ('low',),
+            'description': _('Note: This page reloads if you change the selection. Save it first.'),
+        }),
         (_('General'), {
             'fields': general_fields,
-            'classes': ('sidebar',),
+            'classes': ('general',),
         }),
-        (_('Options'), {
-            'fields': normal_fields,
-            'classes': ('sidebar', 'clear'),
-            'description': _('Note: This page reloads if you change the selection'),
+        (_('Advanced'), {
+            'fields': advanced_fields,
+            'classes': ('collapse',),
+        }),
+        (_('Template'), {
+            'fields': template_fields,
+            'classes': ('low',),
+            'description': _('Note: This page reloads if you change the selection. Save it first.'),         
         }),
     )
     
     list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
     search_fields = ('title_set__slug', 'title_set__title', 'content__body')
-    
       
     class Media:
         css = {
@@ -154,7 +166,7 @@ class PageAdmin(admin.ModelAdmin):
                 placeholder_fieldsets.append(placeholder.name)
        
         given_fieldsets = list(self.declared_fieldsets)
-        given_fieldsets[0][1]['fields'] = given_fieldsets[0][1]['fields'][:]
+        given_fieldsets[0][1]['fields'] = given_fieldsets[0][1]['fields'][:] #make a copy so we can manipulate it
         
         if obj:
             if not obj.has_publish_permission(request):
@@ -174,12 +186,12 @@ class PageAdmin(admin.ModelAdmin):
             instance.author = request.user
         return instance
 
-    def get_widget(self, request, name):
+    def get_widget(self, request, page, lang, name):
         """
-        Given the request and name of a placeholder return a Widget subclass
-        like Textarea or TextInput.
+        Given the request and name of a placeholder return a PluginEditor Widget
         """
-        widget = dict(getmembers(widgets, isclass)).get(name, Textarea)
+        installed_plugins = plugin_pool.get_all_plugins()
+        widget = PluginEditor(installed=installed_plugins)
         if not isinstance(widget(), Widget):
             widget = Textarea
         return widget
@@ -210,13 +222,13 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['template'].choices = template_choices
             form.base_fields['template'].initial = force_unicode(template)
         for placeholder in get_placeholders(request, template):
-            widget = self.get_widget(request, placeholder.widget)()
             if placeholder.name not in self.mandatory_placeholders:
+                installed_plugins = plugin_pool.get_all_plugins()
+                plugin_list = []
                 if obj:
-                    initial = Content.objects.get_content(obj, language, placeholder.name)
-                else:
-                    initial = None
-                form.base_fields[placeholder.name] = CharField(widget=widget, required=False, initial=initial)
+                    plugin_list = CMSPlugin.objects.filter(page=obj, language=language).order_by('position')
+                widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
+                form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
 
     def change_view(self, request, object_id, extra_context=None):

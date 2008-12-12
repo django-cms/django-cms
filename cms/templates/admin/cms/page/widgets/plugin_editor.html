@@ -1,0 +1,20 @@
+{% load i18n %}
+<ul class="plugin-list">
+	{% for plugin in plugin_list %}
+	<li>{{ plugin.name }}</li>
+	{% endfor %}
+</ul>
+<select name="plugins">
+	<option value="">{% trans "Available Plugins" %}</option>
+	{% for plugin in installed_plugins %}
+	<option value="{{ plugin }}">{{ plugin.name }}</option>
+	{% endfor %}
+</select>
+<a href="#">{% trans "Add Plugin" %}</a>
+<div class="plugin-editor">
+	{% if plugin_list %}
+		{% blocktrans %}No Plugin selected. Selected one on the left side{% endblocktrans %}
+	{% else %}
+		{% blocktrans %}No Plugins present. Add a plugin to this placeholder-slot.{% endblocktrans %}
+	{% endif %}
+</div>

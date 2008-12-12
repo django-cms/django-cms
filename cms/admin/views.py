@@ -3,10 +3,10 @@ from django.http import HttpResponse, Http404
 from django.contrib.admin.views.decorators import staff_member_required
 
 from cms import settings
-from cms.models import Page, Content, Title
+from cms.models import Page, Title
 
 from cms.utils import auto_render
-from cms.admin.utils import get_placeholders
+#from cms.admin.utils import get_placeholders
 
 def change_status(request, page_id):
     """
@@ -67,16 +67,16 @@ def modify_content(request, page_id, content_id, language_id):
     raise Http404
 modify_content = staff_member_required(modify_content)
 
-def traduction(request, page_id, language_id):
-    page = Page.objects.get(pk=page_id)
-    context = {}
-    lang = language_id
-    placeholders = get_placeholders(request, page.get_template())
-    if Content.objects.get_content(page, language_id, "title") is None:
-        language_error = True
-    return 'pages/traduction_helper.html', locals()
-traduction = staff_member_required(traduction)
-traduction = auto_render(traduction)
+#def traduction(request, page_id, language_id):
+#    page = Page.objects.get(pk=page_id)
+#    context = {}
+#    lang = language_id
+#    placeholders = get_placeholders(request, page.get_template())
+#    if Content.objects.get_content(page, language_id, "title") is None:
+#        language_error = True
+#    return 'pages/traduction_helper.html', locals()
+#traduction = staff_member_required(traduction)
+#traduction = auto_render(traduction)
 
 def get_content(request, page_id, content_id):
     content_instance = get_object_or_404(Content, pk=content_id)

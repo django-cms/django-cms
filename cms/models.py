@@ -1,29 +1,23 @@
 from datetime import datetime
-
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
-from django.utils.safestring import mark_safe
-from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.sites.models import Site
 
-
 import mptt
 from cms import settings
-from cms.managers import PageManager, ContentManager, PagePermissionManager,\
-    TitleManager
+from cms.managers import PageManager, PagePermissionManager, TitleManager
 
-try:
-    tagging = models.get_app('tagging')
-    from tagging.fields import TagField
-except ImproperlyConfigured:
-    tagging = False
+#try:
+#    tagging = models.get_app('tagging')
+#    from tagging.fields import TagField
+#except ImproperlyConfigured:
+#    tagging = False
 
-if not settings.CMS_TAGGING:
-    tagging = False
+#if not settings.CMS_TAGGING:
+#    tagging = False
 
 class Page(models.Model):
     """
@@ -51,8 +45,8 @@ class Page(models.Model):
     # Managers
     objects = PageManager()
 
-    if tagging:
-        tags = TagField()
+    #if tagging:
+    #    tags = TagField()
         
     class Meta:
         verbose_name = _('page')
@@ -264,24 +258,17 @@ class Title(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
     class Meta:
-        pass
-        #unique_together = ('language', 'page')
+        unique_together = ('language', 'page')
 
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"))
     position = models.PositiveSmallIntegerField(_("position"), default=0)
     slot = models.CharField(_("slot"), max_length=50, default=0, db_index=True)
     language = models.CharField(_("language"), max_length=3, blank=False, db_index=True)
+    plugin_name = models.CharField(_("plugin_name"), max_length=25, db_index=True)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
-    class Meta:
-        abstract = True
+    #class Meta:
+    #    pass
+        #abstract = True
     
-class Content(CMSPlugin):
-    """A block of content, tied to a page, for a particular language"""
-    body = models.TextField(_("body"))
-    type = models.CharField(_("type"), max_length=100, blank=False)
-    
-    objects = ContentManager()
 
-    def __unicode__(self):
-        return "%s :: %s" % (self.page.get_slug(), self.body[0:15])

@@ -26,7 +26,9 @@ CMS_TAGGING = getattr(settings, 'CMS_TAGGING', False)
 # Whether to only allow unique slugs.
 CMS_UNIQUE_SLUG_REQUIRED = getattr(settings, 'CMS_UNIQUE_SLUG_REQUIRED', True)
 
-CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False) 
+CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
+
+CMS_REVISIONS = getattr(settings, 'CMS_REVISIONS', False)
 
 # Whether to enable revisions.
 CMS_CONTENT_REVISION = getattr(settings, 'CMS_CONTENT_REVISION', True)

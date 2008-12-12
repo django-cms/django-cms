@@ -3,7 +3,7 @@ from django.core.cache import cache
 from django.utils.safestring import SafeUnicode
 
 from cms import settings
-from cms.models import Content, Page, Title, PagePermission
+from cms.models import Page, Title, PagePermission, CMSPlugin
 from cms.utils import get_language_from_request, get_page_from_request
 
 register = template.Library()
@@ -156,7 +156,6 @@ def show_admin_menu(context, page, no_children=False, level=None):
                 perm_softroot_ids = PagePermission.objects.get_softroot_id_list(request.user)
                 if perm_edit_ids and perm_edit_ids != "All":
                     pages = pages.filter(pk__in=perm_edit_ids)
-                
             ids = []
             all_pages = pages[:]
             has_childrens = False
@@ -246,12 +245,12 @@ def show_content(context, content_type, lang=None):
     if not request or not page:
         return {'content':''}
     # if the page is a SafeUnicode, try to use it like a slug
-    if isinstance(page, SafeUnicode):
-        c = Content.objects.filter(type='slug', body=page)
-        if len(c):
-            page = c[0].page
-        else:
-            return {'content':''}
+    #if isinstance(page, SafeUnicode):
+    #    c = Content.objects.filter(type='slug', body=page)
+    #    if len(c):
+    #        page = c[0].page
+    #    else:
+    #        return {'content':''}
     if lang is None:
         lang = get_language_from_request(context['request'])
     if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
@@ -330,9 +329,13 @@ class PlaceholderNode(template.Node):
     widget-name -- the widget name you want into the admin interface. Take
         a look into pages.admin.widgets to see which widgets are available.
     """
-    def __init__(self, name, widget=None):
+    def __init__(self, name, plugins=None):
         self.name = name
-        self.widget = widget
+        if plugins:
+            self.plugins = plugins
+        else:
+            self.plugins = []
+        
 
     def render(self, context):
         self.page = get_page_from_request(context) #TODO: change to request
@@ -340,12 +343,20 @@ class PlaceholderNode(template.Node):
             return ''
         l = get_language_from_request(context['request'])
         request = context['request']
+        c = None
         if self.name.lower() == "title":
-            c = Title.objects.get_title(self.page, l, True).title
+            t = Title.objects.get_title(self.page, l, True)
+            if t:
+                c = t.title
         elif self.name.lower() == "slug":
-            c = Title.objects.get_title(self.page, l, True).slug
+            t = Title.objects.get_title(self.page, l, True)
+            if t:
+                c = t.slug
         else:
-            c = Content.objects.get_content(self.page, l, self.name, True)
+            plugins = CMSPlugin.objects.filter(page=self.page, language=l)
+            c = ""
+            for plugin in plugins:
+                c += plugin.plugin_name
         if not c:
             return ''
         return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)

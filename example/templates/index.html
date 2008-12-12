@@ -1,7 +1,7 @@
 {% load cache pages_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
-<title>{% show_content "title" %}</title>
+<title>{{ current_page.get_title }}</title>
 <script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script>
 <style>
     .placeholder-editable {
@@ -110,14 +110,14 @@
 {% block content %}
     <div style="float:right;width:25%">
     <h3>Right column placeholder</h3>
-    {% placeholder right-column Textarea %}
+    {% placeholder right-column %}
     </div>
 
     {% if current_page %}
     <div style="width:70%">
         
-		<h3>title placeholder {% placeholder title TextInput %}</h3>
-        <div>body placeholder {% placeholder body WYMEditor %}</div>
+		<h3>title placeholder {% placeholder title %}</h3>
+        <div>body placeholder {% placeholder body %}</div>
 		
     </div>
     {% endif %}
