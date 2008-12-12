@@ -1,6 +1,67 @@
-{% load pages_tags i18n adminmedia %}
-
-{#%# if has_permission %#}
+<li{% if page.last %} class="last"{% endif %}>{% load pages_tags i18n adminmedia %}{#%# if has_permission %#}<div class="cont">
+<div class="col1">
+<div class="info">
+<a href="#" {% ifequal 0 page.children.all.count %}style="display: none"{% endifequal %} id="c{{ page.id }}" class="collapse">{% if not no_children %}<span class="collapsed">+</span><span>-</span>{% endif %}</a>
+<a href="{{ url }}{{ page.id }}/" class="titel">{{ page.get_slug }}</a>
+</div>		
+<span id="move-target-{{ page.id }}" class="move-target-container" style="display:none;float:right">
+<a href="#" class="move-target left"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
+<a href="#" class="move-target right"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a></a> |
+<a href="#" class="move-target first-child">↘</a>
+</span>		
+</div>
+<div class="col2">
+<div class="col-language">
+{% for lang in page.get_languages %} 
+<a href="{{ url }}{{ page.id }}/?language={{ lang }}">{{ lang }}</a>
+{% if not forloop.last %}|{% endif %}
+{% endfor %}
+</div>
+<div class="col-actions">
+<a href="#" class="move" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>
+<a href="{{ page.get_absolute_url }}" class="selector-add"><span>{% trans "view" %}</span></a>
+<a href="#" class="addlink" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+<a href="{{ page.id }}/delete/" class="deletelink"><span>{% trans "delete" %}</span></a>
+</div>	
+<div class="col-published">
+{% if page.status %}
+<label>
+<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+{% if has_publish_permission %}
+<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" />
+{% endif %}
+</label>
+{% else %}
+<label>
+<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+{% if has_publish_permission %}
+<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" />
+{% endif %}
+</label>
+{% endif %}			
+</div>
+<div class="col-navigation">
+{% if page.in_navigation %}
+<label>
+<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" checked="checked" value="1" />
+</label>
+{% else %}
+<label>
+<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />
+</label>
+{% endif %}				
+</div>
+<div class="col-softroot">
+{% if page.soft_root %}
+<label>
+<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+</label>
+{% endif %}				
+</div>
+<div class="col-template">{{ page.get_template }}</div>
+<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div></div></div>{% comment %}
 <tr id="page-row-{{ page.id }}" class="child-of-{{ page.parent.id }}">
 <td {% if level %}style="padding-left:{{level}}em"{% endif %}>
 	<div class="row-container">
@@ -72,10 +133,4 @@
 <td>
 {% firstof page.author.get_full_name page.author.first_name page.author.username %}
 </td>
-</tr>
-{#% endif %#}
-
-
-{% for child in children %}
-    {% show_admin_menu child no_children level %}
-{% endfor %}
+</tr>{#% endif %#}{% endcomment %}{% if children %}<ul{% if page.last %} class="last"{% endif %}>{% for child in children %}{% show_admin_menu child no_children level %}{% endfor %}</ul>{% endif %}</li>

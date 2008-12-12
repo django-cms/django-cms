@@ -1,4 +1,25 @@
 {% load i18n pages_tags %}
+<div id="sitemap">
+<ul class="header">
+	<li>
+		<div class="cont">
+			<div class="col1">{% trans "title" %}</div>
+			<div class="col2">
+				<div class="col-actions">{% trans "quick actions" %}</div>	
+				<div class="col-published">{% trans "published" %}</div>
+				<div class="col-navigation">{% trans "in navigation" %}</div>
+				<div class="col-softroot">{% trans "softroot" %}</div>
+				<div class="col-template">{% trans "template" %}</div>
+				<div class="col-creator">{% trans "creator" %}</div>
+			</div>
+		</div>
+	</li>
+</ul>
+<ul class="last">{% for page in cl.query_set %}{% show_admin_menu page cl.is_filtered %}{% endfor %}</ul>
+</div>
+
+
+<!--
 <table cellspacing="0" id="page-list">
 <thead>
 <tr>
@@ -12,8 +33,7 @@
 </tr>
 </thead>
 <tbody>
-{% for page in cl.query_set %}
-    {% show_admin_menu page cl.is_filtered %}
-{% endfor %}
+
 </tbody>
 </table>
+-->

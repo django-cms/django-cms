@@ -23,7 +23,7 @@
 {% block content_title %}<h1>{% trans "Select" %} {{ name }} {% trans "to change" %}</h1>{% endblock %}
 
 {% block content %}
-<div id="content-main">
+<div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
 
 {% block object-tools %}
 {% if has_add_permission %}
@@ -36,7 +36,13 @@
 
 {% block filters %}
 {% if cl.has_filters %}
-<div id="changelist-filter">
+<script type="text/javascript">
+	function showchangelistfilter(){
+		$("#changelist-filter").toggle();
+	}		
+</script>
+<a href="javascript:showchangelistfilter();" id="changelist-filter-button">Filter: {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
+<div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>
 {% for spec in cl.filter_specs %}
    {% admin_list_filter cl spec %}
