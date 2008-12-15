@@ -1,8 +1,24 @@
-{% load i18n %}
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify adminmedia pages_tags %}
+{% block title %}{% trans "Change a page" %}{% endblock %}
+
+{% block extrahead %}
 {{ form.media }}
-<h2>{{ plugin.get_plugin_name }}</h2>
+{{ block.super }}
+
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+
 <form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" method="post">
+	<h2>{{ plugin.get_plugin_name }}</h2>
 	{{ form.as_p }}
 	
 	<input type=submit value="{% trans "save" %}" />
 </form>
+</div>
+{% endblock %}
