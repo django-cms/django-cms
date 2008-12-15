@@ -283,16 +283,30 @@ class Title(models.Model):
         unique_together = ('language', 'page')
 
 class CMSPlugin(models.Model):
-    page = models.ForeignKey(Page, verbose_name=_("page"))
-    position = models.PositiveSmallIntegerField(_("position"), default=0)
-    placeholder = models.CharField(_("slot"), max_length=50, db_index=True)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True)
-    plugin_type = models.CharField(_("plugin_name"), max_length=25, db_index=True)
+    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), default=0, editable=False)
+    placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
+    plugin_type = models.CharField(_("plugin_name"), max_length=25, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
+    
+    def render(self, request):
+        from cms.plugin_pool import plugin_pool
+        plugin = plugin_pool.get_plugin(self.plugin_type)()
+        print plugin.model.__name__.lower()
+        try:
+            instance = getattr(self, plugin.model.__name__.lower())
+        except:
+            instance = None
+        if instance:
+            return plugin.render(request, instance)
+        else:
+            return ""
+        
     #class Meta:
     #    pass
         #abstract = True

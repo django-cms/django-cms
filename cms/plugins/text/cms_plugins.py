@@ -11,7 +11,7 @@ class TextPlugin(CMSPluginBase):
     name = _("Text")
     form = TextForm
     
-    def render(self, request):
-        return "hello world"
+    def render(self, request, instance):
+        return instance.body
     
 plugin_pool.register_plugin(TextPlugin)
