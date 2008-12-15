@@ -151,7 +151,7 @@ def edit_plugin(request, plugin_id):
             form = plugin_class.form(instance=instance)
         else:
             form = plugin_class.form() 
-    return render_to_response('admin/cms/page/plugin_forms.html',{'form':form, 'plugin':cms_plugin, 'is_popup':True}, RequestContext(request))
+    return render_to_response('admin/cms/page/plugin_forms.html',{'form':form, 'plugin':cms_plugin, 'is_popup':True, 'CMS_MEDIA_URL':settings.CMS_MEDIA_URL}, RequestContext(request))
 
     
 def move_plugin(request, plugin_id , old_position, new_position):
