@@ -48,15 +48,17 @@ ul.plugin-list li{
 	clear:both;	
 	border-bottom:1px solid #DEDEDC;
 	margin-right:1px;
-}
-ul.plugin-list li a{
-	display:block;
 	height:28px;
 	background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
 	line-height:27px;
+	cursor:pointer;
 }
-ul.plugin-list li a:hover{background-position:0px -300px; color:#fff;}
-ul.plugin-list li a:hover .drag{ background-position:0px -40px;}
+ul.plugin-list li.active{
+	margin-right:0px;
+}
+
+ul.plugin-list li:hover{background-position:0px -300px; color:#fff;}
+ul.plugin-list li:hover .drag{background-position:0px -40px;}
 
 ul.plugin-list .drag{
 	display:block;

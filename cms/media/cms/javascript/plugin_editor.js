@@ -14,10 +14,14 @@ $(document).ready(function() {
 			$.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
 				loadPluginForm(target_div, data)
 				ul_list.append('<li id="plugin_'+data+'" class="' + pluginvalue + '"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>')
+				setclickfunctions();
 			}, "html" );
-		
 		}
 	});
+	setclickfunctions();
+});
+
+function setclickfunctions(){
 	$('ul.plugin-list .text').click(function(){
 		console.log("text click")
 		var target = $(this).parent().parent().parent().parent().parent().children("div.plugin-editor")
@@ -26,8 +30,7 @@ $(document).ready(function() {
 		return false
 	})
 	
-	$('ul.plugin-list .delete').click(function(){
-    	
+	$('ul.plugin-list .delete').click(function(){    	
 		console.log("delete")
 		var plugin_id = $(this).parent().attr("id").split("plugin_")[1]
 		$.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
@@ -35,12 +38,11 @@ $(document).ready(function() {
 			$("#plugin_"+data).remove()
 		}, "html");
    	});
-	
    
    	$('ul.plugin-list .drag').click(function(){
     	alert("drag");
-   	});
-});
+   	});	
+}
 
 
 function loadPluginForm(target, id){
