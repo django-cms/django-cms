@@ -44,7 +44,7 @@ function setiframeheight(height, id){
 }
 
 function loadPluginForm(target, id){
-	var object = '<iframe id="iframe_'+id+'" src="/admin/cms/page/edit-plugin/'+id+'"></iframe>' 
+	var object = '<iframe id="iframe_'+id+'" src="/admin/cms/page/edit-plugin/'+id+'" frameborder="0"></iframe>' 
 	target.html(object)
 	$('ul.plugin-list .active').removeClass("active")
 	$('#plugin_'+id).addClass("active")

@@ -89,8 +89,8 @@ ul.plugin-list span.delete{
 
 .plugin-editor{
 	width:100%;
-	margin-right:-320px;/*300*/
-	padding:0px 10px 10px 10px;
+	margin-right:-310px;/*300*/
+	padding:0px 0px 10px 10px;
 }
 
 .plugin-editor iframe{
@@ -99,4 +99,5 @@ ul.plugin-list span.delete{
 	padding:0;
 	width:100%;
 	height:auto;
+	text-align: right;
 }
