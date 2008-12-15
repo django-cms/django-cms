@@ -39,12 +39,12 @@ function setclickfunctions(){
    	});
 }
 
-function setiframeheight(){
-	alert("setiframeheight");
+function setiframeheight(height, id){
+	$('#iframe_'+id).height(height+"px")
 }
 
 function loadPluginForm(target, id){
-	var object = '<iframe src="/admin/cms/page/edit-plugin/'+id+'"></iframe>' 
+	var object = '<iframe id="iframe_'+id+'" src="/admin/cms/page/edit-plugin/'+id+'"></iframe>' 
 	target.html(object)
 	$('ul.plugin-list .active').removeClass("active")
 	$('#plugin_'+id).addClass("active")
