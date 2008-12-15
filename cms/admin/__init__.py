@@ -26,7 +26,7 @@ from django.template.context import RequestContext
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import get_content, change_status, modify_content, change_innavigation, add_plugin,\
-    edit_plugin
+    edit_plugin, remove_plugin
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 
@@ -117,7 +117,7 @@ class PageAdmin(admin.ModelAdmin):
             return edit_plugin(request, plugin_id)
         elif 'remove-plugin' in url:
             #page_id, placeholder, position = url.split('/')
-            return remove_plugin(request, page_id, placeholder, position)
+            return remove_plugin(request)
         
         
         #elif url.endswith('/valid-targets-list'):

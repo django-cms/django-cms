@@ -114,8 +114,13 @@ def add_plugin(request):
     raise Http404
     
 
-def remove_plugin(request, plugin_id):
-    pass
+def remove_plugin(request):
+    if request.method == "POST":
+        plugin_id = request.POST['plugin_id']
+        plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+        plugin.delete()
+        return HttpResponse(str(plugin_id))
+    raise Http404
 
 def edit_plugin(request, plugin_id):
     print plugin_id
