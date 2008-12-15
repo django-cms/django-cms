@@ -1,11 +1,13 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse, Http404
 from django.contrib.admin.views.decorators import staff_member_required
 
 from cms import settings
-from cms.models import Page, Title
+from cms.models import Page, Title, CMSPlugin
 
 from cms.utils import auto_render
+from cms.plugin_pool import plugin_pool
+from django.template.context import RequestContext
 #from cms.admin.utils import get_placeholders
 
 def change_status(request, page_id):
@@ -84,13 +86,49 @@ def get_content(request, page_id, content_id):
 get_content = staff_member_required(get_content)
 get_content = auto_render(get_content)
 
-def valid_targets_list(request, page_id):
-    """A list of valid targets to move a page"""
-    if not settings.CMS_PERMISSION:
-        perms = "All"
+#def valid_targets_list(request, page_id):
+#    """A list of valid targets to move a page"""
+#    if not settings.CMS_PERMISSION:
+#        perms = "All"
+#    else:
+#        from cms.models import PagePermission
+#        perms = PagePermission.objects.get_edit_id_list(request.user)
+#    query = Page.objects.valid_targets(page_id, request, perms)
+#    return HttpResponse(",".join([str(p.id) for p in query]))
+#valid_targets_list = staff_member_required(valid_targets_list)
+
+
+def add_plugin(request):
+    if request.method == "POST":
+        page_id = request.POST['page_id']
+        page = get_object_or_404(Page, pk=page_id)
+        placeholder = request.POST['placeholder']
+        plugin_type = request.POST['plugin_type']
+        language = request.POST['language']
+        position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
+        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position) 
+        plugin.save()      
+        return get_form(request, plugin.pk)
+    raise Http404
+    
+
+def remove_plugin(request, plugin_id):
+    pass
+
+def get_form(request, plugin_id):
+    cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+    
+    plugin_class = plugin_pool.get_plugin(cms_plugin.plugin_type)()
+    model = plugin_class.model
+    try:
+        instance = model.objects.get(pk=cms_plugin.pk)
+    except:
+        instance = None
+    if instance:
+        form = plugin_class.form(instance=instance)
     else:
-        from cms.models import PagePermission
-        perms = PagePermission.objects.get_edit_id_list(request.user)
-    query = Page.objects.valid_targets(page_id, request, perms)
-    return HttpResponse(",".join([str(p.id) for p in query]))
-valid_targets_list = staff_member_required(valid_targets_list)
+        form = plugin_class.form()
+    return render_to_response('admin/cms/page/forms.html',{'form':form}, RequestContext(request))
+    
+def move_plugin(request, plugin_id , old_position, new_position):
+    pass

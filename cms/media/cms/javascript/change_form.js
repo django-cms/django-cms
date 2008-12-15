@@ -27,16 +27,6 @@ $(document).ready(function() {
             e.value = URLify(this.value, 64);
         }
     });
-    $('add-plugin').click(function(){
-		var select = $(this).parent().children("select")
-		var pluginvalue = select.attr('value')
-		if (pluginvalue) {
-			var pluginname = select.children('[@selected]').text()
-			$(this).parent().children("ul.plugin-list").append("<li class=" + pluginvalue + ">" + pluginname + "</li>")
-		}
-	});
+    
 });
 
-function loadPluginForm(name){
-	
-}

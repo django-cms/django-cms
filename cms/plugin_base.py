@@ -8,7 +8,7 @@ class CMSPluginBase(object):
     form = None
     model = None
     
-    def __init__(self, context):
+    def __init__(self, context=None):
         if self.model:
             if not CMSPlugin in self.model._meta.parents:
                 raise SubClassNeededError, "plugin model needs to subclass CMSPlugin" 

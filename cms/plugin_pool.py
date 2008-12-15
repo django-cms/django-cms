@@ -31,7 +31,7 @@ class PluginPool(object):
         """
         Retrieve a plugin from the cache.
         """
-        self.discover_modules()
+        self.discover_plugins()
         return self.plugins[name]
 
 plugin_pool = PluginPool()

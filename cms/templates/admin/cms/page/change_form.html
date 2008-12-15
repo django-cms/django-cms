@@ -1,6 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_modify adminmedia pages_tags %}
-{% block title %}hello{% trans "Change a page" %}{% endblock %}
+{% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
 <script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
@@ -8,7 +8,7 @@
 
 {% endblock %}
 
-{% block content_title %}<h1>hello{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>{% endblock %}
+{% block content_title %}<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>{% endblock %}
 
 {% block content %}<div id="content-main">
 {% block object-tools %}

@@ -25,8 +25,7 @@ from django.template.context import RequestContext
 
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
-from cms.admin.views import get_content, valid_targets_list, \
-    change_status, modify_content, change_innavigation
+from cms.admin.views import get_content, change_status, modify_content, change_innavigation, get_form, add_plugin
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 
@@ -109,14 +108,25 @@ class PageAdmin(admin.ModelAdmin):
             page_id, action, content_id, language_id = url.split('/')
             return modify_content(request, unquote(page_id),
                                     unquote(content_id), unquote(language_id))
-        elif url.endswith('/valid-targets-list'):
-            return valid_targets_list(request, unquote(url[:-19]))
+        elif url.endswith('add-plugin'):
+            #page_id, placeholder, plugin_name = url.split('/')
+            return add_plugin(request)
+        elif 'remove-plugin' in url:
+            #page_id, placeholder, position = url.split('/')
+            return remove_plugin(request, page_id, placeholder, position)
+        elif 'get-form' in url:
+            #spage_id, placeholder, position = url.split('/')
+            return get_form(request, unquote(page_id), unquote(placeholder), unquote(position))
+        
+        #elif url.endswith('/valid-targets-list'):
+        #    return valid_targets_list(request, unquote(url[:-19]))
         elif url.endswith('/move-page'):
             return self.move_page(request, unquote(url[:-10]))
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
+        
         return super(PageAdmin, self).__call__(request, url)
 
     def save_model(self, request, obj, form, change):
