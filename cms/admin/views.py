@@ -128,7 +128,7 @@ def get_form(request, plugin_id):
         form = plugin_class.form(instance=instance)
     else:
         form = plugin_class.form()
-    return render_to_response('admin/cms/page/forms.html',{'form':form}, RequestContext(request))
+    return render_to_response('admin/cms/page/plugin_forms.html',{'form':form}, RequestContext(request))
     
 def move_plugin(request, plugin_id , old_position, new_position):
     pass

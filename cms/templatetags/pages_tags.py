@@ -356,7 +356,7 @@ class PlaceholderNode(template.Node):
             plugins = CMSPlugin.objects.filter(page=self.page, language=l)
             c = ""
             for plugin in plugins:
-                c += plugin.plugin_name
+                c += plugin.plugin_type
         if not c:
             return ''
         return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)

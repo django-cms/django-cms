@@ -16,6 +16,7 @@ class CMSPluginBase(object):
                 class DefaultModelForm(ModelForm):
                     class Meta:
                         model = self.model
+                        exclude = ('page', 'position', 'placeholder', 'language', 'plugin_type')
                 self.form = DefaultModelForm
 
       

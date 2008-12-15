@@ -1,0 +1,7 @@
+{% load i18n %}
+<h2>{{ plugin.name }}</h2>
+<form action="">
+	{{ form.as_p }}
+	
+	<input type=submit value="{% trans "save" %}"/>
+</form>
