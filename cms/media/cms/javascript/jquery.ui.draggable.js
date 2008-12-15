@@ -1,1 +1,672 @@
-eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('(c(A){A.2I("g.i",A.2c({},A.g.2L,{2G:c(){a B=4.9;7(B.d=="24"&&!(/(l|V|13)/).1h(4.j.e("m"))){4.j.e("m","l")}4.j.1M("g-i");(B.1O&&4.j.1M("g-i-1O"));4.2M()},2n:c(F){a H=4.9;7(4.d||H.1O||A(F.2a).2A(".g-2F-1G")){n 15}a C=!4.9.1G||!A(4.9.1G,4.j).1C?v:15;A(4.9.1G,4.j).2C("*").2E().1d(c(){7(4==F.2a){C=v}});7(!C){n 15}7(A.g.1b){A.g.1b.2Z=4}4.d=A.2P(H.d)?A(H.d.30(4.j[0],[F])):(H.d=="28"?4.j.28():4.j);7(!4.d.31("12").1C){4.d.1u((H.1u=="k"?4.j[0].1t:H.1u))}7(4.d[0]!=4.j[0]&&!(/(13|V)/).1h(4.d.e("m"))){4.d.e("m","V")}4.S={6:(o(4.j.e("33"),10)||0),5:(o(4.j.e("2S"),10)||0)};4.z=4.d.e("m");4.8=4.j.8();4.8={5:4.8.5-4.S.5,6:4.8.6-4.S.6};4.8.r={6:F.1r-4.8.6,5:F.1s-4.8.5};4.p=4.d.p();a B=4.p.8();7(4.p[0]==f.12&&A.2V.2Y){B={5:0,6:0}}4.8.k={5:B.5+(o(4.p.e("1N"),10)||0),6:B.6+(o(4.p.e("1T"),10)||0)};a E=4.j.m();4.8.l=4.z=="l"?{5:E.5-(o(4.d.e("5"),10)||0)+4.p[0].q,6:E.6-(o(4.d.e("6"),10)||0)+4.p[0].s}:{5:0,6:0};4.1g=4.1S(F);4.w={t:4.d.26(),u:4.d.1Q()};7(H.16){7(H.16.6!=1A){4.8.r.6=H.16.6+4.S.6}7(H.16.2s!=1A){4.8.r.6=4.w.t-H.16.2s+4.S.6}7(H.16.5!=1A){4.8.r.5=H.16.5+4.S.5}7(H.16.2k!=1A){4.8.r.5=4.w.u-H.16.2k+4.S.5}}7(H.h){7(H.h=="k"){H.h=4.d[0].1t}7(H.h=="f"||H.h=="1o"){4.h=[0-4.8.l.6-4.8.k.6,0-4.8.l.5-4.8.k.5,A(H.h=="f"?f:1o).t()-4.8.l.6-4.8.k.6-4.w.t-4.S.6-(o(4.j.e("2i"),10)||0),(A(H.h=="f"?f:1o).u()||f.12.1t.2u)-4.8.l.5-4.8.k.5-4.w.u-4.S.5-(o(4.j.e("2h"),10)||0)]}7(!(/^(f|1o|k)$/).1h(H.h)){a D=A(H.h)[0];a G=A(H.h).8();4.h=[G.6+(o(A(D).e("1T"),10)||0)-4.8.l.6-4.8.k.6,G.5+(o(A(D).e("1N"),10)||0)-4.8.l.5-4.8.k.5,G.6+T.2g(D.2U,D.1U)-(o(A(D).e("1T"),10)||0)-4.8.l.6-4.8.k.6-4.w.t-4.S.6-(o(4.j.e("2i"),10)||0),G.5+T.2g(D.2u,D.1V)-(o(A(D).e("1N"),10)||0)-4.8.l.5-4.8.k.5-4.w.u-4.S.5-(o(4.j.e("2h"),10)||0)]}}4.19("18",F);4.w={t:4.d.26(),u:4.d.1Q()};7(A.g.1b&&!H.2m){A.g.1b.2Q(4,F)}4.d.1M("g-i-2p");4.2d(F);n v},X:c(C,D){7(!D){D=4.m}a B=C=="V"?1:-1;n{5:(D.5+4.8.l.5*B+4.8.k.5*B-(4.z=="13"||(4.z=="V"&&4.p[0]==f.12)?0:4.p[0].q)*B+(4.z=="13"?A(f).q():0)*B+4.S.5*B),6:(D.6+4.8.l.6*B+4.8.k.6*B-(4.z=="13"||(4.z=="V"&&4.p[0]==f.12)?0:4.p[0].s)*B+(4.z=="13"?A(f).s():0)*B+4.S.6*B)}},1S:c(E){a F=4.9;a B={5:(E.1s-4.8.r.5-4.8.l.5-4.8.k.5+(4.z=="13"||(4.z=="V"&&4.p[0]==f.12)?0:4.p[0].q)-(4.z=="13"?A(f).q():0)),6:(E.1r-4.8.r.6-4.8.l.6-4.8.k.6+(4.z=="13"||(4.z=="V"&&4.p[0]==f.12)?0:4.p[0].s)-(4.z=="13"?A(f).s():0))};7(!4.1g){n B}7(4.h){7(B.6<4.h[0]){B.6=4.h[0]}7(B.5<4.h[1]){B.5=4.h[1]}7(B.6>4.h[2]){B.6=4.h[2]}7(B.5>4.h[3]){B.5=4.h[3]}}7(F.1a){a D=4.1g.5+T.2l((B.5-4.1g.5)/F.1a[1])*F.1a[1];B.5=4.h?(!(D<4.h[1]||D>4.h[3])?D:(!(D<4.h[1])?D-F.1a[1]:D+F.1a[1])):D;a C=4.1g.6+T.2l((B.6-4.1g.6)/F.1a[0])*F.1a[0];B.6=4.h?(!(C<4.h[0]||C>4.h[2])?C:(!(C<4.h[0])?C-F.1a[0]:C+F.1a[0])):C}n B},2d:c(B){4.m=4.1S(B);4.1j=4.X("V");4.m=4.19("1c",B)||4.m;7(!4.9.1w||4.9.1w!="y"){4.d[0].1x.6=4.m.6+"1J"}7(!4.9.1w||4.9.1w!="x"){4.d[0].1x.5=4.m.5+"1J"}7(A.g.1b){A.g.1b.1c(4,B)}n 15},2b:c(C){a D=15;7(A.g.1b&&!4.9.2m){a D=A.g.1b.34(4,C)}7((4.9.1m=="2N"&&!D)||(4.9.1m=="2D"&&D)||4.9.1m===v){a B=4;A(4.d).2B(4.1g,o(4.9.1m,10)||2O,c(){B.19("1k",C);B.22()})}1y{4.19("1k",C);4.22()}n 15},22:c(){4.d.2o("g-i-2p");7(4.9.d!="24"&&!4.1z){4.d.2e()}4.d=2K;4.1z=15},2H:{},23:c(B){n{d:4.d,m:4.m,1P:4.1j,9:4.9}},19:c(C,B){A.g.17.2t(4,C,[B,4.23()]);7(C=="1c"){4.1j=4.X("V")}n 4.j.2z(C=="1c"?C:"1c"+C,[B,4.23()],4.9[C])},2T:c(){7(!4.j.U("i")){n}4.j.3d("i").3x(".i").2o("g-i");4.35()}}));A.2c(A.g.i,{3l:{1u:"k",1w:15,3r:":3p",3q:0,3n:1,d:"24"}});A.g.17.1e("i","1p",{18:c(D,C){a B=A("12");7(B.e("1p")){C.9.21=B.e("1p")}B.e("1p",C.9.1p)},1k:c(C,B){7(B.9.21){A("12").e("1p",B.9.21)}}});A.g.17.1e("i","Z",{18:c(D,C){a B=A(C.d);7(B.e("Z")){C.9.1W=B.e("Z")}B.e("Z",C.9.Z)},1k:c(C,B){7(B.9.1W){A(B.d).e("Z",B.9.1W)}}});A.g.17.1e("i","1l",{18:c(D,C){a B=A(C.d);7(B.e("1l")){C.9.1X=B.e("1l")}B.e("1l",C.9.1l)},1k:c(C,B){7(B.9.1X){A(B.d).e("1l",B.9.1X)}}});A.g.17.1e("i","1K",{18:c(C,B){A(B.9.1K===v?"3v":B.9.1K).1d(c(){A(\'<1Y 3y="g-i-1K" 1x="3t: #3u;"></1Y>\').e({t:4.1U+"1J",u:4.1V+"1J",m:"V",1l:"0.3a",Z:3k}).e(A(4).8()).1u("12")})},1k:c(C,B){A("1Y.37").1d(c(){4.1t.3c(4)})}});A.g.17.1e("i","1v",{18:c(D,C){a E=C.9;a B=A(4).U("i");E.14=E.14||20;E.11=E.11||20;B.W=c(F){2f{7(/1D|1v/.1h(F.e("1L"))||(/1D|1v/).1h(F.e("1L-y"))){n F}F=F.k()}2j(F[0].1t);n A(f)}(4);B.Y=c(F){2f{7(/1D|1v/.1h(F.e("1L"))||(/1D|1v/).1h(F.e("1L-x"))){n F}F=F.k()}2j(F[0].1t);n A(f)}(4);7(B.W[0]!=f&&B.W[0].1F!="1E"){B.1Z=B.W.8()}7(B.Y[0]!=f&&B.Y[0].1F!="1E"){B.25=B.Y.8()}},1c:c(D,C){a E=C.9;a B=A(4).U("i");7(B.W[0]!=f&&B.W[0].1F!="1E"){7((B.1Z.5+B.W[0].1V)-D.1s<E.14){B.W[0].q=B.W[0].q+E.11}7(D.1s-B.1Z.5<E.14){B.W[0].q=B.W[0].q-E.11}}1y{7(D.1s-A(f).q()<E.14){A(f).q(A(f).q()-E.11)}7(A(1o).u()-(D.1s-A(f).q())<E.14){A(f).q(A(f).q()+E.11)}}7(B.Y[0]!=f&&B.Y[0].1F!="1E"){7((B.25.6+B.Y[0].1U)-D.1r<E.14){B.Y[0].s=B.Y[0].s+E.11}7(D.1r-B.25.6<E.14){B.Y[0].s=B.Y[0].s-E.11}}1y{7(D.1r-A(f).s()<E.14){A(f).s(A(f).s()-E.11)}7(A(1o).t()-(D.1r-A(f).s())<E.14){A(f).s(A(f).s()+E.11)}}}});A.g.17.1e("i","1R",{18:c(D,C){a B=A(4).U("i");B.1i=[];A(C.9.1R===v?".g-i":C.9.1R).1d(c(){a F=A(4);a E=F.8();7(4!=B.j[0]){B.1i.2x({2q:4,t:F.26(),u:F.1Q(),5:E.5,6:E.6})}})},1c:c(J,N){a I=A(4).U("i");a L=N.9.3j||20;a D=N.1P.6,C=D+I.w.t,P=N.1P.5,O=P+I.w.u;3s(a H=I.1i.1C-1;H>=0;H--){a E=I.1i[H].6,B=E+I.1i[H].t,R=I.1i[H].5,M=R+I.1i[H].u;7(!((E-L<D&&D<B+L&&R-L<P&&P<M+L)||(E-L<D&&D<B+L&&R-L<O&&O<M+L)||(E-L<C&&C<B+L&&R-L<P&&P<M+L)||(E-L<C&&C<B+L&&R-L<O&&O<M+L))){3w}7(N.9.2w!="3b"){a K=T.1f(R-O)<=20;a Q=T.1f(M-P)<=20;a G=T.1f(E-C)<=20;a F=T.1f(B-D)<=20;7(K){N.m.5=I.X("l",{5:R-I.w.u,6:0}).5}7(Q){N.m.5=I.X("l",{5:M,6:0}).5}7(G){N.m.6=I.X("l",{5:0,6:E-I.w.t}).6}7(F){N.m.6=I.X("l",{5:0,6:B}).6}}7(N.9.2w!="36"){a K=T.1f(R-P)<=20;a Q=T.1f(M-O)<=20;a G=T.1f(E-D)<=20;a F=T.1f(B-C)<=20;7(K){N.m.5=I.X("l",{5:R,6:0}).5}7(Q){N.m.5=I.X("l",{5:M-I.w.u,6:0}).5}7(G){N.m.6=I.X("l",{5:0,6:E}).6}7(F){N.m.6=I.X("l",{5:0,6:B-I.w.t}).6}}}}});A.g.17.1e("i","2v",{18:c(D,C){a B=A(4).U("i");B.1H=[];A(C.9.2v).1d(c(){7(A.U(4,"27")){a E=A.U(4,"27");B.1H.2x({b:E,2y:E.9.1m});E.3g();E.19("39",D,B)}})},1k:c(D,C){a B=A(4).U("i");A.1d(B.1H,c(){7(4.b.1q){4.b.1q=0;B.1z=v;4.b.1z=15;7(4.2y){4.b.9.1m=v}4.b.2b(D);4.b.j.2z("3f",[D,A.2c(4.b.g(),{3e:B.j})],4.b.9.3h);4.b.9.d=4.b.9.29}1y{4.b.19("3i",D,B)}})},1c:c(F,E){a D=A(4).U("i"),B=4;a C=c(K){a H=K.6,J=H+K.t,I=K.5,G=I+K.u;n(H<(4.1j.6+4.8.r.6)&&(4.1j.6+4.8.r.6)<J&&I<(4.1j.5+4.8.r.5)&&(4.1j.5+4.8.r.5)<G)};A.1d(D.1H,c(G){7(C.2t(D,4.b.3o)){7(!4.b.1q){4.b.1q=1;4.b.1I=A(B).28().1u(4.b.j).U("27-2q",v);4.b.9.29=4.b.9.d;4.b.9.d=c(){n E.d[0]};F.2a=4.b.1I[0];4.b.3m(F,v);4.b.2n(F,v,v);4.b.8.r.5=D.8.r.5;4.b.8.r.6=D.8.r.6;4.b.8.k.6-=D.8.k.6-4.b.8.k.6;4.b.8.k.5-=D.8.k.5-4.b.8.k.5;D.19("2J",F)}7(4.b.1I){4.b.2d(F)}}1y{7(4.b.1q){4.b.1q=0;4.b.1z=v;4.b.9.1m=15;4.b.2b(F,v);4.b.9.d=4.b.9.29;4.b.1I.2e();7(4.b.2r){4.b.2r.2e()}D.19("32",F)}}})}});A.g.17.1e("i","1n",{18:c(D,B){a C=A.2X(A(B.9.1n.2W)).2R(c(F,E){n(o(A(F).e("Z"),10)||B.9.1n.1B)-(o(A(E).e("Z"),10)||B.9.1n.1B)});A(C).1d(c(E){4.1x.Z=B.9.1n.1B+E});4[0].1x.Z=B.9.1n.1B+C.1C}})})(38);',62,221,'||||this|top|left|if|offset|options|var|instance|function|helper|css|document|ui|containment|draggable|element|parent|relative|position|return|parseInt|offsetParent|scrollTop|click|scrollLeft|width|height|true|helperProportions|||cssPosition|||||||||||||||||||margins|Math|data|absolute|overflowY|convertPositionTo|overflowX|zIndex||scrollSpeed|body|fixed|scrollSensitivity|false|cursorAt|plugin|start|propagate|grid|ddmanager|drag|each|add|abs|originalPosition|test|snapElements|positionAbs|stop|opacity|revert|stack|window|cursor|isOver|pageX|pageY|parentNode|appendTo|scroll|axis|style|else|cancelHelperRemoval|undefined|min|length|auto|HTML|tagName|handle|sortables|currentItem|px|iframeFix|overflow|addClass|borderTopWidth|disabled|absolutePosition|outerHeight|snap|generatePosition|borderLeftWidth|offsetWidth|offsetHeight|_zIndex|_opacity|div|overflowYOffset||_cursor|clear|uiHash|original|overflowXOffset|outerWidth|sortable|clone|_helper|target|mouseStop|extend|mouseDrag|remove|do|max|marginBottom|marginRight|while|bottom|round|dropBehaviour|mouseStart|removeClass|dragging|item|placeholder|right|call|scrollHeight|connectToSortable|snapMode|push|shouldRevert|triggerHandler|is|animate|find|valid|andSelf|resizable|init|plugins|widget|toSortable|null|mouse|mouseInit|invalid|500|isFunction|prepareOffsets|sort|marginTop|destroy|scrollWidth|browser|group|makeArray|mozilla|current|apply|parents|fromSortable|marginLeft|drop|mouseDestroy|outer|DragDropIframeFix|jQuery|activate|001|inner|removeChild|removeData|sender|sortreceive|refreshItems|receive|deactivate|snapTolerance|1000|defaults|mouseCapture|distance|containerCache|input|delay|cancel|for|background|fff|iframe|continue|unbind|class'.split('|'),0,{}))
+/*
+ * jQuery UI Draggable @VERSION
+ *
+ * Copyright (c) 2008 Paul Bakaus
+ * Dual licensed under the MIT (MIT-LICENSE.txt)
+ * and GPL (GPL-LICENSE.txt) licenses.
+ * 
+ * http://docs.jquery.com/UI/Draggables
+ *
+ * Depends:
+ *	ui.core.js
+ */
+(function($) {
+
+$.widget("ui.draggable", $.extend({}, $.ui.mouse, {
+	
+	getHandle: function(e) {
+
+		var handle = !this.options.handle || !$(this.options.handle, this.element).length ? true : false;
+		$(this.options.handle, this.element)
+			.find("*")
+			.andSelf()
+			.each(function() {
+				if(this == e.target) handle = true;
+			});
+		
+		return handle;
+
+	},
+	
+	createHelper: function() {
+
+		var o = this.options;
+		var helper = $.isFunction(o.helper) ? $(o.helper.apply(this.element[0], [e])) : (o.helper == 'clone' ? this.element.clone() : this.element);
+		
+		if(!helper.parents('body').length)
+			helper.appendTo((o.appendTo == 'parent' ? this.element[0].parentNode : o.appendTo));
+			
+		if(helper[0] != this.element[0] && !(/(fixed|absolute)/).test(helper.css("position")))
+			helper.css("position", "absolute");
+			
+		return helper;
+		
+	},
+	
+	
+	_init: function() {
+		
+		if (this.options.helper == 'original' && !(/^(?:r|a|f)/).test(this.element.css("position")))
+			this.element[0].style.position = 'relative';
+		
+		(this.options.cssNamespace && this.element.addClass(this.options.cssNamespace+"-draggable"));
+		(this.options.disabled && this.element.addClass('ui-draggable-disabled'));
+		
+		this._mouseInit();
+		
+	},
+
+	_mouseCapture: function(e) {
+
+		var o = this.options;
+		
+		if (this.helper || o.disabled || $(e.target).is('.ui-resizable-handle'))
+			return false;
+			
+		//Quit if we're not on a valid handle
+		this.handle = this.getHandle(e);
+		if (!this.handle)
+			return false;
+		
+		return true;
+
+	},
+
+	_mouseStart: function(e) {
+		
+		var o = this.options;
+		
+		//Create and append the visible helper
+		this.helper = this.createHelper();
+		
+		//If ddmanager is used for droppables, set the global draggable
+		if($.ui.ddmanager)
+			$.ui.ddmanager.current = this;
+		
+		/*
+		 * - Position generation -
+		 * This block generates everything position related - it's the core of draggables.
+		 */
+		
+		this.margins = {																				//Cache the margins
+			left: (parseInt(this.element.css("marginLeft"),10) || 0),
+			top: (parseInt(this.element.css("marginTop"),10) || 0)
+		};		
+		
+		this.cssPosition = this.helper.css("position");													//Store the helper's css position
+		this.offset = this.element.offset();															//The element's absolute position on the page
+		this.offset = {																					//Substract the margins from the element's absolute offset
+			top: this.offset.top - this.margins.top,
+			left: this.offset.left - this.margins.left
+		};
+		
+		this.offset.click = {																			//Where the click happened, relative to the element
+			left: e.pageX - this.offset.left,
+			top: e.pageY - this.offset.top
+		};
+
+		//Calling this method cached the next parents that have scrollTop / scrollLeft attached
+		this.cacheScrollParents();
+		
+		
+		this.offsetParent = this.helper.offsetParent(); var po = this.offsetParent.offset();			//Get the offsetParent and cache its position
+		if(this.offsetParent[0] == document.body && $.browser.mozilla) po = { top: 0, left: 0 };		//Ugly FF3 fix
+		this.offset.parent = {																			//Store its position plus border
+			top: po.top + (parseInt(this.offsetParent.css("borderTopWidth"),10) || 0),
+			left: po.left + (parseInt(this.offsetParent.css("borderLeftWidth"),10) || 0)
+		};
+		
+		//This is a relative to absolute position minus the actual position calculation - only used for relative positioned helper
+		if(this.cssPosition == "relative") {
+			var p = this.element.position();
+			this.offset.relative = {
+				top: p.top - (parseInt(this.helper.css("top"),10) || 0) + this.scrollTopParent.scrollTop(),
+				left: p.left - (parseInt(this.helper.css("left"),10) || 0) + this.scrollLeftParent.scrollLeft()
+			};
+		} else {
+			this.offset.relative = { top: 0, left: 0 };
+		}
+		
+		//Generate the original position
+		this.originalPosition = this._generatePosition(e);
+		
+		//Cache the helper size
+		this.cacheHelperProportions();
+		
+		//Adjust the mouse offset relative to the helper if 'cursorAt' is supplied
+		if(o.cursorAt)
+			this.adjustOffsetFromHelper(o.cursorAt);
+
+		//Cache later used stuff
+		$.extend(this, {
+			PAGEY_INCLUDES_SCROLL: (this.cssPosition == "absolute" && (!this.scrollTopParent[0].tagName || (/(html|body)/i).test(this.scrollTopParent[0].tagName))),
+			PAGEX_INCLUDES_SCROLL: (this.cssPosition == "absolute" && (!this.scrollLeftParent[0].tagName || (/(html|body)/i).test(this.scrollLeftParent[0].tagName))),
+			OFFSET_PARENT_NOT_SCROLL_PARENT_Y: this.scrollTopParent[0] != this.offsetParent[0] && !(this.scrollTopParent[0] == document && (/(body|html)/i).test(this.offsetParent[0].tagName)),
+			OFFSET_PARENT_NOT_SCROLL_PARENT_X: this.scrollLeftParent[0] != this.offsetParent[0] && !(this.scrollLeftParent[0] == document && (/(body|html)/i).test(this.offsetParent[0].tagName))
+		});
+		
+		if(o.containment)
+			this.setContainment();
+
+		
+		//Call plugins and callbacks
+		this._propagate("start", e);
+		
+		//Recache the helper size
+		this.cacheHelperProportions();
+		
+		//Prepare the droppable offsets
+		if ($.ui.ddmanager && !o.dropBehaviour)
+			$.ui.ddmanager.prepareOffsets(this, e);
+		
+		this.helper.addClass("ui-draggable-dragging");
+		this._mouseDrag(e); //Execute the drag once - this causes the helper not to be visible before getting its correct position
+		return true;
+	},
+	
+	cacheScrollParents: function() {
+
+		this.scrollTopParent = function(el) {
+			do { if(/auto|scroll/.test(el.css('overflow')) || (/auto|scroll/).test(el.css('overflow-y'))) return el; el = el.parent(); } while (el[0].parentNode);
+			return $(document);
+		}(this.helper);
+		this.scrollLeftParent = function(el) {
+			do { if(/auto|scroll/.test(el.css('overflow')) || (/auto|scroll/).test(el.css('overflow-x'))) return el; el = el.parent(); } while (el[0].parentNode);
+			return $(document);
+		}(this.helper);
+
+	},
+	
+	adjustOffsetFromHelper: function(obj) {
+		if(obj.left != undefined) this.offset.click.left = obj.left + this.margins.left;
+		if(obj.right != undefined) this.offset.click.left = this.helperProportions.width - obj.right + this.margins.left;
+		if(obj.top != undefined) this.offset.click.top = obj.top + this.margins.top;
+		if(obj.bottom != undefined) this.offset.click.top = this.helperProportions.height - obj.bottom + this.margins.top;
+	},
+	
+	cacheHelperProportions: function() {
+		this.helperProportions = {
+			width: this.helper.outerWidth(),
+			height: this.helper.outerHeight()
+		};
+	},
+	
+	setContainment: function() {
+
+		var o = this.options;
+		if(o.containment == 'parent') o.containment = this.helper[0].parentNode;
+		if(o.containment == 'document' || o.containment == 'window') this.containment = [
+			0 - this.offset.relative.left - this.offset.parent.left,
+			0 - this.offset.relative.top - this.offset.parent.top,
+			$(o.containment == 'document' ? document : window).width() - this.offset.relative.left - this.offset.parent.left - this.helperProportions.width - this.margins.left - (parseInt(this.element.css("marginRight"),10) || 0),
+			($(o.containment == 'document' ? document : window).height() || document.body.parentNode.scrollHeight) - this.offset.relative.top - this.offset.parent.top - this.helperProportions.height - this.margins.top - (parseInt(this.element.css("marginBottom"),10) || 0)
+		];
+		
+		if(!(/^(document|window|parent)$/).test(o.containment)) {
+			var ce = $(o.containment)[0];
+			var co = $(o.containment).offset();
+			var over = ($(ce).css("overflow") != 'hidden');
+			
+			this.containment = [
+				co.left + (parseInt($(ce).css("borderLeftWidth"),10) || 0) - this.offset.relative.left - this.offset.parent.left,
+				co.top + (parseInt($(ce).css("borderTopWidth"),10) || 0) - this.offset.relative.top - this.offset.parent.top,
+				co.left+(over ? Math.max(ce.scrollWidth,ce.offsetWidth) : ce.offsetWidth) - (parseInt($(ce).css("borderLeftWidth"),10) || 0) - this.offset.relative.left - this.offset.parent.left - this.helperProportions.width - this.margins.left - (parseInt(this.element.css("marginRight"),10) || 0),
+				co.top+(over ? Math.max(ce.scrollHeight,ce.offsetHeight) : ce.offsetHeight) - (parseInt($(ce).css("borderTopWidth"),10) || 0) - this.offset.relative.top - this.offset.parent.top - this.helperProportions.height - this.margins.top - (parseInt(this.element.css("marginBottom"),10) || 0)
+			];
+		}
+
+	},
+	
+	
+	_convertPositionTo: function(d, pos) {
+
+		if(!pos) pos = this.position;
+		var mod = d == "absolute" ? 1 : -1;
+
+		return {
+			top: (
+				pos.top																	// the calculated relative position
+				+ this.offset.relative.top	* mod										// Only for relative positioned nodes: Relative offset from element to offset parent
+				+ this.offset.parent.top * mod											// The offsetParent's offset without borders (offset + border)
+				- (this.cssPosition == "fixed" || this.PAGEY_INCLUDES_SCROLL || this.OFFSET_PARENT_NOT_SCROLL_PARENT_Y ? 0 : this.scrollTopParent.scrollTop()) * mod	// The offsetParent's scroll position, not if the element is fixed
+				+ (this.cssPosition == "fixed" ? $(document).scrollTop() : 0) * mod
+				+ this.margins.top * mod												//Add the margin (you don't want the margin counting in intersection methods)
+			),
+			left: (
+				pos.left																// the calculated relative position
+				+ this.offset.relative.left	* mod										// Only for relative positioned nodes: Relative offset from element to offset parent
+				+ this.offset.parent.left * mod											// The offsetParent's offset without borders (offset + border)
+				- (this.cssPosition == "fixed" || this.PAGEX_INCLUDES_SCROLL || this.OFFSET_PARENT_NOT_SCROLL_PARENT_X ? 0 : this.scrollLeftParent.scrollLeft()) * mod	// The offsetParent's scroll position, not if the element is fixed
+				+ (this.cssPosition == "fixed" ? $(document).scrollLeft() : 0) * mod
+				+ this.margins.left * mod												//Add the margin (you don't want the margin counting in intersection methods)
+			)
+		};
+	},
+	_generatePosition: function(e) {
+
+		var o = this.options;
+		var position = {
+			top: (
+				e.pageY																	// The absolute mouse position
+				- this.offset.click.top													// Click offset (relative to the element)
+				- this.offset.relative.top												// Only for relative positioned nodes: Relative offset from element to offset parent
+				- this.offset.parent.top												// The offsetParent's offset without borders (offset + border)
+				+ (this.cssPosition == "fixed" || this.PAGEY_INCLUDES_SCROLL || this.OFFSET_PARENT_NOT_SCROLL_PARENT_Y ? 0 : this.scrollTopParent.scrollTop())	// The offsetParent's scroll position, not if the element is fixed
+				- (this.cssPosition == "fixed" ? $(document).scrollTop() : 0)
+			),
+			left: (
+				e.pageX																	// The absolute mouse position
+				- this.offset.click.left												// Click offset (relative to the element)
+				- this.offset.relative.left												// Only for relative positioned nodes: Relative offset from element to offset parent
+				- this.offset.parent.left												// The offsetParent's offset without borders (offset + border)
+				+ (this.cssPosition == "fixed" || this.PAGEX_INCLUDES_SCROLL || this.OFFSET_PARENT_NOT_SCROLL_PARENT_X ? 0 : this.scrollLeftParent.scrollLeft())	// The offsetParent's scroll position, not if the element is fixed
+				- (this.cssPosition == "fixed" ? $(document).scrollLeft() : 0)
+			)
+		};
+	
+		if(!this.originalPosition) return position;										//If we are not dragging yet, we won't check for options
+		
+		/*
+		 * - Position constraining -
+		 * Constrain the position to a mix of grid, containment.
+		 */
+		if(this.containment) {
+			if(position.left < this.containment[0]) position.left = this.containment[0];
+			if(position.top < this.containment[1]) position.top = this.containment[1];
+			if(position.left > this.containment[2]) position.left = this.containment[2];
+			if(position.top > this.containment[3]) position.top = this.containment[3];
+		}
+		
+		if(o.grid) {
+			var top = this.originalPosition.top + Math.round((position.top - this.originalPosition.top) / o.grid[1]) * o.grid[1];
+			position.top = this.containment ? (!(top < this.containment[1] || top > this.containment[3]) ? top : (!(top < this.containment[1]) ? top - o.grid[1] : top + o.grid[1])) : top;
+			
+			var left = this.originalPosition.left + Math.round((position.left - this.originalPosition.left) / o.grid[0]) * o.grid[0];
+			position.left = this.containment ? (!(left < this.containment[0] || left > this.containment[2]) ? left : (!(left < this.containment[0]) ? left - o.grid[0] : left + o.grid[0])) : left;
+		}
+		
+		return position;
+	},
+	_mouseDrag: function(e) {
+	
+		//Compute the helpers position
+		this.position = this._generatePosition(e);
+		this.positionAbs = this._convertPositionTo("absolute");
+		
+		//Call plugins and callbacks and use the resulting position if something is returned		
+		this.position = this._propagate("drag", e) || this.position;
+	
+		if(!this.options.axis || this.options.axis != "y") this.helper[0].style.left = this.position.left+'px';
+		if(!this.options.axis || this.options.axis != "x") this.helper[0].style.top = this.position.top+'px';
+		if($.ui.ddmanager) $.ui.ddmanager.drag(this, e);
+		
+		return false;
+	},
+	_mouseStop: function(e) {
+		
+		//If we are using droppables, inform the manager about the drop
+		var dropped = false;
+		if ($.ui.ddmanager && !this.options.dropBehaviour)
+			var dropped = $.ui.ddmanager.drop(this, e);		
+		
+		if((this.options.revert == "invalid" && !dropped) || (this.options.revert == "valid" && dropped) || this.options.revert === true || ($.isFunction(this.options.revert) && this.options.revert.call(this.element, dropped))) {
+			var self = this;
+			$(this.helper).animate(this.originalPosition, parseInt(this.options.revertDuration, 10) || 500, function() {
+				self._propagate("stop", e);
+				self._clear();
+			});
+		} else {
+			this._propagate("stop", e);
+			this._clear();
+		}
+		
+		return false;
+	},
+	_clear: function() {
+		this.helper.removeClass("ui-draggable-dragging");
+		if(this.options.helper != 'original' && !this.cancelHelperRemoval) this.helper.remove();
+		//if($.ui.ddmanager) $.ui.ddmanager.current = null;
+		this.helper = null;
+		this.cancelHelperRemoval = false;
+	},
+	
+	// From now on bulk stuff - mainly helpers
+	plugins: {},
+	uiHash: function(e) {
+		return {
+			helper: this.helper,
+			position: this.position,
+			absolutePosition: this.positionAbs,
+			options: this.options			
+		};
+	},
+	_propagate: function(n,e) {
+		$.ui.plugin.call(this, n, [e, this.uiHash()]);
+		if(n == "drag") this.positionAbs = this._convertPositionTo("absolute"); //The absolute position has to be recalculated after plugins
+		return this.element.triggerHandler(n == "drag" ? n : "drag"+n, [e, this.uiHash()], this.options[n]);
+	},
+	destroy: function() {
+		if(!this.element.data('draggable')) return;
+		this.element.removeData("draggable").unbind(".draggable").removeClass('ui-draggable ui-draggable-dragging ui-draggable-disabled');
+		this._mouseDestroy();
+	}
+}));
+
+$.extend($.ui.draggable, {
+	defaults: {
+		appendTo: "parent",
+		axis: false,
+		cancel: ":input",
+		delay: 0,
+		distance: 1,
+		helper: "original",
+		scope: "default",
+		cssNamespace: "ui"
+	}
+});
+
+$.ui.plugin.add("draggable", "cursor", {
+	start: function(e, ui) {
+		var t = $('body');
+		if (t.css("cursor")) ui.options._cursor = t.css("cursor");
+		t.css("cursor", ui.options.cursor);
+	},
+	stop: function(e, ui) {
+		if (ui.options._cursor) $('body').css("cursor", ui.options._cursor);
+	}
+});
+
+$.ui.plugin.add("draggable", "zIndex", {
+	start: function(e, ui) {
+		var t = $(ui.helper);
+		if(t.css("zIndex")) ui.options._zIndex = t.css("zIndex");
+		t.css('zIndex', ui.options.zIndex);
+	},
+	stop: function(e, ui) {
+		if(ui.options._zIndex) $(ui.helper).css('zIndex', ui.options._zIndex);
+	}
+});
+
+$.ui.plugin.add("draggable", "opacity", {
+	start: function(e, ui) {
+		var t = $(ui.helper);
+		if(t.css("opacity")) ui.options._opacity = t.css("opacity");
+		t.css('opacity', ui.options.opacity);
+	},
+	stop: function(e, ui) {
+		if(ui.options._opacity) $(ui.helper).css('opacity', ui.options._opacity);
+	}
+});
+
+$.ui.plugin.add("draggable", "iframeFix", {
+	start: function(e, ui) {
+		$(ui.options.iframeFix === true ? "iframe" : ui.options.iframeFix).each(function() {					
+			$('<div class="ui-draggable-iframeFix" style="background: #fff;"></div>')
+			.css({
+				width: this.offsetWidth+"px", height: this.offsetHeight+"px",
+				position: "absolute", opacity: "0.001", zIndex: 1000
+			})
+			.css($(this).offset())
+			.appendTo("body");
+		});
+	},
+	stop: function(e, ui) {
+		$("div.ui-draggable-iframeFix").each(function() { this.parentNode.removeChild(this); }); //Remove frame helpers	
+	}
+});
+
+
+
+$.ui.plugin.add("draggable", "scroll", {
+	start: function(e, ui) {
+		var o = ui.options;
+		var i = $(this).data("draggable");
+		o.scrollSensitivity	= o.scrollSensitivity || 20;
+		o.scrollSpeed		= o.scrollSpeed || 20;
+		
+		i.overflowY = function(el) {
+			do { if(/auto|scroll/.test(el.css('overflow')) || (/auto|scroll/).test(el.css('overflow-y'))) return el; el = el.parent(); } while (el[0].parentNode);
+			return $(document);
+		}(this);
+		i.overflowX = function(el) {
+			do { if(/auto|scroll/.test(el.css('overflow')) || (/auto|scroll/).test(el.css('overflow-x'))) return el; el = el.parent(); } while (el[0].parentNode);
+			return $(document);
+		}(this);
+		
+		if(i.overflowY[0] != document && i.overflowY[0].tagName != 'HTML') i.overflowYOffset = i.overflowY.offset();
+		if(i.overflowX[0] != document && i.overflowX[0].tagName != 'HTML') i.overflowXOffset = i.overflowX.offset();
+		
+	},
+	drag: function(e, ui) {
+		
+		var o = ui.options, scrolled = false;
+		var i = $(this).data("draggable");
+		
+		if(i.overflowY[0] != document && i.overflowY[0].tagName != 'HTML') {
+			if((i.overflowYOffset.top + i.overflowY[0].offsetHeight) - e.pageY < o.scrollSensitivity)
+				i.overflowY[0].scrollTop = scrolled = i.overflowY[0].scrollTop + o.scrollSpeed;
+			if(e.pageY - i.overflowYOffset.top < o.scrollSensitivity)
+				i.overflowY[0].scrollTop = scrolled = i.overflowY[0].scrollTop - o.scrollSpeed;
+							
+		} else {
+			if(e.pageY - $(document).scrollTop() < o.scrollSensitivity)
+				scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+			if($(window).height() - (e.pageY - $(document).scrollTop()) < o.scrollSensitivity)
+				scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+		}
+		
+		if(i.overflowX[0] != document && i.overflowX[0].tagName != 'HTML') {
+			if((i.overflowXOffset.left + i.overflowX[0].offsetWidth) - e.pageX < o.scrollSensitivity)
+				i.overflowX[0].scrollLeft = scrolled = i.overflowX[0].scrollLeft + o.scrollSpeed;
+			if(e.pageX - i.overflowXOffset.left < o.scrollSensitivity)
+				i.overflowX[0].scrollLeft = scrolled = i.overflowX[0].scrollLeft - o.scrollSpeed;
+		} else {
+			if(e.pageX - $(document).scrollLeft() < o.scrollSensitivity)
+				scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+			if($(window).width() - (e.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
+				scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+		}
+		
+		if(scrolled !== false)
+			$.ui.ddmanager.prepareOffsets(i, e);
+		
+	}
+});
+
+
+$.ui.plugin.add("draggable", "snap", {
+	start: function(e, ui) {
+		
+		var inst = $(this).data("draggable");
+		inst.snapElements = [];
+
+		$(ui.options.snap.constructor != String ? ( ui.options.snap.items || ':data(draggable)' ) : ui.options.snap).each(function() {
+			var $t = $(this); var $o = $t.offset();
+			if(this != inst.element[0]) inst.snapElements.push({
+				item: this,
+				width: $t.outerWidth(), height: $t.outerHeight(),
+				top: $o.top, left: $o.left
+			});
+		});
+		
+	},
+	drag: function(e, ui) {
+	
+		var inst = $(this).data("draggable");
+		var d = ui.options.snapTolerance || 20;
+
+		var x1 = ui.absolutePosition.left, x2 = x1 + inst.helperProportions.width,
+			y1 = ui.absolutePosition.top, y2 = y1 + inst.helperProportions.height;
+		
+		for (var i = inst.snapElements.length - 1; i >= 0; i--){
+			
+			var l = inst.snapElements[i].left, r = l + inst.snapElements[i].width, 
+				t = inst.snapElements[i].top, b = t + inst.snapElements[i].height;
+		
+			//Yes, I know, this is insane ;)
+			if(!((l-d < x1 && x1 < r+d && t-d < y1 && y1 < b+d) || (l-d < x1 && x1 < r+d && t-d < y2 && y2 < b+d) || (l-d < x2 && x2 < r+d && t-d < y1 && y1 < b+d) || (l-d < x2 && x2 < r+d && t-d < y2 && y2 < b+d))) {
+				if(inst.snapElements[i].snapping) (inst.options.snap.release && inst.options.snap.release.call(inst.element, null, $.extend(inst.uiHash(), { snapItem: inst.snapElements[i].item })));
+				inst.snapElements[i].snapping = false;
+				continue;
+			}
+		
+			if(ui.options.snapMode != 'inner') {
+				var ts = Math.abs(t - y2) <= d;
+				var bs = Math.abs(b - y1) <= d;
+				var ls = Math.abs(l - x2) <= d;
+				var rs = Math.abs(r - x1) <= d;
+				if(ts) ui.position.top = inst._convertPositionTo("relative", { top: t - inst.helperProportions.height, left: 0 }).top;
+				if(bs) ui.position.top = inst._convertPositionTo("relative", { top: b, left: 0 }).top;
+				if(ls) ui.position.left = inst._convertPositionTo("relative", { top: 0, left: l - inst.helperProportions.width }).left;
+				if(rs) ui.position.left = inst._convertPositionTo("relative", { top: 0, left: r }).left;
+			}
+			
+			var first = (ts || bs || ls || rs);
+			
+			if(ui.options.snapMode != 'outer') {
+				var ts = Math.abs(t - y1) <= d;
+				var bs = Math.abs(b - y2) <= d;
+				var ls = Math.abs(l - x1) <= d;
+				var rs = Math.abs(r - x2) <= d;
+				if(ts) ui.position.top = inst._convertPositionTo("relative", { top: t, left: 0 }).top;
+				if(bs) ui.position.top = inst._convertPositionTo("relative", { top: b - inst.helperProportions.height, left: 0 }).top;
+				if(ls) ui.position.left = inst._convertPositionTo("relative", { top: 0, left: l }).left;
+				if(rs) ui.position.left = inst._convertPositionTo("relative", { top: 0, left: r - inst.helperProportions.width }).left;
+			}
+			
+			if(!inst.snapElements[i].snapping && (ts || bs || ls || rs || first))
+				(inst.options.snap.snap && inst.options.snap.snap.call(inst.element, null, $.extend(inst.uiHash(), { snapItem: inst.snapElements[i].item })));
+			inst.snapElements[i].snapping = (ts || bs || ls || rs || first);
+			
+		};
+
+	}
+});
+
+$.ui.plugin.add("draggable", "connectToSortable", {
+	start: function(e,ui) {
+	
+		var inst = $(this).data("draggable");
+		inst.sortables = [];
+		$(ui.options.connectToSortable).each(function() {
+			if($.data(this, 'sortable')) {
+				var sortable = $.data(this, 'sortable');
+				inst.sortables.push({
+					instance: sortable,
+					shouldRevert: sortable.options.revert
+				});
+				sortable._refreshItems();	//Do a one-time refresh at start to refresh the containerCache	
+				sortable._propagate("activate", e, inst);
+			}
+		});
+
+	},
+	stop: function(e,ui) {
+		
+		//If we are still over the sortable, we fake the stop event of the sortable, but also remove helper
+		var inst = $(this).data("draggable");
+		
+		$.each(inst.sortables, function() {
+			if(this.instance.isOver) {
+				this.instance.isOver = 0;
+				inst.cancelHelperRemoval = true; //Don't remove the helper in the draggable instance
+				this.instance.cancelHelperRemoval = false; //Remove it in the sortable instance (so sortable plugins like revert still work)
+				if(this.shouldRevert) this.instance.options.revert = true; //revert here
+				this.instance._mouseStop(e);
+				
+				//Also propagate receive event, since the sortable is actually receiving a element
+				this.instance.element.triggerHandler("sortreceive", [e, $.extend(this.instance.ui(), { sender: inst.element })], this.instance.options["receive"]);
+
+				this.instance.options.helper = this.instance.options._helper;
+			} else {
+				this.instance._propagate("deactivate", e, inst);
+			}
+
+		});
+		
+	},
+	drag: function(e,ui) {
+
+		var inst = $(this).data("draggable"), self = this;
+		
+		var checkPos = function(o) {
+				
+			var l = o.left, r = l + o.width,
+				t = o.top, b = t + o.height;
+
+			return (l < (this.positionAbs.left + this.offset.click.left) && (this.positionAbs.left + this.offset.click.left) < r
+					&& t < (this.positionAbs.top + this.offset.click.top) && (this.positionAbs.top + this.offset.click.top) < b);				
+		};
+		
+		$.each(inst.sortables, function(i) {
+
+			if(checkPos.call(inst, this.instance.containerCache)) {
+
+				//If it intersects, we use a little isOver variable and set it once, so our move-in stuff gets fired only once
+				if(!this.instance.isOver) {
+					this.instance.isOver = 1;
+
+					//Now we fake the start of dragging for the sortable instance,
+					//by cloning the list group item, appending it to the sortable and using it as inst.currentItem
+					//We can then fire the start event of the sortable with our passed browser event, and our own helper (so it doesn't create a new one)
+					this.instance.currentItem = $(self).clone().appendTo(this.instance.element).data("sortable-item", true);
+					this.instance.options._helper = this.instance.options.helper; //Store helper option to later restore it
+					this.instance.options.helper = function() { return ui.helper[0]; };
+				
+					e.target = this.instance.currentItem[0];
+					this.instance._mouseCapture(e, true);
+					this.instance._mouseStart(e, true, true);
+
+					//Because the browser event is way off the new appended portlet, we modify a couple of variables to reflect the changes
+					this.instance.offset.click.top = inst.offset.click.top;
+					this.instance.offset.click.left = inst.offset.click.left;
+					this.instance.offset.parent.left -= inst.offset.parent.left - this.instance.offset.parent.left;
+					this.instance.offset.parent.top -= inst.offset.parent.top - this.instance.offset.parent.top;
+					
+					inst._propagate("toSortable", e);
+				
+				}
+				
+				//Provided we did all the previous steps, we can fire the drag event of the sortable on every draggable drag, when it intersects with the sortable
+				if(this.instance.currentItem) this.instance._mouseDrag(e);
+				
+			} else {
+				
+				//If it doesn't intersect with the sortable, and it intersected before,
+				//we fake the drag stop of the sortable, but make sure it doesn't remove the helper by using cancelHelperRemoval
+				if(this.instance.isOver) {
+					this.instance.isOver = 0;
+					this.instance.cancelHelperRemoval = true;
+					this.instance.options.revert = false; //No revert here
+					this.instance._mouseStop(e, true);
+					this.instance.options.helper = this.instance.options._helper;
+					
+					//Now we remove our currentItem, the list group clone again, and the placeholder, and animate the helper back to it's original size
+					this.instance.currentItem.remove();
+					if(this.instance.placeholder) this.instance.placeholder.remove();
+					
+					inst._propagate("fromSortable", e);
+				}
+				
+			};
+
+		});
+
+	}
+});
+
+$.ui.plugin.add("draggable", "stack", {
+	start: function(e,ui) {
+		var group = $.makeArray($(ui.options.stack.group)).sort(function(a,b) {
+			return (parseInt($(a).css("zIndex"),10) || ui.options.stack.min) - (parseInt($(b).css("zIndex"),10) || ui.options.stack.min);
+		});
+		
+		$(group).each(function(i) {
+			this.style.zIndex = ui.options.stack.min + i;
+		});
+		
+		this[0].style.zIndex = ui.options.stack.min + group.length;
+	}
+});
+
+})(jQuery);

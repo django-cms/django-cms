@@ -293,7 +293,7 @@ div#sitemap li.last, div#sitemap li:last-child {
 }
 #sitemap li a.addlink span, #sitemap li a.deletelink span{display:none;}
 
-#sitemap li .cont:hover{background-position:0px -300px;}
+#sitemap li .cont:hover {background-position:0px -300px;}
 #sitemap li .cont:hover a,
 #sitemap li .cont:hover .col-language,
 #sitemap li .cont:hover .col-language a{color:#fff;}
@@ -305,6 +305,10 @@ div#sitemap li.last, div#sitemap li:last-child {
 #sitemap li .cont:active a,
 #sitemap li .cont:active .col-language,
 #sitemap li .cont:active .col-language a{color:#5B80B2;}
+
+#sitemap li .drop-over {
+	border-bottom:1px solid #000;
+}
 
 .activ-filter div#sitemap ul,
 .activ-filter div#sitemap li,
