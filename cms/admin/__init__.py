@@ -25,7 +25,8 @@ from django.template.context import RequestContext
 
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
-from cms.admin.views import get_content, change_status, modify_content, change_innavigation, get_form, add_plugin
+from cms.admin.views import get_content, change_status, modify_content, change_innavigation, add_plugin,\
+    edit_plugin
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 
@@ -111,12 +112,13 @@ class PageAdmin(admin.ModelAdmin):
         elif url.endswith('add-plugin'):
             #page_id, placeholder, plugin_name = url.split('/')
             return add_plugin(request)
+        elif 'edit-plugin' in url:
+            plugin_id = url.split("/")[-1]
+            return edit_plugin(request, plugin_id)
         elif 'remove-plugin' in url:
             #page_id, placeholder, position = url.split('/')
             return remove_plugin(request, page_id, placeholder, position)
-        elif 'get-form' in url:
-            #spage_id, placeholder, position = url.split('/')
-            return get_form(request, unquote(page_id), unquote(placeholder), unquote(position))
+        
         
         #elif url.endswith('/valid-targets-list'):
         #    return valid_targets_list(request, unquote(url[:-19]))

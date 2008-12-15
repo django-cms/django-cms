@@ -11,8 +11,13 @@ $(document).ready(function() {
 		if (pluginvalue) {
 			var pluginname = select.children('[@selected]').text()
 			$(this).parent().children("ul.plugin-list").append("<li class=" + pluginvalue + ">" + pluginname + "</li>")
-			$.post("add-plugin", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
+			$.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
 				target_div.html(data)
+				target_div.children("form").submit(function() {
+					alert("send")
+					return false;
+				});
+
 			}, "html" );
 		
 		}

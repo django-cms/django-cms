@@ -1,7 +1,8 @@
 {% load i18n %}
-<h2>{{ plugin.name }}</h2>
-<form action="">
+{{ form.media }}
+<h2>{{ plugin.get_plugin_name }}</h2>
+<form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" method="post">
 	{{ form.as_p }}
 	
-	<input type=submit value="{% trans "save" %}"/>
+	<input type=submit value="{% trans "save" %}" />
 </form>

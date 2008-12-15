@@ -100,6 +100,7 @@ get_content = auto_render(get_content)
 
 def add_plugin(request):
     if request.method == "POST":
+        print "add plugin"
         page_id = request.POST['page_id']
         page = get_object_or_404(Page, pk=page_id)
         placeholder = request.POST['placeholder']
@@ -107,15 +108,17 @@ def add_plugin(request):
         language = request.POST['language']
         position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
-        plugin.save()      
-        return get_form(request, plugin.pk)
+        plugin.save()
+        request.method = "GET"      
+        return edit_plugin(request, plugin.pk)
     raise Http404
     
 
 def remove_plugin(request, plugin_id):
     pass
 
-def get_form(request, plugin_id):
+def edit_plugin(request, plugin_id):
+    print plugin_id
     cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
     
     plugin_class = plugin_pool.get_plugin(cms_plugin.plugin_type)()
@@ -124,11 +127,27 @@ def get_form(request, plugin_id):
         instance = model.objects.get(pk=cms_plugin.pk)
     except:
         instance = None
-    if instance:
-        form = plugin_class.form(instance=instance)
+    
+    if request.method == "POST":
+        if instance:
+            form = plugin_class.form(request.POST, request.FILES, instance=instance)
+        else:
+            form = plugin_class.form(request.POST, request.FILES)
+        if form.is_valid():
+            inst = form.save(commit=False)
+            inst.page = cms_plugin.page
+            inst.position = cms_plugin.position
+            inst.placeholder = cms_plugin.placeholder
+            inst.language = cms_plugin.language
+            inst.save()
+            return render_to_response('admin/cms/page/plugin_forms_ok.html',{},RequestContext(request))
     else:
-        form = plugin_class.form()
-    return render_to_response('admin/cms/page/plugin_forms.html',{'form':form}, RequestContext(request))
+        if instance:
+            form = plugin_class.form(instance=instance)
+        else:
+            form = plugin_class.form() 
+    return render_to_response('admin/cms/page/plugin_forms.html',{'form':form, 'plugin':cms_plugin}, RequestContext(request))
+
     
 def move_plugin(request, plugin_id , old_position, new_position):
     pass
