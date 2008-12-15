@@ -11,7 +11,7 @@ $(document).ready(function() {
 			var ul_list = $(this).parent().parent().children("ul.plugin-list")
 			$.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
 				loadPluginForm(target_div, data)
-				ul_list.append('<li id="plugin_'+data+'" class="' + pluginvalue + '"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>')
+				ul_list.append('<li id="plugin_'+data+'" class="' + pluginvalue + ' active"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>')
 				setclickfunctions();
 			}, "html" );
 		}
@@ -21,10 +21,8 @@ $(document).ready(function() {
 
 function setclickfunctions(){
 	$('ul.plugin-list .text').click(function(){
-		console.log($(this))
 		var target = $(this).parent().parent().parent().parent().children("div.plugin-editor")
 		var id = $(this).parent().attr("id").split("plugin_")[1]
-		console.log("click",id,target)
 		loadPluginForm(target, id)
 		return false
 	})
@@ -32,7 +30,6 @@ function setclickfunctions(){
 	$('ul.plugin-list .delete').click(function(){
 		var plugin_id = $(this).parent().attr("id").split("plugin_")[1]
 		$.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
-			console.log("plugin_"+data)
 			$("#plugin_"+data).remove()
 		}, "html");
    	});
@@ -44,10 +41,8 @@ function setclickfunctions(){
 
 
 function loadPluginForm(target, id){
-	console.log(id)
 	var object = '<object id="page" type="text/html" data="/admin/cms/page/edit-plugin/'+id+'"></object>' 
 	target.html(object)
 	$('ul.plugin-list .active').removeClass("active")
 	$('#plugin_'+id).addClass("active")
-	console.log($('li#plugin_'+id))
 };
