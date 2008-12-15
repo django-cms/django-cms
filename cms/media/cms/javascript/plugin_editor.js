@@ -13,7 +13,7 @@ $(document).ready(function() {
 			var ul_list = $(this).parent().parent().children("ul.plugin-list")
 			$.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
 				loadPluginForm(target_div, data)
-				ul_list.append('<li id="plugin_'+data+'" class="' + pluginvalue + '">' + pluginname + '</li>')
+				ul_list.append('<li id="plugin_'+data+'" class="' + pluginvalue + '"><a href="#"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></a></li>')
 			}, "html" );
 		
 		}
