@@ -1,6 +1,6 @@
 {% load i18n %}
 <ul class="plugin-list">{% for plugin in plugin_list %}
-	<li class="{{ plugin.value }}">{{ plugin.name }}</li>{% endfor %}
+	<li class="{{ plugin.plugin_type }}">{{ plugin.get_plugin_name }}</li>{% endfor %}
 </ul>
 <select name="plugins">
 	<option value="" selected="selected">{% trans "Available Plugins" %}</option>{% for p in installed_plugins %}

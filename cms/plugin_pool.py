@@ -1,6 +1,7 @@
 
 from cms.exceptions import PluginAllreadyRegistered
 from django.conf import settings
+from cms.plugin_base import CMSPluginBase
 
 class PluginPool(object):
     def __init__(self):
@@ -16,10 +17,9 @@ class PluginPool(object):
     
     def register_plugin(self, plugin):
         #from cms.plugins import CMSPluginBase
-        #assert issubclass(plugin, CMSPluginBase)
+        assert issubclass(plugin, CMSPluginBase)
         if plugin.__name__ in self.plugins.keys():
             raise PluginAllreadyRegistered, "[%s] a plugin with this name is already registered" % plugin.__name__
-        print plugin.__name__
         plugin.value = plugin.__name__
         self.plugins[plugin.__name__] = plugin 
     

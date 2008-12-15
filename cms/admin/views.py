@@ -106,7 +106,7 @@ def add_plugin(request):
         plugin_type = request.POST['plugin_type']
         language = request.POST['language']
         position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
-        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position) 
+        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         plugin.save()      
         return get_form(request, plugin.pk)
     raise Http404

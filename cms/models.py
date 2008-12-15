@@ -285,10 +285,16 @@ class Title(models.Model):
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"))
     position = models.PositiveSmallIntegerField(_("position"), default=0)
-    placeholder = models.CharField(_("slot"), max_length=50, default=0, db_index=True)
+    placeholder = models.CharField(_("slot"), max_length=50, db_index=True)
     language = models.CharField(_("language"), max_length=3, blank=False, db_index=True)
     plugin_type = models.CharField(_("plugin_name"), max_length=25, db_index=True)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    
+    def get_plugin_name(self):
+        from cms.plugin_pool import plugin_pool
+        print plugin_pool.get_plugin(self.plugin_type)
+        print plugin_pool.get_plugin(self.plugin_type).name
+        return plugin_pool.get_plugin(self.plugin_type).name
     #class Meta:
     #    pass
         #abstract = True

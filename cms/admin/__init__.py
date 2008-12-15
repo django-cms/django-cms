@@ -178,7 +178,6 @@ class PageAdmin(admin.ModelAdmin):
             if not obj.has_softroot_permission(request):
                 given_fieldsets[0][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
-            print placeholder
             if placeholder.name not in self.mandatory_placeholders:
                 given_fieldsets += [(placeholder.name, {'fields':[placeholder.name]})]        
         return given_fieldsets
@@ -234,7 +233,8 @@ class PageAdmin(admin.ModelAdmin):
                 installed_plugins = plugin_pool.get_all_plugins()
                 plugin_list = []
                 if obj:
-                    plugin_list = CMSPlugin.objects.filter(page=obj, language=language).order_by('position')
+                    print placeholder.name
+                    plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
