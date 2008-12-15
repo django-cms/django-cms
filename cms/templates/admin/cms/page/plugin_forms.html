@@ -3,7 +3,9 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.js"></script>
 {{ form.media }}
+
 {{ block.super }}
 
 {% endblock %}
@@ -11,7 +13,13 @@
 {% block content_title %}{% endblock %}
 
 {% block content %}
-<script type="text/javascript">parent.setiframeheight();</script>
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		parent.setiframeheight($('body').height(), {{plugin.pk}});
+	});
+	
+</script>
 
 <div id="content-main">
 
