@@ -30,4 +30,4 @@ class WYMEditor(Textarea):
             'CMS_MEDIA_URL': CMS_MEDIA_URL,
         }
         return rendered + mark_safe(render_to_string(
-            'admin/cms/page/widgets/wymeditor.html', context))
+            'text/widgets/wymeditor.html', context))

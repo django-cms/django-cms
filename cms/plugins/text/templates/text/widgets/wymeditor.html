@@ -2,7 +2,7 @@
 {% full_tree_for_model cms.Page as pages %}
 <script type="text/javascript">
     jQuery('#id_{{ name }}').wymeditor({
-        lang: '{{ language }}',
+        lang: 'en{{ language }}',
         skin: 'django',
         skinPath: "{{ CMS_MEDIA_URL }}javascript/wymeditor/skins/django/",
         updateSelector: '.submit-row input[type=submit],',

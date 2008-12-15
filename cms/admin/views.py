@@ -131,6 +131,8 @@ def edit_plugin(request, plugin_id):
     try:
         instance = model.objects.get(pk=cms_plugin.pk)
     except:
+        print model
+        print "no instance"
         instance = None
     
     if request.method == "POST":
@@ -140,10 +142,12 @@ def edit_plugin(request, plugin_id):
             form = plugin_class.form(request.POST, request.FILES)
         if form.is_valid():
             inst = form.save(commit=False)
+            inst.pk = cms_plugin.pk
             inst.page = cms_plugin.page
             inst.position = cms_plugin.position
             inst.placeholder = cms_plugin.placeholder
             inst.language = cms_plugin.language
+            inst.plugin_type = cms_plugin.plugin_type
             inst.save()
             return render_to_response('admin/cms/page/plugin_forms_ok.html',{},RequestContext(request))
     else:
