@@ -149,7 +149,7 @@ def edit_plugin(request, plugin_id):
             inst.language = cms_plugin.language
             inst.plugin_type = cms_plugin.plugin_type
             inst.save()
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL},RequestContext(request))
+            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))
     else:
         if instance:
             form = plugin_class.form(instance=instance)
