@@ -292,8 +292,6 @@ class CMSPlugin(models.Model):
     
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
-        print plugin_pool.get_plugin(self.plugin_type)
-        print plugin_pool.get_plugin(self.plugin_type).name
         return plugin_pool.get_plugin(self.plugin_type).name
     #class Meta:
     #    pass

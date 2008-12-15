@@ -4,7 +4,7 @@ from inspect import isclass, getmembers
 from django.forms import Widget, TextInput, Textarea, CharField
 from django.contrib import admin
 from django.utils.translation import ugettext as _, ugettext_lazy
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 
 from django.db import models
 from django.http import HttpResponseRedirect
@@ -29,6 +29,7 @@ from cms.admin.views import get_content, change_status, modify_content, change_i
     edit_plugin, remove_plugin
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
+from copy import deepcopy
 
 
 class PageAdmin(admin.ModelAdmin):
@@ -172,13 +173,14 @@ class PageAdmin(admin.ModelAdmin):
         fieldsets.
         """
         template = get_template_from_request(request, obj)
-        given_fieldsets = list(self.declared_fieldsets)
-        given_fieldsets[0][1]['fields'] = given_fieldsets[0][1]['fields'][:] #make a copy so we can manipulate it
+        given_fieldsets = list(deepcopy(self.declared_fieldsets))
+        given_fieldsets[1][1]['fields'] = given_fieldsets[1][1]['fields'][:] #make a copy so we can manipulate it
+        given_fieldsets[2][1]['fields'] = given_fieldsets[2][1]['fields'][:]
         if obj:
             if not obj.has_publish_permission(request):
-                given_fieldsets[0][1]['fields'].remove('status')
+                given_fieldsets[1][1]['fields'].remove('status')
             if not obj.has_softroot_permission(request):
-                given_fieldsets[0][1]['fields'].remove('soft_root')
+                given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
                 given_fieldsets += [(placeholder.name, {'fields':[placeholder.name], 'classes':['plugin-holder']})]        
@@ -223,7 +225,6 @@ class PageAdmin(admin.ModelAdmin):
             initial_title = obj.get_title(language=language, fallback=False)
             form.base_fields['slug'].initial = initial_slug
             form.base_fields['title'].initial = initial_title
-            
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)
@@ -235,7 +236,6 @@ class PageAdmin(admin.ModelAdmin):
                 installed_plugins = plugin_pool.get_all_plugins()
                 plugin_list = []
                 if obj:
-                    print placeholder.name
                     plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
