@@ -18,10 +18,20 @@ $(document).ready(function() {
 		
 		}
 	});
+	$('ul.plugin-list a .text').click(function(){
+		var target = $(this).parent().parent().parent().parent().parent().children("div.plugin-editor")
+		var id = $(this).parent().parent().attr("id").split("plugin_")[1]
+		loadPluginForm(target, id)
+		return false
+	})
 });
 
 
 function loadPluginForm(target, id){
+	console.log(id)
 	var object = '<object id="page" type="text/html" data="/admin/cms/page/edit-plugin/'+id+'"></object>' 
 	target.html(object)
+	$('li#plugin_'+id).addClass("active")
+	console.log('#plugin_'+id)
+	console.log($('#plugin_'+id))
 };
