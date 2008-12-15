@@ -18,7 +18,7 @@ $(document).ready(function() {
 		
 		}
 	});
-	$('ul.plugin-list a .text').click(function(){
+	$('ul.plugin-list .text').click(function(){
 		console.log("text click")
 		var target = $(this).parent().parent().parent().parent().parent().children("div.plugin-editor")
 		var id = $(this).parent().parent().attr("id").split("plugin_")[1]
@@ -26,19 +26,18 @@ $(document).ready(function() {
 		return false
 	})
 	
-	$('ul.plugin-list a .delete').click(function(){
+	$('ul.plugin-list .delete').click(function(){
     	
 		console.log("delete")
-		var plugin_id = $(this).parent().parent().attr("id").split("plugin_")[1]
+		var plugin_id = $(this).parent().attr("id").split("plugin_")[1]
 		$.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
 			console.log("plugin_"+data)
-			$("plugin_"+data).remove()
+			$("#plugin_"+data).remove()
 		}, "html");
    	});
 	
-	$('ul.plugin-list a').removeAttr("href")
    
-   	$('ul.plugin-list a .drag').click(function(){
+   	$('ul.plugin-list .drag').click(function(){
     	alert("drag");
    	});
 });
