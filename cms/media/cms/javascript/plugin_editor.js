@@ -47,6 +47,7 @@ function loadPluginForm(target, id){
 	console.log(id)
 	var object = '<object id="page" type="text/html" data="/admin/cms/page/edit-plugin/'+id+'"></object>' 
 	target.html(object)
+	$('ul.plugin-list .active').removeClass("active")
 	$('#plugin_'+id).addClass("active")
 	console.log($('li#plugin_'+id))
 };
