@@ -1,0 +1,90 @@
+.plugin-holder .form-row{
+	padding:0;
+}
+.plugin-holder label{
+	display:none;
+}
+
+
+
+.plugin-editor, .plugin-list-holder{
+	float:left;
+}
+
+
+.plugin-list-holder ul, .plugin-list-holder li, .plugin-list-holder ul.plugin-list{
+	list-style:none;
+	margin:0;
+	padding:0;	
+
+}
+
+
+.plugin-holder .plugin-editor label{
+	display:block;
+}
+
+.plugin-holder{
+	background:url(../images/pluginlist-holder-bg.gif) repeat-y;		
+}
+
+
+.plugin-list-holder{
+	width:300px;
+	/*background-color:#F0F3F8;*/
+}
+.plugin-list-holder select{
+	clear:both;
+}
+.plugin-list-holder .plugin-select-holder{
+	padding:10px;
+}
+.plugin-list-holder .add-plugin{
+	margin-left:10px;
+	cursor:pointer;
+}
+
+ul.plugin-list li{
+	clear:both;	
+	border-bottom:1px solid #DEDEDC;
+	margin-right:1px;
+}
+ul.plugin-list li a{
+	display:block;
+	height:28px;
+	background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
+	line-height:27px;
+}
+ul.plugin-list li a:hover{background-position:0px -300px; color:#fff;}
+ul.plugin-list li a:hover .drag{ background-position:0px -40px;}
+
+ul.plugin-list .drag{
+	display:block;
+	float:left;
+	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
+	display:block;
+	height:28px;
+	width:20px;
+}
+ul.plugin-list .text{
+	float:left;
+	width:255px;
+}
+ul.plugin-list span.delete{
+	float:left;
+	height:28px;
+	width:15px;
+	background:url(../images/pluginlist-delete.png) no-repeat 0px 0px;
+	text-indent:-7777px;
+	cursor:pointer;
+}
+
+.plugin-editor{
+	width:100%;
+	margin-right:-320px;/*300*/
+	padding:0px 10px 0px 10px;
+}
+
+.plugin-editor h2{
+	/*display:none;*/
+}

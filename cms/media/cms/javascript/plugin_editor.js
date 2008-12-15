@@ -5,12 +5,12 @@ $(document).ready(function() {
 		var placeholder = $(this).parent().parent().parent().children("h2").text()
 		var page_id = window.location.href.split("/")[6]  
 		var language = $('#id_language').attr('value')
-		var target_div = $(this).parent().children('div.plugin-editor')
+		var target_div = $(this).parent().parent().parent().children('div.plugin-editor')
 		console.log(page_id)
 		
 		if (pluginvalue) {
 			var pluginname = select.children('[@selected]').text()
-			$(this).parent().children("ul.plugin-list").append("<li class=" + pluginvalue + ">" + pluginname + "</li>")
+			$(this).parent().parent().children("ul.plugin-list").append("<li class=" + pluginvalue + "><a href='#'><span class='drag'></span><span class='text'>" + pluginname + "</span><span class='delete'>delete</span></a></li>")
 			$.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
 				target_div.html(data)
 				target_div.children("form").submit(function() {

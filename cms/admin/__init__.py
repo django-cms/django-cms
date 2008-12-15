@@ -181,7 +181,7 @@ class PageAdmin(admin.ModelAdmin):
                 given_fieldsets[0][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
-                given_fieldsets += [(placeholder.name, {'fields':[placeholder.name]})]        
+                given_fieldsets += [(placeholder.name, {'fields':[placeholder.name], 'classes':['plugin-holder']})]        
         return given_fieldsets
 
     def save_form(self, request, form, change):
