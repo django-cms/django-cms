@@ -54,16 +54,11 @@ ul.plugin-list li{
 	cursor:pointer;
 	color:#5B80B2;
 }
-ul.plugin-list li:hover{background-position:0px -300px; color:#fff;}
-ul.plugin-list li:hover .drag{background-position:0px -40px;}
 
 ul.plugin-list li.active{
 	margin-right:0px;
 	background-position:0px 7777px;
 }
-
-ul.plugin-list li.active:hover{background-position:0px -300px; color:#fff;}
-ul.plugin-list li.active:hover .drag{background-position:0px -40px;}
 
 
 ul.plugin-list .drag{
@@ -87,10 +82,20 @@ ul.plugin-list span.delete{
 	cursor:pointer;
 }
 
+ul.plugin-list li:hover{background-position:0px -300px; color:#fff;}
+ul.plugin-list li:hover .drag{background-position:0px -40px;}
+ul.plugin-list li:hover span.delete{background-position:0px -40px;}
+
+
+ul.plugin-list li.active:hover{background-position:0px -300px; color:#fff;}
+ul.plugin-list li.active:hover .drag{background-position:0px -40px;}
+
+
+
 .plugin-editor{
 	width:100%;
 	margin-right:-310px;/*300*/
-	padding:0px 0px 10px 10px;
+	padding:10px 0px 10px 10px;
 }
 
 .plugin-editor iframe{
