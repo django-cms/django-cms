@@ -242,16 +242,15 @@ $(document).ready(function() {
 				zIndex: 1000,
 				
 				start: function(event, ui) {
-					$(this).find('.cont').each(function() {
-						alert('bla');
+					$(this).parent().find('.cont').each(function() {
 						$(this).droppable('disable');
-					})
+					});
 				},
 				
 				stop: function(event, ui) {
-					$(this).find('.cont').each(function() {
+					$(this).parent().find('.cont').each(function() {
 						$(this).droppable('enable');
-					})
+					});
 				}
 			}).droppable({
 				hoverClass: 'drop-over',
@@ -274,9 +273,19 @@ $(document).ready(function() {
 							ul.appendTo($(this).parent());
 						} else {
 							li.appendTo($(this).siblings()[0]);
-							ul.remove();
+							if ($(this).siblings()[0] != ul)
+								ul.remove();
 						}
 					}
+					
+					$('#sitemap li').each(function() {
+						if ($(this).siblings().length > 0) {
+							$(this).removeClass('last').parent().removeClass('last');
+						} else {
+							$(this).removeClass('last').parent().removeClass('last');
+							$(this).addClass('last').parent().addClass('last');
+						}
+					});
 				}
 			});
         });
