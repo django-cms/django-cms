@@ -36,12 +36,15 @@ function setclickfunctions(){
    
    	$('ul.plugin-list .drag').click(function(){
     	alert("drag");
-   	});	
+   	});
 }
 
+function setiframeheight(){
+	alert("setiframeheight");
+}
 
 function loadPluginForm(target, id){
-	var object = '<object id="page" type="text/html" data="/admin/cms/page/edit-plugin/'+id+'"></object>' 
+	var object = '<iframe src="/admin/cms/page/edit-plugin/'+id+'"></iframe>' 
 	target.html(object)
 	$('ul.plugin-list .active').removeClass("active")
 	$('#plugin_'+id).addClass("active")
