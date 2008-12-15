@@ -10,14 +10,10 @@ $(document).ready(function() {
 		
 		if (pluginvalue) {
 			var pluginname = select.children('[@selected]').text()
-			$(this).parent().parent().children("ul.plugin-list").append("<li class=" + pluginvalue + "><a href='#'><span class='drag'></span><span class='text'>" + pluginname + "</span><span class='delete'>delete</span></a></li>")
+			var ul_list = $(this).parent().parent().children("ul.plugin-list")
 			$.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
-				target_div.html(data)
-				target_div.children("form").submit(function() {
-					alert("send")
-					return false;
-				});
-
+				loadPluginForm(target_div, data)
+				ul_list.append('<li id="plugin_'+data+'" class="' + pluginvalue + '">' + pluginname + '</li>')
 			}, "html" );
 		
 		}
@@ -25,6 +21,7 @@ $(document).ready(function() {
 });
 
 
-function loadPluginForm(name){
-	
-}
+function loadPluginForm(target, id){
+	var object = '<object id="page" type="text/html" data="/admin/cms/page/edit-plugin/'+id+'"></object>' 
+	target.html(object)
+};

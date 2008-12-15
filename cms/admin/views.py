@@ -110,7 +110,7 @@ def add_plugin(request):
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         plugin.save()
         request.method = "GET"      
-        return edit_plugin(request, plugin.pk)
+        return HttpResponse(str(plugin.pk))
     raise Http404
     
 
