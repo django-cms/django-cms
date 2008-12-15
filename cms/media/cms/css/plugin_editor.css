@@ -5,12 +5,9 @@
 	display:none;
 }
 
-
-
 .plugin-editor, .plugin-list-holder{
 	float:left;
 }
-
 
 .plugin-list-holder ul, .plugin-list-holder li, .plugin-list-holder ul.plugin-list{
 	list-style:none;
@@ -18,7 +15,6 @@
 	padding:0;	
 
 }
-
 
 .plugin-holder .plugin-editor label{
 	display:block;
@@ -28,10 +24,8 @@
 	background:url(../images/pluginlist-holder-bg.gif) repeat-y;		
 }
 
-
 .plugin-list-holder{
 	width:300px;
-	/*background-color:#F0F3F8;*/
 }
 .plugin-list-holder select{
 	clear:both;
@@ -89,7 +83,6 @@ ul.plugin-list li:hover span.delete{background-position:0px -40px;}
 
 ul.plugin-list li.active:hover{background-position:0px -300px; color:#fff;}
 ul.plugin-list li.active:hover .drag{background-position:0px -40px;}
-
 
 
 .plugin-editor{
