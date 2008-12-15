@@ -182,7 +182,7 @@ div#sitemap li.last, div#sitemap li:last-child {
 	display:block;
 	height:28px;
 	line-height:27px;
-	padding-left:16px;
+	/*padding-left:16px;*/
 }
 #sitemap li .col1 .info a.collapse, #sitemap li .col1 .info a.collapsed{
 	display:block;
@@ -208,6 +208,13 @@ div#sitemap li.last, div#sitemap li:last-child {
 	margin-left:10px;
 	display:none;	
 }
+#sitemap li .col1 .info a.drag{
+	display:block;
+	float:left;
+	width:16px;
+}
+#sitemap li .col1 .info a.drag:hover{text-decoration:none;}
+
 #sitemap li .col-language,
 #sitemap li .col-actions,	
 #sitemap li .col-published,

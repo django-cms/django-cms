@@ -1,6 +1,7 @@
 <li{% if page.last %} class="last"{% endif %}>{% load pages_tags i18n adminmedia %}{#%# if has_permission %#}<div class="cont">
 <div class="col1">
 <div class="info">
+<a href="#" class="drag">&nbsp;</a>
 <a href="#" {% ifequal 0 page.children.all.count %}style="display: none"{% endifequal %} id="c{{ page.id }}" class="collapse">{% if not no_children %}<span class="collapsed">+</span><span>-</span>{% endif %}</a>
 <a href="{{ url }}{{ page.id }}/" class="titel">{{ page.get_slug }}</a>
 <a href="{{ url }}{{ page.id }}/" class="changelink">edit</a>
