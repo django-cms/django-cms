@@ -149,13 +149,17 @@ def edit_plugin(request, plugin_id):
             inst.language = cms_plugin.language
             inst.plugin_type = cms_plugin.plugin_type
             inst.save()
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{},RequestContext(request))
+            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL},RequestContext(request))
     else:
         if instance:
             form = plugin_class.form(instance=instance)
         else:
             form = plugin_class.form() 
-    return render_to_response('admin/cms/page/plugin_forms.html',{'form':form, 'plugin':cms_plugin, 'is_popup':True, 'CMS_MEDIA_URL':settings.CMS_MEDIA_URL}, RequestContext(request))
+    if plugin_class.form_template:
+        template = plugin_class.form_template
+    else:
+        template = 'admin/cms/page/plugin_forms.html'
+    return render_to_response(template, {'form':form, 'plugin':cms_plugin, 'instance':instance, 'is_popup':True, 'CMS_MEDIA_URL':settings.CMS_MEDIA_URL}, RequestContext(request))
 
     
 def move_plugin(request, plugin_id , old_position, new_position):

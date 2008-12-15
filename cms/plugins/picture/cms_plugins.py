@@ -8,7 +8,7 @@ from models import Picture
 class PicturePlugin(CMSPluginBase):
     model = Picture
     name = _("Picture")
-    
+    form_template = "picture/form.html"
     
     def render(self, request):
         return "hello world"

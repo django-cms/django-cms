@@ -23,8 +23,8 @@
 
 <div id="content-main">
 
-
-<form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" method="post">
+{% block top %}{% endblock %}
+<form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" enctype="multipart/form-data" method="post">
 	<h2>{{ plugin.get_plugin_name }}</h2>
 	{{ form.as_p }}
 	

@@ -6,6 +6,7 @@ from django.conf import settings
 class CMSPluginBase(object):
     name = ""
     form = None
+    form_template = None
     model = None
     
     def __init__(self, context=None):
