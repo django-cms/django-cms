@@ -27,7 +27,7 @@ $(document).ready(function() {
             e.value = URLify(this.value, 64);
         }
     });
-    $('span.add-plugin').click(function(){
+    $('add-plugin').click(function(){
 		var select = $(this).parent().children("select")
 		var pluginvalue = select.attr('value')
 		if (pluginvalue) {
@@ -36,3 +36,7 @@ $(document).ready(function() {
 		}
 	});
 });
+
+function loadPluginForm(name){
+	
+}
