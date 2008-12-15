@@ -2,12 +2,10 @@ $(document).ready(function() {
 	$('span.add-plugin').click(function(){
 		var select = $(this).parent().children("select")
 		var pluginvalue = select.attr('value')
-		var placeholder = $(this).parent().parent().parent().children("h2").text()
+		var placeholder = $(this).parent().parent().parent().parent().parent().children("h2").text()
 		var page_id = window.location.href.split("/")[6]  
 		var language = $('#id_language').attr('value')
 		var target_div = $(this).parent().parent().parent().children('div.plugin-editor')
-		console.log(page_id)
-		
 		if (pluginvalue) {
 			var pluginname = select.children('[@selected]').text()
 			var ul_list = $(this).parent().parent().children("ul.plugin-list")
@@ -23,15 +21,15 @@ $(document).ready(function() {
 
 function setclickfunctions(){
 	$('ul.plugin-list .text').click(function(){
-		console.log("text click")
-		var target = $(this).parent().parent().parent().parent().parent().children("div.plugin-editor")
-		var id = $(this).parent().parent().attr("id").split("plugin_")[1]
+		console.log($(this))
+		var target = $(this).parent().parent().parent().parent().children("div.plugin-editor")
+		var id = $(this).parent().attr("id").split("plugin_")[1]
+		console.log("click",id,target)
 		loadPluginForm(target, id)
 		return false
 	})
 	
-	$('ul.plugin-list .delete').click(function(){    	
-		console.log("delete")
+	$('ul.plugin-list .delete').click(function(){
 		var plugin_id = $(this).parent().attr("id").split("plugin_")[1]
 		$.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
 			console.log("plugin_"+data)
@@ -49,7 +47,6 @@ function loadPluginForm(target, id){
 	console.log(id)
 	var object = '<object id="page" type="text/html" data="/admin/cms/page/edit-plugin/'+id+'"></object>' 
 	target.html(object)
-	$('li#plugin_'+id).addClass("active")
-	console.log('#plugin_'+id)
-	console.log($('#plugin_'+id))
+	$('#plugin_'+id).addClass("active")
+	console.log($('li#plugin_'+id))
 };
