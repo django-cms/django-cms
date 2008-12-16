@@ -9,7 +9,7 @@ class PageForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(),
         help_text=_('The default title'))
     slug = forms.CharField(widget=forms.TextInput(),
-        help_text=_('The part of the title that is used in permalinks'))
+        help_text=_('The part of the title that is used in the url'))
     language = forms.ChoiceField(choices=settings.CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
     template = forms.ChoiceField(choices=settings.CMS_TEMPLATES, required=False,

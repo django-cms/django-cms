@@ -1,16 +1,43 @@
 $(document).ready(function() {
-    $('#id_template').change(function() {
-        var index = this.selectedIndex;
-        var array = window.location.href.split('?');
-        var query = $.query.set('template', this.options[index].value).toString();
-        window.location.href=array[0]+query;
+	$.each(["language", "template"], function(i, label){
+        var select = $('#id_'+label);
+        var index = select[0].selectedIndex;
+        select.change(function() {
+            if (this.selectedIndex != index) {
+				changed = false;
+				if($("#id_slug")[0]._changed){
+					changed = true;
+				}
+				if($("#id_title")[0]._changed){
+					changed = true;
+				}
+				if($("#id_status")[0]._changed){
+					changed = true;
+				}
+				if($('iframe').length){
+					changed = true;
+				}
+                var array = window.location.href.split('?');
+                var query = $.query.set(label, this.options[this.selectedIndex].value).toString();
+                if (changed) {
+					var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?")
+					var answer = confirm(interpolate(question, {
+						field_name: select.prev().text().slice(0, -1),
+					}, true));
+				}else{
+					var answer = true;
+				}
+                if (answer) {
+                    window.location.href = array[0]+query;
+                } else {
+                    this.selectedIndex = index;
+                }
+            }
+        });
     });
-    $('#id_language').change(function() {
-        var index = this.selectedIndex;
-        var array = window.location.href.split('?');
-        var query = $.query.set('language', this.options[index].value).toString();
-        window.location.href=array[0]+query;
-    });
+	
+	
+    
     document.getElementById("id_title").focus();
     var template = $.query.get('template');
     if(template) {
@@ -21,12 +48,22 @@ $(document).ready(function() {
         })
     }
     $("#id_slug").change(function() { this._changed = true; });
+	$('#id_title').change(function() {this._changed = true; })
+	$('#id_status').change(function() {this._changed = true; })
     $("#id_title").keyup(function() {
         var e = $("#id_slug")[0];
         if (!e._changed) {
             e.value = URLify(this.value, 64);
         }
     });
+	
+	$('#page_form').submit(function(){
+		if($('iframe').length){
+			var question = gettext("Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost.")
+			var answer = confirm(question, true);
+			return answer
+		}
+	})
     
 });
 
