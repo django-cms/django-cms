@@ -26,7 +26,7 @@ from django.template.context import RequestContext
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import get_content, change_status, modify_content, change_innavigation, add_plugin,\
-    edit_plugin, remove_plugin
+    edit_plugin, remove_plugin, move_plugin
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 from copy import deepcopy
@@ -119,7 +119,8 @@ class PageAdmin(admin.ModelAdmin):
         elif 'remove-plugin' in url:
             #page_id, placeholder, position = url.split('/')
             return remove_plugin(request)
-        
+        elif 'move-plugin' in url:
+            return move_plugin(request)
         
         #elif url.endswith('/valid-targets-list'):
         #    return valid_targets_list(request, unquote(url[:-19]))
@@ -174,11 +175,6 @@ class PageAdmin(admin.ModelAdmin):
         """
         template = get_template_from_request(request, obj)
         given_fieldsets = deepcopy(self.fieldsets)
-        print self.fieldsets
-        print given_fieldsets
-        
-        #given_fieldsets[1][1]['fields'] = given_fieldsets[1][1]['fields'][:] #make a copy so we can manipulate it
-        #given_fieldsets[2][1]['fields'] = given_fieldsets[2][1]['fields'][:]
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[1][1]['fields'].remove('status')
@@ -374,7 +370,7 @@ class TitleAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
 
 #admin.site.register(Content, ContentAdmin)
-admin.site.register(Title, TitleAdmin)
+#admin.site.register(Title, TitleAdmin)
 
 if settings.CMS_PERMISSION:
     from cms.models import PagePermission

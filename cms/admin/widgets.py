@@ -19,6 +19,8 @@ class PluginEditor(Widget):
         js = [join(CMS_MEDIA_URL, path) for path in (
             'javascript/jquery.js',
             'javascript/plugin_editor.js',
+            'javascript/ui.core.js',
+            'javascript/ui.sortable.js',
         )]
         css = {
             'all': [join(CMS_MEDIA_URL, path) for path in (

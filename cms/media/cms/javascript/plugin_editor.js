@@ -16,6 +16,29 @@ $(document).ready(function() {
 			}, "html" );
 		}
 	});
+	console.log($('ul.plugin-list'))
+	$('ul.plugin-list').sortable({	handle:'span.drag',
+									//appendTo:'body',
+									axis:'y',
+									opacity:0.9,
+									zIndex:2000,
+									update:function(event, ui){
+										var array = ui.element.sortable('toArray')
+										var d = ""
+										for(var i=0;i<array.length;i++){
+											d += array[i].split("plugin_")[1]
+											if (i!=array.length-1){
+												d += "_"
+											}
+										}
+										
+										$.post("move-plugin", { ids:d },
+										  function(data){
+										    console.log(data); //  2pm
+										  }, "json");
+	
+									}
+								})
 	setclickfunctions();
 });
 
@@ -34,9 +57,7 @@ function setclickfunctions(){
 		}, "html");
    	});
    
-   	$('ul.plugin-list .drag').click(function(){
-    	alert("drag");
-   	});
+   	
 }
 
 function setiframeheight(height, id){

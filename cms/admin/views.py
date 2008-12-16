@@ -123,11 +123,8 @@ def remove_plugin(request):
     raise Http404
 
 def edit_plugin(request, plugin_id):
-    print plugin_id
     cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
     instance, plugin_class = cms_plugin.get_plugin_instance()
-    if not instance:
-        print "no instance"
     if request.method == "POST":
         if instance:
             form = plugin_class.form(request.POST, request.FILES, instance=instance)
@@ -157,5 +154,15 @@ def edit_plugin(request, plugin_id):
     return render_to_response(template, {'form':form, 'plugin':cms_plugin, 'instance':instance, 'is_popup':True, 'CMS_MEDIA_URL':settings.CMS_MEDIA_URL}, RequestContext(request))
 
     
-def move_plugin(request, plugin_id , old_position, new_position):
-    pass
+def move_plugin(request):
+    if request.method == "POST":
+        pos = 0
+        for id in request.POST['ids'].split("_"):
+            plugin = CMSPlugin.objects.get(pk=id)
+            if plugin.position != pos:
+                plugin.position = pos
+                plugin.save()
+            pos += 1
+        return HttpResponse(str("ok"))
+    else:
+        raise Http404

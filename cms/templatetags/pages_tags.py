@@ -15,7 +15,7 @@ def get_page_children_for_site(page, site, levels=100):
                                                 rght__lt=page.rght, 
                                                 tree_id=page.tree_id, 
                                                 level__lte=page.level+levels, 
-                                                sites__domain=site)
+                                                sites__domain=site.domain)
         return pages
     else:
         return []
@@ -80,7 +80,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 soft_root_filter['rght__lte'] = current_page.rght
                 #current_page.soft_root = False
                 from_level = current_page.level
-            pages = list(Page.objects.published().filter(in_navigation=True, sites__domain=site).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter))
+            pages = list(Page.objects.published().filter(in_navigation=True, sites__domain=site.domain).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter))
             all_pages = pages[:]
             for page in pages:# build the tree
                 ids.append(page.pk)

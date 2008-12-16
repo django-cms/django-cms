@@ -23,14 +23,19 @@ class WYMEditor(Textarea):
             self.attrs.update(attrs)
         super(WYMEditor, self).__init__(attrs)
 
-    def render(self, name, value, attrs=None):
-        rendered = super(WYMEditor, self).render(name, value, attrs)
+    def render_textarea(self, name, value, attrs=None):
+        return super(WYMEditor, self).render(name, value, attrs)
+
+    def render_additions(self, name, value, attrs=None):
         language = get_language()
-        print "language:", language
         context = {
             'name': name,
             'language': language,
             'CMS_MEDIA_URL': CMS_MEDIA_URL,
         }
-        return rendered + mark_safe(render_to_string(
+        return mark_safe(render_to_string(
             'text/widgets/wymeditor.html', context))
+
+    def render(self, name, value, attrs=None):
+        return self.render_textarea(name, value, attrs) + \
+            self.render_additions(name, value, attrs)
