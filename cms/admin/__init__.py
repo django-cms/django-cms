@@ -174,8 +174,11 @@ class PageAdmin(admin.ModelAdmin):
         """
         template = get_template_from_request(request, obj)
         given_fieldsets = deepcopy(self.fieldsets)
-        given_fieldsets[1][1]['fields'] = given_fieldsets[1][1]['fields'][:] #make a copy so we can manipulate it
-        given_fieldsets[2][1]['fields'] = given_fieldsets[2][1]['fields'][:]
+        print self.fieldsets
+        print given_fieldsets
+        
+        #given_fieldsets[1][1]['fields'] = given_fieldsets[1][1]['fields'][:] #make a copy so we can manipulate it
+        #given_fieldsets[2][1]['fields'] = given_fieldsets[2][1]['fields'][:]
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[1][1]['fields'].remove('status')
@@ -215,8 +218,14 @@ class PageAdmin(admin.ModelAdmin):
         if obj:
             if not obj.has_publish_permission(request):
                 self.exclude.append('status')
+            else:
+                if 'status' in self.exclude:
+                    self.exclude.remove('status')
             if not obj.has_softroot_permission(request):
                 self.exclude.append('soft_root')
+            else:
+                if 'soft_root' in self.exclude:
+                    self.exclude.remove('soft_root')
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
