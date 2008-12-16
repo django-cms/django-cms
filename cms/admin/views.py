@@ -125,16 +125,9 @@ def remove_plugin(request):
 def edit_plugin(request, plugin_id):
     print plugin_id
     cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-    
-    plugin_class = plugin_pool.get_plugin(cms_plugin.plugin_type)()
-    model = plugin_class.model
-    try:
-        instance = model.objects.get(pk=cms_plugin.pk)
-    except:
-        print model
+    instance, plugin_class = cms_plugin.get_plugin_instance()
+    if not instance:
         print "no instance"
-        instance = None
-    
     if request.method == "POST":
         if instance:
             form = plugin_class.form(request.POST, request.FILES, instance=instance)
@@ -150,6 +143,8 @@ def edit_plugin(request, plugin_id):
             inst.plugin_type = cms_plugin.plugin_type
             inst.save()
             return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))
+        else:
+            print request.POST
     else:
         if instance:
             form = plugin_class.form(instance=instance)

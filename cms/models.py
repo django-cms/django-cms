@@ -54,11 +54,11 @@ class Page(models.Model):
         ordering = ('tree_id', 'lft')
         
     def __unicode__(self):
-        title = u""
-        for t in range(self.level):
-            title += "+ "
-        title += self.get_slug()
-        return title
+        #title = u""
+        #for t in range(self.level):
+        #    title += "+ "
+        #title += 
+        return self.get_slug()
 
     def save(self):
         if not self.status:
@@ -294,14 +294,17 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
     
-    def render(self, request):
+    def get_plugin_instance(self):
         from cms.plugin_pool import plugin_pool
         plugin = plugin_pool.get_plugin(self.plugin_type)()
-        print plugin.model.__name__.lower()
         try:
             instance = getattr(self, plugin.model.__name__.lower())
         except:
             instance = None
+        return instance, plugin
+    
+    def render(self, request):
+        instance, plugin = self.get_plugin_instance()
         if instance:
             return plugin.render(request, instance)
         else:
