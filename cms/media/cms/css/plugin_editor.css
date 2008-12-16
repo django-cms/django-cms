@@ -12,8 +12,7 @@
 .plugin-list-holder ul, .plugin-list-holder li, .plugin-list-holder ul.plugin-list{
 	list-style:none;
 	margin:0;
-	padding:0;	
-
+	padding:0;
 }
 
 .plugin-holder .plugin-editor label{
@@ -86,9 +85,12 @@ ul.plugin-list li.active:hover .drag{background-position:0px -40px;}
 
 
 .plugin-editor{
-	width:100%;
-	margin-right:-310px;/*300*/
-	padding:10px 0px 10px 10px;
+	width:auto;
+/*	margin-right:-310px;300*/
+	margin-left:300px;
+	/*margin:10px 0px 10px 310px;*/
+	padding:0px;
+	float:none;
 }
 
 .plugin-editor iframe{
