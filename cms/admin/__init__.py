@@ -56,7 +56,7 @@ class PageAdmin(admin.ModelAdmin):
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
     
-    fieldsets = (
+    fieldsets = [
         (_('Top'), {
             'fields': top_fields,
             'classes': ('low',),
@@ -75,7 +75,7 @@ class PageAdmin(admin.ModelAdmin):
             'classes': ('low',),
             'description': _('Note: This page reloads if you change the selection. Save it first.'),         
         }),
-    )
+    ]
     
     list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
     search_fields = ('title_set__slug', 'title_set__title', 'content__body')
@@ -173,7 +173,7 @@ class PageAdmin(admin.ModelAdmin):
         fieldsets.
         """
         template = get_template_from_request(request, obj)
-        given_fieldsets = list(deepcopy(self.declared_fieldsets))
+        given_fieldsets = deepcopy(self.fieldsets)
         given_fieldsets[1][1]['fields'] = given_fieldsets[1][1]['fields'][:] #make a copy so we can manipulate it
         given_fieldsets[2][1]['fields'] = given_fieldsets[2][1]['fields'][:]
         if obj:
