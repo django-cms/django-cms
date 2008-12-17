@@ -148,6 +148,7 @@ def show_admin_menu(context, page, no_children=False, level=None):
         children = page.childrens
     else:
         children = []
+        page.root_node = True
         if not no_children:
             pages = Page.objects.filter(tree_id=page.tree_id, level__gt=page.level).order_by('tree_id', 'parent', 'lft')
             if settings.CMS_PERMISSION:

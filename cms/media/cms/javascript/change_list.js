@@ -229,7 +229,7 @@ $(document).ready(function() {
 	
 	/* START DRAG'N'DROP INTERFACE */
 	
-		$('#sitemap .drag').each(function() {
+		/*$('#sitemap .drag').each(function() {
 			$(this).click(function() {
 				
 			});
@@ -288,7 +288,7 @@ $(document).ready(function() {
 					});
 				}
 			});
-        });
+        });*/
 	
 	/* END DRAG'N'DROP INTERFACE */
 });

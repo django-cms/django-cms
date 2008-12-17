@@ -133,6 +133,171 @@ a.collapsed span.collapsed{
 
 
 /* Sitemap */
+
+.simpleTree {
+	/*margin: 0 !important;*/
+	padding: 0 0 2em 0 !important;
+	}
+	
+	.simpleTree li {
+		list-style: none;
+		margin:0;
+		padding:0 0 0 34px;
+		}
+		
+		.simpleTree li span.row {
+			display:block;
+			background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
+			height:27px;
+			border:1px solid #DEDEDC;
+			border-top:none;
+			border-right:none;
+			overflow:hidden;
+			line-height:27px;
+			padding: 0 0 0 10px;
+			margin-left: -7px;
+			min-width: 500px;
+			}
+			
+	.simpleTree ul {
+		margin:0; 
+		padding:0;
+		}
+	
+	.simpleTree .root {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/root.gif) no-repeat 16px 0 #ffffff;
+		}
+		
+	.simpleTree span.root {
+		display: none;
+		}
+
+	.simpleTree .line,
+	.simpleTree .line-last,
+	.simpleTree .line-over,
+	.simpleTree .line-over-last {
+		margin: -2px 0 0 -14px;
+		padding:0;
+		line-height: 5px;
+		height:5px;
+		font-size:5px;
+		
+		position: absolute;
+		width: 500px;
+		
+		background: none;
+		}
+
+	.simpleTree .line-over,
+	.simpleTree .line-over-last {
+		background: url(/media/cms/images/simpletree/line_bg_over.gif) 0 0 no-repeat transparent;
+		}
+
+	.simpleTree .folder-open {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/collapsable.gif) 0 0 no-repeat #fff;
+		}
+	
+	.simpleTree .folder-open-last {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/collapsable-last.gif) 0 0 no-repeat #fff;
+		}
+	
+	.simpleTree .folder-close {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/expandable.gif) 0 0 no-repeat #fff;
+		}
+	
+	.simpleTree .folder-close-last {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/expandable-last.gif) 0 0 no-repeat #fff;
+		}
+	
+	.simpleTree .doc {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/leaf.gif) 0 0 no-repeat #fff;
+		}
+	
+	.simpleTree .doc-last {
+		margin-left:-16px;
+		background: url(/media/cms/images/simpletree/leaf-last.gif) 0 0 no-repeat #fff;
+		}
+	
+	.simpleTree .ajax {
+		background: url(/media/cms/images/simpletree/spinner.gif) no-repeat 0 0 #ffffff;
+		height: 16px;
+		display:none;
+		}
+	
+	.simpleTree .ajax li {
+		display:none;
+		margin:0; 
+		padding:0;
+		}
+	
+	.simpleTree .trigger {
+		display:inline;
+		margin-left:-32px;
+		width: 18px;
+		height: 27px;
+		cursor:pointer;
+		}
+	
+	.simpleTree .text { cursor: default; }
+	
+	.simpleTree .active {
+		cursor: default;
+		background: #F7BE77 none;
+		padding:0px 10px;
+		}
+	
+#drag_container {
+	background:#ffffff;
+	color:#000;
+	font: normal 11px arial, tahoma, helvetica, sans-serif;
+	border: 1px dashed #767676;
+	}
+
+	#drag_container ul {
+		list-style: none;
+		padding:0;
+		margin:0;
+		}
+	
+	#drag_container li {
+		list-style: none;
+		background-color:#ffffff;
+		line-height:18px;
+		white-space: nowrap;
+		padding:1px 1px 0px 16px;
+		margin:0;
+		}
+	
+	#drag_container li span {
+		padding:0;
+		}
+	
+		#drag_container li.doc, #drag_container li.doc-last {
+			background: url(/media/cms/images/simpletree/leaf.gif) no-repeat -17px 0 #ffffff;
+			}
+	
+		#drag_container .folder-close, #drag_container .folder-close-last {
+			background: url(/media/cms/images/simpletree/expandable.gif) no-repeat -17px 0 #ffffff;
+			}
+	
+		#drag_container .folder-open, #drag_container .folder-open-last {
+			background: url(/media/cms/images/simpletree/collapsable.gif) no-repeat -17px 0 #ffffff;
+			}
+
+.contextMenu { display:none; }
+
+#tree_plus {
+	margin: 7px 0 0 4px;
+	}
+
+
+/*
 div#sitemap {
 	margin:0px;
 	padding:0px;
@@ -182,7 +347,6 @@ div#sitemap li.last, div#sitemap li:last-child {
 	display:block;
 	height:28px;
 	line-height:27px;
-	/*padding-left:16px;*/
 }
 #sitemap li .col1 .info a.collapse, #sitemap li .col1 .info a.collapsed{
 	display:block;
@@ -225,7 +389,6 @@ div#sitemap li.last, div#sitemap li:last-child {
 	border-left:1px solid #DEDEDC;
 	text-align:center;
 	height:28px;
-	/*width:100px;	*/
 	width:auto;
 	line-height:28px;
 	float:left;
@@ -249,7 +412,6 @@ div#sitemap li.last, div#sitemap li:last-child {
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
 #sitemap li .col-actions{
-	/*width:105px;*/
 }
 
 #sitemap li .col-published{
@@ -318,6 +480,103 @@ div#sitemap li.last, div#sitemap li:last-child {
 .activ-filter #sitemap li .col1 .info{padding-left:5px;}
 .activ-filter div#sitemap li{margin-left:0px; padding-left:0px;}
 
+
+*/
+br.clear {
+	clear: both;
+}
+
+#sitemap ul.header {
+	background:#E1E1E1 url(../images/nav-bg.gif) repeat-x scroll left top;
+	}
+
+	#sitemap ul.header,
+	#sitemap ul.header li {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		}
+	
+	#sitemap ul.header li {
+		border-bottom: 1px solid #DEDEDC;
+		line-height: 22px;
+		}
+		
+		#sitemap ul div {
+			float: right;
+			padding: 0;
+			border-left: 1px solid #DEDEDC;
+			text-align: center;
+			overflow: hidden;
+			}
+			
+			#sitemap ul.header div {
+				color:#666666;
+				font-weight: bold;
+				}
+			
+			#sitemap ul div.col-title {
+				float: left;
+				border: none;
+				}
+			
+			#sitemap ul.header div.col-title { padding-left: 8px; }
+
+#sitemap .col-actions { width: 90px; }
+#sitemap .col-published { width: 65px; }
+#sitemap .col-navigation { width: 90px; }
+#sitemap .col-soft { width: 55px; }
+#sitemap .col-template { width: 94px; }
+#sitemap .col-creator { width: 65px; }
+
+#sitemap li a.move {
+	width:15px;
+	height:14px;
+	display:inline-block;
+	background:url(../images/cut.gif) 0px 0px no-repeat; 
+}
+#sitemap li a.move span{display:none;}
+
+#sitemap li a.selector-add {
+	margin-left:4px;
+	width:16px;
+	height:14px;
+	display:inline-block;
+	background:url(../images/page_find.gif) 0 -1px no-repeat; 
+}
+#sitemap li a.selector-add span{display:none;}
+
+
+#sitemap li a.addlink, #sitemap li a.deletelink{
+	width:10px;
+	height:10px;
+	display:inline-block;
+	background-position:0 0px;
+	margin:0;
+	padding:0;	
+	margin-left:4px;
+}
+#sitemap li a.addlink span, #sitemap li a.deletelink span{display:none;}
+
+
+/*div#sitemap ul.header li, div#sitemap ul.header {
+	padding: 0px 0px 0px 12px;
+	margin: 0px;
+	list-style-type: none;
+	}
+div#sitemap ul.header {
+	margin: 0px 0px 0px -12px;
+	padding-bottom:0px; padding-top:0px;
+	background: url(../images/sitemap-exim.gif) repeat-y;
+	clear: both;
+}*/
+
+/*div#sitemap ul.header .cont div {
+	display: block;
+	float: left;
+	padding: 0 2em;
+}
+
 div#sitemap ul.header, div#sitemap ul.header li{
 	background:none;	
 	border:none;
@@ -349,7 +608,7 @@ div#sitemap ul.header li{
 	background:none;
 	line-height:14px;
 }
-#sitemap ul.header li .cont:hover{}
+#sitemap ul.header li .cont:hover{}*/
 
 #changelist{
 	width:auto;
