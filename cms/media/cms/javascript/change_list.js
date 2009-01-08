@@ -173,7 +173,7 @@ $(document).ready(function() {
 							}else{
 								tree_pos = "inside"
 							}
-							tree.moved("#page_"+selected_page,"#page_"+target_id+" a.title", tree_pos, false, false)
+							tree.moved("#page_"+selected_page,$("#page_"+target_id+" a.title")[0], tree_pos, false, false)
 						}else{
 							
 						}
