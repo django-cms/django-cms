@@ -48,7 +48,7 @@
 		{% endif %}				
 	</div>
 	<div class="col-template">{{ page.get_template_name }}</div>
-	<!--div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div-->
+	<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div>
 </div>
 </div>
 {% if children %}

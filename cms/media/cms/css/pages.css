@@ -620,18 +620,50 @@ div#sitemap ul.header li{
 
 
 
-
-
-
-
+div#sitemap {
+	margin:0px;
+	padding:0px;
+}
+div#sitemap a{text-decoration:none; border:none; outline:none;}
+div#sitemap a:hover{text-decoration:underline;}
+div#sitemap li, div#sitemap ul{
+	list-style-type: none;
+}
 
 
 
 #sitemap li .cont{
 	display:block;
 	background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
-
 }
+
+
+#sitemap li .col1 .info{
+	/*background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
+	display:block;
+	height:28px;
+	line-height:27px;
+	float:left;*/
+}
+
+#sitemap li .col1 .title{
+	display:block;
+	float:left;
+	
+	line-height:27px;
+	height:28px;
+	padding-left:20px;
+	background-repeat:no-repeat;
+	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
+	
+}
+
+#sitemap li .col1 .info a.changelink{
+	margin-left:10px;
+	line-height:27px;
+	display:none;	
+}
+
 
 
 #sitemap li .col-language,
@@ -712,7 +744,56 @@ div#sitemap ul.header li{
 }
 #sitemap li a.addlink span, #sitemap li a.deletelink span{display:none;}
 
+div#sitemap ul.header, div#sitemap ul.header li{
+	background:none;	
+	border:none;
+	list-style:none;
+	margin:0px;
+	padding:0px;
+}
+div#sitemap ul.header li{
+	background:#E1E1E1 url(../images/nav-bg.gif) repeat-x scroll left top;
+	border-bottom:1px solid #DDDDDD;
+	color:#666666;
+	font-size:11px;
+	padding:2px 5px;
+	font-weight:bold;
+	height:auto;
+}
+#sitemap ul.header li .cont{
+	background:none;
+	height:15px;
+	background:none;
+	border:none;
+}
+#sitemap ul.header li .col-language,
+#sitemap ul.header li .col-actions,	
+#sitemap ul.header li .col-published,
+#sitemap ul.header li .col-navigation,
+#sitemap ul.header li .col-softroot,
+#sitemap ul.header li .col-template,
+#sitemap ul.header li .col-creator{
+	height:auto;
+	border:none;
+	background:none;
+	line-height:14px;
+}
+#sitemap ul.header li .cont:hover{}
 
+
+#sitemap li .cont:hover {background-position:0px -300px;}
+#sitemap li .cont:hover a,
+#sitemap li .cont:hover .col-language,
+#sitemap li .cont:hover .col-language a{color:#fff;}
+
+/*#sitemap li .cont:hover .col1 .info{ background-position:0px -40px;}*/
+#sitemap li .cont:hover .col1 .title{ background-position:0px -40px;}
+#sitemap li .cont:hover .col1 .info a.changelink{display:inline;}
+
+#sitemap li .cont:active {background-position:0px -600px; }
+#sitemap li .cont:active a,
+#sitemap li .cont:active .col-language,
+#sitemap li .cont:active .col-language a{color:#5B80B2;}
 
 
 
