@@ -39,6 +39,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                 page.descendant = True
             if len(target.childrens):
                 target.childrens[-1].last = False
+            page.ancestors_ascending = target.ancestors_ascending + [target]
             page.last = True
             target.childrens.append(page)    
             find_children(page, pages, levels-1, active_levels, ancestors, selected_pk, soft_roots)
@@ -85,6 +86,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             for page in pages:# build the tree
                 ids.append(page.pk)
                 if page.level == from_level:
+                    if from_level != 0:
+                        page.get_cached_ancestors()
+                    else:
+                        page.ancestors_ascending = []
                     children.append(page)
                     if page.pk == current_page.pk and current_page.soft_root:
                         page.soft_root = False #ugly hack for the recursive function
@@ -100,7 +105,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     page.ancestor = True
                 if page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
                     page.sibling = True
-                
         else:
             if current_page and next_page.childrens:
                 children = next_page.childrens
@@ -120,10 +124,12 @@ def show_sub_menu(context, levels=100):
     pages = get_page_children_for_site(page, site, levels)
     ids = []
     children = []
+    pages = list(pages)
     all_pages = pages[:]
     for p in pages:# build the tree
         ids.append(p.pk)
         if p.parent_id == page.pk:
+            p.ancestors_ascending = [page]
             children.append(p)
             find_children(p, pages, levels, levels, [], -1)
     titles = Title.objects.filter(pk__in=ids, language=lang)
@@ -147,10 +153,11 @@ def show_admin_menu(context, page, no_children=False, level=None):
     if hasattr(page, "childrens"):
         children = page.childrens
     else:
+        print "start queries"
         children = []
         page.root_node = True
         if not no_children:
-            pages = Page.objects.filter(tree_id=page.tree_id, level__gt=page.level).order_by('tree_id', 'parent', 'lft')
+            pages = Page.objects.filter(tree_id=page.tree_id, level__gt=page.level).order_by('tree_id', 'parent', 'lft').select_related()
             if settings.CMS_PERMISSION:
                 perm_edit_ids = PagePermission.objects.get_edit_id_list(request.user)
                 perm_publish_ids = PagePermission.objects.get_publish_id_list(request.user)
@@ -158,6 +165,7 @@ def show_admin_menu(context, page, no_children=False, level=None):
                 if perm_edit_ids and perm_edit_ids != "All":
                     pages = pages.filter(pk__in=perm_edit_ids)
             ids = []
+            pages = list(pages)
             all_pages = pages[:]
             has_childrens = False
             for p in pages:# build the tree
@@ -182,14 +190,21 @@ def show_admin_menu(context, page, no_children=False, level=None):
                     if len(children):
                         children[-1].last = False
                     children.append(p)
+                    p.ancestors_ascending = [page]
                     find_children(p, pages, 1000, 1000, [], -1, soft_roots=False)
             if not has_childrens:
                 page.childrens = []
-            titles = Title.objects.filter(pk__in=ids, language=lang)
+            titles = Title.objects.filter(page__in=ids)
             for p in all_pages:# add the title and slugs and some meta data
+                p.languages_cache = []
                 for title in titles:
                     if title.page_id == p.pk:
-                        p.title_cache = title
+                        if title.language == lang:
+                            p.title_cache = title
+                        if not title.language in p.languages_cache:
+                            p.languages_cache.append(title.language)
+            for p in children:
+                p.get_slug()
     has_permission = page.has_page_permission(request)
     has_publish_permission = page.has_publish_permission(request)
     

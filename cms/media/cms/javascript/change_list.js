@@ -62,7 +62,16 @@ $(document).ready(function() {
 		        theme_path  : false,
 		        theme_name  : "default",
 				a_class		: "title"
-		    }
+		    },
+			callback:{
+				onmove: function(what, where, position, tree){
+					console.log("move")
+					console.log(what, where, position)
+				},
+				onchange: function(node, tree){
+					console.log("select")
+				}
+			}
 	   });
 	
    
@@ -175,12 +184,12 @@ $(document).ready(function() {
 							}
 							tree.moved("#page_"+selected_page,$("#page_"+target_id+" a.title")[0], tree_pos, false, false)
 						}else{
-							
+							console.error(html)
 						}
                         
                         $('#page-row-'+selected_page).addClass("selected");
                         var msg = $('<span>Successfully moved</span>');
-                        $($('#page-row-'+selected_page+" td")[0]).append(msg);
+                        $($('#page_'+selected_page)[0]).append(msg);
                         msg.fadeOut(5000);
                     }
                 );

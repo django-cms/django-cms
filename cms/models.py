@@ -96,11 +96,14 @@ class Page(models.Model):
         get the list of all existing languages for this page
         """
         titles = Title.objects.filter(page=self)
-        languages = []
-        for t in titles:
-            if t.language not in languages:
-                languages.append(t.language)
-        return languages
+        if not hasattr(self, "languages_cache"):
+            print "no languages cache"
+            languages = []
+            for t in titles:
+                if t.language not in languages:
+                    languages.append(t.language)
+            self.languages_cache = languages
+        return self.languages_cache
 
     def get_absolute_url(self, language=None):
         return reverse('pages-root') + self.get_url(language)
@@ -113,10 +116,20 @@ class Page(models.Model):
             url = u'%s/' % self.get_slug(language)
         else:
             url = u'%s-%d/' % (self.get_slug(language), self.id)
-        for ancestor in self.get_ancestors(ascending=True):
+        for ancestor in self.get_cached_ancestors(ascending=True):
             url = ancestor.get_slug(language) + u'/' + url
         return url
-
+    
+    def get_cached_ancestors(self, ascending=True):
+        if ascending:
+            if not hasattr(self, "ancestors_ascending"):
+                self.ancestors_ascending = self.get_ancestors(ascending) 
+            return self.ancestors_ascending
+        else:
+            if not hasattr(self, "ancestors_descending"):
+                self.ancestors_descending = self.get_ancestors(ascending)
+            return self.ancestors_descending
+        
     def get_slug(self, language=None, fallback=True):
         """
         get the slug of the page depending on the given language
@@ -124,7 +137,7 @@ class Page(models.Model):
         if not language:
             language = settings.CMS_DEFAULT_LANGUAGE
         if not hasattr(self, "title_cache"):
-            #print "no slug"
+            print "no slug"
             
             self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
         title = self.title_cache
@@ -140,7 +153,7 @@ class Page(models.Model):
         if not language:
             language = settings.CMS_DEFAULT_LANGUAGE
         if not hasattr(self, "title_cache"):
-            #print "no title"
+            print "no title"
             self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
         title = self.title_cache
         if title:

@@ -1527,8 +1527,6 @@ function tree_component () {
 			}
 		},
 		moved : function (what, where, how, is_new, is_copy) {
-			console.log(what)
-			console.log(where)
 			var what	= jQuery(what);
 			var $parent	= jQuery(what).parents("ul:eq(0)");
 			var $where	= jQuery(where);
