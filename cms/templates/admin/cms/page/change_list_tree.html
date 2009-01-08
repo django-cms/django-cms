@@ -15,5 +15,9 @@
 		</div>
 	</li>
 </ul>
-<ul class="last">{% for page in cl.query_set %}{% show_admin_menu page cl.is_filtered %}{% endfor %}</ul>
+<div class="tree">
+	<ul class="tree-default">
+		{% for page in cl.query_set %}{% show_admin_menu page cl.is_filtered %}{% endfor %}
+	</ul>
+</div>
 </div>

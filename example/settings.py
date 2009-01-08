@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'mptt',
     'debug_toolbar',
     'django_evolution',
+    
 )
 
 gettext_noop = lambda s: s

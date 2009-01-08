@@ -9,7 +9,7 @@
         updateEvent: 'click',
         postInit: function(wym) {
             //wym.resizable({handles: "s", maxHeight: 600});
-            //construct the button's html
+            //construct the insertLinkButton html
             html = "<li class='wym_tools_pagelink'>"
                  + "<a name='PageLink' href='#'"
                  + " title='Page link'"
@@ -18,6 +18,17 @@
                  + " background-position-y: -623px;'>"
                  + "Page link"
                  + "</a></li>";
+				 
+			//construct the insertHTMLButton html
+            html += "<li class='wym_tools_inserthtml'>"
+                 + "<a name='InsertHtml' href='#'"
+                 + " title='Insert HTML'"
+                 + " style='background-image:"
+                 + " url({{ CMS_MEDIA_URL }}javascript/wymeditor/skins/django/icons.png);"
+                 + " background-position-y: -623px;'>"
+                 + "Insert HTML"
+                 + "</a></li>";
+			 
 
             //add the button to the tools box
             jQuery(wym._box)
@@ -59,6 +70,11 @@
             jQuery(wym._box)
             .find('li.wym_tools_pagelink a').click(function() {
                 wym.dialog('Page link', html);
+                return(false);
+            });
+			jQuery(wym._box)
+            .find('li.wym_tools_inserthtml a').click(function() {
+                wym.insert('<div class="plugin">hello world</div>');
                 return(false);
             });
         },

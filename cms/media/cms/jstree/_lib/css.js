@@ -20,8 +20,8 @@ function get_css(rule_name, stylesheet, delete_flag) {
 	return false;
 }
 function add_css(rule_name, stylesheet) {
-	if (!document.styleSheets || get_css(rule_name)) return false;
 	rule_name = rule_name.toLowerCase(); stylesheet = stylesheet || 0;
+	if (!document.styleSheets || get_css(rule_name, stylesheet)) return false;
 	(document.styleSheets[stylesheet].addRule) ? document.styleSheets[stylesheet].addRule(rule_name, null, 0) : document.styleSheets[stylesheet].insertRule(rule_name+' { }', 0);
 	return get_css(rule_name);
 }

@@ -25,6 +25,9 @@ class CMSPluginBase(object):
         raise NotImplementedError, "render needs to be implemented"
     
     def get_form(self, request, context):
+        """
+        used for editing the plugin
+        """
         if self.form:
             return self.form
         raise MissingFormError, "this plugin doesn't have a form"

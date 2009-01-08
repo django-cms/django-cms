@@ -222,6 +222,16 @@ def show_breadcrumb(context, start_level=0):
     return locals()
 show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
                                          takes_context=True)(show_breadcrumb)
+                                         
+
+def render_plugin(context, plugin_id):
+    plugin = CMSPlugin.objects.get(pk=plugin_id)
+    content = plugin.render(context)
+    return  locals()
+render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
+
+#def render_plugin_title(context, plugin_id):
+    
 
 def has_permission(page, request):
     return page.has_page_permission(request)
@@ -289,18 +299,18 @@ def show_absolute_url(context, page, lang=None):
 show_absolute_url = register.inclusion_tag('cms/content.html',
                                       takes_context=True)(show_absolute_url)
 
-def show_revisions(context, page, content_type, lang=None):
-    """Render the last 10 revisions of a page content with a list"""
-    if not settings.CMS_CONTENT_REVISION:
-        return {'revisions':None}
-    revisions = Content.objects.filter(page=page, language=lang,
-                                type=content_type).order_by('-creation_date')
-    if len(revisions) < 2:
-        return {'revisions':None}
-    return {'revisions':revisions[0:10]}
-
-show_revisions = register.inclusion_tag('cms/revisions.html',
-                                        takes_context=True)(show_revisions)
+#def show_revisions(context, page, content_type, lang=None):
+#    """Render the last 10 revisions of a page content with a list"""
+#    if not settings.CMS_CONTENT_REVISION:
+#        return {'revisions':None}
+#    revisions = Content.objects.filter(page=page, language=lang,
+#                                type=content_type).order_by('-creation_date')
+#    if len(revisions) < 2:
+#        return {'revisions':None}
+#    return {'revisions':revisions[0:10]}
+#
+#show_revisions = register.inclusion_tag('cms/revisions.html',
+#                                        takes_context=True)(show_revisions)
 
 def do_placeholder(parser, token):
     error_string = '%r tag requires three arguments' % token.contents[0]

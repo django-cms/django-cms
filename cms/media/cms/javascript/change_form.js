@@ -35,9 +35,6 @@ $(document).ready(function() {
             }
         });
     });
-	
-	
-    
     document.getElementById("id_title").focus();
     var template = $.query.get('template');
     if(template) {
@@ -56,7 +53,6 @@ $(document).ready(function() {
             e.value = URLify(this.value, 64);
         }
     });
-	
 	$('#page_form').submit(function(){
 		if($('iframe').length){
 			var question = gettext("Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost.")

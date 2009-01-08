@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from django.utils.encoding import force_unicode, smart_str
 
 from django.db import models
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.admin.util import unquote
 
 from cms import settings
@@ -36,19 +36,17 @@ class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'parent']
     mandatory_placeholders = ('title', 'slug')
-    
-    
+
     top_fields = ['language']
     general_fields = [('title', 'slug'), 'status']
     advanced_fields = ['sites', 'in_navigation', 'soft_root']
     template_fields = ['template']
-    #prepopulated_fields = {"slug": ("title",)}
 
     if settings.CMS_REVISIONS:
-        top_fields = ['revisions']
+        top_fields = ['revisions']# TODO: implement
         
-    if settings.CMS_TAGGING:
-        advanced_fields.append('tags')
+    #if settings.CMS_TAGGING:
+    #    advanced_fields.append('tags')
     
     if settings.CMS_SHOW_START_DATE:
         advanced_fields.append('publication_date')
@@ -352,11 +350,13 @@ class PageAdmin(admin.ModelAdmin):
             try:
                 target = self.model.objects.get(pk=target)
             except self.model.DoesNotExist:
+                return HttpResponse("error")
                 context.update({'error': _('Page could not been moved.')})
             else:
                 page.move_to(target, position)
+                return HttpResponse("ok")
                 return self.list_pages(request,
-                    template_name='admin/cms/page/change_list_table.html')
+                    template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 admin.site.register(Page, PageAdmin)

@@ -145,8 +145,8 @@ function tree_component () {
 
 				var mov = false;
 				var st = cnt.scrollTop();
-
-				if(event.target.tagName == "A" ) {
+				
+				if(event.target.tagName == "A" && event.target.className=="title") {
 					// just in case if hover is over the draggable
 					if(jQuery(event.target).is("#dragged")) return false;
 
@@ -743,7 +743,7 @@ function tree_component () {
 					_this.toggle_branch.apply(_this, [event.target]);
 					event.stopPropagation();
 				})
-				.listen("click", "a", function (event) { // WHEN CLICK IS ON THE TEXT OR ICON
+				.listen("click", "a.title", function (event) { // WHEN CLICK IS ON THE TEXT OR ICON
 					if(_this.locked) {
 						event.preventDefault(); 
 						event.target.blur();
@@ -755,7 +755,7 @@ function tree_component () {
 					event.target.blur();
 					return false;
 				})
-				.listen("dblclick", "a", function (event) { // WHEN DOUBLECLICK ON TEXT OR ICON
+				.listen("dblclick", "a.title", function (event) { // WHEN DOUBLECLICK ON TEXT OR ICON
 					if(_this.locked) {
 						event.preventDefault(); 
 						event.stopPropagation();
@@ -767,7 +767,7 @@ function tree_component () {
 					event.stopPropagation();
 					event.target.blur();
 				})
-				.listen("contextmenu", "a", function (event) {
+				.listen("contextmenu", "a.title", function (event) {
 					if(_this.locked) {
 						event.target.blur();
 						return _this.error("LOCKED");
@@ -813,7 +813,7 @@ function tree_component () {
 					}
 					return true;
 				})
-				.listen("mouseover", "a", function (event) {
+				.listen("mouseover", "a.title", function (event) {
 					if(_this.locked) {
 						event.preventDefault();
 						event.stopPropagation();

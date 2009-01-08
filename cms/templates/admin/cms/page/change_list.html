@@ -12,42 +12,31 @@
 
 {% block coltype %}flex{% endblock %}
 {% block extrahead %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/rte.css" />
-<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/pages.css" />
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.ui.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.ui.core.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.ui.droppable.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.query.js"></script>
+
+<!--link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/rte.css" />
+<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/pages.css"/-->
+<!--script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.js"></script-->
+
+<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}jstree/tree_component.css" />
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/css.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/jquery.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/jquery.listen.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/tree_component.js"></script>
+
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/sarissa.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/sarissa_ieemu_xpath.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/jquery.xslt.js"></script>
+
+<!-- required for cookie functionality -->
+<script type="text/javascript" src="path-to-jsTree/_lib/jquery.cookie.js"></script>
+
+<!-- required for metadata rule definitions -->
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/jquery.metadata.js"></script>
+
+
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/change_list.js"></script>
-
-
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.simple.tree.js"></script>
-<script type="text/javascript">
-var simpleTreeCollection;
-$(document).ready(function(){
-	simpleTreeCollection = $('.simpleTree').simpleTree({
-		autoclose: false,
-		docToFolderConvert: true,
-		afterClick:function(node){
-			//alert("text-"+$('span:first',node).text());
-		},
-		afterDblClick:function(node){
-			//alert("text-"+$('span:first',node).text());
-		},
-		afterMove:function(destination, source, pos){
-			//alert("destination-"+destination.attr('id')+" source-"+source.attr('id')+" pos-"+pos);
-		},
-		afterAjax:function()
-		{
-			//alert('Loaded');
-		},
-		animate:true
-		//,docToFolderConvert:true
-	});
-});
-</script>
+
 {% endblock %}
 
 
@@ -70,8 +59,10 @@ $(document).ready(function(){
 <script type="text/javascript">
 	function showchangelistfilter(){
 		$("#changelist-filter").toggle();
-	}		
+	}
 </script>
+
+
 <a href="javascript:showchangelistfilter();" id="changelist-filter-button">Filter: {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
 <div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>
@@ -84,7 +75,7 @@ $(document).ready(function(){
 
 <div class="module" id="changelist">
 
-{% include "admin/cms/page/change_list_simpletree.html" %}
+{% include "admin/cms/page/change_list_tree.html" %}
 
 </div>
 </div>

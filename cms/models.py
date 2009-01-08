@@ -281,7 +281,13 @@ class Title(models.Model):
         return "%s (%s)" % (self.title, self.slug) 
     class Meta:
         unique_together = ('language', 'page')
-
+            
+class Placeholder(models.Model):
+    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
+    name = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
+    body = models.TextField()
+    
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
     position = models.PositiveSmallIntegerField(_("position"), default=0, editable=False)
