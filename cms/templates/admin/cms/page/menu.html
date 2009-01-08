@@ -1,15 +1,17 @@
 <li id="page_{{page.pk}}"  >{% load pages_tags i18n adminmedia %}
-<a href="{{ url }}{{ page.id }}/" class="title">{{ page.get_slug }}</a>
-<div class="info">
-	<a href="#" class="drag">&nbsp;</a>
-	<a href="{{ url }}{{ page.id }}/" class="changelink">edit</a>
-</div>		
-<span id="move-target-{{ page.id }}" class="move-target-container" style="display:none;float:right">
-	<a href="#" class="move-target left"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
-	<a href="#" class="move-target right"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a></a> |
-	<a href="#" class="move-target first-child">↘</a>
-</span>
-</div>	
+<div class="cont">
+<div class="col1">
+	<a href="{{ url }}{{ page.id }}/" class="title">{{ page.get_slug }}</a>
+	<div class="info">
+		<a href="#" class="drag">&nbsp;</a>
+		<a href="{{ url }}{{ page.id }}/" class="changelink">edit</a>
+	</div>		
+	<span id="move-target-{{ page.id }}" class="move-target-container" style="display:none;float:right">
+		<a href="#" class="move-target left"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
+		<a href="#" class="move-target right"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a></a> |
+		<a href="#" class="move-target first-child">↘</a>
+	</span>	
+</div>
 <div class="col2">
 	<div class="col-language">{% for lang in page.get_languages %} 
 		<a href="{{ url }}{{ page.id }}/?language={{ lang }}">{{ lang }}</a>{% if not forloop.last %}|{% endif %}{% endfor %}
