@@ -16,6 +16,7 @@
 	display:none;
 	clear:both;
 }
+/*
 .tree li a,
 .tree li span {
 	display:inline;
@@ -32,7 +33,8 @@
 	-moz-border-radius:3px;
 	border:0;
 	margin:0;
-}
+}*/
+/*
 .tree li a:hover, 
 .tree li a.hover {
 	background-color: #e7f4f9;
@@ -40,6 +42,8 @@
 	padding:0px 3px 0px 22px !important;
 	background-position:3px 0px; 
 }
+*/
+
 .tree li a.clicked,
 .tree li a.clicked:hover,
 .tree li span.clicked {

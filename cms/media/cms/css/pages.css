@@ -133,9 +133,8 @@ a.collapsed span.collapsed{
 
 
 /* Sitemap */
-
+/*
 .simpleTree {
-	/*margin: 0 !important;*/
 	padding: 0 0 2em 0 !important;
 	}
 	
@@ -295,7 +294,7 @@ a.collapsed span.collapsed{
 #tree_plus {
 	margin: 7px 0 0 4px;
 	}
-
+*/
 
 /*
 div#sitemap {
@@ -481,7 +480,7 @@ li.tree-item .drop-over {
 .activ-filter div li.tree-item{margin-left:0px; padding-left:0px;}
 
 
-*/
+
 br.clear {
 	clear: both;
 }
@@ -558,7 +557,7 @@ br.clear {
 }
 #sitemap li a.addlink span, #sitemap li a.deletelink span{display:none;}
 
-
+*/
 /*div#sitemap ul.header li, div#sitemap ul.header {
 	padding: 0px 0px 0px 12px;
 	margin: 0px;
@@ -609,6 +608,119 @@ div#sitemap ul.header li{
 	line-height:14px;
 }
 #sitemap ul.header li .cont:hover{}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#sitemap li .cont{
+	display:block;
+	background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
+
+}
+
+
+#sitemap li .col-language,
+#sitemap li .col-actions,	
+#sitemap li .col-published,
+#sitemap li .col-navigation,
+#sitemap li .col-softroot,
+#sitemap li .col-template,
+#sitemap li .col-creator{
+	border-left:1px solid #DEDEDC;
+	text-align:center;
+	height:28px;
+	/*width:100px;	*/
+	width:auto;
+	line-height:28px;
+	float:left;
+	display:block;
+	background-color:#fff;
+	padding-left:3px;
+	padding-right:3px;
+	white-space:nowrap;
+	filter: alpha(opacity=70);
+	-moz-opacity: 0.70;
+	opacity: 0.70;
+}
+
+#sitemap li .col-language{
+	background:none;
+	border:none;
+	width:auto;
+	text-align:right;
+	padding-right:5px;
+}
+#sitemap li .col-language a{text-transform:uppercase;}
+#sitemap li .col-language a:hover{text-decoration:underline;}
+#sitemap li .col-actions{
+	/*width:105px;*/
+}
+
+#sitemap li .col-published{
+	width:65px;
+}
+
+#sitemap li .col-softroot{
+	width:55px;
+}
+
+#sitemap li .col-creator{
+	width:65px;
+}
+
+#sitemap li a.move {
+	width:15px;
+	height:14px;
+	display:inline-block;
+	background:url(../images/cut.gif) 0px 0px no-repeat; 
+}
+#sitemap li a.move span{display:none;}
+
+#sitemap li a.selector-add {
+	margin-left:4px;
+	width:16px;
+	height:14px;
+	display:inline-block;
+	background:url(../images/page_find.gif) 0 -1px no-repeat; 
+}
+#sitemap li a.selector-add span{display:none;}
+
+
+#sitemap li a.addlink, #sitemap li a.deletelink{
+	width:10px;
+	height:10px;
+	display:inline-block;
+	background-position:0 0px;
+	margin:0;
+	padding:0;	
+	margin-left:4px;
+}
+#sitemap li a.addlink span, #sitemap li a.deletelink span{display:none;}
+
+
+
+
+
+
+
+
+
+
 
 #changelist{
 	width:auto;

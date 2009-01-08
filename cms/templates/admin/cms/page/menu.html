@@ -1,4 +1,6 @@
 <li id="page_{{page.pk}}"  >{% load pages_tags i18n adminmedia %}
+<div class="cont">
+<div class="col1">
 <a href="{{ url }}{{ page.id }}/" class="title">{{ page.get_slug }}</a>
 <div class="info">
 	<a href="#" class="drag">&nbsp;</a>
@@ -9,6 +11,7 @@
 	<a href="#" class="move-target right"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a></a> |
 	<a href="#" class="move-target first-child">↘</a>
 </span>
+</div>	
 <div class="col2">
 	<div class="col-language">{% for lang in page.get_languages %} 
 		<a href="{{ url }}{{ page.id }}/?language={{ lang }}">{{ lang }}</a>{% if not forloop.last %}|{% endif %}{% endfor %}
@@ -28,7 +31,7 @@
 			<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />{% if has_publish_permission %}
 			<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" />{% endif %}
 		</label>{% endif %}			
-	</div>{% comment %}
+	</div>
 	<div class="col-navigation">{% if page.in_navigation %}
 		<label>
 			<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
@@ -43,15 +46,16 @@
 		
 			<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
 		{% endif %}				
-	</div-->
+	</div>
 	<div class="col-template">{{ page.get_template_name }}</div>
 	<!--div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div-->
-</div>{% endcomment %}
-
+</div>
+</div>
 {% if children %}
 <ul{% if page.last %} class="last"{% endif %}>{% for child in children %}
 	{% show_admin_menu child no_children level %}{% endfor %}
 </ul>{% endif %}
+
 </li>
 
 

@@ -209,6 +209,7 @@ $(document).ready(function() {
         return true;
     });
 	
+	/*
 	$.fn.syncWidth = function(max) {
 		$(this).each(function() {
 			var val= $(this).width();
@@ -225,5 +226,5 @@ $(document).ready(function() {
 	$('#sitemap .col-navigation').syncWidth(0);
 	$('#sitemap .col-softroot').syncWidth(0);
 	$('#sitemap .col-template').syncWidth(0);
-	$('#sitemap .col-creator').syncWidth(0);
+	$('#sitemap .col-creator').syncWidth(0);*/
 });
