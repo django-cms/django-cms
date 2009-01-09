@@ -52,7 +52,7 @@
 	background-image:url("f.png");
 }
 
-/* CONTEXT MENU */
+/* CONTEXT MENU 
 .tree .tree-default .context {
 	width:160px;
 	background:#F0F0F0 url("context.gif") 22px 0 repeat-y;
@@ -86,13 +86,14 @@
 	min-height:1px;
 	display:block;
 }
+*/
 
-
+/*
 .tree .tree-default a:hover{
 	background-color:transparent;
 	border-color:#fff;
 	
-}
+}*/
 
 
 #sitemap li div{display:inline;}

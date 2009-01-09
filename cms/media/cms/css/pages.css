@@ -171,10 +171,10 @@ div#sitemap li, div#sitemap ul{
 	
 }
 
-#sitemap li .col1 .info a.changelink{
+#sitemap li .col1 a.changelink{
 	margin-left:10px;
 	line-height:27px;
-	display:none;	
+	display:none;
 }
 
 #sitemap li .move-target-container{
@@ -304,25 +304,14 @@ div#sitemap ul.header li{
 #sitemap ul.header li .cont:hover{}
 
 
-#sitemap li .cont:hover {background-position:0px -300px;}
-#sitemap li .cont:hover a,
-#sitemap li .cont:hover .col-language,
-#sitemap li .cont:hover .col-language a{color:#fff;}
+#sitemap .cont:hover {background-position:0px -300px;}
+#sitemap .cont:hover a,
+#sitemap .cont:hover .col-language,
+#sitemap .cont:hover .col-language a{color:#fff;}
 
 /*#sitemap li .cont:hover .col1 .info{ background-position:0px -40px;}*/
-#sitemap li .cont:hover .col1 .title{ background-position:0px -40px;}
-#sitemap li .cont:hover .col1 .info a.changelink{display:inline;}
-
-#sitemap li .cont:active {background-position:0px -600px; }
-#sitemap li .cont:active a,
-#sitemap li .cont:active .col-language,
-#sitemap li .cont:active .col-language a{color:#5B80B2;}
-
-
-
-
-
-
+#sitemap .cont:hover .col1 .title{ background-position:0px -40px;}
+#sitemap .cont:hover .col1 a.changelink{display:inline;}
 
 
 

@@ -1,11 +1,8 @@
 <li id="page_{{page.pk}}"  >{% load pages_tags i18n adminmedia %}
 <div class="cont">
 <div class="col1">
-	<a href="{{ url }}{{ page.id }}/" class="title">{{ page.get_slug }}</a>
-	<div class="info">
-		<a href="#" class="drag">&nbsp;</a>
-		<a href="{{ url }}{{ page.id }}/" class="changelink">edit</a>
-	</div>	
+	<a href="{{ url }}{{ page.id }}/" class="title">{{ page.get_slug }}</a>	
+	<a href="{{ url }}{{ page.id }}/" class="changelink">edit</a>
 </div>
 <div class="col2">	
 		<span id="move-target-{{ page.id }}" class="move-target-container" >

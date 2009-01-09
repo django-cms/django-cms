@@ -44,6 +44,7 @@
 }
 */
 
+/*
 .tree li a.clicked,
 .tree li a.clicked:hover,
 .tree li span.clicked {
@@ -51,7 +52,7 @@
 	border:1px solid #99defd;
 	padding:0px 3px 0px 22px !important;
 	background-position:3px 0px; 
-}
+}*/
 .tree li span.clicked {
 	padding:0px 3px 0px 20px !important;
 }
