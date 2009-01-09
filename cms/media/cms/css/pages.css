@@ -664,6 +664,16 @@ div#sitemap li, div#sitemap ul{
 	display:none;	
 }
 
+#sitemap li .move-target-container{
+	/*
+	width:100px;
+	display:block;*/
+	display:none;
+	float:left;
+	line-height:27px;
+	margin-right:10px;
+}
+
 
 
 #sitemap li .col-language,

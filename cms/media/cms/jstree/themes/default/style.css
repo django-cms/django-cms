@@ -13,11 +13,11 @@
 
 /* OPEN or CLOSED */
 .tree .tree-default li.open {
-	background:url("fminus.gif") 4px 6px no-repeat;
+	background:url("fminus.gif") 4px 10px no-repeat;
 }
 
 .tree .tree-default li.closed {
-	background:url("fplus.gif") 5px 5px no-repeat;
+	background:url("fplus.gif") 5px 10px no-repeat;
 }
 
 .tree .tree-default #dragged li.open {

@@ -178,7 +178,7 @@ function tree_component () {
 					}
 
 					if(tree_component.inst[cnt.attr("id")].checkMove(_this.container.find("li.dragged"), jQuery(event.target), mov)) {
-						if(mov == "inside")	jQuery("#marker").attr("src", _this.settings.ui.theme_path + "default/plus.gif").width(11);
+						if(mov == "inside")	jQuery("#marker").attr("src", _this.settings.ui.theme_path + "default/plus.gif").width(13);
 						else {
 							if(cnt.hasClass("rtl"))	{ jQuery("#marker").attr("src", _this.settings.ui.theme_path + "default/marker_rtl.gif").width(40); }
 							else					{ jQuery("#marker").attr("src", _this.settings.ui.theme_path + "default/marker.gif").width(40); }
@@ -428,7 +428,7 @@ function tree_component () {
 						src	: _this.settings.ui.theme_path + "default/marker.gif"
 					})
 					.css({
-						height		: "5px",
+						height		: "8px",
 						width		: "40px",
 						display		: "block",
 						position	: "absolute",
