@@ -173,7 +173,7 @@ $(document).ready(function() {
             var target_id = target.parentNode.id.split("move-target-")[1];
 			console.log(target_id)
             if(action=="move") {
-				moveTreeItem(selected_page, target_id, position, true)
+				moveTreeItem(selected_page, target_id, position, tree)
                 /*$.post("/admin/cms/page/"+selected_page+"/move-page/", {
                         position:position,
                         target:target_id
@@ -251,8 +251,8 @@ $(document).ready(function() {
 });
 
 
-function moveTreeItem(item_id, target_id, position, move_in_tree){
-	console.log("move tree", item_id, target_id, position, move_in_tree)
+function moveTreeItem(item_id, target_id, position, tree){
+	console.log("move tree", item_id, target_id, position, tree)
 	$.post("/admin/cms/page/"+item_id+"/move-page/", {
             position:position,
             target:target_id
@@ -264,7 +264,7 @@ function moveTreeItem(item_id, target_id, position, move_in_tree){
 	            var msg = $('<span>Successfully moved</span>');
 	            $($('#page_'+item_id)[0]).append(msg);
 	            msg.fadeOut(5000);
-				if (move_in_tree) {
+				if (tree) {
 					var tree_pos = false;
 					if (position == "left") {
 						tree_pos = "before"
@@ -273,7 +273,7 @@ function moveTreeItem(item_id, target_id, position, move_in_tree){
 					}else {
 						tree_pos = "inside"
 					}
-					tree.moved("#page_" + selected_page, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)
+					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)
 				}
 			}else{
 				console.error(html)
