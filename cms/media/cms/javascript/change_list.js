@@ -67,6 +67,16 @@ $(document).ready(function() {
 				onmove: function(what, where, position, tree){
 					console.log("move")
 					console.log(what, where, position)
+					item_id = what.id.split("page_")[1];
+					target_id = where.id.split("page_")[1];
+					if (position == "before"){
+						position = "left"
+					}else if (position == "after"){
+						position = "right"
+					}else{
+						position = "first-child"
+					}
+					moveTreeItem(item_id, target_id, position, false)
 				},
 				onchange: function(node, tree){
 					console.log("select")
@@ -153,6 +163,7 @@ $(document).ready(function() {
         
         if(jtarget.hasClass("move-target")) {
 			console.log("move target")
+			console.log(jtarget)
             if(jtarget.hasClass("left"))
                 var position = "left";
             if(jtarget.hasClass("right"))
@@ -162,7 +173,8 @@ $(document).ready(function() {
             var target_id = target.parentNode.id.split("move-target-")[1];
 			console.log(target_id)
             if(action=="move") {
-                $.post("/admin/cms/page/"+selected_page+"/move-page/", {
+				moveTreeItem(selected_page, target_id, position, true)
+                /*$.post("/admin/cms/page/"+selected_page+"/move-page/", {
                         position:position,
                         target:target_id
                     },
@@ -192,7 +204,7 @@ $(document).ready(function() {
                         $($('#page_'+selected_page)[0]).append(msg);
                         msg.fadeOut(5000);
                     }
-                );
+                );*/
                 $('.move-target-container').hide();
             }
             if(action=="add") {
@@ -237,3 +249,39 @@ $(document).ready(function() {
 	$('#sitemap ul .col-template').syncWidth(0);
 	$('#sitemap ul .col-creator').syncWidth(0);
 });
+
+
+function moveTreeItem(item_id, target_id, position, move_in_tree){
+	console.log("move tree", item_id, target_id, position, move_in_tree)
+	$.post("/admin/cms/page/"+item_id+"/move-page/", {
+            position:position,
+            target:target_id
+        },
+        function(html) {
+			console.log(html)
+			if(html=="ok"){
+	            $('#page-row-'+item_id).addClass("selected");
+	            var msg = $('<span>Successfully moved</span>');
+	            $($('#page_'+item_id)[0]).append(msg);
+	            msg.fadeOut(5000);
+				if (move_in_tree) {
+					var tree_pos = false;
+					if (position == "left") {
+						tree_pos = "before"
+					}else if (position == "right") {
+						tree_pos = "after"
+					}else {
+						tree_pos = "inside"
+					}
+					tree.moved("#page_" + selected_page, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)
+				}
+			}else{
+				console.error(html)
+				 $('#page-row-'+item_id).addClass("selected");
+	            var msg = $('<span>An error occured.</span>');
+				$($('#page_'+item_id)[0]).append(msg);
+			}
+            
+        }
+    );
+}

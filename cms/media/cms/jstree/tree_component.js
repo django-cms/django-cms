@@ -1584,12 +1584,12 @@ function tree_component () {
 			switch(how) {
 				case "before":
 					$where.parents("ul:eq(0)").children("li.last").removeClass("last");
-					$where.parent().before(what.removeClass("last"));
+					$where.parents("li:eq(0)").before(what.removeClass("last"));
 					$where.parents("ul:eq(0)").children("li:last").addClass("last");
 					break;
 				case "after":
 					$where.parents("ul:eq(0)").children("li.last").removeClass("last");
-					$where.parent().after(what.removeClass("last"));
+					$where.parents("li:eq(0)").after(what.removeClass("last"));
 					$where.parents("ul:eq(0)").children("li:last").addClass("last");
 					break;
 				case "inside":
@@ -1600,14 +1600,14 @@ function tree_component () {
 							return this.open_branch(obj, true, function () { _this.moved.apply(_this, [what, where, how, is_new, is_copy]); })
 						}
 					}
-					if($where.parent().children("ul:first").size()) {
-						if(this.settings.rules.createat == "top")	$where.parent().children("ul:first").prepend(what.removeClass("last")).children("li:last").addClass("last");
-						else										$where.parent().children("ul:first").children(".last").removeClass("last").end().append(what.removeClass("last")).children("li:last").addClass("last");
+					if($where.parents("li:eq(0)").children("ul:first").size()) {
+						if(this.settings.rules.createat == "top")	$where.parents("li:eq(0)").children("ul:first").prepend(what.removeClass("last")).children("li:last").addClass("last");
+						else										$where.parents("li:eq(0)").children("ul:first").children(".last").removeClass("last").end().append(what.removeClass("last")).children("li:last").addClass("last");
 					}
 					else {
 						what.addClass("last");
-						$where.parent().append("<ul/>").removeClass("leaf").addClass("closed");
-						$where.parent().children("ul:first").prepend(what);
+						$where.parents("li:eq(0)").append("<ul/>").removeClass("leaf").addClass("closed");
+						$where.parents("li:eq(0)").children("ul:first").prepend(what);
 					}
 					if(!this.settings.data.async) {
 						this.open_branch($where);
