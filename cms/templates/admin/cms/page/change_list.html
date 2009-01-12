@@ -51,11 +51,14 @@
 		var msg = $('<span class="success">An error occured. Please reload the page</span>');
 		node.append(msg);
 	}
-	{% if not cl.is_filtered %}
+	
+	
 	$(document).ready(function() {
+		{% if not cl.is_filtered %}
 		initTree();
+		{% endif %}
 	});
-	{% endif %}
+	
 </script>
 
 
