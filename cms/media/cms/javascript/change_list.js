@@ -1,6 +1,4 @@
-
-$(document).ready(function() {
-	$('#sitemap').hide();
+function initTree(){
 	var tree = new tree_component();
 	tree.init($("div.tree"), {
 			rules:{
@@ -115,6 +113,7 @@ $(document).ready(function() {
                 }
                 jtarget.attr("value", val);
             });
+			e.stopPropagation();
             return true;
         }
         
@@ -161,8 +160,8 @@ $(document).ready(function() {
 	$('#sitemap ul .col-navigation').syncWidth(0);
 	$('#sitemap ul .col-softroot').syncWidth(0);
 	$('#sitemap ul .col-template').syncWidth(0);
-	$('#sitemap ul .col-creator').syncWidth(0);
-});
+	$('#sitemap ul .col-creator').syncWidth(0);	
+}
 
 
 function moveTreeItem(item_id, target_id, position, tree){
@@ -173,7 +172,6 @@ function moveTreeItem(item_id, target_id, position, tree){
         function(html) {
 			if(html=="ok"){
 				if (tree) {
-					
 					var tree_pos = false;
 					if (position == "left") {
 						tree_pos = "before"
