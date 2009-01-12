@@ -1,4 +1,6 @@
+
 $(document).ready(function() {
+	$('#sitemap').hide();
 	var tree = new tree_component();
 	tree.init($("div.tree"), {
 			rules:{
@@ -138,8 +140,11 @@ $(document).ready(function() {
         }
         return true;
     });
+		
 	
-	/* */
+	$('#sitemap').show();
+	
+	/* Colums width sync */
 	$.fn.syncWidth = function(max) {
 		$(this).each(function() {
 			var val= $(this).width();
@@ -149,7 +154,7 @@ $(document).ready(function() {
   			$(this).css("width",max+'px');
 		});
 		return this;
-	};	
+	};
 	
 	$('#sitemap ul .col-actions').syncWidth(80);
 	$('#sitemap ul .col-published').syncWidth(0);
@@ -157,7 +162,6 @@ $(document).ready(function() {
 	$('#sitemap ul .col-softroot').syncWidth(0);
 	$('#sitemap ul .col-template').syncWidth(0);
 	$('#sitemap ul .col-creator').syncWidth(0);
-	
 });
 
 
