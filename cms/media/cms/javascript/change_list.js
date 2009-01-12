@@ -40,7 +40,8 @@ function initTree(){
 			}
 		}
 	});
-}
+};
+
 $(document).ready(function() { 
     var selected_page = false;
     var action = false;
@@ -142,9 +143,6 @@ $(document).ready(function() {
         }
         return true;
     });
-		
-	$("div#sitemap").show()
-		
 	/* Colums width sync */
 	$.fn.syncWidth = function(max) {
 		$(this).each(function() {
@@ -156,13 +154,14 @@ $(document).ready(function() {
 		});
 		return this;
 	};
-	
+	$("div#sitemap").show()
 	$('#sitemap ul .col-actions').syncWidth(80);
 	$('#sitemap ul .col-published').syncWidth(0);
 	$('#sitemap ul .col-navigation').syncWidth(0);
 	$('#sitemap ul .col-softroot').syncWidth(0);
 	$('#sitemap ul .col-template').syncWidth(0);
 	$('#sitemap ul .col-creator').syncWidth(0);	
+	
 });
 
 
@@ -182,7 +181,6 @@ function moveTreeItem(item_id, target_id, position, tree){
 					}else {
 						tree_pos = "inside"
 					}
-					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)
 				}else{
 					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"))
 				}
@@ -191,4 +189,4 @@ function moveTreeItem(item_id, target_id, position, tree){
 			}
         }
     );
-}
+};
