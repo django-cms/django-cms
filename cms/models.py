@@ -124,7 +124,6 @@ class Page(models.Model):
     def get_cached_ancestors(self, ascending=True):
         if ascending:
             if not hasattr(self, "ancestors_ascending"):
-                print "DB=============getting the cached ancestors"
                 self.ancestors_ascending = self.get_ancestors(ascending) 
             return self.ancestors_ascending
         else:

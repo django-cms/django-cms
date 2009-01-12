@@ -303,6 +303,7 @@ class PageAdmin(admin.ModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+        cl.set_items(request)
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,

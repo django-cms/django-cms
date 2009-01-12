@@ -2,6 +2,8 @@ from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from cms.models import Title, PagePermission
 from cms import settings
+from cms.utils import get_language_from_request
+from cms.templatetags.pages_tags import find_children
 
 class CMSChangeList(ChangeList):
     real_queryset = False
@@ -21,8 +23,8 @@ class CMSChangeList(ChangeList):
                 self.root_query_set = self.root_query_set.filter(pk__in=perm_ids)
                 if not self.is_filtered(): # is not filtered so only the root ones
                     qs = qs.exclude(parent__in=perm_ids)
-            elif not self.is_filtered():# is not filtered and is superuser
-                qs = qs.filter(parent=None)
+            #elif not self.is_filtered():# is not filtered and is superuser
+            #    qs = qs.filter(parent=None)
             self.real_queryset = True
         qs = qs.order_by('tree_id', 'parent', 'lft')
         return qs
@@ -44,3 +46,57 @@ class CMSChangeList(ChangeList):
                 self.full_result_count = self.root_query_set.count()
             else:
                 self.full_result_count = self.root_query_set.count()
+    
+    def set_items(self, request):
+        lang = get_language_from_request(request)
+        pages = self.get_query_set(request).order_by('tree_id', 'parent', 'lft').select_related()
+        if settings.CMS_PERMISSION:
+            perm_edit_ids = PagePermission.objects.get_edit_id_list(request.user)
+            perm_publish_ids = PagePermission.objects.get_publish_id_list(request.user)
+            perm_softroot_ids = PagePermission.objects.get_softroot_id_list(request.user)
+            if perm_edit_ids and perm_edit_ids != "All":
+                pages = pages.filter(pk__in=perm_edit_ids)
+        ids = []
+        root_pages = []
+        pages = list(pages)
+        all_pages = pages[:]
+        for page in pages:
+            children = []
+            if not page.parent_id:
+                page.root_node = True
+            ids.append(page.pk)
+            if settings.CMS_PERMISSION:# caching the permissions
+                if perm_edit_ids == "All" or page.pk in perm_edit_ids:
+                    page.permission_edit_cache = True
+                else:
+                    page.permission_edit_cache = False
+                if perm_publish_ids == "All" or page.pk in perm_publish_ids:
+                    page.permission_publish_cache = True
+                else:
+                    page.permission_publish_cache = False
+                if perm_publish_ids == "All" or page.pk in perm_softroot_ids:
+                    page.permission_softroot_cache = True
+                else:
+                    page.permission_softroot_cache = False
+                page.permission_user_cache = request.user
+            if not page.parent_id:
+                page.last = True
+                if len(children):
+                    children[-1].last = False
+                root_pages.append(page)
+                page.ancestors_ascending = []
+                find_children(page, pages, 1000, 1000, [], -1, soft_roots=False)
+        titles = Title.objects.filter(page__in=ids)
+        for page in all_pages:# add the title and slugs and some meta data
+            page.languages_cache = []
+            for title in titles:
+                if title.page_id == page.pk:
+                    if title.language == lang:
+                        page.title_cache = title
+                    if not title.language in page.languages_cache:
+                        page.languages_cache.append(title.language)
+        self.root_pages = root_pages
+        
+    def get_items(self):
+        return self.root_pages
+    

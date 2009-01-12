@@ -32,7 +32,6 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
         levels = active_levels
     if (levels <= 0 or (target.soft_root and soft_roots)) and not target.pk in ancestors:
         return 
-    
     for page in pages:
         if page.parent_id and page.parent_id == target.pk:
             if hasattr(target, "selected") or hasattr(target, "descendant"):
@@ -84,11 +83,15 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             pages = Page.objects.published().filter(in_navigation=True, sites__domain=site.domain).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter)
             pages = list(pages)
             all_pages = pages[:]
+            last = None
             for page in pages:# build the tree
                 ids.append(page.pk)
                 if page.level == from_level:
                     if from_level != 0:
-                        page.get_cached_ancestors()
+                        if last and last.parent_id == page.parent_id:
+                            page.ancestors_ascending = last.ancestors_ascending
+                        else:
+                            page.get_cached_ancestors()
                     else:
                         page.ancestors_ascending = []
                     children.append(page)
@@ -97,6 +100,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
                     if page.pk == current_page.pk and current_page.soft_root:
                         page.soft_root = True
+                if from_level != 0:
+                    last = page
             titles = list(Title.objects.filter(page__in=ids, language=lang))
             for page in all_pages:# add the title and slugs and some meta data
                 for title in titles:
@@ -157,63 +162,9 @@ def show_admin_menu(context, page, no_children=False, level=None):
         filtered = context['cl'].is_filtered()
     elif context.has_key('filtered'):
         filtered = context['filtered']
-    if hasattr(page, "childrens"):
-        children = page.childrens
-    else:
-        children = []
-        page.root_node = True
-        if not no_children:
-            pages = Page.objects.filter(tree_id=page.tree_id, level__gt=page.level).order_by('tree_id', 'parent', 'lft').select_related()
-            if settings.CMS_PERMISSION:
-                perm_edit_ids = PagePermission.objects.get_edit_id_list(request.user)
-                perm_publish_ids = PagePermission.objects.get_publish_id_list(request.user)
-                perm_softroot_ids = PagePermission.objects.get_softroot_id_list(request.user)
-                if perm_edit_ids and perm_edit_ids != "All":
-                    pages = pages.filter(pk__in=perm_edit_ids)
-            ids = []
-            pages = list(pages)
-            all_pages = pages[:]
-            has_childrens = False
-            for p in pages:# build the tree
-                ids.append(p.pk)
-                if settings.CMS_PERMISSION:# caching the permissions
-                    if perm_edit_ids == "All" or p.pk in perm_edit_ids:
-                        p.permission_edit_cache = True
-                    else:
-                        p.permission_edit_cache = False
-                    if perm_publish_ids == "All" or p.pk in perm_publish_ids:
-                        p.permission_publish_cache = True
-                    else:
-                        p.permission_publish_cache = False
-                    if perm_publish_ids == "All" or p.pk in perm_softroot_ids:
-                        p.permission_softroot_cache = True
-                    else:
-                        p.permission_softroot_cache = False
-                    p.permission_user_cache = request.user
-                if p.parent_id == page.pk:
-                    has_childrens = True
-                    p.last = True
-                    if len(children):
-                        children[-1].last = False
-                    children.append(p)
-                    p.ancestors_ascending = [page]
-                    find_children(p, pages, 1000, 1000, [], -1, soft_roots=False)
-            if not has_childrens:
-                page.childrens = []
-            titles = Title.objects.filter(page__in=ids)
-            for p in all_pages:# add the title and slugs and some meta data
-                p.languages_cache = []
-                for title in titles:
-                    if title.page_id == p.pk:
-                        if title.language == lang:
-                            p.title_cache = title
-                        if not title.language in p.languages_cache:
-                            p.languages_cache.append(title.language)
-            for p in children:
-                p.get_slug()
+    children = page.childrens
     has_permission = page.has_page_permission(request)
     has_publish_permission = page.has_publish_permission(request)
-    
     # level is used to add a left margin on table row
     if level is None:
         level = 0

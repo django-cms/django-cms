@@ -17,7 +17,7 @@
 </ul>
 <div class="tree">
 	<ul class="tree-default">
-		{% for page in cl.query_set %}{% show_admin_menu page cl.is_filtered %}{% endfor %}
+		{% for page in cl.get_items %}{% show_admin_menu page cl.is_filtered %}{% endfor %}
 	</ul>
 </div>
 </div>
