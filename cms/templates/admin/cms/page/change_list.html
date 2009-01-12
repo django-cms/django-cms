@@ -18,7 +18,9 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/_all.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/tree_component.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/change_list.js"></script>
-
+{% if cl.is_filtered %}
+<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}jstree/themes/default/style.css" />
+{% endif %}
 {% endblock %}
 
 
@@ -43,7 +45,7 @@
 		{% if not cl.is_filtered %}
 		initTree();
 		{% endif %}
-		$("div#changelist").show()
+		
 	});	
 </script>
 

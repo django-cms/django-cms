@@ -11,8 +11,8 @@
 				<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
 			</span>
 			<div class="col-language">{% for lang in page.get_languages %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}</div>
-			<div class="col-actions">
-				<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>
+			<div class="col-actions">{% if not filtered %}
+				<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
 				<a href="{{ page.get_absolute_url }}" title="{% trans "View on page" %}" class="selector-add"><span>{% trans "view" %}</span></a>
 				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
 				<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>

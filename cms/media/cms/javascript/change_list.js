@@ -1,44 +1,47 @@
 function initTree(){
 	var tree = new tree_component();
 	tree.init($("div.tree"), {
-			rules:{
-		        clickable   : "all",
-		        renameable  : "none",
-		        deletable   : "all",
-		        creatable   : "all",
-		        draggable   : "all",
-		        dragrules   : "all"
-		    },
-			path:false,
-			ui:{
-		        dots        : true,
-		        rtl         : false,
-		        animation   : 0,
-		        hover_mode  : true,
-		        theme_path  : false,
-		        theme_name  : "default",
-				a_class		: "title"
-		    },
-			callback:{
-				onmove: function(what, where, position, tree){
-					item_id = what.id.split("page_")[1];
-					target_id = where.id.split("page_")[1];
-					if (position == "before"){
-						position = "left"
-					}else if (position == "after"){
+		rules: {
+			clickable: "all",
+			renameable: "none",
+			deletable: "all",
+			creatable: "all",
+			draggable: "all",
+			dragrules: "all"
+		},
+		path: false,
+		ui: {
+			dots: true,
+			rtl: false,
+			animation: 0,
+			hover_mode: true,
+			theme_path: false,
+			theme_name: "default",
+			a_class: "title"
+		},
+		callback: {
+			onmove: function(what, where, position, tree){
+				item_id = what.id.split("page_")[1];
+				target_id = where.id.split("page_")[1];
+				if (position == "before") {
+					position = "left"
+				}
+				else 
+					if (position == "after") {
 						position = "right"
-					}else{
+					}
+					else {
 						position = "first-child"
 					}
-					moveTreeItem(item_id, target_id, position, false)
-				},
-				onchange: function(node, tree){
-					self.location = node.id.split("page_")[1]
-				}
+				moveTreeItem(item_id, target_id, position, false)
+			},
+			onchange: function(node, tree){
+				self.location = node.id.split("page_")[1]
 			}
-	   });
-	
-   
+		}
+	});
+}
+$(document).ready(function() { 
     var selected_page = false;
     var action = false;
     
@@ -140,7 +143,8 @@ function initTree(){
         return true;
     });
 		
-	
+	$("div#sitemap").show()
+		
 	/* Colums width sync */
 	$.fn.syncWidth = function(max) {
 		$(this).each(function() {
@@ -159,7 +163,7 @@ function initTree(){
 	$('#sitemap ul .col-softroot').syncWidth(0);
 	$('#sitemap ul .col-template').syncWidth(0);
 	$('#sitemap ul .col-creator').syncWidth(0);	
-}
+});
 
 
 function moveTreeItem(item_id, target_id, position, tree){

@@ -150,6 +150,11 @@ def show_admin_menu(context, page, no_children=False, level=None):
     request = context['request']
     site = request.site
     lang = get_language_from_request(request)
+    if context.has_key("cl"):
+        filtered = context['cl'].is_filtered()
+    elif context.has_key('filtered'):
+        filtered = context['filtered']
+    print "filtered: ", filtered
     if hasattr(page, "childrens"):
         children = page.childrens
     else:
