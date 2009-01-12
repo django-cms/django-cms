@@ -65,12 +65,12 @@
 		$("#changelist-filter").toggle();
 	}
 	function moveSuccess(node){
-		var msg = $('<span>{% trans "Successfully moved" %}</span>');
+		var msg = $('<span class="success">{% trans "Successfully moved" %}</span>');
 		node.append(msg);
-	    msg.fadeOut(5000);
+	    msg.fadeOut(3000);
 	}
 	function moveError(node){
-		var msg = $('<span>An error occured. Please reload the page</span>');
+		var msg = $('<span class="success">An error occured. Please reload the page</span>');
 		node.append(msg);
 	}
 </script>

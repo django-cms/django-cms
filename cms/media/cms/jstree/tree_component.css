@@ -141,8 +141,9 @@
 	padding-bottom:2px;
 }
 /* EXPLORER 6 */
+
 .tree li {
-	_width:50%;
+	/*_width:50%;*/
 	_margin-bottom:-2px;
 }
 .tree li ul {

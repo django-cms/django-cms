@@ -119,7 +119,7 @@ function tree_component () {
 				if(cnt.size() == 0) {
 					if(tree_component.sto) clearTimeout(tree_component.sto);
 					if(jQuery(_this.drag).children("IMG").size() == 0) {
-						jQuery(_this.drag).append("<img style='position:absolute; " + (_this.settings.ui.rtl ? "right" : "left" ) + ":4px; top:0px; background:white; padding:2px;' src='" + _this.settings.ui.theme_path + "default/remove.png' />");
+						jQuery(_this.drag).append("<img class='removeicon' style='position:absolute; " + (_this.settings.ui.rtl ? "right" : "left" ) + ":4px; top:0px;' src='" + _this.settings.ui.theme_path + "default/remove.gif' />");
 					}
 					_this.moveType = false;
 					_this.moveRef  = false;
@@ -132,7 +132,7 @@ function tree_component () {
 				// if moving over another tree and multitree is false
 				if( _this.foreign === false && cnt.get(0) != _this.container.get(0) && (!_this.settings.rules.multitree || !tree_component.inst[cnt.attr("id")].settings.rules.multitree) ) {
 					if(jQuery(_this.drag).children("IMG").size() == 0) {
-						jQuery(_this.drag).append("<img style='position:absolute; " + (_this.settings.ui.rtl ? "right" : "left" ) + ":4px; top:0px; background:white; padding:2px;' src='" + _this.settings.ui.theme_path + "default/remove.png' />");
+						jQuery(_this.drag).append("<img class='removeicon' style='position:absolute; " + (_this.settings.ui.rtl ? "right" : "left" ) + ":4px; top:0px;' src='" + _this.settings.ui.theme_path + "default/remove.gif' />");
 					}
 					_this.moveType = false;
 					_this.moveRef  = false;
@@ -190,7 +190,7 @@ function tree_component () {
 					}
 					else {
 						if(jQuery(_this.drag).children("IMG").size() == 0) {
-							jQuery(_this.drag).append("<img style='position:absolute; " + (_this.settings.ui.rtl ? "right:0px;" : "left:4px;" ) + " top:0px; background:white; padding:2px;' src='" + _this.settings.ui.theme_path + "default/remove.png' />");
+							jQuery(_this.drag).append("<img class='removeicon' style='position:absolute; " + (_this.settings.ui.rtl ? "right:0px;" : "left:4px;" ) + " top:0px;' src='" + _this.settings.ui.theme_path + "default/remove.gif' />");
 						}
 						_this.moveType = false;
 						_this.moveRef = false;
@@ -199,7 +199,7 @@ function tree_component () {
 				}
 				else {
 					if(jQuery(_this.drag).children("IMG").size() == 0) {
-						jQuery(_this.drag).append("<img style='position:absolute; " + (_this.settings.ui.rtl ? "right:0px;" : "left:4px;" ) + " top:0px; background:white; padding:2px;' src='" + _this.settings.ui.theme_path + "default/remove.png' />");
+						jQuery(_this.drag).append("<img class='removeicon' style='position:absolute; " + (_this.settings.ui.rtl ? "right:0px;" : "left:4px;" ) + " top:0px;' src='" + _this.settings.ui.theme_path + "default/remove.gif' />");
 					}
 					_this.moveType = false;
 					_this.moveRef = false;
@@ -255,7 +255,7 @@ function tree_component () {
 					{ 
 						id		: "delete",
 						label	: "Delete",
-						icon	: "remove.png",
+						icon	: "remove.gif",
 						visible	: function (NODE, TREE_OBJ) { return TREE_OBJ.check("deletable", NODE); }, 
 						action	: function (NODE, TREE_OBJ) { NODE.each( function () { TREE_OBJ.remove(this); }); } 
 					}

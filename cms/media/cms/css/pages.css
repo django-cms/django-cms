@@ -144,6 +144,11 @@ div#sitemap li, div#sitemap ul{
 }
 
 
+#sitemap li, #sitemap ul{
+	display:block;
+}
+
+
 
 #sitemap li .cont{
 	display:block;
@@ -159,16 +164,22 @@ div#sitemap li, div#sitemap ul{
 	float:left;*/
 }
 
-#sitemap li .col1 .title{
+#sitemap li .col1 .title, #sitemap li .col1 .success{
 	display:block;
 	float:left;
-	
 	line-height:27px;
 	height:28px;
-	padding-left:20px;
+	padding-left:20px;	
+}
+
+#sitemap li .col1 .title{
 	background-repeat:no-repeat;
 	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
-	
+}
+
+#sitemap li .col1 .success{
+	padding-left:10px;
+	color:#666;
 }
 
 #sitemap li .col1 a.changelink{
@@ -309,9 +320,29 @@ div#sitemap ul.header li{
 #sitemap .cont:hover .col-language,
 #sitemap .cont:hover .col-language a{color:#fff;}
 
-/*#sitemap li .cont:hover .col1 .info{ background-position:0px -40px;}*/
 #sitemap .cont:hover .col1 .title{ background-position:0px -40px;}
 #sitemap .cont:hover .col1 a.changelink{display:inline;}
+
+
+#sitemap li#dragged{
+	min-width:500px;
+}
+#sitemap li#dragged .cont{
+	border-top: 1px solid #DEDEDC;
+	border-right: 1px solid #DEDEDC;
+}
+#sitemap li#dragged .col2{
+	display:none;
+}
+#sitemap li#dragged .col1 .title{}
+
+.activ-filter #sitemap li, .activ-filter #sitemap ul{
+	background-image:none;
+}
+.activ-filter #sitemap .tree ul{margin-left:0px;}
+.activ-filter #sitemap .tree li{padding-left:0px;}
+.activ-filter #sitemap .tree li .cont{border-left:none;}
+.activ-filter #sitemap .tree li .col1 .title{background-image:none; padding-left:8px;}
 
 
 
