@@ -81,7 +81,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 soft_root_filter['rght__lte'] = current_page.rght
                 #current_page.soft_root = False
                 from_level = current_page.level
-            pages = list(Page.objects.published().filter(in_navigation=True, sites__domain=site.domain).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter))
+            pages = Page.objects.published().filter(in_navigation=True, sites__domain=site.domain).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter)
+            pages = list(pages)
             all_pages = pages[:]
             for page in pages:# build the tree
                 ids.append(page.pk)
@@ -96,11 +97,12 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
                     if page.pk == current_page.pk and current_page.soft_root:
                         page.soft_root = True
-            titles = Title.objects.filter(pk__in=ids, language=lang)
+            titles = list(Title.objects.filter(page__in=ids, language=lang))
             for page in all_pages:# add the title and slugs and some meta data
                 for title in titles:
                     if title.page_id == page.pk:
                         page.title_cache = title
+                        titles.remove(title)
                 if page.pk in ancestors:
                     page.ancestor = True
                 if page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
@@ -114,6 +116,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
 show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
 
 def show_sub_menu(context, levels=100):
+    print "show sub menu"
     """Get the root page of the current page and 
     render a nested list of all root's children pages"""
     page = get_page_from_request(context)# TODO: change to request
@@ -132,7 +135,7 @@ def show_sub_menu(context, levels=100):
             p.ancestors_ascending = [page]
             children.append(p)
             find_children(p, pages, levels, levels, [], -1)
-    titles = Title.objects.filter(pk__in=ids, language=lang)
+    titles = Title.objects.filter(page__in=ids, language=lang)
     for p in all_pages:# add the title and slugs and some meta data
         for title in titles:
             if title.page_id == p.pk:
@@ -154,11 +157,9 @@ def show_admin_menu(context, page, no_children=False, level=None):
         filtered = context['cl'].is_filtered()
     elif context.has_key('filtered'):
         filtered = context['filtered']
-    print "filtered: ", filtered
     if hasattr(page, "childrens"):
         children = page.childrens
     else:
-        print "start queries"
         children = []
         page.root_node = True
         if not no_children:
@@ -223,6 +224,7 @@ show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)
 
 def show_breadcrumb(context, start_level=0):
+    print "show breadcrumb"
     request = context['request']
     lang = get_language_from_request(request)
     page = get_page_from_request(context)# TODO: change to request
@@ -299,6 +301,7 @@ show_content = register.inclusion_tag('cms/content.html',
                                       takes_context=True)(show_content)
 
 def show_absolute_url(context, page, lang=None):
+    print "show absolute url"
     """Show the url of a page in the right language"""
     request = context.get('request', False)
     if not request or not page:

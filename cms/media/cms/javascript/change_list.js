@@ -1,5 +1,7 @@
+var tree
+
 function initTree(){
-	var tree = new tree_component();
+	tree = new tree_component();
 	tree.init($("div.tree"), {
 		rules: {
 			clickable: "all",
@@ -134,8 +136,8 @@ $(document).ready(function() {
                 $('.move-target-container').hide();
             }
             if(action=="add") {
-                var query = $.query.set('target', target_id).set('position', position).toString();
-                window.location.href += 'add/'+query;
+                //var query = $.query.set('target', target_id).set('position', position).toString();
+                window.location.href += 'add/?target='+target_id+"&position="+position;
             }
             //selected_page = false;
 			e.stopPropagation();
@@ -166,6 +168,7 @@ $(document).ready(function() {
 
 
 function moveTreeItem(item_id, target_id, position, tree){
+
 	$.post("/admin/cms/page/"+item_id+"/move-page/", {
             position:position,
             target:target_id
@@ -181,6 +184,7 @@ function moveTreeItem(item_id, target_id, position, tree){
 					}else {
 						tree_pos = "inside"
 					}
+					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)
 				}else{
 					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"))
 				}

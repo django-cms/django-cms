@@ -36,7 +36,7 @@ class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'parent']
     mandatory_placeholders = ('title', 'slug')
-
+    filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [('title', 'slug'), 'status']
     advanced_fields = ['sites', 'in_navigation', 'soft_root']

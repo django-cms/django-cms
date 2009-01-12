@@ -32,7 +32,7 @@ class Page(models.Model):
         (PUBLISHED, _('Published')),
     )
     author = models.ForeignKey(User, verbose_name=_("author"))
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', editable=False)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
@@ -106,6 +106,7 @@ class Page(models.Model):
         return self.languages_cache
 
     def get_absolute_url(self, language=None):
+        #print "get_absolute_url"
         return reverse('pages-root') + self.get_url(language)
 
     def get_url(self, language=None):
@@ -123,6 +124,7 @@ class Page(models.Model):
     def get_cached_ancestors(self, ascending=True):
         if ascending:
             if not hasattr(self, "ancestors_ascending"):
+                print "DB=============getting the cached ancestors"
                 self.ancestors_ascending = self.get_ancestors(ascending) 
             return self.ancestors_ascending
         else:
@@ -138,7 +140,7 @@ class Page(models.Model):
             language = settings.CMS_DEFAULT_LANGUAGE
         if not hasattr(self, "title_cache"):
             print "no slug"
-            
+            print self.pk
             self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
         title = self.title_cache
         if title:
