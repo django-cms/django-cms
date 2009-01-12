@@ -141,8 +141,6 @@ function initTree(){
     });
 		
 	
-	$('#sitemap').show();
-	
 	/* Colums width sync */
 	$.fn.syncWidth = function(max) {
 		$(this).each(function() {

@@ -1,4 +1,4 @@
-<li id="page_{{page.pk}}"  >{% load pages_tags i18n adminmedia %}
+<li id="page_{{page.pk}}" {% if cl.is_filtered %}class="leaf"{% endif %} >{% load pages_tags i18n adminmedia %}
 	<div class="cont">
 		<div class="col1">
 			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	

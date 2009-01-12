@@ -25,19 +25,6 @@
 {% block content_title %}<h1>{% trans "Select" %} {{ name }} {% trans "to change" %}</h1>{% endblock %}
 
 {% block content %}
-<div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
-
-{% block object-tools %}
-{% if has_add_permission %}
-<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
-{% endif %}
-{% endblock %}
-<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-{% block search %}{% search_form cl %}{% endblock %}
-{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
-
-{% block filters %}
-{% if cl.has_filters %}
 <script type="text/javascript">
 	function showchangelistfilter(){
 		$("#changelist-filter").toggle();
@@ -52,14 +39,27 @@
 		node.append(msg);
 	}
 	
-	
 	$(document).ready(function() {
 		{% if not cl.is_filtered %}
 		initTree();
 		{% endif %}
-	});
-	
+		$("div#changelist").show()
+	});	
 </script>
+
+<div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
+
+{% block object-tools %}
+{% if has_add_permission %}
+<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
+{% endif %}
+{% endblock %}
+<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+{% block search %}{% search_form cl %}{% endblock %}
+{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+
+{% block filters %}
+{% if cl.has_filters %}
 
 
 <a href="javascript:showchangelistfilter();" id="changelist-filter-button">Filter: {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
@@ -72,11 +72,11 @@
 {% endif %}
 {% endblock %}
 
-<div class="module" id="changelist">
+<!--div class="module" id="changelist" style="display:none;"-->
 
 {% include "admin/cms/page/change_list_tree.html" %}
 
-</div>
+<!--/div-->
 </div>
 </div>
 
