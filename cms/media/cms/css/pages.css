@@ -135,34 +135,13 @@ a.collapsed span.collapsed{
 /* Sitemap */
 div#sitemap {
 	margin:0px;
-	padding:0px;
+	padding:0px 0px 5px 0px;
 }
 div#sitemap a{text-decoration:none; border:none; outline:none;}
 div#sitemap a:hover{text-decoration:underline;}
-div#sitemap li, div#sitemap ul{
-	list-style-type: none;
-}
-
-
-#sitemap li, #sitemap ul{
-	display:block;
-}
-
-
-
-#sitemap li .cont{
-	display:block;
-	background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
-}
-
-
-#sitemap li .col1 .info{
-	/*background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
-	display:block;
-	height:28px;
-	line-height:27px;
-	float:left;*/
-}
+div#sitemap li, div#sitemap ul{list-style-type: none;}
+#sitemap li, #sitemap ul{display:block;}
+#sitemap li .cont{display:block;background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;}
 
 #sitemap li .col1 .title, #sitemap li .col1 .success{
 	display:block;
@@ -189,16 +168,11 @@ div#sitemap li, div#sitemap ul{
 }
 
 #sitemap li .move-target-container{
-	/*
-	width:100px;
-	display:block;*/
 	display:none;
 	float:left;
 	line-height:27px;
 	margin-right:10px;
 }
-
-
 
 #sitemap li .col-language,
 #sitemap li .col-actions,	
@@ -210,7 +184,6 @@ div#sitemap li, div#sitemap ul{
 	border-left:1px solid #DEDEDC;
 	text-align:center;
 	height:28px;
-	/*width:100px;	*/
 	width:auto;
 	line-height:28px;
 	float:left;
@@ -233,21 +206,10 @@ div#sitemap li, div#sitemap ul{
 }
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
-#sitemap li .col-actions{
-	/*width:105px;*/
-}
-
-#sitemap li .col-published{
-	width:65px;
-}
-
-#sitemap li .col-softroot{
-	width:55px;
-}
-
-#sitemap li .col-creator{
-	width:65px;
-}
+#sitemap li .col-actions{}
+#sitemap li .col-published{width:65px;}
+#sitemap li .col-softroot{width:55px;}
+#sitemap li .col-creator{width:65px;}
 
 #sitemap li a.move {
 	width:15px;
@@ -265,7 +227,6 @@ div#sitemap li, div#sitemap ul{
 	background:url(../images/page_find.gif) 0 -1px no-repeat; 
 }
 #sitemap li a.selector-add span{display:none;}
-
 
 #sitemap li a.addlink, #sitemap li a.deletelink{
 	width:10px;
@@ -314,7 +275,6 @@ div#sitemap ul.header li{
 }
 #sitemap ul.header li .cont:hover{}
 
-
 #sitemap .cont:hover {background-position:0px -300px;}
 #sitemap .cont:hover a,
 #sitemap .cont:hover .col-language,
@@ -322,7 +282,6 @@ div#sitemap ul.header li{
 
 #sitemap .cont:hover .col1 .title{ background-position:0px -40px;}
 #sitemap .cont:hover .col1 a.changelink{display:inline;}
-
 
 #sitemap li#dragged{
 	min-width:500px;
@@ -334,7 +293,7 @@ div#sitemap ul.header li{
 #sitemap li#dragged .col2{
 	display:none;
 }
-#sitemap li#dragged .col1 .title{}
+#sitemap li#dragged .col1 .title{padding-right:10px;}
 
 .activ-filter #sitemap li, .activ-filter #sitemap ul{
 	background-image:none;
@@ -345,11 +304,9 @@ div#sitemap ul.header li{
 .activ-filter #sitemap .tree li .col1 .title{background-image:none; padding-left:8px;}
 
 
-
 #changelist{
 	width:auto;
 }
-
 /* changelist filter */
 #toolbar{height:23px;}
 #changelist-filter-button{
@@ -365,27 +322,15 @@ div#sitemap ul.header li{
 	height:auto;
 	display:block;
 	line-height:30px;
-	padding-left:10px;
-	
+	padding-left:10px;	
 }
-#changelist-filter-button:hover{
-	background-position:0px -50px;
-}
+#changelist-filter-button:hover{background-position:0px -50px;}
 .activ-filter #changelist-filter-button{background-position:0px -100px; color:#fff;}
 .activ-filter #changelist-filter-button:hover{background-position:0px -100px;}
 
-#changelist-filter{
-	top:30px;	
-}
-#changelist-filter h2{
-	display:none;
-}
+#changelist-filter{top:30px;}
+#changelist-filter h2{	display:none;}
 
-.change-list .filtered {
-	background:#fff none repeat-y scroll right top !important;
-}
+.change-list .filtered {background:#fff none repeat-y scroll right top !important;}
 
-.change-list #changelist .module{
-	border:none;
-
-}
+.change-list #changelist .module{border:none;}
