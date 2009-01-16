@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.sites.models import Site, RequestSite, SITE_CACHE
 
 from cms import settings
+from cms.models import Page
 
 def auto_render(func):
     """Decorator that put automaticaly the template path in the context dictionary
@@ -123,6 +124,9 @@ def get_site_from_request(request, check_subdomain=True):
     return site or RequestSite(request)
 
 def get_page_from_request(request):
-    return request['current_page']
+    if request.has_key('current_page'):
+        return request['current_page']
+    else:
+        return Page.objects.order_by('tree_id','lft')[0]
 
 

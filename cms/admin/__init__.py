@@ -30,6 +30,7 @@ from cms.admin.views import get_content, change_status, modify_content, change_i
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 from copy import deepcopy
+from cms.settings import CMS_MEDIA_URL
 
 
 class PageAdmin(admin.ModelAdmin):
@@ -39,7 +40,7 @@ class PageAdmin(admin.ModelAdmin):
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [('title', 'slug'), 'status']
-    advanced_fields = ['sites', 'in_navigation', 'soft_root']
+    advanced_fields = ['sites', 'in_navigation', 'soft_root', ('has_url_overwrite', 'url_overwrite')]
     template_fields = ['template']
 
     if settings.CMS_REVISIONS:
@@ -312,6 +313,7 @@ class PageAdmin(admin.ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
+            'CMS_MEDIA_URL': CMS_MEDIA_URL
         }
         context.update(extra_context or {})
         return render_to_response(self.change_list_template or [

@@ -41,6 +41,7 @@ USE_I18N = True
 MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/')
 #ADMIN_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../admin_media/')
 MEDIA_URL = '/media/'
+
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 FIXTURE_DIRS = [os.path.join(PROJECT_DIR, 'fixtures')]
