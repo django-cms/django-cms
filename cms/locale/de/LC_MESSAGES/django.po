@@ -1,0 +1,419 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-cms\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-01-16 15:47+0100\n"
+"PO-Revision-Date: 2009-01-16 15:49+0100\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"Language-Team: divio <developers@divio.ch>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: models.py:31
+msgid "Draft"
+msgstr "Entwurf"
+
+#: models.py:32
+msgid "Published"
+msgstr "Veröffentlicht"
+
+#: models.py:34
+#: templates/admin/cms/page/change_list_tree.html:13
+msgid "author"
+msgstr "Verfasser"
+
+#: models.py:37
+msgid "publication date"
+msgstr "Veröffentlicht am"
+
+#: models.py:37
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgstr "Ab wann soll die Seite veröffentlicht werden? Der Status der Seite muss aber auf \"veröffentlicht\" sein. "
+
+#: models.py:38
+msgid "publication end date"
+msgstr "Veröffentlicht bis"
+
+#: models.py:38
+msgid "When to expire the page. Leave empty to never expire."
+msgstr "Ablaufdatum der Seite. Leer lassen um nie abzulaufen."
+
+#: models.py:39
+msgid "login required"
+msgstr "Login erforderlich"
+
+#: models.py:40
+#: templates/admin/cms/page/change_list_tree.html:10
+msgid "in navigation"
+msgstr "In der Navigation"
+
+#: models.py:41
+msgid "soft root"
+msgstr "Soft Root"
+
+#: models.py:41
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Alle Überseiten werden nicht in der Navigation dargestellt."
+
+#: models.py:42
+msgid "has url overwrite"
+msgstr "Die Url wird überschrieben"
+
+#: models.py:43
+msgid "url overwrite"
+msgstr "Url Überschreibung"
+
+#: models.py:43
+msgid "The url that this page has instead. Starts with a \"/\""
+msgstr "Die Url diese Seite anstatt hat. Sollte mit \"/\" beginnen."
+
+#: models.py:44
+msgid "status"
+msgstr "Status"
+
+#: models.py:45
+#: templates/admin/cms/page/change_list_tree.html:12
+msgid "template"
+msgstr "Vorlage"
+
+#: models.py:46
+msgid "The site(s) the page is accessible at."
+msgstr "Die Webseite (domain) wo die Seite verfügbar ist."
+
+#: models.py:46
+msgid "sites"
+msgstr "Websites"
+
+#: models.py:54
+#: models.py:273
+#: models.py:296
+#: models.py:307
+#: models.py:313
+#: admin/__init__.py:335
+#: templates/admin/cms/page/change_form.html:11
+msgid "page"
+msgstr "Seite"
+
+#: models.py:55
+msgid "pages"
+msgstr "Seiten"
+
+#: models.py:197
+msgid "default"
+msgstr "Standart"
+
+#: models.py:267
+msgid "All pages"
+msgstr "alle Seiten"
+
+#: models.py:268
+msgid "This page only"
+msgstr "Nur diese Seite"
+
+#: models.py:269
+msgid "This page and all childrens"
+msgstr "Diese Seite und alle Unterseiten"
+
+#: models.py:272
+msgid "type"
+msgstr "Typ"
+
+#: models.py:274
+msgid "user"
+msgstr "Benutzer"
+
+#: models.py:275
+msgid "group"
+msgstr "Gruppe"
+
+#: models.py:276
+msgid "everybody"
+msgstr "alle"
+
+#: models.py:277
+msgid "can edit"
+msgstr "kann editieren"
+
+#: models.py:278
+msgid "can change soft-root"
+msgstr "kann den Softroot verändern"
+
+#: models.py:279
+msgid "can publish"
+msgstr "kann publizieren"
+
+#: models.py:289
+msgid "Page Permission"
+msgstr "Seite Berechtigung"
+
+#: models.py:290
+msgid "Page Permissions"
+msgstr "Seiten Berechtigungen"
+
+#: models.py:293
+#: models.py:309
+#: models.py:316
+msgid "language"
+msgstr "Sprache"
+
+#: models.py:294
+#: templates/admin/cms/page/change_list_tree.html:6
+msgid "title"
+msgstr "Titel"
+
+#: models.py:295
+msgid "slug"
+msgstr "Slug"
+
+#: models.py:297
+#: models.py:318
+msgid "creation date"
+msgstr "erstellt am"
+
+#: models.py:308
+#: models.py:315
+msgid "slot"
+msgstr "Slot"
+
+#: models.py:314
+msgid "position"
+msgstr "Position"
+
+#: models.py:317
+msgid "plugin_name"
+msgstr "Plugin Name"
+
+#: admin/__init__.py:59
+msgid "Top"
+msgstr "Oben"
+
+#: admin/__init__.py:62
+#: admin/__init__.py:75
+msgid "Note: This page reloads if you change the selection. Save it first."
+msgstr "Achtung: Diese Seite wird neu geladen wenn sie die Auswahl änder. Sichern Sie vorher!"
+
+#: admin/__init__.py:64
+msgid "General"
+msgstr "Allgemein"
+
+#: admin/__init__.py:68
+msgid "Advanced"
+msgstr "Erweitert"
+
+#: admin/__init__.py:72
+msgid "Template"
+msgstr "Vorlage"
+
+#: admin/__init__.py:235
+msgid "Default template"
+msgstr "Standart Vorlage"
+
+#: admin/__init__.py:305
+msgid "Database error"
+msgstr "Datenbankfehler"
+
+#: admin/__init__.py:357
+msgid "Page could not been moved."
+msgstr "Die Seite konnte nicht verschoben werden."
+
+#: admin/forms.py:10
+msgid "The default title"
+msgstr "Der standart Titel"
+
+#: admin/forms.py:12
+msgid "The part of the title that is used in the url"
+msgstr "Der Teil des Titels der in der URL verwendet wird."
+
+#: admin/forms.py:14
+msgid "The current language of the content fields."
+msgstr "Die Momentane Sprache der Inhalt Felder."
+
+#: admin/forms.py:16
+msgid "The template used to render the content."
+msgstr "Die benutzte Vorlage um die Seite darzustellen."
+
+#: admin/forms.py:32
+msgid "Another page with this slug already exists"
+msgstr "Eine andere Seite mit diesem Slug existiert bereits"
+
+#: plugins/picture/cms_plugins.py:12
+msgid "Picture"
+msgstr "Bild"
+
+#: plugins/picture/models.py:9
+msgid "image"
+msgstr "Bild"
+
+#: plugins/text/cms_plugins.py:11
+msgid "Text"
+msgstr "Text"
+
+#: plugins/text/models.py:10
+msgid "body"
+msgstr "body"
+
+#: templates/admin/cms/page/change_form.html:3
+#: templates/admin/cms/page/plugin_forms.html:3
+#: templates/admin/cms/page/plugin_forms_ok.html:6
+msgid "Change a page"
+msgstr "Seite bearbeiten"
+
+#: templates/admin/cms/page/change_form.html:11
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: templates/admin/cms/page/change_form.html:11
+msgid "Change"
+msgstr "Ändern"
+
+#: templates/admin/cms/page/change_form.html:17
+msgid "History"
+msgstr "Geschichte"
+
+#: templates/admin/cms/page/change_form.html:18
+msgid "View on site"
+msgstr "Im Web anzeigen"
+
+#: templates/admin/cms/page/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Bitte korrigieren Sie unterhalb den Fehler."
+msgstr[1] "Bitte korrigieren Sie unterhalb alle Fehler."
+
+#: templates/admin/cms/page/change_list.html:8
+msgid "Home"
+msgstr "Start"
+
+#: templates/admin/cms/page/change_list.html:27
+msgid "Select"
+msgstr "Suswählen"
+
+#: templates/admin/cms/page/change_list.html:27
+msgid "to change"
+msgstr "zum ändern"
+
+#: templates/admin/cms/page/change_list.html:35
+msgid "Successfully moved"
+msgstr "Erfolgreich verschoben"
+
+#: templates/admin/cms/page/change_list.html:56
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s hinzufügen"
+
+#: templates/admin/cms/page/change_list.html:67
+msgid "on"
+msgstr "ein"
+
+#: templates/admin/cms/page/change_list.html:67
+msgid "off"
+msgstr "aus"
+
+#: templates/admin/cms/page/change_list.html:69
+msgid "Filter"
+msgstr "Filter"
+
+#: templates/admin/cms/page/change_list_tree.html:8
+msgid "quick actions"
+msgstr "Kurz Befehle"
+
+#: templates/admin/cms/page/change_list_tree.html:9
+msgid "published"
+msgstr "veröffentlicht"
+
+#: templates/admin/cms/page/change_list_tree.html:11
+msgid "softroot"
+msgstr "Softroot"
+
+#: templates/admin/cms/page/menu.html:4
+#: templates/admin/cms/page/menu.html:5
+msgid "edit this page"
+msgstr "Diese Seite editieren"
+
+#: templates/admin/cms/page/menu.html:9
+msgid "insert above"
+msgstr "Darüber einfügen"
+
+#: templates/admin/cms/page/menu.html:10
+msgid "insert below"
+msgstr "Darunter einfügen"
+
+#: templates/admin/cms/page/menu.html:11
+msgid "insert inside"
+msgstr "Als Unterseite einfügen"
+
+#: templates/admin/cms/page/menu.html:13
+#, python-format
+msgid "Edit this page in %(language)s "
+msgstr "Editieren Sei diese Seite in %(language)s "
+
+#: templates/admin/cms/page/menu.html:15
+msgid "Cut"
+msgstr "Ausschneiden"
+
+#: templates/admin/cms/page/menu.html:15
+msgid "cut"
+msgstr "ausschneiden"
+
+#: templates/admin/cms/page/menu.html:16
+msgid "View on page"
+msgstr "Im Web anzeigen"
+
+#: templates/admin/cms/page/menu.html:16
+msgid "view"
+msgstr "Anzeigen"
+
+#: templates/admin/cms/page/menu.html:17
+msgid "Add Child"
+msgstr "Unterseite hinzufügen"
+
+#: templates/admin/cms/page/menu.html:17
+msgid "add"
+msgstr "Hinzufügen"
+
+#: templates/admin/cms/page/menu.html:18
+msgid "Delete"
+msgstr "Löschen"
+
+#: templates/admin/cms/page/menu.html:18
+msgid "delete"
+msgstr "Löschen"
+
+#: templates/admin/cms/page/plugin_forms.html:57
+msgid "Save"
+msgstr "Sichern"
+
+#: templates/admin/cms/page/plugin_forms_ok.html:12
+msgid "Plugin saved successfully."
+msgstr "Plugin wurde erfolgreich gespeichert"
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:8
+msgid "Available Plugins"
+msgstr "Vorhandene Plugins"
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:11
+msgid "Add Plugin"
+msgstr "Plugin hinzufügen"
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:16
+msgid "No Plugin selected. Selected one on the left side"
+msgstr "Kein Plugin ausgewählt. Wählen Sie eins auf der linken Seite aus."
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:18
+msgid "No Plugins present. Add a plugin to this placeholder-slot."
+msgstr "Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter ein."
+
+#: templates/cms/traduction_helper.html:4
+msgid "Wanted language has not been translated yet."
+msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
+

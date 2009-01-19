@@ -124,9 +124,12 @@ def get_site_from_request(request, check_subdomain=True):
     return site or RequestSite(request)
 
 def get_page_from_request(request):
-    if request.has_key('current_page'):
-        return request['current_page']
+    if hasattr(request, '_current_page_cache'):
+        return request._current_page_cache
     else:
-        return Page.objects.order_by('tree_id','lft')[0]
+        path = request.path
+        from cms.views import details
+        resp = details(request, path.split("/")[0], no404=True, only_context=True)
+        return resp['current_page']
 
 

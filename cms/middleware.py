@@ -16,13 +16,13 @@ class CurrentSiteMiddleware(object):
     
 class LazyPage(object):
     def __get__(self, request, obj_type=None):
-        if not hasattr(request, '_cached_page'):
-            request._cached_page = get_page_from_request(request)
-        return request._cached_page
+        if not hasattr(request, '_current_page_cache'):
+            request._current_page_cache = get_page_from_request(request)
+        return request._current_page_cache
     
 class CurrentPageMiddleware(object):
     def process_request(self, request):
-        request._class__.site = LazyPage()
+        request.__class__.current_page = LazyPage()
         return None
 
 class MultilingualURLMiddleware:
@@ -35,6 +35,7 @@ class MultilingualURLMiddleware:
         changed = False
         if check is not None:
             request.path = request.path[3:]
+            print request.path
             t = check.group(1)
             if t in supported:
                 lang = t
