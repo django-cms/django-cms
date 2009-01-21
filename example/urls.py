@@ -6,6 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
+    (r'^categories/', include('categories.urls')),
 )
 
 if settings.DEBUG:

@@ -74,6 +74,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'cms.middleware.CurrentSiteMiddleware',
+    'cms.middleware.CurrentPageMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
@@ -97,6 +98,7 @@ INSTALLED_APPS = (
     'cms.plugins.text',
     'cms.plugins.picture',
     'mptt',
+    'example.categories',
     'debug_toolbar',
     'django_evolution',
     
@@ -116,6 +118,8 @@ CMS_TEMPLATES = (
     ('cool.html', 'cool one'),
     ('long-folder-long/long-template-name.html', 'long')
 )
+
+CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 try:
     from local_settings import *

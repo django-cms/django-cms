@@ -3,7 +3,12 @@
 {% for child in children %}
 <li>
 	{% if not child.is_leaf_node %}+{% endif %}{{ child.level }}
-	<a href="{{ child.get_absolute_url }}">{{ child.get_title }}</a>
+	<a href="{{ child.get_absolute_url }}">{{ child.get_title }}</a><span style="color:#999">
+	{% if child.selected %}selected{% endif %}
+	{% if child.ancestor %}ancestor{% endif %}
+	{% if child.sibling %}sibling{% endif %}
+	{% if child.descendant %}descendant{% endif %}
+	{% if child.soft_root %}(softroot}{% endif %}</span>
     {% if child.childrens %}
     <ul>
     	{% show_menu from_level to_level extra_inactive extra_active child %}

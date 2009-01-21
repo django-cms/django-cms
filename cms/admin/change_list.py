@@ -85,7 +85,7 @@ class CMSChangeList(ChangeList):
                     children[-1].last = False
                 root_pages.append(page)
                 page.ancestors_ascending = []
-                find_children(page, pages, 1000, 1000, [], -1, soft_roots=False)
+                find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True)
         titles = Title.objects.filter(page__in=ids)
         for page in all_pages:# add the title and slugs and some meta data
             page.languages_cache = []

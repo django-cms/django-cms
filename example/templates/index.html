@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
 <title>{{ current_page.get_title }}</title>
-<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script>
+<!--script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script-->
 <style>
     .placeholder-editable {
         border:1px #bbb solid;
@@ -95,17 +95,12 @@
 	{% show_menu 1 %}
 </ul>
 
-<ul>
-	{% show_menu 0 100 100 100 %}
-</ul>
+<h2>Display the sub menu of the current page (as a nested list)</h2>
 
-<h2>Display the sub menu of the root page (as a nested list)</h2>
-
-{% if current_page %}
 <ul>
     {% show_sub_menu 1 %}
 </ul>
-{% endif %}
+
 
 <h2>Show the breadcrumb navigation of the current page</h2>
 {% show_breadcrumb %}

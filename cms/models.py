@@ -41,6 +41,7 @@ class Page(models.Model):
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True)
     url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Starts with a \"/\""))
+    navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
     template = models.CharField(_("template"), max_length=100, null=True, blank=True)
     sites = models.ManyToManyField(Site, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
@@ -119,18 +120,19 @@ class Page(models.Model):
             url = u'%s/' % self.get_slug(language)
         else:
             url = u'%s-%d/' % (self.get_slug(language), self.id)
-        for ancestor in self.get_cached_ancestors(ascending=True):
-            url = ancestor.get_slug(language) + u'/' + url
+        ancestors = self.get_cached_ancestors(ascending=True)
+        if ancestors:
+            return ancestors[-1].get_url(language) + url
         return url
     
     def get_cached_ancestors(self, ascending=True):
         if ascending:
             if not hasattr(self, "ancestors_ascending"):
-                self.ancestors_ascending = self.get_ancestors(ascending) 
+                self.ancestors_ascending = list(self.get_ancestors(ascending)) 
             return self.ancestors_ascending
         else:
             if not hasattr(self, "ancestors_descending"):
-                self.ancestors_descending = self.get_ancestors(ascending)
+                self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
         
     def get_slug(self, language=None, fallback=True):
@@ -140,8 +142,8 @@ class Page(models.Model):
         if not language:
             language = settings.CMS_DEFAULT_LANGUAGE
         if not hasattr(self, "title_cache"):
-            print "no slug"
-            print self.pk
+            #print "no slug"
+            #print self.pk
             self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
         title = self.title_cache
         if title:

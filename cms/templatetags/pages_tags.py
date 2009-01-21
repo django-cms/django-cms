@@ -1,26 +1,17 @@
 from django import template
 from django.core.cache import cache
-from django.utils.safestring import SafeUnicode
 
 from cms import settings
-from cms.models import Page, Title, PagePermission, CMSPlugin
-from cms.utils import get_language_from_request, get_page_from_request
+from cms.models import Page, Title, CMSPlugin
+from cms.utils import get_language_from_request, get_page_from_request,\
+    get_extended_navigation_nodes
 
 register = template.Library()
 
-def get_page_children_for_site(page, site, levels=100):
-    if page:
-        pages = Page.objects.published().filter(in_navigation=True, 
-                                                lft__gt=page.lft, 
-                                                rght__lt=page.rght, 
-                                                tree_id=page.tree_id, 
-                                                level__lte=page.level+levels, 
-                                                sites__domain=site.domain)
-        return pages
-    else:
-        return []
-    
-def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True):
+def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False):
+    """
+    recursive function for marking all children and handling the active and inactive trees with the level limits
+    """
     if not hasattr(target, "childrens"):
         target.childrens = []
     if ancestors == None:
@@ -38,13 +29,30 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                 page.descendant = True
             if len(target.childrens):
                 target.childrens[-1].last = False
-            page.ancestors_ascending = target.ancestors_ascending + [target]
+            page.ancestors_ascending = list(target.ancestors_ascending) + [target]
             page.last = True
             target.childrens.append(page)    
-            find_children(page, pages, levels-1, active_levels, ancestors, selected_pk, soft_roots)
-            
-                
-    
+            find_children(page, 
+                          pages, 
+                          levels-1, 
+                          active_levels, 
+                          ancestors, 
+                          selected_pk, 
+                          soft_roots, 
+                          request, 
+                          no_extended)
+    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:
+        if target.pk in ancestors and target.pk == ancestors[-1]:
+            mark_sibling = True
+        else:
+            mark_sibling = False
+        target.childrens += get_extended_navigation_nodes(request, 
+                                                          levels, 
+                                                          list(target.ancestors_ascending) + [target], 
+                                                          target.level, 
+                                                          active_levels,
+                                                          mark_sibling)
+
 
 def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, next_page=None):
     """
@@ -57,97 +65,157 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     site = request.site
     CMS_CONTENT_CACHE_DURATION = settings.CMS_CONTENT_CACHE_DURATION
     lang = get_language_from_request(request)
-    if 'current_page' in context:
-        current_page = get_page_from_request(context)# TODO: change to request
-        if not next_page and current_page: #new menu... get all the data so we can save a lot of queries
-            ids = []
-            children = []
-            ancestors = []
+    current_page = request.current_page
+   
+    if not next_page: #new menu... get all the data so we can save a lot of queries
+        ids = []
+        children = []
+        ancestors = []
+        if current_page:
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
-            soft_root_filter = {}
-            #check the ancestors for softroots
-            for p in alist:
-                ancestors.append(p[0])
-                if p[1]:
-                    soft_root = Page.objects.get(pk=p[0])
-                    soft_root_filter['lft__gte'] = soft_root.lft
-                    soft_root_filter['rght__lte'] = soft_root.rght
-                    soft_root_filter['tree_id'] = soft_root.tree_id
-                    from_level = soft_root.level
-            if current_page.soft_root:
-                soft_root_filter['tree_id'] = current_page.tree_id
-                soft_root_filter['lft__gte'] = current_page.lft
-                soft_root_filter['rght__lte'] = current_page.rght
-                #current_page.soft_root = False
-                from_level = current_page.level
-            pages = Page.objects.published().filter(in_navigation=True, sites__domain=site.domain).order_by('tree_id', 'parent', 'lft').filter(level__gte=from_level, level__lte=to_level, **soft_root_filter)
-            pages = list(pages)
-            all_pages = pages[:]
-            last = None
-            for page in pages:# build the tree
+        else:# maybe the active node is in an extender?
+            alist = []
+            extenders = Page.objects.published().filter(in_navigation=True, 
+                                                        sites__domain=site.domain, 
+                                                        level__lte=to_level)
+            extenders = extenders.exclude(navigation_extenders__isnull=True).exclude( navigation_extenders__exact="")
+            for ext in extenders:
+                ext.childrens = []
+                ext.ancestors_ascending = []
+                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, False)
+                if hasattr(ext, "ancestor"):
+                    alist = list(ext.get_ancestors().values_list('id', 'soft_root'))
+                    alist = [(ext.pk, ext.soft_root)] + alist
+                    break
+        soft_root_filter = {}
+        #check the ancestors for softroots
+        for p in alist:
+            ancestors.append(p[0])
+            if p[1]:
+                soft_root = Page.objects.get(pk=p[0])
+                soft_root_filter['lft__gte'] = soft_root.lft
+                soft_root_filter['rght__lte'] = soft_root.rght
+                soft_root_filter['tree_id'] = soft_root.tree_id
+                from_level = soft_root.level
+        if current_page and current_page.soft_root: 
+            soft_root_filter['tree_id'] = current_page.tree_id
+            soft_root_filter['lft__gte'] = current_page.lft
+            soft_root_filter['rght__lte'] = current_page.rght
+            from_level = current_page.level
+        pages = Page.objects.published().filter(in_navigation=True, 
+                                                sites__domain=site.domain, 
+                                                level__lte=to_level, 
+                                                **soft_root_filter).order_by('tree_id', 
+                                                                             'parent', 
+                                                                             'lft')
+        pages = list(pages)
+        all_pages = pages[:]
+        last = None
+        for page in pages:# build the tree
+            if page.level >= from_level:
                 ids.append(page.pk)
-                if page.level == from_level:
-                    if from_level != 0:
-                        if last and last.parent_id == page.parent_id:
-                            page.ancestors_ascending = last.ancestors_ascending
-                        else:
-                            page.get_cached_ancestors()
-                    else:
-                        page.ancestors_ascending = []
-                    children.append(page)
-                    if page.pk == current_page.pk and current_page.soft_root:
-                        page.soft_root = False #ugly hack for the recursive function
-                    find_children(page, pages, extra_inactive, extra_active, ancestors, current_page.pk)
-                    if page.pk == current_page.pk and current_page.soft_root:
-                        page.soft_root = True
-                if from_level != 0:
-                    last = page
-            titles = list(Title.objects.filter(page__in=ids, language=lang))
-            for page in all_pages:# add the title and slugs and some meta data
-                for title in titles:
-                    if title.page_id == page.pk:
-                        page.title_cache = title
-                        titles.remove(title)
-                if page.pk in ancestors:
-                    page.ancestor = True
-                if page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
-                    page.sibling = True
-        else:
-            if current_page and next_page.childrens:
-                children = next_page.childrens
-            else:
-                children = []
+            if page.level == 0:
+                page.ancestors_ascending = []
+                children.append(page)
+                if current_page and page.pk == current_page.pk and current_page.soft_root:
+                    page.soft_root = False #ugly hack for the recursive function
+                if current_page:
+                    pk = current_page.pk
+                else:
+                    pk = -1
+                find_children(page, pages, extra_inactive+from_level, extra_active, ancestors, pk, request=request)
+                if current_page and page.pk == current_page.pk and current_page.soft_root:
+                    page.soft_root = True
+        if from_level > 0:
+            children = cut_levels(children, from_level)
+        titles = list(Title.objects.filter(page__in=ids, language=lang))
+        for page in all_pages:# add the title and slugs and some meta data
+            for title in titles:
+                if title.page_id == page.pk:
+                    page.title_cache = title
+                    titles.remove(title)
+            if page.pk in ancestors:
+                page.ancestor = True
+            if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
+                page.sibling = True
+    else:
+        #if current_page and next_page.childrens:
+        children = next_page.childrens
+        #else:
+        #    children = []
     return locals()
 show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
 
+def cut_levels(nodes, level):
+    """
+    for cutting the levels if you have a from_level in the navigation
+    """
+    result = []
+    if nodes:
+        if nodes[0].level == level:
+            return nodes
+    for node in nodes:
+        result += cut_levels(node.childrens, level)
+    return result
+
+def find_selected(nodes):
+    for node in nodes:
+        if hasattr(node, "selected"):
+            return node
+        if hasattr(node, "ancestor"):
+            result = find_selected(node.childrens)
+            if result:
+                return result
+
 def show_sub_menu(context, levels=100):
-    print "show sub menu"
     """Get the root page of the current page and 
     render a nested list of all root's children pages"""
-    page = get_page_from_request(context)# TODO: change to request
-    root = page.get_root()
     request = context['request']
     lang = get_language_from_request(request)
     site = request.site
-    pages = get_page_children_for_site(page, site, levels)
-    ids = []
     children = []
-    pages = list(pages)
-    all_pages = pages[:]
-    for p in pages:# build the tree
-        ids.append(p.pk)
-        if p.parent_id == page.pk:
-            p.ancestors_ascending = [page]
-            children.append(p)
-            find_children(p, pages, levels, levels, [], -1)
-    titles = Title.objects.filter(page__in=ids, language=lang)
-    for p in all_pages:# add the title and slugs and some meta data
-        for title in titles:
-            if title.page_id == p.pk:
-                p.title_cache = title
-    from_level = page.level
-    to_level = page.level+levels
-    extra_active = extra_inactive = levels
+    page = request.current_page
+    if page:
+        root = page.get_root()
+        pages = Page.objects.published().filter(in_navigation=True, 
+                                                lft__gt=page.lft, 
+                                                rght__lt=page.rght, 
+                                                tree_id=page.tree_id, 
+                                                level__lte=page.level+levels, 
+                                                sites__domain=site.domain)
+        ids = []
+        pages = list(pages)
+        all_pages = pages[:]
+        page.ancestors_ascending = []
+        for p in pages:
+            p.descendant  = True
+            ids.append(p.pk)
+        page.selected = True
+        find_children(page, pages, levels, levels, [], page.pk, request=request)
+        children = page.childrens
+        titles = Title.objects.filter(page__in=ids, language=lang)
+        for p in all_pages:# add the title and slugs and some meta data
+            for title in titles:
+                if title.page_id == p.pk:
+                    p.title_cache = title
+        from_level = page.level
+        to_level = page.level+levels
+        extra_active = extra_inactive = levels
+    else:
+        extenders = Page.objects.published().filter(in_navigation=True, 
+                                                    sites__domain=site.domain)
+        extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
+        for ext in extenders:
+            ext.childrens = []
+            ext.ancestors_ascending = []
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, levels, False)
+            if hasattr(ext, "ancestor"):
+                selected = find_selected(nodes)
+                if selected:
+                    children = selected.childrens
+                    from_level = selected.level
+                    to_level =  from_level+levels
+                    extra_active = extra_inactive = levels
     return locals()
 show_sub_menu = register.inclusion_tag('cms/sub_menu.html',
                                        takes_context=True)(show_sub_menu)
@@ -175,10 +243,9 @@ show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)
 
 def show_breadcrumb(context, start_level=0):
-    print "show breadcrumb"
     request = context['request']
+    page = request.current_page
     lang = get_language_from_request(request)
-    page = get_page_from_request(context)# TODO: change to request
     if page:
         ancestors = list(page.get_ancestors())
         ancestors.append(page)
@@ -191,7 +258,28 @@ def show_breadcrumb(context, start_level=0):
                 if title.page_id == anc.pk:
                     anc.title_cache = title
     else:
+        site = request.site
         ancestors = []
+        extenders = Page.objects.published().filter(in_navigation=True, 
+                                                    sites__domain=site.domain)
+        extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
+        for ext in extenders:
+            ext.childrens = []
+            ext.ancestors_ascending = []
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 0, False)
+            if hasattr(ext, "ancestor"):
+                selected = find_selected(nodes)
+                if selected:
+                    ancestors = list(ext.get_ancestors()) + [ext]
+                    ids = []
+                    for anc in ancestors:
+                        ids.append(anc.pk)
+                    titles = Title.objects.filter(pk__in=ids, language=lang)
+                    for anc in ancestors:
+                        for title in titles:
+                            if title.page_id == anc.pk:
+                                anc.title_cache = title
+                    ancestors += selected.ancestors_ascending + [selected]
     return locals()
 show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
                                          takes_context=True)(show_breadcrumb)
@@ -323,22 +411,22 @@ class PlaceholderNode(template.Node):
         
 
     def render(self, context):
-        self.page = get_page_from_request(context) #TODO: change to request
         if not 'request' in context:
             return ''
         l = get_language_from_request(context['request'])
         request = context['request']
+        page = request.current_page
         c = None
         if self.name.lower() == "title":
-            t = Title.objects.get_title(self.page, l, True)
+            t = Title.objects.get_title(page, l, True)
             if t:
                 c = t.title
         elif self.name.lower() == "slug":
-            t = Title.objects.get_title(self.page, l, True)
+            t = Title.objects.get_title(page, l, True)
             if t:
                 c = t.slug
         else:
-            plugins = CMSPlugin.objects.filter(page=self.page, language=l, placeholder=self.name).order_by('position')
+            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder=self.name).order_by('position')
             c = ""
             for plugin in plugins:
                 c += plugin.render(context)

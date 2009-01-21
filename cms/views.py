@@ -16,20 +16,27 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
             current_page = get_object_or_404(Page.objects.published(site), pk=page_id)
         elif slug:
             slug_titles = Title.objects.get_page_slug(slug, site)
-            if len(slug_titles) == 1:
+            title_count = slug_titles.count()
+            if title_count == 1:
                 slug_title = slug_titles[0]
                 if slug_title and slug_title.page.calculated_status == Page.PUBLISHED:
                     current_page = slug_title.page
                 else:
                     raise Http404
-            elif len(slug_titles) > 1:
-                print slug
-                print slug_titles
-                raise "more than one" #TODO: implement
+            elif title_count > 1:
+                for title in slug_titles:
+                    print request.path
+                    print title.page.get_absolute_url()
+                    if request.path == title.page.get_absolute_url(lang):
+                        current_page = title.page
+                        break
             else:
                 raise Http404
         else:
-            current_page = pages[0]
+            if slug == None:
+                current_page = None
+            else:
+                current_page = pages[0]
         template_name = get_template_from_request(request, current_page)
     else:
         if no404:# used for placeholder finder
@@ -42,5 +49,7 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
         has_page_permissions = current_page.has_page_permission(request)
     else:
         has_page_permissions = False
+    if current_page:
+        request._current_page_cache = current_page
     return template_name, locals()
 details = auto_render(details)

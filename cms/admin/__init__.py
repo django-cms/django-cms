@@ -40,20 +40,21 @@ class PageAdmin(admin.ModelAdmin):
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [('title', 'slug'), 'status']
-    advanced_fields = ['sites', 'in_navigation', 'soft_root', ('has_url_overwrite', 'url_overwrite')]
+    advanced_fields = ['sites', 'in_navigation']
     template_fields = ['template']
 
     if settings.CMS_REVISIONS:
         top_fields = ['revisions']# TODO: implement
-        
-    #if settings.CMS_TAGGING:
-    #    advanced_fields.append('tags')
-    
+    if settings.CMS_SOFTROOT:
+        advanced_fields.append('soft_root')
     if settings.CMS_SHOW_START_DATE:
         advanced_fields.append('publication_date')
-    
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
+    if settings.CMS_URL_OVERWRITE:
+        advanced_fields.append(('has_url_overwrite', 'url_overwrite'))
+    if settings.CMS_NAVIGATION_EXTENDERS:
+        advanced_fields.append('navigation_extenders')
     
     fieldsets = [
         (_('Top'), {

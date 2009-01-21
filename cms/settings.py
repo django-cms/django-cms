@@ -26,8 +26,10 @@ CMS_TAGGING = getattr(settings, 'CMS_TAGGING', False)
 # Whether to only allow unique slugs.
 CMS_UNIQUE_SLUG_REQUIRED = getattr(settings, 'CMS_UNIQUE_SLUG_REQUIRED', True)
 
+# Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
 
+# Wheter the cms uses django-reversion
 CMS_REVISIONS = getattr(settings, 'CMS_REVISIONS', False)
 
 # Whether to enable revisions.
@@ -63,3 +65,9 @@ CMS_SHOW_START_DATE = getattr(settings, 'CMS_SHOW_START_DATE', False)
 # Changing this from True to False could cause some weirdness.  If that is required,
 # you should update your database and null any pages with publication_end_date set.
 CMS_SHOW_END_DATE = getattr(settings, 'CMS_SHOW_END_DATE', False)
+
+# Whether the user can overwrite the url of a page
+CMS_URL_OVERWRITE = getattr(settings, 'CMS_URL_OVERWRITE', True)
+
+# a tuble with a python path to a function that returns a list of navigation nodes
+CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())

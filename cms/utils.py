@@ -133,3 +133,72 @@ def get_page_from_request(request):
         return resp['current_page']
 
 
+def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_levels=0):
+    levels -= 1
+    level += 1
+    found = False
+    for item in items:
+        item.level = level
+        if descendants and not found:
+            item.descendant = True
+        item.ancestors_ascending = ancestors
+        if item.get_absolute_url() == url:
+            item.selected = True
+            levels = active_levels
+            descendants = True
+            found = True
+            last = None
+            for anc in ancestors:
+                if not isinstance(anc, Page) and last:
+                    last = None
+                    if hasattr(last, 'childrens'):
+                        for child in last.childrens:
+                            if isinstance(child, Page):
+                                child.sibling = True
+                else:
+                    last = anc
+                anc.ancestor = True
+            if last:
+                if hasattr(last, 'childrens'):
+                    for child in last.childrens:
+                        if isinstance(child, Page):
+                            child.sibling = True
+        elif found:
+            item.sibling = True
+        if levels == 0 and not hasattr(item, "ancestor" ):
+            item.childrens = []
+        else:
+            make_tree(item.childrens, levels, url, ancestors+[item], descendants, level, active_levels) 
+    if found:
+        for item in items:
+            if not hasattr(item, "selected"):
+                item.sibling = True
+
+def get_extended_navigation_nodes(request, levels, ancestors, level, active_levels, mark_sibling):
+    #print "get extended:",levels
+    if settings.CMS_NAVIGATION_EXTENDERS:
+        for ext in settings.CMS_NAVIGATION_EXTENDERS:
+            path = ext[0]
+            func_name = path.split(".")[-1]
+            ext = __import__(".".join(path.split(".")[:-1]),(),(),(func_name,))
+            func = getattr(ext, func_name)
+            items = func(request)
+            descendants = False
+            for anc in ancestors:
+                if hasattr(anc, 'selected'):
+                    if anc.selected:
+                        descendants = True
+            if len(ancestors) and hasattr(ancestors[-1], 'ancestor'):
+                make_tree(items, 100, request.path, ancestors, descendants, level, active_levels)
+            make_tree(items, levels, request.path, ancestors, descendants, level, active_levels)
+            if mark_sibling:
+                for item in items:
+                    if not hasattr(item, "selected" ):
+                        item.sibling = True
+            return items
+    else:
+        return []
+    
+
+
+
