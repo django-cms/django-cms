@@ -22,7 +22,8 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
         target.selected = True
         levels = active_levels
     if (levels <= 0 or (target.soft_root and soft_roots)) and not target.pk in ancestors:
-        return 
+        return
+    mark_sibling = False 
     for page in pages:
         if page.parent_id and page.parent_id == target.pk:
             if hasattr(target, "selected") or hasattr(target, "descendant"):
@@ -41,11 +42,9 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                           soft_roots, 
                           request, 
                           no_extended)
-    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:
-        if target.pk in ancestors and target.pk == ancestors[-1]:
-            mark_sibling = True
-        else:
-            mark_sibling = False
+            if hasattr(page, "selected"):
+                mark_sibling = True
+    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:    
         target.childrens += get_extended_navigation_nodes(request, 
                                                           levels, 
                                                           list(target.ancestors_ascending) + [target], 
