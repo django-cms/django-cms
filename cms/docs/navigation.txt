@@ -1,0 +1,197 @@
+Navigation
+==========
+==========
+
+There are 3 templatetags for use in the templates:
+
+show_menu
+=========
+
+show_menu renders the navigation of the current page.
+You can overwrite the appearance and the html if you add a cms/menu.html template to you project or edit the one provided with django-cms
+show_menu takes 4 parameters:
+from what level of the navigation to which level should the navigation be rendered?
+
+start level (default=0)
+end_level (default=100)
+
+if you have a home as a root node and don't want to display home you can render the navigation only after level 1
+
+extra_inactive (default=0)
+
+if a node is not a direct ancestor or descendant of the current active node how many levels deep should the navigation be displayed?
+
+extra_active (default=100)
+
+if a node is the current active, how many levels deep should its descendants be displayed?
+
+Some Examples:
+
+Complete navigation (as a nested list)
+
+{% load cache pages_tags %}
+<ul>
+	{% show_menu 0 100 100 100 %}
+</ul>
+
+Navigation with active tree(as a nested list)
+<ul>
+	{% show_menu 0 100 0 100 %}
+</ul>
+
+Navigation with only 1 active extra level
+<ul>
+	{% show_menu 0 100 0 1 %}
+</ul>
+
+Level 1 navigation (as a nested list)
+<ul>
+	{% show_menu 1 %}
+</ul>
+
+
+show_sub_menu
+=============
+
+Display the sub menu of the current page (as a nested list)
+Takes one argument: how many levels deep should the submenu be displayed?
+The template for the html can be found at cms/sub_menu.html
+
+<ul>
+    {% show_sub_menu 1 %}
+</ul>
+
+show_breadcrump
+===============
+
+Show the breadcrumb navigation of the current page
+The tamplate for the html can be found at cms/breadcrumb.html
+
+{% show_breadcrumb %}
+
+
+Extending the menu
+==================
+
+There is a way to extend the menu with static or dynamic content.
+For example you have a shop with categories and want these categories to be displayed in the navigation.
+
+Add the following to your settings file:
+
+CMS_NAVIGATION_EXTENDERS = (('path.to.the.function', 'Name'),)
+
+No you are able to link a Navigation Extender to a page in the Advanced Tab of the Page Settings.
+
+An example of an extender function:
+
+from categories.models import Category
+
+def get_nodes(request):
+    cats = list(Category.objects.all())
+    res = []
+    all_cats = cats[:]
+    childs = []
+    for cat in cats:
+        if cat.parent_id:
+            childs.append(cat)
+        else:
+            res.append(cat)
+    for cat in all_cats:
+        cat.childrens = []
+        for child in childs:
+            if child.parent_id == cat.pk:
+                cat.childrens.append(child)
+    return res
+    
+The model would look something like this:
+
+from django.db import models
+from django.core.urlresolvers import reverse
+import mptt
+
+class Category(models.Model):
+    parent = models.ForeignKey('self', blank=True, null=True)
+    name = models.CharField(max_length=20)
+    
+    def __unicode__(self):
+        return self.name
+    
+    def get_title(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return reverse('category_view', args=[self.pk])
+    
+try:
+    mptt.register(Category)
+except mptt.AlreadyRegistered:
+    pass
+    
+It is encouraged to use mptt for the tree structure because of performance considerations.
+The objects provided must adhere to the following Structure:
+
+they must have a:
+
+get_title function
+get_absolute_url function
+childrens array with all its children inside (the s at the end is done on purpose because children is taken by mptt)
+
+Be sure that get_title and get_absolute_url doesn't trigger any queries when called in the template or otherwise you 
+may have some serious performance and DB problems with lot of queries
+
+Properties of Navigation Nodes
+==============================
+
+node.is_leaf_node:
+
+Is it the last in the tree? If true it doesn't have any children
+Comes from mptt and maybe if your node is an extended one and isn't mapped by mptt this property is not available
+
+node.level:
+
+The level of the node. Starts at 0
+
+node.get_absolute_url:
+
+The absolute url of the node
+
+node.get_title:
+
+The title in the current language of the node
+ 
+node.selected:
+
+If true this node the current selected/active at this URL?
+ 
+node.ancestor:
+
+If true this node is an ancestor of the current selected node.
+
+node.sibling
+
+If true this node is a sibling of the current selected node.
+
+node.descendant:
+
+If true this node is a descendant of the current selected node.
+
+node.soft_root
+
+If true this node is softroot
+
+Softroot
+========
+
+Softroots are pages that start a new navigation.
+If you are in a child of a softroot node you can only see the path to the softroot.
+This feature is useful if you have big pages with a lot of sites and don't want to overwhelm the user
+
+To enable it put the following to your settings.py
+
+CMS_SOFTROOT = True
+
+Now you can mark a page as softroot in the advanced Tab of the Page Settings.
+
+
+
+
