@@ -119,9 +119,15 @@ def get_site_from_request(request, check_subdomain=True):
     else:
         site = None
     # Cache the site (caching None means we should use RequestSite).
-    SITE_CACHE[host] = site
+    
     # Return site, falling back to just using a RequestSite.
-    return site or RequestSite(request)
+    if not site:
+        if settings.CMS_USE_REQUEST_SITE:
+            site = RequestSite(request)
+        else:
+            site = Site.objects.get_current()
+    SITE_CACHE[host] = site
+    return site
 
 def get_page_from_request(request):
     if hasattr(request, '_current_page_cache'):
