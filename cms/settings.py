@@ -46,6 +46,9 @@ CMS_CONTENT_CACHE_DURATION = getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60)
 
 # The id of default Site instance to be used for multisite purposes.
 SITE_ID = getattr(settings, 'SITE_ID', 1)
+DEBUG = getattr(settings, 'DEBUG', False)
+MANAGERS = settings.MANAGERS
+DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 
 # if the request host is not found in the db, should the default site_id be used or not? False means yes
 CMS_USE_REQUEST_SITE = getattr(settings, 'CMS_USE_REQUEST_SITE', False)

@@ -4,54 +4,10 @@ from django.core.cache import cache
 from cms import settings
 from cms.models import Page, Title, CMSPlugin
 from cms.utils import get_language_from_request, get_page_from_request,\
-    get_extended_navigation_nodes
+    get_extended_navigation_nodes, find_children, cut_levels, find_selected
+from django.core.mail import send_mail
 
 register = template.Library()
-
-def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False):
-    """
-    recursive function for marking all children and handling the active and inactive trees with the level limits
-    """
-    if not hasattr(target, "childrens"):
-        target.childrens = []
-    if ancestors == None:
-        ancestors = []
-    if target.pk in ancestors:
-        target.ancestor = True
-    if target.pk == selected_pk:
-        target.selected = True
-        levels = active_levels
-    if (levels <= 0 or (target.soft_root and soft_roots)) and not target.pk in ancestors:
-        return
-    mark_sibling = False 
-    for page in pages:
-        if page.parent_id and page.parent_id == target.pk:
-            if hasattr(target, "selected") or hasattr(target, "descendant"):
-                page.descendant = True
-            if len(target.childrens):
-                target.childrens[-1].last = False
-            page.ancestors_ascending = list(target.ancestors_ascending) + [target]
-            page.last = True
-            target.childrens.append(page)    
-            find_children(page, 
-                          pages, 
-                          levels-1, 
-                          active_levels, 
-                          ancestors, 
-                          selected_pk, 
-                          soft_roots, 
-                          request, 
-                          no_extended)
-            if hasattr(page, "selected"):
-                mark_sibling = True
-    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:    
-        target.childrens += get_extended_navigation_nodes(request, 
-                                                          levels, 
-                                                          list(target.ancestors_ascending) + [target], 
-                                                          target.level, 
-                                                          active_levels,
-                                                          mark_sibling)
-
 
 def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, next_page=None):
     """
@@ -145,26 +101,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     return locals()
 show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
 
-def cut_levels(nodes, level):
-    """
-    for cutting the levels if you have a from_level in the navigation
-    """
-    result = []
-    if nodes:
-        if nodes[0].level == level:
-            return nodes
-    for node in nodes:
-        result += cut_levels(node.childrens, level)
-    return result
 
-def find_selected(nodes):
-    for node in nodes:
-        if hasattr(node, "selected"):
-            return node
-        if hasattr(node, "ancestor"):
-            result = find_selected(node.childrens)
-            if result:
-                return result
 
 def show_sub_menu(context, levels=100):
     """Get the root page of the current page and 
@@ -297,59 +234,72 @@ def has_permission(page, request):
     return page.has_page_permission(request)
 register.filter(has_permission)
 
-def show_content(context, content_type, lang=None):
-    """Display a content type from a page.
-    
-    eg: {% show_content page_object "title" %}
-    
-    You can also use the slug of a page
-    
-    eg: {% show_content "my-page-slug" "title" %}
-    
-    Keyword arguments:
-    page -- the page object
-    args -- content_type used by a placeholder
-    lang -- the wanted language (default None, use the request object to know)
-    """
-    page = get_page_from_request(context)
-    request = context.get('request', False)
-    if not request or not page:
-        return {'content':''}
-    # if the page is a SafeUnicode, try to use it like a slug
-    #if isinstance(page, SafeUnicode):
-    #    c = Content.objects.filter(type='slug', body=page)
-    #    if len(c):
-    #        page = c[0].page
-    #    else:
-    #        return {'content':''}
-    if lang is None:
-        lang = get_language_from_request(context['request'])
-    if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
-        key = 'content_cache_pid:'+str(page.id)+'_l:'+str(lang)+'_type:'+str(content_type)
-        c = cache.get(key)
-        if not c:
-            c = Content.objects.get_content(page, lang, content_type, True)
-            cache.set(key, c, settings.CMS_CONTENT_CACHE_DURATION)
-    else:
-        c = Content.objects.get_content(page, lang, content_type, True)
-    if c:
-        return {'content':c}
-    return {'content':''}
-show_content = register.inclusion_tag('cms/content.html',
-                                      takes_context=True)(show_content)
+#def show_content(context, content_type, lang=None):
+#    """Display a content type from a page.
+#    
+#    eg: {% show_content page_object "title" %}
+#    
+#    You can also use the slug of a page
+#    
+#    eg: {% show_content "my-page-slug" "title" %}
+#    
+#    Keyword arguments:
+#    page -- the page object
+#    args -- content_type used by a placeholder
+#    lang -- the wanted language (default None, use the request object to know)
+#    """
+#    page = get_page_from_request(context)
+#    request = context.get('request', False)
+#    if not request or not page:
+#        return {'content':''}
+#    # if the page is a SafeUnicode, try to use it like a slug
+#    #if isinstance(page, SafeUnicode):
+#    #    c = Content.objects.filter(type='slug', body=page)
+#    #    if len(c):
+#    #        page = c[0].page
+#    #    else:
+#    #        return {'content':''}
+#    if lang is None:
+#        lang = get_language_from_request(context['request'])
+#    if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
+#        key = 'content_cache_pid:'+str(page.id)+'_l:'+str(lang)+'_type:'+str(content_type)
+#        c = cache.get(key)
+#        if not c:
+#            c = Content.objects.get_content(page, lang, content_type, True)
+#            cache.set(key, c, settings.CMS_CONTENT_CACHE_DURATION)
+#    else:
+#        c = Content.objects.get_content(page, lang, content_type, True)
+#    if c:
+#        return {'content':c}
+#    return {'content':''}
+#show_content = register.inclusion_tag('cms/content.html',
+#                                      takes_context=True)(show_content)
 
-def show_absolute_url(context, page, lang=None):
+def page_url(context, reverse_id, lang=None):
     print "show absolute url"
     """Show the url of a page in the right language"""
     request = context.get('request', False)
-    if not request or not page:
+    if not request:
         return {'content':''}
     if lang is None:
-        lang = get_language_from_request(context['request'])
+        lang = get_language_from_request(request)
     if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
-        key = 'page_url_pid:'+str(page.id)+'_l:'+str(lang)+'_type:absolute_url'
+        key = 'page_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
         url = cache.get(key)
         if not url:
+            try:
+                page = Page.objects.get(reverse_id=reverse_id)
+            except:
+                if settings.DEBUG:
+                    raise
+                else:
+                    site = request.site
+                    send_mail(_('Reverse ID not found on %s') % site.domain,
+                              _("A page_url template tag didn't found a page with the reverse_id %s\nThe url of the page was: http://%s%s")%(reverse_id, request.host, request.path),
+                               settings.DEFAULT_FROM_EMAIL,
+                               settings.MANAGERS, 
+                               fail_silently=True)
+
             url = page.get_absolute_url(language=lang)
             cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
     else:
@@ -357,8 +307,7 @@ def show_absolute_url(context, page, lang=None):
     if url:
         return {'content':url}
     return {'content':''}
-show_absolute_url = register.inclusion_tag('cms/content.html',
-                                      takes_context=True)(show_absolute_url)
+page_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_url)
 
 #def show_revisions(context, page, content_type, lang=None):
 #    """Render the last 10 revisions of a page content with a list"""

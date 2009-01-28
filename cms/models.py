@@ -41,7 +41,7 @@ class Page(models.Model):
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True)
     url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Starts with a \"/\""))
-    reverse_id = models.CharField(_("url id"), max_length=40, db_index=True, unique=True, null=True, blank=True, help_text=_("An unique identifier that allows for linking to this page"))
+    reverse_id = models.CharField(_("reverse url id"), max_length=40, db_index=True, unique=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
     template = models.CharField(_("template"), max_length=100, null=True, blank=True)
@@ -77,6 +77,8 @@ class Page(models.Model):
                     self.publication_date = None
             else:
                 self.publication_date = None
+        if self.reverse_id == "":
+            self.reverse_id = None
         super(Page, self).save()
 
     def get_calculated_status(self):

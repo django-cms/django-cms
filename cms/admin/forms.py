@@ -31,3 +31,9 @@ class PageForm(forms.ModelForm):
         if titles.count():
             raise forms.ValidationError(ugettext_lazy('Another page with this slug already exists'))
         return slug
+    
+    def clean_reverse_id(self):
+        id = self.cleaned_data['reverse_id']
+        if id:
+            if Page.objects.filter(reverse_id=id).exclude(pk=self.instance.pk).count():
+                raise forms.ValidationError(ugettext_lazy('A page with this reverse url id exists already.'))

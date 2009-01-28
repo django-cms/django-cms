@@ -207,4 +207,67 @@ def get_extended_navigation_nodes(request, levels, ancestors, level, active_leve
     
 
 
+def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False):
+    """
+    recursive function for marking all children and handling the active and inactive trees with the level limits
+    """
+    if not hasattr(target, "childrens"):
+        target.childrens = []
+    if ancestors == None:
+        ancestors = []
+    if target.pk in ancestors:
+        target.ancestor = True
+    if target.pk == selected_pk:
+        target.selected = True
+        levels = active_levels
+    if (levels <= 0 or (target.soft_root and soft_roots)) and not target.pk in ancestors:
+        return
+    mark_sibling = False 
+    for page in pages:
+        if page.parent_id and page.parent_id == target.pk:
+            if hasattr(target, "selected") or hasattr(target, "descendant"):
+                page.descendant = True
+            if len(target.childrens):
+                target.childrens[-1].last = False
+            page.ancestors_ascending = list(target.ancestors_ascending) + [target]
+            page.last = True
+            target.childrens.append(page)    
+            find_children(page, 
+                          pages, 
+                          levels-1, 
+                          active_levels, 
+                          ancestors, 
+                          selected_pk, 
+                          soft_roots, 
+                          request, 
+                          no_extended)
+            if hasattr(page, "selected"):
+                mark_sibling = True
+    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:    
+        target.childrens += get_extended_navigation_nodes(request, 
+                                                          levels, 
+                                                          list(target.ancestors_ascending) + [target], 
+                                                          target.level, 
+                                                          active_levels,
+                                                          mark_sibling)
 
+def cut_levels(nodes, level):
+    """
+    for cutting the levels if you have a from_level in the navigation
+    """
+    result = []
+    if nodes:
+        if nodes[0].level == level:
+            return nodes
+    for node in nodes:
+        result += cut_levels(node.childrens, level)
+    return result
+
+def find_selected(nodes):
+    for node in nodes:
+        if hasattr(node, "selected"):
+            return node
+        if hasattr(node, "ancestor"):
+            result = find_selected(node.childrens)
+            if result:
+                return result

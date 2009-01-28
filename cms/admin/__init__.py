@@ -40,7 +40,7 @@ class PageAdmin(admin.ModelAdmin):
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [('title', 'slug'), 'status']
-    advanced_fields = ['sites', 'in_navigation']
+    advanced_fields = ['sites', 'in_navigation', 'reverse_id']
     template_fields = ['template']
 
     if settings.CMS_REVISIONS:
