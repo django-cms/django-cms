@@ -1,8 +1,9 @@
 from django.contrib import admin
 from categories.models import Category
+from reversion.admin import VersionAdmin
 
 
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(VersionAdmin):
     pass
 
 admin.site.register(Category, CategoryAdmin)

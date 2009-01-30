@@ -2,7 +2,7 @@
 import os
 PROJECT_DIR = os.path.dirname(__file__)
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'cms.plugins.text',
     'cms.plugins.picture',
     'mptt',
+    'reversion',
     'example.categories',
     'debug_toolbar',
     'django_evolution',

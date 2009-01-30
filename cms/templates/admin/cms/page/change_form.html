@@ -14,7 +14,7 @@
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
-  <!--<li><a href="history/" class="historylink">{% trans "History" %}</a></li>-->
+  <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}

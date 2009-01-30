@@ -52,9 +52,16 @@
 <div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
 
 {% block object-tools %}
-{% if has_add_permission %}
-<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
-{% endif %}
+
+<ul class="object-tools">
+	{% if has_change_permission %}
+		<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
+	{% endif %}
+	{% if has_add_permission %}
+	<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
+	{% endif %}
+</ul>
+
 {% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
 {% block search %}{% search_form cl %}{% endblock %}

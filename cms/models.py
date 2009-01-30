@@ -10,6 +10,8 @@ import mptt
 from cms import settings
 from cms.managers import PageManager, PagePermissionManager, TitleManager
 
+if 'reversion' in settings.INSTALLED_APPS:
+    import reversion
 #try:
 #    tagging = models.get_app('tagging')
 #    from tagging.fields import TagField
@@ -246,11 +248,6 @@ class Page(models.Model):
             return True
         else:
             return False
-        
-        
-    
-
-    
 
 # Don't register the Page model twice.
 try:
@@ -345,5 +342,9 @@ class CMSPlugin(models.Model):
     #class Meta:
     #    pass
         #abstract = True
-    
 
+if 'reversion' in settings.INSTALLED_APPS:        
+    reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])
+    reversion.register(CMSPlugin)
+    reversion.register(Title)
+    

@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="../../../">{% trans 'Home' %}</a> &rsaquo; 
+    <a href="../../">{{app_label|capfirst|escape}}</a> &rsaquo; 
+    <a href="../">{{module_name}}</a> &rsaquo; 
+    {% blocktrans with opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}
+</div>
+{% endblock %}
+
+{% block content %}
+	<div id="content-main">
+		<p>{% blocktrans %}Choose a date from the list below to recover a deleted version of an object.{% endblocktrans %}</p>
+		<div class="module">
+			{% if deleted %}
+			    <table id="change-history">
+			        <thead>
+			        <tr>
+			            <th scope="col">{% trans 'Date/time' %}</th>
+			            <th scope="col">{{opts.verbose_name|capfirst}}</th>
+			        </tr>
+			        </thead>
+			        <tbody>
+			        {% for deletion in deleted %}
+			        <tr>
+			            <th scope="row"><a href="{{deletion.pk}}/">{{deletion.revision.date_created|date:_("DATETIME_FORMAT")}}</a></th>
+			            <td>{{deletion.object_repr}}</td>
+			        </tr>
+			        {% endfor %}
+			        </tbody>
+			    </table>
+			{% else %}
+			    <p>{% trans "There are no deleted objects to recover." %}</p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

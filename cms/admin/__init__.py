@@ -17,7 +17,7 @@ from cms.utils import get_template_from_request, has_page_add_permission, \
     get_language_from_request
 from django.core.exceptions import PermissionDenied
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 
 from cms.admin.change_list import CMSChangeList
 from django.template.context import RequestContext
@@ -25,12 +25,13 @@ from django.template.context import RequestContext
 
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
-from cms.admin.views import get_content, change_status, modify_content, change_innavigation, add_plugin,\
+from cms.admin.views import change_status, change_innavigation, add_plugin,\
     edit_plugin, remove_plugin, move_plugin
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 from copy import deepcopy
 from cms.settings import CMS_MEDIA_URL
+
 
 
 class PageAdmin(admin.ModelAdmin):
@@ -42,7 +43,7 @@ class PageAdmin(admin.ModelAdmin):
     general_fields = [('title', 'slug'), 'status']
     advanced_fields = ['sites', 'in_navigation', 'reverse_id']
     template_fields = ['template']
-
+    change_list_template = "admin/cms/page/change_list.html"
     if settings.CMS_REVISIONS:
         top_fields = ['revisions']# TODO: implement
     if settings.CMS_SOFTROOT:
@@ -100,16 +101,16 @@ class PageAdmin(admin.ModelAdmin):
         """
         if url is None:
             return self.list_pages(request)
-        elif 'traduction' in url:
-            page_id, action, language_id = url.split('/')
-            return traduction(request, unquote(page_id), unquote(language_id))
-        elif 'get-content' in url:
-            page_id, action, content_id = url.split('/')
-            return get_content(request, unquote(page_id), unquote(content_id))
-        elif 'modify-content' in url:
-            page_id, action, content_id, language_id = url.split('/')
-            return modify_content(request, unquote(page_id),
-                                    unquote(content_id), unquote(language_id))
+        #elif 'traduction' in url:
+        #    page_id, action, language_id = url.split('/')
+        #    return traduction(request, unquote(page_id), unquote(language_id))
+        #elif 'get-content' in url:
+        #    page_id, action, content_id = url.split('/')
+        #    return get_content(request, unquote(page_id), unquote(content_id))
+        #elif 'modify-content' in url:
+        #    page_id, action, content_id, language_id = url.split('/')
+        #    return modify_content(request, unquote(page_id),
+        #                            unquote(content_id), unquote(language_id))
         elif url.endswith('add-plugin'):
             #page_id, placeholder, plugin_name = url.split('/')
             return add_plugin(request)
@@ -240,8 +241,21 @@ class PageAdmin(admin.ModelAdmin):
             if placeholder.name not in self.mandatory_placeholders:
                 installed_plugins = plugin_pool.get_all_plugins()
                 plugin_list = []
+                
                 if obj:
-                    plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
+                    if "history" in request.path:
+                        from reversion.models import Version
+                        version_id = request.path.split("/")[-2]
+                        version = get_object_or_404(Version, pk=version_id)
+                        revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+                        plugin_list = []
+                        for rev in revs:
+                            obj = rev.object
+                            if obj.__class__ == CMSPlugin:
+                                if obj.language == language and obj.placeholder == placeholder.name:
+                                    plugin_list.append(rev.object)
+                    else:
+                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
@@ -312,10 +326,13 @@ class PageAdmin(admin.ModelAdmin):
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
+            
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
             'CMS_MEDIA_URL': CMS_MEDIA_URL
         }
+        if 'reversion' in settings.INSTALLED_APPS:
+            context['has_change_permission'] = self.has_change_permission(request)
         context.update(extra_context or {})
         return render_to_response(self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
@@ -363,7 +380,17 @@ class PageAdmin(admin.ModelAdmin):
                     template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
-admin.site.register(Page, PageAdmin)
+
+
+class PageAdminMixins(admin.ModelAdmin):
+    pass
+
+if 'reversion' in settings.INSTALLED_APPS:
+    from reversion.admin import VersionAdmin
+    PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__    
+    admin.site.register(Page, PageAdminMixins)
+else:
+    admin.site.register(Page, PageAdmin)
 
 class ContentAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'type', 'language', 'page')

@@ -1,0 +1,35 @@
+{% extends "admin/object_history.html" %}
+{% load i18n %}
+
+
+{% block content %}
+	<div id="content-main">
+	
+		<p>{% blocktrans %}Choose a date from the list below to revert to a previous version of this object.{% endblocktrans %}</p>
+	
+		<div class="module">
+			{% if action_list %}
+			    <table id="change-history">
+			        <thead>
+				        <tr>
+				            <th scope="col">{% trans 'Date/time' %}</th>
+				            <th scope="col">{% trans 'User' %}</th>
+				            <th scope="col">{% trans 'Comment' %}</th>
+				        </tr>
+			        </thead>
+			        <tbody>
+				        {% for action in action_list %}
+					        <tr>
+					            <th scope="row"><a href="./{{action.pk}}/">{{action.revision.date_created|date:_("DATETIME_FORMAT")}}</a></th>
+					            <td>{{action.revision.user.username}}{% if action.revision.user.first_name %} ({{action.revision.user.first_name}} {{action.revision.user.last_name}}){% endif %}</td>
+					            <td>{{action.revision.comment|default:""}}</td>
+					        </tr>
+				        {% endfor %}
+			        </tbody>
+			    </table>
+			{% else %}
+			    <p>{% trans "This object doesn't have a change history. It probably wasn't added via this admin site." %}</p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

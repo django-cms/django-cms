@@ -49,6 +49,7 @@ SITE_ID = getattr(settings, 'SITE_ID', 1)
 DEBUG = getattr(settings, 'DEBUG', False)
 MANAGERS = settings.MANAGERS
 DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
+INSTALLED_APPS = settings.INSTALLED_APPS
 
 # if the request host is not found in the db, should the default site_id be used or not? False means yes
 CMS_USE_REQUEST_SITE = getattr(settings, 'CMS_USE_REQUEST_SITE', False)
