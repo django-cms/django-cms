@@ -79,9 +79,17 @@ def has_page_add_permission(request, page=None):
         return True
     else:
         from cms.models import PagePermission
-        permission = PagePermission.objects.get_edit_id_list(request.user)
-        if permission == "All":
+        permissions = PagePermission.objects.get_edit_id_list(request.user)
+        if permissions == "All":
             return True
+        target = request.GET.get('target', -1)
+        position = request.GET.get('position', None)
+        if int(target) in permissions:
+            if position == "first-child":
+                return True
+            else:
+                if Page.objects.get(pk=target).parent_id in permissions:
+                    return True
     return False
 
 def get_site_from_request(request, check_subdomain=True):

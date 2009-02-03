@@ -117,7 +117,7 @@ def edit_plugin(request, plugin_id):
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-        print revs
+        #print revs
         for rev in revs:
             obj = rev.object
             if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
@@ -154,7 +154,8 @@ def edit_plugin(request, plugin_id):
                 revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
             return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True},RequestContext(request))
         else:
-            print request.POST
+            pass
+            #print request.POST
     else:
         if instance:
             form = plugin_class.form(instance=instance)
@@ -217,3 +218,20 @@ def save_all_plugins(page, excludes=None):
             if plugin.pk in excludes:
                 continue
         plugin.save()
+        
+def revert_plugins(request, version_id):
+    from reversion.models import Version
+    
+    version = get_object_or_404(Version, pk=version_id)
+    revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+    plugin_list = []
+    page = None
+    for rev in revs:
+        obj = rev.object
+        print obj.__class__
+        if obj.__class__ == CMSPlugin:
+            if obj.language == language and obj.placeholder == placeholder.name:
+                plugin_list.append(rev.object)
+        if obj.__class__ == Page:
+            page = obj
+    current_plugins = CMSPlugin.objects.filter(page=page)

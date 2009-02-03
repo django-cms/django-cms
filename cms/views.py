@@ -31,8 +31,6 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
             else:
                 raise Http404
         else:
-            print "no slug"
-            print slug
             if slug == None:
                 current_page = None
             else:

@@ -26,7 +26,7 @@ from django.template.context import RequestContext
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import change_status, change_innavigation, add_plugin,\
-    edit_plugin, remove_plugin, move_plugin
+    edit_plugin, remove_plugin, move_plugin, revert_plugins
 from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 from copy import deepcopy
@@ -131,7 +131,14 @@ class PageAdmin(admin.ModelAdmin):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
-        
+        elif 'history' in url and request.method == "POST":
+            print "history post"
+            resp = super(PageAdmin, self).__call__(request, url)
+            if resp.status_code == 302:
+                print "history recover"
+                version = int(url.split("/")[-2])
+                revert_plugins(request, version)
+                return
         return super(PageAdmin, self).__call__(request, url)
 
     def save_model(self, request, obj, form, change):
@@ -380,6 +387,8 @@ class PageAdmin(admin.ModelAdmin):
                     template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
+    
+    
 
 
 class PageAdminMixins(admin.ModelAdmin):
