@@ -4,7 +4,7 @@ from cms import settings
 
 urlpatterns = patterns('',
     # Public pages
-    url(r'^$', details, name='pages-root'),
+    url(r'^$', details, {'slug':''}, name='pages-root'),
 )
 
 if settings.CMS_UNIQUE_SLUG_REQUIRED:

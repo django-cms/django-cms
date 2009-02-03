@@ -25,14 +25,14 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
                     raise Http404
             elif title_count > 1:
                 for title in slug_titles:
-                    print request.path
-                    print title.page.get_absolute_url()
                     if request.path == title.page.get_absolute_url(lang):
                         current_page = title.page
                         break
             else:
                 raise Http404
         else:
+            print "no slug"
+            print slug
             if slug == None:
                 current_page = None
             else:
