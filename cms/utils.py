@@ -212,8 +212,6 @@ def get_extended_navigation_nodes(request, levels, ancestors, level, active_leve
     else:
         return []
     
-
-
 def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False):
     """
     recursive function for marking all children and handling the active and inactive trees with the level limits
