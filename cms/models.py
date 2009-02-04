@@ -276,9 +276,8 @@ class Page(models.Model):
                     setattr(self, att_name, False)
             return getattr(self, att_name)
         
-    def is_home(self):
-        
-        if not self.parent_id and Page.objects.order_by('tree_id', 'lft')[0].pk == self.pk:
+    def is_home(self):   
+        if not self.parent_id and Page.objects.filter(parent=None).order_by('tree_id', 'lft')[0].pk == self.pk:
             return True
         else:
             return False
