@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.sites.models import Site
+from django.shortcuts import get_object_or_404
 
 import mptt
 from cms import settings
@@ -66,7 +67,7 @@ class Page(models.Model):
         #title += 
         return self.get_slug()
 
-    def save(self):
+    def save(self, no_signals=False):
         if not self.status:
             self.status = self.DRAFT
         # Published pages should always have a publication date
@@ -81,8 +82,11 @@ class Page(models.Model):
                 self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
-        super(Page, self).save()
-
+        if no_signals:# ugly hack because of mptt
+            super(Page, self).save_base(cls=self.__class__)
+        else:
+            super(Page, self).save()
+            
     def get_calculated_status(self):
         """
         get the calculated status of the page based on published_date,
@@ -140,31 +144,63 @@ class Page(models.Model):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
         
-    def get_slug(self, language=None, fallback=True):
+    def get_slug(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the slug of the page depending on the given language
         """
         if not language:
             language = settings.CMS_DEFAULT_LANGUAGE
-        if not hasattr(self, "title_cache"):
-            #print "no slug"
+        if not hasattr(self, "title_cache") or force_reload:
+            print "no slug"
             #print self.pk
-            self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
+            if version_id:
+                from reversion.models import Version
+                version = get_object_or_404(Version, pk=version_id)
+                revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+                for rev in revs:
+                    obj = rev.object
+                    if obj.__class__ == Title:
+                        if obj.language == language and obj.page_id == self.pk:
+                            self.title_cache = obj
+                if not self.title_cache and fallback:
+                    for rev in revs:
+                        obj = rev.object
+                        if obj.__class__ == Title:
+                            if obj.page_id == self.pk:
+                                self.title_cache = obj
+            else:
+                self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
         title = self.title_cache
         if title:
             return title.slug
         else:
             return ""
 
-    def get_title(self, language=None, fallback=True):
+    def get_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the title of the page depending on the given language
         """
         if not language:
             language = settings.CMS_DEFAULT_LANGUAGE
-        if not hasattr(self, "title_cache"):
+        if not hasattr(self, "title_cache") or force_reload:
             print "no title"
-            self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
+            if version_id:
+                from reversion.models import Version
+                version = get_object_or_404(Version, pk=version_id)
+                revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+                for rev in revs:
+                    obj = rev.object
+                    if obj.__class__ == Title:
+                        if obj.language == language and obj.page_id == self.pk:
+                            self.title_cache = obj
+                if not self.title_cache and fallback:
+                    for rev in revs:
+                        obj = rev.object
+                        if obj.__class__ == Title:
+                            if obj.page_id == self.pk:
+                                self.title_cache = obj
+            else:
+                self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
         title = self.title_cache
         if title:
             return title.title

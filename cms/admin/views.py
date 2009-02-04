@@ -9,7 +9,6 @@ from cms.models import Page, Title, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import auto_render
 
-
 def change_status(request, page_id):
     """
     Switch the status of a page
@@ -44,42 +43,8 @@ def change_innavigation(request, page_id):
     raise Http404
 change_status = staff_member_required(change_status)
 
-#def modify_content(request, page_id, content_id, language_id):
-#    if request.method == 'POST':
-#        content = request.POST.get('content', False)
-#        if not content:
-#            raise Http404
-#        page = Page.objects.get(pk=page_id)
-#        if not page.has_page_permission(request):
-#            raise Http404
-#        #if settings.CMS_CONTENT_REVISION: #TODO: implement with revisions
-#        #    Content.objects.create_content_if_changed(page, language_id,
-#        #                                              content_id, content)
-#        #else:
-#        if content_id.lower() not in ['title', 'slug']:
-#            Content.objects.set_or_create_content(page, language_id,
-#                                                  content_id, content)
-#        else:
-#            if content_id.lower() == "title":
-#                Title.objects.set_or_create(page, language_id, slug=None, title=content)
-#            elif content_id.lower() == "slug":
-#                Title.objects.set_or_create(page, language_id, slug=content, title=None)
-#        return HttpResponse('ok')
-#    raise Http404
-#modify_content = staff_member_required(modify_content)
-
-#def get_content(request, page_id, content_id):
-#    content_instance = get_object_or_404(Content, pk=content_id)
-#    return HttpResponse(content_instance.body)
-#get_content = staff_member_required(get_content)
-#get_content = auto_render(get_content)
-
 if 'reversion' in settings.INSTALLED_APPS:
-    from reversion import revision
-
-
-    # Make changes to your models here.
-    
+    from reversion import revision    
 
 def add_plugin(request):
     if request.method == "POST":
@@ -220,18 +185,37 @@ def save_all_plugins(page, excludes=None):
         plugin.save()
         
 def revert_plugins(request, version_id):
+    print "revert plugins"
     from reversion.models import Version
-    
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+    print revs
     plugin_list = []
+    titles = []
     page = None
     for rev in revs:
         obj = rev.object
-        print obj.__class__
         if obj.__class__ == CMSPlugin:
-            if obj.language == language and obj.placeholder == placeholder.name:
-                plugin_list.append(rev.object)
+            plugin_list.append(rev.object)
         if obj.__class__ == Page:
             page = obj
-    current_plugins = CMSPlugin.objects.filter(page=page)
+            obj.save()
+        if obj.__class__ == Title:
+            titles.append(obj) 
+    current_plugins = list(CMSPlugin.objects.filter(page=page))
+    for plugin in plugin_list:
+        plugin.page = page
+        plugin.save()
+        for old in current_plugins:
+            if old.pk == plugin.pk:
+                current_plugins.remove(old)
+    for title in titles:
+        title.page = page
+        try:
+            title.save()
+        except:
+            title.pk = Title.objects.get(page=page, language=title.language).pk
+            title.save()
+    for plugin in current_plugins:
+        plugin.delete()
+    

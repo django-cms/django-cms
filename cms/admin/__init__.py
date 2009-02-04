@@ -131,23 +131,25 @@ class PageAdmin(admin.ModelAdmin):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
-        elif 'history' in url and request.method == "POST":
-            print "history post"
+        elif ('history' in url or 'recover' in url) and request.method == "POST":
             resp = super(PageAdmin, self).__call__(request, url)
             if resp.status_code == 302:
-                print "history recover"
-                version = int(url.split("/")[-2])
+                version = int(url.split("/")[-1])
                 revert_plugins(request, version)
-                return
+                return resp
         return super(PageAdmin, self).__call__(request, url)
 
     def save_model(self, request, obj, form, change):
-        print "save model"
         """
         Move the page in the tree if neccesary and save every placeholder
         Content object.
         """
-        obj.save()
+        print obj
+        if 'recover' in request.path:
+            obj.save(no_signals=True)
+            obj.save()
+        else:
+            obj.save()
         language = form.cleaned_data['language']
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
@@ -230,12 +232,22 @@ class PageAdmin(admin.ModelAdmin):
             else:
                 if 'soft_root' in self.exclude:
                     self.exclude.remove('soft_root')
+        version_id = None
+        versioned = False
+        if "history" in request.path or 'recover' in request.path:
+            versioned = True
+            version_id = request.path.split("/")[-2]
+            #if 'history' in request.path:
+            #    version_id = request.path.split("/")[-2]
+            #elif 'recover' in request.path:
+            #    version_id = request.path.split("/")[-2]
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
         if obj:
-            initial_slug = obj.get_slug(language=language, fallback=False)
-            initial_title = obj.get_title(language=language, fallback=False)
+            print "version id", version_id
+            initial_slug = obj.get_slug(language=language, fallback=False, version_id=version_id, force_reload=True)
+            initial_title = obj.get_title(language=language, fallback=False, version_id=version_id)
             form.base_fields['slug'].initial = initial_slug
             form.base_fields['title'].initial = initial_title
         template = get_template_from_request(request, obj)
@@ -248,14 +260,14 @@ class PageAdmin(admin.ModelAdmin):
             if placeholder.name not in self.mandatory_placeholders:
                 installed_plugins = plugin_pool.get_all_plugins()
                 plugin_list = []
-                
                 if obj:
-                    if "history" in request.path:
+                    if versioned:
                         from reversion.models import Version
-                        version_id = request.path.split("/")[-2]
                         version = get_object_or_404(Version, pk=version_id)
                         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                         plugin_list = []
+                        print "============================"
+                        print revs
                         for rev in revs:
                             obj = rev.object
                             if obj.__class__ == CMSPlugin:
