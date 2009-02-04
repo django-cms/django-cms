@@ -189,7 +189,6 @@ def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_
                 item.sibling = True
 
 def get_extended_navigation_nodes(request, levels, ancestors, level, active_levels, mark_sibling):
-    #print "get extended:",levels
     if settings.CMS_NAVIGATION_EXTENDERS:
         for ext in settings.CMS_NAVIGATION_EXTENDERS:
             path = ext[0]

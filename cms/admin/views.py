@@ -48,14 +48,11 @@ if 'reversion' in settings.INSTALLED_APPS:
 
 def add_plugin(request):
     if request.method == "POST":
-        
-        print "add plugin"
         page_id = request.POST['page_id']
         page = get_object_or_404(Page, pk=page_id)
         placeholder = request.POST['placeholder']
         plugin_type = request.POST['plugin_type']
         language = request.POST['language']
-        
         position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         plugin.save()
@@ -82,7 +79,6 @@ def edit_plugin(request, plugin_id):
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-        #print revs
         for rev in revs:
             obj = rev.object
             if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
@@ -118,9 +114,6 @@ def edit_plugin(request, plugin_id):
                 plugin_name = unicode(plugin_pool.get_plugin(inst.plugin_type).name)
                 revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
             return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True},RequestContext(request))
-        else:
-            pass
-            #print request.POST
     else:
         if instance:
             form = plugin_class.form(instance=instance)
@@ -185,11 +178,9 @@ def save_all_plugins(page, excludes=None):
         plugin.save()
         
 def revert_plugins(request, version_id):
-    print "revert plugins"
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-    print revs
     plugin_list = []
     titles = []
     page = None

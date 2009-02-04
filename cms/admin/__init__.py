@@ -101,30 +101,15 @@ class PageAdmin(admin.ModelAdmin):
         """
         if url is None:
             return self.list_pages(request)
-        #elif 'traduction' in url:
-        #    page_id, action, language_id = url.split('/')
-        #    return traduction(request, unquote(page_id), unquote(language_id))
-        #elif 'get-content' in url:
-        #    page_id, action, content_id = url.split('/')
-        #    return get_content(request, unquote(page_id), unquote(content_id))
-        #elif 'modify-content' in url:
-        #    page_id, action, content_id, language_id = url.split('/')
-        #    return modify_content(request, unquote(page_id),
-        #                            unquote(content_id), unquote(language_id))
         elif url.endswith('add-plugin'):
-            #page_id, placeholder, plugin_name = url.split('/')
             return add_plugin(request)
         elif 'edit-plugin' in url:
             plugin_id = url.split("/")[-1]
             return edit_plugin(request, plugin_id)
         elif 'remove-plugin' in url:
-            #page_id, placeholder, position = url.split('/')
             return remove_plugin(request)
         elif 'move-plugin' in url:
             return move_plugin(request)
-        
-        #elif url.endswith('/valid-targets-list'):
-        #    return valid_targets_list(request, unquote(url[:-19]))
         elif url.endswith('/move-page'):
             return self.move_page(request, unquote(url[:-10]))
         elif url.endswith('/change-status'):
@@ -144,7 +129,6 @@ class PageAdmin(admin.ModelAdmin):
         Move the page in the tree if neccesary and save every placeholder
         Content object.
         """
-        print obj
         if 'recover' in request.path:
             obj.save(no_signals=True)
             obj.save()
@@ -161,22 +145,6 @@ class PageAdmin(admin.ModelAdmin):
             else:
                 obj.move_to(target, position)
         Title.objects.set_or_create(obj, language, form.cleaned_data['slug'], form.cleaned_data['title'])
-#        for placeholder in get_placeholders(request, obj.get_template()):
-#            if placeholder.name in form.cleaned_data:
-#                if placeholder.name not in self.mandatory_placeholders:
-#                    if change:                        
-#                            # we need create a new content if revision is enabled
-#                            #TODO: implement django-revision
-#                            if False and settings.CMS_CONTENT_REVISION and placeholder.name \
-#                                    not in settings.CMS_CONTENT_REVISION_EXCLUDE_LIST:
-#                                Content.objects.create_content_if_changed(obj, language,
-#                                    placeholder.name, form.cleaned_data[placeholder.name])
-#                            else:
-#                                Content.objects.set_or_create_content(obj, language,
-#                                    placeholder.name, form.cleaned_data[placeholder.name])
-#                    else:
-#                        Content.objects.set_or_create_content(obj, language,
-#                            placeholder.name, form.cleaned_data[placeholder.name])
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -237,15 +205,10 @@ class PageAdmin(admin.ModelAdmin):
         if "history" in request.path or 'recover' in request.path:
             versioned = True
             version_id = request.path.split("/")[-2]
-            #if 'history' in request.path:
-            #    version_id = request.path.split("/")[-2]
-            #elif 'recover' in request.path:
-            #    version_id = request.path.split("/")[-2]
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
         if obj:
-            print "version id", version_id
             initial_slug = obj.get_slug(language=language, fallback=False, version_id=version_id, force_reload=True)
             initial_title = obj.get_title(language=language, fallback=False, version_id=version_id)
             form.base_fields['slug'].initial = initial_slug
@@ -266,8 +229,6 @@ class PageAdmin(admin.ModelAdmin):
                         version = get_object_or_404(Version, pk=version_id)
                         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                         plugin_list = []
-                        print "============================"
-                        print revs
                         for rev in revs:
                             obj = rev.object
                             if obj.__class__ == CMSPlugin:

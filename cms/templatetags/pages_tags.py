@@ -276,7 +276,6 @@ register.filter(has_permission)
 #                                      takes_context=True)(show_content)
 
 def page_url(context, reverse_id, lang=None):
-    print "show absolute url"
     """Show the url of a page in the right language"""
     request = context.get('request', False)
     if not request:

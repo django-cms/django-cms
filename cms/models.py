@@ -109,7 +109,6 @@ class Page(models.Model):
         """
         titles = Title.objects.filter(page=self)
         if not hasattr(self, "languages_cache"):
-            print "no languages cache"
             languages = []
             for t in titles:
                 if t.language not in languages:
@@ -118,7 +117,6 @@ class Page(models.Model):
         return self.languages_cache
 
     def get_absolute_url(self, language=None):
-        #print "get_absolute_url"
         return reverse('pages-root') + self.get_url(language)
 
     def get_url(self, language=None):

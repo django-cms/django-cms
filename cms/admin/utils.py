@@ -14,7 +14,6 @@ def get_placeholders(request, template_name):
     except TemplateDoesNotExist:
         return []
     context = details(request, no404=True, only_context=True)
-    #print context
     temp.render(RequestContext(request, context))
     list = []
     placeholders_recursif(temp.nodelist, list)
