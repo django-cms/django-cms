@@ -57,6 +57,17 @@
     a {
         color:#ff7959
     }
+	
+	ul.breadcrumb {
+		clear:left;
+		padding-bottom:30px;
+		margin-left:-40px;
+	}
+	ul.breadcrumb li{
+		float:left;
+		margin-left:5px;
+		list-style:none;
+		}
 </style>
 </head>
 <body>
@@ -103,7 +114,10 @@
 
 
 <h2>Show the breadcrumb navigation of the current page</h2>
-{% show_breadcrumb %}
+<ul class="breadcrumb">
+	<li><a href="/">home</a></li>
+	{% show_breadcrumb %}
+</ul>
 
 <h2>Content</h2>
 {% block content %}

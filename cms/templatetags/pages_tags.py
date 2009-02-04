@@ -211,11 +211,14 @@ def show_breadcrumb(context, start_level=0):
                     for anc in ancestors:
                         ids.append(anc.pk)
                     titles = Title.objects.filter(pk__in=ids, language=lang)
+                    ancs = []
                     for anc in ancestors:
+                        anc.ancestors_ascending = ancs[:]
+                        ancs += [anc]
                         for title in titles:
                             if title.page_id == anc.pk:
                                 anc.title_cache = title
-                    ancestors += selected.ancestors_ascending + [selected]
+                    ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
     return locals()
 show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
                                          takes_context=True)(show_breadcrumb)
