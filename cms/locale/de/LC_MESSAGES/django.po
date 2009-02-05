@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-16 15:47+0100\n"
-"PO-Revision-Date: 2009-01-16 15:49+0100\n"
+"POT-Creation-Date: 2009-02-05 10:39+0100\n"
+"PO-Revision-Date: 2009-02-05 10:47+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -19,210 +19,226 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: models.py:31
+#: models.py:34
 msgid "Draft"
 msgstr "Entwurf"
 
-#: models.py:32
+#: models.py:35
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: models.py:34
+#: models.py:37
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "author"
 msgstr "Verfasser"
 
-#: models.py:37
+#: models.py:40
 msgid "publication date"
 msgstr "Veröffentlicht am"
 
-#: models.py:37
+#: models.py:40
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Ab wann soll die Seite veröffentlicht werden? Der Status der Seite muss aber auf \"veröffentlicht\" sein. "
 
-#: models.py:38
+#: models.py:41
 msgid "publication end date"
 msgstr "Veröffentlicht bis"
 
-#: models.py:38
+#: models.py:41
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Ablaufdatum der Seite. Leer lassen um nie abzulaufen."
 
-#: models.py:39
+#: models.py:42
 msgid "login required"
 msgstr "Login erforderlich"
 
-#: models.py:40
+#: models.py:43
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "in navigation"
 msgstr "In der Navigation"
 
-#: models.py:41
+#: models.py:44
 msgid "soft root"
 msgstr "Soft Root"
 
-#: models.py:41
+#: models.py:44
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alle Überseiten werden nicht in der Navigation dargestellt."
 
-#: models.py:42
+#: models.py:45
 msgid "has url overwrite"
 msgstr "Die Url wird überschrieben"
 
-#: models.py:43
+#: models.py:46
 msgid "url overwrite"
 msgstr "Url Überschreibung"
 
-#: models.py:43
+#: models.py:46
 msgid "The url that this page has instead. Starts with a \"/\""
 msgstr "Die Url diese Seite anstatt hat. Sollte mit \"/\" beginnen."
 
-#: models.py:44
+#: models.py:47
+msgid "reverse url id"
+msgstr "Reverse-Url-ID"
+
+#: models.py:47
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgstr "Ein einzigartiger Identifikator der benutzt wird um mit dem page_url templatetag auf diese Seite zu verlinken."
+
+#: models.py:48
+msgid "navigation extenders"
+msgstr "Navigations Erweiterungen"
+
+#: models.py:49
 msgid "status"
 msgstr "Status"
 
-#: models.py:45
+#: models.py:50
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "template"
 msgstr "Vorlage"
 
-#: models.py:46
+#: models.py:50
+msgid "The template used to render the content."
+msgstr "Die benutzte Vorlage um die Seite darzustellen."
+
+#: models.py:51
 msgid "The site(s) the page is accessible at."
 msgstr "Die Webseite (domain) wo die Seite verfügbar ist."
 
-#: models.py:46
+#: models.py:51
 msgid "sites"
 msgstr "Websites"
 
-#: models.py:54
-#: models.py:273
-#: models.py:296
-#: models.py:307
-#: models.py:313
-#: admin/__init__.py:335
+#: models.py:59
+#: models.py:308
+#: models.py:331
+#: models.py:342
+#: models.py:348
+#: admin/__init__.py:334
 #: templates/admin/cms/page/change_form.html:11
 msgid "page"
 msgstr "Seite"
 
-#: models.py:55
+#: models.py:60
 msgid "pages"
 msgstr "Seiten"
 
-#: models.py:197
+#: models.py:238
 msgid "default"
 msgstr "Standart"
 
-#: models.py:267
+#: models.py:302
 msgid "All pages"
 msgstr "alle Seiten"
 
-#: models.py:268
+#: models.py:303
 msgid "This page only"
 msgstr "Nur diese Seite"
 
-#: models.py:269
+#: models.py:304
 msgid "This page and all childrens"
 msgstr "Diese Seite und alle Unterseiten"
 
-#: models.py:272
+#: models.py:307
 msgid "type"
 msgstr "Typ"
 
-#: models.py:274
+#: models.py:309
 msgid "user"
 msgstr "Benutzer"
 
-#: models.py:275
+#: models.py:310
 msgid "group"
 msgstr "Gruppe"
 
-#: models.py:276
+#: models.py:311
 msgid "everybody"
 msgstr "alle"
 
-#: models.py:277
+#: models.py:312
 msgid "can edit"
 msgstr "kann editieren"
 
-#: models.py:278
+#: models.py:313
 msgid "can change soft-root"
 msgstr "kann den Softroot verändern"
 
-#: models.py:279
+#: models.py:314
 msgid "can publish"
 msgstr "kann publizieren"
 
-#: models.py:289
+#: models.py:324
 msgid "Page Permission"
 msgstr "Seite Berechtigung"
 
-#: models.py:290
+#: models.py:325
 msgid "Page Permissions"
 msgstr "Seiten Berechtigungen"
 
-#: models.py:293
-#: models.py:309
-#: models.py:316
+#: models.py:328
+#: models.py:344
+#: models.py:351
+#: admin/__init__.py:62
+#: admin/forms.py:13
 msgid "language"
 msgstr "Sprache"
 
-#: models.py:294
+#: models.py:329
+#: admin/forms.py:9
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
 msgstr "Titel"
 
-#: models.py:295
+#: models.py:330
+#: admin/forms.py:11
 msgid "slug"
 msgstr "Slug"
 
-#: models.py:297
-#: models.py:318
+#: models.py:332
+#: models.py:353
 msgid "creation date"
 msgstr "erstellt am"
 
-#: models.py:308
-#: models.py:315
+#: models.py:343
+#: models.py:350
 msgid "slot"
 msgstr "Slot"
 
-#: models.py:314
+#: models.py:349
 msgid "position"
 msgstr "Position"
 
-#: models.py:317
+#: models.py:352
 msgid "plugin_name"
 msgstr "Plugin Name"
 
-#: admin/__init__.py:59
-msgid "Top"
-msgstr "Oben"
-
-#: admin/__init__.py:62
-#: admin/__init__.py:75
+#: admin/__init__.py:65
+#: admin/__init__.py:78
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr "Achtung: Diese Seite wird neu geladen wenn sie die Auswahl änder. Sichern Sie vorher!"
 
-#: admin/__init__.py:64
+#: admin/__init__.py:67
 msgid "General"
 msgstr "Allgemein"
 
-#: admin/__init__.py:68
+#: admin/__init__.py:71
 msgid "Advanced"
 msgstr "Erweitert"
 
-#: admin/__init__.py:72
+#: admin/__init__.py:75
 msgid "Template"
 msgstr "Vorlage"
 
-#: admin/__init__.py:235
+#: admin/__init__.py:220
 msgid "Default template"
 msgstr "Standart Vorlage"
 
-#: admin/__init__.py:305
+#: admin/__init__.py:301
 msgid "Database error"
 msgstr "Datenbankfehler"
 
-#: admin/__init__.py:357
+#: admin/__init__.py:356
 msgid "Page could not been moved."
 msgstr "Die Seite konnte nicht verschoben werden."
 
@@ -238,19 +254,38 @@ msgstr "Der Teil des Titels der in der URL verwendet wird."
 msgid "The current language of the content fields."
 msgstr "Die Momentane Sprache der Inhalt Felder."
 
-#: admin/forms.py:16
-msgid "The template used to render the content."
-msgstr "Die benutzte Vorlage um die Seite darzustellen."
-
-#: admin/forms.py:32
+#: admin/forms.py:30
 msgid "Another page with this slug already exists"
 msgstr "Eine andere Seite mit diesem Slug existiert bereits"
+
+#: admin/forms.py:37
+msgid "A page with this reverse url id exists already."
+msgstr "Eine andere Seite mit dieser reverse-url-id ist bereits vorhanden"
+
+#: admin/views.py:65
+#, python-format
+msgid "%(plugin_name)s plugin added to %(placeholder)s"
+msgstr "%(plugin_name)s-Plugin wurde in %(placeholder)s eingefühgt"
+
+#: admin/views.py:115
+#, python-format
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr "%(plugin_name)s-Plugin auf der %(position)s position in %(placeholder)s wurde editiert."
+
+#: admin/views.py:147
+msgid "Plugins where moved"
+msgstr "Plugins wurden verschoben"
+
+#: admin/views.py:166
+#, python-format
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgstr "Das %(plugin_name)s-Plugin auf der  %(position)s Position in %(placeholder)s wurde gekllöscht."
 
 #: plugins/picture/cms_plugins.py:12
 msgid "Picture"
 msgstr "Bild"
 
-#: plugins/picture/models.py:9
+#: plugins/picture/models.py:13
 msgid "image"
 msgstr "Bild"
 
@@ -258,13 +293,14 @@ msgstr "Bild"
 msgid "Text"
 msgstr "Text"
 
-#: plugins/text/models.py:10
+#: plugins/text/models.py:12
 msgid "body"
 msgstr "body"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms.html:3
-#: templates/admin/cms/page/plugin_forms_ok.html:6
+#: templates/admin/cms/page/plugin_forms_history.html:3
+#: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
 msgstr "Seite bearbeiten"
 
@@ -294,32 +330,29 @@ msgstr[1] "Bitte korrigieren Sie unterhalb alle Fehler."
 msgid "Home"
 msgstr "Start"
 
-#: templates/admin/cms/page/change_list.html:27
-msgid "Select"
-msgstr "Suswählen"
-
-#: templates/admin/cms/page/change_list.html:27
-msgid "to change"
-msgstr "zum ändern"
-
-#: templates/admin/cms/page/change_list.html:35
+#: templates/admin/cms/page/change_list.html:32
 msgid "Successfully moved"
 msgstr "Erfolgreich verschoben"
 
-#: templates/admin/cms/page/change_list.html:56
+#: templates/admin/cms/page/change_list.html:55
+#, python-format
+msgid "Recover deleted %(name)s"
+msgstr "%(name)s wiederherstellen"
+
+#: templates/admin/cms/page/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s hinzufügen"
 
-#: templates/admin/cms/page/change_list.html:67
+#: templates/admin/cms/page/change_list.html:71
 msgid "on"
 msgstr "ein"
 
-#: templates/admin/cms/page/change_list.html:67
+#: templates/admin/cms/page/change_list.html:71
 msgid "off"
 msgstr "aus"
 
-#: templates/admin/cms/page/change_list.html:69
+#: templates/admin/cms/page/change_list.html:73
 msgid "Filter"
 msgstr "Filter"
 
@@ -393,7 +426,11 @@ msgstr "Löschen"
 msgid "Save"
 msgstr "Sichern"
 
-#: templates/admin/cms/page/plugin_forms_ok.html:12
+#: templates/admin/cms/page/plugin_forms_history.html:9
+msgid "An old revision of a plugin can not be saved!"
+msgstr "Eine alte Version von einem Plugin kann nicht gespeichert werden!"
+
+#: templates/admin/cms/page/plugin_forms_ok.html:9
 msgid "Plugin saved successfully."
 msgstr "Plugin wurde erfolgreich gespeichert"
 
@@ -416,4 +453,25 @@ msgstr "Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter ein
 #: templates/cms/traduction_helper.html:4
 msgid "Wanted language has not been translated yet."
 msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
+
+#: templatetags/pages_tags.py:299
+#, python-format
+msgid "Reverse ID not found on %(domain)s"
+msgstr "Eien reverse-ID wurde auf %(domain)s nicht gefunden"
+
+#: templatetags/pages_tags.py:300
+#, python-format
+msgid ""
+"A page_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+"The url of the page was: http://%(host)s%(path)s"
+msgstr ""
+"Ein page_url template tag hat keine Seite mit der revere-id  %(reverse_id)s gefunden.\n"
+"Die url der seite war: http://%(host)s%(path)s"
+
+#~ msgid "Top"
+#~ msgstr "Oben"
+#~ msgid "Select"
+#~ msgstr "Suswählen"
+#~ msgid "to change"
+#~ msgstr "zum ändern"
 

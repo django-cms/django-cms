@@ -31,6 +31,7 @@ from cms.plugin_pool import plugin_pool
 from cms.admin.widgets import PluginEditor
 from copy import deepcopy
 from cms.settings import CMS_MEDIA_URL
+from django.template.defaultfilters import title
 
 
 
@@ -58,7 +59,7 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('navigation_extenders')
     
     fieldsets = [
-        (_('Top'), {
+        (_('language'), {
             'fields': top_fields,
             'classes': ('low',),
             'description': _('Note: This page reloads if you change the selection. Save it first.'),
@@ -160,7 +161,7 @@ class PageAdmin(admin.ModelAdmin):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
-                given_fieldsets += [(placeholder.name, {'fields':[placeholder.name], 'classes':['plugin-holder']})]        
+                given_fieldsets += [(title(placeholder.name), {'fields':[placeholder.name], 'classes':['plugin-holder']})]        
         return given_fieldsets
 
     def save_form(self, request, form, change):

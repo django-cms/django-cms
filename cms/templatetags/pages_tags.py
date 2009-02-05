@@ -296,8 +296,8 @@ def page_url(context, reverse_id, lang=None):
                     raise
                 else:
                     site = request.site
-                    send_mail(_('Reverse ID not found on %s') % site.domain,
-                              _("A page_url template tag didn't found a page with the reverse_id %s\nThe url of the page was: http://%s%s")%(reverse_id, request.host, request.path),
+                    send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                              _("A page_url template tag didn't found a page with the reverse_id %(reverse_id)s\nThe url of the page was: http://%(host)s%(path)s")%{'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
                                settings.DEFAULT_FROM_EMAIL,
                                settings.MANAGERS, 
                                fail_silently=True)
