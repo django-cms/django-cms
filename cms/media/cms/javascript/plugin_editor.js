@@ -18,7 +18,6 @@ $(document).ready(function() {
 			}, "html" );
 		}
 	});
-	console.log($('ul.plugin-list'))
 	$('ul.plugin-list').sortable({	handle:'span.drag',
 									//appendTo:'body',
 									axis:'y',
@@ -36,7 +35,6 @@ $(document).ready(function() {
 										
 										$.post("move-plugin", { ids:d },
 										  function(data){
-										    console.log(data); //  2pm
 										  }, "json");
 	
 									}
