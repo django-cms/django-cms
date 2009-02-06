@@ -47,6 +47,8 @@ if 'reversion' in settings.INSTALLED_APPS:
     from reversion import revision    
 
 def add_plugin(request):
+    if 'history' or 'recover' in request.path:
+        return HttpResponse(str("error"))
     if request.method == "POST":
         page_id = request.POST['page_id']
         page = get_object_or_404(Page, pk=page_id)

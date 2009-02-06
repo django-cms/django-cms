@@ -29,6 +29,7 @@ from copy import deepcopy
 
 from inspect import isclass, getmembers
 from os.path import join
+from django.views.generic.create_update import redirect
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -112,6 +113,8 @@ class PageAdmin(admin.ModelAdmin):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
+        elif url.endswith('jsi18n'):
+            return HttpResponseRedirect("../../../jsi18n/")
         elif ('history' in url or 'recover' in url) and request.method == "POST":
             resp = super(PageAdmin, self).__call__(request, url)
             if resp.status_code == 302:
