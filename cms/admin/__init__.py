@@ -1,39 +1,34 @@
-from os.path import join
-from inspect import isclass, getmembers
-
-from django.forms import Widget, TextInput, Textarea, CharField
 from django.contrib import admin
-from django.utils.translation import ugettext as _, ugettext_lazy
-from django.utils.encoding import force_unicode, smart_str
-
-from django.db import models
-from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
+from django.core.exceptions import PermissionDenied
+from django.db import models
+from django.forms import Widget, TextInput, Textarea, CharField
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import ugettext as _, ugettext_lazy
 
 from cms import settings
-from cms.models import Page, Title, CMSPlugin
-from cms.views import details
-from cms.utils import get_template_from_request, has_page_add_permission, \
-    get_language_from_request
-from django.core.exceptions import PermissionDenied
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.shortcuts import render_to_response, get_object_or_404
-
 from cms.admin.change_list import CMSChangeList
-from django.template.context import RequestContext
-
-
 from cms.admin.forms import PageForm
 from cms.admin.utils import get_placeholders
-from cms.admin.views import change_status, change_innavigation, add_plugin,\
-    edit_plugin, remove_plugin, move_plugin, revert_plugins
-from cms.plugin_pool import plugin_pool
+from cms.admin.views import (change_status, change_innavigation, add_plugin, 
+    edit_plugin, remove_plugin, move_plugin, revert_plugins)
 from cms.admin.widgets import PluginEditor
-from copy import deepcopy
+from cms.models import Page, Title, CMSPlugin
+from cms.plugin_pool import plugin_pool
 from cms.settings import CMS_MEDIA_URL
-from django.template.defaultfilters import title
+from cms.utils import (get_template_from_request, has_page_add_permission, 
+    get_language_from_request)
+from cms.views import details
 
+from copy import deepcopy
 
+from inspect import isclass, getmembers
+from os.path import join
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
