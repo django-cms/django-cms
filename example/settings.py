@@ -122,6 +122,8 @@ CMS_TEMPLATES = (
 
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
+CMS_SOFTROOT = True
+
 try:
     from local_settings import *
 except ImportError:

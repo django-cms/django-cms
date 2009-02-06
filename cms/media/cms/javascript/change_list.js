@@ -21,6 +21,7 @@ function initTree(){
 			theme_name: "default",
 			a_class: "title"
 		},
+		cookies : {},
 		callback: {
 			onmove: function(what, where, position, tree){
 				item_id = what.id.split("page_")[1];

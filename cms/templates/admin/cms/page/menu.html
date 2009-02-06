@@ -36,12 +36,12 @@
 					<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
 					<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />
 				</label>{% endif %}				
-			</div>
+			</div>{% if softroot %}
 			<div class="col-softroot">{% if page.soft_root %}
 				
 					<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
 				{% endif %}				
-			</div>
+			</div>{% endif %}
 			<div class="col-template">{{ page.get_template_name }}</div>
 			<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div>
 		</div>

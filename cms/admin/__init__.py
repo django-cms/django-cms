@@ -310,7 +310,8 @@ class PageAdmin(admin.ModelAdmin):
             
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
-            'CMS_MEDIA_URL': CMS_MEDIA_URL
+            'CMS_MEDIA_URL': CMS_MEDIA_URL,
+            'softroot': settings.CMS_SOFTROOT,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)
