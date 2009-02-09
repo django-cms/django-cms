@@ -1,4 +1,3 @@
-
 from cms.exceptions import PluginAllreadyRegistered
 from django.conf import settings
 from cms.plugin_base import CMSPluginBase
@@ -25,7 +24,9 @@ class PluginPool(object):
     
     def get_all_plugins(self):
         self.discover_plugins()
-        return self.plugins.values()
+        plugins = self.plugins.values()
+        plugins.sort(key=lambda obj: unicode(obj.name))
+        return plugins
 
     def get_plugin(self, name):
         """
@@ -33,6 +34,7 @@ class PluginPool(object):
         """
         self.discover_plugins()
         return self.plugins[name]
+
 
 plugin_pool = PluginPool()
 

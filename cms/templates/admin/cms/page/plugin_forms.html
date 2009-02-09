@@ -52,9 +52,24 @@ runOnLoad(function(){
 {% block top %}{% endblock %}
 <form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" enctype="multipart/form-data" method="post">
 	<h2>{{ plugin.get_plugin_name }}</h2>
-	{{ form.as_p }}
+	<fieldset class="module aligned general">
+		
+		{% for field in form %}
+		<div class="form-row">
+		    <div class="field-box{% if field.field.required %} required{% endif %}">
+			  {% if field.is_checkbox %}
+		          {{ field }}{{ field.label_tag }}
+		      {% else %}
+		          {{ field.label_tag }}{{ field }}
+		      {% endif %}
+		      {% if field.field.help_text %}<p class="help">{{ field.field.help_text|safe }}</p>{% endif %} 
+			  {{ field.errors }}   
+		    </div>
+		</div>
+		{% endfor %}
+	</fieldset>
 	
-	<input type="submit" value="{% trans "Save" %}" />
+	<input class="" type="submit" name="_save"  value="{% trans "Save" %}" />
 </form>
 </div>
 {% endblock %}
