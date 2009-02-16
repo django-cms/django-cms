@@ -26,7 +26,10 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
             elif title_count > 1:
                 for title in slug_titles:
                     if request.path == title.page.get_absolute_url(lang):
-                        current_page = title.page
+                        if title.page.calculated_status == Page.PUBLISHED:
+                            current_page = title.page
+                        else:
+                            raise Http404
                         break
             else:
                 raise Http404
