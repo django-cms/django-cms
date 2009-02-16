@@ -58,7 +58,6 @@ def add_plugin(request):
         position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         plugin.save()
-        request.method = "GET"
         if 'reversion' in settings.INSTALLED_APPS:
             page.save()
             save_all_plugins(page)
