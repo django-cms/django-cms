@@ -16,23 +16,13 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
             current_page = get_object_or_404(Page.objects.published(site), pk=page_id)
         elif slug:
             slug_titles = Title.objects.get_page_slug(slug, site)
-            title_count = slug_titles.count()
-            if title_count == 1:
-                slug_title = slug_titles[0]
-                if slug_title and slug_title.page.calculated_status == Page.PUBLISHED:
-                    current_page = slug_title.page
-                else:
-                    raise Http404
-            elif title_count > 1:
-                for title in slug_titles:
-                    if request.path == title.page.get_absolute_url(lang):
-                        if title.page.calculated_status == Page.PUBLISHED:
-                            current_page = title.page
-                        else:
-                            raise Http404
-                        break
-            else:
-                raise Http404
+            current_page = None 
+            for title in slug_titles: 
+                if request.path == title.page.get_absolute_url(lang) and title.page.calculated_status == Page.PUBLISHED: 
+                    current_page = title.page 
+                    break 
+            if current_page is None: 
+                raise Http404 
         else:
             if slug == None:
                 current_page = None
