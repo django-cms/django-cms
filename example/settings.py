@@ -75,6 +75,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.doc.XViewMiddleware',
     'cms.middleware.CurrentSiteMiddleware',
     'cms.middleware.CurrentPageMiddleware',
+    'cms.middleware.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 

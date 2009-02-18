@@ -6,13 +6,12 @@ from cms import settings
 from cms.models import Page, Title
 
 class PageForm(forms.ModelForm):
-    title = forms.CharField(label=_("title"), widget=forms.TextInput(),
+    title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
-    slug = forms.CharField(label=_("slug"), widget=forms.TextInput(),
-        help_text=_('The part of the title that is used in the url'))
-    language = forms.ChoiceField(label=_("language"), choices=settings.CMS_LANGUAGES,
+    language = forms.ChoiceField(label=_("Language"), choices=settings.CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
-
+    slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
+        help_text=_('The part of the title that is used in the url'))
     #if tagging:
     #    from tagging.forms import TagField
     #    from cms.admin.widgets import AutoCompleteTagInput
@@ -22,10 +21,18 @@ class PageForm(forms.ModelForm):
         model = Page
 
     def clean_slug(self):
+        print "verify"
+        print settings.CMS_LANGUAGES
         slug = slugify(self.cleaned_data['slug'])
-        titles = Title.objects.filter(slug=slug, page__parent=self.instance.parent)
+        titles = Title.objects.filter(slug=slug)
+        print self.cleaned_data
+        lang = self.cleaned_data['language']
+        
+        print lang
+        print titles
         if self.instance.pk:
-            titles = titles.exclude(page=self.instance)
+            titles = titles.exclude(page=self.instance, language=lang)
+        print titles
         if titles.count():
             raise forms.ValidationError(ugettext_lazy('Another page with this slug already exists'))
         return slug

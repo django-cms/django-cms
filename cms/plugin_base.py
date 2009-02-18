@@ -8,6 +8,7 @@ class CMSPluginBase(object):
     form = None
     form_template = None
     model = None
+    placeholders = None
     
     def __init__(self, context=None):
         if self.model:
@@ -21,7 +22,7 @@ class CMSPluginBase(object):
                 self.form = DefaultModelForm
 
       
-    def render(self, request, context):
+    def render(self, context, placeholder):
         raise NotImplementedError, "render needs to be implemented"
     
     def get_form(self, request, context):

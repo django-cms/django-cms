@@ -88,7 +88,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             for title in titles:
                 if title.page_id == page.pk:
                     page.title_cache = title
-                    titles.remove(title)
+                    #titles.remove(title)
             if page.pk in ancestors:
                 page.ancestor = True
             if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
@@ -279,8 +279,11 @@ register.filter(has_permission)
 #show_content = register.inclusion_tag('cms/content.html',
 #                                      takes_context=True)(show_content)
 
-def page_url(context, reverse_id, lang=None):
-    """Show the url of a page in the right language"""
+def page_id_url(context, reverse_id, lang=None):
+    """
+    Show the url of a page with a reverse id in the right language
+    This is mostly used if you want to have a static link in a template to a page
+    """
     request = context.get('request', False)
     if not request:
         return {'content':''}
@@ -310,7 +313,28 @@ def page_url(context, reverse_id, lang=None):
     if url:
         return {'content':url}
     return {'content':''}
-page_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_url)
+page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_id_url)
+
+def page_language_url(context, lang):
+    """
+    Displays the url of the current page in the defined url
+    """
+    if not 'request' in context:
+        return ''
+    
+    request = context['request']
+    page = request.current_page
+    if not page:
+        return ''
+    url = "/%s" % lang + page.get_absolute_url(language=lang)
+    if url:
+        return {'content':url}
+    return {'content':''}
+page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
+
+
+
+
 
 #def show_revisions(context, page, content_type, lang=None):
 #    """Render the last 10 revisions of a page content with a list"""
@@ -380,7 +404,7 @@ class PlaceholderNode(template.Node):
             plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder=self.name).order_by('position')
             c = ""
             for plugin in plugins:
-                c += plugin.render(context)
+                c += plugin.render(context, self.name)
                     
             
         if not c:

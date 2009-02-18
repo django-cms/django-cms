@@ -23,9 +23,6 @@ CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
 # Whether to enable tagging. 
 CMS_TAGGING = getattr(settings, 'CMS_TAGGING', False)
 
-# Whether to only allow unique slugs.
-CMS_UNIQUE_SLUG_REQUIRED = getattr(settings, 'CMS_UNIQUE_SLUG_REQUIRED', True)
-
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
 

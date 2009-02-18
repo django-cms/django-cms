@@ -12,8 +12,8 @@ class PicturePlugin(CMSPluginBase):
     name = _("Picture")
     form_template = "picture/form.html"
     
-    def render(self, context, instance):
+    def render(self, context, instance, placeholder):
         request = context['request']
-        return mark_safe(render_to_string("picture/plugin.html", {'picture':instance}))
+        return mark_safe(render_to_string("picture/plugin.html", {'picture':instance, 'placeholder':placeholder}))
     
 plugin_pool.register_plugin(PicturePlugin)

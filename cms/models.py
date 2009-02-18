@@ -52,19 +52,12 @@ class Page(models.Model):
     # Managers
     objects = PageManager()
 
-    #if tagging:
-    #    tags = TagField()
-        
     class Meta:
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
         
     def __unicode__(self):
-        #title = u""
-        #for t in range(self.level):
-        #    title += "+ "
-        #title += 
         return self.get_slug()
 
     def save(self, no_signals=False):
@@ -116,21 +109,15 @@ class Page(models.Model):
             self.languages_cache = languages
         return self.languages_cache
 
-    def get_absolute_url(self, language=None):
-        return reverse('pages-root') + self.get_url(language)
-
-    def get_url(self, language=None):
-        """
-        get the url of this page, adding parent's slug
-        """
-        if settings.CMS_UNIQUE_SLUG_REQUIRED:
-            url = u'%s/' % self.get_slug(language)
+    def get_absolute_url(self, language=None, fallback=True):
+        if self.has_url_overwrite:
+            return reverse('pages-root') + self.url_overwrite
         else:
-            url = u'%s-%d/' % (self.get_slug(language), self.id)
-        ancestors = self.get_cached_ancestors(ascending=True)
-        if ancestors:
-            return ancestors[-1].get_url(language) + url
-        return url
+            if self.is_home():
+                return reverse('pages-root')
+            else:
+                path = self.get_path(language, fallback)
+                return reverse('pages-root') + path +"/"
     
     def get_cached_ancestors(self, ascending=True):
         if ascending:
@@ -142,46 +129,54 @@ class Page(models.Model):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
         
+        
+    def get_path(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get the slug of the page depending on the given language
+        """
+        self._get_title_cache(language, fallback, version_id, force_reload)
+        if self.title_cache:
+            return self.title_cache.path
+        else:
+            return None
+
     def get_slug(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the slug of the page depending on the given language
         """
-        if not language:
-            language = settings.CMS_DEFAULT_LANGUAGE
-        if not hasattr(self, "title_cache") or force_reload:
-            print "no slug"
-            #print self.pk
-            if version_id:
-                from reversion.models import Version
-                version = get_object_or_404(Version, pk=version_id)
-                revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-                for rev in revs:
-                    obj = rev.object
-                    if obj.__class__ == Title:
-                        if obj.language == language and obj.page_id == self.pk:
-                            self.title_cache = obj
-                if not self.title_cache and fallback:
-                    for rev in revs:
-                        obj = rev.object
-                        if obj.__class__ == Title:
-                            if obj.page_id == self.pk:
-                                self.title_cache = obj
-            else:
-                self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
-        title = self.title_cache
-        if title:
-            return title.slug
+        self._get_title_cache(language, fallback, version_id, force_reload)
+        if self.title_cache:
+            return self.title_cache.slug
         else:
-            return ""
-
+            return None
+        
     def get_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the title of the page depending on the given language
         """
+        self._get_title_cache(language, fallback, version_id, force_reload)
+        if self.title_cache:
+            return self.title_cache.title
+        else:
+            return None
+        
+    def _get_title_cache(self, language, fallback, version_id, force_reload):
+        default_lang = False
         if not language:
+            default_lang = True
             language = settings.CMS_DEFAULT_LANGUAGE
-        if not hasattr(self, "title_cache") or force_reload:
-            print "no title"
+        load = False
+        if not hasattr(self, "title_cache"):
+            load = True
+            #print "no attr"
+        elif self.title_cache and self.title_cache.language != language and language and not default_lang:
+            load = True
+            #print "no lang diff"
+        if force_reload:
+            #print "force"
+            load = True
+        if load:
+            print "no title cache"
             if version_id:
                 from reversion.models import Version
                 version = get_object_or_404(Version, pk=version_id)
@@ -199,12 +194,9 @@ class Page(models.Model):
                                 self.title_cache = obj
             else:
                 self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
-        title = self.title_cache
-        if title:
-            return title.title
-        else:
-            return None
-
+                
+                
+                
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
@@ -275,12 +267,12 @@ class Page(models.Model):
                 else:
                     setattr(self, att_name, False)
             return getattr(self, att_name)
-        
-    def is_home(self):   
-        if not self.parent_id and Page.objects.filter(parent=None).order_by('tree_id', 'lft')[0].pk == self.pk:
-            return True
-        else:
+    
+    def is_home(self):
+        if self.parent_id:
             return False
+        else:
+            return Page.objects.filter(parent=None).order_by('tree_id', 'lft')[0].pk == self.pk
 
 # Don't register the Page model twice.
 try:
@@ -327,7 +319,8 @@ if settings.CMS_PERMISSION:
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=3, db_index=True)
     title = models.CharField(_("title"), max_length=255)
-    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True)
+    path = models.CharField(_("path"), max_length=255, db_index=True, unique=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
@@ -335,6 +328,29 @@ class Title(models.Model):
     
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
+
+    def save(self):
+        # Build path from parent page's path and slug
+        current_path = self.path
+        parent_page = self.page.parent
+        slug = u'%s' % self.slug
+        if parent_page:
+            self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
+        else:
+            self.path = u'%s' % slug
+        super(Title, self).save()
+        # Update descendants only if path changed
+        if current_path != self.path:
+            descendant_titles = Title.objects.filter(
+                page__lft__gt=self.page.lft, 
+                page__rght__lt=self.page.rght, 
+                page__tree_id__exact=self.page.tree_id,
+                language=self.language
+            )
+            for descendant_title in descendant_titles:
+                descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
+                descendant_title.save()
+
     class Meta:
         unique_together = ('language', 'page')
             
@@ -365,10 +381,10 @@ class CMSPlugin(models.Model):
             instance = None
         return instance, plugin
     
-    def render(self, request):
+    def render(self, context, placeholder):
         instance, plugin = self.get_plugin_instance()
         if instance:
-            return plugin.render(request, instance)
+            return plugin.render(context, instance, placeholder)
         else:
             return ""
         

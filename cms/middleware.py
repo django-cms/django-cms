@@ -1,7 +1,8 @@
 from cms.utils import get_site_from_request, get_page_from_request
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
-
+from django.conf import settings
+import re
 
 class LazySite(object):
     def __get__(self, request, obj_type=None):
@@ -25,17 +26,17 @@ class CurrentPageMiddleware(object):
         request.__class__.current_page = LazyPage()
         return None
 
+SUB = re.compile(ur'<a([^>]+)href="/(.*)"([^>].*)>').sub
+
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
-        from django.conf import settings
-        import re
         supported = dict(settings.LANGUAGES)
         lang = settings.LANGUAGE_CODE[:2]
         check = re.match(r"/(\w\w)/.*", request.path)
         changed = False
         if check is not None:
             request.path = request.path[3:]
-            print request.path
+            request.path_info = request.path_info[3:]
             t = check.group(1)
             if t in supported:
                 lang = t
@@ -45,6 +46,7 @@ class MultilingualURLMiddleware:
                     request.set_cookie("django_language", lang)
                 changed = True
         if not changed:
+            print "not changed"
             if hasattr(request, "session"):
                 lang = request.session.get("django_language", None)
                 if lang in supported and lang is not None:
@@ -53,6 +55,7 @@ class MultilingualURLMiddleware:
                 lang = request.COOKIES.get("django_language", None)
                 if lang in supported and lang is not None:
                     return lang
+        print "language:",  request.session.get("django_language", None)
         return lang
     
     def process_request(self, request):
@@ -66,4 +69,9 @@ class MultilingualURLMiddleware:
     def process_response(self, request, response):
         patch_vary_headers(response, ("Accept-Language",))
         translation.deactivate()
+        if response.status_code == 200 and not request.path.startswith(settings.MEDIA_URL):
+            response.content = \
+                SUB(ur'<a\1href="/%s/\2"\3>' % request.LANGUAGE_CODE, \
+                    response.content.decode('utf-8'))
+
         return response
