@@ -1,4 +1,8 @@
 $(document).ready(function() {
+        var new_slug = true
+        if($('#id_slug')[0].value){
+            new_slug = false
+        }
 	$.each(["language", "template"], function(i, label){
         var select = $('#id_'+label);
         var index = select[0].selectedIndex;
@@ -49,7 +53,7 @@ $(document).ready(function() {
 	$('#id_status').change(function() {this._changed = true; })
     $("#id_title").keyup(function() {
         var e = $("#id_slug")[0];
-        if (!e._changed) {
+        if (!e._changed && new_slug) {
             e.value = URLify(this.value, 64);
         }
     });
