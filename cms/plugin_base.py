@@ -8,7 +8,7 @@ class CMSPluginBase(object):
     form = None
     form_template = None
     model = None
-    placeholders = None
+    placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
     
     def __init__(self, context=None):
         if self.model:
