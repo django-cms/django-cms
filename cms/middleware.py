@@ -32,11 +32,14 @@ class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
         supported = dict(settings.LANGUAGES)
         lang = settings.LANGUAGE_CODE[:2]
-        langs = ""
-        for lang in supported:
-            langs += lang[0]+"|"
-        langs = langs [-1]
-        check = re.match(r"/([%s])/.*" % langs, request.path)
+        
+        #langs = ""
+        #for lang in settings.LANGUAGES:
+        #    langs += lang[0]+"|"
+        #langs = langs[:-1]
+        
+        langs = "|".join(map(lambda l: l[0], settings.LANGUAGES))
+        check = re.match(r"^/(%s)/.*" % langs, request.path)
         changed = False
         if check is not None:
             request.path = request.path[3:]
