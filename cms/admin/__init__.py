@@ -177,7 +177,7 @@ class PageAdmin(admin.ModelAdmin):
         """
         Given the request and name of a placeholder return a PluginEditor Widget
         """
-        installed_plugins = plugin_pool.get_all_plugins()
+        installed_plugins = plugin_pool.get_all_plugins(name)
         widget = PluginEditor(installed=installed_plugins)
         if not isinstance(widget(), Widget):
             widget = Textarea
@@ -220,7 +220,7 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['template'].initial = force_unicode(template)
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
-                installed_plugins = plugin_pool.get_all_plugins()
+                installed_plugins = plugin_pool.get_all_plugins(placeholder.name)
                 plugin_list = []
                 if obj:
                     if versioned:

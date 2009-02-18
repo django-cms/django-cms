@@ -22,10 +22,27 @@ class PluginPool(object):
         plugin.value = plugin.__name__
         self.plugins[plugin.__name__] = plugin 
     
-    def get_all_plugins(self):
+    def get_all_plugins(self, placeholder=None):
         self.discover_plugins()
-        plugins = self.plugins.values()
+        plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
+        
+        if placeholder:
+            final_plugins = []
+            print "================="
+            print placeholder
+            for plugin in plugins:
+                found = False
+                if plugin.placeholders:
+                    for p in plugin.placeholders:
+                        if p == placeholder:
+                            found = True
+                else:
+                    found = True
+                if found:
+                    final_plugins.append(plugin)
+            plugins = final_plugins
+                    
         return plugins
 
     def get_plugin(self, name):
