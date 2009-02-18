@@ -26,11 +26,8 @@ class PluginPool(object):
         self.discover_plugins()
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
-        
         if placeholder:
             final_plugins = []
-            print "================="
-            print placeholder
             for plugin in plugins:
                 found = False
                 if plugin.placeholders:
@@ -42,7 +39,6 @@ class PluginPool(object):
                 if found:
                     final_plugins.append(plugin)
             plugins = final_plugins
-                    
         return plugins
 
     def get_plugin(self, name):
