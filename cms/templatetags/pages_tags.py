@@ -326,7 +326,10 @@ def page_language_url(context, lang):
     page = request.current_page
     if not page:
         return ''
-    url = "/%s" % lang + page.get_absolute_url(language=lang)
+    try:
+        url = "/%s" % lang + page.get_absolute_url(language=lang)
+    except:
+        url = "/%s" % lang + request.path
     if url:
         return {'content':url}
     return {'content':''}

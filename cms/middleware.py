@@ -32,7 +32,11 @@ class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
         supported = dict(settings.LANGUAGES)
         lang = settings.LANGUAGE_CODE[:2]
-        check = re.match(r"/(\w\w)/.*", request.path)
+        langs = ""
+        for lang in supported:
+            langs += lang[0]+"|"
+        langs = langs [-1]
+        check = re.match(r"/([%s])/.*" % langs, request.path)
         changed = False
         if check is not None:
             request.path = request.path[3:]
@@ -45,17 +49,19 @@ class MultilingualURLMiddleware:
                 else:
                     request.set_cookie("django_language", lang)
                 changed = True
+        else:
+            lang = translation.get_language_from_request(request)
         if not changed:
-            print "not changed"
             if hasattr(request, "session"):
                 lang = request.session.get("django_language", None)
                 if lang in supported and lang is not None:
                     return lang
-            else:
+            elif "django_language" in request.COOKIES.keys():
                 lang = request.COOKIES.get("django_language", None)
                 if lang in supported and lang is not None:
                     return lang
-        print "language:",  request.session.get("django_language", None)
+            if not lang:
+                lang = translation.get_language_from_request(request) 
         return lang
     
     def process_request(self, request):
