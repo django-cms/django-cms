@@ -74,6 +74,13 @@ $(document).ready(function() {
             return false;
         }
         
+        if(jtarget.hasClass("viewpage")) {
+            var view_page_url = $('#' + target.id + '-select').val();
+            if(view_page_url){
+                window.open(view_page_url);
+            }
+        }
+        
         if(jtarget.hasClass("addlink")) {
             $("tr").removeClass("target");
             $("#changelist table").removeClass("table-selected");
