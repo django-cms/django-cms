@@ -34,7 +34,7 @@ class Page(models.Model):
         (DRAFT, _('Draft')),
         (PUBLISHED, _('Published')),
     )
-    author = models.ForeignKey(User, verbose_name=_("author"))
+    author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', editable=False, db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)

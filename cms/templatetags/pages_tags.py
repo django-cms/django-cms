@@ -418,3 +418,15 @@ class PlaceholderNode(template.Node):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
+
+def clean_admin_list_filter(cl, spec):
+    choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
+    query_string = None
+    unique_choices = []
+    for choice in choices:
+        if choice['query_string'] != query_string:
+            unique_choices.append(choice)
+            query_string = choice['query_string']
+    return {'title': spec.title(), 'choices' : unique_choices}
+clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
+
