@@ -58,7 +58,8 @@ class Page(models.Model):
         ordering = ('tree_id', 'lft')
         
     def __unicode__(self):
-        return self.get_slug()
+        
+        return self.get_slug(fallback=True)
 
     def save(self, no_signals=False):
         if not self.status:
@@ -172,9 +173,12 @@ class Page(models.Model):
         elif self.title_cache and self.title_cache.language != language and language and not default_lang:
             load = True
             #print "no lang diff"
+        elif fallback and not self.title_cache:
+            load = True 
         if force_reload:
             #print "force"
             load = True
+        
         if load:
             print "no title cache"
             if version_id:
