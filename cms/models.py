@@ -178,7 +178,6 @@ class Page(models.Model):
         if force_reload:
             #print "force"
             load = True
-        
         if load:
             print "no title cache"
             if version_id:

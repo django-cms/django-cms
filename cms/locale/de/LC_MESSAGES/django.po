@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-05 10:39+0100\n"
-"PO-Revision-Date: 2009-02-05 10:47+0100\n"
+"PO-Revision-Date: 2009-02-23 21:20+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -216,7 +216,7 @@ msgstr "Plugin Name"
 #: admin/__init__.py:65
 #: admin/__init__.py:78
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Achtung: Diese Seite wird neu geladen wenn sie die Auswahl änder. Sichern Sie vorher!"
+msgstr "Achtung: Diese Seite wird neu geladen wenn sie die Auswahl ändern. Sichern Sie vorher!"
 
 #: admin/__init__.py:67
 msgid "General"
