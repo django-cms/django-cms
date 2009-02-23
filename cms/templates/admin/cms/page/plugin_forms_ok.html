@@ -2,19 +2,10 @@
 {% load i18n admin_modify adminmedia pages_tags %}
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
-{% block extrahead %}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.js"></script>
-{% endblock %}
-
-{% block content_title %}{% trans "Plugin saved successfully." %}{% endblock %}
+{% block content_title %}{% endblock %}
 
 {% block content %}
 <script type="text/javascript">
-
-	
-	
-$(document).ready(function() {
-   parent.setiframeheight($('body').height(), {{plugin.pk}});
-});	
+	parent.hide_iframe({{plugin.pk}}, "{% trans "Plugin saved successfully." %}");	
 </script>
 {% endblock %}

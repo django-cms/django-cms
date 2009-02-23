@@ -64,6 +64,10 @@ function setiframeheight(height, id){
 	$('#iframe_'+id).height(height+"px")
 }
 
+function hide_iframe(id, msg){
+	$('#iframe_'+id).parent().html("<p>"+msg+"</p>")
+}
+
 function loadPluginForm(target, id){
 	var object = '<iframe id="iframe_'+id+'" src="edit-plugin/'+id+'/" frameborder="0"></iframe>' 
 	target.html(object)
