@@ -94,10 +94,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
                 page.sibling = True
     else:
-        #if current_page and next_page.childrens:
         children = next_page.childrens
-        #else:
-        #    children = []
     return locals()
 show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
 
@@ -238,47 +235,6 @@ def has_permission(page, request):
     return page.has_page_permission(request)
 register.filter(has_permission)
 
-#def show_content(context, content_type, lang=None):
-#    """Display a content type from a page.
-#    
-#    eg: {% show_content page_object "title" %}
-#    
-#    You can also use the slug of a page
-#    
-#    eg: {% show_content "my-page-slug" "title" %}
-#    
-#    Keyword arguments:
-#    page -- the page object
-#    args -- content_type used by a placeholder
-#    lang -- the wanted language (default None, use the request object to know)
-#    """
-#    page = get_page_from_request(context)
-#    request = context.get('request', False)
-#    if not request or not page:
-#        return {'content':''}
-#    # if the page is a SafeUnicode, try to use it like a slug
-#    #if isinstance(page, SafeUnicode):
-#    #    c = Content.objects.filter(type='slug', body=page)
-#    #    if len(c):
-#    #        page = c[0].page
-#    #    else:
-#    #        return {'content':''}
-#    if lang is None:
-#        lang = get_language_from_request(context['request'])
-#    if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
-#        key = 'content_cache_pid:'+str(page.id)+'_l:'+str(lang)+'_type:'+str(content_type)
-#        c = cache.get(key)
-#        if not c:
-#            c = Content.objects.get_content(page, lang, content_type, True)
-#            cache.set(key, c, settings.CMS_CONTENT_CACHE_DURATION)
-#    else:
-#        c = Content.objects.get_content(page, lang, content_type, True)
-#    if c:
-#        return {'content':c}
-#    return {'content':''}
-#show_content = register.inclusion_tag('cms/content.html',
-#                                      takes_context=True)(show_content)
-
 def page_id_url(context, reverse_id, lang=None):
     """
     Show the url of a page with a reverse id in the right language
@@ -325,6 +281,7 @@ def page_language_url(context, lang):
     request = context['request']
     page = request.current_page
     if not page:
+        print "no page for language change"
         return ''
     try:
         url = "/%s" % lang + page.get_absolute_url(language=lang)
@@ -334,23 +291,6 @@ def page_language_url(context, lang):
         return {'content':url}
     return {'content':''}
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
-
-
-
-
-
-#def show_revisions(context, page, content_type, lang=None):
-#    """Render the last 10 revisions of a page content with a list"""
-#    if not settings.CMS_CONTENT_REVISION:
-#        return {'revisions':None}
-#    revisions = Content.objects.filter(page=page, language=lang,
-#                                type=content_type).order_by('-creation_date')
-#    if len(revisions) < 2:
-#        return {'revisions':None}
-#    return {'revisions':revisions[0:10]}
-#
-#show_revisions = register.inclusion_tag('cms/revisions.html',
-#                                        takes_context=True)(show_revisions)
 
 def do_placeholder(parser, token):
     error_string = '%r tag requires three arguments' % token.contents[0]
