@@ -321,7 +321,7 @@ class PlaceholderNode(template.Node):
         a look into pages.admin.widgets to see which widgets are available.
     """
     def __init__(self, name, plugins=None):
-        self.name = name
+        self.name = name.lower()
         if plugins:
             self.plugins = plugins
         else:
@@ -335,11 +335,11 @@ class PlaceholderNode(template.Node):
         request = context['request']
         page = request.current_page
         c = None
-        if self.name.lower() == "title":
+        if self.name == "title":
             t = Title.objects.get_title(page, l, True)
             if t:
                 c = t.title
-        elif self.name.lower() == "slug":
+        elif self.name == "slug":
             t = Title.objects.get_title(page, l, True)
             if t:
                 c = t.slug

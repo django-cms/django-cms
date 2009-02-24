@@ -52,7 +52,7 @@ def add_plugin(request):
     if request.method == "POST":
         page_id = request.POST['page_id']
         page = get_object_or_404(Page, pk=page_id)
-        placeholder = request.POST['placeholder']
+        placeholder = request.POST['placeholder'].lower()
         plugin_type = request.POST['plugin_type']
         language = request.POST['language']
         position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
