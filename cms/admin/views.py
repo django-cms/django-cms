@@ -109,6 +109,7 @@ def edit_plugin(request, plugin_id):
             inst.plugin_type = cms_plugin.plugin_type
             inst.save()
             inst.page.save()
+            form.save_m2m()
             if 'reversion' in settings.INSTALLED_APPS:
                 save_all_plugins(inst.page, [inst.pk])
                 revision.user = request.user

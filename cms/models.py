@@ -378,10 +378,10 @@ class CMSPlugin(models.Model):
     def get_plugin_instance(self):
         from cms.plugin_pool import plugin_pool
         plugin = plugin_pool.get_plugin(self.plugin_type)()
-        try:
+        if plugin.model != CMSPlugin:
             instance = getattr(self, plugin.model.__name__.lower())
-        except:
-            instance = None
+        else:
+            instance = self
         return instance, plugin
     
     def render(self, context, placeholder):

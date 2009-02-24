@@ -27,6 +27,7 @@ class CurrentPageMiddleware(object):
         return None
 
 SUB = re.compile(ur'<a([^>]+)href="/(.*)"([^>].*)>').sub
+SUB2 = re.compile(ur'<form([^>]+)action="/(.*)"([^>].*)>').sub
 
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
@@ -78,9 +79,12 @@ class MultilingualURLMiddleware:
     def process_response(self, request, response):
         patch_vary_headers(response, ("Accept-Language",))
         translation.deactivate()
-        if response.status_code == 200 and not request.path.startswith(settings.MEDIA_URL):
+        print response._headers['content-type'][1].split(';')[0]
+        if response.status_code == 200 and not request.path.startswith(settings.MEDIA_URL) and response._headers['content-type'][1].split(';')[0] == "text/html":
             response.content = \
                 SUB(ur'<a\1href="/%s/\2"\3>' % request.LANGUAGE_CODE, \
                     response.content.decode('utf-8'))
-
+            response.content = \
+                SUB2(ur'<form\1action="/%s/\2"\3>' % request.LANGUAGE_CODE, \
+                    response.content.decode('utf-8'))
         return response

@@ -7,12 +7,12 @@ class CMSPluginBase(object):
     name = ""
     form = None
     form_template = None
-    model = None
+    model = CMSPlugin
     placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
     
     def __init__(self, context=None):
         if self.model:
-            if not CMSPlugin in self.model._meta.parents:
+            if not CMSPlugin in self.model._meta.parents and self.model != CMSPlugin:
                 raise SubClassNeededError, "plugin model needs to subclass CMSPlugin" 
             if not self.form:
                 class DefaultModelForm(ModelForm):
