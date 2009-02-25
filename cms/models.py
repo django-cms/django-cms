@@ -58,8 +58,12 @@ class Page(models.Model):
         ordering = ('tree_id', 'lft')
         
     def __unicode__(self):
+        slug = self.get_slug(fallback=True)
+        if slug is None:
+            return u'' # otherwise we get unicode decode errors
+        else:
+            return slug
         
-        return self.get_slug(fallback=True)
 
     def save(self, no_signals=False):
         if not self.status:
@@ -179,7 +183,6 @@ class Page(models.Model):
             #print "force"
             load = True
         if load:
-            print "no title cache"
             if version_id:
                 from reversion.models import Version
                 version = get_object_or_404(Version, pk=version_id)

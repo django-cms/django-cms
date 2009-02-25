@@ -212,6 +212,12 @@ class PageAdmin(admin.ModelAdmin):
             initial_title = obj.get_title(language=language, fallback=False, version_id=version_id)
             form.base_fields['slug'].initial = initial_slug
             form.base_fields['title'].initial = initial_title
+        else:
+            # Clear out the customisations made above
+            # TODO - remove this hack, this is v ugly
+            form.base_fields['slug'].initial = u''
+            form.base_fields['title'].initial = u''
+
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)
