@@ -4,3 +4,8 @@ h2 {
 	font-size:14px;
 	margin:0em 0 0.5em;
 }
+
+/* Fix issue caused by forms.css. */
+fieldset .field-box {
+    float: none;
+}
