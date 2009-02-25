@@ -79,7 +79,6 @@ class MultilingualURLMiddleware:
     def process_response(self, request, response):
         patch_vary_headers(response, ("Accept-Language",))
         translation.deactivate()
-        print response._headers['content-type'][1].split(';')[0]
         if response.status_code == 200 and not request.path.startswith(settings.MEDIA_URL) and response._headers['content-type'][1].split(';')[0] == "text/html":
             response.content = \
                 SUB(ur'<a\1href="/%s/\2"\3>' % request.LANGUAGE_CODE, \
