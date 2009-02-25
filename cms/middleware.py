@@ -26,21 +26,15 @@ class CurrentPageMiddleware(object):
         request.__class__.current_page = LazyPage()
         return None
 
-SUB = re.compile(ur'<a([^>]+)href="/(.*)"([^>].*)>').sub
-SUB2 = re.compile(ur'<form([^>]+)action="/(.*)"([^>].*)>').sub
+SUB = re.compile(ur'<a([^>]+)href="/([^"]*)"([^>]*)>')
+SUB2 = re.compile(ur'<form([^>]+)action="/([^"]*)"([^>]*)>').sub
 
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
         supported = dict(settings.LANGUAGES)
         lang = settings.LANGUAGE_CODE[:2]
-        
-        #langs = ""
-        #for lang in settings.LANGUAGES:
-        #    langs += lang[0]+"|"
-        #langs = langs[:-1]
-        
         langs = "|".join(map(lambda l: l[0], settings.LANGUAGES))
-        check = re.match(r"^/(%s)/.*" % langs, request.path)
+        check = re.match(r"^/(%s)/.*" % langs, request.path_info)
         changed = False
         if check is not None:
             request.path = request.path[3:]
@@ -80,10 +74,6 @@ class MultilingualURLMiddleware:
         patch_vary_headers(response, ("Accept-Language",))
         translation.deactivate()
         if response.status_code == 200 and not request.path.startswith(settings.MEDIA_URL) and response._headers['content-type'][1].split(';')[0] == "text/html":
-            response.content = \
-                SUB(ur'<a\1href="/%s/\2"\3>' % request.LANGUAGE_CODE, \
-                    response.content.decode('utf-8'))
-            response.content = \
-                SUB2(ur'<form\1action="/%s/\2"\3>' % request.LANGUAGE_CODE, \
-                    response.content.decode('utf-8'))
+            response.content = SUB.sub(ur'<a\1href="/%s/\2"\3>' % request.LANGUAGE_CODE, response.content.decode('utf-8'))
+            response.content = SUB2.sub(ur'<form\1action="/%s/\2"\3>' % request.LANGUAGE_CODE, response.content.decode('utf-8'))
         return response
