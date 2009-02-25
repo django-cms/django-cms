@@ -27,7 +27,7 @@ class CurrentPageMiddleware(object):
         return None
 
 SUB = re.compile(ur'<a([^>]+)href="/([^"]*)"([^>]*)>')
-SUB2 = re.compile(ur'<form([^>]+)action="/([^"]*)"([^>]*)>').sub
+SUB2 = re.compile(ur'<form([^>]+)action="/([^"]*)"([^>]*)>')
 
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
