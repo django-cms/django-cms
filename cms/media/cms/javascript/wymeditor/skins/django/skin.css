@@ -110,6 +110,8 @@
         .wym_skin_django .wym_buttons li.wym_tools_paste a         { background-position: 0 -552px;}
         .wym_skin_django .wym_buttons li.wym_tools_html a          { background-position: 0 -193px;}
         .wym_skin_django .wym_buttons li.wym_tools_preview a       { background-position: 0 -408px;}
+		.wym_skin_django .wym_buttons li.wym_tools_pagelink a      { background-position: 0 -623px;}
+		
 
 /*DECORATION*/
         .wym_skin_django .wym_section h2             { background: #fff;}
