@@ -56,7 +56,7 @@ runOnLoad(function(){
 		
 		{% for field in form %}
 		<div class="form-row">
-		    <div class="field-box{% if field.field.required %} required{% endif %}">
+		    <div class="{% if field.field.required %} required{% endif %}">
 			  {% if field.is_checkbox %}
 		          {{ field }}{{ field.label_tag }}
 		      {% else %}
