@@ -5,486 +5,476 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django-cms\n"
+"Project-Id-Version: django-cms 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-25 13:17+0100\n"
-"PO-Revision-Date: 2009-02-25 13:18+0100\n"
+"PO-Revision-Date: 2009-02-25 13:17+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: divio <developers@divio.ch>\n"
+"Language-Team: Gerard\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: SWITZERLAND\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Poedit-Language: Polish\n"
+"X-Poedit-Country: POLAND\n"
 
 #: models.py:34
 msgid "Draft"
-msgstr "Entwurf"
+msgstr "Szkic"
 
 #: models.py:35
 msgid "Published"
-msgstr "Veröffentlicht"
+msgstr "Opublikowany"
 
-#: models.py:37
-#: templates/admin/cms/page/change_list_tree.html:13
+#: models.py:37 templates/admin/cms/page/change_list_tree.html:13
 msgid "author"
-msgstr "Verfasser"
+msgstr "autor"
 
 #: models.py:40
 msgid "publication date"
-msgstr "Veröffentlicht am"
+msgstr "data publikacji"
 
 #: models.py:40
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr "Ab wann soll die Seite veröffentlicht werden? Der Status der Seite muss aber auf \"veröffentlicht\" sein. "
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
+msgstr ""
+"Aby strona była publicznie widoczna w internecie musi zostać \"opublikowana"
+"\". W tym celu ustaw status \"opublikowano\"."
 
 #: models.py:41
 msgid "publication end date"
-msgstr "Veröffentlicht bis"
+msgstr "czas zakończenia publikacji strony"
 
 #: models.py:41
 msgid "When to expire the page. Leave empty to never expire."
-msgstr "Ablaufdatum der Seite. Leer lassen um nie abzulaufen."
+msgstr ""
+"Czas kiedy strona ma przestać być publikowana. Pozostaw to pole puste, gdy "
+"strona zawsze ma być publikowana."
 
 #: models.py:42
 msgid "login required"
-msgstr "Login erforderlich"
+msgstr "trzeba być zalogowanym"
 
-#: models.py:43
-#: templates/admin/cms/page/change_list_tree.html:10
+#: models.py:43 templates/admin/cms/page/change_list_tree.html:10
 msgid "in navigation"
-msgstr "In der Navigation"
+msgstr "w menu"
 
 #: models.py:44
 msgid "soft root"
-msgstr "Soft Root"
+msgstr "softroot"
 
 #: models.py:44
 msgid "All ancestors will not be displayed in the navigation"
-msgstr "Alle Überseiten werden nicht in der Navigation dargestellt."
+msgstr "Wszyscy przodkowie nie będą wyświetlani w menu nawigacyjnym"
 
 #: models.py:45
 msgid "has url overwrite"
-msgstr "Die Url wird überschrieben"
+msgstr "Czy ma zastąpić url?"
 
 #: models.py:46
 msgid "url overwrite"
-msgstr "Url Überschreibung"
+msgstr "zastępowany url"
 
 #: models.py:46
 msgid "The url that this page has instead. Starts with a \"/\""
-msgstr "Die Url diese Seite anstatt hat. Sollte mit \"/\" beginnen."
+msgstr "Zamienny adres url dla tej strony. Zaczyna się od \"/\""
 
 #: models.py:47
 msgid "reverse url id"
-msgstr "Reverse-Url-ID"
+msgstr "odwrotne id adresu url"
 
 #: models.py:47
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr "Ein einzigartiger Identifikator der benutzt wird um mit dem page_url templatetag auf diese Seite zu verlinken."
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
+msgstr ""
 
 #: models.py:48
 msgid "navigation extenders"
-msgstr "Navigations Erweiterungen"
+msgstr "rozszerzenia menu nawigacyjnego"
 
 #: models.py:49
 msgid "status"
-msgstr "Status"
+msgstr "status"
 
-#: models.py:50
-#: templates/admin/cms/page/change_list_tree.html:12
+#: models.py:50 templates/admin/cms/page/change_list_tree.html:12
 msgid "template"
-msgstr "Vorlage"
+msgstr "szablon"
 
 #: models.py:50
 msgid "The template used to render the content."
-msgstr "Die benutzte Vorlage um die Seite darzustellen."
+msgstr "Szablon, który będzie użyty do renderowania treści."
 
 #: models.py:51
 msgid "The site(s) the page is accessible at."
-msgstr "Die Webseite (domain) wo die Seite verfügbar ist."
+msgstr ""
 
 #: models.py:51
 msgid "sites"
-msgstr "Websites"
+msgstr ""
 
-#: models.py:56
-#: models.py:303
-#: models.py:327
-#: models.py:361
-#: models.py:367
-#: admin/__init__.py:333
-#: templates/admin/cms/page/change_form.html:11
+#: models.py:56 models.py:303 models.py:327 models.py:361 models.py:367
+#: admin/__init__.py:333 templates/admin/cms/page/change_form.html:11
 msgid "page"
-msgstr "Seite"
+msgstr "stronę"
 
 #: models.py:57
 msgid "pages"
-msgstr "Seiten"
+msgstr "strony"
 
 #: models.py:233
 msgid "default"
-msgstr "Standart"
+msgstr "domyślny"
 
 #: models.py:297
 msgid "All pages"
-msgstr "alle Seiten"
+msgstr "Wszystkie strony"
 
 #: models.py:298
 msgid "This page only"
-msgstr "Nur diese Seite"
+msgstr "Tylko tę stronę"
 
 #: models.py:299
 msgid "This page and all childrens"
-msgstr "Diese Seite und alle Unterseiten"
+msgstr "Tę stronę i wszystkie potomne"
 
 #: models.py:302
 msgid "type"
-msgstr "Typ"
+msgstr "typ"
 
 #: models.py:304
 msgid "user"
-msgstr "Benutzer"
+msgstr "użytkownik"
 
 #: models.py:305
 msgid "group"
-msgstr "Gruppe"
+msgstr "grupa"
 
 #: models.py:306
 msgid "everybody"
-msgstr "alle"
+msgstr "każdy"
 
 #: models.py:307
 msgid "can edit"
-msgstr "kann editieren"
+msgstr "może edytować"
 
 #: models.py:308
 msgid "can change soft-root"
-msgstr "kann den Softroot verändern"
+msgstr "może zmienić \"soft-root\""
 
 #: models.py:309
 msgid "can publish"
-msgstr "kann publizieren"
+msgstr "może opublikować"
 
 #: models.py:319
 msgid "Page Permission"
-msgstr "Seite Berechtigung"
+msgstr "Prawo dostępu do stron"
 
 #: models.py:320
 msgid "Page Permissions"
-msgstr "Seiten Berechtigungen"
+msgstr "Prawa dostępu do stron"
 
-#: models.py:323
-#: models.py:363
-#: models.py:370
-#: admin/__init__.py:58
+#: models.py:323 models.py:363 models.py:370 admin/__init__.py:58
 msgid "language"
-msgstr "Sprache"
+msgstr "Język"
 
-#: models.py:324
-#: templates/admin/cms/page/change_list_tree.html:6
+#: models.py:324 templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr "Titel"
+msgstr "tytuł"
 
 #: models.py:325
 msgid "slug"
-msgstr "Slug"
+msgstr ""
 
 #: models.py:326
 msgid "path"
-msgstr "pfad"
+msgstr ""
 
-#: models.py:328
-#: models.py:372
+#: models.py:328 models.py:372
 msgid "creation date"
-msgstr "erstellt am"
+msgstr "data stworzenia"
 
-#: models.py:362
-#: models.py:369
+#: models.py:362 models.py:369
 msgid "slot"
-msgstr "Slot"
+msgstr ""
 
 #: models.py:368
 msgid "position"
-msgstr "Position"
+msgstr "pozycja"
 
 #: models.py:371
 msgid "plugin_name"
-msgstr "Plugin Name"
+msgstr ""
 
-#: admin/__init__.py:61
-#: admin/__init__.py:74
+#: admin/__init__.py:61 admin/__init__.py:74
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Achtung: Diese Seite wird neu geladen wenn sie die Auswahl ändern. Sichern Sie vorher!"
+msgstr ""
+"Uwaga: gdy zmienione zostanie zaznaczenie wybranego elementu strona zostanie "
+"przeładowana automatycznie, aby nie utracić danych najpierw zapisz."
 
 #: admin/__init__.py:63
 msgid "General"
-msgstr "Allgemein"
+msgstr "Ogólne"
 
 #: admin/__init__.py:67
 msgid "Advanced"
-msgstr "Erweitert"
+msgstr "Zaawansowane"
 
 #: admin/__init__.py:71
 msgid "Template"
-msgstr "Vorlage"
+msgstr "Szablon"
 
 #: admin/__init__.py:218
 msgid "Default template"
-msgstr "Standart Vorlage"
+msgstr "Domyślny szablon"
 
 #: admin/__init__.py:299
 msgid "Database error"
-msgstr "Datenbankfehler"
+msgstr "Błąd bazy danych"
 
 #: admin/__init__.py:355
 msgid "Page could not been moved."
-msgstr "Die Seite konnte nicht verschoben werden."
+msgstr "Strona nie może zostać przeniesiona."
 
 #: admin/forms.py:9
 msgid "Title"
-msgstr "Titel"
+msgstr "Tytuł"
 
 #: admin/forms.py:10
 msgid "The default title"
-msgstr "Der standart Titel"
+msgstr "Domyślny tytuł"
 
 #: admin/forms.py:11
+#, fuzzy
 msgid "Language"
-msgstr "Sprache"
+msgstr "Język"
 
 #: admin/forms.py:12
 msgid "The current language of the content fields."
-msgstr "Die Momentane Sprache der Inhalt Felder."
+msgstr "Aktualny język tłumaczenia treści."
 
 #: admin/forms.py:13
 msgid "Slug"
-msgstr "Slug"
+msgstr ""
 
 #: admin/forms.py:14
 msgid "The part of the title that is used in the url"
-msgstr "Der Teil des Titels der in der URL verwendet wird."
+msgstr "Część tytułu, która jest używana w adresie url"
 
 #: admin/forms.py:37
 msgid "Another page with this slug already exists"
-msgstr "Eine andere Seite mit diesem Slug existiert bereits"
+msgstr "Inna strona z takim adresem slug już istnieje."
 
 #: admin/forms.py:44
 msgid "A page with this reverse url id exists already."
-msgstr "Eine andere Seite mit dieser reverse-url-id ist bereits vorhanden"
+msgstr "Inna strona z takim samym odwrotnym adresem url już istnieje."
 
 #: admin/views.py:66
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr "%(plugin_name)s-Plugin wurde in %(placeholder)s eingefühgt"
+msgstr ""
 
 #: admin/views.py:117
 #, python-format
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "%(plugin_name)s-Plugin auf der %(position)s position in %(placeholder)s wurde editiert."
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr ""
 
 #: admin/views.py:149
 msgid "Plugins where moved"
-msgstr "Plugins wurden verschoben"
+msgstr "Plugin'y zostały przeniesione"
 
 #: admin/views.py:168
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr "Das %(plugin_name)s-Plugin auf der  %(position)s Position in %(placeholder)s wurde gekllöscht."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
+msgstr ""
 
 #: plugins/picture/cms_plugins.py:13
 msgid "Picture"
-msgstr "Bild"
+msgstr "Obrazek"
 
 #: plugins/picture/models.py:13
 msgid "image"
-msgstr "Bild"
+msgstr "obraz"
 
 #: plugins/text/cms_plugins.py:11
 msgid "Text"
-msgstr "Text"
+msgstr "Tekst"
 
 #: plugins/text/models.py:12
 msgid "body"
-msgstr "body"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr "Seite bearbeiten"
+msgstr "Zmień stronę"
 
 #: templates/admin/cms/page/change_form.html:11
 msgid "Add"
-msgstr "Hinzufügen"
+msgstr "Dodaj"
 
 #: templates/admin/cms/page/change_form.html:11
 msgid "Change"
-msgstr "Ändern"
+msgstr "Zmień"
 
 #: templates/admin/cms/page/change_form.html:17
 msgid "History"
-msgstr "Geschichte"
+msgstr "Historia"
 
 #: templates/admin/cms/page/change_form.html:18
 msgid "View on site"
-msgstr "Im Web anzeigen"
+msgstr "Zobacz na stronie"
 
 #: templates/admin/cms/page/change_form.html:28
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Bitte korrigieren Sie unterhalb den Fehler."
-msgstr[1] "Bitte korrigieren Sie unterhalb alle Fehler."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/admin/cms/page/change_list.html:8
 msgid "Home"
-msgstr "Start"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:33
 msgid "Successfully moved"
-msgstr "Erfolgreich verschoben"
+msgstr "Przeniesiono."
 
 #: templates/admin/cms/page/change_list.html:56
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr "%(name)s wiederherstellen"
+msgstr "Napraw usunięty %(name)s"
 
 #: templates/admin/cms/page/change_list.html:59
 #, python-format
 msgid "Add %(name)s"
-msgstr "%(name)s hinzufügen"
+msgstr "Dodaj %(name)s"
 
 #: templates/admin/cms/page/change_list.html:72
 msgid "on"
-msgstr "ein"
+msgstr "aktywny"
 
 #: templates/admin/cms/page/change_list.html:72
 msgid "off"
-msgstr "aus"
+msgstr "nieaktywny"
 
 #: templates/admin/cms/page/change_list.html:74
 msgid "Filter"
-msgstr "Filter"
+msgstr "Filtr"
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "quick actions"
-msgstr "Kurz Befehle"
+msgstr "szybkie akcje"
 
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "published"
-msgstr "veröffentlicht"
+msgstr "opublikany"
 
 #: templates/admin/cms/page/change_list_tree.html:11
 msgid "softroot"
-msgstr "Softroot"
+msgstr ""
 
-#: templates/admin/cms/page/menu.html:4
-#: templates/admin/cms/page/menu.html:5
+#: templates/admin/cms/page/menu.html:4 templates/admin/cms/page/menu.html:5
 msgid "edit this page"
-msgstr "Diese Seite editieren"
+msgstr "edytuj tą stronę"
 
 #: templates/admin/cms/page/menu.html:9
 msgid "insert above"
-msgstr "Darüber einfügen"
+msgstr "wstaw powyżej"
 
 #: templates/admin/cms/page/menu.html:10
 msgid "insert below"
-msgstr "Darunter einfügen"
+msgstr "wstaw poniżej"
 
 #: templates/admin/cms/page/menu.html:11
 msgid "insert inside"
-msgstr "Als Unterseite einfügen"
+msgstr "wstaw wewnątrz"
 
 #: templates/admin/cms/page/menu.html:13
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr "Editieren Sei diese Seite in %(language)s "
+msgstr "Edytuj tą stronę w języku %(language)s"
 
 #: templates/admin/cms/page/menu.html:20
 msgid "View on page"
-msgstr "Im Web anzeigen"
+msgstr "Zobacz na stronie"
 
 #: templates/admin/cms/page/menu.html:20
 msgid "view"
-msgstr "Anzeigen"
+msgstr "podgląd"
 
 #: templates/admin/cms/page/menu.html:21
 msgid "Cut"
-msgstr "Ausschneiden"
+msgstr "Wytnij"
 
 #: templates/admin/cms/page/menu.html:21
 msgid "cut"
-msgstr "ausschneiden"
+msgstr "wytnij"
 
 #: templates/admin/cms/page/menu.html:22
 msgid "Add Child"
-msgstr "Unterseite hinzufügen"
+msgstr "Dodaj potomka"
 
 #: templates/admin/cms/page/menu.html:22
 msgid "add"
-msgstr "Hinzufügen"
+msgstr "dodaj"
 
 #: templates/admin/cms/page/menu.html:23
 msgid "Delete"
-msgstr "Löschen"
+msgstr "Usuń"
 
 #: templates/admin/cms/page/menu.html:23
 msgid "delete"
-msgstr "Löschen"
+msgstr "usuń"
 
 #: templates/admin/cms/page/plugin_forms.html:72
 msgid "Save"
-msgstr "Sichern"
+msgstr "Zapisz"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr "Eine alte Version von einem Plugin kann nicht gespeichert werden!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:9
 msgid "Plugin saved successfully."
-msgstr "Plugin wurde erfolgreich gespeichert"
+msgstr "Plugin zapiany."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:8
 msgid "Available Plugins"
-msgstr "Vorhandene Plugins"
+msgstr "Dostępne Plugin'y"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:11
 msgid "Add Plugin"
-msgstr "Plugin hinzufügen"
+msgstr "Dodaj Plugin"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:16
 msgid "No Plugin selected. Selected one on the left side"
-msgstr "Kein Plugin ausgewählt. Wählen Sie eins auf der linken Seite aus."
+msgstr "Nie wybrano żadnego Plugin'a. Wybierz jeden z menu po lewej stronie"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:18
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr "Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter ein."
+msgstr "Nie dodano jeszcze pluginów. Dodaj plugin dla tego slotu."
 
 #: templates/cms/traduction_helper.html:4
 msgid "Wanted language has not been translated yet."
-msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
+msgstr "Brak tłumaczenia na ten język."
 
 #: templatetags/pages_tags.py:259
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr "Eien reverse-ID wurde auf %(domain)s nicht gefunden"
+msgstr "Odwrotny ID nie znaleziony w domenie %(domain)s"
 
 #: templatetags/pages_tags.py:260
 #, python-format
 msgid ""
-"A page_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+"A page_url template tag didn't found a page with the reverse_id %(reverse_id)"
+"s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
-"Ein page_url template tag hat keine Seite mit der revere-id  %(reverse_id)s gefunden.\n"
-"Die url der seite war: http://%(host)s%(path)s"
-
-#~ msgid "Top"
-#~ msgstr "Oben"
-#~ msgid "Select"
-#~ msgstr "Suswählen"
-#~ msgid "to change"
-#~ msgstr "zum ändern"
-
