@@ -138,6 +138,9 @@ def get_site_from_request(request, check_subdomain=True):
     return site
 
 def get_page_from_request(request):
+    """
+    tries to get a page from a request if the page hasn't been handled by the cms urls.py
+    """
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
     else:
@@ -148,6 +151,9 @@ def get_page_from_request(request):
 
 
 def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_levels=0):
+    """
+    builds the tree of all the navigation extender nodes and marks them with some metadata
+    """
     levels -= 1
     level += 1
     found = False
@@ -189,6 +195,9 @@ def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_
                 item.sibling = True
 
 def get_extended_navigation_nodes(request, levels, ancestors, level, active_levels, mark_sibling):
+    """
+    discovers all navigation nodes from navigation extenders
+    """
     if settings.CMS_NAVIGATION_EXTENDERS:
         for ext in settings.CMS_NAVIGATION_EXTENDERS:
             #print ancestors
@@ -259,7 +268,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
 
 def cut_levels(nodes, level):
     """
-    for cutting the levels if you have a from_level in the navigation
+    For cutting the nav_extender levels if you have a from_level in the navigation.
     """
     result = []
     if nodes:
@@ -270,6 +279,9 @@ def cut_levels(nodes, level):
     return result
 
 def find_selected(nodes):
+    """
+    Finds a selected nav_extender node 
+    """
     for node in nodes:
         if hasattr(node, "selected"):
             return node
@@ -277,3 +289,20 @@ def find_selected(nodes):
             result = find_selected(node.childrens)
             if result:
                 return result
+            
+            
+def set_language_changer(request, func):
+    """
+    
+    Sets a language chooser function that accepts one parameter: language
+    The function should return a url in the supplied language
+    normally you would want to give it the get_absolute_url function with an optional language parameter
+    example:
+    
+    def get_absolute_url(self, language=None):
+        reverse("product_view", args=[self.get_slug(language=language)])
+        
+    Use this function in your nav extender views that have i18n slugs.
+    """
+    request._language_changer = func
+    

@@ -273,20 +273,22 @@ page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(pag
 
 def page_language_url(context, lang):
     """
-    Displays the url of the current page in the defined url
+    Displays the url of the current page in the defined language.
+    You can set a language_changer function with the set_language_changer function in the utils.py
     """
     if not 'request' in context:
         return ''
     
     request = context['request']
     page = request.current_page
-    if not page:
-        print "no page for language change"
-        return ''
-    try:
-        url = "/%s" % lang + page.get_absolute_url(language=lang)
-    except:
-        url = "/%s" % lang + request.path
+    if hasattr(request, "_language_changer"):
+        url = "/%s" % lang + request._language_changer(lang)
+    else:
+        try:
+            url = "/%s" % lang + page.get_absolute_url(language=lang)
+        except:
+            url = "/%s" % lang + request.path_info
+    print url
     if url:
         return {'content':url}
     return {'content':''}
