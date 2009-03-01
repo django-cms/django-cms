@@ -95,7 +95,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 page.sibling = True
     else:
         children = next_page.childrens
-    return locals()
+    context.update(locals())
+    return context
 show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
 
 
@@ -149,7 +150,8 @@ def show_sub_menu(context, levels=100):
                     from_level = selected.level
                     to_level =  from_level+levels
                     extra_active = extra_inactive = levels
-    return locals()
+    context.update(locals())
+    return context
 show_sub_menu = register.inclusion_tag('cms/sub_menu.html',
                                        takes_context=True)(show_sub_menu)
 
@@ -172,7 +174,8 @@ def show_admin_menu(context, page, no_children=False, level=None):
         level = 0
     else:
         level = level+2
-    return locals()
+    context.update(locals())
+    return context
 show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)
 
@@ -217,7 +220,8 @@ def show_breadcrumb(context, start_level=0):
                             if title.page_id == anc.pk:
                                 anc.title_cache = title
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
-    return locals()
+    context.update(locals())
+    return context
 show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
                                          takes_context=True)(show_breadcrumb)
                                          
@@ -225,7 +229,7 @@ show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
 def render_plugin(context, plugin_id):
     plugin = CMSPlugin.objects.get(pk=plugin_id)
     content = plugin.render(context)
-    return  locals()
+    return content
 render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
 
 #def render_plugin_title(context, plugin_id):
@@ -274,7 +278,8 @@ page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(pag
 def page_language_url(context, lang):
     """
     Displays the url of the current page in the defined language.
-    You can set a language_changer function with the set_language_changer function in the utils.py
+    You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
+    This is need if you have slugs in more than one language.
     """
     if not 'request' in context:
         return ''
@@ -288,7 +293,6 @@ def page_language_url(context, lang):
             url = "/%s" % lang + page.get_absolute_url(language=lang)
         except:
             url = "/%s" % lang + request.path_info
-    print url
     if url:
         return {'content':url}
     return {'content':''}
