@@ -26,8 +26,8 @@ class CurrentPageMiddleware(object):
         request.__class__.current_page = LazyPage()
         return None
 
-SUB = re.compile(ur'<a([^>]+)href="/(?!(%s))([^"]*)"([^>]*)>' % "|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)))
-SUB2 = re.compile(ur'<form([^>]+)action="/(?!(%s))([^"]*)"([^>]*)>' % "|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)))
+SUB = re.compile(ur'<a([^>]+)href="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % ("|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)), settings.MEDIA_URL[1:], settings.ADMIN_MEDIA_PREFIX[1:]))
+SUB2 = re.compile(ur'<form([^>]+)action="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % ("|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)), settings.MEDIA_URL[1:], settings.ADMIN_MEDIA_PREFIX[1:]))
 
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):

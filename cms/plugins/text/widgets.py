@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
 from cms.settings import CMS_MEDIA_URL
+from cms.plugins.text import settings
 from django.utils.translation.trans_real import get_language
 
 
@@ -32,6 +33,9 @@ class WYMEditor(Textarea):
             'name': name,
             'language': language,
             'CMS_MEDIA_URL': CMS_MEDIA_URL,
+            'WYM_TOOLS': mark_safe(settings.WYM_TOOLS),
+            'WYM_CONTAINERS': mark_safe(settings.WYM_CONTAINERS),
+            'WYM_CLASSES': mark_safe(settings.WYM_CLASSES),
         }
         return mark_safe(render_to_string(
             'text/widgets/wymeditor.html', context))

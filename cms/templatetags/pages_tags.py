@@ -37,7 +37,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             for ext in extenders:
                 ext.childrens = []
                 ext.ancestors_ascending = []
-                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, False)
+                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, False, ext.navigation_extenders)
                 if hasattr(ext, "ancestor"):
                     alist = list(ext.get_ancestors().values_list('id', 'soft_root'))
                     alist = [(ext.pk, ext.soft_root)] + alist
@@ -142,7 +142,7 @@ def show_sub_menu(context, levels=100):
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
-            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, levels, False)
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, levels, False, ext.navigation_extenders)
             if hasattr(ext, "ancestor"):
                 selected = find_selected(nodes)
                 if selected:
@@ -203,7 +203,7 @@ def show_breadcrumb(context, start_level=0):
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
-            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 0, False)
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 0, False, ext.navigation_extenders)
             if hasattr(ext, "ancestor"):
                 selected = find_selected(nodes)
                 if selected:
@@ -229,7 +229,7 @@ show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
 def render_plugin(context, plugin_id):
     plugin = CMSPlugin.objects.get(pk=plugin_id)
     content = plugin.render(context)
-    return content
+    return  locals()
 render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
 
 #def render_plugin_title(context, plugin_id):
@@ -298,6 +298,21 @@ def page_language_url(context, lang):
     return {'content':''}
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
 
+
+def language_chooser(context):
+    """
+    Displays a language chooser
+    """
+    if not 'request' in context:
+        return ''
+    
+    request = context['request']
+    languages = settings.LANGUAGES
+    lang = get_language_from_request(request, request.current_page)
+    context.update(locals())
+    return context
+language_chooser = register.inclusion_tag('cms/language_chooser.html', takes_context=True)(language_chooser)
+
 def do_placeholder(parser, token):
     error_string = '%r tag requires three arguments' % token.contents[0]
     try:
@@ -341,6 +356,7 @@ class PlaceholderNode(template.Node):
         request = context['request']
         page = request.current_page
         c = None
+        t = None
         if self.name == "title":
             t = Title.objects.get_title(page, l, True)
             if t:
@@ -350,15 +366,15 @@ class PlaceholderNode(template.Node):
             if t:
                 c = t.slug
         else:
-            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder=self.name).order_by('position').select_related()
+            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name).order_by('position').select_related()
             c = ""
             for plugin in plugins:
-                c += plugin.render(context, self.name)
-                    
-            
+                c += plugin.render(context, self.name)   
         if not c:
             return ''
-        return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)
+        if not t:
+            return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)
+        return c
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name

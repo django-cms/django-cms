@@ -194,33 +194,27 @@ def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_
             if not hasattr(item, "selected"):
                 item.sibling = True
 
-def get_extended_navigation_nodes(request, levels, ancestors, level, active_levels, mark_sibling):
+def get_extended_navigation_nodes(request, levels, ancestors, level, active_levels, mark_sibling, path):
     """
     discovers all navigation nodes from navigation extenders
-    """
-    if settings.CMS_NAVIGATION_EXTENDERS:
-        for ext in settings.CMS_NAVIGATION_EXTENDERS:
-            #print ancestors
-            path = ext[0]
-            func_name = path.split(".")[-1]
-            ext = __import__(".".join(path.split(".")[:-1]),(),(),(func_name,))
-            func = getattr(ext, func_name)
-            items = func(request)
-            descendants = False
-            for anc in ancestors:
-                if hasattr(anc, 'selected'):
-                    if anc.selected:
-                        descendants = True
-            if len(ancestors) and hasattr(ancestors[-1], 'ancestor'):
-                make_tree(items, 100, request.path, ancestors, descendants, level, active_levels)
-            make_tree(items, levels, request.path, ancestors, descendants, level, active_levels)
-            if mark_sibling:
-                for item in items:
-                    if not hasattr(item, "selected" ):
-                        item.sibling = True
-            return items
-    else:
-        return []
+    """    
+    func_name = path.split(".")[-1]
+    ext = __import__(".".join(path.split(".")[:-1]),(),(),(func_name,))
+    func = getattr(ext, func_name)
+    items = func(request)
+    descendants = False
+    for anc in ancestors:
+        if hasattr(anc, 'selected'):
+            if anc.selected:
+                descendants = True
+    if len(ancestors) and hasattr(ancestors[-1], 'ancestor'):
+        make_tree(items, 100, request.path, ancestors, descendants, level, active_levels)
+    make_tree(items, levels, request.path, ancestors, descendants, level, active_levels)
+    if mark_sibling:
+        for item in items:
+            if not hasattr(item, "selected" ):
+                item.sibling = True
+    return items
     
 def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False):
     """
@@ -264,7 +258,8 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                                                           list(target.ancestors_ascending) + [target], 
                                                           target.level, 
                                                           active_levels,
-                                                          mark_sibling)
+                                                          mark_sibling,
+                                                          target.navigation_extenders)
 
 def cut_levels(nodes, level):
     """

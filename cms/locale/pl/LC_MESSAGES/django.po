@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-25 13:17+0100\n"
+"POT-Creation-Date: 2009-03-04 14:44+0100\n"
 "PO-Revision-Date: 2009-02-25 13:17+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Gerard\n"
@@ -293,6 +293,31 @@ msgid ""
 "deleted."
 msgstr ""
 
+#: plugins/flash/cms_plugins.py:11
+msgid "Flash"
+msgstr ""
+
+#: plugins/flash/models.py:13
+#, fuzzy
+msgid "file"
+msgstr "tytuł"
+
+#: plugins/flash/models.py:13
+msgid "use swf file"
+msgstr ""
+
+#: plugins/flash/models.py:14
+msgid "width"
+msgstr ""
+
+#: plugins/flash/models.py:15
+msgid "height"
+msgstr ""
+
+#: plugins/flash/templates/flash/plugin.html:3
+msgid "Missing flash plugin."
+msgstr ""
+
 #: plugins/picture/cms_plugins.py:13
 msgid "Picture"
 msgstr "Obrazek"
@@ -301,7 +326,7 @@ msgstr "Obrazek"
 msgid "image"
 msgstr "obraz"
 
-#: plugins/text/cms_plugins.py:11
+#: plugins/text/cms_plugins.py:13
 msgid "Text"
 msgstr "Tekst"
 
@@ -466,12 +491,12 @@ msgstr "Nie dodano jeszcze pluginów. Dodaj plugin dla tego slotu."
 msgid "Wanted language has not been translated yet."
 msgstr "Brak tłumaczenia na ten język."
 
-#: templatetags/pages_tags.py:259
+#: templatetags/pages_tags.py:263
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr "Odwrotny ID nie znaleziony w domenie %(domain)s"
 
-#: templatetags/pages_tags.py:260
+#: templatetags/pages_tags.py:264
 #, python-format
 msgid ""
 "A page_url template tag didn't found a page with the reverse_id %(reverse_id)"
