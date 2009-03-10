@@ -20,7 +20,9 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
                 current_page = pages[0]
             else:
                 path = request.path.replace(reverse('pages-root'), '', 1)
-                current_page = get_object_or_404(Page.objects.published(site), Q(status=Page.PUBLISHED, has_url_overwrite=True, url_overwrite=path)|Q(title_set__path=path[:-1]))
+                current_page = get_object_or_404(Page.objects.published(site), 
+                                                 Q(status=Page.PUBLISHED, has_url_overwrite=True, url_overwrite=path)|
+                                                 Q(title_set__path=path[:-1], title_set__language=lang))
         else:
             current_page = None
         template_name = get_template_from_request(request, current_page)

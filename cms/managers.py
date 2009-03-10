@@ -98,15 +98,15 @@ class TitleManager(models.Manager):
         """
         set or create a title for a particular page and language
         """
-        if settings.CMS_SANITIZE_USER_INPUT and title != None:
-            title = self.sanitize(title)
+        
         try:
-            obj = self.filter(page=page, language=language).latest('creation_date')
+            obj = self.get(page=page, language=language)
             if title != None:
                 obj.title = title
             if slug != None:
                 obj.slug = slug
         except self.model.DoesNotExist:
+            raise
             obj = self.model(page=page, language=language, title=title, slug=slug)
         obj.save()
         return obj

@@ -20,8 +20,9 @@ if CMS_TEMPLATES is None:
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
 
-# Whether to enable tagging. 
-CMS_TAGGING = getattr(settings, 'CMS_TAGGING', False)
+# Whether a slug should be unique together with its parent and in the same lanuage?
+i18n_installed = not 'cms.middleware.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
+CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_installed)
 
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
@@ -54,9 +55,6 @@ CMS_USE_REQUEST_SITE = getattr(settings, 'CMS_USE_REQUEST_SITE', False)
 
 # You can exclude some placeholder from the revision process
 CMS_CONTENT_REVISION_EXCLUDE_LIST = getattr(settings, 'CMS_CONTENT_REVISION_EXCLUDE_LIST', ())
-
-# Sanitize the user input with html5lib
-CMS_SANITIZE_USER_INPUT = getattr(settings, 'CMS_SANITIZE_USER_INPUT', False)
 
 # URL that handles pages' media and uses <MEDIA_ROOT>/pages by default.
 CMS_MEDIA_URL = getattr(settings, 'CMS_MEDIA_URL', join(settings.MEDIA_URL, 'cms/'))

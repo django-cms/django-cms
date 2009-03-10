@@ -324,8 +324,8 @@ if settings.CMS_PERMISSION:
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=3, db_index=True)
     title = models.CharField(_("title"), max_length=255)
-    slug = models.SlugField(_("slug"), max_length=255, db_index=True)
-    path = models.CharField(_("path"), max_length=255, db_index=True, unique=True)
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
+    path = models.CharField(_("path"), max_length=255, db_index=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     

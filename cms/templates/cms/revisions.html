@@ -1,6 +1,6 @@
-{% if revisions %}
+{% load i18n %}{% if revisions %}
     <div class="revisions">
-        <h4>Revisions</h4>
+        <h4>{% trans "Revisions" %}</h4>
         
         <ul class="revisions-list">
         {% for revision in revisions %}
