@@ -106,7 +106,6 @@ class TitleManager(models.Manager):
             if slug != None:
                 obj.slug = slug
         except self.model.DoesNotExist:
-            raise
             obj = self.model(page=page, language=language, title=title, slug=slug)
         obj.save()
         return obj
