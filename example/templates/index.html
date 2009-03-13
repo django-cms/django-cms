@@ -88,13 +88,13 @@
 
 <h3>site: {{ site.name }}</h3>
 
-<h2>Complete navigation (as a nested list)</h2>
+<h2>Complete navigation</h2>
 
 <ul>
 	{% show_menu 0 100 100 100 %}
 </ul>
 
-<h2>Navigation with active tree(as a nested list)</h2>
+<h2>Navigation with active tree</h2>
 <ul>
 	{% show_menu 0 100 0 100 %}
 </ul>
@@ -105,15 +105,20 @@
 </ul>
 
 
-<h2>Level 1 navigation (as a nested list)</h2>
+<h2>Level 1 navigation </h2>
 <ul>
 	{% show_menu 1 %}
 </ul>
 
-<h2>Display the sub menu of the current page (as a nested list)</h2>
+<h2>Level 0-1 navigation</h2>
+<ul>
+	{% show_menu 0 1 100 100 %}
+</ul>
+
+<h2>Display the sub menu (2 level deep) of the current page</h2>
 
 <ul>
-    {% show_sub_menu 1 %}
+    {% show_sub_menu 2 %}
 </ul>
 
 
