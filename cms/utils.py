@@ -154,8 +154,6 @@ def make_tree(items, levels, url, ancestors, descendants=False, current_level=0,
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
-    print "make_tree"
-    print levels, current_level, active_levels
     levels -= 1
     current_level += 1
     found = False
@@ -255,7 +253,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                           to_levels)
             if hasattr(page, "selected"):
                 mark_sibling = True
-    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:    
+    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended and target.level < to_levels: 
         target.childrens += get_extended_navigation_nodes(request, 
                                                           levels, 
                                                           list(target.ancestors_ascending) + [target], 
@@ -264,6 +262,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                                                           active_levels,
                                                           mark_sibling,
                                                           target.navigation_extenders)
+        
 
 def cut_levels(nodes, level):
     """
