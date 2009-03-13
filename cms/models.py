@@ -42,7 +42,7 @@ class Page(models.Model):
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True)
-    url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Starts with a \"/\""))
+    url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Example: help/"))
     reverse_id = models.CharField(_("reverse url id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)

@@ -20,9 +20,12 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
                 current_page = pages[0]
             else:
                 path = request.path.replace(reverse('pages-root'), '', 1)
-                current_page = get_object_or_404(Page.objects.published(site), 
-                                                 Q(status=Page.PUBLISHED, has_url_overwrite=True, url_overwrite=path)|
-                                                 Q(title_set__path=path[:-1], title_set__language=lang))
+                try:
+                    current_page = Page.objects.published(site).filter( 
+                                                 Q(has_url_overwrite=True, url_overwrite=path)|
+                                                 Q(title_set__path=path[:-1], title_set__language=lang, has_url_overwrite=False)).distinct().select_related()[0]
+                except IndexError:
+                    raise Http404('CMS Page not found')
         else:
             current_page = None
         template_name = get_template_from_request(request, current_page)
@@ -30,7 +33,7 @@ def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS
         if no404:# used for placeholder finder
             current_page = None
         else:
-            raise Http404, "no page found for this site"  
+            raise Http404("no page found for site %s" % unicode(site.name))
     if current_page:  
         has_page_permissions = current_page.has_page_permission(request)
     else:

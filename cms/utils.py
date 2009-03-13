@@ -150,15 +150,17 @@ def get_page_from_request(request):
         return resp['current_page']
 
 
-def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_levels=0):
+def make_tree(items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
+    print "make_tree"
+    print levels, current_level, active_levels
     levels -= 1
-    level += 1
+    current_level += 1
     found = False
     for item in items:
-        item.level = level
+        item.level = current_level
         if descendants and not found:
             item.descendant = True
         item.ancestors_ascending = ancestors
@@ -185,16 +187,16 @@ def make_tree(items, levels, url, ancestors, descendants=False, level=0, active_
                             child.sibling = True
         elif found:
             item.sibling = True
-        if levels == 0 and not hasattr(item, "ancestor" ):
+        if levels == 0 and not hasattr(item, "ancestor" ) or item.level == to_levels:
             item.childrens = []
         else:
-            make_tree(item.childrens, levels, url, ancestors+[item], descendants, level, active_levels) 
+            make_tree(item.childrens, levels, url, ancestors+[item], descendants, current_level, to_levels, active_levels) 
     if found:
         for item in items:
             if not hasattr(item, "selected"):
                 item.sibling = True
 
-def get_extended_navigation_nodes(request, levels, ancestors, level, active_levels, mark_sibling, path):
+def get_extended_navigation_nodes(request, levels, ancestors, current_level, to_levels, active_levels, mark_sibling, path):
     """
     discovers all navigation nodes from navigation extenders
     """    
@@ -208,15 +210,15 @@ def get_extended_navigation_nodes(request, levels, ancestors, level, active_leve
             if anc.selected:
                 descendants = True
     if len(ancestors) and hasattr(ancestors[-1], 'ancestor'):
-        make_tree(items, 100, request.path, ancestors, descendants, level, active_levels)
-    make_tree(items, levels, request.path, ancestors, descendants, level, active_levels)
+        make_tree(items, 100, request.path, ancestors, descendants, current_level, 100, active_levels)
+    make_tree(items, levels, request.path, ancestors, descendants, current_level, to_levels, active_levels)
     if mark_sibling:
         for item in items:
             if not hasattr(item, "selected" ):
                 item.sibling = True
     return items
     
-def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False):
+def find_children(target, pages, levels=100, active_levels=0, ancestors=None, selected_pk=0, soft_roots=True, request=None, no_extended=False, to_levels=100):
     """
     recursive function for marking all children and handling the active and inactive trees with the level limits
     """
@@ -249,7 +251,8 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                           selected_pk, 
                           soft_roots, 
                           request, 
-                          no_extended)
+                          no_extended,
+                          to_levels)
             if hasattr(page, "selected"):
                 mark_sibling = True
     if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended:    
@@ -257,6 +260,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                                                           levels, 
                                                           list(target.ancestors_ascending) + [target], 
                                                           target.level, 
+                                                          to_levels,
                                                           active_levels,
                                                           mark_sibling,
                                                           target.navigation_extenders)
