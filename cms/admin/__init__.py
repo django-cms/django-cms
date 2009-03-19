@@ -41,8 +41,6 @@ class PageAdmin(admin.ModelAdmin):
     advanced_fields = ['sites', 'in_navigation', 'reverse_id']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
-    if settings.CMS_REVISIONS:
-        top_fields = ['revisions']# TODO: implement
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
     if settings.CMS_SHOW_START_DATE:
@@ -76,7 +74,7 @@ class PageAdmin(admin.ModelAdmin):
     ]
     
     list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
-    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
+    search_fields = ('title_set__slug', 'title_set__title', 'content__body')
       
     class Media:
         css = {
@@ -221,7 +219,6 @@ class PageAdmin(admin.ModelAdmin):
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)
-            template_choices.insert(0, (settings.DEFAULT_CMS_TEMPLATE, _('Default template')))
             form.base_fields['template'].choices = template_choices
             form.base_fields['template'].initial = force_unicode(template)
         for placeholder in get_placeholders(request, template):

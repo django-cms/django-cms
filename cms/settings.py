@@ -7,15 +7,11 @@ from os.path import join
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-# Which template should be used.
-DEFAULT_CMS_TEMPLATE = getattr(settings, 'DEFAULT_CMS_TEMPLATE', None)
-if DEFAULT_CMS_TEMPLATE is None:
-    raise ImproperlyConfigured('Please make sure you specified a DEFAULT_CMS_TEMPLATE setting.')
-
-# Could be set to None if you don't need multiple templates.
+# Which templates should be used for extracting the placeholders?
+# example: CMS_TEPLATES = (('base.html', 'default template'),)
 CMS_TEMPLATES = getattr(settings, 'CMS_TEMPLATES', None)
 if CMS_TEMPLATES is None:
-    CMS_TEMPLATES = ()
+    raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
 
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
@@ -26,12 +22,6 @@ CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_installed)
 
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
-
-# Wheter the cms uses django-reversion
-CMS_REVISIONS = getattr(settings, 'CMS_REVISIONS', False)
-
-# Whether to enable revisions.
-CMS_CONTENT_REVISION = getattr(settings, 'CMS_CONTENT_REVISION', True)
 
 # Defines which languages should be offered.
 CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)

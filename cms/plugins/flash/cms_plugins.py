@@ -11,10 +11,11 @@ class FlashPlugin(CMSPluginBase):
     name = _("Flash")
     form = FlashForm
     
+    render_template = "flash/plugin.html"
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,
         })
-        return mark_safe(render_to_string("flash/plugin.html", context))
+        return context
     
 plugin_pool.register_plugin(FlashPlugin)

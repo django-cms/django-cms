@@ -2,11 +2,13 @@ from cms.models import CMSPlugin
 from cms.exceptions import SubClassNeededError, MissingFormError
 from django.forms.models import ModelForm
 from django.conf import settings
+from django.utils.encoding import smart_str
 
 class CMSPluginBase(object):
     name = ""
     form = None
     form_template = None
+    render_template = None
     model = CMSPlugin
     placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
     
@@ -32,5 +34,11 @@ class CMSPluginBase(object):
         if self.form:
             return self.form
         raise MissingFormError, "this plugin doesn't have a form"
+    
+    def __repr__(self):
+        return smart_str(self.name)
+    
+    def __unicode__(self):
+        return self.name
     
 

@@ -1,7 +1,7 @@
 from django.template import loader, Context, RequestContext, TemplateDoesNotExist
 from django.template.loader_tags import ExtendsNode
 # must be imported like this for isinstance
-from django.templatetags.pages_tags import PlaceholderNode
+from django.templatetags.cms_tags import PlaceholderNode
 
 from cms.views import details
 
