@@ -28,6 +28,7 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.CurrentSiteMiddleware',
     'cms.middleware.CurrentPageMiddleware',
     'cms.middleware.MultilingualURLMiddleware',
+    ...
     )
     
 If your site is not multilingual you can leave out the MutilingualURLMiddleware
@@ -40,12 +41,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     ...
     "django.core.context_processors.request",
     "cms.context_processors.media",
+    ...
     )
 
 Templates
 ---------
 
-Add some template names you use and that have some placeholder templatetags present
+Add some template names you use and that have some placeholder templatetags present to your settings.py
 
 CMS_TEMPLATES = (
     ('base.html', gettext('default')),
