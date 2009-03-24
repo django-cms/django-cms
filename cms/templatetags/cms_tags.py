@@ -386,6 +386,9 @@ class PlaceholderNode(template.Node):
 register.tag('placeholder', do_placeholder)
 
 def clean_admin_list_filter(cl, spec):
+    """
+    used in admin to display only these users that have actually edited a page and not everybody
+    """
     choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
     query_string = None
     unique_choices = []
