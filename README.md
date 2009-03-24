@@ -10,9 +10,9 @@ Pages are rendered with a template that have placeholders that get filled with p
 
 Plugins included at the moment:
 
-Text
-Picture
-Flash
+* Text
+* Picture
+* Flash
 
 Plugins are very easy to write and you can easily connect pages with your own models.
 
