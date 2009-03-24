@@ -20,8 +20,7 @@ Plugins are very easy to write and you can easily write them on your own and con
 
 For a feature comparison of all the cms apps available for django see: [CMSComparison](http://code.djangoproject.com/wiki/CMSAppsComparison)
 
-Install instructions you can find [here](INSTALL.md).  
-More docs can be found [here](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs).
+Install instructions you can find in the docs [here](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs).
 
 visit [django-cms.org](http://www.django-cms.org/) or #django-cms on freenet for more info
 
