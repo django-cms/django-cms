@@ -11,16 +11,16 @@ You can overwrite the appearance and the html if you add a cms/menu.html templat
 show_menu takes 4 parameters:
 from what level of the navigation to which level should the navigation be rendered?
 
-start level (default=0)
-end_level (default=100)
+**start_level** (default=0)  
+**end_level** (default=100)
 
 if you have a home as a root node and don't want to display home you can render the navigation only after level 1
 
-extra_inactive (default=0)
+**extra_inactive** (default=0)
 
 if a node is not a direct ancestor or descendant of the current active node how many levels deep should the navigation be displayed?
 
-extra_active (default=100)
+**extra_active** (default=100)
 
 if a node is the current active, how many levels deep should its descendants be displayed?
 
@@ -28,29 +28,32 @@ Some Examples:
 
 Complete navigation (as a nested list)
 
-{% load cache cms_tags %}
-<ul>
-	{% show_menu 0 100 100 100 %}
-</ul>
+	{% load cache cms_tags %}
+	<ul>
+		{% show_menu 0 100 100 100 %}
+	</ul>
 
 Navigation with active tree(as a nested list)
-<ul>
-	{% show_menu 0 100 0 100 %}
-</ul>
+
+	<ul>
+		{% show_menu 0 100 0 100 %}
+	</ul>
 
 Navigation with only 1 active extra level
-<ul>
-	{% show_menu 0 100 0 1 %}
-</ul>
+
+	<ul>
+		{% show_menu 0 100 0 1 %}
+	</ul>
 
 Level 1 navigation (as a nested list)
-<ul>
-	{% show_menu 1 %}
-</ul>
+
+	<ul>
+		{% show_menu 1 %}
+	</ul>
 
 Navigation with own template:
 
-{% show_menu 0 100 100 100 "myapp/menu.html" %}
+	{% show_menu 0 100 100 100 "myapp/menu.html" %}
 
 show_sub_menu
 -------------
@@ -59,15 +62,15 @@ Display the sub menu of the current page (as a nested list)
 Takes one argument: how many levels deep should the submenu be displayed?
 The template can be found at cms/sub_menu.html
 
-<ul>
-    {% show_sub_menu 1 %}
-</ul>
+	<ul>
+    	{% show_sub_menu 1 %}
+	</ul>
 
 with your own template:
 
-<ul>
-    {% show_sub_menu 1 "myapp/submenu.html" %}
-</ul>
+	<ul>
+    	{% show_sub_menu 1 "myapp/submenu.html" %}
+	</ul>
 
 show_breadcrump
 ---------------
@@ -75,11 +78,11 @@ show_breadcrump
 Show the breadcrumb navigation of the current page
 The tamplate for the html can be found at cms/breadcrumb.html
 
-{% show_breadcrumb %}
+	{% show_breadcrumb %}
 
 with your own template:
 
-{% show_breadcrumb "myapp/breadcrumb.html" %}
+	{% show_breadcrumb "myapp/breadcrumb.html" %}
 
 If the current url is not handled by the cms or i a navigation extender you may need to provide your own breadcrump via the template.
 This is mostly needed for pages like login, logout and 3th party apps.
@@ -95,54 +98,54 @@ For example you have a shop with categories and want these categories to be disp
 
 Add the following to your settings file:
 
-CMS_NAVIGATION_EXTENDERS = (('myapp.utils.get_nodes', gettext('Shop Categories')),)
+	CMS_NAVIGATION_EXTENDERS = (('myapp.utils.get_nodes', gettext('Shop Categories')),)
 
 Now you are able to link a Navigation Extender to a page in the Advanced Tab of the Page Settings.
 
 An example of an extender function in a utils.py in myapp:
 
-from categories.models import Category
+	from categories.models import Category
 
-def get_nodes(request):
-    cats = list(Category.objects.all())
-    res = []
-    all_cats = cats[:]
-    childs = []
-    for cat in cats:
-        if cat.parent_id:
-            childs.append(cat)
-        else:
-            res.append(cat)
-    for cat in all_cats:
-        cat.childrens = []
-        for child in childs:
-            if child.parent_id == cat.pk:
-                cat.childrens.append(child)
-    return res
+	def get_nodes(request):
+    	cats = list(Category.objects.all())
+    	res = []
+    	all_cats = cats[:]
+    	childs = []
+    	for cat in cats:
+        	if cat.parent_id:
+            	childs.append(cat)
+        	else:
+            	res.append(cat)
+    	for cat in all_cats:
+        	cat.childrens = []
+        	for child in childs:
+            	if child.parent_id == cat.pk:
+                	cat.childrens.append(child)
+    	return res
     
 The model would look something like this:
 
-from django.db import models
-from django.core.urlresolvers import reverse
-import mptt
+	from django.db import models
+	from django.core.urlresolvers import reverse
+	import mptt
 
-class Category(models.Model):
-    parent = models.ForeignKey('self', blank=True, null=True)
-    name = models.CharField(max_length=20)
+	class Category(models.Model):
+    	parent = models.ForeignKey('self', blank=True, null=True)
+    	name = models.CharField(max_length=20)
     
-    def __unicode__(self):
-        return self.name
+    	def __unicode__(self):
+        	return self.name
     
-    def get_title(self):
-        return self.name
+    	def get_title(self):
+        	return self.name
     
-    def get_absolute_url(self):
-        return reverse('category_view', args=[self.pk])
+    	def get_absolute_url(self):
+        	return reverse('category_view', args=[self.pk])
     
-try:
-    mptt.register(Category)
-except mptt.AlreadyRegistered:
-    pass
+	try:
+    	mptt.register(Category)
+	except mptt.AlreadyRegistered:
+    	pass
     
 It is encouraged to use mptt for the tree structure because of performance considerations.
 The objects provided must adhere to the following Structure:
@@ -150,10 +153,10 @@ The objects provided must adhere to the following Structure:
 they must have a:
 
 get_title function
-get_absolute_url function
+get\_absolute\_url function
 childrens array with all its children inside (the s at the end is done on purpose because children is already taken by mptt)
 
-Be sure that get_title and get_absolute_url doesn't trigger any queries when called in the template or otherwise you 
+Be sure that get\_title and get\_absolute\_url doesn't trigger any queries when called in the template or otherwise you 
 may have some serious performance and DB problems with lot of queries
 
 It may be wise to cache the output of get_nodes. For this you may need to write a wrapper Class because of dynamic content the pickle class can't handle
@@ -162,40 +165,40 @@ If you want to display some static pages in the navigation like "login" for exam
 Properties of Navigation Nodes in the template
 ----------------------------------------------
 
-node.is_leaf_node:
+	{{ node.is_leaf_node }}
 
 Is it the last in the tree? If true it doesn't have any children
 Comes normally from mptt
 
-node.level:
+	{{ node.level }}
 
 The level of the node. Starts at 0
 
-node.get_absolute_url:
+	{{ node.get_absolute_url }}
 
 The absolute url of the node
 
-node.get_title:
+	{{ node.get_title }}
 
 The title in the current language of the node
 
-node.selected:
+	{{ node.selected }}
 
 If true this node is the current selected/active at this URL
  
-node.ancestor:
+	{{ node.ancestor }}
 
 If true this node is an ancestor of the current selected node.
 
-node.sibling
+	{{ node.sibling }}
 
 If true this node is a sibling of the current selected node.
 
-node.descendant:
+	{{ node.descendant }}
 
 If true this node is a descendant of the current selected node.
 
-node.soft_root
+	{{ node.soft_root }}
 
 If true this node is softroot
 
@@ -208,11 +211,11 @@ This feature is useful if you have big navigation trees with a lot of sites and 
 
 To enable it put the following to your settings.py
 
-CMS_SOFTROOT = True
+	CMS_SOFTROOT = True
 
 Now you can mark a page as softroot in the advanced Tab of the Page Settings.
 
-page_id_url
+page\_id\_url
 -----------
 
 This templatetag return the url of a page that has reverse_id.
@@ -222,9 +225,9 @@ Goto this page in the admin and enter a reverse_id in the advanced tab.
 
 Example: "help"
 
-now you can place the page_id_url in your template like this.
+now you can place the page\_id\_url in your template like this.
 
-<a href="{% page_id_url "help" %}">help</a>
+	<a href="{% page_id_url "help" %}">help</a>
 
 
  
