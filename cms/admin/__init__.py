@@ -34,10 +34,10 @@ from django.views.generic.create_update import redirect
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'parent']
-    mandatory_placeholders = ('title', 'slug')
+    mandatory_placeholders = ('title', 'slug', )
     filter_horizontal = ['sites']
     top_fields = ['language']
-    general_fields = [('title', 'slug'), 'status']
+    general_fields = [mandatory_placeholders, 'status']
     advanced_fields = ['sites', 'in_navigation', 'reverse_id']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -53,23 +53,19 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('navigation_extenders')
     
     fieldsets = [
-        (_('language'), {
-            'fields': top_fields,
-            'classes': ('low',),
-            'description': _('Note: This page reloads if you change the selection. Save it first.'),
-        }),
         (_('General'), {
             'fields': general_fields,
             'classes': ('general',),
         }),
-        (_('Advanced'), {
+        (_('Basic Settings'), {
+            'fields': top_fields + template_fields,
+            'classes': ('low',),
+            'description': _('Note: This page reloads if you change the selection. Save it first.'),
+        }),
+       
+        (_('Advanced Settings'), {
             'fields': advanced_fields,
             'classes': ('collapse',),
-        }),
-        (_('Template'), {
-            'fields': template_fields,
-            'classes': ('low',),
-            'description': _('Note: This page reloads if you change the selection. Save it first.'),         
         }),
     ]
     
