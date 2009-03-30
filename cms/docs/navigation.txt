@@ -1,11 +1,10 @@
 Navigation
 ==========
-==========
 
 There are 3 templatetags for use in the templates:
 
 show_menu
-=========
+---------
 
 show_menu renders the navigation of the current page.
 You can overwrite the appearance and the html if you add a cms/menu.html template to you project or edit the one provided with django-cms
@@ -51,7 +50,7 @@ Level 1 navigation (as a nested list)
 
 
 show_sub_menu
-=============
+-------------
 
 Display the sub menu of the current page (as a nested list)
 Takes one argument: how many levels deep should the submenu be displayed?
@@ -62,7 +61,7 @@ The template for the html can be found at cms/sub_menu.html
 </ul>
 
 show_breadcrump
-===============
+---------------
 
 Show the breadcrumb navigation of the current page
 The tamplate for the html can be found at cms/breadcrumb.html
@@ -71,7 +70,7 @@ The tamplate for the html can be found at cms/breadcrumb.html
 
 
 Extending the menu
-==================
+------------------
 
 There is a way to extend the menu with static or dynamic content.
 For example you have a shop with categories and want these categories to be displayed in the navigation.
@@ -140,7 +139,7 @@ Be sure that get_title and get_absolute_url doesn't trigger any queries when cal
 may have some serious performance and DB problems with lot of queries
 
 Properties of Navigation Nodes
-==============================
+------------------------------
 
 node.is_leaf_node:
 
@@ -180,7 +179,7 @@ node.soft_root
 If true this node is softroot
 
 Softroot
-========
+--------
 
 Softroots are pages that start a new navigation.
 If you are in a child of a softroot node you can only see the path to the softroot.
