@@ -5,6 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
+from django.utils.safestring import mark_safe
+from django.template.loader import render_to_string
+from django.core.exceptions import ValidationError
 
 import mptt
 from cms import settings
@@ -42,7 +45,7 @@ class Page(models.Model):
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True)
-    url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Example: help/"))
+    url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Starts with a \"/\""))
     reverse_id = models.CharField(_("reverse url id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
@@ -205,14 +208,14 @@ class Page(models.Model):
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
-        defined or DEFAULT_PAGE_TEMPLATE otherwise
+        defined or the first one
         """
         if self.template:
             return self.template
         for p in self.get_ancestors(ascending=True):
             if p.template:
                 return p.template
-        return settings.DEFAULT_CMS_TEMPLATE
+        return settings.CMS_TEMPLATES[0][0]
 
     def get_template_name(self):
         """
@@ -228,7 +231,7 @@ class Page(models.Model):
                     template =  p.template
                     break
         if not template:
-            template = settings.DEFAULT_CMS_TEMPLATE
+            template = settings.CMS_TEMPLATES[0][0]
         for t in settings.CMS_TEMPLATES:
             if t[0] == template:
                 return t[1] 
@@ -389,10 +392,13 @@ class CMSPlugin(models.Model):
             instance = self
         return instance, plugin
     
-    def render(self, context, placeholder):
+    def render_plugin(self, context, placeholder):
         instance, plugin = self.get_plugin_instance()
         if instance:
-            return plugin.render(context, instance, placeholder)
+            template = plugin.render_template
+            if not template:
+                raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
+            return mark_safe(render_to_string(template, plugin.render(context, instance, placeholder)))
         else:
             return ""
         

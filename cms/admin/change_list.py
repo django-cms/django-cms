@@ -2,8 +2,8 @@ from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from cms.models import Title, PagePermission
 from cms import settings
-from cms.utils import get_language_from_request
-from cms.templatetags.pages_tags import find_children
+from cms.utils import get_language_from_request, find_children
+
 
 class CMSChangeList(ChangeList):
     real_queryset = False

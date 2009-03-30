@@ -3,13 +3,14 @@ from django.core.cache import cache
 
 from cms import settings
 from cms.models import Page, Title, CMSPlugin
-from cms.utils import get_language_from_request, get_page_from_request,\
+from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 
 register = template.Library()
 
-def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, next_page=None):
+
+def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None):
     """
     render a nested list of all children of the pages
     from_level: is the start level
@@ -37,7 +38,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             for ext in extenders:
                 ext.childrens = []
                 ext.ancestors_ascending = []
-                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, 100, False, ext.navigation_extenders)
+                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, False, ext.navigation_extenders)
                 if hasattr(ext, "ancestor"):
                     alist = list(ext.get_ancestors().values_list('id', 'soft_root'))
                     alist = [(ext.pk, ext.soft_root)] + alist
@@ -78,7 +79,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     pk = current_page.pk
                 else:
                     pk = -1
-                find_children(page, pages, from_level+extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
+                find_children(page, pages, extra_inactive+from_level, extra_active, ancestors, pk, request=request)
                 if current_page and page.pk == current_page.pk and current_page.soft_root:
                     page.soft_root = True
         if from_level > 0:
@@ -97,11 +98,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         children = next_page.childrens
     context.update(locals())
     return context
-show_menu = register.inclusion_tag('cms/menu.html', takes_context=True)(show_menu)
+show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
 
 
-def show_sub_menu(context, levels=100):
+def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     """Get the root page of the current page and 
     render a nested list of all root's children pages"""
     request = context['request']
@@ -142,7 +143,7 @@ def show_sub_menu(context, levels=100):
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
-            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, levels, False, ext.navigation_extenders)
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, levels, False, ext.navigation_extenders)
             if hasattr(ext, "ancestor"):
                 selected = find_selected(nodes)
                 if selected:
@@ -152,7 +153,7 @@ def show_sub_menu(context, levels=100):
                     extra_active = extra_inactive = levels
     context.update(locals())
     return context
-show_sub_menu = register.inclusion_tag('cms/sub_menu.html',
+show_sub_menu = register.inclusion_tag('cms/dummy.html',
                                        takes_context=True)(show_sub_menu)
 
                                             
@@ -179,7 +180,7 @@ def show_admin_menu(context, page, no_children=False, level=None):
 show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)
 
-def show_breadcrumb(context, start_level=0):
+def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
     page = request.current_page
     lang = get_language_from_request(request)
@@ -206,7 +207,7 @@ def show_breadcrumb(context, start_level=0):
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
-            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, 0, False, ext.navigation_extenders)
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 0, False, ext.navigation_extenders)
             if hasattr(ext, "ancestor"):
                 selected = find_selected(nodes)
                 if selected:
@@ -225,7 +226,7 @@ def show_breadcrumb(context, start_level=0):
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
     context.update(locals())
     return context
-show_breadcrumb = register.inclusion_tag('cms/breadcrumb.html',
+show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
                                          
 
@@ -302,7 +303,7 @@ def page_language_url(context, lang):
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
 
 
-def language_chooser(context):
+def language_chooser(context, template="cms/language_chooser.html"):
     """
     Displays a language chooser
     """
@@ -314,7 +315,7 @@ def language_chooser(context):
     lang = get_language_from_request(request, request.current_page)
     context.update(locals())
     return context
-language_chooser = register.inclusion_tag('cms/language_chooser.html', takes_context=True)(language_chooser)
+language_chooser = register.inclusion_tag('cms/dummy.html', takes_context=True)(language_chooser)
 
 def do_placeholder(parser, token):
     error_string = '%r tag requires three arguments' % token.contents[0]
@@ -372,7 +373,7 @@ class PlaceholderNode(template.Node):
             plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name).order_by('position').select_related()
             c = ""
             for plugin in plugins:
-                c += plugin.render(context, self.name)   
+                c += plugin.render_plugin(context, self.name)
         if not c:
             return ''
         if not t:
