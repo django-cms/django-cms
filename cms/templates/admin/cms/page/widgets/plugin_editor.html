@@ -7,14 +7,18 @@
 		<select name="plugins">
 			<option value="" selected="selected">{% trans "Available Plugins" %}</option>{% for p in installed_plugins %}
 			<option value="{{ p.value }}">{{ p.name }}</option>{% endfor %}
-		</select>
-		<span class="add-plugin addlink">{% trans "Add Plugin" %}</span>
+		</select>{% if not add %}
+		<span class="add-plugin addlink">{% trans "Add Plugin" %}</span>{% endif %}
 	</div>
 </div>
 <div class="plugin-editor">
-	{% if plugin_list %}
-		<p>{% blocktrans %}No Plugin selected. Selected one on the left side{% endblocktrans %}</p>
+	{% if add %}
+		<p>{% blocktrans %}You must save the page first to add plugins.{% endblocktrans %}</p>
 	{% else %}
-		<p>{% blocktrans %}No Plugins present. Add a plugin to this placeholder-slot.{% endblocktrans %}</p>
+		{% if plugin_list %}
+			<p>{% blocktrans %}No Plugin selected. Selected one on the left side{% endblocktrans %}</p>
+		{% else %}
+			<p>{% blocktrans %}No Plugins present. Add a plugin to this placeholder-slot.{% endblocktrans %}</p>
+		{% endif %}
 	{% endif %}
 </div>
