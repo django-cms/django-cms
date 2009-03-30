@@ -38,7 +38,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             for ext in extenders:
                 ext.childrens = []
                 ext.ancestors_ascending = []
-                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, False, ext.navigation_extenders)
+                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, 100, False, ext.navigation_extenders)
                 if hasattr(ext, "ancestor"):
                     alist = list(ext.get_ancestors().values_list('id', 'soft_root'))
                     alist = [(ext.pk, ext.soft_root)] + alist
@@ -79,7 +79,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     pk = current_page.pk
                 else:
                     pk = -1
-                find_children(page, pages, extra_inactive+from_level, extra_active, ancestors, pk, request=request)
+                find_children(page, pages, from_level+extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
                 if current_page and page.pk == current_page.pk and current_page.soft_root:
                     page.soft_root = True
         if from_level > 0:
@@ -143,7 +143,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
-            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, levels, False, ext.navigation_extenders)
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, levels, False, ext.navigation_extenders)
             if hasattr(ext, "ancestor"):
                 selected = find_selected(nodes)
                 if selected:
@@ -207,7 +207,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
-            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 0, False, ext.navigation_extenders)
+            nodes = get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, 0, False, ext.navigation_extenders)
             if hasattr(ext, "ancestor"):
                 selected = find_selected(nodes)
                 if selected:
