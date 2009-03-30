@@ -106,18 +106,19 @@ INSTALLED_APPS = (
     
 )
 
-gettext = lambda s: s
+gettext_noop = lambda s: s
 LANGUAGES = (
-    ('fr', gettext('French')),
-    ('de', gettext('German')),
-    ('en', gettext('English')),
+    ('fr', gettext_noop('French')),
+    ('de', gettext_noop('German')),
+    ('en', gettext_noop('English')),
 )
 
+DEFAULT_CMS_TEMPLATE = 'index.html'
+
 CMS_TEMPLATES = (
-    ('index.html', gettext('default')),
-    ('nice.html', gettext('nice one')),
-    ('cool.html', gettext('cool one')),
-    ('long-folder-long/long-template-name.html', gettext('long')),
+    ('nice.html', 'nice one'),
+    ('cool.html', 'cool one'),
+    ('long-folder-long/long-template-name.html', 'long')
 )
 
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)

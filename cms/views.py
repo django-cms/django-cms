@@ -8,7 +8,7 @@ from cms.utils import auto_render, get_template_from_request, get_language_from_
 from django.db.models.query_utils import Q
 
 
-def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
+def details(request, page_id=None, slug=None, template_name=settings.DEFAULT_CMS_TEMPLATE, no404=False):
     lang = get_language_from_request(request)
     site = request.site
     pages = Page.objects.root(site).order_by("tree_id")

@@ -1,10 +1,11 @@
 Navigation
 ==========
+==========
 
-There are 4 templatetags for use in the templates that are connected to the menu:
+There are 3 templatetags for use in the templates:
 
 show_menu
----------
+=========
 
 show_menu renders the navigation of the current page.
 You can overwrite the appearance and the html if you add a cms/menu.html template to you project or edit the one provided with django-cms
@@ -48,58 +49,40 @@ Level 1 navigation (as a nested list)
 	{% show_menu 1 %}
 </ul>
 
-Navigation with own template:
-
-{% show_menu 0 100 100 100 "myapp/menu.html" %}
 
 show_sub_menu
--------------
+=============
 
 Display the sub menu of the current page (as a nested list)
 Takes one argument: how many levels deep should the submenu be displayed?
-The template can be found at cms/sub_menu.html
+The template for the html can be found at cms/sub_menu.html
 
 <ul>
     {% show_sub_menu 1 %}
 </ul>
 
-with your own template:
-
-<ul>
-    {% show_sub_menu 1 "myapp/submenu.html" %}
-</ul>
-
 show_breadcrump
----------------
+===============
 
 Show the breadcrumb navigation of the current page
 The tamplate for the html can be found at cms/breadcrumb.html
 
 {% show_breadcrumb %}
 
-with your own template:
-
-{% show_breadcrumb "myapp/breadcrumb.html" %}
-
-If the current url is not handled by the cms or i a navigation extender you may need to provide your own breadcrump via the template.
-This is mostly needed for pages like login, logout and 3th party apps.
-
-A global solution for this problem for django would be welcome
-
 
 Extending the menu
-------------------
+==================
 
 There is a way to extend the menu with static or dynamic content.
 For example you have a shop with categories and want these categories to be displayed in the navigation.
 
 Add the following to your settings file:
 
-CMS_NAVIGATION_EXTENDERS = (('myapp.utils.get_nodes', gettext('Shop Categories')),)
+CMS_NAVIGATION_EXTENDERS = (('path.to.the.function', 'Name'),)
 
-Now you are able to link a Navigation Extender to a page in the Advanced Tab of the Page Settings.
+No you are able to link a Navigation Extender to a page in the Advanced Tab of the Page Settings.
 
-An example of an extender function in a utils.py in myapp:
+An example of an extender function:
 
 from categories.models import Category
 
@@ -151,21 +134,18 @@ they must have a:
 
 get_title function
 get_absolute_url function
-childrens array with all its children inside (the s at the end is done on purpose because children is already taken by mptt)
+childrens array with all its children inside (the s at the end is done on purpose because children is taken by mptt)
 
 Be sure that get_title and get_absolute_url doesn't trigger any queries when called in the template or otherwise you 
 may have some serious performance and DB problems with lot of queries
 
-It may be wise to cache the output of get_nodes. For this you may need to write a wrapper Class because of dynamic content the pickle class can't handle
-If you want to display some static pages in the navigation like "login" for example you can write your own DummyClass that adheres to the standards from above.
-
-Properties of Navigation Nodes in the template
-----------------------------------------------
+Properties of Navigation Nodes
+==============================
 
 node.is_leaf_node:
 
 Is it the last in the tree? If true it doesn't have any children
-Comes normally from mptt
+Comes from mptt and maybe if your node is an extended one and isn't mapped by mptt this property is not available
 
 node.level:
 
@@ -178,10 +158,10 @@ The absolute url of the node
 node.get_title:
 
 The title in the current language of the node
-
+ 
 node.selected:
 
-If true this node is the current selected/active at this URL
+If true this node the current selected/active at this URL?
  
 node.ancestor:
 
@@ -200,11 +180,11 @@ node.soft_root
 If true this node is softroot
 
 Softroot
---------
+========
 
 Softroots are pages that start a new navigation.
 If you are in a child of a softroot node you can only see the path to the softroot.
-This feature is useful if you have big navigation trees with a lot of sites and don't want to overwhelm the user
+This feature is useful if you have big pages with a lot of sites and don't want to overwhelm the user
 
 To enable it put the following to your settings.py
 
@@ -212,20 +192,6 @@ CMS_SOFTROOT = True
 
 Now you can mark a page as softroot in the advanced Tab of the Page Settings.
 
-page_id_url
------------
-
-This templatetag return the url of a page that has reverse_id.
-If you have for example a help page and want to display a link to this site from every page:
-
-Goto this page in the admin and enter a reverse_id in the advanced tab.
-
-Example: "help"
-
-now you can place the page_id_url in your template like this.
-
-<a href="{% page_id_url "help" %}">help</a>
 
 
- 
 

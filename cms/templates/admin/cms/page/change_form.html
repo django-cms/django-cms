@@ -34,11 +34,7 @@
   {% include "admin/includes/fieldset.html" %}
 {% endfor %}
 
-{% block after_field_sets %}{% if add %}
-<p class="errornote">
-    {% blocktrans %}You can add plugins only if you have saved the page.{% endblocktrans %}
-    </p>{% endif %}
-{% endblock %}
+{% block after_field_sets %}{% endblock %}
 
 {% for inline_admin_formset in inline_admin_formsets %}
     {% include inline_admin_formset.opts.template %}
