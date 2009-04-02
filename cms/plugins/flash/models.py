@@ -10,7 +10,7 @@ if 'reversion' in settings.INSTALLED_APPS:
 
 
 class Flash(CMSPlugin):
-    file = models.FileField(_('file'), upload_to='uploads/plugins/flash/%Y/%m/%d', help_text=_('use swf file'))
+    file = models.FileField(_('file'), upload_to=CMSPlugin.get_media_path, help_text=_('use swf file'))
     width = models.CharField(_('width'), max_length=6)
     height = models.CharField(_('height'), max_length=6)    
     
