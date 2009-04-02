@@ -48,6 +48,7 @@ CMS_CONTENT_REVISION_EXCLUDE_LIST = getattr(settings, 'CMS_CONTENT_REVISION_EXCL
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
 CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
+CMS_MEDIA_ROOT = join(settings.MEDIA_ROOT, CMS_MEDIA_PATH)
 CMS_MEDIA_URL = join(settings.MEDIA_URL, CMS_MEDIA_PATH)
 
 # Directory name appended to CMS_MEDIA_PATH for page-specific MEDIA 
