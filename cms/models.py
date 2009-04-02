@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
+from os.path import join
 
 import mptt
 from cms import settings
@@ -281,6 +282,19 @@ class Page(models.Model):
             return False
         else:
             return Page.objects.filter(parent=None).order_by('tree_id', 'lft')[0].pk == self.pk
+            
+    def get_media_path(self, filename):
+        """
+        Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
+        This allows multiple pages to contain files with identical names without namespace issues.
+        Plugins such as Picture can use this method to initialise the 'upload_to' parameter for 
+        File-based fields. For example:
+            image = models.ImageField(_("image"), upload_to=CMSPlugin.get_media_path)
+        where CMSPlugin.get_media_path calls self.page.get_media_path
+        
+        This location can be customised using the CMS_PAGE_MEDIA_PATH setting
+        """
+        return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
 
 # Don't register the Page model twice.
 try:
@@ -401,6 +415,9 @@ class CMSPlugin(models.Model):
             return mark_safe(render_to_string(template, plugin.render(context, instance, placeholder)))
         else:
             return ""
+            
+    def get_media_path(self, filename):
+        return self.page.get_media_path(filename)
         
     #class Meta:
     #    pass
