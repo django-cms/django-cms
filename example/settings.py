@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'cms',
     'cms.plugins.text',
     'cms.plugins.picture',
+    'cms.plugins.file',
     'mptt',
     'reversion',
     'example.categories',
