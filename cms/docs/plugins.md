@@ -7,6 +7,7 @@ Lets say we have the following gallery model:
 		name = models.CharField(max_length=30)
 	
 	class Picture(models.Model):
+		gallery = models.ForeignKey(Gallery)
 		image = models.ImageField(upload_to="uploads/images/")
 		description = models.CharField(max_lenght=60)
 
