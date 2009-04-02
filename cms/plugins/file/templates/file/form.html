@@ -1,0 +1,12 @@
+{% extends "admin/cms/page/plugin_forms.html" %}
+
+{% block top %}
+{% if instance.file.url %}
+<div class="file">
+<a href="{{ instance.file.url }}"/>
+{% if instance.get_icon_url %}<img src="{{ instance.get_icon_url }}" style="border: 0px" alt="Icon" />{% endif %}
+{% if instance.title %}{{ instance.title }}{% else %}{{ instance.get_file_name }}{% endif %} <span class="filesize">({{ instance.file.size|filesizeformat }})</span></a>
+</div>
+{% endif %}
+{% endblock %}
+
