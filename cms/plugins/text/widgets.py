@@ -36,6 +36,7 @@ class WYMEditor(Textarea):
             'WYM_TOOLS': mark_safe(settings.WYM_TOOLS),
             'WYM_CONTAINERS': mark_safe(settings.WYM_CONTAINERS),
             'WYM_CLASSES': mark_safe(settings.WYM_CLASSES),
+            'WYM_STYLES': mark_safe(settings.WYM_STYLES),
         }
         return mark_safe(render_to_string(
             'text/widgets/wymeditor.html', context))
