@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from cms.models import CMSPlugin
-
+from os.path import basename
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -19,6 +19,9 @@ class Flash(CMSPlugin):
     
     def get_width(self):
         return fix_unit(self.width)    
+        
+    def __unicode__(self):
+        return u"%s" % basename(self.file.path)
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Flash, follow=["cmsplugin_ptr"])
