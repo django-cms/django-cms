@@ -51,11 +51,8 @@ CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
 CMS_MEDIA_ROOT = join(settings.MEDIA_ROOT, CMS_MEDIA_PATH)
 CMS_MEDIA_URL = join(settings.MEDIA_URL, CMS_MEDIA_PATH)
 
-# Directory name appended to CMS_MEDIA_PATH for page-specific MEDIA 
-# Each page can have its own id-based directory within this
-CMS_PAGE_MEDIA_DIRECTORY = getattr(settings, 'CMS_PAGE_MEDIA_DIRECTORY', 'page/')
 # Path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
-CMS_PAGE_MEDIA_PATH = join(CMS_MEDIA_PATH, CMS_PAGE_MEDIA_DIRECTORY)
+CMS_PAGE_MEDIA_PATH = getattr(settings, 'CMS_PAGE_MEDIA_PATH', 'cms_page_media/')
 
 # Show the publication date field in the admin, allows for future dating
 # Changing this from True to False could cause some weirdness.  If that is required,
