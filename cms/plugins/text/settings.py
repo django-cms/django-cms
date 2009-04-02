@@ -38,5 +38,10 @@ WYM_CONTAINERS = getattr(settings, "WYM_CONTAINERS", WYM_CONTAINERS)
 WYM_CLASSES = "" + \
     "{'name': 'date', 'title': 'PARA: Date', 'expr': 'p'}," +\
     "{'name': 'hidden-note', 'title': 'PARA: Hidden note', 'expr': 'p[@class!=\"important\"]'}"
+    
+WYM_STYLES = """
+    {'name': '.hidden-note', 'css': 'color: #999; border: 2px solid #ccc;'},
+    {'name': '.date', 'css': 'background-color: #ff9; border: 2px solid #ee9;'},
+"""
 
 WYM_CLASSES = getattr(settings, "WYM_CLASSES", WYM_CLASSES)
