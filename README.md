@@ -3,16 +3,17 @@ Django CMS 2.0
 
 A django app for managing hierarchical pages of content in multiple languages, on different sites.
 
-Django CMS handles the navigation rendering for you in multiple language with i18n slugs 
+Django CMS handles the navigation rendering for you in multiple languages with i18n slugs 
 and the navigation can be extended by your own models.
 
-Pages are rendered with a template that have placeholders that get filled with plugins.
+Pages are rendered with a template that has placeholders that get filled with plugins.
 
 Plugins included at the moment:
 
 * Text
 * Picture
 * Flash
+* File
 
 many more are in the works.
 
@@ -24,5 +25,5 @@ Install instructions you can find in the docs [here](http://github.com/digi604/d
 
 visit [django-cms.org](http://www.django-cms.org/) or #django-cms on freenet for more info
 
-This is a fork of django-page-cms and the main differences are the plugin system and performance improvements.
+This is a fork of django-page-cms.
 
