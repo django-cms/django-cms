@@ -4,7 +4,7 @@
 <pydev_project>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.5</pydev_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-<path>/cms2</path>
+<path>/cms3</path>
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>/Users/patricklauber/Documents/Workspace/dlib/python/py2</path>

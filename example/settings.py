@@ -105,7 +105,6 @@ INSTALLED_APPS = (
     'example.categories',
     'debug_toolbar',
     'south',
-    
 )
 
 gettext = lambda s: s
