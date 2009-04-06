@@ -47,7 +47,7 @@ class Migration:
         
         # Adding model 'Page'
         db.create_table('cms_page', (
-            ('status', models.IntegerField(_("status"), default=DRAFT, db_index=True)),
+            ('status', models.IntegerField(_("status"), default=0, db_index=True)),
             ('rght', models.PositiveIntegerField(db_index=True, editable=False)),
             ('level', models.PositiveIntegerField(db_index=True, editable=False)),
             ('navigation_extenders', models.CharField(_("navigation extenders"), blank=True, max_length=80, null=True, db_index=True)),
