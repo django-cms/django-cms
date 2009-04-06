@@ -11,7 +11,7 @@
 	{% if child.soft_root %}(softroot}{% endif %}</span>
     {% if child.childrens %}
     <ul>
-    	{% show_menu from_level to_level extra_inactive extra_active child %}
+    	{% show_menu from_level to_level extra_inactive extra_active template child %}
     </ul>
     {% endif %}
 </li>
