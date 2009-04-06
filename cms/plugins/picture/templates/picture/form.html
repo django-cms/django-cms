@@ -1,5 +1,5 @@
 {% extends "admin/cms/page/plugin_forms.html" %}
 
 {% block top %}{% if instance.image.url %}
-<img src="{{ instance.image.url }}"/>{% endif %}
+<img {% if instance.alt %}alt="{{ instance.alt }}" {% endif %}src="{{ instance.image.url }}"/>{% endif %}
 {% endblock %}
