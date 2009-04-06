@@ -99,11 +99,12 @@ INSTALLED_APPS = (
     'cms.plugins.text',
     'cms.plugins.picture',
     'cms.plugins.file',
+    'cms.plugins.flash',
     'mptt',
     'reversion',
     'example.categories',
     'debug_toolbar',
-    'django_evolution',
+    #'south',
     
 )
 
