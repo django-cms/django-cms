@@ -6,6 +6,6 @@
 
 {% block content %}
 <script type="text/javascript">
-	parent.hide_iframe({{plugin.pk}}, "{% trans "Plugin saved successfully." %}");	
+	parent.hide_iframe({{plugin.pk}}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");	
 </script>
 {% endblock %}

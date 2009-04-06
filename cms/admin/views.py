@@ -112,7 +112,7 @@ def edit_plugin(request, plugin_id):
                 revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(inst.plugin_type).name)
                 revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True},RequestContext(request))
+            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True, 'name':unicode(inst), "type":inst.plugin_type}, RequestContext(request))
     else:
         if instance:
             form = plugin_class.form(instance=instance)

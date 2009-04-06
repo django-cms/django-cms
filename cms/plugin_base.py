@@ -3,8 +3,9 @@ from cms.exceptions import SubClassNeededError, MissingFormError
 from django.forms.models import ModelForm
 from django.conf import settings
 from django.utils.encoding import smart_str
+from django.contrib import admin
 
-class CMSPluginBase(object):
+class CMSPluginBase(admin.ModelAdmin):
     name = ""
     form = None
     form_template = None

@@ -12,6 +12,7 @@ if 'reversion' in settings.INSTALLED_APPS:
 class Text(CMSPlugin):
     """A block of content, tied to a page, for a particular language"""
     body = models.TextField(_("body"))
+    
     def __unicode__(self):
         return u"%s" % strip_tags(truncate_words((self.body), 3))
 

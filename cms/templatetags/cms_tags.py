@@ -145,6 +145,11 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         extenders = Page.objects.published().filter(in_navigation=True, 
                                                     sites__domain=site.domain)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
+        children = []
+        from_level = 0
+        to_level = 0
+        extra_active = 0
+        extra_inactive = 0
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
