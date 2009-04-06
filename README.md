@@ -26,4 +26,5 @@ Install instructions you can find in the docs [here](http://github.com/digi604/d
 visit [django-cms.org](http://www.django-cms.org/) or #django-cms on freenet for more info
 
 This is a fork of django-page-cms.
+Some icons are from http://www.famfamfam.com
 

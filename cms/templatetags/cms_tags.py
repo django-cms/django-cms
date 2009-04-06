@@ -79,7 +79,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     pk = current_page.pk
                 else:
                     pk = -1
-                find_children(page, pages, from_level+extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
+                find_children(page, pages, extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
                 if current_page and page.pk == current_page.pk and current_page.soft_root:
                     page.soft_root = True
         if from_level > 0:

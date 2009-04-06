@@ -104,10 +104,19 @@
 	{% show_menu 0 100 0 1 %}
 </ul>
 
+<h2>Level 0 navigation </h2>
+<ul>
+	{% show_menu 0 0 0 0 %}
+</ul>
 
 <h2>Level 1 navigation </h2>
 <ul>
-	{% show_menu 1 %}
+	{% show_menu 1 1 100 100 %}
+</ul>
+
+<h2>Level 1 navigation (only active tree)</h2>
+<ul>
+	{% show_menu 1 1 0 100 %}
 </ul>
 
 <h2>Level 0-1 navigation</h2>
