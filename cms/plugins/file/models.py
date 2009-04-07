@@ -43,6 +43,9 @@ class File(CMSPlugin):
 				return join(settings.MEDIA_URL, relative)
 		return None
         
+        def file_exists(self):
+        	return exists(self.file.path);
+        
 	def get_file_name(self):
 		return basename(self.file.path)
         
