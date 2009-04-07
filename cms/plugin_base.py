@@ -8,7 +8,7 @@ from django.contrib import admin
 class CMSPluginBase(admin.ModelAdmin):
     name = ""
     form = None
-    form_template = None
+    change_form_template = None
     render_template = None
     model = CMSPlugin
     placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
