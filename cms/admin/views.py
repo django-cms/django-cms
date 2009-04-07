@@ -93,23 +93,15 @@ def edit_plugin(request, plugin_id):
                 instance = obj
                 break
     if request.method == "POST":
-        if instance:
-            instance.pk = cms_plugin.pk
-            instance.page = cms_plugin.page
-            instance.position = cms_plugin.position
-            instance.placeholder = cms_plugin.placeholder
-            instance.language = cms_plugin.language
-            instance.plugin_type = cms_plugin.plugin_type
-            form = plugin_class.form(request.POST, request.FILES, instance=instance)
-        else:
-            instance = plugin_class.model()
-            instance.pk = cms_plugin.pk
-            instance.page = cms_plugin.page
-            instance.position = cms_plugin.position
-            instance.placeholder = cms_plugin.placeholder
-            instance.language = cms_plugin.language
-            instance.plugin_type = cms_plugin.plugin_type
-            form = plugin_class.form(request.POST, request.FILES, instance=instance)
+        if not instance:
+            instance = plugin_class.model()    
+        instance.pk = cms_plugin.pk
+        instance.page = cms_plugin.page
+        instance.position = cms_plugin.position
+        instance.placeholder = cms_plugin.placeholder
+        instance.language = cms_plugin.language
+        instance.plugin_type = cms_plugin.plugin_type
+        form = plugin_class.form(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             if 'history' in request.path:
                 return render_to_response('admin/cms/page/plugin_forms_history.html', {'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))
@@ -120,7 +112,7 @@ def edit_plugin(request, plugin_id):
                 revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(inst.plugin_type).name)
                 revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True},RequestContext(request))
+            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True, 'name':unicode(inst), "type":inst.plugin_type}, RequestContext(request))
     else:
         if instance:
             form = plugin_class.form(instance=instance)

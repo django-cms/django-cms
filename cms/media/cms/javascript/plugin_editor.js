@@ -63,7 +63,8 @@ function setiframeheight(height, id){
     $('#iframe_'+id).height(height+"px");
 }
 
-function hide_iframe(id, msg){
+function hide_iframe(id, type, title, msg){
+	$('#plugin_'+id+" span.text").html("<b>"+type+"</b> [ "+title+ " ]");
     $('#iframe_'+id).parent().html("<p>"+msg+"</p>");
 }
 

@@ -79,7 +79,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     pk = current_page.pk
                 else:
                     pk = -1
-                find_children(page, pages, from_level+extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
+                find_children(page, pages, extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
                 if current_page and page.pk == current_page.pk and current_page.soft_root:
                     page.soft_root = True
         if from_level > 0:
@@ -96,7 +96,12 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 page.sibling = True
     else:
         children = next_page.childrens
-    context.update(locals())
+    context.update({'children':children,
+                    'template':template,
+                    'from_level':from_level,
+                    'to_level':to_level,
+                    'extra_inactive':extra_inactive,
+                    'extra_active':extra_active})
     return context
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
@@ -140,6 +145,11 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         extenders = Page.objects.published().filter(in_navigation=True, 
                                                     sites__domain=site.domain)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
+        children = []
+        from_level = 0
+        to_level = 0
+        extra_active = 0
+        extra_inactive = 0
         for ext in extenders:
             ext.childrens = []
             ext.ancestors_ascending = []
@@ -151,7 +161,12 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                     from_level = selected.level
                     to_level =  from_level+levels
                     extra_active = extra_inactive = levels
-    context.update(locals())
+    context.update({'children':children,
+                    'template':template,
+                    'from_level':from_level,
+                    'to_level':to_level,
+                    'extra_inactive':extra_inactive,
+                    'extra_active':extra_active})
     return context
 show_sub_menu = register.inclusion_tag('cms/dummy.html',
                                        takes_context=True)(show_sub_menu)

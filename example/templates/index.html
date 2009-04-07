@@ -1,7 +1,7 @@
 {% load cache cms_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
-<title>{{ current_page.get_title }}</title>
+<title>{% placeholder title %}</title>
 <!--script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script-->
 <style>
     .placeholder-editable {
@@ -81,8 +81,7 @@
     {% endif %}
 </p>
 <p>
-	See this page in <a href="{% page_language_url "fr" %}">fr</a> <a href="{% page_language_url "de" %}">de</a> <a href="{% page_language_url "it" %}">it</a> <a href="{% page_language_url "en" %}">en</a>
-	<a href="/de/">test</a>
+	See this page in {% language_chooser %}
 </p>
 <h1>{% block title %}Django CMS based on page objects{% endblock %}</h1>
 
@@ -104,10 +103,19 @@
 	{% show_menu 0 100 0 1 %}
 </ul>
 
+<h2>Level 0 navigation </h2>
+<ul>
+	{% show_menu 0 0 0 0 %}
+</ul>
 
 <h2>Level 1 navigation </h2>
 <ul>
-	{% show_menu 1 %}
+	{% show_menu 1 1 100 100 %}
+</ul>
+
+<h2>Level 1 navigation (only active tree)</h2>
+<ul>
+	{% show_menu 1 1 0 100 %}
 </ul>
 
 <h2>Level 0-1 navigation</h2>

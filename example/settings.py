@@ -104,8 +104,7 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
-    #'south',
-    
+    'south',
 )
 
 gettext = lambda s: s

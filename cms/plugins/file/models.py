@@ -34,6 +34,7 @@ class File(CMSPlugin):
 	# -- they are therefore imported from django.conf.settings
 	ICON_EXTENSIONS = getattr(settings, "CMS_FILE_ICON_EXTENSIONS", ('gif', 'png'))
 	ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", join(cms_settings.CMS_MEDIA_PATH, "images", "file_icons"))
+    
 	def get_icon_url(self):
 		base = join(self.ICON_PATH, self.get_ext())
 		for ext in self.ICON_EXTENSIONS:
@@ -41,14 +42,17 @@ class File(CMSPlugin):
 			if exists(join(settings.MEDIA_ROOT, relative)): 
 				return join(settings.MEDIA_URL, relative)
 		return None
+        
 	def get_file_name(self):
 		return basename(self.file.path)
+        
 	def get_ext(self):
 		return splitext(self.get_file_name())[1][1:]
+        
 	def __unicode__(self):
 		if self.title: return self.title;
 		return self.get_file_name();
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(File, follow=["cmsplugin_ptr"])
-    
+
