@@ -406,7 +406,7 @@ class CMSPlugin(models.Model):
             instance = self
         return instance, plugin
     
-    def render_plugin(self, context, placeholder):
+    def render_plugin(self, context={}, placeholder=None):
         instance, plugin = self.get_plugin_instance()
         if instance:
             template = plugin.render_template
