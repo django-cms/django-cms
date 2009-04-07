@@ -49,7 +49,7 @@ runOnLoad(function(){
 
 <div id="content-main">
 
-{% block top %}{% endblock %}
+{% block top %}{{ plugin.render_plugin }}{% endblock %}
 <form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" enctype="multipart/form-data" method="post">
 	<h2>{{ plugin.get_plugin_name }}</h2>
 	<fieldset class="module aligned general">
