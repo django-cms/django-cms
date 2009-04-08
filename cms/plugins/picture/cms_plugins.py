@@ -6,7 +6,6 @@ from cms.plugins.picture.models import Picture
 class PicturePlugin(CMSPluginBase):
     model = Picture
     name = _("Picture")
-    form_template = "picture/form.html"
     render_template = "picture/plugin.html"
     
     def render(self, context, instance, placeholder):

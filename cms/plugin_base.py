@@ -11,7 +11,8 @@ class CMSPluginBase(admin.ModelAdmin):
     change_form_template = None
     render_template = None
     model = CMSPlugin
-    placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
+    opts = {}
+    placeholders = None # a tupple with placeholder names this plugin can be placed. All if empty
     
     def __init__(self, context=None):
         if self.model:

@@ -7,7 +7,6 @@ from django.conf import settings
 class FilePlugin(CMSPluginBase):
     model = File
     name = _("File")
-    #form_template = "file/form.html"
     render_template = "file/plugin.html"
     
     def render(self, context, instance, placeholder):      
