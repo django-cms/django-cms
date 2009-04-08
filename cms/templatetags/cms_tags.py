@@ -298,7 +298,7 @@ def page_language_url(context, lang):
     """
     Displays the url of the current page in the defined language.
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
-    This is need if you have slugs in more than one language.
+    This is needed if you have slugs in more than one language.
     """
     if not 'request' in context:
         return ''
