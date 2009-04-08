@@ -8,9 +8,11 @@ class TextPlugin(CMSPluginBase):
     model = Text
     name = _("Text")
     form = TextForm
+    form_template = "text/form.html"
     render_template = "text/plugin.html"
     
     def render(self, context, instance, placeholder):
-        return {'body':instance.body,}
+        return {'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
+                'placeholder':placeholder}
     
 plugin_pool.register_plugin(TextPlugin)
