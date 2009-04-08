@@ -238,11 +238,11 @@ class Page(models.Model):
                 return t[1] 
         return _("default")
 
-    def traductions(self):
-        langs = ""
-        for lang in self.get_languages():
-            langs += '%s, ' % lang
-        return langs[0:-2]
+    #def traductions(self):
+    #    langs = ""
+    #    for lang in self.get_languages():
+    #        langs += '%s, ' % lang
+    #    return langs[0:-2]
 
     def has_page_permission(self, request):
         return self.has_generic_permission(request, "edit")
@@ -375,12 +375,6 @@ class Title(models.Model):
 
     class Meta:
         unique_together = ('language', 'page')
-            
-class Placeholder(models.Model):
-    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
-    name = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
-    body = models.TextField()
     
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
