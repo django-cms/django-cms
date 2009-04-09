@@ -378,7 +378,8 @@ class Title(models.Model):
     
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
-    position = models.PositiveSmallIntegerField(_("position"), default=0, editable=False)
+    parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)

@@ -101,7 +101,8 @@ def edit_plugin(request, plugin_id):
         instance.placeholder = cms_plugin.placeholder
         instance.language = cms_plugin.language
         instance.plugin_type = cms_plugin.plugin_type
-        form = plugin_class.form(request.POST, request.FILES, instance=instance)
+        form_class = plugin_class.get_form(request, instance.placeholder)
+        form = form_class(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             if 'history' in request.path:
                 return render_to_response('admin/cms/page/plugin_forms_history.html', {'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))

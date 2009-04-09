@@ -11,7 +11,7 @@ class FlashPlugin(CMSPluginBase):
     name = _("Flash")
     form = FlashForm
     
-    render_template = "flash/plugin.html"
+    render_template = "cms/plugins/flash.html"
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,
