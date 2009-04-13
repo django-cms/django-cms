@@ -11,13 +11,13 @@ WYM_TOOLS = "" + \
     "{'name': 'Outdent', 'title': 'Outdent', 'css': 'wym_tools_outdent'},\n" +\
     "{'name': 'Undo', 'title': 'Undo', 'css': 'wym_tools_undo'},\n" +\
     "{'name': 'Redo', 'title': 'Redo', 'css': 'wym_tools_redo'},\n" +\
-    "{'name': 'CreateLink', 'title': 'Link', 'css': 'wym_tools_link'},\n" +\
-    "{'name': 'Unlink', 'title': 'Unlink', 'css': 'wym_tools_unlink'},\n" +\
-    "{'name': 'InsertImage', 'title': 'Image', 'css': 'wym_tools_image'},\n" +\
-    "{'name': 'InsertTable', 'title': 'Table', 'css': 'wym_tools_table'},\n" +\
     "{'name': 'Paste', 'title': 'Paste_From_Word', 'css': 'wym_tools_paste'},\n" +\
-    "{'name': 'ToggleHtml', 'title': 'HTML', 'css': 'wym_tools_html'},\n" +\
-    "{'name': 'Preview', 'title': 'Preview', 'css': 'wym_tools_preview'}"
+    "{'name': 'ToggleHtml', 'title': 'HTML', 'css': 'wym_tools_html'},\n" 
+    #"{'name': 'CreateLink', 'title': 'Link', 'css': 'wym_tools_link'},\n" +\
+    #"{'name': 'Unlink', 'title': 'Unlink', 'css': 'wym_tools_unlink'},\n" +\
+    #"{'name': 'InsertImage', 'title': 'Image', 'css': 'wym_tools_image'},\n" +\
+    #"{'name': 'InsertTable', 'title': 'Table', 'css': 'wym_tools_table'},\n" +\
+    #"{'name': 'Preview', 'title': 'Preview', 'css': 'wym_tools_preview'}"
 
 WYM_TOOLS = getattr(settings, "WYM_TOOLS", WYM_TOOLS)
 

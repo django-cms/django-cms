@@ -1,16 +1,3 @@
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote
-from django.core.exceptions import PermissionDenied
-from django.db import models
-from django.forms import Widget, TextInput, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import title
-from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext as _, ugettext_lazy
-
 from cms import settings
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm
@@ -24,12 +11,22 @@ from cms.settings import CMS_MEDIA_URL
 from cms.utils import (get_template_from_request, has_page_add_permission, 
     get_language_from_request)
 from cms.views import details
-
 from copy import deepcopy
-
+from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import unquote
+from django.core.exceptions import PermissionDenied
+from django.db import models
+from django.forms import Widget, TextInput, Textarea, CharField
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import ugettext as _, ugettext_lazy
+from django.views.generic.create_update import redirect
 from inspect import isclass, getmembers
 from os.path import join
-from django.views.generic.create_update import redirect
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm

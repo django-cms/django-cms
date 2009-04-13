@@ -15,14 +15,14 @@ class TextPlugin(CMSPluginBase):
     
     def get_form(self, request, placeholder):
         form = self.form
-        editor = WYMEditor()
         objects = []
         plugins = plugin_pool.get_text_enabled_plugins(placeholder)
-        widget = PlaceholderEditor(installed_plugins=plugins, objects=objects, editor=editor)
+        widget = WYMEditor(installed_plugins=plugins, objects=objects)
         form.base_fields["body"] = CharField(widget=widget, required=False)
         return form
     
     def render(self, context, instance, placeholder):
+        print instance.body
         return {'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
                 'placeholder':placeholder}
     

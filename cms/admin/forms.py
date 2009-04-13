@@ -36,3 +36,9 @@ class PageForm(forms.ModelForm):
             if Page.objects.filter(reverse_id=id).exclude(pk=self.instance.pk).count():
                 raise forms.ValidationError(ugettext_lazy('A page with this reverse url id exists already.'))
         return id
+    
+    def clean_url_overwrite(self):
+        url = self.cleaned_data['url_overwrite']
+        if not url.startswith("/"):
+            raise forms.ValidationError(ugettext_lazy('The url-overwrite must start with /'))
+        return url

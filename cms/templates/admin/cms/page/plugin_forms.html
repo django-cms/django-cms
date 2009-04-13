@@ -50,7 +50,8 @@ runOnLoad(function(){
 <div id="content-main">
 
 {% block top %}{{ plugin.render_plugin }}{% endblock %}
-<form action="/admin/cms/page/edit-plugin/{{ plugin.pk }}/" enctype="multipart/form-data" method="post">
+<form action="." enctype="multipart/form-data" method="post">
+    {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 	<h2>{{ plugin.get_plugin_name }}</h2>
 	<fieldset class="module aligned general">
 		
