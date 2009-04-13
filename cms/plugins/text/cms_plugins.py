@@ -22,7 +22,6 @@ class TextPlugin(CMSPluginBase):
         return form
     
     def render(self, context, instance, placeholder):
-        print instance.body
         return {'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
                 'placeholder':placeholder}
     

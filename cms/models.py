@@ -176,14 +176,11 @@ class Page(models.Model):
         load = False
         if not hasattr(self, "title_cache"):
             load = True
-            #print "no attr"
         elif self.title_cache and self.title_cache.language != language and language and not default_lang:
             load = True
-            #print "no lang diff"
         elif fallback and not self.title_cache:
             load = True 
         if force_reload:
-            #print "force"
             load = True
         if load:
             if version_id:
@@ -434,9 +431,10 @@ class CMSPlugin(models.Model):
         else:
             return u''
         
-    #class Meta:
-    #    pass
-        #abstract = True
+try:
+    mptt.register(CMSPlugin)
+except mptt.AlreadyRegistered:
+    pass
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])

@@ -30,7 +30,7 @@ from os.path import join
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
-    exclude = ['author', 'parent']
+    exclude = ['author', 'parent', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', )
     filter_horizontal = ['sites']
     top_fields = ['language']
@@ -227,10 +227,10 @@ class PageAdmin(admin.ModelAdmin):
                         for rev in revs:
                             obj = rev.object
                             if obj.__class__ == CMSPlugin:
-                                if obj.language == language and obj.placeholder == placeholder.name:
+                                if obj.language == language and obj.placeholder == placeholder.name and not obj.parent_id:
                                     plugin_list.append(rev.object)
                     else:
-                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
+                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
