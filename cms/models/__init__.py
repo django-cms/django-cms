@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from os.path import join
 import urllib2
-from cms.urlutils import urljoin, normalize_absolute_path
+from cms.urlutils import urljoin
 
 import mptt
 from cms import settings
@@ -377,7 +377,7 @@ class Title(models.Model):
     def save(self):
         # Build path from parent page's path and slug
         if self.has_url_overwrite and self.path:
-            self.path = normalize_absolute_path(self.path)
+            self.path = self.path.strip(" /")
             current_path = None
         else:
             current_path = self.path
@@ -386,9 +386,9 @@ class Title(models.Model):
             if parent_page:
                 self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
             elif self.page.is_home():
-                self.path = '/'
+                self.path = ''
             else:
-                self.path = u'/%s' % slug
+                self.path = u'%s' % slug
         super(Title, self).save()
         # Update descendants only if path changed
         if current_path != self.path:

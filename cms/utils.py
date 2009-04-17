@@ -17,7 +17,7 @@ def auto_render(func):
             del(kwargs['only_context'])
             response = func(request, *args, **kwargs)
             if isinstance(response, HttpResponse) or isinstance(response, HttpResponseRedirect):
-                raise Except("cannot return context dictionary because a HttpResponseRedirect has been found")
+                raise Exception("cannot return context dictionary because a HttpResponseRedirect has been found")
             (template_name, context) = response
             return context
         if "template_name" in kwargs:
@@ -145,8 +145,22 @@ def get_page_from_request(request):
         return request._current_page_cache
     else:
         path = request.path
+        print "get_page_from_request", path
         from cms.views import details
-        resp = details(request, path.split("/")[0], no404=True, only_context=True)
+        
+        
+        kw = {}
+        # fucking ugly monkey patch :S
+        if path.startswith('/admin/'):
+            kw['page_id']=path.split("/")[0]
+        else:
+            kw['slug']=path.split("/")[-2]
+            
+        resp = details(request, no404=True, only_context=True, **kw)
+        
+        
+        #resp = details(request, path=path.split("/")[0], no404=True, only_context=True)
+        print "get_page_from_request done"
         return resp['current_page']
 
 

@@ -6,7 +6,7 @@ from cms import settings
 from cms.models import Page
 from cms.utils import auto_render, get_template_from_request, get_language_from_request
 from django.db.models.query_utils import Q
-from cms.appresolver import resolve_with_applications
+from cms.appresolver import applications_page_check
 
 
 def _get_current_page(site, path, lang):
@@ -24,10 +24,8 @@ def _get_current_page(site, path, lang):
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
     lang = get_language_from_request(request)
     site = request.site
-    
     pages = Page.objects.root(site).order_by("tree_id")
     current_page, response = None, None
-    
     if pages:
         if page_id:
             current_page = get_object_or_404(Page.objects.published(site), pk=page_id)
@@ -35,18 +33,18 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
             if slug == "":
                 current_page = pages[0]
             else:
-                path = request.path.replace(reverse('pages-root'), '/', 1)
+                path = request.path.replace(reverse('pages-root'), '', 1)
                 current_page = _get_current_page(site, path, lang)
-                
                 if settings.CMS_APPLICATIONS_URLS:
-                    # check if it should'nt point to some application
-                    # cms can't override application url
-                    current_page, response = resolve_with_applications(request, current_page, path, lang)
+                    # check if it should'nt point to some application, if yes,
+                    # change current page if required
+                    current_page = applications_page_check(request, current_page, path)
                 
                 if not current_page:
                     raise Http404('CMS Page not found')
         else:
-            current_page = None
+            current_page = applications_page_check(request)
+            #current_page = None
         template_name = get_template_from_request(request, current_page)
     elif not no404:
         raise Http404("no page found for site %s" % unicode(site.name))
@@ -55,11 +53,6 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         request._current_page_cache = current_page
     else:
         has_page_permissions = False
-    
-    if response:
-        # response from hookable application must take place here, because of
-        # permission checking and _current_page_cache
-        return response    
-    
+        
     return template_name, locals()
 details = auto_render(details)

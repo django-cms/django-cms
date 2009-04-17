@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from cms import settings
 from cms.views import details
 
-urlpatterns = patterns('',
+urlpatterns = (
     # Public pages
     url(r'^$', details, {'slug':''}, name='pages-root'),
     url(r'^.*?/?(?P<slug>[-\w]+)/$', details, name='pages-details-by-slug'),
@@ -13,4 +13,7 @@ if settings.CMS_APPLICATIONS_URLS:
     have standard reverse support.
     """
     from cms.appresolver import DynamicAppRegexUrlResolver
-    urlpatterns += (DynamicAppRegexUrlResolver(), )
+    urlpatterns = (DynamicAppRegexUrlResolver(), ) + urlpatterns
+    
+
+urlpatterns = patterns('', *urlpatterns)

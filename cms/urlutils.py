@@ -30,6 +30,9 @@ def urljoin(*segments):
     
     >>> urljoin('/a', '/b/', '/c/')
     '/a/b/c/'
+    
+    >>> urljoin('/a', '')
+    '/a/'
     """
     cleaned_segments = map(lambda segment: segment.strip("/"), segments)
     nonempty_segments = filter(lambda segment: segment > "", cleaned_segments)
@@ -38,27 +41,6 @@ def urljoin(*segments):
     if segments[0].startswith("/") and not url.startswith("/"):
         url = "/" + url
     
-    if settings.APPEND_SLASH:
+    if settings.APPEND_SLASH and not url.endswith("/"):
         url += "/"
     return url
-
-def normalize_absolute_path(path):
-    """Normalizes path to its absolute form, starting with / and ending
-    without it.
-    
-    >>> normalize_absolute_path('abc')
-    '/abc'
-    
-    >>> normalize_absolute_path('a/b/c')
-    '/a/b/c'
-    
-    >>> normalize_absolute_path('/a/b/c')
-    '/a/b/c'
-    
-    >>> normalize_absolute_path('/a/b/c/')
-    '/a/b/c'
-    """
-    path = path.strip().rstrip('/')
-    if not path.startswith('/'):
-        path = "/" + path
-    return path
