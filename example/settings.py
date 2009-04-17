@@ -104,7 +104,10 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
-    'south',
+    #'south',
+    
+    # sample application
+    'sampleapp',
 )
 
 gettext = lambda s: s
@@ -120,6 +123,12 @@ CMS_TEMPLATES = (
     ('cool.html', gettext('cool one')),
     ('long-folder-long/long-template-name.html', gettext('long')),
 )
+
+CMS_APPLICATIONS_URLS = (
+    ('sampleapp.urls', 'Sample application'),
+    ('sampleapp.urlstwo', 'Second sample application'),
+)
+
 
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
