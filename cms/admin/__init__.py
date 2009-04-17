@@ -38,7 +38,7 @@ class PageAdmin(admin.ModelAdmin):
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [mandatory_placeholders, 'status']
-    advanced_fields = ['sites', 'in_navigation', 'reverse_id']
+    advanced_fields = ['sites', 'in_navigation', 'reverse_id', 'application_urls', 'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     if settings.CMS_SOFTROOT:
@@ -47,8 +47,7 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('publication_date')
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
-    if settings.CMS_URL_OVERWRITE:
-        advanced_fields.append(('has_url_overwrite', 'url_overwrite'))
+    
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
     
@@ -137,7 +136,14 @@ class PageAdmin(admin.ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
-        Title.objects.set_or_create(obj, language, form.cleaned_data['slug'], form.cleaned_data['title'])
+        Title.objects.set_or_create(
+            obj, 
+            language, 
+            form.cleaned_data['slug'],
+            form.cleaned_data['title'],
+            form.cleaned_data['application_urls'],
+            form.cleaned_data['overwrite_url'],
+        )
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -201,16 +207,20 @@ class PageAdmin(admin.ModelAdmin):
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
+        
         if obj:
-            initial_slug = obj.get_slug(language=language, fallback=False, version_id=version_id, force_reload=True)
-            initial_title = obj.get_title(language=language, fallback=False, version_id=version_id)
-            form.base_fields['slug'].initial = initial_slug
-            form.base_fields['title'].initial = initial_title
+            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+            form.base_fields['slug'].initial = title_obj.slug
+            form.base_fields['title'].initial = title_obj.title
+            form.base_fields['application_urls'].initial = title_obj.application_urls
+            form.base_fields['overwrite_url'].initial = title_obj.overwrite_url
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly
             form.base_fields['slug'].initial = u''
             form.base_fields['title'].initial = u''
+            form.base_fields['application_urls'].initial = u''
+            form.base_fields['overwrite_url'].initial = u''
 
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
@@ -351,12 +361,12 @@ class PageAdmin(admin.ModelAdmin):
                 target = self.model.objects.get(pk=target)
             except self.model.DoesNotExist:
                 return HttpResponse("error")
-                context.update({'error': _('Page could not been moved.')})
+                #context.update({'error': _('Page could not been moved.')})
             else:
-                page.move_to(target, position)
+                page.move_page(target, position)
                 return HttpResponse("ok")
-                return self.list_pages(request,
-                    template_name='admin/cms/page/change_list_tree.html')
+                #return self.list_pages(request,
+                #    template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
     

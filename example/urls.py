@@ -7,6 +7,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
     (r'^categories/', include('categories.urls')),
+    
+    # just for testing - native way to sampleapp urls 
+    # (r'^sampleapp-native/', include('sampleapp.urls')),
 )
 
 if settings.DEBUG:

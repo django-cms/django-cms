@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from datetime import datetime
-
 from cms import settings
+from cms.urlutils import levelize_path
 
 
 class PageManager(models.Manager):
@@ -57,6 +57,28 @@ class PageManager(models.Manager):
         return self.on_site(site).filter(
             publication_end_date__lte=datetime.now())
         
+    
+    def get_pages_with_application(self, site, path, language):
+        """Returns all pages containing application for current path, or
+        any parrent. Returned list is sorted by path length, longer path first.
+        """
+        paths = levelize_path(path)
+        q = Q()
+        for path in paths:
+            # build q for all the paths
+            q |= Q(title_set__path=path, title_set__language=language)
+        app_pages = self.published(site).filter(q & Q(title_set__application_urls__gt='')).distinct()
+        # add proper ordering
+        app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
+        return app_pages
+    
+    def get_all_pages_with_application(self):
+        """Returns all pages containing applications for all sites.
+        
+        Doesn't cares about the application language. 
+        """
+        return self.published().filter(title_set__application_urls__gt='').distinct()
+        
         
 class TitleManager(models.Manager):
     def get_title(self, page, language, language_fallback=False, latest_by='creation_date'):
@@ -94,7 +116,8 @@ class TitleManager(models.Manager):
         else:
             return titles
         
-    def set_or_create(self, page, language, slug=None, title=None):
+    def set_or_create(self, page, language, slug=None, title=None, application_urls=None,
+        overwrite_url=None):
         """
         set or create a title for a particular page and language
         """
@@ -105,8 +128,16 @@ class TitleManager(models.Manager):
                 obj.title = title
             if slug != None:
                 obj.slug = slug
+            if application_urls != None:
+                obj.application_urls = application_urls
+                
+            if overwrite_url > "":
+                obj.has_url_overwrite = True
+                obj.path = overwrite_url
+            else:
+                obj.has_url_overwrite = False
         except self.model.DoesNotExist:
-            obj = self.model(page=page, language=language, title=title, slug=slug)
+            obj = self.model(page=page, language=language, title=title, slug=slug, application_urls=application_urls)
         obj.save()
         return obj
     

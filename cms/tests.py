@@ -1,11 +1,27 @@
 # -*- coding: utf-8 -*-
+import unittest
+from django.test import _doctest as doctest
 from django.test import TestCase
 import settings
 from cms.models import *
 from django.test.client import Client
 from django.template import TemplateDoesNotExist
 
-class PagesTestCase(TestCase):
+
+# doc testing in some modules
+#from cms import urlutils
+#suite = unittest.TestSuite()
+#uite.addTest(doctest.DocTestSuite(urlutils))
+
+from cms.urlutils import normalize_absolute_path
+__test__ = {
+    'cms.urlutils': normalize_absolute_path,
+}
+
+
+class PagesTestCase:#(TestCase):
+    """NOTE: This is not a working version... Have to be changed 
+    """
     fixtures = ['tests.json']
     counter = 1
 
@@ -169,6 +185,3 @@ class PagesTestCase(TestCase):
         self.test_02_create_page()
         self.test_05_edit_page()
         self.test_04_details_view()
-
-        
-
