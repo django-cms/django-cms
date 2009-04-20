@@ -1,19 +1,8 @@
-from cms.utils import get_site_from_request, get_page_from_request
+from cms.utils import get_page_from_request
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 from django.conf import settings
 import re
-
-class LazySite(object):
-    def __get__(self, request, obj_type=None):
-        if not hasattr(request, '_cached_site'):
-            request._cached_site = get_site_from_request(request)
-        return request._cached_site
-
-class CurrentSiteMiddleware(object):
-    def process_request(self, request):
-        request.__class__.site = LazySite()
-        return None
     
 class LazyPage(object):
     def __get__(self, request, obj_type=None):

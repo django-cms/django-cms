@@ -163,7 +163,6 @@ class TreeManager(models.Manager):
         return node
 
     def move_node(self, node, target, position='last-child'):
-        print "> move_node()"
         """
         Moves ``node`` relative to a given ``target`` node as specified
         by ``position`` (when appropriate), by examining both nodes and

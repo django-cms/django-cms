@@ -340,7 +340,8 @@ class PageAdmin(admin.ModelAdmin):
             self.change_list_template = template_name
         context = {
             'name': _("page"),
-            'pages': Page.objects.root().order_by("tree_id"),
+            
+            'pages': Page.objects.all_root().order_by("tree_id"),
         }
         context.update(extra_context or {})
         change_list = self.changelist_view(request, context)

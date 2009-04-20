@@ -12,8 +12,11 @@ if settings.CMS_APPLICATIONS_URLS:
     """If there are some application urls, add special resolver, so we will
     have standard reverse support.
     """
-    from cms.appresolver import DynamicAppRegexUrlResolver
-    urlpatterns = (DynamicAppRegexUrlResolver(), ) + urlpatterns
+    #from cms.appresolver import DynamicAppRegexURLResolver
+    #urlpatterns = (DynamicAppRegexURLResolver(), ) + urlpatterns
+    
+    from cms.appresolver import dynamic_app_regex_url_resolver
+    urlpatterns = (dynamic_app_regex_url_resolver, ) + urlpatterns
     
 
 urlpatterns = patterns('', *urlpatterns)
