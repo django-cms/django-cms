@@ -14,7 +14,7 @@ from cms.urlutils import urljoin
 
 import mptt
 from cms import settings
-from cms.managers import PageManager, PagePermissionManager, TitleManager
+from cms.models.managers import PageManager, PagePermissionManager, TitleManager
 from cms.models import signals as cms_signals
 
 
@@ -194,14 +194,11 @@ class Page(models.Model):
         load = False
         if not hasattr(self, "title_cache"):
             load = True
-            #print "no attr"
         elif self.title_cache and self.title_cache.language != language and language and not default_lang:
             load = True
-            #print "no lang diff"
         elif fallback and not self.title_cache:
             load = True 
         if force_reload:
-            #print "force"
             load = True
         if load:
             if version_id:
@@ -374,34 +371,6 @@ class Title(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
 
-    def save(self):
-        # Build path from parent page's path and slug
-        if self.has_url_overwrite and self.path:
-            self.path = self.path.strip(" /")
-            current_path = None
-        else:
-            current_path = self.path
-            parent_page = self.page.parent
-            slug = u'%s' % self.slug
-            if parent_page:
-                self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
-            elif self.page.is_home():
-                self.path = ''
-            else:
-                self.path = u'%s' % slug
-        super(Title, self).save()
-        # Update descendants only if path changed
-        if current_path != self.path:
-            descendant_titles = Title.objects.filter(
-                page__lft__gt=self.page.lft, 
-                page__rght__lt=self.page.rght, 
-                page__tree_id__exact=self.page.tree_id,
-                language=self.language
-            )
-            for descendant_title in descendant_titles:
-                descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
-                descendant_title.save()
-    
     @property
     def overwrite_url(self):
         """Return overrwriten url, or None
