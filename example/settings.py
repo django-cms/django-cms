@@ -103,7 +103,7 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
-    #'south',
+    'south',
     
     # sample application
     'sampleapp',
