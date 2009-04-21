@@ -69,3 +69,9 @@ CMS_URL_OVERWRITE = getattr(settings, 'CMS_URL_OVERWRITE', True)
 
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
+
+# a tuple of hookable applications, e.g.:
+# CMS_APPLICATIONS_URLS = (
+#    ('sampleapp.urls', 'Sample application'),
+# )
+CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
