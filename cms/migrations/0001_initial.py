@@ -51,6 +51,8 @@ class Migration:
             ('rght', models.PositiveIntegerField(db_index=True, editable=False)),
             ('level', models.PositiveIntegerField(db_index=True, editable=False)),
             ('navigation_extenders', models.CharField(_("navigation extenders"), blank=True, max_length=80, null=True, db_index=True)),
+            ('has_url_overwrite', models.BooleanField(_("has url overwrite"), default=False, db_index=True)),
+            ('url_overwrite', models.CharField(_("url overwrite"), blank=True, max_length=80, null=True, db_index=True)),
             ('parent', models.ForeignKey(orm.Page, db_index=True, related_name='children', null=True, editable=False, blank=True)),
             ('author', models.ForeignKey(orm['auth.User'], limit_choices_to={'page__isnull':False}, verbose_name=_("author"))),
             ('reverse_id', models.CharField(_("reverse url id"), blank=True, max_length=40, null=True, db_index=True)),
