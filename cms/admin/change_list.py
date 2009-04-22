@@ -21,10 +21,6 @@ class CMSChangeList(ChangeList):
                 perm_ids = PagePermission.objects.get_edit_id_list(request.user)
                 qs = qs.filter(pk__in=perm_ids)
                 self.root_query_set = self.root_query_set.filter(pk__in=perm_ids)
-                if not self.is_filtered(): # is not filtered so only the root ones
-                    qs = qs.exclude(parent__in=perm_ids)
-            #elif not self.is_filtered():# is not filtered and is superuser
-            #    qs = qs.filter(parent=None)
             self.real_queryset = True
         qs = qs.order_by('tree_id', 'parent', 'lft')
         return qs
@@ -55,15 +51,17 @@ class CMSChangeList(ChangeList):
             perm_publish_ids = PagePermission.objects.get_publish_id_list(request.user)
             perm_softroot_ids = PagePermission.objects.get_softroot_id_list(request.user)
             if perm_edit_ids and perm_edit_ids != "All":
-                pages = pages.filter(pk__in=perm_edit_ids)
+                pages = pages.filter(pk__in=perm_edit_ids)       
         ids = []
         root_pages = []
         pages = list(pages)
         all_pages = pages[:]
         for page in pages:
             children = []
-            if not page.parent_id:
+            if not page.parent_id or (perm_edit_ids != "All" and not int(page.parent_id) in perm_edit_ids):
                 page.root_node = True
+            else:
+                page.root_node = False
             ids.append(page.pk)
             if settings.CMS_PERMISSION:# caching the permissions
                 if perm_edit_ids == "All" or page.pk in perm_edit_ids:
@@ -79,13 +77,16 @@ class CMSChangeList(ChangeList):
                 else:
                     page.permission_softroot_cache = False
                 page.permission_user_cache = request.user
-            if not page.parent_id:
+            if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
                     children[-1].last = False
                 root_pages.append(page)
                 page.ancestors_ascending = []
-                find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True)
+                if not self.is_filtered():
+                    find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True, to_levels=1000)
+                else:
+                    page.childrens = []
         titles = Title.objects.filter(page__in=ids)
         for page in all_pages:# add the title and slugs and some meta data
             page.languages_cache = []

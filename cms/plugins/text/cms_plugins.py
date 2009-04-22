@@ -3,14 +3,26 @@ from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
 from models import Text
 from cms.plugins.text.forms import TextForm
+from cms.plugins.text.widgets import WYMEditor, PlaceholderEditor
+from cms.plugins.text.utils import plugin_tags_to_user_html
+from django.forms.fields import CharField
 
 class TextPlugin(CMSPluginBase):
     model = Text
     name = _("Text")
     form = TextForm
-    render_template = "text/plugin.html"
+    render_template = "cms/plugins/text.html"
+    
+    def get_form(self, request, placeholder):
+        form = self.form
+        objects = []
+        plugins = plugin_pool.get_text_enabled_plugins(placeholder)
+        widget = WYMEditor(installed_plugins=plugins, objects=objects)
+        form.base_fields["body"] = CharField(widget=widget, required=False)
+        return form
     
     def render(self, context, instance, placeholder):
-        return {'body':instance.body,}
+        return {'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
+                'placeholder':placeholder}
     
 plugin_pool.register_plugin(TextPlugin)

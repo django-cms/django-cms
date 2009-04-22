@@ -40,6 +40,14 @@ class PluginPool(object):
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins
+    
+    def get_text_enabled_plugins(self, placeholder):
+        plugins = self.get_all_plugins(placeholder)
+        final = []
+        for plugin in plugins:
+            if plugin.text_enabled:
+                final.append(plugin)
+        return final
 
     def get_plugin(self, name):
         """

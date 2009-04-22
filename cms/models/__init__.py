@@ -9,13 +9,18 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from os.path import join
+import urllib2
+from cms.urlutils import urljoin
 
 import mptt
 from cms import settings
-from cms.managers import PageManager, PagePermissionManager, TitleManager
+from cms.models.managers import PageManager, PagePermissionManager, TitleManager
+from cms.models import signals as cms_signals
+
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
+
 #try:
 #    tagging = models.get_app('tagging')
 #    from tagging.fields import TagField
@@ -45,13 +50,12 @@ class Page(models.Model):
     login_required = models.BooleanField(_('login required'), default=False)
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
-    has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True)
-    url_overwrite = models.CharField(_("url overwrite"), max_length=80, db_index=True, blank=True, null=True, help_text=_("The url that this page has instead. Starts with a \"/\""))
-    reverse_id = models.CharField(_("reverse url id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
+    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
     sites = models.ManyToManyField(Site, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    
     # Managers
     objects = PageManager()
 
@@ -67,7 +71,17 @@ class Page(models.Model):
         else:
             return slug
         
-
+    
+    def move_page(self, target, position='first-child'):
+        """Called from admin interface when page is moved. Should be used on
+        all the places which are changing page position. Used like an interface
+        to mptt, but after move is done page_moved signal is fired.
+        """
+        self.move_to(target, position)
+        # fire signal
+        cms_signals.page_moved.send(sender=Page, instance=self)
+        
+    
     def save(self, no_signals=False):
         if not self.status:
             self.status = self.DRAFT
@@ -118,14 +132,8 @@ class Page(models.Model):
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):
-        if self.has_url_overwrite:
-            return reverse('pages-root') + self.url_overwrite
-        else:
-            if self.is_home():
-                return reverse('pages-root')
-            else:
-                path = self.get_path(language, fallback)
-                return reverse('pages-root') + path +"/"
+        path = self.get_path(language, fallback)
+        return urljoin(reverse('pages-root'), path)
     
     def get_cached_ancestors(self, ascending=True):
         if ascending:
@@ -136,37 +144,47 @@ class Page(models.Model):
             if not hasattr(self, "ancestors_descending"):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
-        
-        
-    def get_path(self, language=None, fallback=True, version_id=None, force_reload=False):
-        """
-        get the slug of the page depending on the given language
+    
+    def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """Helper function for accessing wanted / current title. 
+        If wanted title doesn't exists, EmptyTitle instance will be returned.
         """
         self._get_title_cache(language, fallback, version_id, force_reload)
         if self.title_cache:
-            return self.title_cache.path
-        else:
+            return self.title_cache
+        return EmptyTitle()
+    
+    def get_title_obj_attribute(self, attrname, language=None, fallback=True, version_id=None, force_reload=False):
+        """Helper function for getting attribute or None from wanted/current title.
+        """
+        try:
+            return getattr(self.get_title_obj(language, fallback, version_id, force_reload), attrname)
+        except AttributeError:
             return None
+    
+    def get_path(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get the path of the page depending on the given language
+        """
+        return self.get_title_obj_attribute("path", language, fallback, version_id, force_reload)
 
     def get_slug(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the slug of the page depending on the given language
         """
-        self._get_title_cache(language, fallback, version_id, force_reload)
-        if self.title_cache:
-            return self.title_cache.slug
-        else:
-            return None
+        return self.get_title_obj_attribute("slug", language, fallback, version_id, force_reload)
         
     def get_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the title of the page depending on the given language
         """
-        self._get_title_cache(language, fallback, version_id, force_reload)
-        if self.title_cache:
-            return self.title_cache.title
-        else:
-            return None
+        return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
+        
+    def get_application_urls(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get application urls conf for application hook
+        """
+        return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
         
     def _get_title_cache(self, language, fallback, version_id, force_reload):
         default_lang = False
@@ -176,14 +194,11 @@ class Page(models.Model):
         load = False
         if not hasattr(self, "title_cache"):
             load = True
-            #print "no attr"
         elif self.title_cache and self.title_cache.language != language and language and not default_lang:
             load = True
-            #print "no lang diff"
         elif fallback and not self.title_cache:
             load = True 
         if force_reload:
-            #print "force"
             load = True
         if load:
             if version_id:
@@ -238,11 +253,11 @@ class Page(models.Model):
                 return t[1] 
         return _("default")
 
-    def traductions(self):
-        langs = ""
-        for lang in self.get_languages():
-            langs += '%s, ' % lang
-        return langs[0:-2]
+    #def traductions(self):
+    #    langs = ""
+    #    for lang in self.get_languages():
+    #        langs += '%s, ' % lang
+    #    return langs[0:-2]
 
     def has_page_permission(self, request):
         return self.has_generic_permission(request, "edit")
@@ -343,10 +358,15 @@ class Title(models.Model):
     title = models.CharField(_("title"), max_length=255)
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
+    has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
+    application_urls = models.CharField(_('application'), max_length=32, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True, help_text=_('Hook application to this page.'))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
     objects = TitleManager()
+    
+    class Meta:
+        unique_together = ('language', 'page')
     
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
@@ -375,16 +395,34 @@ class Title(models.Model):
 
     class Meta:
         unique_together = ('language', 'page')
+
+    @property
+    def overwrite_url(self):
+        """Return overrwriten url, or None
+        """
+        if self.has_url_overwrite:
+            return self.path
+        return None
+        
+class EmptyTitle(object):
+    """Empty title object, can be returned from Page.get_title_obj() if required
+    title object doesn't exists.
+    """
+    title = ""
+    slug = ""
+    path = ""
+    has_url_overwite = False
+    application_urls = ""
+    
+    @property
+    def overwrite_url(self):
+        return None
             
-class Placeholder(models.Model):
-    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
-    name = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
-    body = models.TextField()
     
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
-    position = models.PositiveSmallIntegerField(_("position"), default=0, editable=False)
+    parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
@@ -418,10 +456,31 @@ class CMSPlugin(models.Model):
             
     def get_media_path(self, filename):
         return self.page.get_media_path(filename)
+    
+    def get_instance_icon_src(self):
+        """
+        Get src URL for instance's icon
+        """
+        instance, plugin = self.get_plugin_instance()
+        if instance:
+            return plugin.icon_src(instance)
+        else:
+            return u''
+
+    def get_instance_icon_alt(self):
+        """
+        Get alt text for instance's icon
+        """
+        instance, plugin = self.get_plugin_instance()
+        if instance:
+            return unicode(plugin.icon_alt(instance))
+        else:
+            return u''
         
-    #class Meta:
-    #    pass
-        #abstract = True
+try:
+    mptt.register(CMSPlugin)
+except mptt.AlreadyRegistered:
+    pass
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])

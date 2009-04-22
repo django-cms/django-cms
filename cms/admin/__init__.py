@@ -1,16 +1,3 @@
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote
-from django.core.exceptions import PermissionDenied
-from django.db import models
-from django.forms import Widget, TextInput, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import title
-from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext as _, ugettext_lazy
-
 from cms import settings
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm
@@ -24,21 +11,31 @@ from cms.settings import CMS_MEDIA_URL
 from cms.utils import (get_template_from_request, has_page_add_permission, 
     get_language_from_request)
 from cms.views import details
-
 from copy import deepcopy
-
+from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import unquote
+from django.core.exceptions import PermissionDenied
+from django.db import models
+from django.forms import Widget, TextInput, Textarea, CharField
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import ugettext as _, ugettext_lazy
+from django.views.generic.create_update import redirect
 from inspect import isclass, getmembers
 from os.path import join
-from django.views.generic.create_update import redirect
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
-    exclude = ['author', 'parent']
+    exclude = ['author', 'parent', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', )
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [mandatory_placeholders, 'status']
-    advanced_fields = ['sites', 'in_navigation', 'reverse_id']
+    advanced_fields = ['sites', 'in_navigation', 'reverse_id', 'application_urls', 'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     if settings.CMS_SOFTROOT:
@@ -47,8 +44,7 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('publication_date')
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
-    if settings.CMS_URL_OVERWRITE:
-        advanced_fields.append(('has_url_overwrite', 'url_overwrite'))
+    
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
     
@@ -70,7 +66,7 @@ class PageAdmin(admin.ModelAdmin):
     ]
     
     list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
-    search_fields = ('title_set__slug', 'title_set__title', 'content__body')
+    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
       
     class Media:
         css = {
@@ -137,7 +133,14 @@ class PageAdmin(admin.ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
-        Title.objects.set_or_create(obj, language, form.cleaned_data['slug'], form.cleaned_data['title'])
+        Title.objects.set_or_create(
+            obj, 
+            language, 
+            form.cleaned_data['slug'],
+            form.cleaned_data['title'],
+            form.cleaned_data['application_urls'],
+            form.cleaned_data['overwrite_url'],
+        )
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -149,7 +152,7 @@ class PageAdmin(admin.ModelAdmin):
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[1][1]['fields'].remove('status')
-            if not obj.has_softroot_permission(request):
+            if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
@@ -201,16 +204,20 @@ class PageAdmin(admin.ModelAdmin):
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
+        
         if obj:
-            initial_slug = obj.get_slug(language=language, fallback=False, version_id=version_id, force_reload=True)
-            initial_title = obj.get_title(language=language, fallback=False, version_id=version_id)
-            form.base_fields['slug'].initial = initial_slug
-            form.base_fields['title'].initial = initial_title
+            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+            form.base_fields['slug'].initial = title_obj.slug
+            form.base_fields['title'].initial = title_obj.title
+            form.base_fields['application_urls'].initial = title_obj.application_urls
+            form.base_fields['overwrite_url'].initial = title_obj.overwrite_url
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly
             form.base_fields['slug'].initial = u''
             form.base_fields['title'].initial = u''
+            form.base_fields['application_urls'].initial = u''
+            form.base_fields['overwrite_url'].initial = u''
 
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
@@ -230,10 +237,10 @@ class PageAdmin(admin.ModelAdmin):
                         for rev in revs:
                             obj = rev.object
                             if obj.__class__ == CMSPlugin:
-                                if obj.language == language and obj.placeholder == placeholder.name:
+                                if obj.language == language and obj.placeholder == placeholder.name and not obj.parent_id:
                                     plugin_list.append(rev.object)
                     else:
-                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
+                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
@@ -330,7 +337,8 @@ class PageAdmin(admin.ModelAdmin):
             self.change_list_template = template_name
         context = {
             'name': _("page"),
-            'pages': Page.objects.root().order_by("tree_id"),
+            
+            'pages': Page.objects.all_root().order_by("tree_id"),
         }
         context.update(extra_context or {})
         change_list = self.changelist_view(request, context)
@@ -351,12 +359,12 @@ class PageAdmin(admin.ModelAdmin):
                 target = self.model.objects.get(pk=target)
             except self.model.DoesNotExist:
                 return HttpResponse("error")
-                context.update({'error': _('Page could not been moved.')})
+                #context.update({'error': _('Page could not been moved.')})
             else:
-                page.move_to(target, position)
+                page.move_page(target, position)
                 return HttpResponse("ok")
-                return self.list_pages(request,
-                    template_name='admin/cms/page/change_list_tree.html')
+                #return self.list_pages(request,
+                #    template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
     
