@@ -50,7 +50,7 @@ class Page(models.Model):
     login_required = models.BooleanField(_('login required'), default=False)
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
-    reverse_id = models.CharField(_("reverse url id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
+    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
