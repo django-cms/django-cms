@@ -371,8 +371,6 @@ class Title(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
 
-<<<<<<< HEAD:cms/models/__init__.py
-=======
     def save(self):
         # Build path from parent page's path and slug
         current_path = self.path
@@ -398,7 +396,6 @@ class Title(models.Model):
     class Meta:
         unique_together = ('language', 'page')
 
->>>>>>> e9a80daaaeb5810f44fba06c83d03fd3ed823bc9:cms/models/__init__.py
     @property
     def overwrite_url(self):
         """Return overrwriten url, or None
