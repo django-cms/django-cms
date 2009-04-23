@@ -83,12 +83,12 @@ def add_plugin(request):
 if 'reversion' in settings.INSTALLED_APPS:
     add_plugin = revision.create_on_success(add_plugin)
 
-def edit_plugin(request, plugin_id):
+def edit_plugin(request, plugin_id, admin_site):
+    plugin_id = int(plugin_id)
     if not 'history' in request.path:
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
         instance, plugin_class = cms_plugin.get_plugin_instance()
     else:
-        plugin_id = int(plugin_id)
         from reversion.models import Version
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
         version = get_object_or_404(Version, pk=version_id)
@@ -107,7 +107,16 @@ def edit_plugin(request, plugin_id):
                 break
         if not instance:
             raise Http404
+
+    admin = plugin_class(plugin_class.model, admin_site)
+    #admin = plugin_class(plugin_class.model, admin_site)
+    plugin_class.opts = plugin_class.model._meta
+    #plugin_class.admin_site = admin_site
+    return plugin_class.add_view(request)#, plugin_id)
+
+        
     
+
     if request.method == "POST":
         if not instance:
             instance = plugin_class.model()    
@@ -124,6 +133,7 @@ def edit_plugin(request, plugin_id):
         instance.level = cms_plugin.level
         form_class = plugin_class.get_form(request, instance.placeholder)
         form = form_class(request.POST, request.FILES, instance=instance)
+
         if form.is_valid():
             if 'history' in request.path:
                 return render_to_response('admin/cms/page/plugin_forms_history.html', {'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))

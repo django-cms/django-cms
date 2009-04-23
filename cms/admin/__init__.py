@@ -92,7 +92,7 @@ class PageAdmin(admin.ModelAdmin):
             return add_plugin(request)
         elif 'edit-plugin' in url:
             plugin_id = url.split("/")[-1]
-            return edit_plugin(request, plugin_id)
+            return edit_plugin(request, plugin_id, self.admin_site)
         elif 'remove-plugin' in url:
             return remove_plugin(request)
         elif 'move-plugin' in url:
