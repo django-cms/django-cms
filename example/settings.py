@@ -108,6 +108,7 @@ INSTALLED_APPS = (
     'south',
     # sample application
     'sampleapp',
+    'store',
 )
 
 gettext = lambda s: s

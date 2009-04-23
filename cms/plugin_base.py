@@ -29,6 +29,7 @@ class CMSPluginBase(admin.ModelAdmin):
     def render(self, context, placeholder):
         raise NotImplementedError, "render needs to be implemented"
     
+    
     def get_form(self, request, placeholder):
         """
         used for editing the plugin
