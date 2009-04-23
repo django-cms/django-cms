@@ -1,0 +1,10 @@
+- make all plugins searchable (search API)
+- PluginBase extends ModelAdmin
+- Tree Plugins
+- Site trees in admin
+- text objects
+- meta and description in titles... more SEO
+- media folder cleanup
+- check and cleanup reversions
+- tests, more tests and event more tests
+- sitemaps support

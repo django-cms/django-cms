@@ -1,16 +1,3 @@
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote
-from django.core.exceptions import PermissionDenied
-from django.db import models
-from django.forms import Widget, TextInput, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import title
-from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext as _, ugettext_lazy
-
 from cms import settings
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm
@@ -24,16 +11,26 @@ from cms.settings import CMS_MEDIA_URL
 from cms.utils import (get_template_from_request, has_page_add_permission, 
     get_language_from_request)
 from cms.views import details
-
 from copy import deepcopy
-
+from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import unquote
+from django.core.exceptions import PermissionDenied
+from django.db import models
+from django.forms import Widget, TextInput, Textarea, CharField
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import ugettext as _, ugettext_lazy
+from django.views.generic.create_update import redirect
 from inspect import isclass, getmembers
 from os.path import join
-from django.views.generic.create_update import redirect
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
-    exclude = ['author', 'parent']
+    exclude = ['author', 'parent', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', )
     filter_horizontal = ['sites']
     top_fields = ['language']
@@ -155,7 +152,7 @@ class PageAdmin(admin.ModelAdmin):
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[1][1]['fields'].remove('status')
-            if not obj.has_softroot_permission(request):
+            if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
@@ -240,10 +237,10 @@ class PageAdmin(admin.ModelAdmin):
                         for rev in revs:
                             obj = rev.object
                             if obj.__class__ == CMSPlugin:
-                                if obj.language == language and obj.placeholder == placeholder.name:
+                                if obj.language == language and obj.placeholder == placeholder.name and not obj.parent_id:
                                     plugin_list.append(rev.object)
                     else:
-                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name).order_by('position')
+                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form

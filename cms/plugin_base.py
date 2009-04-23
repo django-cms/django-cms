@@ -12,6 +12,7 @@ class CMSPluginBase(admin.ModelAdmin):
     render_template = None
     model = CMSPlugin
     placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
+    text_enabled = False
     
     def __init__(self):
         if self.model:
@@ -28,13 +29,27 @@ class CMSPluginBase(admin.ModelAdmin):
     def render(self, context, placeholder):
         raise NotImplementedError, "render needs to be implemented"
     
-    def get_form(self, request, context):
+    def get_form(self, request, placeholder):
         """
         used for editing the plugin
         """
         if self.form:
             return self.form
-        raise MissingFormError, "this plugin doesn't have a form"
+        raise MissingFormError("this plugin doesn't have a form")
+    
+    def icon_src(self, instance):
+        """
+        Return the URL for an image to be used for an icon for this
+        plugin instance in a text editor.
+        """
+        raise NotImplementedError
+
+    def icon_alt(self, instance):
+        """
+        Return the 'alt' text to be used for an icon representing
+        the plugin object in a text editor.
+        """
+        return "%s - %s" % (unicode(self.name), unicode(instance))
     
     def __repr__(self):
         return smart_str(self.name)
