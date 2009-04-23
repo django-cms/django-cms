@@ -14,8 +14,12 @@ def _get_current_page(path, lang):
     returns: Page or None
     """
     try:
-        return Page.objects.published().filter( 
-            Q(title_set__path=path[:-1], title_set__language=lang)).distinct().select_related()[0]
+        if settings.CMS_FLAT_URLS:
+            return Page.objects.published().filter(Q(title_set__slug=path[:-1],
+                                                     title_set__language=lang)).distinct().select_related()[0]
+        else:
+            return Page.objects.published().filter(Q(title_set__path=path[:-1],
+                                                     title_set__language=lang)).distinct().select_related()[0]
     except IndexError:
         return None
 
