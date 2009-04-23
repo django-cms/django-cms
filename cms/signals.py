@@ -46,9 +46,14 @@ def pre_save_title(instance, raw, **kwargs):
     instance.tmp_application_urls = None
     
     if not instance.id:
-        tmp_title = Page.objects.get(pk=instance.id)
-        instance.tmp_path = tmp_title.path
-        instance.tmp_application_urls = tmp_title.appliction_urls
+        try:
+            tmp_title = Title.objects.get(pk=instance.id)
+            instance.tmp_path = tmp_title.path
+            instance.tmp_application_urls = tmp_title.appliction_urls
+        except Title.DoesNotExist:
+            instance.tmp_path = ""
+            instance.tmp_application_urls = None
+        
     
     # Build path from parent page's path and slug
     if instance.has_url_overwrite and instance.path:
@@ -59,8 +64,6 @@ def pre_save_title(instance, raw, **kwargs):
         if parent_page:
             parent_path = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True).path
             instance.path = (u'%s/%s' % (parent_path, slug)).lstrip("/")
-        elif instance.page.is_home():
-            instance.path = ''
         else:
             instance.path = u'%s' % slug
 
