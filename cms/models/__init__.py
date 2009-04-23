@@ -43,7 +43,7 @@ class Page(models.Model):
         (PUBLISHED, _('Published')),
     )
     author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', editable=False, db_index=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
@@ -132,7 +132,10 @@ class Page(models.Model):
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):
-        path = self.get_path(language, fallback)
+        if settings.CMS_FLAT_URLS:
+            path = self.get_slug(language, fallback)
+        else:
+            path = self.get_path(language, fallback)
         return urljoin(reverse('pages-root'), path)
     
     def get_cached_ancestors(self, ascending=True):
