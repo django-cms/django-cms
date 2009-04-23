@@ -22,7 +22,7 @@ def _get_current_page(path, lang):
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
-    pages = Page.objects.root().order_by("tree_id")
+    pages = Page.objects.published().root().order_by("tree_id")
     current_page, response = None, None
     if pages:
         if page_id:
