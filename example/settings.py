@@ -73,7 +73,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    'cms.middleware.CurrentSiteMiddleware',
     'cms.middleware.CurrentPageMiddleware',
     'cms.middleware.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',

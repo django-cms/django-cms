@@ -1,32 +1,57 @@
 from cms.models import Page
 from django.conf import settings
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
-from cms.utils import get_language_from_request
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to found if given path was resolved over application. 
     Applications have higher priority than other cms pages. 
     """
-    language = get_language_from_request(request)
+    if current_page:
+        return current_page
+    
     if path is None:
         path = request.path.replace(reverse('pages-root'), '', 1)
-    
-    page_set = Page.objects.get_pages_with_application(request.site, path, language)
-    print "ps", page_set
-    for page in page_set:
-        urlconf_name = page.get_application_urls(language)
-        page_path = page.get_path(language)
-        resolver = RegexURLResolver(r'^' + page_path + "/", urlconf_name)
-        try:
-            resolver.resolve(path)
-            return current_page or page
-        except Resolver404:
-            pass    
-    print "> CP: ", current_page
-    return current_page
-    
+    # check if application resolver can resolve this
+    try:
+        page_id = dynamic_app_regex_url_resolver.resolve_page_id(path)
+        # yes, it is application page
+        page = Page.objects.get(id=page_id)
+        
+        # If current page was matched, then we have some override for content
+        # from cms, but keep current page. Otherwise return page to which was application assigned.
+        return page 
+    except Resolver404:
+        pass
+    return None    
 
-class DynamicAppRegexUrlResolver(RegexURLResolver):
+class PageRegexURLResolver(RegexURLResolver):
+    page_id = None
+    
+    def resolve_page_id(self, path):
+        """Resolves requested path similar way how resolve does, but instead
+        of return callback,.. returns page_id to which was application 
+        assigned.
+        """
+        tried = []
+        match = self.regex.search(path)
+        if match:
+            new_path = path[match.end():]
+            for pattern in self.urlconf_module.urlpatterns:
+                try:
+                    sub_match = pattern.resolve(new_path)
+                except Resolver404, e:
+                    tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
+                else:
+                    if sub_match:
+                        if isinstance(pattern, RegexURLResolver):
+                            return pattern.page_id
+                        else:
+                            return self.page_id
+                    tried.append(pattern.regex.pattern)
+            raise Resolver404, {'tried': tried, 'path': new_path}
+
+
+class DynamicAppRegexURLResolver(PageRegexURLResolver):
     """Dynamic application url resolver.
     
     Used for adding support to standard reverse function used by standard 
@@ -36,20 +61,46 @@ class DynamicAppRegexUrlResolver(RegexURLResolver):
     here.
     """
     
-    # give some name to it
-    #name = None
-    
     def __init__(self):
-        super(DynamicAppRegexUrlResolver, self).__init__(r'^', "DynamicAppResolver", {})
+        super(DynamicAppRegexURLResolver, self).__init__(r'^', "DynamicAppResolver", {})
+        self._dynamic_url_conf_module = DynamicURLConfModule()
         
     # fake this and provide dynamic instance instead of module
     @property
     def urlconf_module(self): 
-        return dynamic_url_conf_module
+        return self._dynamic_url_conf_module
     
+    def reset_cache(self):
+        self._dynamic_url_conf_module.reset_cache()
+    
+
+class ApplicationRegexUrlResolver(PageRegexURLResolver):
+    def __init__(self, title, default_kwargs={}):
+        """Creates standard variant of RegexUrlResolver, but adds some usefull
+        functionality to it.
         
+        Args:
+            title: Title instance
+            default_kwargs
+        """
         
-class DynamicUrlConfModule(object):
+        # NOTE: can we use default_kwargs here to pass some aditional data
+        # to application? - can we deefine some data in admin and pass them here
+        # will they be be than passed to pattern, and from pattern to view? 
+        # If it will work, will be give us possibility to configure one
+        # application for multiple hooks. 
+        
+        regex = r'%s' % title.path
+        if settings.APPEND_SLASH:
+            regex += r'/'  
+        urlconf_name = title.application_urls
+        
+        # assign page_id to resolver, so he knows on which page he was assigned
+        self.page_id = title.page_id
+        super(ApplicationRegexUrlResolver, self).__init__(regex, urlconf_name, default_kwargs)
+    
+                
+class DynamicURLConfModule(object):
     """Fake urls module class. Creates resolvers for hookable applications on
     the fly from db. 
     
@@ -86,22 +137,10 @@ class DynamicUrlConfModule(object):
                     if mixid in included:
                         # don't add the same thing twice
                         continue  
-                    self._urlpatterns.append(self._create_resolver(title))
+                    self._urlpatterns.append(ApplicationRegexUrlResolver(title))
                     included.append(mixid)
         return self._urlpatterns
-    
-    def _create_resolver(self, title):
-        # NOTE: can we use default_kwargs here to pass some aditional data
-        # to application? - can we deefine some data in admin and pass them here
-        # will they be be than passed to pattern, and from pattern to view? 
-        # If it will work, will be give us possibility to configure one
-        # application for multiple hooks. 
-        regex = r'%s' % title.path
-        if settings.APPEND_SLASH:
-            regex += r'/'  
-        resolver = RegexURLResolver(regex, title.application_urls)
-        return resolver
-    
+        
     def reset_cache(self):
         """Reset urlpatterns cache. Should be called always when there is some
         application change on any page
@@ -110,5 +149,4 @@ class DynamicUrlConfModule(object):
         # recache patterns with new state
         fake = self.urlpatterns
 
-dynamic_url_conf_module = DynamicUrlConfModule()
-
+dynamic_app_regex_url_resolver = DynamicAppRegexURLResolver()
