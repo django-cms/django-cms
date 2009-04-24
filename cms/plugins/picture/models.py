@@ -19,6 +19,8 @@ class Picture(CMSPlugin):
     alt = models.CharField(_("alternate text"), max_length=255, blank=True, null=True, help_text=_("textual description of the image"))
     
     def __unicode__(self):
+        if self.alt:
+            return self.alt[:40]
         return u"%s" % basename(self.image.path)
 
 if 'reversion' in settings.INSTALLED_APPS:        
