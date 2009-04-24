@@ -13,9 +13,9 @@ from django.template import TemplateDoesNotExist
 #suite = unittest.TestSuite()
 #uite.addTest(doctest.DocTestSuite(urlutils))
 
-from cms.urlutils import normalize_absolute_path
+from cms.urlutils import urljoin
 __test__ = {
-    'cms.urlutils': normalize_absolute_path,
+    'cms.urlutils': urljoin,
 }
 
 
