@@ -1,7 +1,14 @@
 from django.db.models import signals
+from cms.models import signals as cms_signals, Page
 from django.contrib.sites.models import Site, SITE_CACHE
 from cms.models import CMSPlugin
 
+
+
+
+
+"""Signal listeners 
+"""
 def clear_site_cache(sender, instance, **kwargs):
     """
     Clears site cache in case a Site instance has been created or an existing
@@ -20,7 +27,14 @@ def update_plugin_positions(**kwargs):
             p.position = last
             p.save()
         last += 1
+
+
+def update_title_paths(instance, **kwargs):
+    for title in instance.title_set.all():
+        title.save()
         
 signals.pre_delete.connect(clear_site_cache, sender=Site)
 signals.post_save.connect(clear_site_cache, sender=Site)
 signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin)
+
+cms_signals.page_moved.connect(update_title_paths, sender=Page)

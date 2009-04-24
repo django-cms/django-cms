@@ -4,6 +4,7 @@ __version__ = '.'.join(map(str, VERSION))
 
 import signals
 import plugin_pool
+
 from django.conf import settings as d_settings
 plugin_pool.plugin_pool.discover_plugins()
 

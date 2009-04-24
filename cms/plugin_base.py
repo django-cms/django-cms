@@ -14,7 +14,7 @@ class CMSPluginBase(admin.ModelAdmin):
     placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
     text_enabled = False
     
-    def __init__(self, context=None):
+    def __init__(self):
         if self.model:
             if not CMSPlugin in self.model._meta.parents and self.model != CMSPlugin:
                 raise SubClassNeededError, "plugin model needs to subclass CMSPlugin" 
@@ -56,5 +56,3 @@ class CMSPluginBase(admin.ModelAdmin):
     
     def __unicode__(self):
         return self.name
-    
-
