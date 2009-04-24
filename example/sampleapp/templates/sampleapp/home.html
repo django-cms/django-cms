@@ -1,0 +1,8 @@
+{% extends "index.html" %}
+{% load cms_tags %}
+
+{% block content %}
+	<h2>Sample application home page</h2>
+	<h3>{{ message }}</h3>
+	{{ block.super }}
+{% endblock content %}
