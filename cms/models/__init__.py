@@ -84,12 +84,12 @@ class Page(models.Model):
     
     def save(self, no_signals=False):
         if not self.status:
-            self.status = self.DRAFT
+            self.status = Page.DRAFT
         # Published pages should always have a publication date
         if self.publication_date is None and self.status == self.PUBLISHED:
             self.publication_date = datetime.now()
         # Drafts should not, unless they have been set to the future
-        if self.status == self.DRAFT:
+        if self.status == Page.DRAFT:
             if settings.CMS_SHOW_START_DATE:
                 if self.publication_date and self.publication_date <= datetime.now():
                     self.publication_date = None
