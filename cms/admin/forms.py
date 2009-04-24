@@ -39,6 +39,6 @@ class PageForm(forms.ModelForm):
     
     def clean_url_overwrite(self):
         url = self.cleaned_data['url_overwrite']
-        if not url.startswith("/"):
+        if url and not url.startswith("/"):
             raise forms.ValidationError(ugettext_lazy('The url-overwrite must start with /'))
         return url
