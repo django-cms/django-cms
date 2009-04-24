@@ -46,11 +46,10 @@ class PageForm(forms.ModelForm):
             if Page.objects.filter(reverse_id=id).exclude(pk=self.instance.pk).count():
                 raise forms.ValidationError(ugettext_lazy('A page with this reverse url id exists already.'))
         return id
-    
+
     def clean_overwrite_url(self):
         url = self.cleaned_data['overwrite_url']
         if url:
             if not any_path_re.match(url):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
-

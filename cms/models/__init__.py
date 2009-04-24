@@ -256,11 +256,11 @@ class Page(models.Model):
                 return t[1] 
         return _("default")
 
-    def traductions(self):
-        langs = ""
-        for lang in self.get_languages():
-            langs += '%s, ' % lang
-        return langs[0:-2]
+    #def traductions(self):
+    #    langs = ""
+    #    for lang in self.get_languages():
+    #        langs += '%s, ' % lang
+    #    return langs[0:-2]
 
     def has_page_permission(self, request):
         return self.has_generic_permission(request, "edit")
@@ -374,6 +374,30 @@ class Title(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
 
+    def save(self):
+        # Build path from parent page's path and slug
+        current_path = self.path
+        parent_page = self.page.parent
+        slug = u'%s' % self.slug
+        if parent_page:
+            self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
+        else:
+            self.path = u'%s' % slug
+        super(Title, self).save()
+        # Update descendants only if path changed
+        if current_path != self.path:
+            descendant_titles = Title.objects.filter(
+                page__lft__gt=self.page.lft, 
+                page__rght__lt=self.page.rght, 
+                page__tree_id__exact=self.page.tree_id,
+                language=self.language
+            )
+            for descendant_title in descendant_titles:
+                descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
+                descendant_title.save()
+
+    class Meta:
+        unique_together = ('language', 'page')
     @property
     def overwrite_url(self):
         """Return overrwriten url, or None
@@ -395,16 +419,11 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
-            
-class Placeholder(models.Model):
-    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
-    name = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
-    body = models.TextField()
     
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
-    position = models.PositiveSmallIntegerField(_("position"), default=0, editable=False)
+    parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
@@ -438,10 +457,31 @@ class CMSPlugin(models.Model):
             
     def get_media_path(self, filename):
         return self.page.get_media_path(filename)
+    
+    def get_instance_icon_src(self):
+        """
+        Get src URL for instance's icon
+        """
+        instance, plugin = self.get_plugin_instance()
+        if instance:
+            return plugin.icon_src(instance)
+        else:
+            return u''
+
+    def get_instance_icon_alt(self):
+        """
+        Get alt text for instance's icon
+        """
+        instance, plugin = self.get_plugin_instance()
+        if instance:
+            return unicode(plugin.icon_alt(instance))
+        else:
+            return u''
         
-    #class Meta:
-    #    pass
-        #abstract = True
+try:
+    mptt.register(CMSPlugin)
+except mptt.AlreadyRegistered:
+    pass
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])
