@@ -39,13 +39,17 @@ class CMSPluginBase(admin.ModelAdmin):
     
     def icon_src(self, instance):
         """
+        Overwrite this if text_enabled = True
+
         Return the URL for an image to be used for an icon for this
         plugin instance in a text editor.
         """
-        raise NotImplementedError
+        return ""
 
     def icon_alt(self, instance):
         """
+        Overwrite this if necessary if text_enabled = True
+        
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
