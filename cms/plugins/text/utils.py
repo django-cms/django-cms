@@ -13,6 +13,7 @@ def plugin_tags_to_admin_html(text):
     Convert plugin object 'tags' into the form used to represent
     them in the admin text editor.
     """
+    print text
     def _tag_to_admin(m):
         plugin_id = int(m.groups()[0])
         try:
@@ -31,6 +32,7 @@ def plugin_tags_to_admin_html(text):
     return OBJ_TAG_RE.sub(_tag_to_admin, text)
 
 def plugin_tags_to_user_html(text, context, placeholder):
+    print text
     """
     Convert plugin object 'tags' into the form for public site.
 
@@ -44,7 +46,7 @@ def plugin_tags_to_user_html(text, context, placeholder):
             # Object must have been deleted.  It cannot be rendered to
             # end user so just remove it from the HTML altogether
             return u''
-        return obj.render(context, placeholder)
+        return obj.render_plugin(context, placeholder)
     return OBJ_TAG_RE.sub(_render_tag, text)
 
 
