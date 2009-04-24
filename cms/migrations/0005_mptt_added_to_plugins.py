@@ -13,8 +13,6 @@ class Migration:
         if not db.dry_run:
             plugins = orm.CMSPlugin.objects.all().order_by('page', 'position')
             for plugin in plugins:
-                print plugin
-                print dir(plugin)
                 if not plugin.parent_id and plugin.position:
                     plugin.tree_id = plugin.position
                     plugin.save()

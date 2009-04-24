@@ -68,7 +68,6 @@ def add_plugin(request):
             position = None
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         if parent:
-            print "new parent", parent
             plugin.parent = parent
         plugin.save()
         if 'reversion' in settings.INSTALLED_APPS:
