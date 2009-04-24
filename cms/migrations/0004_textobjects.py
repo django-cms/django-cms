@@ -8,7 +8,7 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'CMSPlugin.position'
-        db.alter_column('cms_cmsplugin', 'position', models.PositiveSmallIntegerField(_("position"), null=True, editable=False, blank=True))
+        db.alter_column('cms_cmsplugin', 'position', models.SmallIntegerField(_("position"), null=True, editable=False, blank=True))
         
         # Adding field 'CMSPlugin.parent'
         db.add_column('cms_cmsplugin', 'parent', models.ForeignKey(orm.CMSPlugin, null=True, editable=False, blank=True))
@@ -18,7 +18,7 @@ class Migration:
     def backwards(self, orm):
         
         # Deleting field 'CMSPlugin.position'
-        db.alter_column('cms_cmsplugin', 'position', models.PositiveSmallIntegerField(_("position"), default=0, editable=False))
+        db.alter_column('cms_cmsplugin', 'position', models.SmallIntegerField(_("position"), default=0, editable=False))
         
         # Deleting field 'CMSPlugin.parent'
         db.delete_column('cms_cmsplugin', 'parent_id')
