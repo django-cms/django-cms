@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'cms.plugins.picture',
     'cms.plugins.file',
     'cms.plugins.flash',
+    'cms.plugins.link',
     'mptt',
     'reversion',
     'example.categories',
@@ -124,6 +125,8 @@ CMS_TEMPLATES = (
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
+
+SOUTH_AUTO_FREEZE_APP = True
 
 try:
     from local_settings import *
