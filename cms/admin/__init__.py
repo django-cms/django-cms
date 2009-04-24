@@ -149,7 +149,7 @@ class PageAdmin(admin.ModelAdmin):
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[1][1]['fields'].remove('status')
-            if not obj.has_softroot_permission(request):
+            if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
