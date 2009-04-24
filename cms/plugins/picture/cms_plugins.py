@@ -6,8 +6,8 @@ from cms.plugins.picture.models import Picture
 class PicturePlugin(CMSPluginBase):
     model = Picture
     name = _("Picture")
-    form_template = "picture/form.html"
-    render_template = "picture/plugin.html"
+    render_template = "cms/plugins/picture.html"
+    text_enabled = True
     
     def render(self, context, instance, placeholder):
         return {'picture':instance, 'placeholder':placeholder}
