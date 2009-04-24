@@ -66,9 +66,9 @@ def add_plugin(request):
             placeholder = parent.placeholder
             language = parent.language
             position = None
-        print language
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         if parent:
+            print "new parent", parent
             plugin.parent = parent
         plugin.save()
         if 'reversion' in settings.INSTALLED_APPS:
@@ -117,6 +117,11 @@ def edit_plugin(request, plugin_id):
         instance.placeholder = cms_plugin.placeholder
         instance.language = cms_plugin.language
         instance.plugin_type = cms_plugin.plugin_type
+        instance.lft = cms_plugin.lft
+        instance.rght = cms_plugin.rght
+        instance.tree_id = cms_plugin.tree_id
+        instance.parent = cms_plugin.parent
+        instance.level = cms_plugin.level
         form_class = plugin_class.get_form(request, instance.placeholder)
         form = form_class(request.POST, request.FILES, instance=instance)
         if form.is_valid():
@@ -143,7 +148,6 @@ def edit_plugin(request, plugin_id):
             form = form_class(instance=instance) 
         else:
             form = form_class() 
-            print form.as_p()
     if plugin_class.form_template:
         template = plugin_class.form_template
     else:

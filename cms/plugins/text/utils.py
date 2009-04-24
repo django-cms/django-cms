@@ -3,6 +3,7 @@ Created on Apr 8, 2009
 
 @author: patricklauber
 '''
+from cms.models import CMSPlugin
 import re
 
 OBJ_TAG_RE = re.compile(u"\{\{ plugin_object (\d+) \}\}")
@@ -13,7 +14,6 @@ def plugin_tags_to_admin_html(text):
     Convert plugin object 'tags' into the form used to represent
     them in the admin text editor.
     """
-    print text
     def _tag_to_admin(m):
         plugin_id = int(m.groups()[0])
         try:
@@ -32,7 +32,6 @@ def plugin_tags_to_admin_html(text):
     return OBJ_TAG_RE.sub(_tag_to_admin, text)
 
 def plugin_tags_to_user_html(text, context, placeholder):
-    print text
     """
     Convert plugin object 'tags' into the form for public site.
 
@@ -47,7 +46,7 @@ def plugin_tags_to_user_html(text, context, placeholder):
             # end user so just remove it from the HTML altogether
             return u''
         return obj.render_plugin(context, placeholder)
-    return OBJ_TAG_RE.sub(_render_tag, text)
+    return OBJ_ADMIN_RE.sub(_render_tag, text)
 
 
 

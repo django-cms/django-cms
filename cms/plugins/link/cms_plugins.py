@@ -12,8 +12,8 @@ class LinkPlugin(CMSPluginBase):
     text_enabled = True
     
     def render(self, context, instance, placeholder):
-        if instance.link:
-            link = instance.link
+        if instance.url:
+            link = instance.url
         if instance.page:
             link = instance.page.get_absolute_url()
         return {'name':instance.name,

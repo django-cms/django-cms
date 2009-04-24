@@ -42,7 +42,6 @@ class CMSPluginBase(admin.ModelAdmin):
         Return the URL for an image to be used for an icon for this
         plugin instance in a text editor.
         """
-        print instance
         raise NotImplementedError
 
     def icon_alt(self, instance):
@@ -50,7 +49,7 @@ class CMSPluginBase(admin.ModelAdmin):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (self.name, unicode(instance))
+        return "%s - %s" % (unicode(self.name), unicode(instance))
     
     def __repr__(self):
         return smart_str(self.name)
