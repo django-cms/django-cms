@@ -14,10 +14,18 @@ Plugins included at the moment:
 * Picture
 * Flash
 * File
+* Links
 
 many more are in the works.
 
 Plugins are very easy to write and you can easily write them on your own and connect them with your own models.
+
+![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen3.png "Tree / List view")
+
+![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen1.png "Edit view")
+
+![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen2.png "Plugin Editor with Textplugin")
+
 
 For a feature comparison of all the cms apps available for django see: [CMSComparison](http://code.djangoproject.com/wiki/CMSAppsComparison)
 
