@@ -396,8 +396,6 @@ class Title(models.Model):
                 descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
                 descendant_title.save()
 
-    class Meta:
-        unique_together = ('language', 'page')
     @property
     def overwrite_url(self):
         """Return overrwriten url, or None
@@ -433,9 +431,14 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
     
-    def get_plugin_instance(self):
+    
+    def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
-        plugin = plugin_pool.get_plugin(self.plugin_type)()
+        return plugin_pool.get_plugin(self.plugin_type)
+        
+    def get_plugin_instance(self, *args, **kwargs):
+        from cms.plugin_pool import plugin_pool
+        plugin = plugin_pool.get_plugin(self.plugin_type)(*args, **kwargs)
         if plugin.model != CMSPlugin:
             try:
                 instance = getattr(self, plugin.model.__name__.lower())

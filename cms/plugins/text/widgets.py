@@ -12,11 +12,10 @@ from django.utils.translation.trans_real import get_language
 class WYMEditor(Textarea):
     class Media:
         js = [join(CMS_MEDIA_URL, path) for path in (
-            'javascript/jquery.js',
+            #'javascript/jquery.js', # NOTE: jquery is already available (loaded from plugin_change_form.html) 
             'wymeditor/jquery.wymeditor.js',
             'wymeditor/plugins/resizable/jquery.wymeditor.resizable.js',
             'javascript/wymeditor/plugins/wymeditor.placeholdereditor.js',
-            #
             'javascript/ui.core.js',
             #'javascript/placeholder_editor.js',
             'javascript/placeholder_editor_registry.js',

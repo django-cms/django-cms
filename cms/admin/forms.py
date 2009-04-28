@@ -53,3 +53,4 @@ class PageForm(forms.ModelForm):
             if not any_path_re.match(url):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
+
