@@ -6,7 +6,6 @@ from cms.models import CMSPlugin
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
 
-
 class Store(CMSPlugin):
     """Simple store example - for testing admin inlines
     """
@@ -32,6 +31,7 @@ class StoreItem(models.Model):
         
     __unicode__ = lambda self: self.name
 
+
 if 'reversion' in settings.INSTALLED_APPS:
     try:
         # seems there is some issue with reversion, probably this get imported
@@ -40,3 +40,4 @@ if 'reversion' in settings.INSTALLED_APPS:
         reversion.register(StoreItem)
     except:
         pass    
+
