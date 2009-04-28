@@ -1,6 +1,11 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
+
+if 'reversion' in settings.INSTALLED_APPS:
+    import reversion
+
 
 class Store(CMSPlugin):
     """Simple store example - for testing admin inlines
@@ -26,4 +31,12 @@ class StoreItem(models.Model):
         verbose_name_plural=_('Store items')
         
     __unicode__ = lambda self: self.name
-    
+
+if 'reversion' in settings.INSTALLED_APPS:
+    try:
+        # seems there is some issue with reversion, probably this get imported
+        # more than once, so avoid multiple registrations
+        reversion.register(Store, follow=["cmsplugin_ptr", "storeitem_set"])
+        reversion.register(StoreItem)
+    except:
+        pass    

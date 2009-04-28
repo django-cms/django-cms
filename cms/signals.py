@@ -1,20 +1,7 @@
 from django.db.models import signals
 from cms import settings as cms_settings, appresolver
 from cms.models import signals as cms_signals, Page, Title
-from cms.models import CMSPlugin
-
-# Is this still required?
-#def clear_site_cache(sender, instance, **kwargs):
-#    """
-#    Clears site cache in case a Site instance has been created or an existing
-#    is deleted. That's required to use RequestSite objects properly.
-#    """
-#    if instance.domain in SITE_CACHE:
-#        del SITE_CACHE[instance.domain]
-#
-#signals.pre_delete.connect(clear_site_cache, sender=Site)
-#signals.post_save.connect(clear_site_cache, sender=Site)
-        
+from cms.models import CMSPlugin        
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
@@ -45,10 +32,10 @@ def pre_save_title(instance, raw, **kwargs):
     instance.tmp_path = None
     instance.tmp_application_urls = None
     
-    if not instance.id:
-        tmp_title = Page.objects.get(pk=instance.id)
+    if instance.id:
+        tmp_title = Title.objects.get(pk=instance.id)
         instance.tmp_path = tmp_title.path
-        instance.tmp_application_urls = tmp_title.appliction_urls
+        instance.tmp_application_urls = tmp_title.application_urls
     
     # Build path from parent page's path and slug
     if instance.has_url_overwrite and instance.path:
