@@ -82,59 +82,76 @@ def add_plugin(request):
 if 'reversion' in settings.INSTALLED_APPS:
     add_plugin = revision.create_on_success(add_plugin)
 
-def edit_plugin(request, plugin_id):
+def edit_plugin(request, plugin_id, admin_site):
+    plugin_id = int(plugin_id)
     if not 'history' in request.path:
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-        instance, plugin_class = cms_plugin.get_plugin_instance()
+        instance, admin = cms_plugin.get_plugin_instance(admin_site)
     else:
-        plugin_id = int(plugin_id)
+        # history view with reversion
         from reversion.models import Version
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+        
         for rev in revs:
             obj = rev.object
             if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
                 cms_plugin = obj
                 break
-        inst, plugin_class = cms_plugin.get_plugin_instance()
+        inst, admin = cms_plugin.get_plugin_instance(admin_site)
         instance = None
+        
         for rev in revs:
             obj = rev.object
             if obj.__class__ == inst.__class__ and int(obj.pk) == plugin_id:
                 instance = obj
                 break
         if not instance:
+            # TODO: this should be changed, and render something else.. There 
+            # can be case when plugin is not using (registered) with reversion
+            # so it doesn't haves any version - it should just render plugin
+            # and say something like - not in version system..
             raise Http404
+        
+    # assign required variables to admin
+    admin.cms_plugin_instance = cms_plugin
+    admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
     
     if request.method == "POST":
-        if not instance:
-            instance = plugin_class.model()    
-        instance.pk = cms_plugin.pk
-        instance.page = cms_plugin.page
-        instance.position = cms_plugin.position
-        instance.placeholder = cms_plugin.placeholder
-        instance.language = cms_plugin.language
-        instance.plugin_type = cms_plugin.plugin_type
-        instance.lft = cms_plugin.lft
-        instance.rght = cms_plugin.rght
-        instance.tree_id = cms_plugin.tree_id
-        instance.parent = cms_plugin.parent
-        instance.level = cms_plugin.level
-        form_class = plugin_class.get_form(request, instance.placeholder)
-        form = form_class(request.POST, request.FILES, instance=instance)
-        if form.is_valid():
-            if 'history' in request.path:
-                return render_to_response('admin/cms/page/plugin_forms_history.html', {'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))
-            inst = form.save()
-            inst.page.save()
-            if 'reversion' in settings.INSTALLED_APPS:
-                save_all_plugins(inst.page, [inst.pk])
-                revision.user = request.user
-                plugin_name = unicode(plugin_pool.get_plugin(inst.plugin_type).name)
-                revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
-                
+        # set the continue flag, otherwise will admin make redirect to list
+        # view, which actually does'nt exists
+        request.POST['_continue'] = True
+    
+    if 'reversion' in settings.INSTALLED_APPS and 'history' in request.path:
+        # in case of looking to history just render the plugin content
+        context = RequestContext(request)
+        return render_to_response(admin.render_template, admin.render(context, instance, admin.placeholder), context)
+    
+    
+    if not instance:
+        # instance doesn't exist, call add view
+        response = admin.add_view(request)
+
+    else:
+        # already saved before, call change view
+        # we actually have the instance here, but since i won't override  
+        # change_view method, is better if it will be loaded again, so 
+        # just pass id to admin
+        response = admin.change_view(request, plugin_id)
+    
+    if request.method == "POST":
+        # if reversion is installed, save version of the page plugins
+        if 'reversion' in settings.INSTALLED_APPS and admin.object_successfully_changed:
+            # perform this only if object was successfully changed
+            cms_plugin.page.save()
+            save_all_plugins(cms_plugin.page, [cms_plugin.pk])
+            revision.user = request.user
+            plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
+            revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':cms_plugin.position, 'placeholder': cms_plugin.placeholder}
             
+            # TODO: integrate on plugin close
+            """
             icon = force_escape(escapejs(cms_plugin.get_instance_icon_src()))
             alt = force_escape(escapejs(cms_plugin.get_instance_icon_alt()))
             return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 
@@ -146,17 +163,8 @@ def edit_plugin(request, plugin_id):
                                                                              'icon':icon,
                                                                              'alt':alt,
                                                                              }, RequestContext(request))
-    else:
-        form_class = plugin_class.get_form(request, cms_plugin.placeholder) 
-        if instance:
-            form = form_class(instance=instance) 
-        else:
-            form = form_class() 
-    if plugin_class.form_template:
-        template = plugin_class.form_template
-    else:
-        template = 'admin/cms/page/plugin_forms.html'
-    return render_to_response(template, {'form':form, 'plugin':cms_plugin, 'instance':instance, 'is_popup':True, 'CMS_MEDIA_URL':settings.CMS_MEDIA_URL}, RequestContext(request))
+            """
+    return response
 
 if 'reversion' in settings.INSTALLED_APPS:
     edit_plugin = revision.create_on_success(edit_plugin)
@@ -209,7 +217,11 @@ def save_all_plugins(page, excludes=None):
         if excludes:
             if plugin.pk in excludes:
                 continue
-        plugin.save()
+        instance, admin = plugin.get_plugin_instance()
+        if instance:
+            instance.save()
+        else:
+            plugin.save()
         
 def revert_plugins(request, version_id):
     from reversion.models import Version
