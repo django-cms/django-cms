@@ -1,20 +1,23 @@
-from cms.models import CMSPlugin
-from cms.exceptions import SubClassNeededError, MissingFormError
-from django.forms.models import ModelForm
 from django.conf import settings
+from cms.models import CMSPlugin
+from cms.exceptions import SubClassNeededError
+from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.contrib import admin
 
 class CMSPluginBase(admin.ModelAdmin):
     name = ""
     form = None
-    form_template = None
+    
+    change_form_template = "admin/cms/page/plugin_change_form.html"
+    
     render_template = None
     model = CMSPlugin
-    placeholders = None # a tupple with placehodler names this plugin can be placed. All if empty
+    opts = {}
+    placeholders = None # a tupple with placeholder names this plugin can be placed. All if empty
     text_enabled = False
     
-    def __init__(self):
+    def __init__(self, admin_site=None):
         if self.model:
             if not CMSPlugin in self.model._meta.parents and self.model != CMSPlugin:
                 raise SubClassNeededError, "plugin model needs to subclass CMSPlugin" 
@@ -24,19 +27,70 @@ class CMSPluginBase(admin.ModelAdmin):
                         model = self.model
                         exclude = ('page', 'position', 'placeholder', 'language', 'plugin_type')
                 self.form = DefaultModelForm
-
-      
+        
+        if admin_site:
+            super(CMSPluginBase, self).__init__(self.model, admin_site)
+        
+        self.object_successfully_changed = False
+        
+        # variables will be overriden in edit_view, so we got requred 
+        self.cms_plugin_instance = None
+        self.placeholder = None
+    
+    
     def render(self, context, placeholder):
         raise NotImplementedError, "render needs to be implemented"
     
-    def get_form(self, request, placeholder):
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        """We just need the popup interface here
         """
-        used for editing the plugin
-        """
-        if self.form:
-            return self.form
-        raise MissingFormError("this plugin doesn't have a form")
+        context.update({
+            'is_popup': True,
+            'plugin': self.cms_plugin_instance,
+        })
+        
+        return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
     
+    def save_model(self, request, obj, form, change):
+        """Override original method, and add some attributes to obj
+        
+        This have to be made, because if object is newly created, he must know
+        where he belives.
+        
+        Attributes from cms_plugin_instance have to be assigned to object, if 
+        is cms_plugin_instance attribute available. 
+        """
+        
+        if getattr(self, "cms_plugin_instance"):
+            # assign stuff to object
+            fields = self.cms_plugin_instance._meta.fields
+            for field in fields:
+                # assign all the fields - we can do this, because object is
+                # subclassing cms_plugin_instance (one to one relation)
+                value = getattr(self.cms_plugin_instance, field.name)
+                setattr(obj, field.name, value)
+        
+        return super(CMSPluginBase, self).save_model(request, obj, form, change)
+    
+    def response_change(self, request, obj):
+        """Just set a flag, so we know something was changed, and can make
+        new version if reversion installed. 
+        
+        New version will be created in admin.views.edit_plugin
+        """
+        self.object_successfully_changed = True
+        return super(CMSPluginBase, self).response_change(request, obj)
+    
+    def response_add(self, request, obj):
+        """Just set a flag, so we know something was changed, and can make
+        new version if reversion installed. 
+        
+        New version will be created in admin.views.edit_plugin
+        """
+        self.object_successfully_changed = True
+        return super(CMSPluginBase, self).response_add(request, obj)
+    
+                
     def icon_src(self, instance):
         """
         Overwrite this if text_enabled = True
