@@ -49,7 +49,7 @@ def pre_save_title(instance, raw, **kwargs):
         try:
             tmp_title = Title.objects.get(pk=instance.id)
             instance.tmp_path = tmp_title.path
-            instance.tmp_application_urls = tmp_title.appliction_urls
+            instance.tmp_application_urls = tmp_title.application_urls
         except Title.DoesNotExist:
             instance.tmp_path = ""
             instance.tmp_application_urls = None
