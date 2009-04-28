@@ -6,6 +6,10 @@
 
 {% block content %}
 <script type="text/javascript">
-	parent.hide_iframe({{plugin.pk}}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");	
+	if(parent != self){
+		parent.hide_iframe({{plugin.pk}}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
+	}else{
+		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
+	}
 </script>
 {% endblock %}

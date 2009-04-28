@@ -30,7 +30,7 @@ class Text(CMSPlugin):
 
     
     def __unicode__(self):
-        return u"%s" % (truncate_words(strip_tags(self.body), 3))
+        return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Text, follow=["cmsplugin_ptr"])

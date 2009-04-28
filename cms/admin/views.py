@@ -143,14 +143,19 @@ def edit_plugin(request, plugin_id, admin_site):
                 revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(inst.plugin_type).name)
                 revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
-            if request.POST.has_key("_popup") and instance.plugin_type != "TextPlugin":
-                return HttpResponse('<script type="text/javascript">opener.dismissEditPluginPopup(window, "%s", "%s", "%s");</script>' % \
-                                    (plugin_id,
-                                     force_escape(escapejs(cms_plugin.get_instance_icon_src())),
-                                     force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
-                                     )
-                                    )
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True, 'name':unicode(inst), "type":inst.get_plugin_name()}, RequestContext(request))
+                
+            
+            icon = force_escape(escapejs(cms_plugin.get_instance_icon_src()))
+            alt = force_escape(escapejs(cms_plugin.get_instance_icon_alt()))
+            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 
+                                                                             'plugin':cms_plugin, 
+                                                                             'is_popup':True, 
+                                                                             'name':unicode(inst), 
+                                                                             "type":inst.get_plugin_name(),
+                                                                             'plugin_id':plugin_id,
+                                                                             'icon':icon,
+                                                                             'alt':alt,
+                                                                             }, RequestContext(request))
     else:
         form_class = plugin_class.get_form(request, cms_plugin.placeholder) 
         if instance:
@@ -196,13 +201,14 @@ def remove_plugin(request):
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
         page = plugin.page
         plugin.delete()
+        plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+        comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
         if 'reversion' in settings.INSTALLED_APPS:
             save_all_plugins(page)
             page.save()
             revision.user = request.user
-            plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
-            revision.comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
-        return HttpResponse(str(plugin_id))
+            revision.comment = comment
+        return HttpResponse("%s,%s" % (plugin_id, comment))
     raise Http404
 
 if 'reversion' in settings.INSTALLED_APPS:

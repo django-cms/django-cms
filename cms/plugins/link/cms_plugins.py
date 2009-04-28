@@ -14,8 +14,8 @@ class LinkPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         if instance.url:
             link = instance.url
-        if instance.page:
-            link = instance.page.get_absolute_url()
+        if instance.page_link:
+            link = instance.page_link.get_absolute_url()
         return {'name':instance.name,
                 'link':link, 
                 'placeholder':placeholder}
