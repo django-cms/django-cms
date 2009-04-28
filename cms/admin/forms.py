@@ -2,6 +2,7 @@ from django import forms
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
+from django.forms.util import ErrorList
 from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
 from cms.models import Page, Title
 from cms.urlutils import any_path_re
@@ -22,12 +23,14 @@ class PageForm(forms.ModelForm):
     
     class Meta:
         model = Page
-
-    def clean_slug(self):
-        slug = slugify(self.cleaned_data['slug'])
+    
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        slug = cleaned_data['slug']
+        
         page = self.instance
-        lang = self.cleaned_data['language']
-        parent = self.cleaned_data['parent']
+        lang = cleaned_data['language']
+        parent = cleaned_data['parent']
         if CMS_UNIQUE_SLUGS:
             titles = Title.objects.filter(slug=slug)
         else:
@@ -37,7 +40,11 @@ class PageForm(forms.ModelForm):
         if self.instance.pk:
             titles = titles.exclude(language=lang, page=page)
         if titles.count():
-            raise forms.ValidationError(ugettext_lazy('Another page with this slug already exists'))
+            self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
+            del cleaned_data['slug']
+        return cleaned_data
+    def clean_slug(self):
+        slug = slugify(self.cleaned_data['slug'])
         return slug
     
     def clean_reverse_id(self):
