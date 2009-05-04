@@ -13,6 +13,7 @@ add the following to your INSTALLED_APPS in your settings.py:
     	'cms',
     	'cms.plugins.text',
     	'cms.plugins.picture',
+		'cms.plugins.link',
     	'mptt',
     	...
     
@@ -25,7 +26,6 @@ add the following middlewares:
 
 	MIDDLEWARE_CLASSES = (
     	...
-    	'cms.middleware.CurrentSiteMiddleware',
     	'cms.middleware.CurrentPageMiddleware',
     	'cms.middleware.MultilingualURLMiddleware',
     	...
