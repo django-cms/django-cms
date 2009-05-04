@@ -14,10 +14,11 @@ add the following to your INSTALLED_APPS in your settings.py:
     	'cms.plugins.text',
     	'cms.plugins.picture',
 		'cms.plugins.link',
+		'cms.plugins.file',
     	'mptt',
     	...
     
-Django-cms 2.0 is compatible with django-reversion for versioning all the page content and its plugins.
+Django-cms 2.0 is compatible with [django-reversion](http://code.google.com/p/django-reversion/) for versioning all the page content and its plugins.
 
 Middleware
 ----------
@@ -60,7 +61,7 @@ Add some template names you use and that have some placeholder templatetags pres
     	('base.html', gettext('default')),
     	('2col.html', gettext('2 Column')),
     	('3col.html', gettext('3 Column')),
-    	('extra.html', gettext('Some extra wired template')),
+    	('extra.html', gettext('Some extra fancy template')),
 	)
 	
 For some template examples see the templates used in the example project
@@ -91,7 +92,7 @@ Other settings
 
 For a list of all settings that can be overwritten in your settings.py have a look at cms/settings.py
 
-More information is available in the docs folder: cms/docs/
+More information is available in the docs folder: [cms/docs/](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs)
 or have a look at the example project
 
 
