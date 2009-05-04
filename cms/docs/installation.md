@@ -47,15 +47,22 @@ add the following context processors if not already present:
 Templates
 ---------
 
-Add some template names you use and that have some placeholder templatetags present to your settings.py
 
+If you don't have already a gettext stub in your settings.py put this in your settings.py after the imports:
+
+	gettext = lambda s: s
+	
+This allows you to use gettext in the settings.py
+
+Add some template names you use and that have some placeholder templatetags present to your settings.py
+	
 	CMS_TEMPLATES = (
     	('base.html', gettext('default')),
     	('2col.html', gettext('2 Column')),
     	('3col.html', gettext('3 Column')),
     	('extra.html', gettext('Some extra wired template')),
 	)
-
+	
 For some template examples see the templates used in the example project
 
 a quick example:
