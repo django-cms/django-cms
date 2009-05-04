@@ -138,7 +138,7 @@ def edit_plugin(request, plugin_id, admin_site):
         # we actually have the instance here, but since i won't override  
         # change_view method, is better if it will be loaded again, so 
         # just pass id to admin
-        response = admin.change_view(request, plugin_id)
+        response = admin.change_view(request, str(plugin_id))
     
     if request.method == "POST":
         # if reversion is installed, save version of the page plugins
