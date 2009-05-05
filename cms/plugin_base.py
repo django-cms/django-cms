@@ -70,6 +70,9 @@ class CMSPluginBase(admin.ModelAdmin):
                 value = getattr(self.cms_plugin_instance, field.name)
                 setattr(obj, field.name, value)
         
+        # remember the saved object
+        self.saved_object = obj
+        
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
     
     def response_change(self, request, obj):

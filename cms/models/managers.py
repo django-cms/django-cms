@@ -3,8 +3,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Q
 from datetime import datetime
 from cms import settings
-from cms.urlutils import levelize_path
-
+from cms.utils.urlutils import levelize_path
 
 class PageManager(models.Manager):
     def on_site(self):
@@ -147,9 +146,20 @@ class TitleManager(models.Manager):
             obj = self.model(page=page, language=language, title=title, slug=slug, application_urls=application_urls)
         obj.save()
         return obj
-    
 
+    
 class PagePermissionManager(models.Manager):
+    """Page permission manager.
+    !IMPORTANT: this actually points to Page model, not to PagePermission. Seems 
+    this will be better approach. Can be accessed over Page.permissions
+    
+    Maybe this even shouldn't be a manager - it mixes different models together.
+    """
+    
+    # we will return this in case we have a superuser, or permissions are not
+    # enabled/configured in settings
+    GRANT_ALL = 'All'
+    
     
     def get_publish_id_list(self, user):
         """
@@ -172,9 +182,19 @@ class PagePermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_change_softroot")
     
-    def __get_id_list(self, user, attr):
-        if user.is_superuser:
-            return 'All'
+    def get_change_permissions_id_list(self, user):
+        """
+        Give a list of page where the user can change permissions.
+        """
+        return self.__get_id_list(user, "can_change_permissions")
+    
+    """
+    def x__get_id_list(self, user, attr):
+        if user.is_superuser or not settings.CMS_PERMISSION:
+            # got superuser, or permissions aren't enabled? just return grant 
+            # all mark
+            return PagePermissionManager.GRANT_ALL
+        
         allow_list = []
         deny_list = []
         group_ids = user.groups.all().values_list('id', flat=True)
@@ -214,3 +234,39 @@ class PagePermissionManager(models.Manager):
         #    if id in allow_list:
         #        allow_list.remove(id)
         return allow_list
+        """
+    def __get_id_list(self, user, attr):
+        
+        if user.is_superuser or not settings.CMS_PERMISSION:
+            # got superuser, or permissions aren't enabled? just return grant 
+            # all mark
+            return PagePermissionManager.GRANT_ALL
+        
+        from cms.models import GlobalPagePermission, PagePermission
+        # check global permissions
+        filter = {}
+        filter[attr] = True
+        in_global_permissions = GlobalPagePermission.objects.filter(Q(user=user) | Q(group__user=user), **filter)
+        if in_global_permissions:
+            # user or his group are allowed to do `attr` action
+            # !IMPORTANT: page permissions must not override global permissions 
+            return PagePermissionManager.GRANT_ALL
+        
+        # for standard users without global permissions, get all pages for him or
+        # his group/s
+        qs = PagePermission.objects.filter(Q(user=user) | Q(group__user=user))
+        qs.order_by('page__tree_id', 'page__level', 'page__lft')
+        
+        # default is denny...
+        
+        page_id_allow_list = []
+        for permission in qs:
+            is_allowed = getattr(permission, attr)
+            if is_allowed:
+                if permission.grant_on & PagePermission.MASK_PAGE:
+                    page_id_allow_list.append(permission.page.id)
+                if permission.grant_on & PagePermission.MASK_CHILDREN:
+                    page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
+                elif permission.grant_on & PagePermission.MASK_DESCENDANTS:
+                    page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
+        return page_id_allow_list

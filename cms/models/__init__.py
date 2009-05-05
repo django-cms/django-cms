@@ -1,3 +1,4 @@
+import urllib2
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User, Group
@@ -9,12 +10,11 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from os.path import join
-import urllib2
-from cms.urlutils import urljoin
+from cms.utils.urlutils import urljoin
 
 import mptt
 from cms import settings
-from cms.models.managers import PageManager, PagePermissionManager, TitleManager
+from cms.models.managers import PageManager, TitleManager, PagePermissionManager
 from cms.models import signals as cms_signals
 
 
@@ -58,6 +58,7 @@ class Page(models.Model):
     
     # Managers
     objects = PageManager()
+    permissions = PagePermissionManager()
 
     class Meta:
         verbose_name = _('page')
@@ -271,6 +272,9 @@ class Page(models.Model):
     def has_softroot_permission(self, request):
         return self.has_generic_permission(request, "softroot")
     
+    def has_change_permissions_permission(self, request):
+        return self.has_generic_permission(request, "change_permissions")
+    
     def has_generic_permission(self, request, type):
         """
         Return true if the current user has permission on the page.
@@ -285,7 +289,7 @@ class Page(models.Model):
         else:
             att_name = "permission_%s_cache" % type
             if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) or request.user.pk != self.permission_user_cache.pk:
-                func = getattr(PagePermission.objects, "get_%s_id_list" % type)
+                func = getattr(Page.permissions, "get_%s_id_list" % type)
                 permission = func(request.user)
                 self.permission_user_cache = request.user
                 if permission == "All" or self.id in permission:
@@ -321,40 +325,81 @@ except mptt.AlreadyRegistered:
     pass
 
 if settings.CMS_PERMISSION:
-    class PagePermission(models.Model):
+    
+    class AbstractPagePermission(models.Model):
+        """Abstract page permissions
         """
-        Page permission object
-        """
-        
-        ALLPAGES = 0
-        THISPAGE = 1
-        PAGECHILDREN = 2
-        
-        TYPES = (
-            (ALLPAGES, _('All pages')),
-            (THISPAGE, _('This page only')),
-            (PAGECHILDREN, _('This page and all childrens')),
-        )
-        
-        type = models.IntegerField(_("type"), choices=TYPES, default=0)
-        page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
+        # who:
         user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
         group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
-        everybody = models.BooleanField(_("everybody"), default=False)
+        
+        # what:
         can_edit = models.BooleanField(_("can edit"), default=True)
         can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
         can_publish = models.BooleanField(_("can publish"), default=True)
-        #can_change_innavigation = models.BooleanField(_("can change in-navigation"), default=True)
-        
-        
-        objects = PagePermissionManager()
-        
-        def __unicode__(self):
-            return "%s :: %s" % (self.user, unicode(PagePermission.TYPES[self.type][1]))
+        can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
         
         class Meta:
-            verbose_name = _('Page Permission')
-            verbose_name_plural = _('Page Permissions')
+            abstract = True
+            
+        @property
+        def audience(self):
+            """Return audience by priority, so: All or User, Group                
+            """
+            targets = filter(lambda item: item, (self.user, self.group,))
+            return ", ".join([unicode(t) for t in targets]) or 'No one'
+        
+        def save(self, force_insert=False, force_update=False):
+            if not self.user and not self.group and not self.everybody:
+                # don't allow `empty` objects
+                return
+            return super(AbstractPagePermission, self).save(force_insert, force_update)    
+        
+    class GlobalPagePermission(AbstractPagePermission):
+        """Permissions for all pages (global).
+        """
+        class Meta:
+            verbose_name = _('Page global permission')
+            verbose_name_plural = _('Pages global permissions')
+        
+        __unicode__ = lambda self: "%s :: GLOBAL" % self.audience
+        
+        
+    class PagePermission(AbstractPagePermission):
+        """Page permissions for single page
+        """
+        
+        # NOTE: those are not just numbers!! we will do binary AND on them,
+        # so pay attention when adding/changing them, see MASK_..
+        ACCESS_PAGE = 1
+        ACCESS_CHILDREN = 2 # just immediate children (1 level)
+        ACCESS_PAGE_AND_CHILDREN = 3 # just immediate children (1 level)
+        ACCESS_DESCENDANTS = 4 
+        ACCESS_PAGE_AND_DESCENDANTS = 5
+        
+        _grant_on_choices = (
+            (ACCESS_PAGE, _('Current page')),
+            (ACCESS_CHILDREN, _('Page children (immediate)')),
+            (ACCESS_PAGE_AND_CHILDREN, _('Page and children (immediate)')),
+            (ACCESS_DESCENDANTS, _('Page descendants')),
+            (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
+        )
+        
+        # binary masks for ACCESS permissions
+        MASK_PAGE = 1
+        MASK_CHILDREN = 2
+        MASK_DESCENDANTS = 4
+        
+        grant_on = models.IntegerField(_("Grant on"), choices=_grant_on_choices, default=ACCESS_PAGE)
+        page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
+        
+        class Meta:
+            verbose_name = _('Page permission')
+            verbose_name_plural = _('Page permissions')
+            
+        def __unicode__(self):
+            return "%s :: %s" % (self.audience, unicode(dict(self._grant_on_choices)[self.grant_on][1]))
+        
             
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=3, db_index=True)
@@ -431,14 +476,9 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
     
-    
-    def get_plugin_class(self):
+    def get_plugin_instance(self):
         from cms.plugin_pool import plugin_pool
-        return plugin_pool.get_plugin(self.plugin_type)
-        
-    def get_plugin_instance(self, *args, **kwargs):
-        from cms.plugin_pool import plugin_pool
-        plugin = plugin_pool.get_plugin(self.plugin_type)(*args, **kwargs)
+        plugin = plugin_pool.get_plugin(self.plugin_type)()
         if plugin.model != CMSPlugin:
             try:
                 instance = getattr(self, plugin.model.__name__.lower())
