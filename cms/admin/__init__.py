@@ -8,8 +8,8 @@ from cms.admin.widgets import PluginEditor
 from cms.models import Page, Title, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.settings import CMS_MEDIA_URL
-from cms.utils import (get_template_from_request, has_page_add_permission, 
-    get_language_from_request)
+from cms.utils import get_template_from_request, get_language_from_request
+from cms.utils.permissions import has_page_add_permission
 from cms.views import details
 from copy import deepcopy
 from django.contrib import admin
@@ -28,6 +28,39 @@ from django.views.generic.create_update import redirect
 from inspect import isclass, getmembers
 from os.path import join
 
+PAGE_ADMIN_INLINES = []
+
+if settings.CMS_PERMISSION:
+    from cms.models import PagePermission, GlobalPagePermission
+    class PagePermissionInlineAdmin(admin.TabularInline):
+        model = PagePermission
+        
+        if not settings.CMS_SOFTROOT:
+            exclude = ['can_change_softroot']
+                
+    PAGE_ADMIN_INLINES.append(PagePermissionInlineAdmin)
+
+    class GlobalPagePermissionAdmin(admin.ModelAdmin):
+        list_display = ['user', 'group', 'can_edit', 'can_publish', 'can_change_permissions']
+        list_filter = ['user', 'group', 'can_edit', 'can_publish', 'can_change_permissions']
+        
+        if settings.CMS_SOFTROOT:
+            list_display += ('can_change_softroot', )
+            list_filter += ('can_change_softroot', )
+        
+        search_fields = ('user__username', 'user__firstname', 'user__lastname', 'group__name')
+        
+        if settings.CMS_SOFTROOT:
+            list_display.append('can_change_softroot')
+            list_filter.append('can_change_softroot')
+        else:
+            exclude = ['can_change_softroot']
+        
+    #class PagePermissionAdmin(admin.ModelAdmin):
+    #admin.site.register(PagePermission, PagePermissionAdmin)
+    
+    admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
+
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
@@ -38,8 +71,13 @@ class PageAdmin(admin.ModelAdmin):
     advanced_fields = ['sites', 'in_navigation', 'reverse_id', 'application_urls', 'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
+    
+    list_filter = ['status', 'in_navigation', 'template', 'author']
+    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
+    
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
+        list_filter.append('soft_root')
     if settings.CMS_SHOW_START_DATE:
         advanced_fields.append('publication_date')
     if settings.CMS_SHOW_END_DATE:
@@ -47,6 +85,11 @@ class PageAdmin(admin.ModelAdmin):
     
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
+    
+    list_filter += ['sites']
+    
+    # take care with changing fieldsets, get_fieldsets() method removes some
+    # fields depending on permissions, but its very static!!
     
     fieldsets = [
         (None, {
@@ -65,8 +108,7 @@ class PageAdmin(admin.ModelAdmin):
         }),
     ]
     
-    list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
-    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
+    inlines = PAGE_ADMIN_INLINES
       
     class Media:
         css = {
@@ -141,7 +183,7 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['application_urls'],
             form.cleaned_data['overwrite_url'],
         )
-
+    
     def get_fieldsets(self, request, obj=None):
         """
         Add fieldsets of placeholders to the list of already existing
@@ -149,16 +191,28 @@ class PageAdmin(admin.ModelAdmin):
         """
         template = get_template_from_request(request, obj)
         given_fieldsets = deepcopy(self.fieldsets)
+        
+        print given_fieldsets
+        
         if obj:
             if not obj.has_publish_permission(request):
-                given_fieldsets[1][1]['fields'].remove('status')
+                given_fieldsets[0][1]['fields'].remove('status')
             if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
                 given_fieldsets += [(title(placeholder.name), {'fields':[placeholder.name], 'classes':['plugin-holder']})]        
         return given_fieldsets
-
+    
+    # remove permission inlines, if user isn't allowed to change them
+    def get_formsets(self, request, obj=None):
+        for inline in self.inline_instances:
+            if obj and settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
+                if not obj.has_change_permissions_permission(request):
+                    continue
+            yield inline.get_formset(request, obj)
+    
+    
     def save_form(self, request, form, change):
         """
         Given a ModelForm return an unsaved instance. ``change`` is True if
@@ -191,7 +245,7 @@ class PageAdmin(admin.ModelAdmin):
             else:
                 if 'status' in self.exclude:
                     self.exclude.remove('status')
-            if not obj.has_softroot_permission(request):
+            if not obj.has_softroot_permission(request) and settings.CMS_SOFTROOT:
                 self.exclude.append('soft_root')
             else:
                 if 'soft_root' in self.exclude:
@@ -381,38 +435,13 @@ if 'reversion' in settings.INSTALLED_APPS:
 else:
     admin.site.register(Page, PageAdmin)
 
-class ContentAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'type', 'language', 'page')
-    list_filter = ('page',)
-    search_fields = ('body',)
+#class ContentAdmin(admin.ModelAdmin):
+#    list_display = ('__unicode__', 'type', 'language', 'page')
+#    list_filter = ('page',)
+#    search_fields = ('body',)
 
-class TitleAdmin(admin.ModelAdmin):
-    prepopulated_fields = {"slug": ("title",)}
+#class TitleAdmin(admin.ModelAdmin):
+#    prepopulated_fields = {"slug": ("title",)}
 
 #admin.site.register(Content, ContentAdmin)
 #admin.site.register(Title, TitleAdmin)
-
-if settings.CMS_PERMISSION:
-    from cms.models import PagePermission
-    
-    class PermissionAdmin(admin.ModelAdmin):
-        list_display = ('user',
-                        'group',
-                        'everybody',
-                        'page', 
-                        'type', 
-                        'can_edit',
-                        'can_publish',
-                        'can_change_softroot'
-                        #'can_change_innavigation',
-                        )
-        list_filter = ('group', 
-                       'user', 
-                       'everybody', 
-                       'type', 
-                       'can_edit',
-                       'can_publish',
-                       'can_change_softroot',
-                       )
-        search_fields = ('user__username', 'user__firstname', 'user__lastname', 'group__name')
-    admin.site.register(PagePermission, PermissionAdmin)

@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
 from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
 from cms.models import Page, Title
-from cms.urlutils import any_path_re
+from cms.utils.urlutils import any_path_re
 
 class PageForm(forms.ModelForm):
     APPLICATION_URLS = (('', '----------'), ) + CMS_APPLICATIONS_URLS
