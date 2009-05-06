@@ -1,17 +1,4 @@
-from cms import settings
-from cms.admin.change_list import CMSChangeList
-from cms.admin.forms import PageForm
-from cms.admin.utils import get_placeholders
-from cms.admin.views import (change_status, change_innavigation, add_plugin, 
-    edit_plugin, remove_plugin, move_plugin, revert_plugins)
-from cms.admin.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin
-from cms.plugin_pool import plugin_pool
-from cms.settings import CMS_MEDIA_URL
-from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.permissions import has_page_add_permission
-from cms.views import details
-from copy import deepcopy
+from os.path import join
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
@@ -26,17 +13,60 @@ from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.generic.create_update import redirect
 from inspect import isclass, getmembers
-from os.path import join
+from copy import deepcopy
+
+from cms import settings
+from cms.admin.change_list import CMSChangeList
+from cms.admin.forms import PageForm
+from cms.admin.utils import get_placeholders
+from cms.admin.views import (change_status, change_innavigation, add_plugin, 
+    edit_plugin, remove_plugin, move_plugin, revert_plugins)
+from cms.admin.widgets import PluginEditor
+from cms.models import Page, Title, CMSPlugin
+from cms.plugin_pool import plugin_pool
+from cms.settings import CMS_MEDIA_URL
+from cms.utils import get_template_from_request, get_language_from_request
+from cms.utils.permissions import has_page_add_permission
+from cms.views import details
+from cms.admin.models import BaseInlineFormSetWithQuerySet
 
 PAGE_ADMIN_INLINES = []
 
+################################################################################
+# Permissions
+################################################################################
+
 if settings.CMS_PERMISSION:
     from cms.models import PagePermission, GlobalPagePermission
+    
     class PagePermissionInlineAdmin(admin.TabularInline):
         model = PagePermission
+        formset = BaseInlineFormSetWithQuerySet
         
         if not settings.CMS_SOFTROOT:
             exclude = ['can_change_softroot']
+            
+        def queryset(self, request):
+            """Queryset change, so user with global change permissions can see
+            all permissions. Otherwise can user see only permissions for 
+            peoples which are under him (he can't see his permissions, because
+            this will lead to violation, when he can add more power to itself)
+            """
+            # can see only permissions for users which are under him in tree
+            qs = PagePermission.objects.followed_after_user(request.user)
+            return qs
+        
+        def get_formset(self, request, obj=None, **kwargs):
+            """Seems django doesn't cares about queryset defined here - its 
+            probably a bug, so monkey patching again.. Assign use_queryset
+            attribute to FormSet, our overiden formset knows how to handle
+            this, @see BaseInlineFormSetWithQuerySet for more details.
+            """
+            FormSet = super(PagePermissionInlineAdmin, self).get_formset(request, obj=None, **kwargs)
+            # asign queryset 
+            FormSet.use_queryset = self.queryset(request)
+            return FormSet
+        
                 
     PAGE_ADMIN_INLINES.append(PagePermissionInlineAdmin)
 
@@ -56,10 +86,11 @@ if settings.CMS_PERMISSION:
         else:
             exclude = ['can_change_softroot']
         
-    #class PagePermissionAdmin(admin.ModelAdmin):
-    #admin.site.register(PagePermission, PagePermissionAdmin)
-    
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
+
+################################################################################
+# Page
+################################################################################
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -192,8 +223,6 @@ class PageAdmin(admin.ModelAdmin):
         template = get_template_from_request(request, obj)
         given_fieldsets = deepcopy(self.fieldsets)
         
-        print given_fieldsets
-        
         if obj:
             if not obj.has_publish_permission(request):
                 given_fieldsets[0][1]['fields'].remove('status')
@@ -240,16 +269,17 @@ class PageAdmin(admin.ModelAdmin):
         the request.
         """
         if obj:
-            if not obj.has_publish_permission(request):
+            if not obj.has_publish_permission(request) and not 'status' in self.exclude:
                 self.exclude.append('status')
-            else:
-                if 'status' in self.exclude:
-                    self.exclude.remove('status')
-            if not obj.has_softroot_permission(request) and settings.CMS_SOFTROOT:
-                self.exclude.append('soft_root')
-            else:
-                if 'soft_root' in self.exclude:
-                    self.exclude.remove('soft_root')
+            elif 'status' in self.exclude:
+                self.exclude.remove('status')
+            
+            if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request) \
+                and not 'soft_root' in self.exclude: 
+                    self.exclude.append('soft_root')
+            elif 'soft_root' in self.exclude:
+                self.exclude.remove('soft_root')
+        
         version_id = None
         versioned = False
         if "history" in request.path or 'recover' in request.path:
