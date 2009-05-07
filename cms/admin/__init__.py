@@ -40,11 +40,13 @@ if settings.CMS_PERMISSION:
     from cms.models import PagePermission, GlobalPagePermission, ExtUser, \
         ExtGroup
         
-    admin.site.register(ExtGroup)
-    admin.site.register(ExtUser)
+    from cms.admin.forms import PagePermissionInlineAdminForm
     
     class PagePermissionInlineAdmin(admin.TabularInline):
         model = PagePermission
+        # use special form, so we can override of user and group field
+        form = PagePermissionInlineAdminForm
+        # use special formset, so we can use queryset defined here
         formset = BaseInlineFormSetWithQuerySet
         
         def __init__(self, *args, **kwargs):
@@ -60,7 +62,7 @@ if settings.CMS_PERMISSION:
             this will lead to violation, when he can add more power to itself)
             """
             # can see only permissions for users which are under him in tree
-            qs = PagePermission.objects.followed_after_user(request.user)
+            qs = PagePermission.objects.subordinate_to_user(request.user)
             return qs
         
         def get_formset(self, request, obj=None, **kwargs):
@@ -88,8 +90,7 @@ if settings.CMS_PERMISSION:
             # asign queryset 
             FormSet.use_queryset = self.queryset(request)
             return FormSet
-                
-                
+        
     PAGE_ADMIN_INLINES.append(PagePermissionInlineAdmin)
 
     class GlobalPagePermissionAdmin(admin.ModelAdmin):
@@ -109,6 +110,11 @@ if settings.CMS_PERMISSION:
             exclude = ['can_change_softroot']
         
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
+    
+    # Keep ExtGroup and ExtUser hidden, there currently isn't any reason for
+    # making them editable. They should just work.
+    #admin.site.register(ExtGroup)
+    #admin.site.register(ExtUser)
 
 ################################################################################
 # Page

@@ -175,7 +175,7 @@ class BasicPagePermissionManager(models.Manager):
 class PagePermissionManager(BasicPagePermissionManager):
     """Page permission manager accessible under objects.
     """
-    def followed_after_user(self, user):
+    def subordinate_to_user(self, user):
         """Get all page permission objects on which user/group is lover in 
         hierarchy then given user and given user can change permissions on them. 
         

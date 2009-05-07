@@ -1,5 +1,7 @@
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
+from django.contrib.auth.models import User, Group
+from django.db.models import Q
 
 try:
     from threading import local
@@ -8,6 +10,19 @@ except ImportError:
 
 # thread local support
 _thread_locals = local()
+
+def set_current_user(user):
+    """Assigns current user from request to thread_locals, used by
+    CurrentUserMiddleware.
+    """
+    _thread_locals.user=user
+
+    
+def get_current_user():
+    """Returns current user, or None
+    """
+    return getattr(_thread_locals, 'user', None)
+
 
 def has_page_add_permission(request, page=None):
     """Return true if the current user has permission to add a new page.
@@ -62,14 +77,61 @@ def get_user_permission_level(user):
         raise NoPermissionsException
     return permission.page.level
 
-
-def set_current_user(user):
-    """Assigns current user from request to thread_locals, used by
-    CurrentUserMiddleware.
-    """
-    _thread_locals.user=user
+def get_subordinate_users(user):
+    """Returns users queryset, containing all subordinate users to given user 
+    including users created by given user and not assigned to any page.
     
-def get_current_user():
-    """Returns current user, or None
+    Not assigned users must be returned, because they shouldn't get lost, and
+    user should still have possibility to see them. 
+    
+    Only users created_by given user which are on the same, or lover level are
+    returned.
+    
+    If user haves global permissions or is a superuser, then he can see all the
+    users.
+    
+    This function is currently used in PagePermissionInlineAdminForm for limit
+    users in permission conbobox. 
+    
+    Example:
+                              A,W                    level 0
+                            /    \
+                          user    B,GroupE           level 1
+                Z       /     \
+                      C,X     D,Y,W                  level 2
+                      
+        Rules: W was created by user, Z was created by user, but is not assigned
+        to any page.
+        
+        Will return [user, C, X, D, Y, Z]. W was created by user, but is also
+        assigned to higher level.
     """
-    return getattr(_thread_locals, 'user', None)
+    if user.is_superuser or \
+            GlobalPagePermission.objects.with_can_change_permissions(user):
+        return User.objects.all() 
+    
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+    user_level = get_user_permission_level(user)
+    
+    qs = User.objects.distinct().filter(
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
+        | (Q(extuser__created_by=user) & Q(pagepermission__page=None))
+    )
+    return qs
+
+def get_subordinate_groups(user):
+    """Simillar to get_subordinate_users, but returns queryset of Groups instead
+    of Users.
+    """
+    if user.is_superuser or \
+            GlobalPagePermission.objects.with_can_change_permissions(user):
+        return Group.objects.all()
+    
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+    user_level = get_user_permission_level(user)
+    
+    qs = Group.objects.distinct().filter(
+         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
+        | (Q(extgroup__created_by=user) & Q(pagepermission__page=None))
+    )
+    return qs

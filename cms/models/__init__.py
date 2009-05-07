@@ -557,7 +557,7 @@ class PagePermission(AbstractPagePermission):
         return "%s :: %s" % (self.audience, unicode(dict(self._grant_on_choices)[self.grant_on][1]))
 
 class ExtUser(models.Model):
-    """Cms specific user data
+    """Cms specific user data, required for permission system
     """
     user = models.OneToOneField(User)
     created_by = models.ForeignKey(User, related_name="created_users")
@@ -569,7 +569,7 @@ class ExtUser(models.Model):
     __unicode__ = lambda self: unicode(self.user)
         
 class ExtGroup(models.Model):
-    """Cms specific group data 
+    """Cms specific group data, required for permission system 
     """
     group = models.OneToOneField(Group)
     created_by = models.ForeignKey(User, related_name="created_usergroups")

@@ -1,11 +1,12 @@
 from django import forms
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
-from django.conf import settings
 from django.forms.util import ErrorList
 from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
 from cms.models import Page, Title
 from cms.utils.urlutils import any_path_re
+from cms.utils.permissions import get_current_user, get_subordinate_users,\
+    get_subordinate_groups
 
 class PageForm(forms.ModelForm):
     APPLICATION_URLS = (('', '----------'), ) + CMS_APPLICATIONS_URLS
@@ -61,3 +62,25 @@ class PageForm(forms.ModelForm):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
 
+class PagePermissionInlineAdminForm(forms.ModelForm):
+    """Page permission inline admin form used in inline admin. Required, because
+    user and group queryset must be changed. User can see only users on the same
+    level or under him in choosen page tree, and users which were created by him, 
+    but aren't assigned to higher page level than current user.
+    """
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+        
+        super(PagePermissionInlineAdminForm, self).__init__(data, files,
+            auto_id, prefix, initial, error_class, label_suffix, empty_permitted,
+            instance)
+        
+        user = get_current_user() # current user from threadlocals
+        
+        self.fields['user'].queryset=get_subordinate_users(user)
+        self.fields['group'].queryset=get_subordinate_groups(user)
+        
+        
+        
+        
