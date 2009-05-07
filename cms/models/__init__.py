@@ -224,8 +224,6 @@ class Page(models.Model):
             else:
                 self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
                 
-                
-                
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
@@ -391,6 +389,7 @@ class Title(models.Model):
             return self.path
         return None
         
+        
 class EmptyTitle(object):
     """Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
@@ -404,6 +403,7 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
+    
     
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
@@ -492,9 +492,6 @@ class AbstractPagePermission(models.Model):
     can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
     can_move_page = models.BooleanField(_("can move"), default=True)
     
-    #todo: can_add ...?
-    
-    
     class Meta:
         abstract = True
         
@@ -559,10 +556,26 @@ class PagePermission(AbstractPagePermission):
     def __unicode__(self):
         return "%s :: %s" % (self.audience, unicode(dict(self._grant_on_choices)[self.grant_on][1]))
 
-from django.contrib.auth.models import User
-
-class PageUser(User):
+class ExtUser(models.Model):
     """Cms specific user data
     """
-    level = models.SmallIntegerField(_('level'))
+    user = models.OneToOneField(User)
+    created_by = models.ForeignKey(User, related_name="created_users")
     
+    class Meta:
+        verbose_name = _('Extended user')
+        verbose_name_plural = _('Extended users')
+        
+    __unicode__ = lambda self: unicode(self.user)
+        
+class ExtGroup(models.Model):
+    """Cms specific group data 
+    """
+    group = models.OneToOneField(Group)
+    created_by = models.ForeignKey(User, related_name="created_usergroups")
+    
+    class Meta:
+        verbose_name = _('Extended group')
+        verbose_name_plural = _('Extended groups')
+        
+        __unicode__ = lambda self: unicode(self.group)

@@ -73,9 +73,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    'cms.middleware.CurrentPageMiddleware',
-    'cms.middleware.MultilingualURLMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
 )
 
 ROOT_URLCONF = 'example.urls'

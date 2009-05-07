@@ -37,7 +37,11 @@ PAGE_ADMIN_INLINES = []
 ################################################################################
 
 if settings.CMS_PERMISSION:
-    from cms.models import PagePermission, GlobalPagePermission
+    from cms.models import PagePermission, GlobalPagePermission, ExtUser, \
+        ExtGroup
+        
+    admin.site.register(ExtGroup)
+    admin.site.register(ExtUser)
     
     class PagePermissionInlineAdmin(admin.TabularInline):
         model = PagePermission
@@ -111,6 +115,10 @@ if settings.CMS_PERMISSION:
 ################################################################################
 
 class PageAdmin(admin.ModelAdmin):
+    """sdfsdf sdf f
+    """
+    
+    
     form = PageForm
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent')

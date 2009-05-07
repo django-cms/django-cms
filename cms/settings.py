@@ -16,6 +16,12 @@ if CMS_TEMPLATES is None:
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
 
+# check if is user middleware installed
+if CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in settings.MIDDLEWARE_CLASSES:
+    raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
+        'Please put it into your MIDDLEWARE_CLASSES in settings file')
+    
+
 # Whether a slug should be unique ... must be unique in all languages.
 i18n_installed = not 'cms.middleware.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
 CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_installed)

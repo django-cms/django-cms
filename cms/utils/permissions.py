@@ -1,6 +1,14 @@
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
 
+try:
+    from threading import local
+except ImportError:
+    from django.utils._threading_local import local
+
+# thread local support
+_thread_locals = local()
+
 def has_page_add_permission(request, page=None):
     """Return true if the current user has permission to add a new page.
     """        
@@ -53,14 +61,15 @@ def get_user_permission_level(user):
         # user is'nt assigned to any node
         raise NoPermissionsException
     return permission.page.level
+
+
+def set_current_user(user):
+    """Assigns current user from request to thread_locals, used by
+    CurrentUserMiddleware.
+    """
+    _thread_locals.user=user
     
-
-def get_add_permission(self):
-        return 'add_%s' % self.object_name.lower()
-
-def get_change_permission(self):
-    return 'change_%s' % self.object_name.lower()
-
-def get_delete_permission(self):
-    return 'delete_%s' % self.object_name.lower()
-
+def get_current_user():
+    """Returns current user, or None
+    """
+    return getattr(_thread_locals, 'user', None)
