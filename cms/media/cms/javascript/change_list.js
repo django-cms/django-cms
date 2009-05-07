@@ -1,4 +1,4 @@
-var tree
+var tree;
 
 function initTree(){
 	tree = new tree_component();
@@ -8,7 +8,7 @@ function initTree(){
 			renameable: "none",
 			deletable: "all",
 			creatable: "all",
-			draggable: "all",
+			draggable: ["moveable"],
 			dragrules: "all"
 		},
 		path: false,

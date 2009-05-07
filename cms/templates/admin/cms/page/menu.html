@@ -1,4 +1,4 @@
-<li id="page_{{page.pk}}" {% if cl.is_filtered %}class="leaf"{% endif %} >{% load cms_tags i18n adminmedia %}
+<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf {% endif %}{% if has_move_page_permission %} moveable{% endif %}" {% if has_move_page_permission %}rel="moveable"{% endif %}>{% load cms_tags i18n adminmedia %}
 	<div class="cont">
 		<div class="col1">
 			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
@@ -18,9 +18,9 @@
 				{% endfor %}
 				</select>
 				<a href="#" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
-				<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
+				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}{% endif %}
 				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
-				<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>
+				{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
 			</div>	
 			<div class="col-published">{% if page.status %}
 				<label>

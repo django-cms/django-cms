@@ -220,12 +220,6 @@ class PagePermissionManager(BasicPagePermissionManager):
         If user is superuser, or haves global can_change_permission permissions,
         show him everything.
         
-        This function will return just following permission nodes, and never the 
-        node to which is user assigned directly - because he must not be able to 
-        change permissions for himself - only user higher then him in tree can 
-        change his permissions if he is allowed. This is because user can't have
-        possibility to add himself more permissions.
-        
         Result of this is used in admin for page permissions inline.
         """
         from cms.models import GlobalPagePermission, Page
@@ -246,9 +240,11 @@ class PagePermissionManager(BasicPagePermissionManager):
         
         # get permission set, but without objects targeting user, or any group 
         # in which he can be
-        qs = self.filter(page__id__in=page_id_allow_list, page__level__gte=user_level)
-        qs = qs.exclude(user=user, group__user=user)
-        
+        qs = self.filter(
+            page__id__in=page_id_allow_list, 
+            page__level__gte=user_level
+        )
+        #qs = qs.exclude(user=user).exclude(group__user=user)
         return qs
 
 
@@ -273,12 +269,19 @@ class PagePermissionsPermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_publish")
     
-    def get_edit_id_list(self, user):
+    def get_change_id_list(self, user):
         """
         Give a list of page where the user has edit rights or the string "All" if
         the user has all rights.
         """
-        return self.__get_id_list(user, "can_edit")
+        return self.__get_id_list(user, "can_change")
+    
+    def get_delete_id_list(self, user):
+        """
+        Give a list of page where the user has delete rights or the string "All" if
+        the user has all rights.
+        """
+        return self.__get_id_list(user, "can_delete")
     
     def get_softroot_id_list(self, user):
         """
@@ -288,10 +291,18 @@ class PagePermissionsPermissionManager(models.Manager):
         return self.__get_id_list(user, "can_change_softroot")
     
     def get_change_permissions_id_list(self, user):
-        """
-        Give a list of page where the user can change permissions.
+        """Give a list of page where the user can change permissions.
         """
         return self.__get_id_list(user, "can_change_permissions")
+    
+    def get_move_page_id_list(self, user):
+        """Give a list of pages which user can move.
+        """
+        # TODO: this is going to be tricky!!
+        
+        #... continue here ... 
+        
+        return self.__get_id_list(user, "can_move_page")
     
     def __get_id_list(self, user, attr):
         if user.is_superuser or not settings.CMS_PERMISSION:

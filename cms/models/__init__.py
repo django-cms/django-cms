@@ -264,9 +264,20 @@ class Page(models.Model):
     #        langs += '%s, ' % lang
     #    return langs[0:-2]
 
-    def has_page_permission(self, request):
-        return self.has_generic_permission(request, "edit")
-
+    def has_change_permission(self, request):
+        opts = self._meta
+        if request.user.is_superuser:
+            return True
+        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
+            self.has_generic_permission(request, "change")
+    
+    def has_delete_permission(self, request):
+        opts = self._meta
+        if request.user.is_superuser:
+            return True
+        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
+            self.has_generic_permission(request, "delete")
+    
     def has_publish_permission(self, request):
         return self.has_generic_permission(request, "publish")
     
@@ -274,7 +285,15 @@ class Page(models.Model):
         return self.has_generic_permission(request, "softroot")
     
     def has_change_permissions_permission(self, request):
+        """Has user ability to change permissions for current page?
+        """
         return self.has_generic_permission(request, "change_permissions")
+    
+    def has_move_page_permission(self, request):
+        """Has user ability to move current page?
+        """
+        print "> can move page: ", self.has_generic_permission(request, "move_page")
+        return self.has_generic_permission(request, "move_page")
     
     def has_generic_permission(self, request, type):
         """
@@ -283,9 +302,7 @@ class Page(models.Model):
         """
         if not request.user.is_authenticated() or not request.user.is_staff:
             return False
-        if request.user.is_superuser:
-            return True
-        if not settings.CMS_PERMISSION:
+        if not settings.CMS_PERMISSION or request.user.is_superuser:
             return True
         
         att_name = "permission_%s_cache" % type
@@ -468,10 +485,15 @@ class AbstractPagePermission(models.Model):
     group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
     
     # what:
-    can_edit = models.BooleanField(_("can edit"), default=True)
+    can_change = models.BooleanField(_("can edit"), default=True)
+    can_delete = models.BooleanField(_("can delete"), default=True)
     can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
     can_publish = models.BooleanField(_("can publish"), default=True)
     can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
+    can_move_page = models.BooleanField(_("can move"), default=True)
+    
+    #todo: can_add ...?
+    
     
     class Meta:
         abstract = True

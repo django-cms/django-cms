@@ -4,7 +4,14 @@ from cms.exceptions import NoPermissionsException
 def has_page_add_permission(request, page=None):
     """Return true if the current user has permission to add a new page.
     """        
-    permissions = Page.permissions.get_edit_id_list(request.user)
+    if request.user.is_superuser:
+        return True
+    
+    opts = Page._meta
+    if not request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()):
+        return False
+    
+    permissions = Page.permissions.get_change_id_list(request.user)
     if permissions is Page.permissions.GRANT_ALL:
         return True
     target = request.GET.get('target', -1)
@@ -47,4 +54,13 @@ def get_user_permission_level(user):
         raise NoPermissionsException
     return permission.page.level
     
-    
+
+def get_add_permission(self):
+        return 'add_%s' % self.object_name.lower()
+
+def get_change_permission(self):
+    return 'change_%s' % self.object_name.lower()
+
+def get_delete_permission(self):
+    return 'delete_%s' % self.object_name.lower()
+

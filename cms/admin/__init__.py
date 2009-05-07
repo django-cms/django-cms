@@ -43,6 +43,9 @@ if settings.CMS_PERMISSION:
         model = PagePermission
         formset = BaseInlineFormSetWithQuerySet
         
+        def __init__(self, *args, **kwargs):
+            super(PagePermissionInlineAdmin, self).__init__(*args, **kwargs)
+        
         if not settings.CMS_SOFTROOT:
             exclude = ['can_change_softroot']
             
@@ -59,20 +62,35 @@ if settings.CMS_PERMISSION:
         def get_formset(self, request, obj=None, **kwargs):
             """Seems django doesn't cares about queryset defined here - its 
             probably a bug, so monkey patching again.. Assign use_queryset
-            attribute to FormSet, our overiden formset knows how to handle
-            this, @see BaseInlineFormSetWithQuerySet for more details.
+            attribute to FormSet, our overiden formset knows how to handle this, 
+            @see BaseInlineFormSetWithQuerySet for more details.
+            
+            Some fields may be excluded here. User can change only permissions
+            which are available for him. E.g. if user does not hves can_publish
+            flag, he can't change assign can_publish permissions.
             """
+            if obj:
+                self.exclude = []
+                if not obj.has_delete_permission(request):
+                    self.exclude.append('can_delete')
+                if not obj.has_publish_permission(request):
+                    self.exclude.append('can_publish')
+                if not obj.has_softroot_permission(request):
+                    self.exclude.append('can_change_softroot')
+                if not obj.has_move_page_permission(request):
+                    self.exclude.append('can_move_page')
+                    
             FormSet = super(PagePermissionInlineAdmin, self).get_formset(request, obj=None, **kwargs)
             # asign queryset 
             FormSet.use_queryset = self.queryset(request)
             return FormSet
-        
+                
                 
     PAGE_ADMIN_INLINES.append(PagePermissionInlineAdmin)
 
     class GlobalPagePermissionAdmin(admin.ModelAdmin):
-        list_display = ['user', 'group', 'can_edit', 'can_publish', 'can_change_permissions']
-        list_filter = ['user', 'group', 'can_edit', 'can_publish', 'can_change_permissions']
+        list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+        list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
         
         if settings.CMS_SOFTROOT:
             list_display += ('can_change_softroot', )
@@ -354,10 +372,9 @@ class PageAdmin(admin.ModelAdmin):
         """
         Return true if the current user has permission to add a new page.
         """
-        if not settings.CMS_PERMISSION:
-            return super(PageAdmin, self).has_add_permission(request)
-        else:
+        if settings.CMS_PERMISSION:
             return has_page_add_permission(request)
+        return super(PageAdmin, self).has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
         """
@@ -365,9 +382,18 @@ class PageAdmin(admin.ModelAdmin):
         Return the string 'All' if the user has all rights.
         """
         if settings.CMS_PERMISSION and obj is not None:
-            return obj.has_page_permission(request)
+            return obj.has_change_permission(request)
         return super(PageAdmin, self).has_change_permission(request, obj)
     
+    def has_delete_permission(self, request, obj=None):
+        """
+        Returns True if the given request has permission to change the given
+        Django model instance. If CMS_PERMISSION are in use also takes look to
+        object permissions.
+        """
+        if settings.CMS_PERMISSION and obj is not None:
+            return obj.has_delete_permission(request)
+        return super(PageAdmin, self).has_delete_permission(request, obj)
     
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."

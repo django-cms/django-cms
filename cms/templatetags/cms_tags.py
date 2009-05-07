@@ -183,8 +183,10 @@ def show_admin_menu(context, page, no_children=False, level=None):
     elif context.has_key('filtered'):
         filtered = context['filtered']
     children = page.childrens
-    has_permission = page.has_page_permission(request)
+    has_permission = page.has_change_permission(request)
     has_publish_permission = page.has_publish_permission(request)
+    has_delete_permission = page.has_delete_permission(request)
+    has_move_page_permission = page.has_move_page_permission(request)
     # level is used to add a left margin on table row
     if level is None:
         level = 0
@@ -255,7 +257,7 @@ render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=Tru
     
 
 def has_permission(page, request):
-    return page.has_page_permission(request)
+    return page.has_change_permission(request)
 register.filter(has_permission)
 
 def page_id_url(context, reverse_id, lang=None):

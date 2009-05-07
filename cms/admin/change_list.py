@@ -17,7 +17,7 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         qs = super(CMSChangeList, self).get_query_set()
         if request:
-            permissions = Page.permissions.get_edit_id_list(request.user)
+            permissions = Page.permissions.get_change_id_list(request.user)
             if permissions != Page.permissions.GRANT_ALL:
                 qs = qs.filter(pk__in=permissions)
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
@@ -47,7 +47,7 @@ class CMSChangeList(ChangeList):
         lang = get_language_from_request(request)
         pages = self.get_query_set(request).order_by('tree_id', 'parent', 'lft').select_related()
         
-        perm_edit_ids = Page.permissions.get_edit_id_list(request.user)
+        perm_edit_ids = Page.permissions.get_change_id_list(request.user)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user)
         perm_softroot_ids = Page.permissions.get_softroot_id_list(request.user)
         

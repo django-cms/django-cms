@@ -32,7 +32,7 @@ def change_innavigation(request, page_id):
     """
     if request.method == 'POST':
         page = Page.objects.get(pk=page_id)
-        if page.has_page_permission(request):
+        if page.has_change_permission(request):
             if page.in_navigation:
                 page.in_navigation = False
                 val = 0
