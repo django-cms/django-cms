@@ -1,4 +1,4 @@
-<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf {% endif %}{% if has_move_page_permission %} moveable{% endif %}" {% if has_move_page_permission %}rel="moveable"{% endif %}>{% load cms_tags i18n adminmedia %}
+<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf {% endif %}{% if has_move_page_permission %} moveable{% endif %}"{% if has_move_page_permission %} rel="moveable"{% endif %}{% if CMS_PERMISSION and not has_add_page_permission %} mdata="{ valid_children : false }"{% endif %}>{% load cms_tags i18n adminmedia %}
 	<div class="cont">
 		<div class="col1">
 			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
@@ -6,9 +6,12 @@
 		</div>
 		<div class="col2">	
 			<span id="move-target-{{ page.id }}" class="move-target-container" >
-				<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
-				<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a> |
-				<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
+				{% if not CMS_PERMISSION or has_add_permission %}
+					{# if permissions not enabled, user user haves global can_add page #}
+					<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
+					<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a> |
+					<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
+				{% endif %}
 			</span>
 			<div class="col-language">{% for lang in page.get_languages %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}</div>
 			<div class="col-actions">{% if not filtered %}
@@ -19,7 +22,14 @@
 				</select>
 				<a href="#" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}{% endif %}
-				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+				{% if has_add_permission %}
+					<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+				{% else %}
+					{% if has_add_page_permission %}
+						{# if he can add page under current page, go directly to thi url #}
+						<a href="./add/?target={{ page.id }}&amp;position=first-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+					{% endif %}
+				{% endif %}
 				{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
 			</div>	
 			<div class="col-published">{% if page.status %}

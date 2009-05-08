@@ -77,6 +77,8 @@ if settings.CMS_PERMISSION:
             """
             if obj:
                 self.exclude = []
+                if not obj.has_add_permission(request):
+                    self.exclude.append('can_add')
                 if not obj.has_delete_permission(request):
                     self.exclude.append('can_delete')
                 if not obj.has_publish_permission(request):

@@ -7,6 +7,8 @@ from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
+from cms.utils.permissions import has_page_add_permission
+from cms.settings import CMS_PERMISSION
 register = template.Library()
 
 
@@ -182,17 +184,29 @@ def show_admin_menu(context, page, no_children=False, level=None):
         filtered = context['cl'].is_filtered()
     elif context.has_key('filtered'):
         filtered = context['filtered']
-    children = page.childrens
-    has_permission = page.has_change_permission(request)
-    has_publish_permission = page.has_publish_permission(request)
-    has_delete_permission = page.has_delete_permission(request)
-    has_move_page_permission = page.has_move_page_permission(request)
+    
     # level is used to add a left margin on table row
     if level is None:
         level = 0
     else:
         level = level+2
-    context.update(locals())
+        
+    context.update({
+        'page': page,
+        'no_children': no_children,
+        'site': site,
+        'lang': lang,
+        'softroot': softroot,
+        'filtered': filtered,
+        'children': page.childrens,
+        'level': level,
+        'CMS_PERMISSION': settings.CMS_PERMISSION,
+        'has_permission': page.has_change_permission(request),
+        'has_publish_permission': page.has_publish_permission(request),
+        'has_delete_permission': page.has_delete_permission(request),
+        'has_move_page_permission': page.has_move_page_permission(request),
+        'has_add_page_permission': page.has_add_permission(request)#has_page_add_permission(request, page)
+    })
     return context
 show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)

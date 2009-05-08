@@ -136,6 +136,7 @@ CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categor
 
 CMS_SOFTROOT = True
 CMS_FLAT_URLS = True
+#CMS_PERMISSION = False
 
 SOUTH_AUTO_FREEZE_APP = True
 

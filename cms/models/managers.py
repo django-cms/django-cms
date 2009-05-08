@@ -276,6 +276,13 @@ class PagePermissionsPermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_change")
     
+    def get_add_id_list(self, user):
+        """
+        Give a list of page where the user has add page rights or the string 
+        "All" if the user has all rights.
+        """
+        return self.__get_id_list(user, "can_add")
+    
     def get_delete_id_list(self, user):
         """
         Give a list of page where the user has delete rights or the string "All" if

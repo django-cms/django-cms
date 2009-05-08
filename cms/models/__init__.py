@@ -287,6 +287,11 @@ class Page(models.Model):
         """
         return self.has_generic_permission(request, "change_permissions")
     
+    def has_add_permission(self, request):
+        """Has user ability to add page under current page?
+        """
+        return self.has_generic_permission(request, "add")
+    
     def has_move_page_permission(self, request):
         """Has user ability to move current page?
         """
@@ -486,6 +491,7 @@ class AbstractPagePermission(models.Model):
     
     # what:
     can_change = models.BooleanField(_("can edit"), default=True)
+    can_add = models.BooleanField(_("can add"), default=True)
     can_delete = models.BooleanField(_("can delete"), default=True)
     can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
     can_publish = models.BooleanField(_("can publish"), default=True)

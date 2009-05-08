@@ -1,5 +1,7 @@
 var tree;
 
+// {% ifequal level 0 %}{% if not CMS_PERMISSION or has_add_permission %}allow-tree-drop{% endif %}{% endifequal %} 
+
 function initTree(){
 	tree = new tree_component();
 	tree.init($("div.tree"), {
@@ -9,7 +11,10 @@ function initTree(){
 			deletable: "all",
 			creatable: "all",
 			draggable: ["moveable"],
-			dragrules: "all"
+			dragrules: "all",
+			metadata : "mdata",
+			use_inline: true,
+			droppable : ["tree_drop"]
 		},
 		path: false,
 		ui: {
@@ -82,7 +87,13 @@ $(document).ready(function() {
         }
         
         if(jtarget.hasClass("addlink")) {
-            $("tr").removeClass("target");
+			if (!/#$/g.test(jtarget.attr('href'))) {
+				// if there is url instead of # inside href, follow this url
+				// used if user haves add_page 
+				return true;
+			}
+			
+			$("tr").removeClass("target");
             $("#changelist table").removeClass("table-selected");
             var page_id = target.id.split("add-link-")[1];
             selected_page = page_id;

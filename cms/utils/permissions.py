@@ -24,30 +24,34 @@ def get_current_user():
     return getattr(_thread_locals, 'user', None)
 
 
-def has_page_add_permission(request, page=None):
-    """Return true if the current user has permission to add a new page.
+def has_page_add_permission(request):
+    """Return true if the current user has permission to add a new page. This is
+    just used for general add buttons - only superuser, or user with can_add in
+    globalpagepermission can add page.
+    
+    
+    Special case occur when page is going to be added from add page button in
+    change list - then we have target and position there, so check if user can
+    add page under target page will occur. 
     """        
-    if request.user.is_superuser:
-        return True
-    
     opts = Page._meta
-    if not request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()):
-        return False
-    
-    permissions = Page.permissions.get_change_id_list(request.user)
-    if permissions is Page.permissions.GRANT_ALL:
+    if request.user.is_superuser or \
+        (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
+            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True)):
         return True
-    target = request.GET.get('target', -1)
+    
+    # if add under page
+    target = request.GET.get('target', None)
     position = request.GET.get('position', None)
-    if int(target) in permissions:
-        if position == "first-child":
-            return True
-        else:
-            if Page.objects.get(pk=target).parent_id in permissions:
-                return True
+    
+    if target is not None and position == "first-child":
+        try:
+            page = Page.objects.get(pk=target)
+        except:
+            return False
+        return page.has_add_permission(request)
     return False
-
-
+    
 def get_user_permission_level(user):
     """Returns highest user level from the page/permission hierarchy on which
     user haves can_change_permission. Also takes look into user groups. Higher 
