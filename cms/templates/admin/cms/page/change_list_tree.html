@@ -15,7 +15,7 @@
 		</div>
 	</li>
 </ul>
-<div class="tree">
+<div class="tree{% if not CMS_PERMISSION or has_add_permission %} root_allow_children{% endif %}">
 	<ul class="tree-default">
 		{% for page in cl.get_items %}{% show_admin_menu page cl.is_filtered %}{% endfor %}
 	</ul>

@@ -1,20 +1,19 @@
 var tree;
 
-// {% ifequal level 0 %}{% if not CMS_PERMISSION or has_add_permission %}allow-tree-drop{% endif %}{% endifequal %} 
-
 function initTree(){
 	tree = new tree_component();
-	tree.init($("div.tree"), {
+	var options = {
 		rules: {
 			clickable: "all",
 			renameable: "none",
 			deletable: "all",
 			creatable: "all",
-			draggable: ["moveable"],
+			draggable: "all",
 			dragrules: "all",
+			droppable: "all",
 			metadata : "mdata",
 			use_inline: true,
-			droppable : ["tree_drop"]
+			//droppable : ["tree_drop"]
 		},
 		path: false,
 		ui: {
@@ -44,10 +43,22 @@ function initTree(){
 				moveTreeItem(item_id, target_id, position, false)
 			},
 			onchange: function(node, tree){
-				self.location = node.id.split("page_")[1]
+				self.location = node.id.split("page_")[1];
 			}
 		}
-	});
+	};
+	
+	if (!$($("div.tree").get(0)).hasClass('root_allow_children')){
+		// disalow possibility for adding subnodes to main tree, user doesn't
+		// have permissions for this
+		options.rules.dragrules = ["node inside topnode", "node * node"];
+	}
+	
+	//dragrules : [ "folder * folder", "folder inside root", "tree-drop * folder" ],
+        
+	
+	//console.log($("div.tree").get(0).className);
+	tree.init($("div.tree"), options);
 };
 
 $(document).ready(function() { 

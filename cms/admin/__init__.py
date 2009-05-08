@@ -442,6 +442,7 @@ class PageAdmin(admin.ModelAdmin):
             'app_label': app_label,
             'CMS_MEDIA_URL': CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
+            'CMS_PERMISSION': settings.CMS_PERMISSION,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)
@@ -475,24 +476,25 @@ class PageAdmin(admin.ModelAdmin):
         """
         Move the page to the requested target, at the given position
         """
-        context = {}
-        page = Page.objects.get(pk=page_id)
-
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
-        if target is not None and position is not None:
-            try:
-                target = self.model.objects.get(pk=target)
-            except self.model.DoesNotExist:
-                return HttpResponse("error")
-                #context.update({'error': _('Page could not been moved.')})
-            else:
-                page.move_page(target, position)
-                return HttpResponse("ok")
-                #return self.list_pages(request,
-                #    template_name='admin/cms/page/change_list_tree.html')
-        context.update(extra_context or {})
-        return HttpResponseRedirect('../../')
+        if target is None or position is None:
+            return HttpResponseRedirect('../../')            
+        
+        try:
+            page = self.model.get(pk=page_id)
+            target = self.model.objects.get(pk=target)
+        except self.model.DoesNotExist:
+            return HttpResponse("error")
+            
+        # does he haves permissions to do this...?
+        if not page.has_move_page_permission(request) or \
+            not target.has_add_permission(request):
+                return HttpResponse("Denied")
+        # move page
+        page.move_page(target, position)
+        return HttpResponse("ok")
+
     
     
 

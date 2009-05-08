@@ -190,7 +190,23 @@ def show_admin_menu(context, page, no_children=False, level=None):
         level = 0
     else:
         level = level+2
+    
+    has_add_permission = page.has_add_permission(request)
+    has_move_page_permission = page.has_move_page_permission(request)
+    
+    metadata = ""
+    if settings.CMS_PERMISSION:
+        # jstree metadata generator 
+        md = []
+        if not has_add_permission:
+            md.append(('valid_children', False))
+        if not has_move_page_permission:
+            md.append(('draggable', False))
         
+        # just turn it into simple javasript object
+        metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
+            str(e[1]).lower() if isinstance(e[1], bool) else str(e[1])), md)) + "}"
+    
     context.update({
         'page': page,
         'no_children': no_children,
@@ -204,8 +220,9 @@ def show_admin_menu(context, page, no_children=False, level=None):
         'has_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
-        'has_move_page_permission': page.has_move_page_permission(request),
-        'has_add_page_permission': page.has_add_permission(request)#has_page_add_permission(request, page)
+        'has_move_page_permission': has_move_page_permission,
+        'has_add_page_permission': has_add_permission,
+        'metadata': metadata,
     })
     return context
 show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',

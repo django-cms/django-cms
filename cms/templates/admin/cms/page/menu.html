@@ -1,4 +1,4 @@
-<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf {% endif %}{% if has_move_page_permission %} moveable{% endif %}"{% if has_move_page_permission %} rel="moveable"{% endif %}{% if CMS_PERMISSION and not has_add_page_permission %} mdata="{ valid_children : false }"{% endif %}>{% load cms_tags i18n adminmedia %}
+{% load cms_tags i18n adminmedia %}<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf{% endif %}{% if has_move_page_permission %} moveable{% endif %}"{% if metadata %} mdata="{{ metadata }}{% endif %}" rel="{% ifequal level 0 %}topnode{% else %}node{% endifequal %}">
 	<div class="cont">
 		<div class="col1">
 			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
