@@ -1,9 +1,10 @@
 from cms.models import Page
 from django.conf import settings
+from cms.settings import CMS_FLAT_URLS
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
 
 def applications_page_check(request, current_page=None, path=None):
-    """Tries to found if given path was resolved over application. 
+    """Tries to find if given path was resolved over application. 
     Applications have higher priority than other cms pages. 
     """
     if current_page:
@@ -89,8 +90,10 @@ class ApplicationRegexUrlResolver(PageRegexURLResolver):
         # will they be be than passed to pattern, and from pattern to view? 
         # If it will work, will be give us possibility to configure one
         # application for multiple hooks. 
-        
-        regex = r'%s' % title.path
+        if CMS_FLAT_URLS:
+            regex = r'^%s' % title.slug
+        else:
+            regex = r'^%s' % title.path
         if settings.APPEND_SLASH:
             regex += r'/'  
         urlconf_name = title.application_urls
@@ -120,7 +123,6 @@ class DynamicURLConfModule(object):
         Caches result, so db lookup is required only once, or when the cache
         is reseted.
         """
-       
         if not self._urlpatterns:
             # TODO: will this work with multiple sites? how are they exactly
             # implemerted ?
@@ -133,7 +135,10 @@ class DynamicURLConfModule(object):
                 # get all titles with application
                 title_set = page.title_set.filter(application_urls__gt="")
                 for title in title_set:
-                    mixid = "%s:%s" % (title.path + "/", title.application_urls)
+                    if CMS_FLAT_URLS:
+                        mixid = "%s:%s" % (title.slug + "/", title.application_urls)
+                    else:
+                        mixid = "%s:%s" % (title.path + "/", title.application_urls)
                     if mixid in included:
                         # don't add the same thing twice
                         continue  
