@@ -66,7 +66,7 @@ def add_plugin(request):
             placeholder = parent.placeholder
             language = parent.language
             position = None
-        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
+        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
         if parent:
             plugin.parent = parent
         plugin.save()
@@ -75,7 +75,7 @@ def add_plugin(request):
             save_all_plugins(page)
             revision.user = request.user
             plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-            revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}       
+            revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
         return HttpResponse(str(plugin.pk))
     raise Http404
 
@@ -108,7 +108,7 @@ def edit_plugin(request, plugin_id, admin_site):
                 instance = obj
                 break
         if not instance:
-            # TODO: this should be changed, and render something else.. There 
+            # TODO: this should be changed, and render something else.. There
             # can be case when plugin is not using (registered) with reversion
             # so it doesn't haves any version - it should just render plugin
             # and say something like - not in version system..
@@ -132,17 +132,17 @@ def edit_plugin(request, plugin_id, admin_site):
     if not instance:
         # instance doesn't exist, call add view
         response = admin.add_view(request)
-
+ 
     else:
         # already saved before, call change view
-        # we actually have the instance here, but since i won't override  
-        # change_view method, is better if it will be loaded again, so 
+        # we actually have the instance here, but since i won't override
+        # change_view method, is better if it will be loaded again, so
         # just pass id to admin
         response = admin.change_view(request, str(plugin_id))
     
-    if request.method == "POST":
+    if request.method == "POST" and admin.object_successfully_changed:
         # if reversion is installed, save version of the page plugins
-        if 'reversion' in settings.INSTALLED_APPS and admin.object_successfully_changed:
+        if 'reversion' in settings.INSTALLED_APPS:
             # perform this only if object was successfully changed
             cms_plugin.page.save()
             save_all_plugins(cms_plugin.page, [cms_plugin.pk])
@@ -150,20 +150,21 @@ def edit_plugin(request, plugin_id, admin_site):
             plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
             revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':cms_plugin.position, 'placeholder': cms_plugin.placeholder}
             
-            # TODO: integrate on plugin close
-            """
-            icon = force_escape(escapejs(cms_plugin.get_instance_icon_src()))
-            alt = force_escape(escapejs(cms_plugin.get_instance_icon_alt()))
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 
-                                                                             'plugin':cms_plugin, 
-                                                                             'is_popup':True, 
-                                                                             'name':unicode(inst), 
-                                                                             "type":inst.get_plugin_name(),
-                                                                             'plugin_id':plugin_id,
-                                                                             'icon':icon,
-                                                                             'alt':alt,
-                                                                             }, RequestContext(request))
-            """
+        # read the saved object from admin - ugly but works
+        saved_object = admin.saved_object
+        
+        context = {
+            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'plugin': saved_object,
+            'is_popup': True,
+            'name': unicode(saved_object),
+            "type": saved_object.get_plugin_name(),
+            'plugin_id': plugin_id,
+            'icon': force_escape(escapejs(saved_object.get_instance_icon_src())),
+            'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
+        }
+        return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
+        
     return response
 
 if 'reversion' in settings.INSTALLED_APPS:
