@@ -14,15 +14,19 @@ def _get_current_page(path, lang):
     returns: Page or None
     """
     try:
-        return Page.objects.published().filter( 
-            Q(title_set__path=path[:-1], title_set__language=lang)).distinct().select_related()[0]
+        if settings.CMS_FLAT_URLS:
+            return Page.objects.published().filter(Q(title_set__slug=path[:-1],
+                                                     title_set__language=lang)).distinct().select_related()[0]
+        else:
+            return Page.objects.published().filter(Q(title_set__path=path[:-1],
+                                                     title_set__language=lang)).distinct().select_related()[0]
     except IndexError:
         return None
 
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
-    pages = Page.objects.root().order_by("tree_id")
+    pages = Page.objects.published().filter(parent__isnull=True).order_by("tree_id")
     current_page, response = None, None
     if pages:
         if page_id:

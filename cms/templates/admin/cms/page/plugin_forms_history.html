@@ -10,11 +10,8 @@
 
 {% block content %}
 <script type="text/javascript">
-
-	
-	
-$(document).ready(function() {
-   parent.setiframeheight($('body').height(), {{plugin.pk}});
-});	
+	$(document).ready(function() {
+	   parent.setiframeheight($('body').height(), {{plugin.pk}});
+	});	
 </script>
 {% endblock %}

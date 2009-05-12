@@ -1,0 +1,15 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify adminmedia %}
+{% block title %}{% trans "Change a page" %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+	if(parent != self){
+		parent.hide_iframe({{plugin.pk}}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
+	}else{
+		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
+	}
+</script>
+{% endblock %}
