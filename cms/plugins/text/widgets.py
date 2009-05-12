@@ -20,10 +20,7 @@ class WYMEditor(Textarea):
             #'javascript/placeholder_editor.js',
             'javascript/placeholder_editor_registry.js',
         )]
-        css = {'all': [join(CMS_MEDIA_URL, path) for path in (
-                'css/placeholder_editor.css',
-                )]
-            }
+        
 
     def __init__(self, attrs=None, installed_plugins=None, objects=None):
         """
