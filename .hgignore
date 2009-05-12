@@ -1,0 +1,9 @@
+# use glob syntax.
+syntax: glob
+
+*.elc
+*.pyc
+*~
+*.DS_Store
+.*
+cms/media/cms_page_media/
