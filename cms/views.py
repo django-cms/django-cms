@@ -8,48 +8,58 @@ from django.db.models.query_utils import Q
 from cms.appresolver import applications_page_check
 from django.contrib.sites.models import Site
 
-def _get_current_page(path, lang):
+def _get_current_page(path, lang, queryset):
     """Helper for getting current page from path depending on language
     
     returns: Page or None
     """
     try:
         if settings.CMS_FLAT_URLS:
-            return Page.objects.published().filter(Q(title_set__slug=path[:-1],
+            return queryset.filter(Q(title_set__slug=path,
                                                      title_set__language=lang)).distinct().select_related()[0]
         else:
-            return Page.objects.published().filter(Q(title_set__path=path[:-1],
+            return queryset.filter(Q(title_set__path=path,
                                                      title_set__language=lang)).distinct().select_related()[0]
+            
     except IndexError:
         return None
 
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
-    pages = Page.objects.published().filter(parent__isnull=True).order_by("tree_id")
+    if 'preview' in request.GET.keys():
+        pages = Page.objects.all()
+    else:
+        pages = Page.objects.published()
+    root_pages = pages.filter(parent__isnull=True).order_by("tree_id")
     current_page, response = None, None
-    if pages:
+    if root_pages:
         if page_id:
-            current_page = get_object_or_404(Page.objects.published(site), pk=page_id)
+            current_page = get_object_or_404(pages, pk=page_id)
         elif slug != None:
             if slug == "":
-                current_page = pages[0]
+                current_page = root_pages[0]
             else:
-                path = request.path.replace(reverse('pages-root'), '', 1)
-                current_page = _get_current_page(path, lang)
+                if slug.startswith(reverse('pages-root')):
+                    path = slug.replace(reverse('pages-root'), '', 1)
+                else:
+                    path = slug
+                current_page = _get_current_page(path, lang, pages)
                 if settings.CMS_APPLICATIONS_URLS:
                     # check if it should'nt point to some application, if yes,
                     # change current page if required
                     current_page = applications_page_check(request, current_page, path)
-                
                 if not current_page:
-                    raise Http404('CMS Page not found')
+                    if no404:# used for placeholder finder
+                        current_page = None
+                    else:
+                        raise Http404('CMS: Page not found for "%s"' % slug)
         else:
             current_page = applications_page_check(request)
             #current_page = None
         template_name = get_template_from_request(request, current_page)
     elif not no404:
-        raise Http404("no page found for site %s" % unicode(site.name))
+        raise Http404("CMS: No page found for site %s" % unicode(site.name))
     if current_page:  
         has_page_permissions = current_page.has_page_permission(request)
         request._current_page_cache = current_page
