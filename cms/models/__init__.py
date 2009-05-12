@@ -43,7 +43,7 @@ class Page(models.Model):
         (PUBLISHED, _('Published')),
     )
     author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', editable=False, db_index=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
@@ -84,12 +84,12 @@ class Page(models.Model):
     
     def save(self, no_signals=False):
         if not self.status:
-            self.status = self.DRAFT
+            self.status = Page.DRAFT
         # Published pages should always have a publication date
         if self.publication_date is None and self.status == self.PUBLISHED:
             self.publication_date = datetime.now()
         # Drafts should not, unless they have been set to the future
-        if self.status == self.DRAFT:
+        if self.status == Page.DRAFT:
             if settings.CMS_SHOW_START_DATE:
                 if self.publication_date and self.publication_date <= datetime.now():
                     self.publication_date = None
@@ -132,7 +132,10 @@ class Page(models.Model):
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):
-        path = self.get_path(language, fallback)
+        if settings.CMS_FLAT_URLS:
+            path = self.get_slug(language, fallback)
+        else:
+            path = self.get_path(language, fallback)
         return urljoin(reverse('pages-root'), path)
     
     def get_cached_ancestors(self, ascending=True):
@@ -393,9 +396,6 @@ class Title(models.Model):
                 descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
                 descendant_title.save()
 
-    class Meta:
-        unique_together = ('language', 'page')
-
     @property
     def overwrite_url(self):
         """Return overrwriten url, or None
@@ -417,7 +417,6 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
-            
     
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
@@ -432,9 +431,14 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
     
-    def get_plugin_instance(self):
+    
+    def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
-        plugin = plugin_pool.get_plugin(self.plugin_type)()
+        return plugin_pool.get_plugin(self.plugin_type)
+        
+    def get_plugin_instance(self, *args, **kwargs):
+        from cms.plugin_pool import plugin_pool
+        plugin = plugin_pool.get_plugin(self.plugin_type)(*args, **kwargs)
         if plugin.model != CMSPlugin:
             try:
                 instance = getattr(self, plugin.model.__name__.lower())

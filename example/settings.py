@@ -104,10 +104,11 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
+
     'south',
-    
     # sample application
     'sampleapp',
+    'store',
 )
 
 gettext = lambda s: s
@@ -133,6 +134,7 @@ CMS_APPLICATIONS_URLS = (
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
+CMS_FLAT_URLS = True
 
 SOUTH_AUTO_FREEZE_APP = True
 

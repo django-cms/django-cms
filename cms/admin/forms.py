@@ -2,14 +2,13 @@ from django import forms
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
-from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS
+from django.forms.util import ErrorList
+from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
 from cms.models import Page, Title
 from cms.urlutils import any_path_re
 
 class PageForm(forms.ModelForm):
-    
-    _applications_urls = (('', '----------'), ) + CMS_APPLICATIONS_URLS
-    
+    APPLICATION_URLS = (('', '----------'), ) + CMS_APPLICATIONS_URLS
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
     language = forms.ChoiceField(label=_("Language"), choices=CMS_LANGUAGES,
@@ -17,26 +16,35 @@ class PageForm(forms.ModelForm):
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the url'))
     application_urls = forms.ChoiceField(label=_('Application'), 
-        choices=_applications_urls, required=False,  
+        choices=APPLICATION_URLS, required=False,  
         help_text=_('Hook application to this page.'))
     overwrite_url = forms.CharField(label='Overwrite url', max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
     
     class Meta:
         model = Page
-
+    
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        slug = cleaned_data['slug']
+        
+        page = self.instance
+        lang = cleaned_data['language']
+        parent = cleaned_data['parent']
+        if CMS_UNIQUE_SLUGS:
+            titles = Title.objects.filter(slug=slug)
+        else:
+            titles = Title.objects.filter(slug=slug, language=lang)        
+        if not CMS_FLAT_URLS:
+            titles = titles.filter(page__parent=parent)
+        if self.instance.pk:
+            titles = titles.exclude(language=lang, page=page)
+        if titles.count():
+            self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
+            del cleaned_data['slug']
+        return cleaned_data
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
-        page = self.instance
-        lang = self.cleaned_data['language']
-        if CMS_UNIQUE_SLUGS:
-            titles = Title.objects.filter(slug=slug, page__parent=page.parent_id)
-        else:
-            titles = Title.objects.filter(slug=slug, language=lang, page__parent=page.parent_id)
-        if self.instance.pk:
-            titles = titles.exclude(page=self.instance, language=lang)
-        if titles.count():
-            raise forms.ValidationError(ugettext_lazy('Another page with this slug already exists'))
         return slug
     
     def clean_reverse_id(self):
@@ -52,3 +60,4 @@ class PageForm(forms.ModelForm):
             if not any_path_re.match(url):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
+

@@ -141,7 +141,7 @@ $(document).ready(function(){
 				}
 			}, "html");
 			
-		});
+		}).css("cursor", "pointer").css("margin", "5px");
 		
 		/* onclick for 'Edit selected object' */
 		$('span.edit-object').click(function(){
@@ -162,7 +162,7 @@ $(document).ready(function(){
 			}
 			var plugin_id = imgobj.id.substr("plugin_obj_".length);
 			edit_object(plugin_id);
-		});
+		}).css("cursor", "pointer").css("margin","5px");
 	}
 });
     </script>

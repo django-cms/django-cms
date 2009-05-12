@@ -17,7 +17,7 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
 from django.core.exceptions import PermissionDenied
 from django.db import models
-from django.forms import Widget, TextInput, Textarea, CharField
+from django.forms import Widget, TextInput, Textarea, CharField, HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
@@ -30,8 +30,8 @@ from os.path import join
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
-    exclude = ['author', 'parent', 'lft', 'rght', 'tree_id', 'level']
-    mandatory_placeholders = ('title', 'slug', )
+    exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
+    mandatory_placeholders = ('title', 'slug', 'parent')
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [mandatory_placeholders, 'status']
@@ -49,7 +49,7 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('navigation_extenders')
     
     fieldsets = [
-        (_('General'), {
+        (None, {
             'fields': general_fields,
             'classes': ('general',),
         }),
@@ -204,7 +204,6 @@ class PageAdmin(admin.ModelAdmin):
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
-        
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             form.base_fields['slug'].initial = title_obj.slug
@@ -218,7 +217,8 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['title'].initial = u''
             form.base_fields['application_urls'].initial = u''
             form.base_fields['overwrite_url'].initial = u''
-
+            form.base_fields['parent'].initial = request.GET.get('target', None)
+        form.base_fields['parent'].widget = HiddenInput() 
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)
@@ -294,7 +294,7 @@ class PageAdmin(admin.ModelAdmin):
             raise PermissionDenied
         try:
             cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
+                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
