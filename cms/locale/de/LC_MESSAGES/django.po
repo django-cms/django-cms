@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-04-23 16:57+0200\n"
-"PO-Revision-Date: 2009-04-23 17:07+0100\n"
+"PO-Revision-Date: 2009-05-12 22:44+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -58,7 +58,7 @@ msgstr "Titel"
 
 #: admin/forms.py:12
 msgid "The default title"
-msgstr "Der standart Titel"
+msgstr "Der Standard-Titel"
 
 #: admin/forms.py:13
 msgid "Language"
@@ -66,7 +66,7 @@ msgstr "Sprache"
 
 #: admin/forms.py:14
 msgid "The current language of the content fields."
-msgstr "Die Momentane Sprache der Inhalt Felder."
+msgstr "Sprachvariante dieser Seite, die bearbeitet werden soll."
 
 #: admin/forms.py:15
 msgid "Slug"
@@ -74,7 +74,7 @@ msgstr "Slug"
 
 #: admin/forms.py:16
 msgid "The part of the title that is used in the url"
-msgstr "Der Teil des Titels der in der URL verwendet wird."
+msgstr "Die Kurzform des Titels, die in URLs verwendet wird."
 
 #: admin/forms.py:17
 msgid "Application"
@@ -95,11 +95,11 @@ msgstr "Eine andere Seite mit diesem Slug existiert bereits"
 
 #: admin/forms.py:47
 msgid "A page with this reverse url id exists already."
-msgstr "Eine andere Seite mit dieser reverse-url-id ist bereits vorhanden"
+msgstr "Eine andere Seite mit dieser Reverse-URL-ID ist bereits vorhanden"
 
 #: admin/forms.py:54
 msgid "Invalid url, use /my/url format."
-msgstr "Keine korrekte url. Bitte verwenden sie das Format: /meine/url/"
+msgstr "Keine korrekte URL. Bitte verwenden sie das Format: /meine/url/ !"
 
 #: admin/views.py:78
 #, python-format
@@ -153,7 +153,7 @@ msgstr "Slot"
 #: migrations/0001_initial.py:18
 #: models/__init__.py:431
 msgid "plugin_name"
-msgstr "Plugin Name"
+msgstr "Plugin-Name"
 
 #: migrations/0001_initial.py:25
 #: models/__init__.py:361
@@ -166,7 +166,7 @@ msgstr "Titel"
 #: migrations/0001_initial.py:28
 #: models/__init__.py:363
 msgid "path"
-msgstr "pfad"
+msgstr "Pfad"
 
 #: migrations/0001_initial.py:30
 #: models/__init__.py:362
@@ -241,17 +241,17 @@ msgstr "Verfasser"
 #: migrations/0001_initial.py:58
 #: migrations/0006_apphook.py:36
 msgid "reverse url id"
-msgstr "Reverse-Url-ID"
+msgstr "Reverse-URL-ID"
 
 #: migrations/0001_initial.py:59
 #: models/__init__.py:50
 msgid "login required"
-msgstr "Login erforderlich"
+msgstr "Login erforderlich!"
 
 #: migrations/0001_initial.py:60
 #: models/__init__.py:52
 msgid "soft root"
-msgstr "Soft Root"
+msgstr "Soft-Root"
 
 #: migrations/0001_initial.py:63
 #: models/__init__.py:49
@@ -273,7 +273,7 @@ msgstr "Veröffentlicht am"
 #: models/__init__.py:51
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "in navigation"
-msgstr "In der Navigation"
+msgstr "im Men√º"
 
 #: migrations/0006_apphook.py:14
 #: models/__init__.py:365
@@ -283,7 +283,7 @@ msgstr "Applikation"
 #: migrations/0006_apphook.py:64
 #: models/__init__.py:53
 msgid "id"
-msgstr "id"
+msgstr "ID"
 
 #: models/__init__.py:42
 msgid "Draft"
@@ -327,7 +327,7 @@ msgstr "Seiten"
 
 #: models/__init__.py:257
 msgid "default"
-msgstr "Standart"
+msgstr "Standard"
 
 #: models/__init__.py:334
 msgid "All pages"
@@ -343,11 +343,11 @@ msgstr "Diese Seite und alle Unterseiten"
 
 #: models/__init__.py:356
 msgid "Page Permission"
-msgstr "Seite Berechtigung"
+msgstr "Seiten-Berechtigung"
 
 #: models/__init__.py:357
 msgid "Page Permissions"
-msgstr "Seiten Berechtigungen"
+msgstr "Seiten-Berechtigungen"
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -389,14 +389,14 @@ msgstr "Link"
 #: plugins/link/models.py:14
 #: plugins/link/migrations/0001_initial.py:14
 msgid "name"
-msgstr "name"
+msgstr "Name"
 
 #: plugins/link/models.py:15
 #: plugins/link/migrations/0001_initial.py:12
 #: plugins/picture/models.py:18
 #: plugins/picture/migrations/0001_initial.py:12
 msgid "link"
-msgstr "link"
+msgstr "Link"
 
 #: plugins/link/models.py:16
 msgid "A link to a page has priority over a text link."
@@ -413,16 +413,16 @@ msgstr "Bild"
 
 #: plugins/picture/models.py:18
 msgid "if present image will be clickable"
-msgstr "wenn vorhanden wird das Bild clickbar"
+msgstr "F√ºllen Sie dieses Feld aus, um aus dem Bild einen Link zu machen!"
 
 #: plugins/picture/models.py:19
 #: plugins/picture/migrations/0001_initial.py:15
 msgid "alternate text"
-msgstr "Alternativer Text"
+msgstr "Alternativer Text."
 
 #: plugins/picture/models.py:19
 msgid "textual description of the image"
-msgstr "Beschreibung des Bildes"
+msgstr "Beschreibung des Bildes."
 
 #: plugins/text/cms_plugins.py:12
 msgid "Text"
@@ -431,7 +431,7 @@ msgstr "Text"
 #: plugins/text/models.py:16
 #: plugins/text/migrations/0001_initial.py:12
 msgid "body"
-msgstr "body"
+msgstr "Body"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:51
 #: templates/admin/cms/page/widgets/plugin_editor.html:8
@@ -565,7 +565,7 @@ msgstr "Als Unterseite einfügen"
 #: templates/admin/cms/page/menu.html:13
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr "Editieren Sei diese Seite in %(language)s "
+msgstr "Editieren Sie diese Seite in %(language)s "
 
 #: templates/admin/cms/page/menu.html:20
 msgid "View on page"
@@ -605,11 +605,11 @@ msgstr "Sichern"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr "Eine alte Version von einem Plugin kann nicht gespeichert werden!"
+msgstr "Eine alte Version eines Plugins kann nicht gespeichert werden!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:10
 msgid "Plugin saved successfully."
-msgstr "Plugin wurde erfolgreich gespeichert"
+msgstr "Das Plugin wurde erfolgreich gespeichert."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:11
 msgid "Add Plugin"
@@ -638,7 +638,7 @@ msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
 #: templatetags/cms_tags.py:282
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr "Eien reverse-ID wurde auf %(domain)s nicht gefunden"
+msgstr "Eine Reverse-ID wurde auf %(domain)s nicht gefunden."
 
 #: templatetags/cms_tags.py:283
 #, python-format
