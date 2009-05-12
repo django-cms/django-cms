@@ -3,7 +3,8 @@ $(document).ready(function() {
         var select = $(this).parent().children("select");
         var pluginvalue = select.attr('value');
         var placeholder = $(this).parent().parent().parent().parent().parent().children("h2").text();
-        var page_id = window.location.href.split("/")[6];
+        var splits = window.location.href.split("/");
+        var page_id = splits[splits.length-2];
         var language = $('#id_language').attr('value');
         var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
         if (pluginvalue) {
