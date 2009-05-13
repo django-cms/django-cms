@@ -385,7 +385,7 @@ class PlaceholderNode(template.Node):
             if t:
                 c = t.slug
         else:
-            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name).order_by('position').select_related()
+            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
             c = ""
             for plugin in plugins:
                 c += plugin.render_plugin(context, self.name)

@@ -54,6 +54,7 @@ def add_plugin(request):
         plugin_type = request.POST['plugin_type']
         page_id = request.POST.get('page_id', None)
         parent = None
+        print parent, page_id, plugin_type
         if page_id:
             page = get_object_or_404(Page, pk=page_id)
             placeholder = request.POST['placeholder'].lower()
