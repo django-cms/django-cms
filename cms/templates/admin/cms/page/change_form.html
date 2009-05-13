@@ -15,11 +15,12 @@
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
   <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  {% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  {% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% block form_top %}{% endblock %}
+{{ adminForm.fields.parent }}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
@@ -31,7 +32,7 @@
 {% endif %}
 
 {% for fieldset in adminform %}
-  {% include "admin/includes/fieldset.html" %}
+  {% include "admin/cms/page/includes/fieldset.html" %}
 {% endfor %}
 
 {% block after_field_sets %}{% if add %}

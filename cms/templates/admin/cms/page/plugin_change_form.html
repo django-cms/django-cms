@@ -1,0 +1,101 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="../../../jsi18n/"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}javascript/jquery.js"></script>
+{{ media }}
+
+<script type="text/javascript">
+	function runOnLoad(f) {
+		if (runOnLoad.loaded){
+			f();
+		}else{
+			runOnLoad.funcs.push(f);
+		}
+	}
+	runOnLoad.funcs = [];
+	runOnLoad.loaded = false;
+	runOnLoad.run = function() {
+		if (runOnLoad.loaded) return;
+	
+		for(var i = 0; i < runOnLoad.funcs.length; i++) {
+			try { 
+				runOnLoad.funcs[i](); 
+			}catch(e) { }
+		}
+		runOnLoad.loaded = true;
+		delete runOnLoad.funcs;
+		delete runOnLoad.run;
+	};
+	if (window.addEventListener){
+		window.addEventListener("load", runOnLoad.run, false);
+	}else if (window.attachEvent){
+		window.attachEvent("onload", runOnLoad.run);
+	}else{
+		window.onload = runOnLoad.run;
+	}
+	runOnLoad(function(){
+		parent.setiframeheight($('body').height()+20, {{ plugin.pk }});
+	});
+</script>
+
+
+{% endblock %}
+ 
+{% block extrastyle %}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
+ 
+{% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
+ 
+{% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+ 
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
+     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo;
+     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endif %}{% endblock %}
+ 
+{% block content_title %}<h2>{{ plugin.get_plugin_name }}</h2>{% endblock %}
+ 
+{% block content %}<div id="content-main">
+{% block top %}{{ plugin.render_plugin }}{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+{% if save_on_top %}{% submit_row %}{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    </p>
+    <ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
+ 
+{% block after_field_sets %}{% endblock %}
+ 
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+ 
+{% block after_related_objects %}{% endblock %}
+
+ 
+{% if add %}
+   <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
+{% endif %}
+ 
+{# JavaScript for prepopulated fields #}
+{% prepopulated_fields_js %}
+ 
+</div>
+<input class="" type="submit" value="{% trans "Save" %}" name="_save"/>
+</form>
+
+</div>
+{% endblock %}

@@ -73,7 +73,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    'cms.middleware.CurrentSiteMiddleware',
+    'django.contrib.csrf.middleware.CsrfMiddleware',
     'cms.middleware.CurrentPageMiddleware',
     'cms.middleware.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -100,11 +100,16 @@ INSTALLED_APPS = (
     'cms.plugins.picture',
     'cms.plugins.file',
     'cms.plugins.flash',
+    'cms.plugins.link',
     'mptt',
     'reversion',
     'example.categories',
     'debug_toolbar',
+
     'south',
+    # sample application
+    'sampleapp',
+    'store',
 )
 
 gettext = lambda s: s
@@ -121,9 +126,18 @@ CMS_TEMPLATES = (
     ('long-folder-long/long-template-name.html', gettext('long')),
 )
 
+CMS_APPLICATIONS_URLS = (
+    ('sampleapp.urls', 'Sample application'),
+    ('sampleapp.urlstwo', 'Second sample application'),
+)
+
+
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
+CMS_FLAT_URLS = True
+
+SOUTH_AUTO_FREEZE_APP = True
 
 try:
     from local_settings import *

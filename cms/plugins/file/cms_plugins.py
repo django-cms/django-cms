@@ -7,8 +7,7 @@ from django.conf import settings
 class FilePlugin(CMSPluginBase):
     model = File
     name = _("File")
-    #form_template = "file/form.html"
-    render_template = "file/plugin.html"
+    render_template = "cms/plugins/file.html"
     
     def render(self, context, instance, placeholder):      
         return {'instance':instance, 'placeholder':placeholder, 'MEDIA_URL': settings.MEDIA_URL}

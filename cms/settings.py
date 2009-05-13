@@ -16,9 +16,12 @@ if CMS_TEMPLATES is None:
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
 
-# Whether a slug should be unique together with its parent and in the same lanuage?
+# Whether a slug should be unique ... must be unique in all languages.
 i18n_installed = not 'cms.middleware.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
 CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_installed)
+
+#Should the tree of the pages be also be displayed in the urls? or should a falt slug strucutre be used?
+CMS_FLAT_URLS = getattr(settings, 'CMS_FLAT_URLS', False)
 
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
@@ -69,3 +72,9 @@ CMS_URL_OVERWRITE = getattr(settings, 'CMS_URL_OVERWRITE', True)
 
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
+
+# a tuple of hookable applications, e.g.:
+# CMS_APPLICATIONS_URLS = (
+#    ('sampleapp.urls', 'Sample application'),
+# )
+CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 

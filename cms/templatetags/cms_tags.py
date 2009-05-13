@@ -6,7 +6,7 @@ from cms.models import Page, Title, CMSPlugin
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
-
+from django.contrib.sites.models import Site
 register = template.Library()
 
 
@@ -18,7 +18,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     render_children: if set to True will render all not direct ascendants too
     """
     request = context['request']
-    site = request.site
+    site = Site.objects.get_current()
     CMS_CONTENT_CACHE_DURATION = settings.CMS_CONTENT_CACHE_DURATION
     lang = get_language_from_request(request)
     current_page = request.current_page
@@ -112,7 +112,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     render a nested list of all root's children pages"""
     request = context['request']
     lang = get_language_from_request(request)
-    site = request.site
+    site = Site.objects.get_current()
     children = []
     page = request.current_page
     if page:
@@ -175,7 +175,7 @@ show_sub_menu = register.inclusion_tag('cms/dummy.html',
 def show_admin_menu(context, page, no_children=False, level=None):
     """Render the admin table of pages"""
     request = context['request']
-    site = request.site
+    site = Site.objects.get_current()
     lang = get_language_from_request(request)
     softroot = context['softroot']
     if context.has_key("cl"):
@@ -214,7 +214,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
             if title.page_id == page.pk:
                 page.title_cache = title
     else:
-        site = request.site
+        site = Site.objects.get_current()
         ancestors = []
         extenders = Page.objects.published().filter(in_navigation=True, 
                                                     sites__domain=site.domain)
@@ -278,7 +278,7 @@ def page_id_url(context, reverse_id, lang=None):
                 if settings.DEBUG:
                     raise
                 else:
-                    site = request.site
+                    site = Site.objects.get_current()
                     send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
                               _("A page_url template tag didn't found a page with the reverse_id %(reverse_id)s\nThe url of the page was: http://%(host)s%(path)s")%{'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
                                settings.DEFAULT_FROM_EMAIL,
@@ -298,7 +298,7 @@ def page_language_url(context, lang):
     """
     Displays the url of the current page in the defined language.
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
-    This is need if you have slugs in more than one language.
+    This is needed if you have slugs in more than one language.
     """
     if not 'request' in context:
         return ''

@@ -8,6 +8,7 @@ from cms import settings
 from cms.models import Page, Title, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import auto_render
+from django.template.defaultfilters import escapejs, force_escape
 
 def change_status(request, page_id):
     """
@@ -50,79 +51,121 @@ def add_plugin(request):
     if 'history' in request.path or 'recover' in request.path:
         return HttpResponse(str("error"))
     if request.method == "POST":
-        page_id = request.POST['page_id']
-        page = get_object_or_404(Page, pk=page_id)
-        placeholder = request.POST['placeholder'].lower()
         plugin_type = request.POST['plugin_type']
-        language = request.POST['language']
-        position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
-        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
+        page_id = request.POST.get('page_id', None)
+        parent = None
+        if page_id:
+            page = get_object_or_404(Page, pk=page_id)
+            placeholder = request.POST['placeholder'].lower()
+            language = request.POST['language']
+            position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
+        else:
+            parent_id = request.POST['parent_id']
+            parent = get_object_or_404(CMSPlugin, pk=parent_id)
+            page = parent.page
+            placeholder = parent.placeholder
+            language = parent.language
+            position = None
+        plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
+        if parent:
+            plugin.parent = parent
         plugin.save()
         if 'reversion' in settings.INSTALLED_APPS:
             page.save()
             save_all_plugins(page)
             revision.user = request.user
             plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-            revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}       
+            revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
         return HttpResponse(str(plugin.pk))
     raise Http404
 
 if 'reversion' in settings.INSTALLED_APPS:
     add_plugin = revision.create_on_success(add_plugin)
 
-def edit_plugin(request, plugin_id):
+def edit_plugin(request, plugin_id, admin_site):
+    plugin_id = int(plugin_id)
     if not 'history' in request.path:
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-        instance, plugin_class = cms_plugin.get_plugin_instance()
+        instance, admin = cms_plugin.get_plugin_instance(admin_site)
     else:
-        plugin_id = int(plugin_id)
+        # history view with reversion
         from reversion.models import Version
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+        
         for rev in revs:
             obj = rev.object
             if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
                 cms_plugin = obj
                 break
-        inst, plugin_class = cms_plugin.get_plugin_instance()
+        inst, admin = cms_plugin.get_plugin_instance(admin_site)
         instance = None
+        
         for rev in revs:
             obj = rev.object
             if obj.__class__ == inst.__class__ and int(obj.pk) == plugin_id:
                 instance = obj
                 break
-    if request.method == "POST":
         if not instance:
-            instance = plugin_class.model()    
-        instance.pk = cms_plugin.pk
-        instance.page = cms_plugin.page
-        instance.position = cms_plugin.position
-        instance.placeholder = cms_plugin.placeholder
-        instance.language = cms_plugin.language
-        instance.plugin_type = cms_plugin.plugin_type
-        form = plugin_class.form(request.POST, request.FILES, instance=instance)
-        if form.is_valid():
-            if 'history' in request.path:
-                return render_to_response('admin/cms/page/plugin_forms_history.html', {'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'is_popup':True},RequestContext(request))
-            inst = form.save()
-            inst.page.save()
-            if 'reversion' in settings.INSTALLED_APPS:
-                save_all_plugins(inst.page, [inst.pk])
-                revision.user = request.user
-                plugin_name = unicode(plugin_pool.get_plugin(inst.plugin_type).name)
-                revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':inst.position, 'placeholder':inst.placeholder}
-            return render_to_response('admin/cms/page/plugin_forms_ok.html',{'CMS_MEDIA_URL':settings.CMS_MEDIA_URL, 'plugin':cms_plugin, 'is_popup':True, 'name':unicode(inst), "type":inst.get_plugin_name()}, RequestContext(request))
+            # TODO: this should be changed, and render something else.. There
+            # can be case when plugin is not using (registered) with reversion
+            # so it doesn't haves any version - it should just render plugin
+            # and say something like - not in version system..
+            raise Http404
+        
+    # assign required variables to admin
+    admin.cms_plugin_instance = cms_plugin
+    admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
+    
+    if request.method == "POST":
+        # set the continue flag, otherwise will admin make redirect to list
+        # view, which actually does'nt exists
+        request.POST['_continue'] = True
+    
+    if 'reversion' in settings.INSTALLED_APPS and 'history' in request.path:
+        # in case of looking to history just render the plugin content
+        context = RequestContext(request)
+        return render_to_response(admin.render_template, admin.render(context, instance, admin.placeholder), context)
+    
+    
+    if not instance:
+        # instance doesn't exist, call add view
+        response = admin.add_view(request)
+ 
     else:
-        if instance:
-            form = plugin_class.form(instance=instance)
-        else:
-            form = plugin_class.form() 
-    if plugin_class.form_template:
-        template = plugin_class.form_template
-    else:
-        template = 'admin/cms/page/plugin_forms.html'
-    return render_to_response(template, {'form':form, 'plugin':cms_plugin, 'instance':instance, 'is_popup':True, 'CMS_MEDIA_URL':settings.CMS_MEDIA_URL}, RequestContext(request))
+        # already saved before, call change view
+        # we actually have the instance here, but since i won't override
+        # change_view method, is better if it will be loaded again, so
+        # just pass id to admin
+        response = admin.change_view(request, str(plugin_id))
+    
+    if request.method == "POST" and admin.object_successfully_changed:
+        # if reversion is installed, save version of the page plugins
+        if 'reversion' in settings.INSTALLED_APPS:
+            # perform this only if object was successfully changed
+            cms_plugin.page.save()
+            save_all_plugins(cms_plugin.page, [cms_plugin.pk])
+            revision.user = request.user
+            plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
+            revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':cms_plugin.position, 'placeholder': cms_plugin.placeholder}
+            
+        # read the saved object from admin - ugly but works
+        saved_object = admin.saved_object
+        
+        context = {
+            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'plugin': saved_object,
+            'is_popup': True,
+            'name': unicode(saved_object),
+            "type": saved_object.get_plugin_name(),
+            'plugin_id': plugin_id,
+            'icon': force_escape(escapejs(saved_object.get_instance_icon_src())),
+            'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
+        }
+        return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
+        
+    return response
 
 if 'reversion' in settings.INSTALLED_APPS:
     edit_plugin = revision.create_on_success(edit_plugin)
@@ -157,13 +200,14 @@ def remove_plugin(request):
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
         page = plugin.page
         plugin.delete()
+        plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+        comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
         if 'reversion' in settings.INSTALLED_APPS:
             save_all_plugins(page)
             page.save()
             revision.user = request.user
-            plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
-            revision.comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
-        return HttpResponse(str(plugin_id))
+            revision.comment = comment
+        return HttpResponse("%s,%s" % (plugin_id, comment))
     raise Http404
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -174,7 +218,11 @@ def save_all_plugins(page, excludes=None):
         if excludes:
             if plugin.pk in excludes:
                 continue
-        plugin.save()
+        instance, admin = plugin.get_plugin_instance()
+        if instance:
+            instance.save()
+        else:
+            plugin.save()
         
 def revert_plugins(request, version_id):
     from reversion.models import Version
