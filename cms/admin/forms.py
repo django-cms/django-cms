@@ -43,6 +43,7 @@ class PageForm(forms.ModelForm):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data
+    
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
         return slug

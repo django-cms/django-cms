@@ -4,5 +4,8 @@
 {% block title %}Nice template{% endblock %}
 
 {% block content %}{{ block.super }}
-    {% placeholder fancy-content %}
+	<div>
+		<h3>Fancy Content placeholder</h3>
+    	{% placeholder fancy-content %}
+    </div>
 {% endblock %}

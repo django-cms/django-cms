@@ -226,15 +226,9 @@ class Page(models.Model):
                 
     def get_template(self):
         """
-        get the template of this page if defined or if closer parent if
-        defined or the first one
+        get the template of this page.
         """
-        if self.template:
-            return self.template
-        for p in self.get_ancestors(ascending=True):
-            if p.template:
-                return p.template
-        return settings.CMS_TEMPLATES[0][0]
+        return self.template
 
     def get_template_name(self):
         """

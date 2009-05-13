@@ -38,8 +38,7 @@ def get_template_from_request(request, obj=None):
     if len(settings.CMS_TEMPLATES) == 1:
         return settings.CMS_TEMPLATES[0][0]
     template = request.REQUEST.get('template', None)
-    if template is not None and \
-            template in dict(settings.CMS_TEMPLATES).keys():
+    if template is not None and template in dict(settings.CMS_TEMPLATES).keys():
         return template
     if obj is not None:
         return obj.get_template()
