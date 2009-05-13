@@ -187,16 +187,17 @@ class PagePermissionManager(models.Manager):
                     allow_list = list(Page.objects.all().values_list('id', flat=True))
                 else:
                     return []
-            if getattr(perm, attr):
-                if perm.page.id not in allow_list:
-                    allow_list.append(perm.page.id)
-                if perm.page.id in deny_list:
-                    deny_list.remove(perm.page.id)
-            else:
-                if perm.page.id not in deny_list:
-                    deny_list.append(perm.page.id)
-                if perm.page.id in allow_list:
-                    allow_list.remove(perm.page.id)
+            if perm.page:
+                if getattr(perm, attr):
+                    if perm.page.id not in allow_list:
+                        allow_list.append(perm.page.id)
+                    if perm.page.id in deny_list:
+                        deny_list.remove(perm.page.id)
+                else:
+                    if perm.page.id not in deny_list:
+                        deny_list.append(perm.page.id)
+                    if perm.page.id in allow_list:
+                        allow_list.remove(perm.page.id)
             if perm.type == PagePermission.PAGECHILDREN:
                 for id in perm.page.get_descendants().values_list('id', flat=True):
                     if getattr(perm, attr):
