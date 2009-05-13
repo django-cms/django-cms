@@ -105,8 +105,7 @@ def get_page_from_request(request):
         if path.startswith('/admin/'):
             kw['page_id']=path.split("/")[0]
         else:
-            kw['slug']=path.split("/")[-2]
-            
+            kw['slug']=path[1:-1]
         resp = details(request, no404=True, only_context=True, **kw)
         return resp['current_page']
 
