@@ -2,6 +2,7 @@ from django.forms.models import ModelForm
 from cms.plugins.text.models import Text
 from django import forms
 
+
 class TextForm(ModelForm):
     body = forms.CharField()
     

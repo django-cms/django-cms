@@ -165,7 +165,6 @@ class PageAdmin(admin.ModelAdmin):
         the object is being changed, and False if it's being added.
         """
         instance = super(PageAdmin, self).save_form(request, form, change)
-        instance.template = form.cleaned_data['template']
         if not change:
             instance.author = request.user
         return instance

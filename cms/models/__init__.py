@@ -226,15 +226,9 @@ class Page(models.Model):
                 
     def get_template(self):
         """
-        get the template of this page if defined or if closer parent if
-        defined or the first one
+        get the template of this page.
         """
-        if self.template:
-            return self.template
-        for p in self.get_ancestors(ascending=True):
-            if p.template:
-                return p.template
-        return settings.CMS_TEMPLATES[0][0]
+        return self.template
 
     def get_template_name(self):
         """
@@ -436,9 +430,10 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type)
         
-    def get_plugin_instance(self, *args, **kwargs):
+    def get_plugin_instance(self, admin=None):
         from cms.plugin_pool import plugin_pool
-        plugin = plugin_pool.get_plugin(self.plugin_type)(*args, **kwargs)
+        plugin_class = plugin_pool.get_plugin(self.plugin_type)
+        plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
         if plugin.model != CMSPlugin:
             try:
                 instance = getattr(self, plugin.model.__name__.lower())

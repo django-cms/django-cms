@@ -138,19 +138,17 @@
 
 <h2>Content</h2>
 {% block content %}
-    <div style="float:right;width:25%">
-    <h3>Right column placeholder</h3>
-    {% placeholder right-column %}
-    </div>
-
-    {% if current_page %}
     <div style="width:70%">
-        
 		<h3>title placeholder {% placeholder title %}</h3>
-        <div>body placeholder {% placeholder body %}</div>
-		
+		<div style="float:right;width:25%">
+    		<h3>Right column placeholder</h3>
+    		{% placeholder right-column %}
+    	 </div>
+        <div>
+        	<h3>body placeholder</h3>
+         	{% placeholder body %}
+         </div>
     </div>
-    {% endif %}
 {% endblock %}
 
 </div>
