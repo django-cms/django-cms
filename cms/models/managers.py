@@ -246,7 +246,23 @@ class PagePermissionManager(BasicPagePermissionManager):
         )
         #qs = qs.exclude(user=user).exclude(group__user=user)
         return qs
-
+    
+    def for_page(self, page):
+        """Returns queryset containing all instances somehow connected to given 
+        page. This includes permissions to page itself and permissions inherited
+        from higher pages.
+        
+        NOTE: this returns just PagePermission instances, to get complete access
+        list merge return of this function with Global permissions.
+        """
+        from cms.models import PagePermission
+        
+        q = Q(page__tree_id=page.tree_id) & (
+            Q(page=page) 
+            | (Q(page__level__lt=page.level)  & (Q(grant_on=PagePermission.ACCESS_DESCENDANTS) | Q(grant_on=PagePermission.ACCESS_PAGE_AND_DESCENDANTS)))
+            | (Q(page__level=page.level - 1) & (Q(grant_on=PagePermission.ACCESS_CHILDREN) | Q(grant_on=PagePermission.ACCESS_PAGE_AND_CHILDREN)))  
+        ) 
+        return self.filter(q).order_by('page__level')
 
 class PagePermissionsPermissionManager(models.Manager):
     """Page permissions permission manager.

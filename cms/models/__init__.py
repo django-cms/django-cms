@@ -423,9 +423,9 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
     
-    def get_plugin_instance(self):
+    def get_plugin_instance(self, *args, **kwargs):
         from cms.plugin_pool import plugin_pool
-        plugin = plugin_pool.get_plugin(self.plugin_type)()
+        plugin = plugin_pool.get_plugin(self.plugin_type)(*args, **kwargs)
         if plugin.model != CMSPlugin:
             try:
                 instance = getattr(self, plugin.model.__name__.lower())

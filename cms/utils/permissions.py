@@ -95,7 +95,7 @@ def get_subordinate_users(user):
     users.
     
     This function is currently used in PagePermissionInlineAdminForm for limit
-    users in permission conbobox. 
+    users in permission combobox. 
     
     Example:
                               A,W                    level 0
@@ -118,6 +118,7 @@ def get_subordinate_users(user):
     user_level = get_user_permission_level(user)
     
     qs = User.objects.distinct().filter(
+        Q(is_staff=True) &
         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
         | (Q(extuser__created_by=user) & Q(pagepermission__page=None))
     )
@@ -139,3 +140,11 @@ def get_subordinate_groups(user):
         | (Q(extgroup__created_by=user) & Q(pagepermission__page=None))
     )
     return qs
+
+def has_global_change_permissions_permission(user):
+    opts = GlobalPagePermission._meta
+    if user.is_superuser or \
+        (user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
+            GlobalPagePermission.objects.with_user(user).filter(can_change=True)):
+        return True
+    return False

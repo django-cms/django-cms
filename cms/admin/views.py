@@ -9,39 +9,41 @@ from cms.models import Page, Title, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import auto_render
 from django.template.defaultfilters import escapejs, force_escape
+from django.views.decorators.http import require_POST
 
+@require_POST
 def change_status(request, page_id):
     """
     Switch the status of a page
     """
-    if request.method == 'POST':
-        page = Page.objects.get(pk=page_id)
-        if page.has_publish_permission(request):
-            if page.status == Page.DRAFT:
-                page.status = Page.PUBLISHED
-            elif page.status == Page.PUBLISHED:
-                page.status = Page.DRAFT
-            page.save()    
-            return HttpResponse(unicode(page.status))
+    page = get_object_or_404(Page, pk=page_id)
+    if page.has_publish_permission(request):
+        if page.status == Page.DRAFT:
+            page.status = Page.PUBLISHED
+        elif page.status == Page.PUBLISHED:
+            page.status = Page.DRAFT
+        page.save()    
+        return HttpResponse(unicode(page.status))
     raise Http404
 change_status = staff_member_required(change_status)
 
+@require_POST
 def change_innavigation(request, page_id):
     """
     Switch the in_navigation of a page
     """
-    if request.method == 'POST':
-        page = Page.objects.get(pk=page_id)
-        if page.has_change_permission(request):
-            if page.in_navigation:
-                page.in_navigation = False
-                val = 0
-            else:
-                page.in_navigation = True
-                val = 1
-            page.save()
-            return HttpResponse(unicode(val))
+    page = get_object_or_404(Page, pk=page_id)
+    if page.has_change_permission(request):
+        if page.in_navigation:
+            page.in_navigation = False
+            val = 0
+        else:
+            page.in_navigation = True
+            val = 1
+        page.save()
+        return HttpResponse(unicode(val))
     raise Http404
+    
 change_status = staff_member_required(change_status)
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -66,13 +68,17 @@ def add_plugin(request):
             placeholder = parent.placeholder
             language = parent.language
             position = None
+        
+        if not page.has_change_permission(request):
+            raise Http404
+        
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
         if parent:
             plugin.parent = parent
         plugin.save()
         if 'reversion' in settings.INSTALLED_APPS:
             page.save()
-            save_all_plugins(page)
+            save_all_plugins(request, page)
             revision.user = request.user
             plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
             revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}       
@@ -113,8 +119,10 @@ def edit_plugin(request, plugin_id, admin_site):
             # so it doesn't haves any version - it should just render plugin
             # and say something like - not in version system..
             raise Http404
-        
-    # assign required variables to admin
+    
+    if not cms_plugin.page.has_change_permission(request):
+        raise Http404
+
     admin.cms_plugin_instance = cms_plugin
     admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
     
@@ -145,7 +153,7 @@ def edit_plugin(request, plugin_id, admin_site):
         if 'reversion' in settings.INSTALLED_APPS:
             # perform this only if object was successfully changed
             cms_plugin.page.save()
-            save_all_plugins(cms_plugin.page, [cms_plugin.pk])
+            save_all_plugins(request, cms_plugin.page, [cms_plugin.pk])
             revision.user = request.user
             plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
             revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':cms_plugin.position, 'placeholder': cms_plugin.placeholder}
@@ -178,13 +186,17 @@ def move_plugin(request):
             plugin = CMSPlugin.objects.get(pk=id)
             if not page:
                 page = plugin.page
+            
+            if not page.has_change_permission(request):
+                raise Http404
+
             if plugin.position != pos:
                 plugin.position = pos
                 plugin.save()
             pos += 1
         if page and 'reversion' in settings.INSTALLED_APPS:
             page.save()
-            save_all_plugins(page)
+            save_all_plugins(request, page)
             revision.user = request.user
             revision.comment = unicode(_(u"Plugins where moved")) 
         return HttpResponse(str("ok"))
@@ -199,11 +211,15 @@ def remove_plugin(request):
         plugin_id = request.POST['plugin_id']
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
         page = plugin.page
+        
+        if not page.has_change_permission(request):
+                raise Http404
+
         plugin.delete()
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
         if 'reversion' in settings.INSTALLED_APPS:
-            save_all_plugins(page)
+            save_all_plugins(request, page)
             page.save()
             revision.user = request.user
             revision.comment = comment
@@ -213,7 +229,10 @@ def remove_plugin(request):
 if 'reversion' in settings.INSTALLED_APPS:
     remove_plugin = revision.create_on_success(remove_plugin)
     
-def save_all_plugins(page, excludes=None):
+def save_all_plugins(request, page, excludes=None):
+    if not page.has_change_permission(request):
+        raise Http404
+    
     for plugin in CMSPlugin.objects.filter(page=page):
         if excludes:
             if plugin.pk in excludes:
@@ -239,7 +258,11 @@ def revert_plugins(request, version_id):
             page = obj
             obj.save()
         if obj.__class__ == Title:
-            titles.append(obj) 
+            titles.append(obj)
+    
+    if not page.has_change_permission(request):
+        raise Http404
+     
     current_plugins = list(CMSPlugin.objects.filter(page=page))
     for plugin in plugin_list:
         plugin.page = page

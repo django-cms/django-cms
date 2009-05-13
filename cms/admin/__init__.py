@@ -5,13 +5,14 @@ from django.contrib.admin.util import unquote
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.forms import Widget, TextInput, Textarea, CharField, HiddenInput
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title
 from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import ugettext as _, ugettext_lazy, ugettext
 from django.views.generic.create_update import redirect
+from django import template
 from inspect import isclass, getmembers
 from copy import deepcopy
 
@@ -22,13 +23,16 @@ from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins)
 from cms.admin.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin
+from cms.models import Page, Title, CMSPlugin, PagePermission
 from cms.plugin_pool import plugin_pool
 from cms.settings import CMS_MEDIA_URL
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.permissions import has_page_add_permission
+from cms.utils.permissions import has_page_add_permission,\
+    get_user_permission_level, has_global_change_permissions_permission
 from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
+from cms.exceptions import NoPermissionsException
+from cms.models.managers import PagePermissionsPermissionManager
 
 PAGE_ADMIN_INLINES = []
 
@@ -125,9 +129,8 @@ if settings.CMS_PERMISSION:
 class PageAdmin(admin.ModelAdmin):
     """sdfsdf sdf f
     """
-    
-    
     form = PageForm
+    
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent')
     filter_horizontal = ['sites']
@@ -206,6 +209,8 @@ class PageAdmin(admin.ModelAdmin):
             return move_plugin(request)
         elif url.endswith('/move-page'):
             return self.move_page(request, unquote(url[:-10]))
+        elif 'permissions' in url:
+            return self.get_permissions(request, url.split('/')[0])
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
@@ -362,7 +367,7 @@ class PageAdmin(admin.ModelAdmin):
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
-
+    
     def change_view(self, request, object_id, extra_context=None):
         """
         The 'change' admin view for the Page model.
@@ -381,6 +386,8 @@ class PageAdmin(admin.ModelAdmin):
                 'language': get_language_from_request(request),
                 'traduction_language': settings.CMS_LANGUAGES,
                 'page': obj,
+                'CMS_PERMISSION': settings.CMS_PERMISSION,
+                'has_change_permissions_permission': obj.has_change_permissions_permission(request)
             }
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
 
@@ -437,11 +444,12 @@ class PageAdmin(admin.ModelAdmin):
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
-            
+             
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
             'CMS_MEDIA_URL': CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
+            
             'CMS_PERMISSION': settings.CMS_PERMISSION,
         }
         if 'reversion' in settings.INSTALLED_APPS:
@@ -495,7 +503,38 @@ class PageAdmin(admin.ModelAdmin):
         page.move_page(target, position)
         return HttpResponse("ok")
 
-    
+    def get_permissions(self, request, page_id):
+        #if not obj.has_change_permissions_permission(request):
+        page = get_object_or_404(Page, id=page_id)
+        
+        can_change_list = Page.permissions.get_change_id_list(request.user)
+        
+        global_page_permissions = GlobalPagePermission.objects.all()
+        page_permissions = PagePermission.objects.for_page(page)
+        permissions = list(global_page_permissions) + list(page_permissions)
+        
+        # does he can change global permissions ?
+        has_global = has_global_change_permissions_permission(request.user)
+        
+        permission_set = []
+        for permission in permissions:
+            if isinstance(permission, GlobalPagePermission):
+                if has_global:
+                    permission_set.append([(True, True), permission])
+                else:
+                    permission_set.append([(True, False), permission])
+            else:
+                if can_change_list == PagePermissionsPermissionManager.GRANT_ALL:
+                    can_change = True
+                else:
+                    can_change = permission.page_id in can_change_list
+                permission_set.append([(False, can_change), permission])
+        
+        context = {
+            'page': page,
+            'permission_set': permission_set,
+        }
+        return render_to_response('admin/cms/page/permissions.html', context)
     
 
 
