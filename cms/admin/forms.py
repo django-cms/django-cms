@@ -26,7 +26,10 @@ class PageForm(forms.ModelForm):
     
     def clean(self):
         cleaned_data = self.cleaned_data
-        slug = cleaned_data['slug']
+        if 'slug' in cleaned_data.keys():
+            slug = cleaned_data['slug']
+        else:
+            slug = ""
         
         page = self.instance
         lang = cleaned_data['language']

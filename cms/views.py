@@ -65,6 +65,5 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         request._current_page_cache = current_page
     else:
         has_page_permissions = False
-        
     return template_name, locals()
 details = auto_render(details)
