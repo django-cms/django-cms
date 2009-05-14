@@ -177,7 +177,6 @@ class ExtUserCreationForm(UserCreationForm):
                 # add permission `t` to model `model`
                 codename = getattr(model._meta, 'get_%s_permission' % t)()
                 permission = Permission.objects.get(content_type=content_type, codename=codename)
-                print "> AP:", permission
                 user.user_permissions.add(permission)
         return user
         
