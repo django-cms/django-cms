@@ -1,3 +1,4 @@
+import urllib2
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User, Group
@@ -9,12 +10,12 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from os.path import join
-import urllib2
-from cms.urlutils import urljoin
+from cms.utils.urlutils import urljoin
 
 import mptt
 from cms import settings
-from cms.models.managers import PageManager, PagePermissionManager, TitleManager
+from cms.models.managers import PageManager, TitleManager, PagePermissionsPermissionManager,\
+    BasicPagePermissionManager, PagePermissionManager
 from cms.models import signals as cms_signals
 
 
@@ -58,6 +59,7 @@ class Page(models.Model):
     
     # Managers
     objects = PageManager()
+    permissions = PagePermissionsPermissionManager()
 
     class Meta:
         verbose_name = _('page')
@@ -222,8 +224,6 @@ class Page(models.Model):
             else:
                 self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
                 
-                
-                
     def get_template(self):
         """
         get the template of this page.
@@ -256,14 +256,40 @@ class Page(models.Model):
     #        langs += '%s, ' % lang
     #    return langs[0:-2]
 
-    def has_page_permission(self, request):
-        return self.has_generic_permission(request, "edit")
-
+    def has_change_permission(self, request):
+        opts = self._meta
+        if request.user.is_superuser:
+            return True
+        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
+            self.has_generic_permission(request, "change")
+    
+    def has_delete_permission(self, request):
+        opts = self._meta
+        if request.user.is_superuser:
+            return True
+        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
+            self.has_generic_permission(request, "delete")
+    
     def has_publish_permission(self, request):
         return self.has_generic_permission(request, "publish")
     
     def has_softroot_permission(self, request):
         return self.has_generic_permission(request, "softroot")
+    
+    def has_change_permissions_permission(self, request):
+        """Has user ability to change permissions for current page?
+        """
+        return self.has_generic_permission(request, "change_permissions")
+    
+    def has_add_permission(self, request):
+        """Has user ability to add page under current page?
+        """
+        return self.has_generic_permission(request, "add")
+    
+    def has_move_page_permission(self, request):
+        """Has user ability to move current page?
+        """
+        return self.has_generic_permission(request, "move_page")
     
     def has_generic_permission(self, request, type):
         """
@@ -272,22 +298,20 @@ class Page(models.Model):
         """
         if not request.user.is_authenticated() or not request.user.is_staff:
             return False
-        if request.user.is_superuser:
+        if not settings.CMS_PERMISSION or request.user.is_superuser:
             return True
-        if not settings.CMS_PERMISSION:
-            return True
-        else:
-            att_name = "permission_%s_cache" % type
-            if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) or request.user.pk != self.permission_user_cache.pk:
-                func = getattr(PagePermission.objects, "get_%s_id_list" % type)
-                permission = func(request.user)
-                self.permission_user_cache = request.user
-                if permission == "All" or self.id in permission:
-                    setattr(self, att_name, True)
-                    self.permission_edit_cache = True
-                else:
-                    setattr(self, att_name, False)
-            return getattr(self, att_name)
+        
+        att_name = "permission_%s_cache" % type
+        if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) or request.user.pk != self.permission_user_cache.pk:
+            func = getattr(Page.permissions, "get_%s_id_list" % type)
+            permission = func(request.user)
+            self.permission_user_cache = request.user
+            if permission == "All" or self.id in permission:
+                setattr(self, att_name, True)
+                self.permission_edit_cache = True
+            else:
+                setattr(self, att_name, False)
+        return getattr(self, att_name)
     
     def is_home(self):
         if self.parent_id:
@@ -314,42 +338,7 @@ try:
 except mptt.AlreadyRegistered:
     pass
 
-if settings.CMS_PERMISSION:
-    class PagePermission(models.Model):
-        """
-        Page permission object
-        """
-        
-        ALLPAGES = 0
-        THISPAGE = 1
-        PAGECHILDREN = 2
-        
-        TYPES = (
-            (ALLPAGES, _('All pages')),
-            (THISPAGE, _('This page only')),
-            (PAGECHILDREN, _('This page and all childrens')),
-        )
-        
-        type = models.IntegerField(_("type"), choices=TYPES, default=0)
-        page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
-        user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
-        group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
-        everybody = models.BooleanField(_("everybody"), default=False)
-        can_edit = models.BooleanField(_("can edit"), default=True)
-        can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
-        can_publish = models.BooleanField(_("can publish"), default=True)
-        #can_change_innavigation = models.BooleanField(_("can change in-navigation"), default=True)
-        
-        
-        objects = PagePermissionManager()
-        
-        def __unicode__(self):
-            return "%s :: %s" % (self.user, unicode(PagePermission.TYPES[self.type][1]))
-        
-        class Meta:
-            verbose_name = _('Page Permission')
-            verbose_name_plural = _('Page Permissions')
-            
+
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=3, db_index=True)
     title = models.CharField(_("title"), max_length=255)
@@ -398,6 +387,7 @@ class Title(models.Model):
             return self.path
         return None
         
+        
 class EmptyTitle(object):
     """Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
@@ -412,6 +402,7 @@ class EmptyTitle(object):
     def overwrite_url(self):
         return None
     
+    
 class CMSPlugin(models.Model):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
@@ -424,7 +415,6 @@ class CMSPlugin(models.Model):
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
-    
     
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
@@ -485,4 +475,110 @@ if 'reversion' in settings.INSTALLED_APPS:
     reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])
     reversion.register(CMSPlugin)
     reversion.register(Title)
+
+################################################################################
+# Permissions
+################################################################################
     
+class AbstractPagePermission(models.Model):
+    """Abstract page permissions
+    """
+    # who:
+    user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
+    group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
+    
+    # what:
+    can_change = models.BooleanField(_("can edit"), default=True)
+    can_add = models.BooleanField(_("can add"), default=True)
+    can_delete = models.BooleanField(_("can delete"), default=True)
+    can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
+    can_publish = models.BooleanField(_("can publish"), default=True)
+    can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
+    can_move_page = models.BooleanField(_("can move"), default=True)
+    
+    class Meta:
+        abstract = True
+        
+    @property
+    def audience(self):
+        """Return audience by priority, so: All or User, Group                
+        """
+        targets = filter(lambda item: item, (self.user, self.group,))
+        return ", ".join([unicode(t) for t in targets]) or 'No one'
+    
+    def save(self, force_insert=False, force_update=False):
+        if not self.user and not self.group:
+            # don't allow `empty` objects
+            return
+        return super(AbstractPagePermission, self).save(force_insert, force_update)    
+    
+class GlobalPagePermission(AbstractPagePermission):
+    """Permissions for all pages (global).
+    """
+    objects = BasicPagePermissionManager()
+    
+    class Meta:
+        verbose_name = _('Page global permission')
+        verbose_name_plural = _('Pages global permissions')
+    
+    __unicode__ = lambda self: "%s :: GLOBAL" % self.audience
+    
+    
+class PagePermission(AbstractPagePermission):
+    """Page permissions for single page
+    """ 
+    # NOTE: those are not just numbers!! we will do binary AND on them,
+    # so pay attention when adding/changing them, see MASK_..
+    ACCESS_PAGE = 1
+    ACCESS_CHILDREN = 2 # just immediate children (1 level)
+    ACCESS_PAGE_AND_CHILDREN = 3 # just immediate children (1 level)
+    ACCESS_DESCENDANTS = 4 
+    ACCESS_PAGE_AND_DESCENDANTS = 5
+    
+    _grant_on_choices = (
+        (ACCESS_PAGE, _('Current page')),
+        (ACCESS_CHILDREN, _('Page children (immediate)')),
+        (ACCESS_PAGE_AND_CHILDREN, _('Page and children (immediate)')),
+        (ACCESS_DESCENDANTS, _('Page descendants')),
+        (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
+    )
+    
+    # binary masks for ACCESS permissions
+    MASK_PAGE = 1
+    MASK_CHILDREN = 2
+    MASK_DESCENDANTS = 4
+    
+    grant_on = models.IntegerField(_("Grant on"), choices=_grant_on_choices, default=ACCESS_PAGE)
+    page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
+    
+    objects = PagePermissionManager()
+    
+    class Meta:
+        verbose_name = _('Page permission')
+        verbose_name_plural = _('Page permissions')
+        
+    def __unicode__(self):
+        return "%s :: %s" % (self.audience, unicode(dict(self._grant_on_choices)[self.grant_on][1]))
+
+class ExtUser(User):
+    """Cms specific user data, required for permission system
+    """
+    created_by = models.ForeignKey(User, related_name="created_users")
+    
+    class Meta:
+        verbose_name = _('Extended user')
+        verbose_name_plural = _('Extended users')
+    
+    #__unicode__ = lambda self: unicode(self.user)
+        
+class ExtGroup(models.Model):
+    """Cms specific group data, required for permission system 
+    """
+    group = models.OneToOneField(Group)
+    created_by = models.ForeignKey(User, related_name="created_usergroups")
+    
+    class Meta:
+        verbose_name = _('Extended group')
+        verbose_name_plural = _('Extended groups')
+        
+        __unicode__ = lambda self: unicode(self.group)

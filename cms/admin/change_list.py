@@ -1,6 +1,6 @@
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
-from cms.models import Title, PagePermission
+from cms.models import Title, Page
 from cms import settings
 from cms.utils import get_language_from_request, find_children
 
@@ -17,10 +17,10 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         qs = super(CMSChangeList, self).get_query_set()
         if request:
-            if not request.user.is_superuser and settings.CMS_PERMISSION: #is not super user so check permissions
-                perm_ids = PagePermission.objects.get_edit_id_list(request.user)
-                qs = qs.filter(pk__in=perm_ids)
-                self.root_query_set = self.root_query_set.filter(pk__in=perm_ids)
+            permissions = Page.permissions.get_change_id_list(request.user)
+            if permissions != Page.permissions.GRANT_ALL:
+                qs = qs.filter(pk__in=permissions)
+                self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
         qs = qs.order_by('tree_id', 'parent', 'lft')
         return qs
@@ -46,33 +46,36 @@ class CMSChangeList(ChangeList):
     def set_items(self, request):
         lang = get_language_from_request(request)
         pages = self.get_query_set(request).order_by('tree_id', 'parent', 'lft').select_related()
-        if settings.CMS_PERMISSION:
-            perm_edit_ids = PagePermission.objects.get_edit_id_list(request.user)
-            perm_publish_ids = PagePermission.objects.get_publish_id_list(request.user)
-            perm_softroot_ids = PagePermission.objects.get_softroot_id_list(request.user)
-            if perm_edit_ids and perm_edit_ids != "All":
-                pages = pages.filter(pk__in=perm_edit_ids)       
+        
+        perm_edit_ids = Page.permissions.get_change_id_list(request.user)
+        perm_publish_ids = Page.permissions.get_publish_id_list(request.user)
+        perm_softroot_ids = Page.permissions.get_softroot_id_list(request.user)
+        
+        if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
+            pages = pages.filter(pk__in=perm_edit_ids)   
+                    
         ids = []
         root_pages = []
         pages = list(pages)
         all_pages = pages[:]
         for page in pages:
             children = []
-            if not page.parent_id or (perm_edit_ids != "All" and not int(page.parent_id) in perm_edit_ids):
+            if not page.parent_id or (perm_edit_ids != Page.permissions.GRANT_ALL and not int(page.parent_id) in perm_edit_ids):
                 page.root_node = True
             else:
                 page.root_node = False
             ids.append(page.pk)
+            
             if settings.CMS_PERMISSION:# caching the permissions
-                if perm_edit_ids == "All" or page.pk in perm_edit_ids:
+                if perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids:
                     page.permission_edit_cache = True
                 else:
                     page.permission_edit_cache = False
-                if perm_publish_ids == "All" or page.pk in perm_publish_ids:
+                if perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids:
                     page.permission_publish_cache = True
                 else:
                     page.permission_publish_cache = False
-                if perm_publish_ids == "All" or page.pk in perm_softroot_ids:
+                if perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_softroot_ids:
                     page.permission_softroot_cache = True
                 else:
                     page.permission_softroot_cache = False

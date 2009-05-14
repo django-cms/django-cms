@@ -1,15 +1,19 @@
-var tree
+var tree;
 
 function initTree(){
 	tree = new tree_component();
-	tree.init($("div.tree"), {
+	var options = {
 		rules: {
 			clickable: "all",
 			renameable: "none",
 			deletable: "all",
 			creatable: "all",
 			draggable: "all",
-			dragrules: "all"
+			dragrules: "all",
+			droppable: "all",
+			metadata : "mdata",
+			use_inline: true,
+			//droppable : ["tree_drop"]
 		},
 		path: false,
 		ui: {
@@ -39,10 +43,22 @@ function initTree(){
 				moveTreeItem(item_id, target_id, position, false)
 			},
 			onchange: function(node, tree){
-				self.location = node.id.split("page_")[1]
+				self.location = node.id.split("page_")[1];
 			}
 		}
-	});
+	};
+	
+	if (!$($("div.tree").get(0)).hasClass('root_allow_children')){
+		// disalow possibility for adding subnodes to main tree, user doesn't
+		// have permissions for this
+		options.rules.dragrules = ["node inside topnode", "node * node"];
+	}
+	
+	//dragrules : [ "folder * folder", "folder inside root", "tree-drop * folder" ],
+        
+	
+	//console.log($("div.tree").get(0).className);
+	tree.init($("div.tree"), options);
 };
 
 $(document).ready(function() { 
@@ -82,7 +98,13 @@ $(document).ready(function() {
         }
         
         if(jtarget.hasClass("addlink")) {
-            $("tr").removeClass("target");
+			if (!/#$/g.test(jtarget.attr('href'))) {
+				// if there is url instead of # inside href, follow this url
+				// used if user haves add_page 
+				return true;
+			}
+			
+			$("tr").removeClass("target");
             $("#changelist table").removeClass("table-selected");
             var page_id = target.id.split("add-link-")[1];
             selected_page = page_id;

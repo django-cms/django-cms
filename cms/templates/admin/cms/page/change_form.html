@@ -45,6 +45,35 @@
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
 
+
+{% if CMS_PERMISSION and has_change_permissions_permission %}
+
+<div class="inline-group">
+	<div class="tabular inline-related">
+		<fieldset id="inherited_permissions" class="module aligned collapse">
+		  <h2>{% trans 'All permissions' %}</h2>
+		  <div class="loading">{% trans 'Loading...' %}</div>
+		</fieldset>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function(){
+		var loaded = false;
+		$('#inherited_permissions > h2').click(function(){
+			// reqest content - do it this way, so we can save some time which
+			// this operation may need
+			if (!loaded) {
+				// load just once
+				$('#inherited_permissions > div').load('./permissions/');
+			}
+			loaded = true;
+			return false;	
+		});
+	});
+</script>
+{% endif %}
+
 {% block after_related_objects %}{% endblock %}
 
 {% submit_row %}

@@ -1,10 +1,11 @@
+from datetime import datetime
 from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models import Q
-from datetime import datetime
-from cms import settings
-from cms.urlutils import levelize_path
 
+from cms import settings
+from cms.utils.urlutils import levelize_path
+from cms.exceptions import NoPermissionsException
 
 class PageManager(models.Manager):
     def on_site(self):
@@ -147,9 +148,135 @@ class TitleManager(models.Manager):
             obj = self.model(page=page, language=language, title=title, slug=slug, application_urls=application_urls)
         obj.save()
         return obj
+
+################################################################################
+# Permissions
+################################################################################
+
+class BasicPagePermissionManager(models.Manager):
+    """Global page permission manager accessible under objects.
+    
+    !IMPORTANT: take care, PagePermissionManager extends this manager 
+    """
+    def with_user(self, user):
+        """Get all objects for given user, also takes look if user is in some
+        group.
+        """
+        return self.filter(Q(user=user) | Q(group__user=user))
+    
+    def with_can_change_permissions(self, user):
+        """Set of objects on which user haves can_change_permissions. !But only
+        the ones on which is this assigned directly. For getting reall 
+        permissions use page.permissions manager. 
+        """
+        return self.with_user(user).filter(can_change_permissions=True)
     
 
-class PagePermissionManager(models.Manager):
+class PagePermissionManager(BasicPagePermissionManager):
+    """Page permission manager accessible under objects.
+    """
+    def subordinate_to_user(self, user):
+        """Get all page permission objects on which user/group is lover in 
+        hierarchy then given user and given user can change permissions on them. 
+        
+        Example:
+                                       A
+                                    /    \
+                                  user    B,E
+                                /     \
+                              C,X     D,Y
+            
+            Gives permission nodes C,X,D,Y under user, so he can edit 
+            permissions if he haves can_change_permission.
+                  
+        Example:
+                                      A,Y
+                                    /    \
+                                  user    B,E,X
+                                /     \
+                              C,X     D,Y
+                              
+            Gives permission nodes C,D under user, so he can edit, but not
+            anymore to X,Y, because this users are on the same level or higher
+            in page hierarchy. (but only if user have can_change_permission)
+        
+        Example:
+                                        A
+                                    /      \
+                                  user     B,E
+                                /     \      \
+                              C,X     D,Y    user
+                                            /    \
+                                           I      J,A
+            
+            User permissions can be assigned to multiple page nodes, so merge of 
+            all of them is required. In this case user can see permissions for 
+            users C,X,D,Y,I,J but not A, because A user in higher in hierarchy.            
+        
+        If permission object holds group, this permission object can be visible 
+        to user only if all of the group members are lover in hierarchy. If any 
+        of members is higher then given user, this entry must stay invisible.
+        
+        If user is superuser, or haves global can_change_permission permissions,
+        show him everything.
+        
+        Result of this is used in admin for page permissions inline.
+        """
+        from cms.models import GlobalPagePermission, Page
+        if user.is_superuser or \
+            GlobalPagePermission.objects.with_can_change_permissions(user):
+            # everything for those guys
+                return self.all()
+        
+        # get user level
+        from cms.utils.permissions import get_user_permission_level
+        try:
+            user_level = get_user_permission_level(user)
+        except NoPermissionsException:
+            return self.get_empty_query_set()
+        
+        # get all permissions
+        page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+        
+        # get permission set, but without objects targeting user, or any group 
+        # in which he can be
+        qs = self.filter(
+            page__id__in=page_id_allow_list, 
+            page__level__gte=user_level
+        )
+        #qs = qs.exclude(user=user).exclude(group__user=user)
+        return qs
+    
+    def for_page(self, page):
+        """Returns queryset containing all instances somehow connected to given 
+        page. This includes permissions to page itself and permissions inherited
+        from higher pages.
+        
+        NOTE: this returns just PagePermission instances, to get complete access
+        list merge return of this function with Global permissions.
+        """
+        from cms.models import PagePermission
+        
+        q = Q(page__tree_id=page.tree_id) & (
+            Q(page=page) 
+            | (Q(page__level__lt=page.level)  & (Q(grant_on=PagePermission.ACCESS_DESCENDANTS) | Q(grant_on=PagePermission.ACCESS_PAGE_AND_DESCENDANTS)))
+            | (Q(page__level=page.level - 1) & (Q(grant_on=PagePermission.ACCESS_CHILDREN) | Q(grant_on=PagePermission.ACCESS_PAGE_AND_CHILDREN)))  
+        ) 
+        return self.filter(q).order_by('page__level')
+
+class PagePermissionsPermissionManager(models.Manager):
+    """Page permissions permission manager.
+    
+    !IMPORTANT: this actually points to Page model, not to PagePermission. Seems 
+    this will be better approach. Accessible under permissions.
+    
+    Maybe this even shouldn't be a manager - it mixes different models together.
+    """
+    
+    # we will return this in case we have a superuser, or permissions are not
+    # enabled/configured in settings
+    GRANT_ALL = 'All'
+    
     
     def get_publish_id_list(self, user):
         """
@@ -158,12 +285,26 @@ class PagePermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_publish")
     
-    def get_edit_id_list(self, user):
+    def get_change_id_list(self, user):
         """
         Give a list of page where the user has edit rights or the string "All" if
         the user has all rights.
         """
-        return self.__get_id_list(user, "can_edit")
+        return self.__get_id_list(user, "can_change")
+    
+    def get_add_id_list(self, user):
+        """
+        Give a list of page where the user has add page rights or the string 
+        "All" if the user has all rights.
+        """
+        return self.__get_id_list(user, "can_add")
+    
+    def get_delete_id_list(self, user):
+        """
+        Give a list of page where the user has delete rights or the string "All" if
+        the user has all rights.
+        """
+        return self.__get_id_list(user, "can_delete")
     
     def get_softroot_id_list(self, user):
         """
@@ -172,46 +313,50 @@ class PagePermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_change_softroot")
     
+    def get_change_permissions_id_list(self, user):
+        """Give a list of page where the user can change permissions.
+        """
+        return self.__get_id_list(user, "can_change_permissions")
+    
+    def get_move_page_id_list(self, user):
+        """Give a list of pages which user can move.
+        """
+        # TODO: this is going to be tricky!!
+        
+        #... continue here ... 
+        
+        return self.__get_id_list(user, "can_move_page")
+    
     def __get_id_list(self, user, attr):
-        if user.is_superuser:
-            return 'All'
-        allow_list = []
-        deny_list = []
-        group_ids = user.groups.all().values_list('id', flat=True)
-        q = Q(user=user)|Q(group__in=group_ids)|Q(everybody=True)
-        perms = self.filter(q).order_by('page__tree_id', 'page__level', 'page__lft')
-        from cms.models import PagePermission, Page
-        for perm in perms:
-            if perm.type == PagePermission.ALLPAGES:
-                if getattr(perm, attr):
-                    allow_list = list(Page.objects.all().values_list('id', flat=True))
-                else:
-                    return []
-            if perm.page:
-                if getattr(perm, attr):
-                    if perm.page.id not in allow_list:
-                        allow_list.append(perm.page.id)
-                    if perm.page.id in deny_list:
-                        deny_list.remove(perm.page.id)
-                else:
-                    if perm.page.id not in deny_list:
-                        deny_list.append(perm.page.id)
-                    if perm.page.id in allow_list:
-                        allow_list.remove(perm.page.id)
-            if perm.type == PagePermission.PAGECHILDREN:
-                for id in perm.page.get_descendants().values_list('id', flat=True):
-                    if getattr(perm, attr):
-                        if id not in allow_list:
-                            allow_list.append(id)
-                        if id in deny_list:
-                            deny_list.remove(id)
-                    else:
-                        if id not in deny_list:
-                            deny_list.append(id)
-                        if id in allow_list:
-                            allow_list.remove(id)
-        #allow_list = list(allow_list)
-        #for id in deny_list:
-        #    if id in allow_list:
-        #        allow_list.remove(id)
-        return allow_list
+        if user.is_superuser or not settings.CMS_PERMISSION:
+            # got superuser, or permissions aren't enabled? just return grant 
+            # all mark
+            return PagePermissionsPermissionManager.GRANT_ALL
+        
+        from cms.models import GlobalPagePermission, PagePermission
+        # check global permissions
+        in_global_permissions = GlobalPagePermission.objects.with_user(user).filter(**{attr: True})
+        if in_global_permissions:
+            # user or his group are allowed to do `attr` action
+            # !IMPORTANT: page permissions must not override global permissions 
+            return PagePermissionsPermissionManager.GRANT_ALL
+        
+        # for standard users without global permissions, get all pages for him or
+        # his group/s
+        qs = PagePermission.objects.with_user(user)
+        qs.order_by('page__tree_id', 'page__level', 'page__lft')
+        
+        # default is denny...
+        
+        page_id_allow_list = []
+        for permission in qs:
+            is_allowed = getattr(permission, attr)
+            if is_allowed:
+                if permission.grant_on & PagePermission.MASK_PAGE:
+                    page_id_allow_list.append(permission.page.id)
+                if permission.grant_on & PagePermission.MASK_CHILDREN:
+                    page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
+                elif permission.grant_on & PagePermission.MASK_DESCENDANTS:
+                    page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
+        print "> perm", attr, page_id_allow_list
+        return page_id_allow_list

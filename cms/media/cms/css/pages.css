@@ -152,6 +152,10 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 }
 
 #sitemap li .col1 .title{
+	background: none;
+}
+
+#sitemap li.moveable .col1 .title{
 	background-repeat:no-repeat;
 	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
 }

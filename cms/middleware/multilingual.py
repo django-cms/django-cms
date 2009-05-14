@@ -1,27 +1,19 @@
-from cms.utils import get_page_from_request
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 from django.conf import settings
-import re
-    
-class LazyPage(object):
-    def __get__(self, request, obj_type=None):
-        if not hasattr(request, '_current_page_cache'):
-            request._current_page_cache = get_page_from_request(request)
-        return request._current_page_cache
-    
-class CurrentPageMiddleware(object):
-    def process_request(self, request):
-        request.__class__.current_page = LazyPage()
-        return None
+import re    
 
-SUB = re.compile(ur'<a([^>]+)href="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % ("|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)), 
-                                                                       settings.MEDIA_URL[1:], 
-                                                                       settings.ADMIN_MEDIA_PREFIX[1:]))
+SUB = re.compile(ur'<a([^>]+)href="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % (
+    "|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)), 
+    settings.MEDIA_URL[1:], 
+    settings.ADMIN_MEDIA_PREFIX[1:]
+))
 
-SUB2 = re.compile(ur'<form([^>]+)action="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % ("|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)),
-                                                                             settings.MEDIA_URL[1:],
-                                                                             settings.ADMIN_MEDIA_PREFIX[1:]))
+SUB2 = re.compile(ur'<form([^>]+)action="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % (
+    "|".join(map(lambda l: l[0] + "/" , settings.LANGUAGES)),
+     settings.MEDIA_URL[1:],
+     settings.ADMIN_MEDIA_PREFIX[1:]
+))
 
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
@@ -57,7 +49,6 @@ class MultilingualURLMiddleware:
         return lang
     
     def process_request(self, request):
-        from django.conf import settings
         language = self.get_language_from_request(request)
         if language is None:
             language = settings.LANGUAGE_CODE[:2]

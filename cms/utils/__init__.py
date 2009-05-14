@@ -1,8 +1,11 @@
+# TODO: this is just stuff from utils.py - should be splitted / moved
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from cms import settings
-from cms.models import Page
+
+# !IMPORTANT: Page cant be imported here, because we will get cyclic import!!
 
 def auto_render(func):
     """Decorator that put automaticaly the template path in the context dictionary
@@ -67,27 +70,6 @@ def get_language_from_request(request, current_page=None):
         language = settings.CMS_DEFAULT_LANGUAGE
     return language[:2]
 
-def has_page_add_permission(request, page=None):
-    """
-    Return true if the current user has permission to add a new page.
-    """
-    if not settings.CMS_PERMISSION:
-        return True
-    else:
-        from cms.models import PagePermission
-        permissions = PagePermission.objects.get_edit_id_list(request.user)
-        if permissions == "All":
-            return True
-        target = request.GET.get('target', -1)
-        position = request.GET.get('position', None)
-        if int(target) in permissions:
-            if position == "first-child":
-                return True
-            else:
-                if Page.objects.get(pk=target).parent_id in permissions:
-                    return True
-    return False
-
 
 def get_page_from_request(request):
     """
@@ -114,6 +96,8 @@ def make_tree(items, levels, url, ancestors, descendants=False, current_level=0,
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
+    from cms.models import Page
+    
     levels -= 1
     current_level += 1
     found = False

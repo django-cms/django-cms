@@ -1,5 +1,3 @@
-
-
 class PluginAllreadyRegistered(Exception):
     pass
 
@@ -11,3 +9,12 @@ class SubClassNeededError(Exception):
 
 class MissingFormError(Exception):
     pass
+
+
+class PermissionsException(Exception):
+    """Base permission exception
+    """
+
+class NoPermissionsException(PermissionsException):
+    """Can be fired when some violate action is performed on permission system. 
+    """

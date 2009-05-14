@@ -16,6 +16,12 @@ if CMS_TEMPLATES is None:
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
 
+# check if is user middleware installed
+if CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in settings.MIDDLEWARE_CLASSES:
+    raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
+        'Please put it into your MIDDLEWARE_CLASSES in settings file')
+    
+
 # Whether a slug should be unique ... must be unique in all languages.
 i18n_installed = not 'cms.middleware.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
 CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_installed)
@@ -78,3 +84,7 @@ CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 #    ('sampleapp.urls', 'Sample application'),
 # )
 CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
+
+# publisher mode - if True, approve path can be setup for every page, so there
+# will be some control over the published stuff
+CMS_PUBLISHER = getattr(settings, 'CMS_PUBLISHER', False) 

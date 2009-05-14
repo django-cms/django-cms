@@ -74,9 +74,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'django.contrib.csrf.middleware.CsrfMiddleware',
-    'cms.middleware.CurrentPageMiddleware',
-    'cms.middleware.MultilingualURLMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
 )
 
 ROOT_URLCONF = 'example.urls'
@@ -106,7 +107,7 @@ INSTALLED_APPS = (
     'example.categories',
     'debug_toolbar',
 
-    'south',
+    # 'south',
     # sample application
     'sampleapp',
     'store',
@@ -136,6 +137,7 @@ CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categor
 
 CMS_SOFTROOT = True
 CMS_FLAT_URLS = True
+#CMS_PERMISSION = False
 
 SOUTH_AUTO_FREEZE_APP = True
 

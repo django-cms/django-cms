@@ -28,7 +28,6 @@ cms_signals.page_moved.connect(update_title_paths, sender=Page)
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
-    
     instance.tmp_path = None
     instance.tmp_application_urls = None
     
@@ -98,3 +97,59 @@ if cms_settings.CMS_APPLICATIONS_URLS:
     cms_signals.application_post_changed.connect(clear_appresolver_cache, sender=Title)        
 
 
+def post_save_user(instance, raw, created, **kwargs):
+    """Signal called when new user is created, required only when CMS_PERMISSION.
+    Asignes creator of the user to PageUserInfo model, so we now who had created 
+    this user account.
+    
+    requires: CurrentUserMiddleware
+    """
+    from cms.utils.permissions import get_current_user
+    # read current user from thread locals
+    creator = get_current_user()
+    if not creator or not created:
+        return
+    
+    from cms.models import ExtUser
+    from django.db import connection
+    
+    # i'm not sure if there is a workaround for this, somebody any ideas? What
+    # we are doing here is creating ExtUser on Top of existing user, i'll do it 
+    # through plain SQL, its not nice, but...
+    
+    # TODO: find a better way than an raw sql !!
+    
+    cursor = connection.cursor()
+    query = "INSERT INTO `%s` (`user_ptr_id`, `created_by_id`) VALUES (%d, %d)" % (
+        ExtUser._meta.db_table,
+        instance.pk, 
+        creator.pk
+    )
+    cursor.execute(query) 
+    cursor.close()
+    
+    
+def post_save_user_group(instance, raw, created, **kwargs):
+    """The same like post_save_user, but for Group, required only when 
+    CMS_PERMISSION.
+    Asignes creator of the group to PageUserGroupInfo model, so we now who had
+    created this user account.
+    
+    requires: CurrentUserMiddleware
+    """
+    from cms.utils.permissions import get_current_user
+    from cms.models import ExtGroup
+    # read current user from thread locals
+    user = get_current_user()
+    if not user or not created:
+        return
+    # only if we got current user and this user object was created
+    ExtGroup(group=instance, created_by=user).save()
+
+
+if cms_settings.CMS_PERMISSION:
+    # only if permissions are in use
+    from django.contrib.auth.models import User, Group
+    # regster signals to user related models
+    signals.post_save.connect(post_save_user, User)
+    signals.post_save.connect(post_save_user_group, Group)

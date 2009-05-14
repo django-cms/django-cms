@@ -1,22 +1,10 @@
 # -*- coding: utf-8 -*-
-import unittest
-from django.test import _doctest as doctest
 from django.test import TestCase
-import settings
-from cms.models import *
+from django.conf import settings
+from cms.models import Page, Title
 from django.test.client import Client
 from django.template import TemplateDoesNotExist
-
-
-# doc testing in some modules
-#from cms import urlutils
-#suite = unittest.TestSuite()
-#uite.addTest(doctest.DocTestSuite(urlutils))
-
-from cms.urlutils import urljoin
-__test__ = {
-    'cms.urlutils': urljoin,
-}
+from django.contrib.auth.models import User
 
 
 class PagesTestCase:#(TestCase):
@@ -52,7 +40,7 @@ class PagesTestCase:#(TestCase):
         page_data = self.get_new_page_data()
         response = c.post('/admin/pages/page/add/', page_data)
         self.assertRedirects(response, '/admin/pages/page/')
-        slug_content = Content.objects.get_content_slug_by_slug(page_data['slug'])
+        slug_content = Title.objects.get_page_slug(self, page_data['slug']) 
         assert(slug_content is not None)
         page = slug_content.page
         assert(page.title() == page_data['title'])
@@ -185,3 +173,18 @@ class PagesTestCase:#(TestCase):
         self.test_02_create_page()
         self.test_05_edit_page()
         self.test_04_details_view()
+        
+        
+class PermissionsTestCase(TestCase):
+    def setUp(self):
+        # create user
+        self.user = User(username='limited', is_active=True, is_staff=True)
+        self.user.set_password('limited')
+        self.user.save()
+                
+    def test_add_page(self):
+        c = Client()
+        c.login(user=self.user)
+        response = c.get('/admin/pages/page/add/')
+        assert(response.status_code == 200)
+    
