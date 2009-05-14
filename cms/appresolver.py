@@ -15,17 +15,13 @@ def applications_page_check(request, current_page=None, path=None):
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
     try:
-        print path
         page_id = dynamic_app_regex_url_resolver.resolve_page_id(path+"/")
         # yes, it is application page
         page = Page.objects.get(id=page_id)
-        print "app page found"
-        print page
         # If current page was matched, then we have some override for content
         # from cms, but keep current page. Otherwise return page to which was application assigned.
         return page 
     except Resolver404:
-        print "app page not found"
         pass
     return None    
 
