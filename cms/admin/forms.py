@@ -3,10 +3,16 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.forms.util import ErrorList
 from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
-from cms.models import Page, Title, PagePermission
+from cms.models import Page, Title, PagePermission, ExtUser
 from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from cms.admin.widgets import UserSelectAdminWidget
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.fields import BooleanField
 
     
 class PageForm(forms.ModelForm):
@@ -69,6 +75,9 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     level or under him in choosen page tree, and users which were created by him, 
     but aren't assigned to higher page level than current user.
     """
+    
+    user = forms.ModelChoiceField(_('user'), widget=UserSelectAdminWidget)
+    
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
@@ -80,9 +89,17 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         user = get_current_user() # current user from threadlocals
         
         self.fields['user'].queryset=get_subordinate_users(user)
+        self.fields['user'].widget.user = user # assign current user
         self.fields['group'].queryset=get_subordinate_groups(user)
         
     def clean(self):
+        super(PagePermissionInlineAdminForm, self).clean()
+        for field in self.Meta.model._meta.fields:
+            if not isinstance(field, BooleanField) or not field.name.startswith('can_'):
+                continue
+            name = field.name
+            self.cleaned_data[name] = self.cleaned_data.get(name, False)
+        
         can_add = self.cleaned_data['can_add']
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == PagePermission.ACCESS_PAGE:
@@ -90,9 +107,73 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # page but after he does this, he will not have permissions to 
             # access this page anymore, so avoid this
             raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants.'))
-        return super(PagePermissionInlineAdminForm, self).clean()
         
+        # TODO: finish this, but is it really required? might be nice to have 
         
+        # check if permissions assigned in cms are correct, and display an message
+        # if not - correctness mean: if user has add permisson to page, but he
+        # does'nt have auth permissions to add page object, display warning
+        return self.cleaned_data
+    
+    def save(self, commit=True):
+        """Boolean fields lacks, if they aren't available in the form, they are
+        taking default value, but we actually wan't false for them.
+        """        
+        instance = super(PagePermissionInlineAdminForm, self).save(commit=False)
+        for field in self.Meta.model._meta.fields:
+            if not isinstance(field, BooleanField) or not field.name.startswith('can_'):
+                continue
+            name = field.name
+            setattr(instance, name, self.cleaned_data.get(name, False))
+        if commit:
+            instance.save()
+        return instance
+    
+
+class ExtUserCreationForm(UserCreationForm):
+    can_add_page = forms.BooleanField(label=_('Can add page'), required=False, initial=True)
+    can_change_page = forms.BooleanField(label=_('Can change page'), required=False, initial=True)
+    can_delete_page = forms.BooleanField(label=_('Can delete page'), required=False)
+    
+    can_add_user = forms.BooleanField(label=_('Can create user'), required=False)
+    can_change_user = forms.BooleanField(label=_('Can change User'), required=False)
+    can_delete_user = forms.BooleanField(label=_('Can delete User'), required=False)
+    
+    can_add_pagepermission = forms.BooleanField(label=_('Can add page permission'), required=False)
+    can_change_pagepermission = forms.BooleanField(label=_('Can change page permission'), required=False)
+    can_delete_pagepermission = forms.BooleanField(label=_('Can delete page permission'), required=False)
+    
+    class Meta:
+        model = ExtUser
+    
+    def save(self, commit=True):
+        """Create user, assign him to staff users, and create permissions for 
+        him if required. Also assigns creator to user.
+        """
+        user = super(ExtUserCreationForm, self).save(commit=False)
+        user.is_staff=True
+        # assign creator to user
+        user.created_by = get_current_user()
         
+        models = (Page, User, PagePermission)
         
+        if commit:
+            user.save()
+        
+        for model in models:
+            name = model.__name__.lower()
+            content_type = ContentType.objects.get_for_model(model)
+            for t in ('add', 'change', 'delete'):
+                if not self.cleaned_data.get('can_%s_%s' % (t, name), None):
+                    continue
+                if not user.pk:
+                    # save user, otherwise we can't assign permissions to him
+                    user.save()
+                
+                # add permission `t` to model `model`
+                codename = getattr(model._meta, 'get_%s_permission' % t)()
+                permission = Permission.objects.get(content_type=content_type, codename=codename)
+                print "> AP:", permission
+                user.user_permissions.add(permission)
+        return user
         

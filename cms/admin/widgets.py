@@ -1,12 +1,12 @@
 from os.path import join
 from django.conf import settings
-from django.forms import TextInput, Textarea
+from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
-
 from cms.settings import CMS_MEDIA_URL
-from cms.models import Page
-from django.forms.widgets import Widget
+from django.forms.widgets import Widget, Select
+from django.contrib.auth.models import User
+
 
 class PluginEditor(Widget):
     def __init__(self, attrs=None, installed=None, list=None):
@@ -37,3 +37,24 @@ class PluginEditor(Widget):
         return mark_safe(render_to_string(
             'admin/cms/page/widgets/plugin_editor.html', context))
 
+
+class UserSelectAdminWidget(Select):
+    """Special widget used in page permission inlines, because we have to render
+    an add user (plus) icon, but point it somewhere else - to special user creation
+    view, which is accessible only if user haves "add user" permissions.
+    
+    Current user should be assigned to widget in form constructor as an user 
+    attribute.
+    """
+    def render(self, name, value, attrs=None, choices=()):
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]    
+        if hasattr(self, 'user') and (self.user.is_superuser or \
+            self.user.has_perm(User._meta.app_label + '.' + User._meta.get_add_permission())):
+            # append + icon
+            add_url = '../../../cms/extuser/add/'
+            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
+                    (add_url, name))
+            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Add Another')))
+        return mark_safe(u''.join(output))
+
+    

@@ -18,7 +18,7 @@ from copy import deepcopy
 
 from cms import settings
 from cms.admin.change_list import CMSChangeList
-from cms.admin.forms import PageForm
+from cms.admin.forms import PageForm, ExtUserCreationForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins)
@@ -33,6 +33,7 @@ from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
+from django.contrib.auth.models import User
 
 PAGE_ADMIN_INLINES = []
 
@@ -69,15 +70,23 @@ if settings.CMS_PERMISSION:
             qs = PagePermission.objects.subordinate_to_user(request.user)
             return qs
         
+        def get_fieldsets(self, request, obj=None):
+            """Request formset with given obj.
+            """
+            if self.declared_fieldsets:
+                return self.declared_fieldsets
+            form = self.get_formset(request, obj).form
+            return [(None, {'fields': form.base_fields.keys()})]
+        
         def get_formset(self, request, obj=None, **kwargs):
-            """Seems django doesn't cares about queryset defined here - its 
+            """Some fields may be excluded here. User can change only 
+            permissions which are available for him. E.g. if user does not haves 
+            can_publish flag, he can't change assign can_publish permissions.
+            
+            Seems django doesn't cares about queryset defined here - its
             probably a bug, so monkey patching again.. Assign use_queryset
             attribute to FormSet, our overiden formset knows how to handle this, 
             @see BaseInlineFormSetWithQuerySet for more details.
-            
-            Some fields may be excluded here. User can change only permissions
-            which are available for him. E.g. if user does not hves can_publish
-            flag, he can't change assign can_publish permissions.
             """
             if obj:
                 self.exclude = []
@@ -91,14 +100,14 @@ if settings.CMS_PERMISSION:
                     self.exclude.append('can_change_softroot')
                 if not obj.has_move_page_permission(request):
                     self.exclude.append('can_move_page')
-                    
             FormSet = super(PagePermissionInlineAdmin, self).get_formset(request, obj=None, **kwargs)
             # asign queryset 
             FormSet.use_queryset = self.queryset(request)
             return FormSet
         
     PAGE_ADMIN_INLINES.append(PagePermissionInlineAdmin)
-
+    
+    
     class GlobalPagePermissionAdmin(admin.ModelAdmin):
         list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
         list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
@@ -117,10 +126,58 @@ if settings.CMS_PERMISSION:
         
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
     
-    # Keep ExtGroup and ExtUser hidden, there currently isn't any reason for
-    # making them editable. They should just work.
-    #admin.site.register(ExtGroup)
-    #admin.site.register(ExtUser)
+    from django.contrib.auth.admin import UserAdmin
+    
+    class ExtUserAdmin(UserAdmin):
+        form = ExtUserCreationForm
+        
+        # get_fieldsets method may add fieldsets depending on user
+        fieldsets = [
+            (None, {'fields': ('username', ('password1', 'password2'))}),
+            (_('User details'), {'fields': (('first_name', 'last_name'), 'email')}),
+        ]
+        
+        def get_fieldsets(self, request, obj=None):
+            """Nobody can grant more than he haves, so check for user 
+            permissions to Page and User model and render fieldset depending on
+            them.
+            """
+            fieldsets = deepcopy(self.fieldsets)
+            
+            models = (
+                (Page, _('Page permissions')),
+                (User, _('User permissions')),
+                (PagePermission, _('Page permission management')),
+            )
+            
+            for model, title in models:
+                opts, fields = model._meta, []
+                name = model.__name__.lower()
+                for t in ('add', 'change', 'delete'):
+                    fn = getattr(opts, 'get_%s_permission' % t)
+                    if request.user.has_perm(opts.app_label + '.' + fn()):
+                        fields.append('can_%s_%s' % (t, name))
+            
+                if fields:
+                    fieldsets.append((title, {'fields': (fields,)}),)
+            return fieldsets
+        
+        def add_view(self, request):
+            return super(UserAdmin, self).add_view(request)
+        
+        def has_add_permission(self, request):
+            """Allow add only in popup, this is a shortcut admin view, for other
+            operations might be used the auth user admin
+            """ 
+            if '_popup' in request.REQUEST and (request.user.is_superuser or \
+                request.user.has_perm(User._meta.app_label + '.' + User._meta.get_add_permission())):
+                return True
+            return False
+        
+        has_change_permission = lambda *args: False
+        has_delete_permission = lambda *args: False
+    
+    admin.site.register(ExtUser, ExtUserAdmin)
 
 ################################################################################
 # Page
@@ -209,7 +266,7 @@ class PageAdmin(admin.ModelAdmin):
             return move_plugin(request)
         elif url.endswith('/move-page'):
             return self.move_page(request, unquote(url[:-10]))
-        elif 'permissions' in url:
+        elif settings.CMS_PERMISSION and 'permissions' in url:
             return self.get_permissions(request, url.split('/')[0])
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))

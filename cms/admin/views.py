@@ -279,4 +279,3 @@ def revert_plugins(request, version_id):
             title.save()
     for plugin in current_plugins:
         plugin.delete()
-    

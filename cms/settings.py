@@ -84,3 +84,7 @@ CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 #    ('sampleapp.urls', 'Sample application'),
 # )
 CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
+
+# publisher mode - if True, approve path can be setup for every page, so there
+# will be some control over the published stuff
+CMS_PUBLISHER = getattr(settings, 'CMS_PUBLISHER', False) 
