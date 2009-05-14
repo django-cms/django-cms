@@ -3,11 +3,12 @@
 from django.db import models
 
 class AlreadyRegistered(Exception):
-    """An attempt was made to register a model for MPTT more than once.
+    """Model already registered
     """
+    
 registry = []
 
-def register(model, tmp_attr="tmp_id"):
+def register(model, tmp_table_prefix):
     if model in registry:
         raise AlreadyRegistered(
             _('The model %s has already been registered.') % model.__name__)
