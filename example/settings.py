@@ -96,6 +96,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.sites',
     #'tagging',
+    
+    'publisher',
+    
     'cms',
     'cms.plugins.text',
     'cms.plugins.picture',
@@ -111,6 +114,7 @@ INSTALLED_APPS = (
     # sample application
     'sampleapp',
     'store',
+    'travel', # simple app for testing publisher
 )
 
 gettext = lambda s: s
