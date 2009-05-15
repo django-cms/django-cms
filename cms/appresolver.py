@@ -8,9 +8,7 @@ def applications_page_check(request, current_page=None, path=None):
     Applications have higher priority than other cms pages. 
     """
     if current_page:
-        print "current page already here"
         return current_page
-    
     if path is None:
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
