@@ -41,3 +41,5 @@ if 'reversion' in settings.INSTALLED_APPS:
     except:
         pass    
 
+
+print "store models()"

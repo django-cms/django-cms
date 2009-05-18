@@ -22,10 +22,13 @@ Requirements:
 
 from django.db.models import signals
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
-class Mptt(object):
+
+class Mptt:
     """Basic mptt configuration class - something like Meta in model
     """
+    
     parent_attr = 'parent' 
     left_attr = 'lft'
     right_attr = 'rght'
@@ -37,16 +40,50 @@ class Mptt(object):
     @classmethod
     def contribute_to_class(cls, main_cls, name):
         # install rest of mptt, class was build
-        try:
-            from functools import wraps
-        except ImportError:
-            from django.utils.functional import wraps # Python 2.3, 2.4 fallback
+        
+        signals.class_prepared.connect(cls.finish_mptt_class,
+            sender=main_cls, weak=False)
         
         from mptt.signals import pre_save
         
         # Set up signal receiver to manage the tree when instances of the
         # model are about to be saved.
-        signals.post_save.connect(pre_save, sender=main_cls)
+        signals.pre_save.connect(pre_save, sender=main_cls)
+    
+    @classmethod
+    def finish_mptt_class(cls, *args, **kwargs):
+        main_cls = kwargs['sender']
+        
+        try:
+            from functools import wraps
+        except ImportError:
+            from django.utils.functional import wraps # Python 2.3, 2.4 fallback
+        
+        from mptt.managers import TreeManager
+        
+        # was Mptt already copied to _meta
+        #if hasattr(main_cls, 'Mptt'):
+        # update _meta atribute, some stuff is required by mptt
+        meta_attributes = ('parent_attr', 'left_attr', 'right_attr', 
+            'tree_id_attr', 'level_attr', 'tree_manager_attr', 'order_insertion_by')
+    
+        # jsut copy attributes to meta
+        for attr in meta_attributes:
+            setattr(main_cls._meta, attr, getattr(cls, attr))
+        
+        meta = main_cls._meta
+        
+        # Instanciate tree manager
+        TreeManager(meta.parent_attr, meta.left_attr, meta.right_attr, 
+            meta.tree_id_attr, meta.level_attr).contribute_to_class(main_cls, meta.tree_manager_attr)
+        
+        #tree_manager = TreeManager(meta.parent_attr, meta.left_attr, 
+        #    meta.right_attr, meta.tree_id_attr, 
+        #    meta.level_attr)
+    
+        # Add a custom tree manager
+        #setattr(main_cls, meta.tree_manager_attr, tree_manager)
+        setattr(main_cls, '_tree_manager', getattr(main_cls, meta.tree_manager_attr))
         
         # Wrap the model's delete method to manage the tree structure before
         # deletion. This is icky, but the pre_delete signal doesn't currently
@@ -72,7 +109,7 @@ def install_mptt(cls, name, bases, attrs):
     """Installs mptt - modifies class attrs, and adds required stuff to them.
     """
     
-    if not 'Mptt' in attrs:
+    if not 'Mptt' in attrs: # or '_is_mptt_model' in attrs:
         return attrs
     
     if not issubclass(attrs['Mptt'], Mptt):
@@ -81,7 +118,6 @@ def install_mptt(cls, name, bases, attrs):
     
     # import required stuff here, so we will have import errors only when mptt
     # is really in use
-    from mptt.managers import TreeManager
     from mptt import models as mptt_models
     from mptt import registry, AlreadyRegistered
     
@@ -92,20 +128,20 @@ def install_mptt(cls, name, bases, attrs):
         raise AlreadyRegistered(
             _('The model %s has already been registered.') % cls.__name__)
     registry.append(cls)
+    attrs['_is_mptt_model'] = lambda self: True
     
+    mptt_meta = attrs['Mptt']
     
-    class Meta: pass # empty meta class - just a helper
-    
-    # merge Meta attributes
-    mptt_meta = attrs.pop('Mptt')
-    attr_meta = attrs.pop('Meta', Meta)
-    attrs['Meta'] = type('Meta', (attr_meta, mptt_meta), {'__module__': cls.__module__})
+    assert mptt_meta.parent_attr in attrs, ("Mppt model must define parent "
+        "field!")
     
     # add mptt fields
     fields = (mptt_meta.left_attr, mptt_meta.right_attr, 
         mptt_meta.tree_id_attr, mptt_meta.level_attr)
+    
     for attr in fields:
-        attrs[attr] = models.PositiveIntegerField(db_index=True, editable=False)
+        if not attr in attrs:
+            attrs[attr] = models.PositiveIntegerField(db_index=True, editable=False)
         
     
     methods = ('get_ancestors', 'get_children', 'get_descendants', 
@@ -115,16 +151,7 @@ def install_mptt(cls, name, bases, attrs):
     
     # Add tree methods for model instances
     for method_name in methods:
-        attrs[method_name] = getattr(mptt_models, method_name)  
-    
-    # Instanciate tree manager
-    tree_manager = TreeManager(mptt_meta.parent_attr, mptt_meta.left_attr, 
-        mptt_meta.right_attr, mptt_meta.tree_id_attr, 
-        mptt_meta.level_attr)
-    
-    # Add a custom tree manager
-    attrs[mptt_meta.tree_manager_attr] = tree_manager
-    attrs['_tree_manager'] = tree_manager
-
+        attrs[method_name] = getattr(mptt_models, method_name)
+          
     return attrs
 

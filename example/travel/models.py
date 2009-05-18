@@ -16,9 +16,9 @@ class Continent(models.Model):
         verbose_name=_('Continent')
         verbose_name_plural=_('Continents')
         
-#    class Publisher(Publisher):
-#        pass
-        
+    # register for publisher
+    # class Publisher(Publisher): pass        
+    
     __unicode__ = lambda self: self.name
 
     
@@ -65,6 +65,9 @@ class Person(models.Model):
         verbose_name=_('Person')
         verbose_name_plural=_('Persons')
         
+    # register for publisher
+    #class Publisher(Publisher): pass
+        
     __unicode__ = lambda self: unicode(self.user)
 
     
@@ -72,7 +75,8 @@ class Destination(models.Model):
     """Simple destination - test mptt
     """
     name = models.CharField(max_length=128, null=True, blank=True)
-    place = models.ForeignKey(Place)
+    place = models.ForeignKey(Place, null=True, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     
     class Meta:
         verbose_name=_('Destination')
@@ -82,9 +86,11 @@ class Destination(models.Model):
     class Mptt(Mptt): pass
     
     # register for publisher
-    class Publisher(Publisher): pass
+    #class Publisher(Publisher): pass
     
     __unicode__ = lambda self: self.name or unicode(self.place)
 
 
 # TODO: and what with inherited models..?
+
+print "travel models()"
