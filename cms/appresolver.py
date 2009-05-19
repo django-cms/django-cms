@@ -9,7 +9,6 @@ def applications_page_check(request, current_page=None, path=None):
     """
     if current_page:
         return current_page
-    
     if path is None:
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
