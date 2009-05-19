@@ -61,7 +61,7 @@ $(document).ready(function(){
             // Enable the placeholderbridge plugin, to allow
             // the placeholder controls to talk to editor
             wym.placeholderbridge({'name': '{{ name }}'});
-			init_buttons();
+            init_buttons("{{ name }}");
         },
         //handle click event on dialog's submit button
         postInitDialog: function( wym, wdw ) {
@@ -98,11 +98,10 @@ $(document).ready(function(){
 
     /* onclick for 'Insert object' */
 	
-	function init_buttons(){
+	function init_buttons(placeholder){
 		$('span.insert-object').click(function(){
 			var select = $(this).parent().children("select");
 			var pluginvalue = select.attr('value');
-			var placeholder = $(this).parent().parent().parent().parent().parent().parent().children("textarea").attr('name');
 			var splits = window.location.href.split("?")[0].split("/");
 			var parent_id = Number(splits[splits.length - 2]);
 			var language = $('#id_language').attr('value');
@@ -145,7 +144,6 @@ $(document).ready(function(){
 		
 		/* onclick for 'Edit selected object' */
 		$('span.edit-object').click(function(){
-			var placeholder = $(this).parent().parent().parent().parent().parent().parent().children("textarea").attr('name');
 			var texteditor = get_editor(placeholder);
 			if (texteditor == null || texteditor.selectedObject == null) {
 				alert("{% trans "Text editor does not support editing objects." %}");
