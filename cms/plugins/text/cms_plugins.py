@@ -14,14 +14,14 @@ class TextPlugin(CMSPluginBase):
     form = TextForm
     render_template = "cms/plugins/text.html"
 
-    def get_editor_widget(self, request, plugins, objects):
+    def get_editor_widget(self, request, plugins):
         """
         Returns the Django form Widget to be used for
         the text area
         """
-        return WYMEditor(installed_plugins=plugins, objects=objects)
+        return WYMEditor(installed_plugins=plugins)
 
-    def get_form_class(self, request, plugins, objects):
+    def get_form_class(self, request, plugins):
         """
         Returns a subclass of Form to be used by this plugin
         """
@@ -29,14 +29,13 @@ class TextPlugin(CMSPluginBase):
         class TextPluginForm(self.form):
             pass
 
-        widget = self.get_editor_widget(request, plugins, objects)
+        widget = self.get_editor_widget(request, plugins)
         TextPluginForm.declared_fields["body"] = CharField(widget=widget, required=False)
         return TextPluginForm
 
     def get_form(self, request, obj=None, **kwargs):
-        objects = [] # not actually used, so we don't bother to calculate
         plugins = plugin_pool.get_text_enabled_plugins(self.placeholder)
-        form = self.get_form_class(request, plugins, objects)
+        form = self.get_form_class(request, plugins)
         kwargs['form'] = form # override standard form
         return super(TextPlugin, self).get_form(request, obj, **kwargs)
 

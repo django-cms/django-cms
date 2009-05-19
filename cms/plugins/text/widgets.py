@@ -22,20 +22,17 @@ class WYMEditor(Textarea):
         )]
         
 
-    def __init__(self, attrs=None, installed_plugins=None, objects=None):
+    def __init__(self, attrs=None, installed_plugins=None):
         """
         Create a widget for editing text + plugins.
 
         installed_plugins is a list of plugins to display that are text_enabled
-        objects is the plugin instances associated with the text,
         """
         self.attrs = {'class': 'wymeditor'}
         if attrs:
             self.attrs.update(attrs)
         super(WYMEditor, self).__init__(attrs)
-        
         self.installed_plugins = installed_plugins
-        self.objects = objects
 
     def render_textarea(self, name, value, attrs=None):
         return super(WYMEditor, self).render(name, value, attrs)
@@ -51,7 +48,6 @@ class WYMEditor(Textarea):
             'WYM_CLASSES': mark_safe(text_settings.WYM_CLASSES),
             'WYM_STYLES': mark_safe(text_settings.WYM_STYLES),
             'installed_plugins': self.installed_plugins,
-            'objects': self.objects,
         }
         return mark_safe(render_to_string(
             'cms/plugins/widgets/wymeditor.html', context))
