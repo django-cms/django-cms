@@ -23,9 +23,9 @@ Requirements:
 from django.db.models import signals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from publisher.models import Mptt
 
-
-class Mptt:
+class MpttMeta:
     """Basic mptt configuration class - something like Meta in model
     """
     
@@ -61,9 +61,6 @@ class Mptt:
         
         from mptt.managers import TreeManager
         
-        # was Mptt already copied to _meta
-        #if hasattr(main_cls, 'Mptt'):
-        # update _meta atribute, some stuff is required by mptt
         meta_attributes = ('parent_attr', 'left_attr', 'right_attr', 
             'tree_id_attr', 'level_attr', 'tree_manager_attr', 'order_insertion_by')
     
@@ -77,10 +74,6 @@ class Mptt:
         TreeManager(meta.parent_attr, meta.left_attr, meta.right_attr, 
             meta.tree_id_attr, meta.level_attr).contribute_to_class(main_cls, meta.tree_manager_attr)
         
-        #tree_manager = TreeManager(meta.parent_attr, meta.left_attr, 
-        #    meta.right_attr, meta.tree_id_attr, 
-        #    meta.level_attr)
-    
         # Add a custom tree manager
         #setattr(main_cls, meta.tree_manager_attr, tree_manager)
         setattr(main_cls, '_tree_manager', getattr(main_cls, meta.tree_manager_attr))
@@ -109,28 +102,26 @@ def install_mptt(cls, name, bases, attrs):
     """Installs mptt - modifies class attrs, and adds required stuff to them.
     """
     
-    if not 'Mptt' in attrs: # or '_is_mptt_model' in attrs:
-        return attrs
+    if not Mptt in bases:
+        return attrs 
     
-    if not issubclass(attrs['Mptt'], Mptt):
+    
+    if 'MpttMeta' in attrs and not issubclass(attrs['MpttMeta'], MpttMeta):
         raise ValueError, ("%s.Mptt must be a subclass "
                            + " of publisher.Mptt.") % (name,)
+    else:
+        attrs['MpttMeta'] = MpttMeta
     
     # import required stuff here, so we will have import errors only when mptt
     # is really in use
     from mptt import models as mptt_models
-    from mptt import registry, AlreadyRegistered
     
     # check if class isn't already registered - this actually should'nt never
     # happen
     
-    if cls in registry:
-        raise AlreadyRegistered(
-            _('The model %s has already been registered.') % cls.__name__)
-    registry.append(cls)
     attrs['_is_mptt_model'] = lambda self: True
     
-    mptt_meta = attrs['Mptt']
+    mptt_meta = attrs['MpttMeta']
     
     assert mptt_meta.parent_attr in attrs, ("Mppt model must define parent "
         "field!")
@@ -154,4 +145,12 @@ def install_mptt(cls, name, bases, attrs):
         attrs[method_name] = getattr(mptt_models, method_name)
           
     return attrs
+
+
+def finish_mptt(cls):
+    if not hasattr(cls, '_is_mptt_model'):
+        return
+    from mptt import registry
+    if not cls in registry:
+        registry.append(cls)
 

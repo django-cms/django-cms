@@ -13,12 +13,16 @@ CACHE_BACKEND = 'locmem:///'
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'cms'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'cms'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'cms'         # Not used with sqlite3.
-DATABASE_HOST = '127.0.0.1'             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = 'mysql'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
+DATABASE_USER = 'cms'           # Not used with sqlite3.
+DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
+DATABASE_HOST = '127.0.0.1'     # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''              # Set to empty string for default. Not used with sqlite3.
+
+# Test database settings
+TEST_DATABASE_CHARSET = "utf8"
+TEST_DATABASE_COLLATION = "utf8_general_ci"
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -90,14 +94,14 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'publisher.pre_publisher', # pre publisher
+    
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.sites',
     #'tagging',
-    
-    'publisher',
     
     'cms',
     'cms.plugins.text',
@@ -115,6 +119,8 @@ INSTALLED_APPS = (
     'sampleapp',
     'store',
     'travel', # simple app for testing publisher
+    
+    'publisher.post_publisher', # post publisher
 )
 
 gettext = lambda s: s
