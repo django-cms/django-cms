@@ -3,7 +3,7 @@ from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
 from models import Text
 from cms.plugins.text.forms import TextForm
-from cms.plugins.text.widgets import WYMEditor, PlaceholderEditor
+from cms.plugins.text.widgets import WYMEditor
 from cms.plugins.text.utils import plugin_tags_to_user_html
 from django.forms.fields import CharField
 
