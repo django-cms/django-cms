@@ -53,7 +53,6 @@ class MpttMeta:
     @classmethod
     def finish_mptt_class(cls, *args, **kwargs):
         main_cls = kwargs['sender']
-        
         try:
             from functools import wraps
         except ImportError:
@@ -93,9 +92,7 @@ class MpttMeta:
                 self._tree_manager._close_gap(tree_width, target_right, tree_id)
                 delete(self)
             return wraps(delete)(_wrapped_delete)
-        main_cls.delete = wrap_delete(main_cls.delete)
-        
-    
+        main_cls.delete = wrap_delete(main_cls.delete)        
     
     
 def install_mptt(cls, name, bases, attrs):
@@ -105,20 +102,16 @@ def install_mptt(cls, name, bases, attrs):
     if not Mptt in bases:
         return attrs 
     
-    
     if 'MpttMeta' in attrs and not issubclass(attrs['MpttMeta'], MpttMeta):
         raise ValueError, ("%s.Mptt must be a subclass "
                            + " of publisher.Mptt.") % (name,)
-    else:
-        attrs['MpttMeta'] = MpttMeta
+    
+    attrs['MpttMeta'] = MpttMeta
     
     # import required stuff here, so we will have import errors only when mptt
     # is really in use
     from mptt import models as mptt_models
-    
-    # check if class isn't already registered - this actually should'nt never
-    # happen
-    
+        
     attrs['_is_mptt_model'] = lambda self: True
     
     mptt_meta = attrs['MpttMeta']
@@ -133,7 +126,6 @@ def install_mptt(cls, name, bases, attrs):
     for attr in fields:
         if not attr in attrs:
             attrs[attr] = models.PositiveIntegerField(db_index=True, editable=False)
-        
     
     methods = ('get_ancestors', 'get_children', 'get_descendants', 
         'get_descendant_count', 'get_next_sibling', 

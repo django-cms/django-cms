@@ -23,12 +23,10 @@ def install_publisher():
         subclass of Publisher.
         """
         
-        # first take care of mptt, if required
-        attrs = install_mptt(cls, name, bases, attrs)
-        
         if Publisher in bases:            
             # copy attrs, because ModelBase affects them
             public_attrs = deepcopy(attrs)
+            
             attrs['_is_publisher_model'] = lambda self: True
                         
             # create proxy - accessor for public model
@@ -39,7 +37,10 @@ def install_publisher():
                     return model
             
             attrs['Public'] = PublicModelProxy()
-            
+        
+        # take care of mptt, if required
+        attrs = install_mptt(cls, name, bases, attrs)
+        
         new_class = _old_new(cls, name, bases, attrs)
         
         if '_is_publisher_model' in attrs:

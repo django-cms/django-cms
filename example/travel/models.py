@@ -69,7 +69,7 @@ class Place(Publisher):
         verbose_name=_('Place')
         verbose_name_plural=_('Places')
         
-    __unicode__ = lambda self: 'change_me'
+    __unicode__ = lambda self: self.name
         
         
 class Person(Publisher):
@@ -140,7 +140,7 @@ class Destination(Publisher, Mptt):
     # publish safe_city
     >>> pub_safe_city = safe_city.publish()
     >>> Destination.Public.objects.get(pk=pub_safe_city.id)
-    [<Destination: Zurich>]
+    <PublicDestination: Zurich>
     
     """ 
     name = models.CharField(max_length=128, null=True, blank=True)
@@ -152,9 +152,3 @@ class Destination(Publisher, Mptt):
         verbose_name_plural=_('Destinations')
     
     __unicode__ = lambda self: self.name or unicode(self.place)
-
-
-
-# TODO: and what with inherited models..?
-
-print "travel models()"
