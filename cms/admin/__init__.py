@@ -100,6 +100,8 @@ if settings.CMS_PERMISSION:
                     self.exclude.append('can_change_softroot')
                 if not obj.has_move_page_permission(request):
                     self.exclude.append('can_move_page')
+                if not settings.CMS_MODERATOR or not obj.has_moderate_permission(request):
+                    self.exclude.append('can_moderate')
             FormSet = super(PagePermissionInlineAdmin, self).get_formset(request, obj=None, **kwargs)
             # asign queryset 
             FormSet.use_queryset = self.queryset(request)
@@ -112,17 +114,21 @@ if settings.CMS_PERMISSION:
         list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
         list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
         
-        if settings.CMS_SOFTROOT:
-            list_display += ('can_change_softroot', )
-            list_filter += ('can_change_softroot', )
-        
         search_fields = ('user__username', 'user__firstname', 'user__lastname', 'group__name')
+        
+        exclude = []
         
         if settings.CMS_SOFTROOT:
             list_display.append('can_change_softroot')
             list_filter.append('can_change_softroot')
         else:
-            exclude = ['can_change_softroot']
+            exclude.append('can_change_softroot')
+            
+        if settings.CMS_MODERATOR:
+            list_display.append('can_moderate')
+            list_filter.append('can_moderate')
+        else:
+            exclude.append('can_moderate')
         
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
     

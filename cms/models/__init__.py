@@ -291,6 +291,14 @@ class Page(models.Model):
         """
         return self.has_generic_permission(request, "move_page")
     
+    def has_moderate_permission(self, request):
+        """Has user ability to moderate current page? If moderation isn't 
+        installed, nobody can moderate.
+        """
+        if not settings.CMS_MODERATOR:
+            return False
+        return self.has_generic_permission(request, "moderate")
+    
     def has_generic_permission(self, request, type):
         """
         Return true if the current user has permission on the page.
@@ -495,6 +503,7 @@ class AbstractPagePermission(models.Model):
     can_publish = models.BooleanField(_("can publish"), default=True)
     can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
     can_move_page = models.BooleanField(_("can move"), default=True)
+    can_moderate = models.BooleanField(_("can moderate"), default=True)
     
     class Meta:
         abstract = True
@@ -582,3 +591,35 @@ class ExtGroup(models.Model):
         verbose_name_plural = _('Extended groups')
         
         __unicode__ = lambda self: unicode(self.group)
+
+
+################################################################################
+# Moderation
+################################################################################
+
+class PageModerator(models.Model):
+    """docstring
+    """
+    
+    ACTION_ADD = "ADD"
+    ACTION_DELETE = "DEL"
+    ACTION_EDIT = "EDI"
+    ACTION_MOVE = "MOV"
+    
+    _actions = (ACTION_ADD, ACTION_DELETE, ACTION_EDIT, ACTION_MOVE)
+    _action_choices = zip(_actions, _actions)  
+    
+    MAX_LEVEL = 9999
+    
+    page = models.OneToOneField(Page)
+    action = models.CharField(max_length=3, choices=_action_choices, null=True, blank=True)
+    moderators = models.ManyToManyField(User)
+    
+    # level of current aprovement of page
+    approved_level = models.IntegerField(default=MAX_LEVEL)
+    
+    class Meta:
+        verbose_name=_('Page moderator')
+        verbose_name_plural=_('Page moderators')
+        
+    __unicode__ = lambda self: 'change_me'

@@ -147,9 +147,9 @@ CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categor
 
 CMS_SOFTROOT = True
 CMS_FLAT_URLS = True
-#CMS_PERMISSION = False
+CMS_MODERATOR = True
 
-SOUTH_AUTO_FREEZE_APP = True
+#SOUTH_AUTO_FREEZE_APP = True
 
 try:
     from local_settings import *

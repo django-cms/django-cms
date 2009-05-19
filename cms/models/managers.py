@@ -321,11 +321,16 @@ class PagePermissionsPermissionManager(models.Manager):
     def get_move_page_id_list(self, user):
         """Give a list of pages which user can move.
         """
-        # TODO: this is going to be tricky!!
-        
-        #... continue here ... 
-        
         return self.__get_id_list(user, "can_move_page")
+    
+    
+    def get_moderate_id_list(self, user):
+        """Give a list of pages which user can moderate. If moderation isn't 
+        installed, nobody can moderate. 
+        """        
+        if not settings.CMS_MODERATOR:
+            return []
+        return self.__get_id_list(user, "can_moderate")
     
     def __get_id_list(self, user, attr):
         if user.is_superuser or not settings.CMS_PERMISSION:
