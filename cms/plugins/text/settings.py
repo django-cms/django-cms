@@ -45,3 +45,4 @@ WYM_STYLES = """
 """
 
 WYM_CLASSES = getattr(settings, "WYM_CLASSES", WYM_CLASSES)
+WYM_STYLES = getattr(settings, "WYM_STYLES", WYM_STYLES)
