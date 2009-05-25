@@ -145,7 +145,8 @@ $(document).ready(function() {
             }
             if(action=="add") {
                 //var query = $.query.set('target', target_id).set('position', position).toString();
-                window.location.href = window.location.href.split("?")[0] + 'add/?target='+target_id+"&position="+position;
+                site = $('select#site-select')[0].value
+                window.location.href = window.location.href.split("?")[0] + 'add/?target='+target_id+"&position="+position+"&site="+site;
             }
             //selected_page = false;
 			e.stopPropagation();
@@ -171,6 +172,29 @@ $(document).ready(function() {
 	$('#sitemap ul .col-softroot').syncWidth(0);
 	$('#sitemap ul .col-template').syncWidth(0);
 	$('#sitemap ul .col-creator').syncWidth(0);	
+	/* Site Selector */
+	$('select#site-select').change(function(event){
+		var id = this.value
+		var url = window.location.href
+		var get_args = false;
+		console.log(url)
+		
+		if(url.split("?").length>1){
+			get_args = true;
+			console.log("get args = true")
+		}
+		var splits = url.split("sites__id__exact=")
+		if(splits.length > 1){
+			window.location = splits[0] + "sites__id__exact=" + id + splits[1].substr(1,splits[1].length);
+		}else{
+			if(get_args){
+				window.location = url + "&sites__id__exact=" + id
+			}else{
+				window.location = url + "?sites__id__exact=" + id
+			}
+		}
+	});
+	
 	
 });
 

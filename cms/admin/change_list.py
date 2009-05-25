@@ -1,9 +1,11 @@
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
-from cms.models import Title, PagePermission
+from cms.models import Title, PagePermission, Page
 from cms import settings
 from cms.utils import get_language_from_request, find_children
+from django.contrib.sites.models import Site
 
+SITE_VAR = "sites__id__exact"
 
 class CMSChangeList(ChangeList):
     real_queryset = False
@@ -13,6 +15,13 @@ class CMSChangeList(ChangeList):
         request = args[0]
         self.query_set = self.get_query_set(request)
         self.get_results(request)
+        if SITE_VAR in self.params:
+            try:   
+                self._current_site = Site.objects.get(pk=self.params[SITE_VAR])
+            except:
+                self._current_site = Site.objects.get_current()
+        else:
+            self._current_site = Site.objects.get_current()
         
     def get_query_set(self, request=None):
         qs = super(CMSChangeList, self).get_query_set()
@@ -27,7 +36,7 @@ class CMSChangeList(ChangeList):
     
     def is_filtered(self):
         lookup_params = self.params.copy() # a dictionary of the query string
-        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
+        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR):
             if i in lookup_params:
                 del lookup_params[i]
         if not lookup_params.items() and not self.query:
@@ -100,4 +109,10 @@ class CMSChangeList(ChangeList):
         
     def get_items(self):
         return self.root_pages
+    
+    def sites(self):
+        return Site.objects.all()
+    
+    def current_site(self):
+        return self._current_site
     

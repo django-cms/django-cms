@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.generic.create_update import redirect
 from inspect import isclass, getmembers
 from os.path import join
+from django.contrib.sites.models import Site
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -203,6 +204,10 @@ class PageAdmin(admin.ModelAdmin):
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
+        if 'site' in request.GET.keys():
+            form.base_fields['sites'].initial = [int(request.GET['site'])]
+        else:
+            form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             form.base_fields['slug'].initial = title_obj.slug
@@ -314,7 +319,6 @@ class PageAdmin(admin.ModelAdmin):
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
-            
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
             'CMS_MEDIA_URL': CMS_MEDIA_URL,
