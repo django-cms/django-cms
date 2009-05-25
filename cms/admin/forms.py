@@ -68,9 +68,10 @@ class PageForm(forms.ModelForm):
     
     def clean_sites(self):
         sites = self.cleaned_data['sites']
-        parent_sites = self.cleaned_data['parent'].sites.all().values_list('id', flat=True)
-        for site in sites:
-            if not site.pk in parent_sites:
-                raise forms.ValidationError(ugettext_lazy('The parent of this page is not on the site %(site)s') % {'site':site } )
+        if self.cleaned_data['parent'] != None:
+            parent_sites = self.cleaned_data['parent'].sites.all().values_list('id', flat=True)
+            for site in sites:
+                if not site.pk in parent_sites:
+                    raise forms.ValidationError(ugettext_lazy('The parent of this page is not on the site %(site)s') % {'site':site } )
         return sites
         
