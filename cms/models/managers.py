@@ -7,6 +7,7 @@ from cms import settings
 from cms.utils.urlutils import levelize_path
 from cms.exceptions import NoPermissionsException
 
+
 class PageManager(models.Manager):
     def on_site(self):
         site = Site.objects.get_current()
@@ -255,12 +256,13 @@ class PagePermissionManager(BasicPagePermissionManager):
         NOTE: this returns just PagePermission instances, to get complete access
         list merge return of this function with Global permissions.
         """
-        from cms.models import PagePermission
+        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN,\
+            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS 
         
         q = Q(page__tree_id=page.tree_id) & (
             Q(page=page) 
-            | (Q(page__level__lt=page.level)  & (Q(grant_on=PagePermission.ACCESS_DESCENDANTS) | Q(grant_on=PagePermission.ACCESS_PAGE_AND_DESCENDANTS)))
-            | (Q(page__level=page.level - 1) & (Q(grant_on=PagePermission.ACCESS_CHILDREN) | Q(grant_on=PagePermission.ACCESS_PAGE_AND_CHILDREN)))  
+            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
+            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
         ) 
         return self.filter(q).order_by('page__level')
 
@@ -338,7 +340,9 @@ class PagePermissionsPermissionManager(models.Manager):
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
         
-        from cms.models import GlobalPagePermission, PagePermission
+        from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
+            MASK_CHILDREN, MASK_DESCENDANTS
+            
         # check global permissions
         in_global_permissions = GlobalPagePermission.objects.with_user(user).filter(**{attr: True})
         if in_global_permissions:
@@ -357,11 +361,11 @@ class PagePermissionsPermissionManager(models.Manager):
         for permission in qs:
             is_allowed = getattr(permission, attr)
             if is_allowed:
-                if permission.grant_on & PagePermission.MASK_PAGE:
+                if permission.grant_on & MASK_PAGE:
                     page_id_allow_list.append(permission.page.id)
-                if permission.grant_on & PagePermission.MASK_CHILDREN:
+                if permission.grant_on & MASK_CHILDREN:
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
-                elif permission.grant_on & PagePermission.MASK_DESCENDANTS:
+                elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
         print "> perm", attr, page_id_allow_list
         return page_id_allow_list

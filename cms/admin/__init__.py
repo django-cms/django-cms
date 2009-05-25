@@ -21,7 +21,7 @@ from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, ExtUserCreationForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
-    edit_plugin, remove_plugin, move_plugin, revert_plugins)
+    edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation)
 from cms.admin.widgets import PluginEditor
 from cms.models import Page, Title, CMSPlugin, PagePermission
 from cms.plugin_pool import plugin_pool
@@ -34,6 +34,7 @@ from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 from django.contrib.auth.models import User
+from cms.utils.publisher import get_user_level
 
 PAGE_ADMIN_INLINES = []
 
@@ -190,8 +191,6 @@ if settings.CMS_PERMISSION:
 ################################################################################
 
 class PageAdmin(admin.ModelAdmin):
-    """sdfsdf sdf f
-    """
     form = PageForm
     
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
@@ -240,12 +239,13 @@ class PageAdmin(admin.ModelAdmin):
     ]
     
     inlines = PAGE_ADMIN_INLINES
-      
+    
     class Media:
         css = {
             'all': [join(settings.CMS_MEDIA_URL, path) for path in (
                 'css/rte.css',
-                'css/pages.css'
+                'css/pages.css',
+                'css/jquery.dialog.css',
             )]
         }
         js = [join(settings.CMS_MEDIA_URL, path) for path in (
@@ -253,6 +253,9 @@ class PageAdmin(admin.ModelAdmin):
             'javascript/jquery.rte.js',
             'javascript/jquery.query.js',
             'javascript/change_form.js',
+            
+            'javascript/ui.core.js',
+            'javascript/ui.dialog.js',
         )]
 
     def __call__(self, request, url):
@@ -278,6 +281,8 @@ class PageAdmin(admin.ModelAdmin):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
+        elif url.endswith('/change-moderation'):
+            return change_moderation(request, unquote(url[:-18]))
         elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
             return HttpResponseRedirect("../../../jsi18n/")
         elif ('history' in url or 'recover' in url) and request.method == "POST":
@@ -443,13 +448,28 @@ class PageAdmin(admin.ModelAdmin):
             obj = None
         else:
             template = get_template_from_request(request, obj)
+            
+            moderation_level = obj.get_moderation_level()
+            print ">> ML:", moderation_level
+            if settings.CMS_MODERATOR:
+                user_level = get_user_level(request.user)
+                print ">> UL:", user_level
+                moderation_required = moderation_level < user_level
+            else:
+                moderation_required = False
+            
             extra_context = {
                 'placeholders': get_placeholders(request, template),
                 'language': get_language_from_request(request),
                 'traduction_language': settings.CMS_LANGUAGES,
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
-                'has_change_permissions_permission': obj.has_change_permissions_permission(request)
+                'CMS_MODERATOR': settings.CMS_MODERATOR,
+                'has_change_permissions_permission': obj.has_change_permissions_permission(request),
+                
+                'moderation_level': moderation_level,
+                'moderation_required': moderation_required, 
+                
             }
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
 
@@ -513,6 +533,7 @@ class PageAdmin(admin.ModelAdmin):
             'softroot': settings.CMS_SOFTROOT,
             
             'CMS_PERMISSION': settings.CMS_PERMISSION,
+            'CMS_MODERATOR': settings.CMS_MODERATOR,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)

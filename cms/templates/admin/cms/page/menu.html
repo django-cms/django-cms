@@ -51,12 +51,15 @@
 					<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
 					<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />
 				</label>{% endif %}				
-			</div>{% if softroot %}
-			<div class="col-softroot">{% if page.soft_root %}
-				
-					<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+			</div>
+			{% if softroot %}<div class="col-softroot">
+				{% if page.soft_root %}<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
 				{% endif %}				
 			</div>{% endif %}
+			{% if CMS_MODERATOR %}<div class="col-moderator">
+				{% if has_moderate_permission %}{% include 'admin/cms/page/moderator_col.html' %}{% endif %}		
+			</div>{% endif %}
+			
 			<div class="col-template">{{ page.get_template_name }}</div>
 			<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div>
 		</div>

@@ -55,7 +55,7 @@ def has_page_add_permission(request):
 def get_user_permission_level(user):
     """Returns highest user level from the page/permission hierarchy on which
     user haves can_change_permission. Also takes look into user groups. Higher 
-    level equals to lover number. Users on top of fierarchy have level 0. Level 
+    level equals to lover number. Users on top of hierarchy have level 0. Level 
     is the same like page.level attribute.
     
     Example:

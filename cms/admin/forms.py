@@ -3,7 +3,7 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.forms.util import ErrorList
 from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
-from cms.models import Page, Title, PagePermission, ExtUser
+from cms.models import Page, Title, PagePermission, ExtUser, ACCESS_PAGE
 from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups
@@ -106,7 +106,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         
         can_add = self.cleaned_data['can_add']
         # check if access for childrens, or descendants is granted
-        if can_add and self.cleaned_data['grant_on'] == PagePermission.ACCESS_PAGE:
+        if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
             # page but after he does this, he will not have permissions to 
             # access this page anymore, so avoid this

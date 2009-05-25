@@ -141,7 +141,14 @@ div#sitemap a{text-decoration:none; border:none; outline:none;}
 div#sitemap a:hover{text-decoration:underline;}
 div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li, #sitemap ul{display:block;}
+
 #sitemap li .cont{display:block;background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;}
+
+/* TODO: change backgrounds 
+#sitemap li .cont.in_approvement_process { border: #f00 1px solid; }
+#sitemap li .cont.approve { border: #00f 1px solid; }
+*/
+
 
 #sitemap li .col1 .title, #sitemap li .col1 .success{
 	display:block;
@@ -183,6 +190,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-published,
 #sitemap li .col-navigation,
 #sitemap li .col-softroot,
+#sitemap li .col-moderator,
 #sitemap li .col-template,
 #sitemap li .col-creator{
 	border-left:1px solid #DEDEDC;
@@ -213,6 +221,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-actions{}
 #sitemap li .col-published{width:65px;}
 #sitemap li .col-softroot{width:55px;}
+#sitemap li .col-moderator { width:55px; }
 #sitemap li .col-creator{width:65px;}
 
 #sitemap li a.move {
@@ -270,6 +279,7 @@ div#sitemap ul.header li{
 #sitemap ul.header li .col-published,
 #sitemap ul.header li .col-navigation,
 #sitemap ul.header li .col-softroot,
+#sitemap ul.header li .col-moderator,
 #sitemap ul.header li .col-template,
 #sitemap ul.header li .col-creator{
 	height:auto;

@@ -88,3 +88,6 @@ CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ())
 # moderator mode - if True, approve path can be setup for every page, so there
 # will be some control over the published stuff
 CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False) 
+
+if CMS_MODERATOR and not CMS_PERMISSION:
+    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')

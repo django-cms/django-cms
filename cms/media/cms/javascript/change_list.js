@@ -153,6 +153,21 @@ $(document).ready(function() {
             return true;
         }
         
+		// moderation
+		if(jtarget.hasClass("moderator-checkbox")) {
+            var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+            parent = jtarget.parents('div.col-moderator');
+			
+			value = 0;
+			parent.find('input[type=checkbox]').each(function(i, el){
+				value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
+			})
+			
+			parent.load("/admin/cms/page/" + pageId + "/change-moderation/", { moderate: value });
+			e.stopPropagation();
+            return true;
+        }
+		
         if(jtarget.hasClass("move-target")) {
             if(jtarget.hasClass("left"))
                 var position = "left";

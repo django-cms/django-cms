@@ -5,11 +5,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.context import RequestContext
 
 from cms import settings
-from cms.models import Page, Title, CMSPlugin
+from cms.models import Page, Title, CMSPlugin, MASK_CHILDREN, MASK_DESCENDANTS,\
+    MASK_PAGE
 from cms.plugin_pool import plugin_pool
 from cms.utils import auto_render
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
+from cms.utils.publisher import publish_page_request
 
 @require_POST
 def change_status(request, page_id):
@@ -19,10 +21,10 @@ def change_status(request, page_id):
     page = get_object_or_404(Page, pk=page_id)
     if page.has_publish_permission(request):
         if page.status == Page.DRAFT:
-            page.status = Page.PUBLISHED
+            publish_page_request(page)
         elif page.status == Page.PUBLISHED:
             page.status = Page.DRAFT
-        page.save()    
+            page.save()    
         return HttpResponse(unicode(page.status))
     raise Http404
 change_status = staff_member_required(change_status)
@@ -280,3 +282,29 @@ def revert_plugins(request, version_id):
             title.save()
     for plugin in current_plugins:
         plugin.delete()
+        
+
+@require_POST
+def change_moderation(request, page_id):
+    """Called when user clicks on a moderation checkbox in tree vies, so if he
+    wants to add/remove/change moderation required by him. Moderate is sum of
+    mask values.
+    """
+    page = get_object_or_404(Page, id=page_id)
+    moderate = request.POST.get('moderate', None)
+    if moderate is not None and page.has_moderate_permission(request):
+        try:
+            moderate = int(moderate)
+        except:
+            moderate = 0
+        if moderate <= MASK_PAGE + MASK_CHILDREN + MASK_DESCENDANTS:
+            page_moderator, created = page.pagemoderator_set.get_or_create(user=request.user)
+            # split value to attributes
+            page_moderator.set_binary(moderate)
+            page_moderator.save()
+            context = {
+                'page': page,
+                'user': request.user,
+            }
+            return render_to_response('admin/cms/page/moderator_col.html', context)
+    raise Http404

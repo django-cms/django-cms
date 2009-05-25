@@ -8,7 +8,16 @@
 
 {% endblock %}
 
-{% block content_title %}<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>{% endblock %}
+{% block content_title %}
+	<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>
+	{% if CMS_MODERATOR %}
+		{% if moderation_required %}
+			<h3>{% blocktrans %}This page must be moderated at level {{ moderation_level }}.{% endblocktrans %}</h3>
+		{% else %}
+			<h3>{% trans 'This page does not requires any moderation.' %}</h3>
+		{% endif %}
+	{% endif %}
+{% endblock %}
 
 {% block content %}<div id="content-main">
 {% block object-tools %}
@@ -70,8 +79,44 @@
 			loaded = true;
 			return false;	
 		});
+		
+		$('#dialog').dialog({
+			bgiframe: true,
+			autoOpen: true,
+			height: 300,
+			modal: true,
+			buttons: {
+				'Create an account': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
+
+					if (bValid) {
+						$('#users tbody').append('<tr>' +
+							'<td>' + name.val() + '</td>' + 
+							'<td>' + email.val() + '</td>' + 
+							'<td>' + password.val() + '</td>' +
+							'</tr>'); 
+						$(this).dialog('close');
+					}
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+			 
+		});
 	});
 </script>
+
+<div id="dialog" title="Approve dialog">
+	<p>{% trans 'This page requires approvement by higher instance, please post a message
+	if required' %}.</p>
+	<textarea>sdfsdf</textarea>
+</div>
+
 {% endif %}
 
 {% block after_related_objects %}{% endblock %}

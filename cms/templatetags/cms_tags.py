@@ -217,11 +217,13 @@ def show_admin_menu(context, page, no_children=False, level=None):
         'children': page.childrens,
         'level': level,
         'CMS_PERMISSION': settings.CMS_PERMISSION,
+        #'CMS_MODERATOR': settings.CMS_MODERATOR,
         'has_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_permission,
+        'has_moderate_permission': page.has_moderate_permission(request),
         'metadata': metadata,
     })
     return context

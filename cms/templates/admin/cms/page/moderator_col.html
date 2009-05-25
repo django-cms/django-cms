@@ -1,0 +1,6 @@
+{% load cms_admin %}
+{# requires page in context #}
+
+{% for value, title, active in page|moderator_choices:user %}<input type="checkbox" class="moderator-checkbox"{% if active %} checked="checked"{% endif %} value="{{ value }}" title="{{ title }}"/>
+{% endfor %}
+
