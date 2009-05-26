@@ -11,7 +11,6 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import auto_render
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
-from cms.utils.publisher import publish_page_request
 
 @require_POST
 def change_status(request, page_id):
@@ -20,12 +19,9 @@ def change_status(request, page_id):
     """
     page = get_object_or_404(Page, pk=page_id)
     if page.has_publish_permission(request):
-        if page.status == Page.DRAFT:
-            publish_page_request(page)
-        elif page.status == Page.PUBLISHED:
-            page.status = Page.DRAFT
-            page.save()    
-        return HttpResponse(unicode(page.status))
+        page.published = not page.published
+        page.save()    
+        return HttpResponse(unicode(int(page.published)))
     raise Http404
 change_status = staff_member_required(change_status)
 

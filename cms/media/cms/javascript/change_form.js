@@ -64,6 +64,23 @@ $(document).ready(function() {
 			return answer
 		}
 	})
-    
+	
+	
+	// inline group loader
+	$('h2').click(function(){
+		// reqest content - do it this way, so we can save some time which
+		// this operation may need
+		var parent = $(this).parent();
+		var pathHolder = $(parent).find('div.load');
+		if (pathHolder.length) {
+			var url = pathHolder.text();
+			// load just once
+			pathHolder.remove();
+			var target = $(parent).find('div.load');
+			$(parent).find('div.loading').load(url);
+		}
+		return false;	
+	});		
+	    
 });
 

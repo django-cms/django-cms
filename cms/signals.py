@@ -2,6 +2,7 @@ from django.db.models import signals
 from cms import settings as cms_settings, appresolver
 from cms.models import signals as cms_signals, Page, Title
 from cms.models import CMSPlugin        
+from cms.utils.publisher import page_changed
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
@@ -128,7 +129,6 @@ def post_save_user(instance, raw, created, **kwargs):
     cursor.execute(query) 
     cursor.close()
     
-    
 def post_save_user_group(instance, raw, created, **kwargs):
     """The same like post_save_user, but for Group, required only when 
     CMS_PERMISSION.
@@ -153,3 +153,31 @@ if cms_settings.CMS_PERMISSION:
     # regster signals to user related models
     signals.post_save.connect(post_save_user, User)
     signals.post_save.connect(post_save_user_group, Group)
+    
+
+def pre_save_page(instance, raw, **kwargs):
+    """Helper pre save signal, assigns old_page attribute, so we can still
+    compare changes. Currently used only if CMS_PUBLISHER
+    """
+    instance.old_page = None
+    if instance.pk:
+        instance.old_page = Page.objects.get(pk=instance.pk)
+        
+
+def post_save_page(instance, raw, created, **kwargs):   
+    """Helper post save signal, cleans old_page attribute.
+    """
+    old_page = instance.old_page
+    del(instance.old_page)
+    
+    if cms_settings.CMS_MODERATOR:
+        # tell moderator something was happen with this page
+        page_changed(instance, old_page)
+    
+
+if cms_settings.CMS_MODERATOR:
+    # tell moderator, there is something happening with this page
+    signals.pre_save.connect(pre_save_page, sender=Page)
+    signals.post_save.connect(post_save_page, sender=Page)
+        
+        

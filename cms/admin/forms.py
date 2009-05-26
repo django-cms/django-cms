@@ -2,24 +2,25 @@ from django import forms
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.forms.util import ErrorList
-from cms.settings import CMS_LANGUAGES, CMS_UNIQUE_SLUGS, CMS_APPLICATIONS_URLS, CMS_FLAT_URLS
-from cms.models import Page, Title, PagePermission, ExtUser, ACCESS_PAGE
-from cms.utils.urlutils import any_path_re
-from cms.utils.permissions import get_current_user, get_subordinate_users,\
-    get_subordinate_groups
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
-from cms.admin.widgets import UserSelectAdminWidget
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import BooleanField
 
+from cms import settings as cms_settings
+from cms.models import Page, Title, PagePermission, ExtUser, ACCESS_PAGE
+from cms.utils.urlutils import any_path_re
+from cms.utils.permissions import get_current_user, get_subordinate_users,\
+    get_subordinate_groups
+from cms.admin.widgets import UserSelectAdminWidget
+
     
 class PageForm(forms.ModelForm):
-    APPLICATION_URLS = (('', '----------'), ) + CMS_APPLICATIONS_URLS
+    APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
+    
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
-    language = forms.ChoiceField(label=_("Language"), choices=CMS_LANGUAGES,
+    language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the url'))
@@ -28,6 +29,11 @@ class PageForm(forms.ModelForm):
         help_text=_('Hook application to this page.'))
     overwrite_url = forms.CharField(label='Overwrite url', max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
+    # moderation state
+    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False) 
+    # moderation - message is a fake filed
+    moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
+    
     
     class Meta:
         model = Page
@@ -42,11 +48,11 @@ class PageForm(forms.ModelForm):
         page = self.instance
         lang = cleaned_data['language']
         parent = cleaned_data['parent']
-        if CMS_UNIQUE_SLUGS:
+        if cms_settings.CMS_UNIQUE_SLUGS:
             titles = Title.objects.filter(slug=slug)
         else:
             titles = Title.objects.filter(slug=slug, language=lang)        
-        if not CMS_FLAT_URLS:
+        if not cms_settings.CMS_FLAT_URLS:
             titles = titles.filter(page__parent=parent)
         if self.instance.pk:
             titles = titles.exclude(language=lang, page=page)
@@ -72,6 +78,7 @@ class PageForm(forms.ModelForm):
             if not any_path_re.match(url):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
+    
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """Page permission inline admin form used in inline admin. Required, because

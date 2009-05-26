@@ -57,14 +57,16 @@ class Page(models.Model):
     """
     A simple hierarchical page model
     """
-    # some class constants to refer to, e.g. Page.DRAFT
-    DRAFT = 0
-    PUBLISHED = 1
-    EXPIRED = 2
-    STATUSES = (
-        (DRAFT, _('Draft')),
-        (PUBLISHED, _('Published')),
+    MODERATOR_CHANGED = 0
+    MODERATOR_NEED_APPROVEMENT = 1
+    MODERATOR_APPROVED = 10
+    
+    moderator_state_choices = (
+        (MODERATOR_CHANGED, _('Changed')),
+        (MODERATOR_NEED_APPROVEMENT, _('Need approvement')),
+        (MODERATOR_APPROVED, _('Approved')),
     )
+    
     author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
@@ -75,9 +77,12 @@ class Page(models.Model):
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
-    status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
+    published = models.BooleanField(_("is published"), blank=True)
+    
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
     sites = models.ManyToManyField(Site, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    
+    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=0)
     
     # Managers
     objects = PageManager()
@@ -107,13 +112,11 @@ class Page(models.Model):
         
     
     def save(self, no_signals=False):
-        if not self.status:
-            self.status = Page.DRAFT
         # Published pages should always have a publication date
-        if self.publication_date is None and self.status == self.PUBLISHED:
+        if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
         # Drafts should not, unless they have been set to the future
-        if self.status == Page.DRAFT:
+        if self.published:
             if settings.CMS_SHOW_START_DATE:
                 if self.publication_date and self.publication_date <= datetime.now():
                     self.publication_date = None
@@ -121,6 +124,7 @@ class Page(models.Model):
                 self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
+        
         if no_signals:# ugly hack because of mptt
             super(Page, self).save_base(cls=self.__class__)
         else:
@@ -133,13 +137,13 @@ class Page(models.Model):
         """
         if settings.CMS_SHOW_START_DATE:
             if self.publication_date > datetime.now():
-                return self.DRAFT
+                return False
         
         if settings.CMS_SHOW_END_DATE and self.publication_end_date:
             if self.publication_end_date < datetime.now():
-                return self.EXPIRED
+                return True
 
-        return self.status
+        return self.published
     calculated_status = property(get_calculated_status)
         
     def get_languages(self):
@@ -657,10 +661,10 @@ class PageModeratorState(models.Model):
     Page can be in only one advanced state. 
     """
     ACTION_ADD = "ADD"
-    ACTION_EDIT = "EDI"
+    ACTION_CHANGED = "CHA"
     
-    ACTION_PUBLISH = "PU1"
-    ACTION_UNPUBLISH = "PU0"
+    ACTION_PUBLISH = "PUB"
+    ACTION_UNPUBLISH = "UNP"
     ACTION_MOVE = "MOV"
     
     # advanced states
@@ -670,22 +674,24 @@ class PageModeratorState(models.Model):
     ACTION_APPROVE = "APP"
     
     _action_choices = (
-        (ACTION_ADD, _('Page was created')), 
-        (ACTION_EDIT, _('Page was changed')), 
+        (ACTION_ADD, _('Created')), 
+        (ACTION_CHANGED, _('Changed')), 
         (ACTION_DELETE, _('Delete request')),
         (ACTION_MOVE, _('Move request')),
         (ACTION_PUBLISH, _('Publish request')),
-        (ACTION_APPROVE, _('Approved')),
+        (ACTION_UNPUBLISH, _('Unpublish request')),
+        (ACTION_APPROVE, _('Approved')), # Approved by somebody in approvement process
     )
     
-    page = models.OneToOneField(Page)
+    page = models.ForeignKey(Page)
     user = models.ForeignKey(User)
     created = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=3, choices=_action_choices, null=True, blank=True)
-    message = models.TextField(max_length=1000, null=True, blank=True)
+    message = models.TextField(max_length=1000, blank=True, default="")
     
     class Meta:
         verbose_name=_('Page moderator state')
         verbose_name_plural=_('Page moderator states')
+        ordering = ('page', 'created')
         
     __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.action)

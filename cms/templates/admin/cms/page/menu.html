@@ -32,7 +32,7 @@
 				{% endif %}
 				{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
 			</div>	
-			<div class="col-published">{% if page.status %}
+			<div class="col-published">{% if page.published %}
 				<label>
 					<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>{% if has_publish_permission %}
 					<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" />{% endif %}

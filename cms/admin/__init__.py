@@ -35,6 +35,7 @@ from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 from django.contrib.auth.models import User
 from cms.utils.publisher import get_user_level
+from cms.utils.moderator import update_moderation_message
 
 PAGE_ADMIN_INLINES = []
 
@@ -197,12 +198,12 @@ class PageAdmin(admin.ModelAdmin):
     mandatory_placeholders = ('title', 'slug', 'parent')
     filter_horizontal = ['sites']
     top_fields = ['language']
-    general_fields = [mandatory_placeholders, 'status']
+    general_fields = [mandatory_placeholders, 'published']
     advanced_fields = ['sites', 'in_navigation', 'reverse_id', 'application_urls', 'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     
-    list_filter = ['status', 'in_navigation', 'template', 'author']
+    list_filter = ['published', 'in_navigation', 'template', 'author']
     search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
     
     if settings.CMS_SOFTROOT:
@@ -215,7 +216,10 @@ class PageAdmin(admin.ModelAdmin):
     
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
-    
+        
+    if settings.CMS_SOFTROOT:
+        advanced_fields.extend(('moderator_state', 'moderator_message'))
+        
     list_filter += ['sites']
     
     # take care with changing fieldsets, get_fieldsets() method removes some
@@ -277,6 +281,8 @@ class PageAdmin(admin.ModelAdmin):
             return self.move_page(request, unquote(url[:-10]))
         elif settings.CMS_PERMISSION and 'permissions' in url:
             return self.get_permissions(request, url.split('/')[0])
+        elif settings.CMS_MODERATOR and 'moderation-states' in url:
+            return self.get_moderation_states(request, url.split('/')[0])
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
@@ -321,6 +327,12 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['application_urls'],
             form.cleaned_data['overwrite_url'],
         )
+        
+        # is there any moderation message? save/update state
+        if settings.CMS_MODERATOR and 'moderator_message' in self.cleaned_data and \
+            self.cleaned_data['moderator_message']:
+            update_moderation_message(obj, self.cleaned_data['moderator_message'])
+        
     
     def get_fieldsets(self, request, obj=None):
         """
@@ -332,7 +344,7 @@ class PageAdmin(admin.ModelAdmin):
         
         if obj:
             if not obj.has_publish_permission(request):
-                given_fieldsets[0][1]['fields'].remove('status')
+                given_fieldsets[0][1]['fields'].remove('published')
             if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
         for placeholder in get_placeholders(request, template):
@@ -375,10 +387,10 @@ class PageAdmin(admin.ModelAdmin):
         the request.
         """
         if obj:
-            if not obj.has_publish_permission(request) and not 'status' in self.exclude:
-                self.exclude.append('status')
-            elif 'status' in self.exclude:
-                self.exclude.remove('status')
+            if not obj.has_publish_permission(request) and not 'published' in self.exclude:
+                self.exclude.append('published')
+            elif 'published' in self.exclude:
+                self.exclude.remove('published')
             
             if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request) \
                 and not 'soft_root' in self.exclude: 
@@ -450,10 +462,8 @@ class PageAdmin(admin.ModelAdmin):
             template = get_template_from_request(request, obj)
             
             moderation_level = obj.get_moderation_level()
-            print ">> ML:", moderation_level
             if settings.CMS_MODERATOR:
                 user_level = get_user_level(request.user)
-                print ">> UL:", user_level
                 moderation_required = moderation_level < user_level
             else:
                 moderation_required = False
@@ -466,10 +476,10 @@ class PageAdmin(admin.ModelAdmin):
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
+                'has_moderate_permission': obj.has_moderate_permission(request),
                 
                 'moderation_level': moderation_level,
-                'moderation_required': moderation_required, 
-                
+                'moderation_required': moderation_required,
             }
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
 
@@ -619,6 +629,18 @@ class PageAdmin(admin.ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
     
+    def get_moderation_states(self, request, page_id):
+        """Returns moderation messsages. Is loaded over ajax to inline-group 
+        element in change form view.
+        """
+        page = get_object_or_404(Page, id=page_id)
+        if not page.has_moderate_permission(request):
+            raise Http404()
+        
+        context = {
+            'page': page,
+        }
+        return render_to_response('admin/cms/page/moderation_messages.html', context)
 
 
 class PageAdminMixins(admin.ModelAdmin):

@@ -44,7 +44,7 @@ class PageManager(models.Manager):
             return self.exclude(id__in=exclude_list)
 
     def published(self):
-        pub = self.on_site().filter(status=self.model.PUBLISHED)
+        pub = self.on_site().filter(published=True)
 
         if settings.CMS_SHOW_START_DATE:
             pub = pub.filter(publication_date__lte=datetime.now())
@@ -57,7 +57,7 @@ class PageManager(models.Manager):
         return pub
 
     def drafts(self):
-        pub = self.on_site().filter(status=self.model.DRAFT)
+        pub = self.on_site().filter(published=False)
         if settings.CMS_SHOW_START_DATE:
             pub = pub.filter(publication_date__gte=datetime.now())
         return pub
@@ -335,10 +335,14 @@ class PagePermissionsPermissionManager(models.Manager):
         return self.__get_id_list(user, "can_moderate")
     
     def __get_id_list(self, user, attr):
+        # TODO: result of this method should be cached per user, and cache should
+        # be cleaned after some change in permissions / globalpermission
+        
         if user.is_superuser or not settings.CMS_PERMISSION:
             # got superuser, or permissions aren't enabled? just return grant 
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
+        
         
         from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
             MASK_CHILDREN, MASK_DESCENDANTS
@@ -367,5 +371,5 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        print "> perm", attr, page_id_allow_list
+        print "> perm u:", user, "attr:", attr, page_id_allow_list
         return page_id_allow_list
