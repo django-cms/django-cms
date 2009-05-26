@@ -2,7 +2,7 @@ from django.db.models import signals
 from cms import settings as cms_settings, appresolver
 from cms.models import signals as cms_signals, Page, Title
 from cms.models import CMSPlugin        
-from cms.utils.publisher import page_changed
+from cms.utils.moderator import page_changed
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']

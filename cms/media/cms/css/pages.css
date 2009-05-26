@@ -42,6 +42,13 @@ td.actions a{
     list-style-type:none;
 }
 
+#site-selector {
+	float:left; 
+	margin-top:2px; 
+	margin-left:5px; 
+	margin-right:10px;
+}
+
 #traduction-helper-content {
     margin-top:1em;
     background:#ffc;

@@ -13,6 +13,7 @@ from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy, ugettext
 from django.views.generic.create_update import redirect
 from django import template
+from django.contrib.sites.models import Site
 from inspect import isclass, getmembers
 from copy import deepcopy
 
@@ -34,8 +35,7 @@ from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 from django.contrib.auth.models import User
-from cms.utils.publisher import get_user_level
-from cms.utils.moderator import update_moderation_message
+from cms.utils.moderator import update_moderation_message, get_user_level
 
 PAGE_ADMIN_INLINES = []
 
@@ -190,7 +190,6 @@ if settings.CMS_PERMISSION:
 ################################################################################
 # Page
 ################################################################################
-
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     
@@ -406,6 +405,10 @@ class PageAdmin(admin.ModelAdmin):
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
+        if 'site' in request.GET.keys():
+            form.base_fields['sites'].initial = [int(request.GET['site'])]
+        else:
+            form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             form.base_fields['slug'].initial = title_obj.slug
@@ -518,8 +521,12 @@ class PageAdmin(admin.ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
-            cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
+            if hasattr(self, 'list_editable'):# django 1.1
+                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
+            else:# django 1.0.2
+                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -536,7 +543,6 @@ class PageAdmin(admin.ModelAdmin):
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
-             
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
             'CMS_MEDIA_URL': CMS_MEDIA_URL,

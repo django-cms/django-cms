@@ -15,12 +15,11 @@
 			</span>
 			<div class="col-language">{% for lang in page.get_languages %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}</div>
 			<div class="col-actions">{% if not filtered %}
-				<select id="view-page-{{page.id}}-select">
-				{% for site in page.sites.all %}
-					<option value="http://{{site.domain}}{{page.get_absolute_url}}">{{site.domain}}</option>
-				{% endfor %}
-				</select>
-				<a href="#" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+
+				
+				<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+				
+				<!--<a href="#" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>-->
 				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}{% endif %}
 				{% if has_add_permission %}
 					<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>

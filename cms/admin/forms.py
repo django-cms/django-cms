@@ -79,6 +79,15 @@ class PageForm(forms.ModelForm):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
     
+    def clean_sites(self):
+        sites = self.cleaned_data['sites']
+        if self.cleaned_data['parent'] != None:
+            parent_sites = self.cleaned_data['parent'].sites.all().values_list('id', flat=True)
+            for site in sites:
+                if not site.pk in parent_sites:
+                    raise forms.ValidationError(ugettext_lazy('The parent of this page is not on the site %(site)s') % {'site':site } )
+        return sites
+
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """Page permission inline admin form used in inline admin. Required, because
@@ -186,4 +195,3 @@ class ExtUserCreationForm(UserCreationForm):
                 permission = Permission.objects.get(content_type=content_type, codename=codename)
                 user.user_permissions.add(permission)
         return user
-        

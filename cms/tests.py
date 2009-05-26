@@ -1,22 +1,39 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 from django.conf import settings
-from cms.models import Page, Title
+from cms.models import *
 from django.test.client import Client
 from django.template import TemplateDoesNotExist
-from django.contrib.auth.models import User
 
 
-class PagesTestCase:#(TestCase):
+# doc testing in some modules
+from cms import urlutils
+def suite():
+    suite1 = unittest.TestSuite()
+    suite1.addTest(doctest.DocTestSuite(urlutils))
+    suite2 = unittest.TestLoader().loadTestsFromTestCase(PagesTestCase)
+    alltests = unittest.TestSuite([suite1, suite2])
+    return alltests
+
+class PagesTestCase(TestCase):
     """NOTE: This is not a working version... Have to be changed 
     """
     fixtures = ['tests.json']
     counter = 1
-
+    
+    def setUp(self):
+        u = User(username="test")
+        u.set_password("test")
+        u.is_staff = True
+        u.is_active = True
+        u.is_superuser = True 
+        u.save()
+        
+    
     def get_new_page_data(self):
         page_data = {'title':'test page %d' % self.counter, 
             'slug':'test-page-%d' % self.counter, 'language':'en',
-            'sites':[2], 'status':Page.PUBLISHED}
+            'sites':[1], 'status':Page.PUBLISHED, 'template':'index.html'}
         self.counter = self.counter + 1
         return page_data
 
@@ -24,69 +41,66 @@ class PagesTestCase:#(TestCase):
         """
         Test that the add admin page could be displayed via the admin
         """
-        c = Client()
-        c.login(username= 'batiste', password='b')
-        response = c.get('/admin/pages/page/add/')
+        logged_in = self.client.login(username= 'test', password='test')
+        assert logged_in
+        response = self.client.get('/admin/cms/page/add/')
         assert(response.status_code == 200)
-
 
     def test_02_create_page(self):
         """
         Test that a page can be created via the admin
         """
-        setattr(settings, "SITE_ID", 2)
-        c = Client()
-        c.login(username= 'batiste', password='b')
+        self.client.login(username= 'test', password='test')
+        setattr(settings, "SITE_ID", 1)
         page_data = self.get_new_page_data()
-        response = c.post('/admin/pages/page/add/', page_data)
-        self.assertRedirects(response, '/admin/pages/page/')
-        slug_content = Title.objects.get_page_slug(self, page_data['slug']) 
-        assert(slug_content is not None)
-        page = slug_content.page
-        assert(page.title() == page_data['title'])
-        assert(page.slug() == page_data['slug'])
+
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        self.assertRedirects(response, '/admin/cms/page/')
+        title = Title.objects.get(slug=page_data['slug'])
+        assert(title is not None)
+        page = title.page
+        assert(page.get_title() == page_data['title'])
+        assert(page.get_slug() == page_data['slug'])
 
     def test_03_slug_collision(self):
         """
         Test a slug collision
         """
-        setattr(settings, "SITE_ID", 2)
+        setattr(settings, "SITE_ID", 1)
         
-        c = Client()
-        c.login(username= 'batiste', password='b')
+        
+        self.client.login(username= 'test', password='test')
         page_data = self.get_new_page_data()
-        response = c.post('/admin/pages/page/add/', page_data)
-        self.assertRedirects(response, '/admin/pages/page/')
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        self.assertRedirects(response, '/admin/cms/page/')
         
-        page1 = Content.objects.get_content_slug_by_slug(page_data['slug']).page
+        page1 = Title.objects.get(slug=page_data['slug']).page
 
-        response = c.post('/admin/pages/page/add/', page_data)
+        response = self.client.post('/admin/cms/page/add/', page_data)
         self.assertEqual(response.status_code, 200)
-
-        settings.PAGE_UNIQUE_SLUG_REQUIRED = False
-        response = c.post('/admin/pages/page/add/', page_data)
-        self.assertRedirects(response, '/admin/pages/page/')
-        page2 = Content.objects.get_content_slug_by_slug(page_data['slug']).page
-        self.assertNotEqual(page1.id, page2.id)
-
+        # TODO: check for slug collisions after move
+        # TODO: check for slug collisions with different settings
+        
+        
+  
     def test_04_details_view(self):
         """
         Test the details view
         """
 
-        c = Client()
-        c.login(username= 'batiste', password='b')
+        
+        self.client.login(username= 'test', password='test')
         try:
-            response = c.get('/pages/')
+            response = self.client.get('/')
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
 
         page_data = self.get_new_page_data()
         page_data['status'] = Page.DRAFT
-        response = c.post('/admin/pages/page/add/', page_data)
+        response = self.client.post('/admin/cms/page/add/', page_data)
         try:
-            response = c.get('/pages/')
+            response = self.client.get('/')
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
@@ -94,28 +108,30 @@ class PagesTestCase:#(TestCase):
         page_data = self.get_new_page_data()
         page_data['status'] = Page.PUBLISHED
         page_data['slug'] = 'test-page-2'
-        response = c.post('/admin/pages/page/add/', page_data)
-        response = c.get('/admin/pages/page/')
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        response = self.client.get('/admin/cms/page/')
         
-        response = c.get('/pages/')
+        response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
     def test_05_edit_page(self):
         """
         Test that a page can edited via the admin
         """
-        c = Client()
-        c.login(username= 'batiste', password='b')
+       
+        self.client.login(username= 'test', password='test')
         page_data = self.get_new_page_data()
-        response = c.post('/admin/pages/page/add/', page_data)
-        response = c.get('/admin/pages/page/1/')
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        response = self.client.get('/admin/cms/page/1/')
         self.assertEqual(response.status_code, 200)
         page_data['title'] = 'changed title'
-        response = c.post('/admin/pages/page/1/', page_data)
-        self.assertRedirects(response, '/admin/pages/page/')
+        response = self.client.post('/admin/cms/page/1/', page_data)
+        self.assertRedirects(response, '/admin/cms/page/')
         page = Page.objects.get(id=1)
-        assert(page.title() == 'changed title')
-        
+        assert(page.get_title() == 'changed title')
+    
+    
+    ''''
     def test_06_site_framework(self):
         """
         Test the site framework, and test if it's possible to disable it
@@ -129,7 +145,7 @@ class PagesTestCase:#(TestCase):
         response = c.post('/admin/pages/page/add/', page_data)
         self.assertRedirects(response, '/admin/pages/page/')
         
-        page = Content.objects.get_content_slug_by_slug(page_data['slug']).page
+        page = Title.objects.get(slug=page_data['slug']).page
         self.assertEqual(page.sites.count(), 1)
         self.assertEqual(page.sites.all()[0].id, 2)
         
@@ -172,19 +188,5 @@ class PagesTestCase:#(TestCase):
         
         self.test_02_create_page()
         self.test_05_edit_page()
-        self.test_04_details_view()
-        
-        
-class PermissionsTestCase(TestCase):
-    def setUp(self):
-        # create user
-        self.user = User(username='limited', is_active=True, is_staff=True)
-        self.user.set_password('limited')
-        self.user.save()
-                
-    def test_add_page(self):
-        c = Client()
-        c.login(user=self.user)
-        response = c.get('/admin/pages/page/add/')
-        assert(response.status_code == 200)
-    
+        self.test_04_details_view()'''
+
