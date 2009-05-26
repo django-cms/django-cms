@@ -198,7 +198,8 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-navigation,
 #sitemap li .col-softroot,
 #sitemap li .col-moderator,
-#sitemap li .col-template,
+#sitemap li .col-last-change,
+#sitemap li .col-draft,
 #sitemap li .col-creator{
 	border-left:1px solid #DEDEDC;
 	text-align:center;
@@ -225,26 +226,29 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 }
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
-#sitemap li .col-actions{}
-#sitemap li .col-published{width:65px;}
-#sitemap li .col-softroot{width:55px;}
-#sitemap li .col-moderator { width:55px; }
+#sitemap li .col-actions { width: 65px; }
+#sitemap li .col-published {width:65px;}
+#sitemap li .col-navigation { width: 100px; }
+#sitemap li .col-softroot {width:55px;}
+#sitemap li .col-moderator  { width:80px; }
 #sitemap li .col-creator{width:65px;}
+#sitemap li .col-draft{width:65px;}
+#sitemap li .col-last-change{width:80px;}
 
 #sitemap li a.move {
-	width:15px;
-	height:14px;
+	width:18px;
+	height:18px;
 	display:inline-block;
-	background:url(../images/cut.gif) 0px 0px no-repeat; 
+	background:url(../images/icons.png) -20px -20px no-repeat; 
 }
 #sitemap li a.move span{display:none;}
 
 #sitemap li a.selector-add {
 	margin-left:4px;
-	width:16px;
-	height:14px;
+	width:18px;
+	height:18px;
 	display:inline-block;
-	background:url(../images/page_find.gif) 0 -1px no-repeat; 
+	background:url(../images/icons.png) -20px 0px no-repeat;
 }
 #sitemap li a.selector-add span{display:none;}
 
@@ -287,7 +291,8 @@ div#sitemap ul.header li{
 #sitemap ul.header li .col-navigation,
 #sitemap ul.header li .col-softroot,
 #sitemap ul.header li .col-moderator,
-#sitemap ul.header li .col-template,
+#sitemap ul.header li .col-last-change,
+#sitemap ul.header li .col-draft,
 #sitemap ul.header li .col-creator{
 	height:auto;
 	border:none;
@@ -355,3 +360,18 @@ div#sitemap ul.header li{
 .change-list .filtered {background:#fff none repeat-y scroll right top !important;}
 
 .change-list #changelist .module{border:none;}
+
+
+/* special checkboxes */
+
+#sitemap li .col-moderator span.ui-checkbox {
+	margin-left:4px;
+	width:18px;
+	height:18px;
+	display:inline-block;
+	background:url(../images/icons.png) 0px 0px no-repeat;
+}
+#sitemap li .col-moderator span.ui-checkbox-state-checked {
+	background-position: -20px 0px;
+}
+ 

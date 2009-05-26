@@ -252,13 +252,11 @@ class PageAdmin(admin.ModelAdmin):
             )]
         }
         js = [join(settings.CMS_MEDIA_URL, path) for path in (
-            'javascript/jquery.js',
-            'javascript/jquery.rte.js',
-            'javascript/jquery.query.js',
-            'javascript/change_form.js',
-            
-            'javascript/ui.core.js',
-            'javascript/ui.dialog.js',
+            'js/lib/jquery.js',
+            'js/lib/jquery.query.js',
+            'js/lib/ui.core.js',
+            'js/lib/ui.dialog.js',
+            'js/change_form.js',
         )]
 
     def __call__(self, request, url):
@@ -328,9 +326,9 @@ class PageAdmin(admin.ModelAdmin):
         )
         
         # is there any moderation message? save/update state
-        if settings.CMS_MODERATOR and 'moderator_message' in self.cleaned_data and \
-            self.cleaned_data['moderator_message']:
-            update_moderation_message(obj, self.cleaned_data['moderator_message'])
+        if settings.CMS_MODERATOR and 'moderator_message' in form.cleaned_data and \
+            form.cleaned_data['moderator_message']:
+            update_moderation_message(obj, form.cleaned_data['moderator_message'])
         
     
     def get_fieldsets(self, request, obj=None):

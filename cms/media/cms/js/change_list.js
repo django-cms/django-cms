@@ -203,7 +203,7 @@ $(document).ready(function() {
 		return this;
 	};
 	$("div#sitemap").show()
-	$('#sitemap ul .col-actions').syncWidth(80);
+	$('#sitemap ul .col-actions').syncWidth(0);
 	$('#sitemap ul .col-published').syncWidth(0);
 	$('#sitemap ul .col-navigation').syncWidth(0);
 	$('#sitemap ul .col-softroot').syncWidth(0);
@@ -263,3 +263,8 @@ function moveTreeItem(item_id, target_id, position, tree){
         }
     );
 };
+
+
+$(function(){
+	$('div.col-moderator input').checkBox({addLabel:false});
+})

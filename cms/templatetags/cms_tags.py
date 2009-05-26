@@ -212,7 +212,6 @@ def show_admin_menu(context, page, no_children=False, level=None):
         'no_children': no_children,
         'site': site,
         'lang': lang,
-        'softroot': softroot,
         'filtered': filtered,
         'children': page.childrens,
         'level': level,

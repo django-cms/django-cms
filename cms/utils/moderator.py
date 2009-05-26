@@ -61,12 +61,15 @@ def update_moderation_message(page, message):
     
     user = get_current_user()
     created = datetime.datetime.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
+    print "> created:", created
     try:
         state = page.pagemoderatorstate_set.filter(user=user, created__gt=created).order_by('-created')[0]
         # just state without message!!
-        assert state.message > "" 
+        assert not state.message  
     except (IndexError, AssertionError):
         state = PageModeratorState(user=user, page=page, action=PageModeratorState.ACTION_CHANGED)
+    
+    
     
     state.message = message
     state.save()

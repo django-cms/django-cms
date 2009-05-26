@@ -83,8 +83,8 @@
 {% if CMS_MODERATOR and moderation_required %}
 	<div id="dialog" title="Approve dialog">
 		<p>{% blocktrans %}This page must be moderated at level {{ moderation_level }}, post a message for moderator.{% endblocktrans %}</p>
-		<textarea name="df_moderator_message" id="id_df_moderator_message"></textarea>
-		<input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label>
+		<div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
+		<div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label></div>
 	</div>
 	
 	<script type="text/javascript">
@@ -99,47 +99,59 @@
 			
 			// change submit states, open dialog
 			$('#page_form').submit(function(event){
-				return dialog(event, '#page_form input[name=_save]');
+				return showDialog(event);
 			});
 			
 			$('#page_form input[name=_continue]').click(function(event){
-				return dialog(event, this);
+				return showDialog(event, this);
 			});
 			
-			function dialog(event, actor) {
+			function showDialog(event, actor) {
 				if (forceSubmit) return true; // escape sequence
-				
 				event.preventDefault();
 				submitActor = actor;
 				$('#dialog').dialog('open');
 				return false;
 			}
-		
+			
+			function dialogSave(){
+				// assign values from dialog form to real form
+				$('#id_moderator_message').val($('#id_df_moderator_message').val());
+				$('#id_moderator_state').val(
+					$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
+				);
+				
+				old_uncollapse_all(); // uncolapse all fields django way
+				$('#dialog').dialog('close');
+				forceSubmit = true;
+				$(submitActor || '#page_form input[name=_save]').click();
+				return false;
+			}
+			
 			$('#dialog').dialog({
 				bgiframe: true,
 				autoOpen: false,
-				height: 200,
+				height: 180,
+				width: 400,
 				modal: true,
 				buttons: {
-					Save: function() {
-						// assign values from dialog form to real form
-						$('#id_moderator_message').val($('#id_df_moderator_message').val());
-						$('#id_moderator_state').val(
-							$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
-						);
-						
-						old_uncollapse_all(); // uncolapse all fields django way
-						$(this).dialog('close');
-						forceSubmit = true;
-						$(submitActor).click();
-					},
 					Cancel: function() {
 						$(this).dialog('close');
+					},
+					Save: function() {
+						dialogSave();
 					}
+					
 				}, 
 				open: function(){
 					var val = $('#id_moderator_state').val();
 					$('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
+					$('#id_df_moderator_message')
+						.focus()
+						.keydown(function(event) { if (event.keyCode == 13) dialogSave()});
+						
+					// add default button class to last rendered button (Save)
+					$(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
 				},
 				close: function(){
 					forceSubmit = false;
