@@ -36,7 +36,7 @@ class PageAdmin(admin.ModelAdmin):
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [mandatory_placeholders, 'status']
-    advanced_fields = ['sites', 'in_navigation', 'reverse_id', 'application_urls', 'overwrite_url']
+    advanced_fields = ['sites', 'in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     if settings.CMS_SOFTROOT:
@@ -45,10 +45,12 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('publication_date')
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
-    
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
-    
+    if settings.CMS_APPLICATIONS_URLS:
+        advanced_fields.append('application_urls')
+    if settings.CMS_REDIRECTS:
+        advanced_fields.append('redirect')
     fieldsets = [
         (None, {
             'fields': general_fields,
@@ -141,6 +143,7 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['title'],
             form.cleaned_data['application_urls'],
             form.cleaned_data['overwrite_url'],
+            form.cleaned_data['redirect'],
         )
 
     def get_fieldsets(self, request, obj=None):
@@ -214,6 +217,7 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['title'].initial = title_obj.title
             form.base_fields['application_urls'].initial = title_obj.application_urls
             form.base_fields['overwrite_url'].initial = title_obj.overwrite_url
+            form.base_fields['redirect'].initial = title_obj.redirect
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly
@@ -383,6 +387,7 @@ class PageAdminMixins(admin.ModelAdmin):
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.admin import VersionAdmin
+    # change the inheritance chain to include VersionAdmin
     PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__    
     admin.site.register(Page, PageAdminMixins)
 else:

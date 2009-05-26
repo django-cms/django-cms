@@ -188,7 +188,13 @@ class Page(models.Model):
         get application urls conf for application hook
         """
         return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
-        
+    
+    def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get redirect
+        """
+        return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
+    
     def _get_title_cache(self, language, fallback, version_id, force_reload):
         default_lang = False
         if not language:
@@ -356,7 +362,8 @@ class Title(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True, help_text=_('Hook application to this page.'))
+    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     

@@ -19,8 +19,10 @@ class PageForm(forms.ModelForm):
     application_urls = forms.ChoiceField(label=_('Application'), 
         choices=APPLICATION_URLS, required=False,  
         help_text=_('Hook application to this page.'))
-    overwrite_url = forms.CharField(label='Overwrite url', max_length=255, required=False,
+    overwrite_url = forms.CharField(label=_('Overwrite url'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
+    redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
+        help_text=_('Redirects to this URL.'))
     
     class Meta:
         model = Page
