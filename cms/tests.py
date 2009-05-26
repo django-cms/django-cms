@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.conf import settings
 from cms.models import *
 from django.test.client import Client
+from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
 
 
@@ -131,7 +132,6 @@ class PagesTestCase(TestCase):
         page = Page.objects.get(id=1)
         assert(page.get_title() == 'changed title')
     
-    
     ''''
     def test_06_site_framework(self):
         """
@@ -190,3 +190,35 @@ class PagesTestCase(TestCase):
         self.test_02_create_page()
         self.test_05_edit_page()
         self.test_04_details_view()'''
+
+    def test_07_meta_description_and_keywords_fields_from_admin(self):
+        """
+        Test that description and keywords tags can be set via the admin
+        """
+        self.client.login(username= 'test', password='test')
+        page_data = self.get_new_page_data()
+        page_data["meta_description"] = "I am a page"
+        page_data["meta_keywords"] = "page,cms,stuff"
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        response = self.client.get('/admin/cms/page/1/')
+        self.assertEqual(response.status_code, 200)
+        page_data['meta_description'] = 'I am a duck'
+        response = self.client.post('/admin/cms/page/1/', page_data)
+        self.assertRedirects(response, '/admin/cms/page/')
+        page = Page.objects.get(id=1)
+        assert(page.get_meta_description() == 'I am a duck')
+        assert(page.get_meta_keywords() == 'page,cms,stuff')
+
+    def test_08_meta_description_and_keywords_from_template_tags(self):
+        from django import template
+        self.client.login(username= 'test', password='test')
+        page_data = self.get_new_page_data()
+        page_data["meta_description"] = "I am a page"
+        page_data["meta_keywords"] = "page,cms,stuff"
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        t = template.Template("{% load cms_tags %}{% placeholder meta_description %} {% placeholder meta_keywords %}")
+        req = HttpRequest()
+        req.current_page = Page.objects.get(id=1)
+        req.REQUEST = {}
+        assert(t.render(template.Context({"request": req}))=="I am a page page,cms,stuff")
+    

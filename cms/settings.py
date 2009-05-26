@@ -81,3 +81,7 @@ CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 #    ('sampleapp.urls', 'Sample application'),
 # )
 CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
+
+# Allow the description and keywords meta tags to be edited from the
+# admin
+CMS_SHOW_META_TAGS = getattr(settings, 'CMS_SHOW_META_TAGS', False) 

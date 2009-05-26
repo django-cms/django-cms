@@ -124,11 +124,10 @@ class TitleManager(models.Manager):
             return titles
         
     def set_or_create(self, page, language, slug=None, title=None, application_urls=None,
-        overwrite_url=None, redirect=None):
+        overwrite_url=None, redirect=None, meta_description=None, meta_keywords=None):
         """
         set or create a title for a particular page and language
         """
-        
         try:
             obj = self.get(page=page, language=language)
             if title != None:
@@ -139,13 +138,18 @@ class TitleManager(models.Manager):
                 obj.application_urls = application_urls
             if redirect != None:
                 obj.redirect = redirect
+            if meta_description != None:
+                obj.meta_description = meta_description
+            if meta_keywords != None:
+                obj.meta_keywords = meta_keywords                
+                                
             if overwrite_url > "":
                 obj.has_url_overwrite = True
                 obj.path = overwrite_url
             else:
                 obj.has_url_overwrite = False
         except self.model.DoesNotExist:
-            obj = self.model(page=page, language=language, title=title, slug=slug, application_urls=application_urls)
+            obj = self.model(page=page, language=language, title=title, slug=slug, application_urls=application_urls, meta_description=meta_description,meta_keywords=meta_keywords)
         obj.save()
         return obj
     

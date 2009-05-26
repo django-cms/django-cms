@@ -377,14 +377,10 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         c = None
         t = None
-        if self.name == "title":
+        if self.name in ["title","slug","meta_description","meta_keywords"]:
             t = Title.objects.get_title(page, l, True)
             if t:
-                c = t.title
-        elif self.name == "slug":
-            t = Title.objects.get_title(page, l, True)
-            if t:
-                c = t.slug
+                c = getattr(t,self.name)
         else:
             plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
             c = ""

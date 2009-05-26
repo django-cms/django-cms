@@ -32,10 +32,10 @@ from django.contrib.sites.models import Site
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
-    mandatory_placeholders = ('title', 'slug', 'parent')
+    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords',)
     filter_horizontal = ['sites']
     top_fields = ['language']
-    general_fields = [mandatory_placeholders, 'status']
+    general_fields = ['title', 'slug', 'parent', 'status']
     advanced_fields = ['sites', 'in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -51,6 +51,10 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('application_urls')
     if settings.CMS_REDIRECTS:
         advanced_fields.append('redirect')
+    if settings.CMS_SHOW_META_TAGS:
+        advanced_fields.append('meta_description')
+        advanced_fields.append('meta_keywords')
+    
     fieldsets = [
         (None, {
             'fields': general_fields,
@@ -144,6 +148,8 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['application_urls'],
             form.cleaned_data['overwrite_url'],
             form.cleaned_data['redirect'],
+            form.cleaned_data['meta_description'],
+            form.cleaned_data['meta_keywords']
         )
 
     def get_fieldsets(self, request, obj=None):
@@ -213,18 +219,13 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
-            form.base_fields['slug'].initial = title_obj.slug
-            form.base_fields['title'].initial = title_obj.title
-            form.base_fields['application_urls'].initial = title_obj.application_urls
-            form.base_fields['overwrite_url'].initial = title_obj.overwrite_url
-            form.base_fields['redirect'].initial = title_obj.redirect
+            for name in ['slug','title','application_urls','overwrite_url','redirect','meta_description','meta_keywords']:
+                form.base_fields[name].initial = getattr(title_obj,name)
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly
-            form.base_fields['slug'].initial = u''
-            form.base_fields['title'].initial = u''
-            form.base_fields['application_urls'].initial = u''
-            form.base_fields['overwrite_url'].initial = u''
+            for name in ['slug','title','application_urls','overwrite_url','meta_description','meta_keywords']:
+                form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
         form.base_fields['parent'].widget = HiddenInput() 
         template = get_template_from_request(request, obj)
