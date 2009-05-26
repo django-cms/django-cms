@@ -39,7 +39,7 @@ class Migration:
             'user': ('models.ForeignKey', ['User'], {'null': 'True', 'verbose_name': '_("user")', 'blank': 'True'})
         },
         'cms.cmsplugin': {
-            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.now', 'editable': 'False'}),
+            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
             'language': ('models.CharField', ['_("language")'], {'db_index': 'True', 'max_length': '3', 'editable': 'False', 'blank': 'False'}),
             'level': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
@@ -55,7 +55,7 @@ class Migration:
         'cms.title': {
             'Meta': {'unique_together': "('language','page')"},
             'application_urls': ('models.CharField', ["_('application')"], {'max_length': '200', 'blank': 'True', 'null': 'True', 'db_index': 'True'}),
-            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.now', 'editable': 'False'}),
+            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
             'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
             'language': ('models.CharField', ['_("language")'], {'max_length': '3', 'db_index': 'True'}),
@@ -67,7 +67,7 @@ class Migration:
         'cms.page': {
             'Meta': {'ordering': "('tree_id','lft')"},
             'author': ('models.ForeignKey', ['User'], {'limit_choices_to': "{'page__isnull':False}", 'verbose_name': '_("author")'}),
-            'creation_date': ('models.DateTimeField', [], {'default': 'datetime.now', 'editable': 'False'}),
+            'creation_date': ('models.DateTimeField', [], {'default': 'datetime.datetime.now', 'editable': 'False'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
             'in_navigation': ('models.BooleanField', ['_("in navigation")'], {'default': 'True', 'db_index': 'True'}),
             'level': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
