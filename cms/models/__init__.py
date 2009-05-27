@@ -81,6 +81,36 @@ class Page(models.Model):
         # fire signal
         cms_signals.page_moved.send(sender=Page, instance=self)
         
+    def copy_page(self, target, position='first-child'):
+        """
+        copy a page and all its descendants to a new location
+        """
+        descendants = self.get_descendants(include_self=True).order_by('level', 'lft')
+        tree = [target]
+        level_dif = self.level - target.level
+        last = None
+        for page in descendants:
+            level = page.level - level_dif
+            dif = level - tree[-1].level
+            if dif < -1:
+                tree = tree[:dif]
+            elif dif == 0:
+                tree.append(last)
+            parent = tree[-1]
+            titles = page.title_set.all()
+            plugins = page.cmsplugin_set.all()
+            page.pk = None
+            page.level = None
+            page.rght = None
+            page.lft = None
+            page.tree_id = None
+            page.parent = parent
+            page.save()
+            for title in titles:
+                title.pk = None
+                title.page = page
+                title.save()
+            last = page
     
     def save(self, no_signals=False):
         if not self.status:

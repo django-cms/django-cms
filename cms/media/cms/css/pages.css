@@ -230,6 +230,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	width:15px;
 	height:15px;
 	margin-left:4px;
+	margin-top:5px;
 	display:inline-block;
 	background:url(../images/copy.gif) 0px 0px no-repeat; 
 }

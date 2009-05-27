@@ -6,8 +6,8 @@
 		</div>
 		<div class="col2">	
 			<span id="move-target-{{ page.id }}" class="move-target-container" >
-				<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
-				<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a> |
+				<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a><span class="line first"> |</span>
+				<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a><span class="line second"> |</span>
 				<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
 			</span>
 			<div class="col-language">{% for lang in page.get_languages %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}</div>

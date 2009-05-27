@@ -102,6 +102,8 @@ class PageAdmin(admin.ModelAdmin):
             return move_plugin(request)
         elif url.endswith('/move-page'):
             return self.move_page(request, unquote(url[:-10]))
+        elif url.endswith('/copy-page'):
+            return self.copy_page(request, unquote(url[:-10]))
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
@@ -373,6 +375,29 @@ class PageAdmin(admin.ModelAdmin):
                 #context.update({'error': _('Page could not been moved.')})
             else:
                 page.move_page(target, position)
+                return HttpResponse("ok")
+                #return self.list_pages(request,
+                #    template_name='admin/cms/page/change_list_tree.html')
+        context.update(extra_context or {})
+        return HttpResponseRedirect('../../')
+    
+    def copy_page(self, request, page_id, extra_context=None):
+        """
+        Copy the page and all its plugins and descendants to the requested target, at the given position
+        """
+        context = {}
+        page = Page.objects.get(pk=page_id)
+
+        target = request.POST.get('target', None)
+        position = request.POST.get('position', None)
+        if target is not None and position is not None:
+            try:
+                target = self.model.objects.get(pk=target)
+            except self.model.DoesNotExist:
+                return HttpResponse("error")
+                #context.update({'error': _('Page could not been moved.')})
+            else:
+                page.copy_page(target, position)
                 return HttpResponse("ok")
                 #return self.list_pages(request,
                 #    template_name='admin/cms/page/change_list_tree.html')
