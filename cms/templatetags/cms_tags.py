@@ -269,29 +269,26 @@ def page_id_url(context, reverse_id, lang=None):
         return {'content':''}
     if lang is None:
         lang = get_language_from_request(request)
-    if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
-        key = 'page_url_id_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
-        url = cache.get(key)
-        if not url:
-            try:
-                page = Page.objects.get(reverse_id=reverse_id)
-            except:
-                if settings.DEBUG:
-                    raise
-                else:
-                    site = Site.objects.get_current()
-                    send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                              _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                                "The url of the page was: http://%(host)s%(path)s")
-                                % {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
-                              settings.DEFAULT_FROM_EMAIL,
-                              settings.MANAGERS, 
-                              fail_silently=True)
+    key = 'page_id_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
+    url = cache.get(key)
+    if not url:
+        try:
+            page = Page.objects.get(reverse_id=reverse_id)
+        except:
+            if settings.DEBUG:
+                raise
+            else:
+                site = Site.objects.get_current()
+                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                          _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                            "The url of the page was: http://%(host)s%(path)s")
+                            % {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
+                          settings.DEFAULT_FROM_EMAIL,
+                          settings.MANAGERS, 
+                          fail_silently=True)
 
-            url = page.get_absolute_url(language=lang)
-            cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
-    else:
         url = page.get_absolute_url(language=lang)
+        cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
     if url:
         return {'content':url}
     return {'content':''}
