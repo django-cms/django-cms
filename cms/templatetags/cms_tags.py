@@ -421,9 +421,7 @@ class PageAttributeNode(template.Node):
         l = get_language_from_request(context['request'])
         request = context['request']
         page = request.current_page
-        c = None
-        t = None
-        if self.name in ["title","slug","meta_description","meta_keywords"]:
+        if page and self.name in ["title","slug","meta_description","meta_keywords"]:
             t = Title.objects.get_title(page, l, True)
             return getattr(t,self.name)
         else:
