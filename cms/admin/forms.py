@@ -23,6 +23,10 @@ class PageForm(forms.ModelForm):
         help_text=_('Keep this field empty if standard path should be used.'))
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
         help_text=_('Redirects to this URL.'))
+    meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
+        help_text=_('A description of the page sometimes used by search engines.'))
+    meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
+        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
     
     class Meta:
         model = Page

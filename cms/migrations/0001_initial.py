@@ -12,7 +12,7 @@ class Migration:
             ('language', models.CharField(_("language"), db_index=True, max_length=3, editable=False, blank=False)),
             ('page', models.ForeignKey(orm.Page, editable=False, verbose_name=_("page"))),
             ('position', models.PositiveSmallIntegerField(_("position"), default=0, editable=False)),
-            ('creation_date', models.DateTimeField(_("creation date"), default=datetime.now, editable=False)),
+            ('creation_date', models.DateTimeField(_("creation date"), default=datetime.datetime.now, editable=False)),
             ('placeholder', models.CharField(_("slot"), max_length=50, editable=False, db_index=True)),
             ('id', models.AutoField(primary_key=True)),
             ('plugin_type', models.CharField(_("plugin_name"), max_length=50, editable=False, db_index=True)),
@@ -26,7 +26,7 @@ class Migration:
             ('page', models.ForeignKey(orm.Page, related_name="title_set", verbose_name=_("page"))),
             ('id', models.AutoField(primary_key=True)),
             ('path', models.CharField(_("path"), max_length=255, db_index=True)),
-            ('creation_date', models.DateTimeField(_("creation date"), default=datetime.now, editable=False)),
+            ('creation_date', models.DateTimeField(_("creation date"), default=datetime.datetime.now, editable=False)),
             ('slug', models.SlugField(_("slug"), unique=False, max_length=255, db_index=True)),
         ))
         db.send_create_signal('cms', ['Title'])
@@ -58,7 +58,7 @@ class Migration:
             ('reverse_id', models.CharField(_("reverse url id"), blank=True, max_length=40, null=True, db_index=True)),
             ('login_required', models.BooleanField(_('login required'), default=False)),
             ('soft_root', models.BooleanField(_("soft root"), default=False, db_index=True)),
-            ('creation_date', models.DateTimeField(default=datetime.now, editable=False)),
+            ('creation_date', models.DateTimeField(default=datetime.datetime.now, editable=False)),
             ('lft', models.PositiveIntegerField(db_index=True, editable=False)),
             ('publication_end_date', models.DateTimeField(_("publication end date"), null=True, db_index=True, blank=True)),
             ('template', models.CharField(_("template"), max_length=100)),
