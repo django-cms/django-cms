@@ -7,6 +7,7 @@ from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
+from django.utils.safestring import mark_safe
 register = template.Library()
 
 
@@ -375,14 +376,11 @@ class PlaceholderNode(template.Node):
         l = get_language_from_request(context['request'])
         request = context['request']
         page = request.current_page
-        c = None
         plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
         c = ""
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name)
-        if not c:
-            return ''
-        return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)
+        return c
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
@@ -483,7 +481,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
     cache.set(key, content, settings.CMS_CONTENT_CACHE_DURATION)
 
     if content:
-        return {'content':content}
+        return {'content':mark_safe(content)}
     return {'content':''}
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
 
