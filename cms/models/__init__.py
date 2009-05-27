@@ -87,14 +87,20 @@ class Page(models.Model):
         """
         descendants = self.get_descendants(include_self=True).order_by('level', 'lft')
         tree = [target]
-        level_dif = self.level - target.level
+        level_dif = self.level - target.level - 1
         last = None
         for page in descendants:
-            level = page.level - level_dif
-            dif = level - tree[-1].level
-            if dif < -1:
+            new_level = page.level - level_dif
+            dif = new_level - tree[-1].level 
+            print "tree", tree
+            print "new_level",new_level
+            print "last_level",tree[-1].level
+            print "dif",dif
+            
+            
+            if dif < 0:
                 tree = tree[:dif]
-            elif dif == 0:
+            elif dif == 1:
                 tree.append(last)
             parent = tree[-1]
             titles = page.title_set.all()

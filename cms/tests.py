@@ -19,8 +19,7 @@ def suite():
     return alltests
 
 class PagesTestCase(TestCase):
-    """NOTE: This is not a working version... Have to be changed 
-    """
+
     fixtures = ['test.json']
     counter = 1
     
@@ -228,5 +227,15 @@ class PagesTestCase(TestCase):
         """
         self.client.login(username= 'test', password='test')
         setattr(settings, "SITE_ID", 1)
-        print Page.objects.all()
-        
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/?target=1&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/?target=2&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/1/copy-page/', {'target':4, 'position':'first-child'})
+        self.assertEqual(response.status_code, 200)
+        print dir(response)
