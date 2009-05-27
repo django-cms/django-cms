@@ -25,7 +25,13 @@ def placeholders_recursif(nodelist, list):
     """
     for node in nodelist:
         if isinstance(node, PlaceholderNode):
-            list.append(node)
+            in_list = False
+            for l in list:
+                if l.name == node.name:
+                    in_list = True
+                    break
+            if not in_list:
+                list.append(node)
             node.render(Context({'current_page':None}))
         for key in ('nodelist', 'nodelist_true', 'nodelist_false'):
             if hasattr(node, key):

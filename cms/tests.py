@@ -21,7 +21,7 @@ def suite():
 class PagesTestCase(TestCase):
     """NOTE: This is not a working version... Have to be changed 
     """
-    fixtures = ['tests.json']
+    fixtures = ['test.json']
     counter = 1
     
     def setUp(self):
