@@ -75,7 +75,6 @@ class PagesTestCase(TestCase):
         page_data = self.get_new_page_data()
         response = self.client.post('/admin/cms/page/add/', page_data)
         self.assertRedirects(response, '/admin/cms/page/')
-        
         page1 = Title.objects.get(slug=page_data['slug']).page
 
         response = self.client.post('/admin/cms/page/add/', page_data)
@@ -223,6 +222,11 @@ class PagesTestCase(TestCase):
         req.REQUEST = {}
         assert(t.render(template.Context({"request": req}))=="Hello I am a page page,cms,stuff")
 
-
-    
-
+    def test_09_copy_page(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        self.client.login(username= 'test', password='test')
+        setattr(settings, "SITE_ID", 1)
+        print Page.objects.all()
+        
