@@ -8,10 +8,10 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'Title.meta_keywords'
-        db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True))
+        db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True, default=''))
         
         # Adding field 'Title.meta_description'
-        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255))
+        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, default=''))
         
     
     def backwards(self, orm):
