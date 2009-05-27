@@ -426,8 +426,11 @@ class EmptyTitle(object):
     title = ""
     slug = ""
     path = ""
+    meta_description = ""
+    meta_keywords = ""
     has_url_overwite = False
     application_urls = ""
+    
     
     @property
     def overwrite_url(self):
