@@ -213,12 +213,16 @@ class PagesTestCase(TestCase):
         from django import template
         self.client.login(username= 'test', password='test')
         page_data = self.get_new_page_data()
+        page_data["title"] = "Hello"
         page_data["meta_description"] = "I am a page"
         page_data["meta_keywords"] = "page,cms,stuff"
         response = self.client.post('/admin/cms/page/add/', page_data)
-        t = template.Template("{% load cms_tags %}{% placeholder meta_description %} {% placeholder meta_keywords %}")
+        t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
         req = HttpRequest()
         req.current_page = Page.objects.get(id=1)
         req.REQUEST = {}
-        assert(t.render(template.Context({"request": req}))=="I am a page page,cms,stuff")
+        assert(t.render(template.Context({"request": req}))=="Hello I am a page page,cms,stuff")
+
+
     
+

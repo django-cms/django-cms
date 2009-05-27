@@ -376,26 +376,63 @@ class PlaceholderNode(template.Node):
         request = context['request']
         page = request.current_page
         c = None
-        t = None
-        if self.name in ["title","slug","meta_description","meta_keywords"]:
-            t = Title.objects.get_title(page, l, True)
-            if t:
-                c = getattr(t,self.name)
-        else:
-            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
-            c = ""
-            for plugin in plugins:
-                c += plugin.render_plugin(context, self.name)
+        plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+        c = ""
+        for plugin in plugins:
+            c += plugin.render_plugin(context, self.name)
         if not c:
             return ''
-        if not t:
-            return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)
-        return c
+        return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
+
+def do_page_attribute(parser, token):
+    error_string = '%r tag requires one argument' % token.contents[0]
+    try:
+        # split_contents() knows not to split quoted strings.
+        bits = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError(error_string)
+    if len(bits) == 2:
+        #tag_name, name
+        return PageAttributeNode(bits[1])
+    else:
+        raise template.TemplateSyntaxError(error_string)
+
+class PageAttributeNode(template.Node):
+    """This template node is used to output attribute from page such
+    as its title and slug.
+    
+    eg: {% page attribute field-name %}
+    
+    Keyword arguments:
+    field-name -- the name of the field to output. One of "title",
+    "slug", "meta_description" or "meta_keywords"
+    """
+    def __init__(self, name):
+        self.name = name.lower()
+
+    def render(self, context):
+        if not 'request' in context:
+            return ''
+        l = get_language_from_request(context['request'])
+        request = context['request']
+        page = request.current_page
+        c = None
+        t = None
+        if self.name in ["title","slug","meta_description","meta_keywords"]:
+            t = Title.objects.get_title(page, l, True)
+            return getattr(t,self.name)
+        else:
+            return ''
+        
+    def __repr__(self):
+        return "<PageAttribute Node: %s>" % self.name
+
+register.tag('page_attribute', do_page_attribute)
 
 def clean_admin_list_filter(cl, spec):
     """
