@@ -142,14 +142,16 @@ class TitleManager(models.Manager):
                 obj.meta_description = meta_description
             if meta_keywords != None:
                 obj.meta_keywords = meta_keywords                
-                                
-            if overwrite_url > "":
-                obj.has_url_overwrite = True
-                obj.path = overwrite_url
-            else:
-                obj.has_url_overwrite = False
         except self.model.DoesNotExist:
-            obj = self.model(page=page, language=language, title=title, slug=slug, application_urls=application_urls, meta_description=meta_description,meta_keywords=meta_keywords)
+            obj = self.model(
+                page=page, language=language, title=title, slug=slug,
+                application_urls=application_urls, redirect=redirect,
+                meta_description=meta_description,meta_keywords=meta_keywords)
+        if overwrite_url > "":
+            obj.has_url_overwrite = True
+            obj.path = overwrite_url
+        else:
+            obj.has_url_overwrite = False
         obj.save()
         return obj
     
