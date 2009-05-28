@@ -81,6 +81,70 @@ class Page(models.Model):
         # fire signal
         cms_signals.page_moved.send(sender=Page, instance=self)
         
+    def copy_page(self, target, site, position='first-child'):
+        """
+        copy a page and all its descendants to a new location
+        """
+        descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
+        tree = [target]
+        level_dif = self.level - target.level - 1
+        first = True
+        for page in descendants:
+            new_level = page.level - level_dif
+            dif = new_level - tree[-1].level 
+            if dif < 0:
+                tree = tree[:dif-1]
+           
+            titles = list(page.title_set.all())
+            plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            page.pk = None
+            page.level = None
+            page.rght = None
+            page.lft = None
+            page.tree_id = None
+            page.status = Page.DRAFT
+            page.parent = tree[-1]
+            page.save()
+            if first:
+                first = False
+                page.move_to(target, position)
+            page.sites = [site]
+            for title in titles:
+                title.pk = None
+                title.page = page
+                title.save()
+            ptree = []
+            for p in plugins:
+                plugin, cls = p.get_plugin_instance()
+                p.page = page
+                p.pk = None
+                p.id = None
+                p.tree_id = None
+                p.lft = None
+                p.rght = None
+                if p.parent:
+                    pdif = p.level - ptree[-1].level
+                    if pdif < 0:
+                        ptree = ptree[:pdif-1]
+                    p.parent = ptree[-1]
+                    if pdif != 0:
+                        ptree.append(p)
+                else:
+                    ptree = [p]
+                p.level = None
+                p.save()
+                if plugin:
+                    plugin.pk = p.pk
+                    plugin.id = p.pk
+                    plugin.page = page
+                    plugin.tree_id = p.tree_id
+                    plugin.lft = p.lft
+                    plugin.rght = p.rght
+                    plugin.level = p.level
+                    plugin.cmsplugin_ptr = p
+                    plugin.save()
+            if dif != 0:
+                tree.append(page)
     
     def save(self, no_signals=False):
         if not self.status:
@@ -428,6 +492,7 @@ class EmptyTitle(object):
     path = ""
     meta_description = ""
     meta_keywords = ""
+    redirect = ""
     has_url_overwite = False
     application_urls = ""
     

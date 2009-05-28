@@ -19,9 +19,8 @@ def suite():
     return alltests
 
 class PagesTestCase(TestCase):
-    """NOTE: This is not a working version... Have to be changed 
-    """
-    fixtures = ['tests.json']
+
+    fixtures = ['test.json']
     counter = 1
     
     def setUp(self):
@@ -75,7 +74,6 @@ class PagesTestCase(TestCase):
         page_data = self.get_new_page_data()
         response = self.client.post('/admin/cms/page/add/', page_data)
         self.assertRedirects(response, '/admin/cms/page/')
-        
         page1 = Title.objects.get(slug=page_data['slug']).page
 
         response = self.client.post('/admin/cms/page/add/', page_data)
@@ -223,6 +221,24 @@ class PagesTestCase(TestCase):
         req.REQUEST = {}
         assert(t.render(template.Context({"request": req}))=="Hello I am a page page,cms,stuff")
 
-
-    
-
+    def test_09_copy_page(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        self.client.login(username= 'test', password='test')
+        setattr(settings, "SITE_ID", 1)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/', page_data)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/?target=1&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/?target=2&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/', page_data)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/?target=4&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        count = Page.objects.all().count()
+        response = self.client.post('/admin/cms/page/1/copy-page/', {'target':5, 'position':'first-child', 'site':1})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Page.objects.all().count()>count)
