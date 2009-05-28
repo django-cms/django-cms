@@ -1,14 +1,11 @@
 from django import template
 from django.core.cache import cache
-
 from cms import settings
 from cms.models import Page, Title, CMSPlugin
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
-from cms.utils.permissions import has_page_add_permission
-from cms.settings import CMS_PERMISSION
 register = template.Library()
 
 
@@ -172,62 +169,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     return context
 show_sub_menu = register.inclusion_tag('cms/dummy.html',
                                        takes_context=True)(show_sub_menu)
-
                                             
-def show_admin_menu(context, page, no_children=False, level=None):
-    """Render the admin table of pages"""
-    request = context['request']
-    site = Site.objects.get_current()
-    lang = get_language_from_request(request)
-    softroot = context['softroot']
-    if context.has_key("cl"):
-        filtered = context['cl'].is_filtered()
-    elif context.has_key('filtered'):
-        filtered = context['filtered']
-    
-    # level is used to add a left margin on table row
-    if level is None:
-        level = 0
-    else:
-        level = level+2
-    
-    has_add_permission = page.has_add_permission(request)
-    has_move_page_permission = page.has_move_page_permission(request)
-    
-    metadata = ""
-    if settings.CMS_PERMISSION:
-        # jstree metadata generator 
-        md = []
-        if not has_add_permission:
-            md.append(('valid_children', False))
-        if not has_move_page_permission:
-            md.append(('draggable', False))
-        
-        # just turn it into simple javasript object
-        metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
-            str(e[1]).lower() if isinstance(e[1], bool) else str(e[1])), md)) + "}"
-    
-    context.update({
-        'page': page,
-        'no_children': no_children,
-        'site': site,
-        'lang': lang,
-        'filtered': filtered,
-        'children': page.childrens,
-        'level': level,
-        'CMS_PERMISSION': settings.CMS_PERMISSION,
-        #'CMS_MODERATOR': settings.CMS_MODERATOR,
-        'has_permission': page.has_change_permission(request),
-        'has_publish_permission': page.has_publish_permission(request),
-        'has_delete_permission': page.has_delete_permission(request),
-        'has_move_page_permission': has_move_page_permission,
-        'has_add_page_permission': has_add_permission,
-        'has_moderate_permission': page.has_moderate_permission(request),
-        'metadata': metadata,
-    })
-    return context
-show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
-                                         takes_context=True)(show_admin_menu)
 
 def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
@@ -433,18 +375,3 @@ class PlaceholderNode(template.Node):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
-
-def clean_admin_list_filter(cl, spec):
-    """
-    used in admin to display only these users that have actually edited a page and not everybody
-    """
-    choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
-    query_string = None
-    unique_choices = []
-    for choice in choices:
-        if choice['query_string'] != query_string:
-            unique_choices.append(choice)
-            query_string = choice['query_string']
-    return {'title': spec.title(), 'choices' : unique_choices}
-clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
-

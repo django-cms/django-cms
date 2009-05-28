@@ -1,5 +1,16 @@
 /* specific CSS for the django page admin application */
 
+/* default icon */
+#sitemap li a.icon,
+#sitemap li span.icon,
+#sitemap li .col-moderator span.ui-checkbox {
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	background: url(../images/icons.png) 0px 0px no-repeat;
+	margin-top: 5px;
+}
+
 .change-list tr{
     padding-left:1.5em;
 }
@@ -147,15 +158,10 @@ div#sitemap {
 div#sitemap a{text-decoration:none; border:none; outline:none;}
 div#sitemap a:hover{text-decoration:underline;}
 div#sitemap li, div#sitemap ul{list-style-type: none;}
-#sitemap li, #sitemap ul{display:block;}
+#sitemap li, #sitemap ul{ display:block; }
 
-#sitemap li .cont{display:block;background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;}
-
-/* TODO: change backgrounds 
-#sitemap li .cont.in_approvement_process { border: #f00 1px solid; }
-#sitemap li .cont.approve { border: #00f 1px solid; }
-*/
-
+#sitemap li .cont{ display:block; background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px; }
+#sitemap .cont:hover { background-position: 0px -100px !important; }
 
 #sitemap li .col1 .title, #sitemap li .col1 .success{
 	display:block;
@@ -192,13 +198,13 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	margin-right:10px;
 }
 
+#sitemap li .col-softroot,
 #sitemap li .col-language,
 #sitemap li .col-actions,	
 #sitemap li .col-published,
 #sitemap li .col-navigation,
-#sitemap li .col-softroot,
 #sitemap li .col-moderator,
-#sitemap li .col-last-change,
+#sitemap li .col-lastchange,
 #sitemap li .col-draft,
 #sitemap li .col-creator{
 	border-left:1px solid #DEDEDC;
@@ -217,6 +223,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	opacity: 0.70;
 }
 
+#sitemap li .col-softroot,
 #sitemap li .col-language{
 	background:none;
 	border:none;
@@ -224,16 +231,17 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	text-align:right;
 	padding-right:5px;
 }
+
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
 #sitemap li .col-actions { width: 65px; }
 #sitemap li .col-published {width:65px;}
 #sitemap li .col-navigation { width: 100px; }
-#sitemap li .col-softroot {width:55px;}
+#sitemap li .col-softroot { width: 20px; }
 #sitemap li .col-moderator  { width:80px; }
 #sitemap li .col-creator{width:65px;}
-#sitemap li .col-draft{width:65px;}
-#sitemap li .col-last-change{width:80px;}
+#sitemap li .col-draft{width:80px;}
+#sitemap li .col-lastchange { width:100px; text-align: left;}
 
 #sitemap li a.move {
 	width:18px;
@@ -245,10 +253,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 
 #sitemap li a.selector-add {
 	margin-left:4px;
-	width:18px;
-	height:18px;
-	display:inline-block;
-	background:url(../images/icons.png) -20px 0px no-repeat;
+	background-position: -20px 0px;
 }
 #sitemap li a.selector-add span{display:none;}
 
@@ -291,17 +296,17 @@ div#sitemap ul.header li{
 #sitemap ul.header li .col-navigation,
 #sitemap ul.header li .col-softroot,
 #sitemap ul.header li .col-moderator,
-#sitemap ul.header li .col-last-change,
+#sitemap ul.header li .col-lastchange,
 #sitemap ul.header li .col-draft,
 #sitemap ul.header li .col-creator{
 	height:auto;
 	border:none;
 	background:none;
 	line-height:14px;
+	text-align: center;
 }
 #sitemap ul.header li .cont:hover{}
 
-#sitemap .cont:hover {background-position:0px -300px;}
 #sitemap .cont:hover a,
 #sitemap .cont:hover .col-language,
 #sitemap .cont:hover .col-language a{color:#fff;}
@@ -361,17 +366,63 @@ div#sitemap ul.header li{
 
 .change-list #changelist .module{border:none;}
 
-
 /* special checkboxes */
+#sitemap li input.hidden {
+	position: absolute;
+	left: -999em;
+}
 
-#sitemap li .col-moderator span.ui-checkbox {
-	margin-left:4px;
-	width:18px;
-	height:18px;
-	display:inline-block;
-	background:url(../images/icons.png) 0px 0px no-repeat;
+/* moderator checkboxes */
+#sitemap li .col-moderator span.ui-checkbox-state-checked.page, 
+#sitemap li .col-moderator span.ui-checkbox-state-checked-hover.page {
+	background-position: 0px -20px;
 }
-#sitemap li .col-moderator span.ui-checkbox-state-checked {
-	background-position: -20px 0px;
+
+
+#sitemap li .col-moderator span.ui-checkbox.children {
+	background-position: 0px -40px;
 }
+#sitemap li .col-moderator span.ui-checkbox-state-checked.children, 
+#sitemap li .col-moderator span.ui-checkbox-state-checked-hover.children {
+	background-position: 0px -60px;
+}
+
+#sitemap li .col-moderator span.ui-checkbox.descendants {
+	background-position: 0px -80px;
+}
+#sitemap li .col-moderator span.ui-checkbox-state-checked.descendants, 
+#sitemap li .col-moderator span.ui-checkbox-state-checked-hover.descendants {
+	background-position: 0px -100px;
+}
+
+
+/* moderation - last state */
+#sitemap li .col-lastchange .state-icon {
+	margin-right: 4px;
+}
+
+#sitemap li .col-lastchange .state-icon.add { background-position: -40px 0px; }
+#sitemap li .col-lastchange .state-icon.cha { background-position: -40px -20px; }
+#sitemap li .col-lastchange .state-icon.pub { background-position: -60px -20px; }
+#sitemap li .col-lastchange .state-icon.unp { background-position: -60px -40px; }
+#sitemap li .col-lastchange .state-icon.mov { background-position: -60px 0px; }
+#sitemap li .col-lastchange .state-icon.del { background-position: -40px -40px; }
+#sitemap li .col-lastchange .state-icon.app { background-position: -600px -60px; } 
+
+/* moderation - changed */
+#sitemap li .cont.moderatorstate0 { background-position: 0px -500px; } 
+
+/* moderation - requires approvement */
+#sitemap li .cont.moderatorstate1 { background-position: 0px -300px; } 
+#sitemap li .cont.moderatorstate1 .col-draft span.state { color: #ff6600; }
+
+/* moderation - approved */
+#sitemap li .cont.moderatorstate10 {} 
+
+/* moderation - you should approve */
+#sitemap li .cont.moderatorstate100 { background-position: 0px -400px; } 
+#sitemap li .cont.moderatorstate100 .col-draft span.state { color: #44ad41; }
  
+
+/* softroot icon */
+#sitemap li .col-softroot span.icon { background-position: -80px 0px; }

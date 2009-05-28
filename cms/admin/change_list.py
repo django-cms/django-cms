@@ -26,7 +26,11 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         qs = super(CMSChangeList, self).get_query_set()
         if request:
-            permissions = Page.permissions.get_change_id_list(request.user)
+            
+            permissions = Page.permissions.get_change_list_id_list(request.user)
+            print ">> CA:", permissions
+            #permissions = Page.permissions.get_change_id_list(request.user)
+            
             if permissions != Page.permissions.GRANT_ALL:
                 qs = qs.filter(pk__in=permissions)
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
@@ -60,8 +64,12 @@ class CMSChangeList(ChangeList):
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user)
         perm_softroot_ids = Page.permissions.get_softroot_id_list(request.user)
         
+        
+        perm_change_list_ids = Page.permissions.get_change_list_id_list(request.user)
+        
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
-            pages = pages.filter(pk__in=perm_edit_ids)   
+            #pages = pages.filter(pk__in=perm_edit_ids)
+            pages = pages.filter(pk__in=perm_change_list_ids)   
                     
         ids = []
         root_pages = []
@@ -69,7 +77,11 @@ class CMSChangeList(ChangeList):
         all_pages = pages[:]
         for page in pages:
             children = []
-            if not page.parent_id or (perm_edit_ids != Page.permissions.GRANT_ALL and not int(page.parent_id) in perm_edit_ids):
+            # note: We are using change_list permission here, because we must
+            # display also pages which user must not edit, but he haves a 
+            # permission for adding a child under this page. Otherwise he would
+            # not be able to add anything under page which he can't change. 
+            if not page.parent_id or (perm_change_list_ids != Page.permissions.GRANT_ALL and not int(page.parent_id) in perm_change_list_ids):
                 page.root_node = True
             else:
                 page.root_node = False

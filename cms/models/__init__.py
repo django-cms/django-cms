@@ -62,9 +62,9 @@ class Page(models.Model):
     MODERATOR_APPROVED = 10
     
     moderator_state_choices = (
-        (MODERATOR_CHANGED, _('Changed')),
-        (MODERATOR_NEED_APPROVEMENT, _('Need approvement')),
-        (MODERATOR_APPROVED, _('Approved')),
+        (MODERATOR_CHANGED, _('changed')),
+        (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
+        (MODERATOR_APPROVED, _('approved')),
     )
     
     author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
@@ -82,7 +82,7 @@ class Page(models.Model):
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
     sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
     
-    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=0)
+    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_CHANGED, blank=True)
     
     # Managers
     objects = PageManager()
@@ -92,7 +92,7 @@ class Page(models.Model):
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
-        
+    
     def __unicode__(self):
         slug = self.get_slug(fallback=True)
         if slug is None:
@@ -366,30 +366,58 @@ class Page(models.Model):
         """
         return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
     
+    def last_page_state(self):
+        if settings.CMS_MODERATOR:
+            # unknown state if no moderator
+            try:
+                return self.pagemoderatorstate_set.all().order_by('-created')[0]
+            except IndexError:
+                pass
+        return None
     
     def get_moderator_set(self):
-        """Returns ordered set of all users, which should moderate this instance
+        """Returns ordered set of all PageModerator instances, which should 
+        moderate this instance
         """
         if not settings.CMS_MODERATOR:
             return PageModerator.objects.get_empty_query_set()
         
-        q = Q(page__tree_id=self.tree_id, moderate_descendants=True) | \
-            Q(page__tree_id=self.tree_id, page__level=self.level - 1, moderate_children=True) | \
-            Q(pk=self.pk, moderate_page=True)
+        q = Q(page__tree_id=self.tree_id, page__level__gte=self.level, moderate_descendants=True) | \
+            Q(page__tree_id=self.tree_id, page__level=self.level + 1, moderate_children=True) | \
+            Q(page__pk=self.pk, moderate_page=True)
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
-        
     
-    def get_moderation_level(self):
-        """Returns min moderation level for page, means highest user in structure
-        which want moderate this page.
+    def get_test_moderation_level(self, user=None):
+        """Returns min moderation level for page, and result of user test if 
+        user is given, so outpu is always tuple of:
+            moderation_level, requires_approvement
+        
+        NOTE: May require some optimization, might call 3 huge sql queries in 
+        worse case
         """
-        if settings.CMS_MODERATOR:
+        if not settings.CMS_MODERATOR or (user and user.is_superuser):
+            return 0, False
+        
+        qs = self.get_moderator_set()
+            
+        if qs.filter(user__is_superuser=True).count():
+            return 0, True
+        
+        if user:
+            if qs.filter(user__id=user.id, user__globalpagepermission__gt=0).count():
+                return 0, False
+            
             try:
-                moderator = self.get_moderator_set()[0]
-                return moderator.page.level
+                moderator = qs.filter(user__id=user.id).select_related()[0]
+                return moderator.page.level, False
             except IndexError:
                 pass
-        return MAX_MODERATION_LEVEL
+        else:
+            if qs.filter(user__globalpagepermission__gt=0).count():
+                return 0, True
+                
+        moderator = qs.select_related()[0]
+        return moderator.page.level, True
         
         
 # Don't register the Page model twice.
@@ -626,7 +654,7 @@ class ExtGroup(models.Model):
 ################################################################################
 # Moderation
 ################################################################################
-MAX_MODERATION_LEVEL = 9999
+#MAX_MODERATION_LEVEL = 9999
 
 class PageModerator(models.Model):
     """Page moderator holds user / page / moderation type states. User can be 
@@ -652,7 +680,15 @@ class PageModerator(models.Model):
         self.moderate_page = state & MASK_PAGE
         self.moderate_children = state & MASK_CHILDREN
         self.moderate_descendants = state & MASK_DESCENDANTS
-        
+    
+    def save(self, force_insert=False, force_update=False):
+        """Just some logical stuff - if user haves moderate_descendants then
+        moderate_children
+        """
+        if self.moderate_descendants:
+            self.moderate_children = True
+        super(PageModerator, self).save(force_insert, force_update)
+    
     __unicode__ = lambda self: "%s: %s" % (unicode(self.user), unicode(self.page))
         
 
@@ -674,13 +710,13 @@ class PageModeratorState(models.Model):
     ACTION_APPROVE = "APP"
     
     _action_choices = (
-        (ACTION_ADD, _('Created')), 
-        (ACTION_CHANGED, _('Changed')), 
-        (ACTION_DELETE, _('Delete request')),
-        (ACTION_MOVE, _('Move request')),
-        (ACTION_PUBLISH, _('Publish request')),
-        (ACTION_UNPUBLISH, _('Unpublish request')),
-        (ACTION_APPROVE, _('Approved')), # Approved by somebody in approvement process
+        (ACTION_ADD, _('created')), 
+        (ACTION_CHANGED, _('changed')), 
+        (ACTION_DELETE, _('delete req.')),
+        (ACTION_MOVE, _('move req.')),
+        (ACTION_PUBLISH, _('publish req.')),
+        (ACTION_UNPUBLISH, _('Unpublish req.')),
+        (ACTION_APPROVE, _('approved')), # Approved by somebody in approvement process
     )
     
     page = models.ForeignKey(Page)
@@ -693,5 +729,7 @@ class PageModeratorState(models.Model):
         verbose_name=_('Page moderator state')
         verbose_name_plural=_('Page moderator states')
         ordering = ('page', 'created')
-        
+    
+    css_class = lambda self: self.action.lower()
+    
     __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.action)

@@ -11,6 +11,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import auto_render
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
+from cms.utils.admin import render_admin_menu_item
 
 @require_POST
 def change_status(request, page_id):
@@ -21,7 +22,7 @@ def change_status(request, page_id):
     if page.has_publish_permission(request):
         page.published = not page.published
         page.save()    
-        return HttpResponse(unicode(int(page.published)))
+        return render_admin_menu_item(request, page)
     raise Http404
 change_status = staff_member_required(change_status)
 
@@ -39,7 +40,7 @@ def change_innavigation(request, page_id):
             page.in_navigation = True
             val = 1
         page.save()
-        return HttpResponse(unicode(val))
+        return render_admin_menu_item(request, page)
     raise Http404
     
 change_status = staff_member_required(change_status)
@@ -302,5 +303,7 @@ def change_moderation(request, page_id):
                 'page': page,
                 'user': request.user,
             }
-            return render_to_response('admin/cms/page/moderator_col.html', context)
+            
+            return render_admin_menu_item(request, page)
+            #return render_to_response('admin/cms/page/moderator_col.html', context)
     raise Http404

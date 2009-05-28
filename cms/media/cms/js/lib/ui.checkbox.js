@@ -1,6 +1,8 @@
 /**
  * @author alexander.farkas
  * @version 1.3
+ * 
+ * @changed by Peter Cicman, added element title support
  */
 (function($){
     $.widget('ui.checkBox', {
@@ -36,6 +38,20 @@
 					return false;
 				});		
             
+			// element title suport added by Peter Cicman
+			if (this.element.attr("title")) {
+				this.visualElement.attr("title", this.element.attr("title"));
+			}
+			
+			// class name copy added by Peter Cicman - add all classes names 
+			// form original input to new element, but only the ones, which are
+			// starting with `copy-`, but remove `copy-` from it.
+			classNames = this.element.attr("class").match(/copy-[a-z0-9A-Z_]+/g);
+			for (var i=0; i < classNames.length; i++) {
+				this.visualElement.addClass(classNames[i].replace(/^copy-/, ''));
+			}
+			
+			
             if (opts.replaceInput) {
 				this.element
 					.addClass('ui-helper-hidden-accessible')

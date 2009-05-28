@@ -30,7 +30,7 @@ class PageForm(forms.ModelForm):
     overwrite_url = forms.CharField(label='Overwrite url', max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
     # moderation state
-    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False) 
+    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
     # moderation - message is a fake filed
     moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
     
@@ -126,7 +126,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # this is a missconfiguration - user can add/move page to current
             # page but after he does this, he will not have permissions to 
             # access this page anymore, so avoid this
-            raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants.'))
+            raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by his creator.'))
         
         # TODO: finish this, but is it really required? might be nice to have 
         

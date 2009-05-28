@@ -35,7 +35,7 @@ from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 from django.contrib.auth.models import User
-from cms.utils.moderator import update_moderation_message, get_user_level
+from cms.utils.moderator import update_moderation_message
 
 PAGE_ADMIN_INLINES = []
 
@@ -205,6 +205,11 @@ class PageAdmin(admin.ModelAdmin):
     list_filter = ['published', 'in_navigation', 'template', 'author']
     search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
     
+    hidden_fields = []
+    
+    if settings.CMS_MODERATOR:
+        list_filter.append('moderator_state')
+    
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
         list_filter.append('soft_root')
@@ -217,7 +222,7 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('navigation_extenders')
         
     if settings.CMS_SOFTROOT:
-        advanced_fields.extend(('moderator_state', 'moderator_message'))
+        hidden_fields.extend(('moderator_state', 'moderator_message'))
         
     list_filter += ['sites']
     
@@ -239,6 +244,11 @@ class PageAdmin(admin.ModelAdmin):
             'fields': advanced_fields,
             'classes': ('collapse',),
         }),
+        
+        (_('Hidden'), {
+            'fields': hidden_fields,
+            'classes': ('hidden',), 
+        }),
     ]
     
     inlines = PAGE_ADMIN_INLINES
@@ -248,6 +258,7 @@ class PageAdmin(admin.ModelAdmin):
             'all': [join(settings.CMS_MEDIA_URL, path) for path in (
                 'css/rte.css',
                 'css/pages.css',
+                'css/change_form.css',
                 'css/jquery.dialog.css',
             )]
         }
@@ -462,12 +473,13 @@ class PageAdmin(admin.ModelAdmin):
         else:
             template = get_template_from_request(request, obj)
             
-            moderation_level = obj.get_moderation_level()
             if settings.CMS_MODERATOR:
-                user_level = get_user_level(request.user)
-                moderation_required = moderation_level < user_level
+                moderation_level, moderation_required = obj.get_test_moderation_level(request.user)
+                #user_level = get_user_publishing_level(request.user)
+                #print "> ml:", moderation_level, "ul:", user_level
+                #moderation_required = moderation_level < user_level
             else:
-                moderation_required = False
+                moderation_level, moderation_required = obj.get_test_moderation_level()[0], False
             
             extra_context = {
                 'placeholders': get_placeholders(request, template),

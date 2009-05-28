@@ -1,0 +1,87 @@
+{% load cms_admin i18n adminmedia %}
+<div class="cont moderatorstate{{ page_moderator_state.state }}">
+	<div class="col1">
+		{% if has_change_permission %}
+			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
+			<a href="{{ url }}{{ page.id }}/" class="changelink" title="{% trans "edit this page" %}">edit</a>
+		{% else %}
+			<span class="title">{{ page.get_slug }}</span>
+		{% endif %}
+	</div>
+	<div class="col2">	
+		<span id="move-target-{{ page.id }}" class="move-target-container" >
+			{% if not CMS_PERMISSION or has_add_permission %}
+				{# if permissions not enabled, user user haves global can_add page #}
+				<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
+				<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a> |
+				<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
+			{% endif %}
+		</span>
+		
+		{% if page.soft_root %}<div class="col-softroot"><span class="icon softroot-icon" title="{% trans 'softroot' %}"></span></div>{% endif %}
+		
+		<div class="col-language">{% for lang in page.get_languages %}
+			{% if has_change_permission %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>
+			{% else %}{{ lang|upper }}
+			{% endif %}
+			{% if not forloop.last %} | {% endif %}
+		{% endfor %}</div>
+		
+		<div class="col-actions">{% if not filtered %}
+			<!--<a href="#" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>-->
+			{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}{% endif %}
+			{% if has_add_permission %}
+				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+			{% else %}
+				{% if has_add_page_permission %}
+					{# if he can add page under current page, go directly to thi url #}
+					<a href="./add/?target={{ page.id }}&amp;position=first-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+				{% endif %}
+			{% endif %}
+			{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
+		</div>	
+		
+		<div class="col-navigation">
+			{% if page.in_navigation %}<label>
+				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" checked="checked" value="1" />{% endif %}
+			</label>
+			{% else %}<label>
+				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />{% endif %}
+			</label>{% endif %}				
+		</div>
+		
+		{% if CMS_MODERATOR %}<div class="col-moderator">
+			{% if has_moderate_permission %}{% for value, title, active, css_class in page|moderator_choices:user %}<input type="checkbox" class="moderator-checkbox hidden copy-{{ css_class }}"{% if active %} checked="checked"{% endif %} value="{{ value }}" title="{{ title }}"/>
+			{% endfor %}{% endif %}		
+		</div>{% endif %}
+		
+		<div class="col-draft">
+			<span class="state">{{ page_moderator_state.label }}</span>
+			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+		</div>
+		
+		<div class="col-published">{% if page.published %}
+			<label>
+				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>{% if has_publish_permission %}
+				<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" />{% endif %}
+			</label>{% else %}
+			<label>
+				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />{% if has_publish_permission %}
+				<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" />{% endif %}
+			</label>{% endif %}
+			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>			
+		</div>
+		
+		
+		{% if CMS_MODERATOR %}<div class="col-lastchange">{% with page.last_page_state as last_state %} 
+			{% if last_state %}
+				<span class="icon state-icon {{ last_state.css_class }}"></span>{{ last_state.get_action_display }}
+			{% endif %}
+			
+		{% endwith %}</div>{% endif %}
+		
+		<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div>
+	</div>
+</div>

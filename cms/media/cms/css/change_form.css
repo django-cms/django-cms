@@ -1,0 +1,4 @@
+div fieldset.module.hidden {
+	position: absolute;
+	left: -1000em;
+}

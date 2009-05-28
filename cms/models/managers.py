@@ -6,7 +6,7 @@ from django.db.models import Q
 from cms import settings
 from cms.utils.urlutils import levelize_path
 from cms.exceptions import NoPermissionsException
-
+from sets import Set
 
 class PageManager(models.Manager):
     def on_site(self):
@@ -178,7 +178,12 @@ class PagePermissionManager(BasicPagePermissionManager):
     """
     def subordinate_to_user(self, user):
         """Get all page permission objects on which user/group is lover in 
-        hierarchy then given user and given user can change permissions on them. 
+        hierarchy then given user and given user can change permissions on them.
+        
+        !IMPORTANT, but exclude objects with given user, or any group containing
+        this user - he can't be able to change his own permissions, because if 
+        he does, and removes some permissions from himself, he will not be able 
+        to add them anymore. 
         
         Example:
                                        A
@@ -243,9 +248,9 @@ class PagePermissionManager(BasicPagePermissionManager):
         # in which he can be
         qs = self.filter(
             page__id__in=page_id_allow_list, 
-            page__level__gte=user_level
+            page__level__gte=user_level,
         )
-        #qs = qs.exclude(user=user).exclude(group__user=user)
+        qs = qs.exclude(user=user).exclude(group__user=user)
         return qs
     
     def for_page(self, page):
@@ -333,6 +338,28 @@ class PagePermissionsPermissionManager(models.Manager):
         if not settings.CMS_MODERATOR:
             return []
         return self.__get_id_list(user, "can_moderate")
+    
+    
+    def get_change_list_id_list(self, user):
+        """This is used just in admin now. Gives all ids where user haves can_edit
+        and can_add merged together.
+        
+        There is for sure a better way how to do this over sql, need to be 
+        optimized...
+        """
+        can_change = self.get_change_id_list(user)
+        can_add = self.get_add_id_list(user)
+        if can_change is can_add:
+            # GRANT_ALL case
+            page_id_list = can_change
+        else:
+            permission_set = filter(lambda i: not i is PagePermissionsPermissionManager.GRANT_ALL, [can_change, can_add])   
+            if len(permission_set) is 1:
+                page_id_list = permission_set[0]
+            else:
+                page_id_list = list(Set(can_change).union(Set(can_add)))
+        return page_id_list
+        
     
     def __get_id_list(self, user, attr):
         # TODO: result of this method should be cached per user, and cache should

@@ -3,9 +3,63 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.sites.models import Site
+from cms import settings as cms_settings
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
+from cms.utils import get_language_from_request
+from cms.utils.moderator import page_moderator_state
+from cms.utils.admin import get_admin_menu_item_context
 
 register = template.Library()
+
+def show_admin_menu(context, page, no_children=False, level=None):
+    """Render the admin table of pages"""
+    request = context['request']
+    
+    if context.has_key("cl"):
+        filtered = context['cl'].is_filtered()
+    elif context.has_key('filtered'):
+        filtered = context['filtered']
+    
+    # level is used to add a left margin on table row
+    if level is None:
+        level = 0
+    else:
+        level = level+2
+    
+    # following function is newly used for getting the context per item (line)
+    # if something more will be required, then get_admin_menu_item_context
+    # function have to be updated. 
+    # This is done because item can be reloaded after some action over ajax.
+    context.update(get_admin_menu_item_context(request, page, filtered))
+    
+    # this here is just context specific for menu rendering - items itself does
+    # not use any of following variables
+    context.update({
+        'children': page.childrens,
+        'no_children': no_children,
+        'level': level,
+    })
+    return context
+show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
+                                         takes_context=True)(show_admin_menu)
+
+
+def clean_admin_list_filter(cl, spec):
+    """
+    used in admin to display only these users that have actually edited a page and not everybody
+    """
+    choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
+    query_string = None
+    unique_choices = []
+    for choice in choices:
+        if choice['query_string'] != query_string:
+            unique_choices.append(choice)
+            query_string = choice['query_string']
+    return {'title': spec.title(), 'choices' : unique_choices}
+clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
+
+
 
 @register.filter
 def boolean_icon(value):
@@ -30,4 +84,4 @@ def moderator_choices(page, user):
         
     for name, title, value in moderate:
         active = page_moderator and getattr(page_moderator, name)
-        yield value, title, active
+        yield value, title, active, name.split('_')[1]

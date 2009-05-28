@@ -1,33 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 import datetime
-from cms.exceptions import NoPermissionsException
-from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
+from django.utils.translation import ugettext as _
+from cms import settings as cms_settings
+from cms.models import Page, GlobalPagePermission, PagePermission, MASK_PAGE,\
     PageModeratorState
 from cms.utils.permissions import get_current_user
-    
-def get_user_level(user):
-    """Returns highest user level from the page/permission hierarchy on which
-    user haves some permissions. Also takes look into user groups. Higher 
-    level equals lover number. Users on top of hierarchy have level 0. Level 
-    is the same like page.level attribute. Checks if user haves permissions 
-    granted on page he is assigned, if no, his level is increased.
-    """
-    if user.is_superuser or \
-        GlobalPagePermission.objects.with_user(user).count():
-        # those
-        return 0
-    try:
-        permission = PagePermission.objects.with_user(user).order_by('page__level')[0]
-    except IndexError:
-        # user is'nt assigned to any node
-        raise NoPermissionsException
-    
-    level = permission.page.level
-    # granted on this page, or followers
-    if not permission.grant_on & MASK_PAGE:
-        # increase level
-        level += 1
-    return level
-
 
 def page_changed(page, old_page=None):
     """Called from page post save signal. If page already had pk, old version
@@ -74,4 +51,28 @@ def update_moderation_message(page, message):
     state.message = message
     state.save()
     
+def page_moderator_state(request, page):
+    """Return moderator page state from page.moderator_state, but also takes 
+    look if current user is in the approvement path, and should approve the this 
+    page. In this case return 100 as an state value. 
+    """
+    I_APPROVE = 100
+    
+    state, label = page.moderator_state, None
+    
+    if cms_settings.CMS_MODERATOR:
+        if state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request):
+            try:
+                page.pagemoderator_set.get(user=request.user)
+                state = I_APPROVE
+                label = _('approve')
+            except ObjectDoesNotExist:
+                pass
+    elif not state is Page.MODERATOR_APPROVED:
+        # if no moderator, we have just 2 states => changed / unchanged
+        state = Page.MODERATOR_CHANGED
+    
+    if not label:
+        label = dict(page.moderator_state_choices)[state]
+    return dict(state=state, label=label)
     

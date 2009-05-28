@@ -1,5 +1,15 @@
-var tree;
+// some very small jquery extensions
+(function($) {
+	// very simple yellow fade plugin..
+	$.fn.yft = function(){ this.effect("highlight", {}, 1000); }
+	
+	// jquery replace plugin :)
+	$.fn.replace = function(o) { 
+		return this.after(o).remove().end(); 
+	};
+})(jQuery);
 
+var tree;
 function initTree(){
 	tree = new tree_component();
 	var options = {
@@ -64,6 +74,35 @@ function initTree(){
 $(document).ready(function() { 
     var selected_page = false;
     var action = false;
+	
+	
+	/**
+	 * Reloads tree item (one line). If some filtering is found, adds 
+	 * filtered variable into posted data. 
+	 * 
+	 * @param {HTMLElement} el Any child element of tree item
+	 * @param {String} url Requested url
+	 * @param {Object} data Optional posted data
+	 * @param {Function} callback Optional calback function
+	 */
+	function reloadItem(el, url, data, callback) {
+		if (data === undefined) data = {};
+	
+		if (/\/\?/ig.test(window.location.href)) {
+			// probably some filter here, tell backend, we need a filtered
+			// version of item	
+			
+			data['fitlered'] = 1;
+		}
+		
+		$.post(url, data, function(response){
+			if (callback) callback(response);
+			var target = $(el).parents('div.cont:first');
+			var parent = target.parent();
+			target.replace(response);
+			parent.find('div.cont:first').yft();
+		})
+	}
     
     // let's start event delegation
 	
@@ -117,42 +156,24 @@ $(document).ready(function() {
             return false;
         }
         
-        if(jtarget.hasClass("publish-checkbox")) {
-            var p = jtarget.attr("name").split("status-")[1];
+		// publish
+		if(jtarget.hasClass("publish-checkbox")) {
+            var pageId = jtarget.attr("name").split("status-")[1];
             // if I don't put data in the post, django doesn't get it
-            $.post("/admin/cms/page/"+p+"/change-status/", {1:1}, function(val) {
-                var img = $('img', jtarget.parent())[0];
-                if(val=="0") {
-                    jtarget.attr("checked", "");
-                    img.src = img.src.replace("-yes.gif", "-no.gif");
-                } else {
-                    jtarget.attr("checked", "checked");
-                    img.src = img.src.replace("-no.gif", "-yes.gif");
-                }
-                jtarget.attr("value", val);
-            });
+            reloadItem(jtarget, "/admin/cms/page/" + pageId + "/change-status/", { 1:1 });
 			e.stopPropagation();
             return true;
         }
 		
+		// in navigation
 		if(jtarget.hasClass("navigation-checkbox")) {
-            var p = jtarget.attr("name").split("navigation-")[1];
+            var pageId = jtarget.attr("name").split("navigation-")[1];
             // if I don't put data in the post, django doesn't get it
-            $.post("/admin/cms/page/"+p+"/change-navigation/", {1:1}, function(val) {
-                var img = $('img', jtarget.parent())[0];
-                if(val=="0") {
-                    jtarget.attr("checked", "");
-                    img.src = img.src.replace("-yes.gif", "-no.gif");
-                } else {
-                    jtarget.attr("checked", "checked");
-                    img.src = img.src.replace("-no.gif", "-yes.gif");
-                }
-                jtarget.attr("value", val);
-            });
+			reloadItem(jtarget, "/admin/cms/page/" + pageId + "/change-navigation/", { 1:1 });
 			e.stopPropagation();
             return true;
         }
-        
+		
 		// moderation
 		if(jtarget.hasClass("moderator-checkbox")) {
             var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
@@ -163,7 +184,7 @@ $(document).ready(function() {
 				value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
 			})
 			
-			parent.load("/admin/cms/page/" + pageId + "/change-moderation/", { moderate: value });
+			reloadItem(jtarget, "/admin/cms/page/" + pageId + "/change-moderation/", { moderate: value });
 			e.stopPropagation();
             return true;
         }
@@ -232,12 +253,14 @@ $(document).ready(function() {
 		}
 	});
 	
-	
+	// moderation checkboxes over livequery
+	$('div.col-moderator input').livequery(function() {
+		$(this).checkBox({addLabel:false});
+	});
 });
 
 
 function moveTreeItem(item_id, target_id, position, tree){
-
 	$.post("./"+item_id+"/move-page/", {
             position:position,
             target:target_id
@@ -263,8 +286,3 @@ function moveTreeItem(item_id, target_id, position, tree){
         }
     );
 };
-
-
-$(function(){
-	$('div.col-moderator input').checkBox({addLabel:false});
-})
