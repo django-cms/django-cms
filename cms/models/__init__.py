@@ -118,20 +118,11 @@ class Page(models.Model):
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
-                
                 if p.parent:
-                    print "============"
-                    print plugin
-                    print ptree
-                    print p.level
-                    print ptree[-1]
                     pdif = p.level - ptree[-1].level
-                    
-                    print pdif
                     if pdif < 0:
                         ptree = ptree[:pdif-1]
                     p.parent = ptree[-1]
-                    print p.parent
                     if pdif != 0:
                         ptree.append(p)
                 else:
