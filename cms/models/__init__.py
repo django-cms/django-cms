@@ -111,11 +111,27 @@ class Page(models.Model):
             print plugins
             for p in plugins:
                 plugin, cls = p.get_plugin_instance()
+                p.page = page
+                p.pk = None
+                p.id = None
+                p.tree_id = None
+                p.lft = None
+                p.rght = None
+                p.level = None
+                if p.parent:
+                    raise NotImplementedError, "Parent nodes are not copied yet"
+                p.save()
                 if plugin:
-                    plugin.pk = None
+                    plugin.pk = p.pk
+                    plugin.id = p.pk
                     plugin.page = page
+                    plugin.tree_id = p.tree_id
+                    plugin.lft = p.lft
+                    plugin.rght = p.rght
+                    plugin.level = p.level
+                    plugin.cmsplugin_ptr = p
                     plugin.save()
-                    print dir(plugin)
+                    print dir(plugin.cmsplugin_ptr)
                 #if plugin:
                 #    plugin.save()
             if dif != 0:

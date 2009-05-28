@@ -257,19 +257,7 @@ function copyTreeItem(item_id, target_id, position, tree){
         },
         function(html) {
 			if(html=="ok"){
-				if (tree) {
-					/*var tree_pos = false;
-					if (position == "left") {
-						tree_pos = "before"
-					}else if (position == "right") {
-						tree_pos = "after"
-					}else {
-						tree_pos = "inside"
-					}
-					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)*/
-				}else{
-					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"))
-				}
+				window.location=window.location.href
 			}else{
 				moveError($('#page_'+item_id + " div.col1:eq(0)"))   
 			}
