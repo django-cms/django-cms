@@ -81,11 +81,11 @@ class Page(models.Model):
         # fire signal
         cms_signals.page_moved.send(sender=Page, instance=self)
         
-    def copy_page(self, target, position='first-child'):
+    def copy_page(self, target, site, position='first-child'):
         """
         copy a page and all its descendants to a new location
         """
-        descendants = self.get_descendants(include_self=True).order_by('-rght')
+        descendants = self.get_descendants(include_self=True).filter(sites__pk=site.pk).order_by('-rght')
         tree = [target]
         level_dif = self.level - target.level - 1
         for page in descendants:
@@ -95,7 +95,7 @@ class Page(models.Model):
                 tree = tree[:dif-1]
             parent = tree[-1]
             titles = list(page.title_set.all())
-            plugins = list(page.cmsplugin_set.all())
+            plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
             page.pk = None
             page.level = None
             page.rght = None
@@ -104,11 +104,12 @@ class Page(models.Model):
             page.parent = parent
             page.status = Page.DRAFT
             page.save()
+            page.sites = [site]
             for title in titles:
                 title.pk = None
                 title.page = page
                 title.save()
-            print plugins
+            ptree = []
             for p in plugins:
                 plugin, cls = p.get_plugin_instance()
                 p.page = page
@@ -117,9 +118,25 @@ class Page(models.Model):
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
-                p.level = None
+                
                 if p.parent:
-                    raise NotImplementedError, "Parent nodes are not copied yet"
+                    print "============"
+                    print plugin
+                    print ptree
+                    print p.level
+                    print ptree[-1]
+                    pdif = p.level - ptree[-1].level
+                    
+                    print pdif
+                    if pdif < 0:
+                        ptree = ptree[:pdif-1]
+                    p.parent = ptree[-1]
+                    print p.parent
+                    if pdif != 0:
+                        ptree.append(p)
+                else:
+                    ptree = [p]
+                p.level = None
                 p.save()
                 if plugin:
                     plugin.pk = p.pk
@@ -131,9 +148,6 @@ class Page(models.Model):
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
                     plugin.save()
-                    print dir(plugin.cmsplugin_ptr)
-                #if plugin:
-                #    plugin.save()
             if dif != 0:
                 tree.append(page)
     

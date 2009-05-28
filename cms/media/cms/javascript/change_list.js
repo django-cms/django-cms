@@ -161,7 +161,8 @@ $(document).ready(function() {
                 $('.move-target-container').hide();
             }
             if(action=="copy") {
-				copyTreeItem(selected_page, target_id, position, tree)
+            	site = $('select#site-select')[0].value
+				copyTreeItem(selected_page, target_id, position, tree, site)
                 $('.move-target-container').hide();
             }
             if(action=="add") {
@@ -249,11 +250,12 @@ function moveTreeItem(item_id, target_id, position, tree){
 };
 
 
-function copyTreeItem(item_id, target_id, position, tree){
+function copyTreeItem(item_id, target_id, position, tree, site){
 
 	$.post("./"+item_id+"/copy-page/", {
             position:position,
-            target:target_id
+            target:target_id,
+            site:site
         },
         function(html) {
 			if(html=="ok"){

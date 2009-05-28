@@ -391,14 +391,19 @@ class PageAdmin(admin.ModelAdmin):
 
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
-        if target is not None and position is not None:
+        site = request.POST.get('site', None)
+        if target is not None and position is not None and site is not None:
             try:
                 target = self.model.objects.get(pk=target)
             except self.model.DoesNotExist:
                 return HttpResponse("error")
+            try:
+                site = Site.objects.get(pk=site)
+            except:
+                return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                page.copy_page(target, position)
+                page.copy_page(target, site, position)
                 return HttpResponse("ok")
                 #return self.list_pages(request,
                 #    template_name='admin/cms/page/change_list_tree.html')
