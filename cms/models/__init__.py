@@ -492,6 +492,7 @@ class EmptyTitle(object):
     path = ""
     meta_description = ""
     meta_keywords = ""
+    redirect = ""
     has_url_overwite = False
     application_urls = ""
     
