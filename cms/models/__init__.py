@@ -85,7 +85,7 @@ class Page(models.Model):
         """
         copy a page and all its descendants to a new location
         """
-        descendants = self.get_descendants(include_self=True).filter(sites__pk=site.pk).order_by('-rght')
+        descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
         tree = [target]
         level_dif = self.level - target.level - 1
         for page in descendants:
