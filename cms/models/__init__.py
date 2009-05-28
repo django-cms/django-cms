@@ -88,12 +88,13 @@ class Page(models.Model):
         descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
         tree = [target]
         level_dif = self.level - target.level - 1
+        first = True
         for page in descendants:
             new_level = page.level - level_dif
             dif = new_level - tree[-1].level 
             if dif < 0:
                 tree = tree[:dif-1]
-            parent = tree[-1]
+           
             titles = list(page.title_set.all())
             plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
             page.pk = None
@@ -101,9 +102,12 @@ class Page(models.Model):
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.parent = parent
             page.status = Page.DRAFT
+            page.parent = tree[-1]
             page.save()
+            if first:
+                first = False
+                page.move_to(target, position)
             page.sites = [site]
             for title in titles:
                 title.pk = None
