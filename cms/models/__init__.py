@@ -85,38 +85,41 @@ class Page(models.Model):
         """
         copy a page and all its descendants to a new location
         """
-        descendants = self.get_descendants(include_self=True).order_by('level', 'lft')
+        descendants = self.get_descendants(include_self=True).order_by('-rght')
         tree = [target]
         level_dif = self.level - target.level - 1
-        last = None
         for page in descendants:
             new_level = page.level - level_dif
             dif = new_level - tree[-1].level 
-            print "tree", tree
-            print "new_level",new_level
-            print "last_level",tree[-1].level
-            print "dif",dif
-            
-            
             if dif < 0:
-                tree = tree[:dif]
-            elif dif == 1:
-                tree.append(last)
+                tree = tree[:dif-1]
             parent = tree[-1]
-            titles = page.title_set.all()
-            plugins = page.cmsplugin_set.all()
+            titles = list(page.title_set.all())
+            plugins = list(page.cmsplugin_set.all())
             page.pk = None
             page.level = None
             page.rght = None
             page.lft = None
             page.tree_id = None
             page.parent = parent
+            page.status = Page.DRAFT
             page.save()
             for title in titles:
                 title.pk = None
                 title.page = page
                 title.save()
-            last = page
+            print plugins
+            for p in plugins:
+                plugin, cls = p.get_plugin_instance()
+                if plugin:
+                    plugin.pk = None
+                    plugin.page = page
+                    plugin.save()
+                    print dir(plugin)
+                #if plugin:
+                #    plugin.save()
+            if dif != 0:
+                tree.append(page)
     
     def save(self, no_signals=False):
         if not self.status:
