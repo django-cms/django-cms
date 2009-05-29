@@ -433,7 +433,7 @@ if settings.CMS_PERMISSION:
             verbose_name_plural = _('Page Permissions')
             
 class Title(models.Model):
-    language = models.CharField(_("language"), max_length=3, db_index=True)
+    language = models.CharField(_("language"), max_length=5, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
@@ -496,7 +496,6 @@ class EmptyTitle(object):
     has_url_overwite = False
     application_urls = ""
     
-    
     @property
     def overwrite_url(self):
         return None
@@ -506,7 +505,7 @@ class CMSPlugin(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
