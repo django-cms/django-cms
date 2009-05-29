@@ -416,12 +416,12 @@ class PageAttributeNode(template.Node):
     def render(self, context):
         if not 'request' in context:
             return ''
-        l = get_language_from_request(context['request'])
+        lang = get_language_from_request(context['request'])
         request = context['request']
         page = request.current_page
-        if page and self.name in ["title","slug","meta_description","meta_keywords"]:
-            t = Title.objects.get_title(page, l, True)
-            return getattr(t,self.name)
+        if page and self.name in ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]:
+            f = getattr(page, "get_"+self.name)
+            return f(language=lang)
         else:
             return ''
         

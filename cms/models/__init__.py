@@ -246,6 +246,24 @@ class Page(models.Model):
         get the title of the page depending on the given language
         """
         return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
+    
+    def get_menu_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+        """
+        get the menu title of the page depending on the given language
+        """
+        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, version_id, force_reload)
+        if not menu_title:
+            return self.get_title(language, True, version_id, force_reload)
+        return menu_title
+    
+    def get_page_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+        """
+        get the page title of the page depending on the given language
+        """
+        page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
+        if not page_title:
+            return self.get_title(language, True, version_id, force_reload)
+        return page_title
 
     def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
@@ -435,6 +453,7 @@ if settings.CMS_PERMISSION:
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=5, db_index=True)
     title = models.CharField(_("title"), max_length=255)
+    menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
@@ -442,6 +461,7 @@ class Title(models.Model):
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
     meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
+    page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
@@ -495,6 +515,8 @@ class EmptyTitle(object):
     redirect = ""
     has_url_overwite = False
     application_urls = ""
+    menu_title = ""
+    page_title = ""
     
     @property
     def overwrite_url(self):

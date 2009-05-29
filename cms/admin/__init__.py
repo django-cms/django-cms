@@ -32,7 +32,7 @@ from django.contrib.sites.models import Site
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
-    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords',)
+    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = ['title', 'slug', 'parent', 'status']
@@ -51,10 +51,10 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('application_urls')
     if settings.CMS_REDIRECTS:
         advanced_fields.append('redirect')
-    if settings.CMS_SHOW_META_TAGS:
-        advanced_fields.append('meta_description')
-        advanced_fields.append('meta_keywords')
-    
+    if settings.CMS_SEO_FIELDS:
+        seo_fields = ('page_title', 'meta_description', 'meta_keywords')
+    if settings.CMS_MENU_TITLE_OVERWRITE:
+        general_fields[0] = ('title', 'menu_title')
     fieldsets = [
         (None, {
             'fields': general_fields,
@@ -71,6 +71,12 @@ class PageAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     ]
+    
+    if settings.CMS_SEO_FIELDS:
+        fieldsets.append((_("SEO Settings"), {
+                          'fields':seo_fields,
+                          'classes': ('collapse',),                   
+                        })) 
     
     list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
     search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
@@ -151,7 +157,9 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['overwrite_url'],
             form.cleaned_data['redirect'],
             form.cleaned_data['meta_description'],
-            form.cleaned_data['meta_keywords']
+            form.cleaned_data['meta_keywords'],
+            form.cleaned_data['page_title'],
+            form.cleaned_data['menu_title'],
         )
 
     def get_fieldsets(self, request, obj=None):
@@ -221,8 +229,16 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
-            for name in ['slug','title','application_urls','overwrite_url','redirect','meta_description','meta_keywords']:
-                form.base_fields[name].initial = getattr(title_obj,name)
+            for name in ['slug',
+                         'title',
+                         'application_urls',
+                         'overwrite_url',
+                         'redirect',
+                         'meta_description',
+                         'meta_keywords', 
+                         'menu_title', 
+                         'page_title']:
+                form.base_fields[name].initial = getattr(title_obj, name)
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly

@@ -82,6 +82,10 @@ CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 # )
 CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
 
-# Allow the description and keywords meta tags to be edited from the
+# Allow the description, title and keywords meta tags to be edited from the
 # admin
-CMS_SHOW_META_TAGS = getattr(settings, 'CMS_SHOW_META_TAGS', False) 
+CMS_SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False) 
+
+# Allow to overwrite the menu title
+
+CMS_MENU_TITLE_OVERWRITE = getattr(settings, 'CMS_MENU_TITLE_OVERWRITE', False)
