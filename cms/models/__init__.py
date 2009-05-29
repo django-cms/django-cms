@@ -440,8 +440,8 @@ class Title(models.Model):
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
-    meta_description = models.TextField(_("description"), max_length=255)
-    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True)
+    meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
+    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     

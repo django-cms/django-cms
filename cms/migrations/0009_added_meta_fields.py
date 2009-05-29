@@ -8,10 +8,10 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'Title.meta_keywords'
-        db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True, default=''))
+        db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True, null=True))
         
         # Adding field 'Title.meta_description'
-        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, default=''))
+        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, blank=True, null=True))
         
     
     def backwards(self, orm):
@@ -51,8 +51,8 @@ class Migration:
             'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
             'language': ('models.CharField', ['_("language")'], {'max_length': '3', 'db_index': 'True'}),
-            'meta_description': ('models.TextField', ['_("description")'], {'max_length': '255'}),
-            'meta_keywords': ('models.CharField', ['_("keywords")'], {'max_length': '255', 'blank': 'True'}),
+            'meta_description': ('models.TextField', ['_("description")'], {'max_length': '255', 'blank': 'True', 'null':'True'}),
+            'meta_keywords': ('models.CharField', ['_("keywords")'], {'max_length': '255', 'blank': 'True', 'null':'True'}),
             'page': ('models.ForeignKey', ["orm['cms.Page']"], {'related_name': '"title_set"'}),
             'path': ('models.CharField', ['_("path")'], {'max_length': '255', 'db_index': 'True'}),
             'redirect': ('models.CharField', ['_("redirect")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
