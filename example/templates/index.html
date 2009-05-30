@@ -1,7 +1,9 @@
 {% load cache cms_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
-<title>{% placeholder title %}</title>
+<title>{% page_attribute page_title %}</title>
+<meta name="description" content="{% page_attribute meta_description %}"/>
+<meta name="keywords" content="{% page_attribute meta_keywords %}"/>
 <!--script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script-->
 <style>
     .placeholder-editable {
@@ -83,7 +85,7 @@
 <p>
 	See this page in {% language_chooser %}
 </p>
-<h1>{% block title %}Django CMS based on page objects{% endblock %}</h1>
+<h1>{% block title %}{% page_attribute title %}{% endblock %}</h1>
 
 <h3>site: {{ site.name }}</h3>
 
@@ -139,7 +141,7 @@
 <h2>Content</h2>
 {% block content %}
     <div style="width:70%">
-		<h3>title placeholder {% placeholder title %}</h3>
+		<h3>title placeholder {% page_attribute title %}</h3>
 		<div style="float:right;width:25%">
     		<h3>Right column placeholder</h3>
     		{% placeholder right-column %}

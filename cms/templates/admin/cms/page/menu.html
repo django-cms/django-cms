@@ -6,19 +6,15 @@
 		</div>
 		<div class="col2">	
 			<span id="move-target-{{ page.id }}" class="move-target-container" >
-				<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a> |
-				<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a> |
+				<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a><span class="line first"> |</span>
+				<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a><span class="line second"> |</span>
 				<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
 			</span>
 			<div class="col-language">{% for lang in page.get_languages %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}</div>
 			<div class="col-actions">{% if not filtered %}
-				<select id="view-page-{{page.id}}-select">
-				{% for site in page.sites.all %}
-					<option value="http://{{site.domain}}{{page.get_absolute_url}}">{{site.domain}}</option>
-				{% endfor %}
-				</select>
-				<a href="#" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
-				<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
+				<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+				<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>
+				<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
 				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
 				<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>
 			</div>	

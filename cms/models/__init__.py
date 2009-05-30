@@ -54,7 +54,7 @@ class Page(models.Model):
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     status = models.IntegerField(_("status"), choices=STATUSES, default=DRAFT, db_index=True)
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
-    sites = models.ManyToManyField(Site, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
     
     # Managers
     objects = PageManager()
@@ -81,6 +81,70 @@ class Page(models.Model):
         # fire signal
         cms_signals.page_moved.send(sender=Page, instance=self)
         
+    def copy_page(self, target, site, position='first-child'):
+        """
+        copy a page and all its descendants to a new location
+        """
+        descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
+        tree = [target]
+        level_dif = self.level - target.level - 1
+        first = True
+        for page in descendants:
+            new_level = page.level - level_dif
+            dif = new_level - tree[-1].level 
+            if dif < 0:
+                tree = tree[:dif-1]
+           
+            titles = list(page.title_set.all())
+            plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            page.pk = None
+            page.level = None
+            page.rght = None
+            page.lft = None
+            page.tree_id = None
+            page.status = Page.DRAFT
+            page.parent = tree[-1]
+            page.save()
+            if first:
+                first = False
+                page.move_to(target, position)
+            page.sites = [site]
+            for title in titles:
+                title.pk = None
+                title.page = page
+                title.save()
+            ptree = []
+            for p in plugins:
+                plugin, cls = p.get_plugin_instance()
+                p.page = page
+                p.pk = None
+                p.id = None
+                p.tree_id = None
+                p.lft = None
+                p.rght = None
+                if p.parent:
+                    pdif = p.level - ptree[-1].level
+                    if pdif < 0:
+                        ptree = ptree[:pdif-1]
+                    p.parent = ptree[-1]
+                    if pdif != 0:
+                        ptree.append(p)
+                else:
+                    ptree = [p]
+                p.level = None
+                p.save()
+                if plugin:
+                    plugin.pk = p.pk
+                    plugin.id = p.pk
+                    plugin.page = page
+                    plugin.tree_id = p.tree_id
+                    plugin.lft = p.lft
+                    plugin.rght = p.rght
+                    plugin.level = p.level
+                    plugin.cmsplugin_ptr = p
+                    plugin.save()
+            if dif != 0:
+                tree.append(page)
     
     def save(self, no_signals=False):
         if not self.status:
@@ -182,13 +246,49 @@ class Page(models.Model):
         get the title of the page depending on the given language
         """
         return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
+    
+    def get_menu_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+        """
+        get the menu title of the page depending on the given language
+        """
+        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, version_id, force_reload)
+        if not menu_title:
+            return self.get_title(language, True, version_id, force_reload)
+        return menu_title
+    
+    def get_page_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+        """
+        get the page title of the page depending on the given language
+        """
+        page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
+        if not page_title:
+            return self.get_title(language, True, version_id, force_reload)
+        return page_title
+
+    def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get content for the description meta tag for the page depending on the given language
+        """
+        return self.get_title_obj_attribute("meta_description", language, fallback, version_id, force_reload)
+
+    def get_meta_keywords(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get content for the keywords meta tag for the page depending on the given language
+        """
+        return self.get_title_obj_attribute("meta_keywords", language, fallback, version_id, force_reload)
         
     def get_application_urls(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get application urls conf for application hook
         """
         return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
-        
+    
+    def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get redirect
+        """
+        return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
+    
     def _get_title_cache(self, language, fallback, version_id, force_reload):
         default_lang = False
         if not language:
@@ -351,12 +451,17 @@ if settings.CMS_PERMISSION:
             verbose_name_plural = _('Page Permissions')
             
 class Title(models.Model):
-    language = models.CharField(_("language"), max_length=3, db_index=True)
+    language = models.CharField(_("language"), max_length=5, db_index=True)
     title = models.CharField(_("title"), max_length=255)
+    menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True, help_text=_('Hook application to this page.'))
+    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
+    meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
+    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
+    page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
@@ -405,8 +510,13 @@ class EmptyTitle(object):
     title = ""
     slug = ""
     path = ""
+    meta_description = ""
+    meta_keywords = ""
+    redirect = ""
     has_url_overwite = False
     application_urls = ""
+    menu_title = ""
+    page_title = ""
     
     @property
     def overwrite_url(self):
@@ -417,7 +527,7 @@ class CMSPlugin(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     

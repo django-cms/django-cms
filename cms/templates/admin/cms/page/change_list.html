@@ -62,7 +62,16 @@
 
 {% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-{% block search %}{% search_form cl %}{% endblock %}
+{% block search %}
+
+<div id="site-selector">
+{% trans "Pages on:" %}
+<select id="site-select">{% for site in cl.sites %}
+	<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>{% endfor %}
+</select>
+</div>
+{% search_form cl %}
+{% endblock %}
 {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
 {% block filters %}
@@ -79,11 +88,8 @@
 {% endif %}
 {% endblock %}
 
-<!--div class="module" id="changelist" style="display:none;"-->
-
 {% include "admin/cms/page/change_list_tree.html" %}
 
-<!--/div-->
 </div>
 </div>
 

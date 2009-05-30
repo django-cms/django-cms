@@ -16,9 +16,9 @@
  *        Jean-Francois Hovinne (jf.hovinne a-t wymeditor dotorg)
  *        Daniel Reszka (d.reszka a-t wymeditor dotorg)
 */
-
+ 
 /* VISUAL FEEDBACK */
-
+ 
 /* basic */
   body  { background: #e1e8f1;}
  
@@ -46,7 +46,7 @@
   td            { width: 25%; }
   blockquote    { margin-left: 30px; }
   pre           { background-color:transparent; border: 1px solid white; }
-
+ 
 /* Gecko min height fix */
   p             { min-height: 1em; } /*min-height is needed under Firefox, because empty parargraphs */
   *+html p      { min-height: auto; } /* but we have to remove it under IE7 because it triggers the 'haslayout' mode */
@@ -62,7 +62,7 @@
   h6        { background-image: url(lbl-h6.png); }
   blockquote{ background-image: url(lbl-blockquote.png); }
   pre       { background-image: url(lbl-pre.png); }
-
+ 
 /* specific HTML elements */
   caption   { text-align: left; }
   img       { margin-right: 5px;
@@ -72,7 +72,7 @@
   a img     { border-width: 1px; border-color: blue; }
   acronym   { border: 1px solid gray; }
   span      { background-color: #eef; }
-
+ 
 /* visual feedback for non-valid nesting of elements*/
   h1 h1, h1 h2, h1 h3, h1 h4, h1 h5, h1 h6, h1 p, h1 pre, h1 address,
   h2 h1, h2 h2, h2 h3, h2 h4, h2 h5, h2 h6, h2 p, h2 pre, h2 address,
@@ -88,3 +88,44 @@
     border: 1px solid red !important;
     font-size: 12px !important;
     font-weight: normal; }
+
+/* amendments by Daniele to improve layout and appearance */
+
+
+  body  { 
+	background: white; 
+	color: black;
+	font-family: "Gill Sans", "Futura", "Bitstream Vera Sans", sans-serif;
+	margin: 0;}
+
+  p		{font-size: 100%;}
+  h1	{font-size: 155%;}
+  h2	{font-size: 140%;}
+  h3	{font-size: 125%;}
+  h4	{font-size: 110%;}
+  h5	{font-size: 95%;}
+  h6	{font-size: 80%;}
+  blockquote	{font-weight: light; color: #666;}
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  ul,
+  ol,
+  table,
+  blockquote,
+  pre   {margin: 0; }
+
+  ol,ul	{border: none;
+		margin: 1em 0;
+		padding-left: 2em;
+		background-image: url(lbl-list.png);
+	  }
+		
+  li	{margin-left: 1em; 
+	padding-left: 1em;
+	list-style-position: outside;}

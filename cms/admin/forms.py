@@ -9,8 +9,13 @@ from cms.urlutils import any_path_re
 
 class PageForm(forms.ModelForm):
     APPLICATION_URLS = (('', '----------'), ) + CMS_APPLICATIONS_URLS
+    
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
+    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
+        help_text=_('Overwrite what is displayed in the menu'), required=False)
+    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
+        help_text=_('Overwrites what is display at the top of your browser or in bookmarks'), required=False)
     language = forms.ChoiceField(label=_("Language"), choices=CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
@@ -18,8 +23,14 @@ class PageForm(forms.ModelForm):
     application_urls = forms.ChoiceField(label=_('Application'), 
         choices=APPLICATION_URLS, required=False,  
         help_text=_('Hook application to this page.'))
-    overwrite_url = forms.CharField(label='Overwrite url', max_length=255, required=False,
+    overwrite_url = forms.CharField(label=_('Overwrite url'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
+    redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
+        help_text=_('Redirects to this URL.'))
+    meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
+        help_text=_('A description of the page sometimes used by search engines.'))
+    meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
+        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
     
     class Meta:
         model = Page
@@ -64,4 +75,13 @@ class PageForm(forms.ModelForm):
             if not any_path_re.match(url):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
-
+    
+    def clean_sites(self):
+        sites = self.cleaned_data['sites']
+        if self.cleaned_data['parent'] != None:
+            parent_sites = self.cleaned_data['parent'].sites.all().values_list('id', flat=True)
+            for site in sites:
+                if not site.pk in parent_sites:
+                    raise forms.ValidationError(ugettext_lazy('The parent of this page is not on the site %(site)s') % {'site':site } )
+        return sites
+        
