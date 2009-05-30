@@ -544,9 +544,12 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         plugin_class = plugin_pool.get_plugin(self.plugin_type)
         plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
-        if plugin.model != CMSPlugin:
+        if plugin.model != CMSPlugin and self.__class__ == CMSPlugin:
+            # (if self is actually a subclass, getattr below would break)
             try:
                 instance = getattr(self, plugin.model.__name__.lower())
+                # could alternatively be achieved with:
+                # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
             except:
                 instance = None
         else:
