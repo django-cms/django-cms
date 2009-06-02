@@ -70,6 +70,12 @@
 		margin-left:5px;
 		list-style:none;
 		}
+	p.chooser a{
+		text-decoration: none;
+	}	
+	p.chooser a.current {
+		text-decoration: underline;
+	}
 </style>
 </head>
 <body>
@@ -82,8 +88,8 @@
         <a href="/admin/">log in</a>
     {% endif %}
 </p>
-<p>
-	See this page in {% language_chooser %}
+<p class="chooser">
+	See this page in: {% language_chooser %}
 </p>
 <h1>{% block title %}{% page_attribute title %}{% endblock %}</h1>
 
