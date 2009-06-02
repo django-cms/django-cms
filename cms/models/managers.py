@@ -97,13 +97,14 @@ class TitleManager(models.Manager):
             title = self.get(language=language, page=page)
             return title
         except self.model.DoesNotExist:
-            pass
-        if language_fallback:
-            try:
-                title = self.filter(page=page).latest(latest_by)
-                return title
-            except self.model.DoesNotExist:
-                pass
+            if language_fallback:
+                try:
+                    title = self.filter(page=page).latest(latest_by)
+                    return title
+                except self.model.DoesNotExist:
+                    pass
+            else:
+                raise
         return None        
     
     def get_page_slug(self, slug, site=None, latest_by='creation_date'):

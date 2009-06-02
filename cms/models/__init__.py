@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
@@ -567,7 +567,12 @@ class CMSPlugin(models.Model):
             return ""
             
     def get_media_path(self, filename):
-        return self.page.get_media_path(filename)
+        if self.page_id:
+            return self.page.get_media_path(filename)
+        else: # django 1.0.2 compatibility
+            today = date.today()
+            return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
+            
     
     def get_instance_icon_src(self):
         """
