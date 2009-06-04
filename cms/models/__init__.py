@@ -487,38 +487,7 @@ class Page(models.Model):
             Q(page__pk=self.pk, moderate_page=True)
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
     
-    def get_test_moderation_level(self, user=None):
-        """Returns min moderation level for page, and result of user test if 
-        user is given, so outpu is always tuple of:
-            moderation_level, requires_approvement
-        
-        NOTE: May require some optimization, might call 3 huge sql queries in 
-        worse case
-        """
-        if not settings.CMS_MODERATOR or (user and user.is_superuser):
-            return 0, False
-        
-        qs = self.get_moderator_set()
-            
-        if qs.filter(user__is_superuser=True).count():
-            return 0, True
-        
-        if user:
-            if qs.filter(user__id=user.id, user__globalpagepermission__gt=0).count():
-                return 0, False
-            
-            try:
-                moderator = qs.filter(user__id=user.id).select_related()[0]
-                return moderator.page.level, False
-            except IndexError:
-                pass
-        else:
-            if qs.filter(user__globalpagepermission__gt=0).count():
-                return 0, True
-                
-        moderator = qs.select_related()[0]
-        return moderator.page.level, True
-        
+    
         
 # Don't register the Page model twice.
 try:

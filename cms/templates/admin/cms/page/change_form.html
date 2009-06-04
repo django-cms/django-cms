@@ -9,22 +9,24 @@
 {% endblock %}
 
 {% block content_title %}
-	<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}</h1>
+	<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}
 	{% if CMS_MODERATOR %}
-		{% if moderation_required %}
-			<h3>{% blocktrans %}This page must be moderated at level {{ moderation_level }}.{% endblocktrans %}</h3>
-		{% else %}
-			<h3>{% trans 'This page does not requires any moderation.' %}</h3>
+		{% if moderation_required %}<span class="requires-approvement">{% blocktrans %}(requires approvement at level {{ moderation_level }}){% endblocktrans %}</span>
+		{% else %}<span>{% trans '(you can perform actions on this page directly)' %}</span>
 		{% endif %}
 	{% endif %}
+	</h1>
 {% endblock %}
 
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
-  <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  {% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	
+	{% if moderator_should_approve %}<li><a href="approve/" class="approvelink">{% trans "Approve" %}</a></li>{% endif %}
+	
+	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+  	{% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}

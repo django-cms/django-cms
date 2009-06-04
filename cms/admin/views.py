@@ -12,6 +12,7 @@ from cms.utils import auto_render
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
+from django.core.exceptions import ObjectDoesNotExist
 
 @require_POST
 def change_status(request, page_id):
@@ -294,16 +295,18 @@ def change_moderation(request, page_id):
             moderate = int(moderate)
         except:
             moderate = 0
-        if moderate <= MASK_PAGE + MASK_CHILDREN + MASK_DESCENDANTS:
+        
+        if moderate == 0:
+            # kill record with moderation which equals zero
+            try:
+                page.pagemoderator_set.get(user=request.user).delete()
+            except ObjectDoesNotExist:
+                pass
+            return render_admin_menu_item(request, page)
+        elif moderate <= MASK_PAGE + MASK_CHILDREN + MASK_DESCENDANTS:
             page_moderator, created = page.pagemoderator_set.get_or_create(user=request.user)
             # split value to attributes
             page_moderator.set_binary(moderate)
             page_moderator.save()
-            context = {
-                'page': page,
-                'user': request.user,
-            }
-            
             return render_admin_menu_item(request, page)
-            #return render_to_response('admin/cms/page/moderator_col.html', context)
     raise Http404

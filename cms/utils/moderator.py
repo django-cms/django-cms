@@ -1,10 +1,13 @@
-from django.core.exceptions import ObjectDoesNotExist
 import datetime
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
-from cms.models import Page, GlobalPagePermission, PagePermission, MASK_PAGE,\
-    PageModeratorState
+from cms.models import Page, PageModeratorState
 from cms.utils.permissions import get_current_user
+
+
+I_APPROVE = 100 # current user should approve page
+
 
 def page_changed(page, old_page=None):
     """Called from page post save signal. If page already had pk, old version
@@ -55,9 +58,10 @@ def page_moderator_state(request, page):
     """Return moderator page state from page.moderator_state, but also takes 
     look if current user is in the approvement path, and should approve the this 
     page. In this case return 100 as an state value. 
-    """
-    I_APPROVE = 100
     
+    Returns:
+        dict(state=state, label=label)
+    """
     state, label = page.moderator_state, None
     
     if cms_settings.CMS_MODERATOR:
@@ -75,4 +79,47 @@ def page_moderator_state(request, page):
     if not label:
         label = dict(page.moderator_state_choices)[state]
     return dict(state=state, label=label)
+
+
+def moderator_should_approve(request, page):
+    """Says if user should approve given page. (just helper)
+    """
+    print ">> pms:", page_moderator_state(request, page)
+    return page_moderator_state(request, page)['state'] is I_APPROVE
+
+
+def get_test_moderation_level(page, user=None):
+    """Returns min moderation level for page, and result of user test if 
+    user is given, so output is always tuple of:
+        
+        (moderation_level, requires_approvement)
+        
+    Meaning of requires_approvement is - somebody of higher instance must 
+    approve changes made on this page by given user. 
     
+    NOTE: May require some optimization, might call 3 huge sql queries in 
+    worse case
+    """
+    if not cms_settings.CMS_MODERATOR or (user and user.is_superuser):
+        return 0, False
+    
+    qs = page.get_moderator_set()
+        
+    if qs.filter(user__is_superuser=True).count():
+        return 0, True
+    
+    if user:
+        if qs.filter(user__id=user.id, user__globalpagepermission__gt=0).count():
+            return 0, False
+        
+        try:
+            moderator = qs.filter(user__id=user.id).select_related()[0]
+            return moderator.page.level, False
+        except IndexError:
+            pass
+    else:
+        if qs.filter(user__globalpagepermission__gt=0).count():
+            return 0, True
+            
+    moderator = qs.select_related()[0]
+    return moderator.page.level, True

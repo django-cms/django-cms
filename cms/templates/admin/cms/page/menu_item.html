@@ -59,18 +59,30 @@
 		
 		<div class="col-draft">
 			<span class="state">{{ page_moderator_state.label }}</span>
+			{% if page.published %}<label>
+				{% if has_publish_permission %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
+				{% else %}<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+				{% endif %}
+			</label>
+			{% else %}<label>
+				{% if has_publish_permission %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
+				{% else %}<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+				{% endif %}
+			</label>{% endif %}
+			
 			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 		</div>
 		
-		<div class="col-published">{% if page.published %}
-			<label>
-				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>{% if has_publish_permission %}
-				<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" />{% endif %}
-			</label>{% else %}
-			<label>
-				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />{% if has_publish_permission %}
-				<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" />{% endif %}
+		<div class="col-published">
+			{# TODO: this must be connected to public page #}
+			
+			{% if page.published %}<label>
+				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
+			</label>
+			{% else %}<label>
+				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
 			</label>{% endif %}
+			
 			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>			
 		</div>
 		

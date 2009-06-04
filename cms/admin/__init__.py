@@ -35,7 +35,8 @@ from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 from django.contrib.auth.models import User
-from cms.utils.moderator import update_moderation_message
+from cms.utils.moderator import update_moderation_message,\
+    get_test_moderation_level, moderator_should_approve
 
 PAGE_ADMIN_INLINES = []
 
@@ -197,8 +198,7 @@ class PageAdmin(admin.ModelAdmin):
     mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     filter_horizontal = ['sites']
     top_fields = ['language']
-    general_fields = [mandatory_placeholders, 'published']
-    #general_fields = ['title', 'slug', 'parent', 'status']
+    general_fields = ['title', 'slug', 'parent', 'published']
     advanced_fields = ['sites', 'in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -269,9 +269,6 @@ class PageAdmin(admin.ModelAdmin):
                           'fields':seo_fields,
                           'classes': ('collapse',),                   
                         })) 
-    
-    list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
-    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
     
     inlines = PAGE_ADMIN_INLINES
       
@@ -505,14 +502,7 @@ class PageAdmin(admin.ModelAdmin):
             obj = None
         else:
             template = get_template_from_request(request, obj)
-            
-            if settings.CMS_MODERATOR:
-                moderation_level, moderation_required = obj.get_test_moderation_level(request.user)
-                #user_level = get_user_publishing_level(request.user)
-                #print "> ml:", moderation_level, "ul:", user_level
-                #moderation_required = moderation_level < user_level
-            else:
-                moderation_level, moderation_required = obj.get_test_moderation_level()[0], False
+            moderation_level, moderation_required = get_test_moderation_level(obj, request.user)
             
             extra_context = {
                 'placeholders': get_placeholders(request, template),
@@ -526,6 +516,7 @@ class PageAdmin(admin.ModelAdmin):
                 
                 'moderation_level': moderation_level,
                 'moderation_required': moderation_required,
+                'moderator_should_approve': moderator_should_approve(request, obj),
             }
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
 

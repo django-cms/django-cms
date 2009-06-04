@@ -1,4 +1,4 @@
-div fieldset.module.hidden {
-	position: absolute;
-	left: -1000em;
-}
+h1 span { font-size: 10px; color: #999; font-weight: normal;}
+h1 span.requires-approvement { color: #f60; }
+
+div fieldset.module.hidden { position: absolute; left: -1000em; }
