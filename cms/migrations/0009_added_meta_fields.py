@@ -11,8 +11,7 @@ class Migration:
         db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True, null=True))
         
         # Adding field 'Title.meta_description'
-        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, blank=True, null=True))
-        
+        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, blank=True, null=True))        
     
     def backwards(self, orm):
         

@@ -8,7 +8,6 @@ from cms import settings
 from cms.models import Page, Title, CMSPlugin, MASK_CHILDREN, MASK_DESCENDANTS,\
     MASK_PAGE
 from cms.plugin_pool import plugin_pool
-from cms.utils import auto_render
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item

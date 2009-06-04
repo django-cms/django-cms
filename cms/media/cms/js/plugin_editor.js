@@ -37,7 +37,7 @@ $(document).ready(function() {
 				}
 			}
 			
-			$.post("move-plugin", { ids:d }, function(data){}, "json");
+			$.post("move-plugin/", { ids:d }, function(data){}, "json");
 			
 		}
 	});

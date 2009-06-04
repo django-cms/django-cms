@@ -1,21 +1,24 @@
 from os.path import join
+from inspect import isclass, getmembers
+from copy import deepcopy
+
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.forms import Widget, TextInput, Textarea, CharField, HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
-from django.template.defaultfilters import title
+from django.template.defaultfilters import title, escapejs, force_escape
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy, ugettext
 from django.views.generic.create_update import redirect
-from django import template
+#from django import template
 from django.contrib.sites.models import Site
-from inspect import isclass, getmembers
-from copy import deepcopy
+from django.contrib.auth.models import User
 
 from cms import settings
 from cms.admin.change_list import CMSChangeList
@@ -26,7 +29,6 @@ from cms.admin.views import (change_status, change_innavigation, add_plugin,
 from cms.admin.widgets import PluginEditor
 from cms.models import Page, Title, CMSPlugin, PagePermission
 from cms.plugin_pool import plugin_pool
-from cms.settings import CMS_MEDIA_URL
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.permissions import has_page_add_permission,\
     get_user_permission_level, has_global_change_permissions_permission
@@ -34,7 +36,7 @@ from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
-from django.contrib.auth.models import User
+
 from cms.utils.moderator import update_moderation_message,\
     get_test_moderation_level, moderator_should_approve
 
@@ -191,6 +193,10 @@ if settings.CMS_PERMISSION:
 ################################################################################
 # Page
 ################################################################################
+
+if 'reversion' in settings.INSTALLED_APPS:
+    from reversion import revision
+
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     
@@ -288,7 +294,11 @@ class PageAdmin(admin.ModelAdmin):
             'js/lib/ui.dialog.js',
             'js/change_form.js',
         )]
-
+    
+    def redirect_jsi18n(self, request):
+            return HttpResponseRedirect("../../../jsi18n/")
+    
+    '''
     def __call__(self, request, url):
         """
         Delegate to the appropriate method, based on the URL.
@@ -299,7 +309,7 @@ class PageAdmin(admin.ModelAdmin):
             return add_plugin(request)
         elif 'edit-plugin' in url:
             plugin_id = url.split("/")[-1]
-            return edit_plugin(request, plugin_id, self.admin_site)
+            return edit_plugin(request, plugin_id)
         elif 'remove-plugin' in url:
             return remove_plugin(request)
         elif 'move-plugin' in url:
@@ -319,14 +329,65 @@ class PageAdmin(admin.ModelAdmin):
         elif url.endswith('/change-moderation'):
             return change_moderation(request, unquote(url[:-18]))
         elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
-            return HttpResponseRedirect("../../../jsi18n/")
-        elif ('history' in url or 'recover' in url) and request.method == "POST":
-            resp = super(PageAdmin, self).__call__(request, url)
-            if resp.status_code == 302:
-                version = int(url.split("/")[-1])
-                revert_plugins(request, version)
-                return resp
+            return self.redirect_jsi18n(request)
+        elif ('history' in url or 'recover' in url):
+            version = int(url.split("/")[-1])
+            return revert_plugins(request, version)
+
         return super(PageAdmin, self).__call__(request, url)
+    '''
+
+    def get_urls(self):
+        from django.conf.urls.defaults import patterns, url
+        
+        info = "%sadmin_%s_%s_cms" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
+        
+        url_patterns = patterns('',
+            url(r'^(?:[0-9]+)/add-plugin/$',
+                self.admin_site.admin_view(add_plugin),
+                name='%s_add_plugin' % info),
+            url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
+                self.admin_site.admin_view(edit_plugin),
+                name='%s_edit_plugin' % info),
+            url(r'^(?:[0-9]+)/remove-plugin/$',
+                self.admin_site.admin_view(remove_plugin),
+                name='%s_remove_plugin' % info),
+            url(r'^(?:[0-9]+)/move-plugin/$',
+                self.admin_site.admin_view(move_plugin),
+                name='%s_move_plugin' % info),
+            url(r'^([0-9]+)/move-page/$',
+                self.admin_site.admin_view(self.move_page),
+                name='%s_move_page' % info),    
+            url(r'^([0-9]+)/permissions/$',
+                self.admin_site.admin_view(self.get_permissions),
+                name='%s_permissions' % info),
+            url(r'^([0-9]+)/moderation-states/$',
+                self.admin_site.admin_view(self.get_moderation_states),
+                name='%s_moderation_states' % info),
+            url(r'^([0-9]+)/copy-page/$',
+                self.admin_site.admin_view(self.copy_page),
+                name='%s_moderation_states' % info),                
+                
+            url(r'^([0-9]+)/change-status/$',
+                self.admin_site.admin_view(change_status),
+                name='%s_change_status' % info),
+
+            url(r'^([0-9]+)/change-navigation/$',
+                self.admin_site.admin_view(change_innavigation),
+                name='%s_change_navigation' % info),
+            url(r'^([0-9]+)/change-moderation/$',
+                self.admin_site.admin_view(change_moderation),
+                name='%s_change_moderation' % info),
+            url(r'^([0-9]+)/jsi18n/$',
+                self.admin_site.admin_view(self.redirect_jsi18n),
+                name='%s_jsi18n' % info),
+            url(r'^(?:[0-9]+)/(?:((history|version)))/([0-9]+)/$',
+                self.admin_site.admin_view(revert_plugins),
+                name='%s_revert_plugins' % info),
+        )
+        
+        url_patterns.extend(super(PageAdmin, self).get_urls())
+        return url_patterns
 
     def save_model(self, request, obj, form, change):
         """
@@ -579,7 +640,7 @@ class PageAdmin(admin.ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
-            'CMS_MEDIA_URL': CMS_MEDIA_URL,
+            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
             
             'CMS_PERMISSION': settings.CMS_PERMISSION,
@@ -638,6 +699,8 @@ class PageAdmin(admin.ModelAdmin):
 
     def get_permissions(self, request, page_id):
         #if not obj.has_change_permissions_permission(request):
+        print ">> get_permissions", page_id
+        
         page = get_object_or_404(Page, id=page_id)
         
         can_change_list = Page.permissions.get_change_id_list(request.user)
