@@ -33,9 +33,12 @@ def pre_save_title(instance, raw, **kwargs):
     instance.tmp_application_urls = None
     
     if instance.id:
-        tmp_title = Title.objects.get(pk=instance.id)
-        instance.tmp_path = tmp_title.path
-        instance.tmp_application_urls = tmp_title.application_urls
+        try:
+            tmp_title = Title.objects.get(pk=instance.id)
+            instance.tmp_path = tmp_title.path
+            instance.tmp_application_urls = tmp_title.application_urls
+        except:
+            pass # no Titles exist for this page yet
     
     # Build path from parent page's path and slug
     if instance.has_url_overwrite and instance.path:
