@@ -298,45 +298,6 @@ class PageAdmin(admin.ModelAdmin):
     def redirect_jsi18n(self, request):
             return HttpResponseRedirect("../../../jsi18n/")
     
-    '''
-    def __call__(self, request, url):
-        """
-        Delegate to the appropriate method, based on the URL.
-        """
-        if url is None:
-            return self.list_pages(request)
-        elif url.endswith('add-plugin'):
-            return add_plugin(request)
-        elif 'edit-plugin' in url:
-            plugin_id = url.split("/")[-1]
-            return edit_plugin(request, plugin_id)
-        elif 'remove-plugin' in url:
-            return remove_plugin(request)
-        elif 'move-plugin' in url:
-            return move_plugin(request)
-        elif url.endswith('/move-page'):
-            return self.move_page(request, unquote(url[:-10]))
-        elif settings.CMS_PERMISSION and 'permissions' in url:
-            return self.get_permissions(request, url.split('/')[0])
-        elif settings.CMS_MODERATOR and 'moderation-states' in url:
-            return self.get_moderation_states(request, url.split('/')[0])
-        elif url.endswith('/copy-page'):
-            return self.copy_page(request, unquote(url[:-10]))
-        elif url.endswith('/change-status'):
-            return change_status(request, unquote(url[:-14]))
-        elif url.endswith('/change-navigation'):
-            return change_innavigation(request, unquote(url[:-18]))
-        elif url.endswith('/change-moderation'):
-            return change_moderation(request, unquote(url[:-18]))
-        elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
-            return self.redirect_jsi18n(request)
-        elif ('history' in url or 'recover' in url):
-            version = int(url.split("/")[-1])
-            return revert_plugins(request, version)
-
-        return super(PageAdmin, self).__call__(request, url)
-    '''
-
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url
         
