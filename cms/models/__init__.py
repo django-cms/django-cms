@@ -110,6 +110,42 @@ class Page(models.Model):
         # fire signal
         cms_signals.page_moved.send(sender=Page, instance=self)
         
+    def copy_page(self, target, position='first-child'):
+        """
+        copy a page and all its descendants to a new location
+        """
+        descendants = self.get_descendants(include_self=True).order_by('level', 'lft')
+        tree = [target]
+        level_dif = self.level - target.level - 1
+        last = None
+        for page in descendants:
+            new_level = page.level - level_dif
+            dif = new_level - tree[-1].level 
+            print "tree", tree
+            print "new_level",new_level
+            print "last_level",tree[-1].level
+            print "dif",dif
+            
+            
+            if dif < 0:
+                tree = tree[:dif]
+            elif dif == 1:
+                tree.append(last)
+            parent = tree[-1]
+            titles = page.title_set.all()
+            plugins = page.cmsplugin_set.all()
+            page.pk = None
+            page.level = None
+            page.rght = None
+            page.lft = None
+            page.tree_id = None
+            page.parent = parent
+            page.save()
+            for title in titles:
+                title.pk = None
+                title.page = page
+                title.save()
+            last = page
     
     def save(self, no_signals=False):
         # Published pages should always have a publication date
@@ -210,13 +246,31 @@ class Page(models.Model):
         get the title of the page depending on the given language
         """
         return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
+
+    def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get content for the description meta tag for the page depending on the given language
+        """
+        return self.get_title_obj_attribute("meta_description", language, fallback, version_id, force_reload)
+
+    def get_meta_keywords(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get content for the keywords meta tag for the page depending on the given language
+        """
+        return self.get_title_obj_attribute("meta_keywords", language, fallback, version_id, force_reload)
         
     def get_application_urls(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get application urls conf for application hook
         """
         return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
-        
+    
+    def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get redirect
+        """
+        return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
+    
     def _get_title_cache(self, language, fallback, version_id, force_reload):
         default_lang = False
         if not language:
@@ -433,7 +487,10 @@ class Title(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True, help_text=_('Hook application to this page.'))
+    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
+    meta_description = models.TextField(_("description"), max_length=255)
+    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
@@ -483,8 +540,11 @@ class EmptyTitle(object):
     title = ""
     slug = ""
     path = ""
+    meta_description = ""
+    meta_keywords = ""
     has_url_overwite = False
     application_urls = ""
+    
     
     @property
     def overwrite_url(self):

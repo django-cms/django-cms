@@ -27,13 +27,19 @@ class PageForm(forms.ModelForm):
     application_urls = forms.ChoiceField(label=_('Application'), 
         choices=APPLICATION_URLS, required=False,  
         help_text=_('Hook application to this page.'))
-    overwrite_url = forms.CharField(label='Overwrite url', max_length=255, required=False,
+    overwrite_url = forms.CharField(label=_('Overwrite url'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
     # moderation state
     moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
     # moderation - message is a fake filed
     moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
     
+    redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
+        help_text=_('Redirects to this URL.'))
+    meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
+        help_text=_('A description of the page sometimes used by search engines.'))
+    meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
+        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
     
     class Meta:
         model = Page

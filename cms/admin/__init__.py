@@ -194,11 +194,12 @@ class PageAdmin(admin.ModelAdmin):
     form = PageForm
     
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
-    mandatory_placeholders = ('title', 'slug', 'parent')
+    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords',)
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [mandatory_placeholders, 'published']
-    advanced_fields = ['sites', 'in_navigation', 'reverse_id', 'application_urls', 'overwrite_url']
+    #general_fields = ['title', 'slug', 'parent', 'status']
+    advanced_fields = ['sites', 'in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     
@@ -217,17 +218,25 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('publication_date')
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
-    
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
         
-    if settings.CMS_SOFTROOT:
+    if settings.CMS_MODERATOR:
         hidden_fields.extend(('moderator_state', 'moderator_message'))
         
+    if settings.CMS_APPLICATIONS_URLS:
+        advanced_fields.append('application_urls')
+    if settings.CMS_REDIRECTS:
+        advanced_fields.append('redirect')
+    if settings.CMS_SHOW_META_TAGS:
+        advanced_fields.append('meta_description')
+        advanced_fields.append('meta_keywords')
+
     list_filter += ['sites']
     
     # take care with changing fieldsets, get_fieldsets() method removes some
     # fields depending on permissions, but its very static!!
+
     
     fieldsets = [
         (None, {
@@ -291,6 +300,8 @@ class PageAdmin(admin.ModelAdmin):
             return self.get_permissions(request, url.split('/')[0])
         elif settings.CMS_MODERATOR and 'moderation-states' in url:
             return self.get_moderation_states(request, url.split('/')[0])
+        elif url.endswith('/copy-page'):
+            return self.copy_page(request, unquote(url[:-10]))
         elif url.endswith('/change-status'):
             return change_status(request, unquote(url[:-14]))
         elif url.endswith('/change-navigation'):
@@ -334,6 +345,9 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['title'],
             form.cleaned_data['application_urls'],
             form.cleaned_data['overwrite_url'],
+            form.cleaned_data['redirect'],
+            form.cleaned_data['meta_description'],
+            form.cleaned_data['meta_keywords']
         )
         
         # is there any moderation message? save/update state
@@ -420,17 +434,13 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
-            form.base_fields['slug'].initial = title_obj.slug
-            form.base_fields['title'].initial = title_obj.title
-            form.base_fields['application_urls'].initial = title_obj.application_urls
-            form.base_fields['overwrite_url'].initial = title_obj.overwrite_url
+            for name in ['slug','title','application_urls','overwrite_url','redirect','meta_description','meta_keywords']:
+                form.base_fields[name].initial = getattr(title_obj,name)
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly
-            form.base_fields['slug'].initial = u''
-            form.base_fields['title'].initial = u''
-            form.base_fields['application_urls'].initial = u''
-            form.base_fields['overwrite_url'].initial = u''
+            for name in ['slug','title','application_urls','overwrite_url','meta_description','meta_keywords']:
+                form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
         form.base_fields['parent'].widget = HiddenInput() 
         template = get_template_from_request(request, obj)
@@ -645,6 +655,29 @@ class PageAdmin(admin.ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
     
+    def copy_page(self, request, page_id, extra_context=None):
+        """
+        Copy the page and all its plugins and descendants to the requested target, at the given position
+        """
+        context = {}
+        page = Page.objects.get(pk=page_id)
+
+        target = request.POST.get('target', None)
+        position = request.POST.get('position', None)
+        if target is not None and position is not None:
+            try:
+                target = self.model.objects.get(pk=target)
+            except self.model.DoesNotExist:
+                return HttpResponse("error")
+                #context.update({'error': _('Page could not been moved.')})
+            else:
+                page.copy_page(target, position)
+                return HttpResponse("ok")
+                #return self.list_pages(request,
+                #    template_name='admin/cms/page/change_list_tree.html')
+        context.update(extra_context or {})
+        return HttpResponseRedirect('../../')
+    
     def get_moderation_states(self, request, page_id):
         """Returns moderation messsages. Is loaded over ajax to inline-group 
         element in change form view.
@@ -664,6 +697,7 @@ class PageAdminMixins(admin.ModelAdmin):
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.admin import VersionAdmin
+    # change the inheritance chain to include VersionAdmin
     PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__    
     admin.site.register(Page, PageAdminMixins)
 else:

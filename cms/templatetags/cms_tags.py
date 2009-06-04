@@ -6,6 +6,7 @@ from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
+from django.utils.safestring import mark_safe
 register = template.Library()
 
 
@@ -234,6 +235,7 @@ def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
 
+
 def page_id_url(context, reverse_id, lang=None):
     """
     Show the url of a page with a reverse id in the right language
@@ -244,31 +246,31 @@ def page_id_url(context, reverse_id, lang=None):
         return {'content':''}
     if lang is None:
         lang = get_language_from_request(request)
-    if hasattr(settings, 'CMS_CONTENT_CACHE_DURATION'):
-        key = 'page_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
-        url = cache.get(key)
-        if not url:
-            try:
-                page = Page.objects.get(reverse_id=reverse_id)
-            except:
-                if settings.DEBUG:
-                    raise
-                else:
-                    site = Site.objects.get_current()
-                    send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                              _("A page_url template tag didn't found a page with the reverse_id %(reverse_id)s\nThe url of the page was: http://%(host)s%(path)s")%{'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
-                               settings.DEFAULT_FROM_EMAIL,
-                               settings.MANAGERS, 
-                               fail_silently=True)
+    key = 'page_id_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
+    url = cache.get(key)
+    if not url:
+        try:
+            page = Page.objects.get(reverse_id=reverse_id)
+        except:
+            if settings.DEBUG:
+                raise
+            else:
+                site = Site.objects.get_current()
+                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                          _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                            "The url of the page was: http://%(host)s%(path)s")
+                            % {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
+                          settings.DEFAULT_FROM_EMAIL,
+                          settings.MANAGERS, 
+                          fail_silently=True)
 
-            url = page.get_absolute_url(language=lang)
-            cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
-    else:
         url = page.get_absolute_url(language=lang)
+        cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
     if url:
         return {'content':url}
     return {'content':''}
 page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_id_url)
+
 
 def page_language_url(context, lang):
     """
@@ -350,28 +352,111 @@ class PlaceholderNode(template.Node):
         l = get_language_from_request(context['request'])
         request = context['request']
         page = request.current_page
-        c = None
-        t = None
-        if self.name == "title":
-            t = Title.objects.get_title(page, l, True)
-            if t:
-                c = t.title
-        elif self.name == "slug":
-            t = Title.objects.get_title(page, l, True)
-            if t:
-                c = t.slug
-        else:
-            plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
-            c = ""
-            for plugin in plugins:
-                c += plugin.render_plugin(context, self.name)
-        if not c:
-            return ''
-        if not t:
-            return '<div id="%s" class="placeholder">%s</div>' % (self.name, c)
+        plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+        c = ""
+        for plugin in plugins:
+            c += plugin.render_plugin(context, self.name)
         return c
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
+
+def do_page_attribute(parser, token):
+    error_string = '%r tag requires one argument' % token.contents[0]
+    try:
+        # split_contents() knows not to split quoted strings.
+        bits = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError(error_string)
+    if len(bits) == 2:
+        #tag_name, name
+        return PageAttributeNode(bits[1])
+    else:
+        raise template.TemplateSyntaxError(error_string)
+
+class PageAttributeNode(template.Node):
+    """This template node is used to output attribute from page such
+    as its title and slug.
+    
+    eg: {% page attribute field-name %}
+    
+    Keyword arguments:
+    field-name -- the name of the field to output. One of "title",
+    "slug", "meta_description" or "meta_keywords"
+    """
+    def __init__(self, name):
+        self.name = name.lower()
+
+    def render(self, context):
+        if not 'request' in context:
+            return ''
+        l = get_language_from_request(context['request'])
+        request = context['request']
+        page = request.current_page
+        if page and self.name in ["title","slug","meta_description","meta_keywords"]:
+            t = Title.objects.get_title(page, l, True)
+            return getattr(t,self.name)
+        else:
+            return ''
+        
+    def __repr__(self):
+        return "<PageAttribute Node: %s>" % self.name
+
+register.tag('page_attribute', do_page_attribute)
+
+def clean_admin_list_filter(cl, spec):
+    """
+    used in admin to display only these users that have actually edited a page and not everybody
+    """
+    choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
+    query_string = None
+    unique_choices = []
+    for choice in choices:
+        if choice['query_string'] != query_string:
+            unique_choices.append(choice)
+            query_string = choice['query_string']
+    return {'title': spec.title(), 'choices' : unique_choices}
+clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
+
+
+def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
+    """
+    Show the content of a page with a placeholder name and a reverse id in the right language
+    This is mostly used if you want to have static content in a template of a page (like a footer)
+    """
+    request = context.get('request', False)
+    if not request:
+        return {'content':''}
+    if lang is None:
+        lang = get_language_from_request(request)
+    key = 'show_placeholder_by_id_pid:'+reverse_id+'placeholder:'+placeholder_name+'_l:'+str(lang)
+    content = cache.get(key)
+    if not content:
+        try:
+            page = Page.objects.get(reverse_id=reverse_id)
+        except:
+            if settings.DEBUG:
+                raise
+            else:
+                site = Site.objects.get_current()
+                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                          _("A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                            "The url of the page was: http://%(host)s%(path)s") %
+                            {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
+                          settings.DEFAULT_FROM_EMAIL,
+                          settings.MANAGERS,
+                          fail_silently=True)
+
+        plugins = CMSPlugin.objects.filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        content = ""
+        for plugin in plugins:
+            content += plugin.render_plugin(context, placeholder_name)
+
+    cache.set(key, content, settings.CMS_CONTENT_CACHE_DURATION)
+
+    if content:
+        return {'content':mark_safe(content)}
+    return {'content':''}
+show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)

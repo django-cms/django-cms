@@ -76,6 +76,9 @@ CMS_SHOW_END_DATE = getattr(settings, 'CMS_SHOW_END_DATE', False)
 # Whether the user can overwrite the url of a page
 CMS_URL_OVERWRITE = getattr(settings, 'CMS_URL_OVERWRITE', True)
 
+# Are redirects activated?
+CMS_REDIRECTS = getattr(settings, 'CMS_REDIRECTS', False)
+
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 
@@ -91,3 +94,7 @@ CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False)
 
 if CMS_MODERATOR and not CMS_PERMISSION:
     raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
+
+# Allow the description and keywords meta tags to be edited from the
+# admin
+CMS_SHOW_META_TAGS = getattr(settings, 'CMS_SHOW_META_TAGS', False) 

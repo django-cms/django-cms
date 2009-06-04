@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.conf import settings
 from cms.models import *
 from django.test.client import Client
+from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
 
 
@@ -16,9 +17,8 @@ def suite():
     return alltests
 
 class PagesTestCase(TestCase):
-    """NOTE: This is not a working version... Have to be changed 
-    """
-    fixtures = ['tests.json']
+
+    fixtures = ['test.json']
     counter = 1
     
     def setUp(self):
@@ -73,7 +73,6 @@ class PagesTestCase(TestCase):
         page_data = self.get_new_page_data()
         response = self.client.post('/admin/cms/page/add/', page_data)
         self.assertRedirects(response, '/admin/cms/page/')
-        
         page1 = Title.objects.get(slug=page_data['slug']).page
 
         response = self.client.post('/admin/cms/page/add/', page_data)
@@ -129,7 +128,6 @@ class PagesTestCase(TestCase):
         self.assertRedirects(response, '/admin/cms/page/')
         page = Page.objects.get(id=1)
         assert(page.get_title() == 'changed title')
-    
     
     ''''
     def test_06_site_framework(self):
@@ -190,3 +188,53 @@ class PagesTestCase(TestCase):
         self.test_05_edit_page()
         self.test_04_details_view()'''
 
+    def test_07_meta_description_and_keywords_fields_from_admin(self):
+        """
+        Test that description and keywords tags can be set via the admin
+        """
+        self.client.login(username= 'test', password='test')
+        page_data = self.get_new_page_data()
+        page_data["meta_description"] = "I am a page"
+        page_data["meta_keywords"] = "page,cms,stuff"
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        response = self.client.get('/admin/cms/page/1/')
+        self.assertEqual(response.status_code, 200)
+        page_data['meta_description'] = 'I am a duck'
+        response = self.client.post('/admin/cms/page/1/', page_data)
+        self.assertRedirects(response, '/admin/cms/page/')
+        page = Page.objects.get(id=1)
+        assert(page.get_meta_description() == 'I am a duck')
+        assert(page.get_meta_keywords() == 'page,cms,stuff')
+
+    def test_08_meta_description_and_keywords_from_template_tags(self):
+        from django import template
+        self.client.login(username= 'test', password='test')
+        page_data = self.get_new_page_data()
+        page_data["title"] = "Hello"
+        page_data["meta_description"] = "I am a page"
+        page_data["meta_keywords"] = "page,cms,stuff"
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
+        req = HttpRequest()
+        req.current_page = Page.objects.get(id=1)
+        req.REQUEST = {}
+        assert(t.render(template.Context({"request": req}))=="Hello I am a page page,cms,stuff")
+
+    def test_09_copy_page(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        self.client.login(username= 'test', password='test')
+        setattr(settings, "SITE_ID", 1)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/?target=1&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/?target=2&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/add/', page_data)
+        page_data = self.get_new_page_data()
+        response = self.client.post('/admin/cms/page/1/copy-page/', {'target':4, 'position':'first-child'})
+        self.assertEqual(response.status_code, 200)
+        print dir(response)
