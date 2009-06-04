@@ -20,6 +20,10 @@ class PageForm(forms.ModelForm):
     
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
+    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
+        help_text=_('Overwrite what is displayed in the menu'), required=False)
+    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
+        help_text=_('Overwrites what is display at the top of your browser or in bookmarks'), required=False)
     language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),

@@ -99,13 +99,14 @@ class TitleManager(models.Manager):
             title = self.get(language=language, page=page)
             return title
         except self.model.DoesNotExist:
-            pass
-        if language_fallback:
-            try:
-                title = self.filter(page=page).latest(latest_by)
-                return title
-            except self.model.DoesNotExist:
-                pass
+            if language_fallback:
+                try:
+                    title = self.filter(page=page).latest(latest_by)
+                    return title
+                except self.model.DoesNotExist:
+                    pass
+            else:
+                raise
         return None        
     
     def get_page_slug(self, slug, site=None, latest_by='creation_date'):
@@ -126,7 +127,7 @@ class TitleManager(models.Manager):
             return titles
         
     def set_or_create(self, page, language, slug=None, title=None, application_urls=None,
-        overwrite_url=None, redirect=None, meta_description=None, meta_keywords=None):
+        overwrite_url=None, redirect=None, meta_description=None, meta_keywords=None, page_title=None, menu_title=None):
         """
         set or create a title for a particular page and language
         """
@@ -143,12 +144,17 @@ class TitleManager(models.Manager):
             if meta_description != None:
                 obj.meta_description = meta_description
             if meta_keywords != None:
-                obj.meta_keywords = meta_keywords                
+                obj.meta_keywords = meta_keywords            
+            if page_title != None:
+                obj.page_title = page_title
+            if menu_title != None:
+                obj.menu_title = menu_title                            
         except self.model.DoesNotExist:
             obj = self.model(
                 page=page, language=language, title=title, slug=slug,
                 application_urls=application_urls, redirect=redirect,
-                meta_description=meta_description,meta_keywords=meta_keywords)
+                meta_description=meta_description, meta_keywords=meta_keywords,
+                page_title=page_title, menu_title=menu_title)
         if overwrite_url > "":
             obj.has_url_overwrite = True
             obj.path = overwrite_url

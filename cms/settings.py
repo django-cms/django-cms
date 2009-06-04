@@ -21,6 +21,37 @@ if CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in setting
     raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
         'Please put it into your MIDDLEWARE_CLASSES in settings file')
     
+# Show the publication date field in the admin, allows for future dating
+# Changing this from True to False could cause some weirdness.  If that is required,
+# you should update your database to correct any future dated pages
+CMS_SHOW_START_DATE = getattr(settings, 'CMS_SHOW_START_DATE', False)
+
+# Show the publication end date field in the admin, allows for page expiration
+# Changing this from True to False could cause some weirdness.  If that is required,
+# you should update your database and null any pages with publication_end_date set.
+CMS_SHOW_END_DATE = getattr(settings, 'CMS_SHOW_END_DATE', False)
+
+# Whether the user can overwrite the url of a page
+CMS_URL_OVERWRITE = getattr(settings, 'CMS_URL_OVERWRITE', True)
+
+# Allow to overwrite the menu title
+CMS_MENU_TITLE_OVERWRITE = getattr(settings, 'CMS_MENU_TITLE_OVERWRITE', False)
+
+# Are redirects activated?
+CMS_REDIRECTS = getattr(settings, 'CMS_REDIRECTS', False)
+
+# Allow the description, title and keywords meta tags to be edited from the
+# admin
+CMS_SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False) 
+
+# a tuble with a python path to a function that returns a list of navigation nodes
+CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
+
+# a tuple of hookable applications, e.g.:
+# CMS_APPLICATIONS_URLS = (
+#    ('sampleapp.urls', 'Sample application'),
+# )
+CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
 
 # Whether a slug should be unique ... must be unique in all languages.
 i18n_installed = not 'cms.middleware.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
@@ -31,6 +62,11 @@ CMS_FLAT_URLS = getattr(settings, 'CMS_FLAT_URLS', False)
 
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
+
+#Hide untranslated Pages
+CMS_HIDE_UNTRANSLATED = getattr(settings, 'CMS_HIDE_UNTRANSLATED', True)
+
+
 
 # Defines which languages should be offered.
 CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)
@@ -62,31 +98,6 @@ CMS_MEDIA_URL = join(settings.MEDIA_URL, CMS_MEDIA_PATH)
 
 # Path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
 CMS_PAGE_MEDIA_PATH = getattr(settings, 'CMS_PAGE_MEDIA_PATH', 'cms_page_media/')
-
-# Show the publication date field in the admin, allows for future dating
-# Changing this from True to False could cause some weirdness.  If that is required,
-# you should update your database to correct any future dated pages
-CMS_SHOW_START_DATE = getattr(settings, 'CMS_SHOW_START_DATE', False)
-
-# Show the publication end date field in the admin, allows for page expiration
-# Changing this from True to False could cause some weirdness.  If that is required,
-# you should update your database and null any pages with publication_end_date set.
-CMS_SHOW_END_DATE = getattr(settings, 'CMS_SHOW_END_DATE', False)
-
-# Whether the user can overwrite the url of a page
-CMS_URL_OVERWRITE = getattr(settings, 'CMS_URL_OVERWRITE', True)
-
-# Are redirects activated?
-CMS_REDIRECTS = getattr(settings, 'CMS_REDIRECTS', False)
-
-# a tuble with a python path to a function that returns a list of navigation nodes
-CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
-
-# a tuple of hookable applications, e.g.:
-# CMS_APPLICATIONS_URLS = (
-#    ('sampleapp.urls', 'Sample application'),
-# )
-CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
 
 # moderator mode - if True, approve path can be setup for every page, so there
 # will be some control over the published stuff

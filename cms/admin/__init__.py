@@ -194,7 +194,7 @@ class PageAdmin(admin.ModelAdmin):
     form = PageForm
     
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
-    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords',)
+    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     filter_horizontal = ['sites']
     top_fields = ['language']
     general_fields = [mandatory_placeholders, 'published']
@@ -228,16 +228,20 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('application_urls')
     if settings.CMS_REDIRECTS:
         advanced_fields.append('redirect')
+
     if settings.CMS_SHOW_META_TAGS:
         advanced_fields.append('meta_description')
         advanced_fields.append('meta_keywords')
 
     list_filter += ['sites']
     
+    if settings.CMS_SEO_FIELDS:
+        seo_fields = ('page_title', 'meta_description', 'meta_keywords')
+    if settings.CMS_MENU_TITLE_OVERWRITE:
+        general_fields[0] = ('title', 'menu_title')
+    
     # take care with changing fieldsets, get_fieldsets() method removes some
     # fields depending on permissions, but its very static!!
-
-    
     fieldsets = [
         (None, {
             'fields': general_fields,
@@ -260,8 +264,17 @@ class PageAdmin(admin.ModelAdmin):
         }),
     ]
     
-    inlines = PAGE_ADMIN_INLINES
+    if settings.CMS_SEO_FIELDS:
+        fieldsets.append((_("SEO Settings"), {
+                          'fields':seo_fields,
+                          'classes': ('collapse',),                   
+                        })) 
     
+    list_filter = ('status', 'in_navigation', 'template', 'author', 'soft_root','sites')
+    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
+    
+    inlines = PAGE_ADMIN_INLINES
+      
     class Media:
         css = {
             'all': [join(settings.CMS_MEDIA_URL, path) for path in (
@@ -347,7 +360,9 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['overwrite_url'],
             form.cleaned_data['redirect'],
             form.cleaned_data['meta_description'],
-            form.cleaned_data['meta_keywords']
+            form.cleaned_data['meta_keywords'],
+            form.cleaned_data['page_title'],
+            form.cleaned_data['menu_title'],
         )
         
         # is there any moderation message? save/update state
@@ -434,8 +449,16 @@ class PageAdmin(admin.ModelAdmin):
             form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
-            for name in ['slug','title','application_urls','overwrite_url','redirect','meta_description','meta_keywords']:
-                form.base_fields[name].initial = getattr(title_obj,name)
+            for name in ['slug',
+                         'title',
+                         'application_urls',
+                         'overwrite_url',
+                         'redirect',
+                         'meta_description',
+                         'meta_keywords', 
+                         'menu_title', 
+                         'page_title']:
+                form.base_fields[name].initial = getattr(title_obj, name)
         else:
             # Clear out the customisations made above
             # TODO - remove this hack, this is v ugly
@@ -664,14 +687,19 @@ class PageAdmin(admin.ModelAdmin):
 
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
-        if target is not None and position is not None:
+        site = request.POST.get('site', None)
+        if target is not None and position is not None and site is not None:
             try:
                 target = self.model.objects.get(pk=target)
             except self.model.DoesNotExist:
                 return HttpResponse("error")
+            try:
+                site = Site.objects.get(pk=site)
+            except:
+                return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                page.copy_page(target, position)
+                page.copy_page(target, site, position)
                 return HttpResponse("ok")
                 #return self.list_pages(request,
                 #    template_name='admin/cms/page/change_list_tree.html')

@@ -7,21 +7,21 @@ class Migration:
     
     def forwards(self, orm):
         
-        # Adding field 'Title.meta_keywords'
-        db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True, null=True))
+        # Adding field 'Title.page_title'
+        db.add_column('cms_title', 'page_title', models.CharField(_("title"), max_length=255, null=True, blank=True))
         
-        # Adding field 'Title.meta_description'
-        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, blank=True, null=True))
-        
-    
+        # Adding field 'Title.menu_title'
+        db.add_column('cms_title', 'menu_title', models.CharField(_("title"), max_length=255, null=True, blank=True))
+
     def backwards(self, orm):
         
-        # Deleting field 'Title.meta_keywords'
-        db.delete_column('cms_title', 'meta_keywords')
+        # Deleting field 'Title.page_title'
+        db.delete_column('cms_title', 'page_title')
         
-        # Deleting field 'Title.meta_description'
-        db.delete_column('cms_title', 'meta_description')
+        # Deleting field 'Title.menu_title'
+        db.delete_column('cms_title', 'menu_title')
         
+    
     
     models = {
         'sites.site': {
@@ -44,25 +44,10 @@ class Migration:
             'type': ('models.IntegerField', ['_("type")'], {'default': '0'}),
             'user': ('models.ForeignKey', ["orm['auth.User']"], {'null': 'True', 'blank': 'True'})
         },
-        'cms.title': {
-            'Meta': {'unique_together': "('language','page')"},
-            'application_urls': ('models.CharField', ["_('application')"], {'blank': 'True', 'max_length': '200', 'null': 'True', 'db_index': 'True'}),
-            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
-            'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),
-            'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'language': ('models.CharField', ['_("language")'], {'max_length': '3', 'db_index': 'True'}),
-            'meta_description': ('models.TextField', ['_("description")'], {'max_length': '255', 'blank': 'True', 'null':'True'}),
-            'meta_keywords': ('models.CharField', ['_("keywords")'], {'max_length': '255', 'blank': 'True', 'null':'True'}),
-            'page': ('models.ForeignKey', ["orm['cms.Page']"], {'related_name': '"title_set"'}),
-            'path': ('models.CharField', ['_("path")'], {'max_length': '255', 'db_index': 'True'}),
-            'redirect': ('models.CharField', ['_("redirect")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'slug': ('models.SlugField', ['_("slug")'], {'unique': 'False', 'max_length': '255', 'db_index': 'True'}),
-            'title': ('models.CharField', ['_("title")'], {'max_length': '255'})
-        },
         'cms.cmsplugin': {
             'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'language': ('models.CharField', ['_("language")'], {'db_index': 'True', 'max_length': '3', 'editable': 'False', 'blank': 'False'}),
+            'language': ('models.CharField', ['_("language")'], {'db_index': 'True', 'max_length': '5', 'editable': 'False', 'blank': 'False'}),
             'level': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
             'lft': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
             'page': ('models.ForeignKey', ["orm['cms.Page']"], {'editable': 'False'}),
@@ -72,6 +57,23 @@ class Migration:
             'position': ('models.PositiveSmallIntegerField', ['_("position")'], {'null': 'True', 'editable': 'False', 'blank': 'True'}),
             'rght': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
             'tree_id': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'})
+        },
+        'cms.title': {
+            'Meta': {'unique_together': "('language','page')"},
+            'application_urls': ('models.CharField', ["_('application')"], {'blank': 'True', 'max_length': '200', 'null': 'True', 'db_index': 'True'}),
+            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
+            'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),
+            'id': ('models.AutoField', [], {'primary_key': 'True'}),
+            'language': ('models.CharField', ['_("language")'], {'max_length': '5', 'db_index': 'True'}),
+            'menu_title': ('models.CharField', ['_("title")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'meta_description': ('models.TextField', ['_("description")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'meta_keywords': ('models.CharField', ['_("keywords")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'page': ('models.ForeignKey', ["orm['cms.Page']"], {'related_name': '"title_set"'}),
+            'page_title': ('models.CharField', ['_("title")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'path': ('models.CharField', ['_("path")'], {'max_length': '255', 'db_index': 'True'}),
+            'redirect': ('models.CharField', ['_("redirect")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'slug': ('models.SlugField', ['_("slug")'], {'unique': 'False', 'max_length': '255', 'db_index': 'True'}),
+            'title': ('models.CharField', ['_("title")'], {'max_length': '255'})
         },
         'cms.page': {
             'Meta': {'ordering': "('tree_id','lft')"},

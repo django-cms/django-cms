@@ -9,6 +9,7 @@ from django.template import TemplateDoesNotExist
 
 # doc testing in some modules
 from cms import urlutils
+
 def suite():
     suite1 = unittest.TestSuite()
     suite1.addTest(doctest.DocTestSuite(urlutils))
@@ -227,14 +228,17 @@ class PagesTestCase(TestCase):
         self.client.login(username= 'test', password='test')
         setattr(settings, "SITE_ID", 1)
         page_data = self.get_new_page_data()
-        response = self.client.post('/admin/cms/page/add/', page_data)
+        self.client.post('/admin/cms/page/add/', page_data)
         page_data = self.get_new_page_data()
-        response = self.client.post('/admin/cms/page/add/?target=1&position=first-child&site=1', page_data)
+        self.client.post('/admin/cms/page/add/?target=1&position=first-child&site=1', page_data)
         page_data = self.get_new_page_data()
-        response = self.client.post('/admin/cms/page/add/?target=2&position=first-child&site=1', page_data)
+        self.client.post('/admin/cms/page/add/?target=2&position=first-child&site=1', page_data)
         page_data = self.get_new_page_data()
-        response = self.client.post('/admin/cms/page/add/', page_data)
+        self.client.post('/admin/cms/page/add/', page_data)
         page_data = self.get_new_page_data()
-        response = self.client.post('/admin/cms/page/1/copy-page/', {'target':4, 'position':'first-child'})
+        self.client.post('/admin/cms/page/add/?target=4&position=first-child&site=1', page_data)
+        page_data = self.get_new_page_data()
+        count = Page.objects.all().count()
+        response = self.client.post('/admin/cms/page/1/copy-page/', {'target':5, 'position':'first-child', 'site':1})
         self.assertEqual(response.status_code, 200)
-        print dir(response)
+        self.assertTrue(Page.objects.all().count()>count)

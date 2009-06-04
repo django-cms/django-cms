@@ -43,27 +43,28 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     alist = list(ext.get_ancestors().values_list('id', 'soft_root'))
                     alist = [(ext.pk, ext.soft_root)] + alist
                     break
-        soft_root_filter = {}
+        filters = {'in_navigation' : True, 
+                   'sites__domain' : site.domain,
+                   'level__lte' : to_level}
         #check the ancestors for softroots
         for p in alist:
             ancestors.append(p[0])
             if p[1]:
                 soft_root = Page.objects.get(pk=p[0])
-                soft_root_filter['lft__gte'] = soft_root.lft
-                soft_root_filter['rght__lte'] = soft_root.rght
-                soft_root_filter['tree_id'] = soft_root.tree_id
+                filters['lft__gte'] = soft_root.lft
+                filters['rght__lte'] = soft_root.rght
+                filters['tree_id'] = soft_root.tree_id
                 from_level = soft_root.level
         if current_page and current_page.soft_root: 
-            soft_root_filter['tree_id'] = current_page.tree_id
-            soft_root_filter['lft__gte'] = current_page.lft
-            soft_root_filter['rght__lte'] = current_page.rght
+            filters['tree_id'] = current_page.tree_id
+            filters['lft__gte'] = current_page.lft
+            filters['rght__lte'] = current_page.rght
             from_level = current_page.level
-        pages = Page.objects.published().filter(in_navigation=True, 
-                                                sites__domain=site.domain, 
-                                                level__lte=to_level, 
-                                                **soft_root_filter).order_by('tree_id', 
-                                                                             'parent', 
-                                                                             'lft')
+        if settings.CMS_HIDE_UNTRANSLATED:
+            filters['title_set__language'] = lang
+        pages = Page.objects.published().filter(**filters).order_by('tree_id', 
+                                                                    'parent', 
+                                                                    'lft')
         pages = list(pages)
         all_pages = pages[:]
         last = None
@@ -117,12 +118,15 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     page = request.current_page
     if page:
         root = page.get_root()
-        pages = Page.objects.published().filter(in_navigation=True, 
-                                                lft__gt=page.lft, 
-                                                rght__lt=page.rght, 
-                                                tree_id=page.tree_id, 
-                                                level__lte=page.level+levels, 
-                                                sites__domain=site.domain)
+        filters = {'in_navigation':True, 
+                  'lft__gt':page.lft, 
+                  'rght__lt':page.rght, 
+                  'tree_id':page.tree_id, 
+                  'level__lte':page.level+levels, 
+                  'sites__domain':site.domain}
+        if settings.CMS_HIDE_UNTRANSLATED:
+            filters['title_set__language'] = lang
+        pages = Page.objects.published().filter(**filters)
         ids = []
         pages = list(pages)
         all_pages = pages[:]
@@ -287,9 +291,9 @@ def page_language_url(context, lang):
         url = "/%s" % lang + request._language_changer(lang)
     else:
         try:
-            url = "/%s" % lang + page.get_absolute_url(language=lang)
+            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=not settings.CMS_HIDE_UNTRANSLATED)
         except:
-            url = "/%s" % lang + request.path_info
+            url = "/%s/" % lang 
     if url:
         return {'content':url}
     return {'content':''}
@@ -392,12 +396,12 @@ class PageAttributeNode(template.Node):
     def render(self, context):
         if not 'request' in context:
             return ''
-        l = get_language_from_request(context['request'])
+        lang = get_language_from_request(context['request'])
         request = context['request']
         page = request.current_page
-        if page and self.name in ["title","slug","meta_description","meta_keywords"]:
-            t = Title.objects.get_title(page, l, True)
-            return getattr(t,self.name)
+        if page and self.name in ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]:
+            f = getattr(page, "get_"+self.name)
+            return f(language=lang, fallback=True)
         else:
             return ''
         

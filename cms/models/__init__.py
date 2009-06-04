@@ -1,5 +1,5 @@
 import urllib2
-from datetime import datetime
+from datetime import datetime, date
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User, Group
@@ -110,42 +110,70 @@ class Page(models.Model):
         # fire signal
         cms_signals.page_moved.send(sender=Page, instance=self)
         
-    def copy_page(self, target, position='first-child'):
+    def copy_page(self, target, site, position='first-child'):
         """
         copy a page and all its descendants to a new location
         """
-        descendants = self.get_descendants(include_self=True).order_by('level', 'lft')
+        descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
         tree = [target]
         level_dif = self.level - target.level - 1
-        last = None
+        first = True
         for page in descendants:
             new_level = page.level - level_dif
             dif = new_level - tree[-1].level 
-            print "tree", tree
-            print "new_level",new_level
-            print "last_level",tree[-1].level
-            print "dif",dif
-            
-            
             if dif < 0:
-                tree = tree[:dif]
-            elif dif == 1:
-                tree.append(last)
-            parent = tree[-1]
-            titles = page.title_set.all()
-            plugins = page.cmsplugin_set.all()
+                tree = tree[:dif-1]
+           
+            titles = list(page.title_set.all())
+            plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
             page.pk = None
             page.level = None
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.parent = parent
+            page.status = Page.DRAFT
+            page.parent = tree[-1]
             page.save()
+            if first:
+                first = False
+                page.move_to(target, position)
+            page.sites = [site]
             for title in titles:
                 title.pk = None
                 title.page = page
                 title.save()
-            last = page
+            ptree = []
+            for p in plugins:
+                plugin, cls = p.get_plugin_instance()
+                p.page = page
+                p.pk = None
+                p.id = None
+                p.tree_id = None
+                p.lft = None
+                p.rght = None
+                if p.parent:
+                    pdif = p.level - ptree[-1].level
+                    if pdif < 0:
+                        ptree = ptree[:pdif-1]
+                    p.parent = ptree[-1]
+                    if pdif != 0:
+                        ptree.append(p)
+                else:
+                    ptree = [p]
+                p.level = None
+                p.save()
+                if plugin:
+                    plugin.pk = p.pk
+                    plugin.id = p.pk
+                    plugin.page = page
+                    plugin.tree_id = p.tree_id
+                    plugin.lft = p.lft
+                    plugin.rght = p.rght
+                    plugin.level = p.level
+                    plugin.cmsplugin_ptr = p
+                    plugin.save()
+            if dif != 0:
+                tree.append(page)
     
     def save(self, no_signals=False):
         # Published pages should always have a publication date
@@ -246,6 +274,24 @@ class Page(models.Model):
         get the title of the page depending on the given language
         """
         return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
+    
+    def get_menu_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+        """
+        get the menu title of the page depending on the given language
+        """
+        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, version_id, force_reload)
+        if not menu_title:
+            return self.get_title(language, True, version_id, force_reload)
+        return menu_title
+    
+    def get_page_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+        """
+        get the page title of the page depending on the given language
+        """
+        page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
+        if not page_title:
+            return self.get_title(language, True, version_id, force_reload)
+        return page_title
 
     def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
@@ -482,15 +528,17 @@ except mptt.AlreadyRegistered:
 
 
 class Title(models.Model):
-    language = models.CharField(_("language"), max_length=3, db_index=True)
+    language = models.CharField(_("language"), max_length=5, db_index=True)
     title = models.CharField(_("title"), max_length=255)
+    menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
-    meta_description = models.TextField(_("description"), max_length=255)
-    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True)
+    meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
+    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
+    page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
@@ -542,9 +590,11 @@ class EmptyTitle(object):
     path = ""
     meta_description = ""
     meta_keywords = ""
+    redirect = ""
     has_url_overwite = False
     application_urls = ""
-    
+    menu_title = ""
+    page_title = ""
     
     @property
     def overwrite_url(self):
@@ -556,7 +606,7 @@ class CMSPlugin(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    language = models.CharField(_("language"), max_length=3, blank=False, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
@@ -572,9 +622,12 @@ class CMSPlugin(models.Model):
         from cms.plugin_pool import plugin_pool
         plugin_class = plugin_pool.get_plugin(self.plugin_type)
         plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
-        if plugin.model != CMSPlugin:
+        if plugin.model != CMSPlugin and self.__class__ == CMSPlugin:
+            # (if self is actually a subclass, getattr below would break)
             try:
                 instance = getattr(self, plugin.model.__name__.lower())
+                # could alternatively be achieved with:
+                # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
             except:
                 instance = None
         else:
@@ -592,7 +645,12 @@ class CMSPlugin(models.Model):
             return ""
             
     def get_media_path(self, filename):
-        return self.page.get_media_path(filename)
+        if self.page_id:
+            return self.page.get_media_path(filename)
+        else: # django 1.0.2 compatibility
+            today = date.today()
+            return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
+            
     
     def get_instance_icon_src(self):
         """

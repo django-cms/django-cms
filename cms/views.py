@@ -63,7 +63,6 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
     if current_page:  
         has_change_permissions = current_page.has_change_permission(request)
         request._current_page_cache = current_page
-        print current_page.get_redirect(language=lang)
         if current_page.get_redirect(language=lang):
             return HttpResponseRedirect(current_page.get_redirect(language=lang))
     else:

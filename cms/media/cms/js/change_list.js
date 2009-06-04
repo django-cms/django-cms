@@ -134,13 +134,8 @@ $(document).ready(function() {
 			if(id==null){
 				id = e.target.parentNode.id.split("copy-link-")[1];
 			}
-            var page_id = id
-            selected_page = page_id;
-            action = "copy";
-			$('a.move-target, span.move-target-container, span.line').show();
-            $('#page_'+page_id).addClass("selected")
-			$('#page_'+page_id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
-            $('#page_'+page_id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
+			selected_page = id;
+            action = mark_copy_node(id)
 			e.stopPropagation();
             return false;
         }
@@ -168,7 +163,6 @@ $(document).ready(function() {
             $('#page-row-'+page_id).addClass("selected");
             $('.move-target-container').hide();
             $('a.move-target, span.line, #move-target-'+page_id).show();
-            
 			e.stopPropagation();
             return false;
         }
@@ -217,17 +211,16 @@ $(document).ready(function() {
             if(action=="move") {
 				moveTreeItem(selected_page, target_id, position, tree)
                 $('.move-target-container').hide();
-            }
-            if(action=="copy") {
-				copyTreeItem(selected_page, target_id, position, tree)
+            }else if(action=="copy") {
+            	site = $('select#site-select')[0].value
+				copyTreeItem(selected_page, target_id, position, tree, site)
                 $('.move-target-container').hide();
-            }
-            if(action=="add") {
-                //var query = $.query.set('target', target_id).set('position', position).toString();
+            }else if(action=="add") {
                 site = $('select#site-select')[0].value
                 window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&position="+position+"&site="+site;
+            }else{
+            	console.log("no action defined!")
             }
-            //selected_page = false;
 			e.stopPropagation();
             return false;
         }
@@ -255,30 +248,80 @@ $(document).ready(function() {
 	$('select#site-select').change(function(event){
 		var id = this.value
 		var url = window.location.href
-		var get_args = false;
-		console.log(url)
-		
-		if(url.split("?").length>1){
-			get_args = true;
-			console.log("get args = true")
-		}
-		var splits = url.split("sites__id__exact=")
-		if(splits.length > 1){
-			window.location = splits[0] + "sites__id__exact=" + id + splits[1].substr(1,splits[1].length);
+		if(action=="copy"){
+			url = insert_into_url(url, "copy", selected_page);
 		}else{
-			if(get_args){
-				window.location = url + "&sites__id__exact=" + id
-			}else{
-				window.location = url + "?sites__id__exact=" + id
-			}
+			url = remove_from_url(url, "copy");
 		}
+		url = insert_into_url(url, "sites__id__exact", id)
+		window.location = url;
 	});
+	var copy_splits = window.location.href.split("copy=")
+	if(copy_splits.length > 1){
+		var id = copy_splits[1].split("&")[0];
+		selected_page = id;
+		action = mark_copy_node(id);
+		                                   
+	}
 	
 	// moderation checkboxes over livequery
 	$('div.col-moderator input').livequery(function() {
 		$(this).checkBox({addLabel:false});
 	});
 });
+
+
+function mark_copy_node(id){
+    
+	$('a.move-target, span.move-target-container, span.line').show();
+    $('#page_'+id).addClass("selected")
+	$('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
+    $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
+    return "copy"
+}
+
+function insert_into_url(url, name, value){
+	dash_splits = url.split("#")
+	url = dash_splits[0]
+	var splits = url.split(name + "=");
+	var get_args = false;
+	if(url.split("?").length>1){
+		get_args = true;
+	}
+	if(splits.length > 1){
+		var after = ""
+		if (splits[1].split("&").length > 1){
+			after = splits[1].split("&")[1];
+		}
+		url = splits[0] + name + "=" + value + "&" + after;
+	}else{
+		if(get_args){
+			url = url + "&" + name + "=" + value;
+		}else{
+			url = url + "?" + name + "=" + value;
+		}
+	}
+	if(dash_splits.length>1){
+		url += dash_splits[1]
+	}
+	return url
+}
+
+function remove_from_url(url, name){
+	var splits = url.split(name + "=");
+	if(splits.length > 1){
+		var after = ""
+		if (splits[1].split("&").length > 1){
+			after = splits[1].split("&")[1];
+		}
+		if (splits[0].substr(splits[0].length-2, splits[0]-length-1)=="?"){
+			url = splits[0] + after;
+		}else{
+			url = splits[0] + "&" + after;
+		}
+	}
+	return url;
+}
 
 
 function moveTreeItem(item_id, target_id, position, tree){
@@ -309,27 +352,16 @@ function moveTreeItem(item_id, target_id, position, tree){
 };
 
 
-function copyTreeItem(item_id, target_id, position, tree){
+function copyTreeItem(item_id, target_id, position, tree, site){
 
 	$.post("./"+item_id+"/copy-page/", {
             position:position,
-            target:target_id
+            target:target_id,
+            site:site
         },
         function(html) {
 			if(html=="ok"){
-				if (tree) {
-					/*var tree_pos = false;
-					if (position == "left") {
-						tree_pos = "before"
-					}else if (position == "right") {
-						tree_pos = "after"
-					}else {
-						tree_pos = "inside"
-					}
-					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false)*/
-				}else{
-					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"))
-				}
+				window.location=window.location.href
 			}else{
 				moveError($('#page_'+item_id + " div.col1:eq(0)"))   
 			}
