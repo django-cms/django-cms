@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
 from cms.models import Page, PageModeratorState
-from cms.utils.permissions import get_current_user
+from cms.utils.permissions import get_current_user, get_user_permission_level
 
 
 I_APPROVE = 100 # current user should approve page
@@ -24,7 +24,10 @@ def page_changed(page, old_page=None):
         (old_page and not old_page.published == page.published):
         action = page.published and PageModeratorState.ACTION_PUBLISH or PageModeratorState.ACTION_UNPUBLISH
         PageModeratorState(user=user, page=page, action=action).save()
-        
+    
+    # TODO: if page was changed, remove all approvements from hiher instances,
+    # but keep approvements by lover instances, if there are some
+    
 
 def update_moderation_message(page, message):
     """This is bit special.. It updates last page state made from current user
@@ -35,21 +38,17 @@ def update_moderation_message(page, message):
     If any page state is'nt found in last UPDATE_TOLERANCE seconds, a new state
     will be created instead of affecting old message.    
     """
-    print ">>> update message:", message
     
     UPDATE_TOLERANCE = 30 # max in last 30 seconds
     
     user = get_current_user()
     created = datetime.datetime.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
-    print "> created:", created
     try:
         state = page.pagemoderatorstate_set.filter(user=user, created__gt=created).order_by('-created')[0]
         # just state without message!!
         assert not state.message  
     except (IndexError, AssertionError):
         state = PageModeratorState(user=user, page=page, action=PageModeratorState.ACTION_CHANGED)
-    
-    
     
     state.message = message
     state.save()
@@ -68,10 +67,13 @@ def page_moderator_state(request, page):
         if state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request):
             try:
                 page.pagemoderator_set.get(user=request.user)
-                state = I_APPROVE
-                label = _('approve')
+                if not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
+                    # only if he didn't approve already...
+                    state = I_APPROVE
+                    label = _('approve')
             except ObjectDoesNotExist:
                 pass
+            
     elif not state is Page.MODERATOR_APPROVED:
         # if no moderator, we have just 2 states => changed / unchanged
         state = Page.MODERATOR_CHANGED
@@ -123,3 +125,34 @@ def get_test_moderation_level(page, user=None):
             
     moderator = qs.select_related()[0]
     return moderator.page.level, True
+
+
+def approve_page(request, page):
+    """Main approving function. Two things can happen here, depending on user
+    level:
+    
+    1.) User is somewhere in the approvement path, but not on the top. In this
+    case just mark this page as approved by this user.
+    
+    2.) User is on top of approvement path. Draft page with all dependencies 
+    will be `copied` to public model, page states log will be cleaned.  
+    
+    """
+    
+    moderation_level, moderation_required = get_test_moderation_level(page, request.user)
+        
+    if not moderator_should_approve(request, page):
+        # escape soon if there isn't any approvement required by this user
+        return
+    
+    if not moderation_required:
+        # this is a second case - user can publish changes
+        
+        print ">> approve: should publish!"
+        # clean log
+        page.pagemoderatorstate_set.all().delete()
+        page.moderator_state = Page.MODERATOR_APPROVED
+        page.save(change_state=False)
+    else:
+        # first case - just mark page as approved from this user
+        PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 

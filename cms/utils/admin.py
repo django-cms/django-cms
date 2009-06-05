@@ -1,6 +1,6 @@
 from django.contrib.sites.models import Site
 from cms import settings as cms_settings
-from cms.utils.moderator import page_moderator_state
+from cms.utils.moderator import page_moderator_state, I_APPROVE
 from cms.utils import get_language_from_request
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -29,6 +29,8 @@ def get_admin_menu_item_context(request, page, filtered=False):
         metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
             str(e[1]).lower() if isinstance(e[1], bool) else str(e[1])), md)) + "}"
     
+    moderator_state = page_moderator_state(request, page)
+    
     context = {
         'page': page,
         'site': site,
@@ -42,7 +44,8 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_permission,
         'has_moderate_permission': page.has_moderate_permission(request),
-        'page_moderator_state': page_moderator_state(request, page),
+        'page_moderator_state': moderator_state,
+        'moderator_should_approve': moderator_state['state'] is I_APPROVE,
         
         'CMS_PERMISSION': cms_settings.CMS_PERMISSION,
         'CMS_MODERATOR': cms_settings.CMS_MODERATOR,

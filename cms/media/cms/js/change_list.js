@@ -200,6 +200,15 @@ $(document).ready(function() {
             return true;
         }
 		
+		// quick approve
+		if(jtarget.hasClass("approve")) {
+            console.log('xxx');
+			var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+            reloadItem(jtarget, "/admin/cms/page/" + pageId + "/approve/?node=1", { });
+			e.stopPropagation();
+            return false;
+        }
+		
         if(jtarget.hasClass("move-target")) {
             if(jtarget.hasClass("left"))
                 var position = "left";

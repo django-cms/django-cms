@@ -1,4 +1,4 @@
-from django.template import loader, Context, RequestContext, TemplateDoesNotExist
+from django.template import loader, Context, TemplateDoesNotExist
 from django.template.loader_tags import ExtendsNode
 # must be imported like this for isinstance
 from django.templatetags.cms_tags import PlaceholderNode
@@ -14,7 +14,12 @@ def get_placeholders(request, template_name):
     except TemplateDoesNotExist:
         return []
     context = details(request, no404=True, only_context=True)
-    temp.render(RequestContext(request, context))
+    # this sucks - it requests context in admin and eats user messages,
+    # standard context will be hopefully enough here
+    
+    # temp.render(RequestContext(request, context))
+    temp.render(Context(context))
+    
     list = []
     placeholders_recursif(temp.nodelist, list)
     return list

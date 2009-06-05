@@ -82,7 +82,7 @@ class Page(models.Model):
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
     sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
     
-    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_CHANGED, blank=True)
+    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
     
     # Managers
     objects = PageManager()
@@ -175,8 +175,13 @@ class Page(models.Model):
             if dif != 0:
                 tree.append(page)
     
-    def save(self, no_signals=False):
+    def save(self, no_signals=False, change_state=True):
         # Published pages should always have a publication date
+        if not settings.CMS_MODERATOR or \
+            change_state and self.moderator_state is not Page.MODERATOR_CHANGED:
+            # always change state to need approvement when there is some change
+            self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+        
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
         # Drafts should not, unless they have been set to the future
@@ -486,8 +491,7 @@ class Page(models.Model):
             Q(page__tree_id=self.tree_id, page__level=self.level + 1, moderate_children=True) | \
             Q(page__pk=self.pk, moderate_page=True)
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
-    
-    
+       
         
 # Don't register the Page model twice.
 try:
@@ -815,7 +819,7 @@ class PageModeratorState(models.Model):
     class Meta:
         verbose_name=_('Page moderator state')
         verbose_name_plural=_('Page moderator states')
-        ordering = ('page', 'created')
+        ordering = ('page', '-created') # newer first
     
     css_class = lambda self: self.action.lower()
     

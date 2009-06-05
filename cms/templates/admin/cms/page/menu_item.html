@@ -70,6 +70,7 @@
 				{% endif %}
 			</label>{% endif %}
 			
+			{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
 			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 		</div>
 		
