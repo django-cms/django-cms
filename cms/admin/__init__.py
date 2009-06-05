@@ -5,7 +5,7 @@ from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins)
 from cms.admin.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin
+from cms.models import Page, Title, CMSPlugin, EmptyTitle
 from cms.plugin_pool import plugin_pool
 from cms.settings import CMS_MEDIA_URL
 from cms.utils import (get_template_from_request, has_page_add_permission, 
@@ -230,7 +230,10 @@ class PageAdmin(admin.ModelAdmin):
         else:
             form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
-            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+            try:
+                title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+            except:
+                title_obj = EmptyTitle()
             for name in ['slug',
                          'title',
                          'application_urls',
