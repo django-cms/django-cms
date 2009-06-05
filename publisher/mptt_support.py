@@ -23,7 +23,7 @@ Requirements:
 from django.db.models import signals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from publisher.models import Mptt
+from publisher.base import Mptt
 
 class MpttMeta:
     """Basic mptt configuration class - something like Meta in model
@@ -98,7 +98,7 @@ class MpttMeta:
 def install_mptt(cls, name, bases, attrs):
     """Installs mptt - modifies class attrs, and adds required stuff to them.
     """
-    
+
     if not Mptt in bases:
         return attrs 
     

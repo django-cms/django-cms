@@ -39,7 +39,4 @@ if 'reversion' in settings.INSTALLED_APPS:
         reversion.register(Store, follow=["cmsplugin_ptr", "storeitem_set"])
         reversion.register(StoreItem)
     except:
-        pass    
-
-
-print "store models()"
+        pass

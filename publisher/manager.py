@@ -2,8 +2,6 @@ from django.db import models
 from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
 from django.db.models.fields.related import RelatedField, add_lazy_relation
-from publisher.models import Publisher
-
     
 class PublisherManager(object):
     # common prefix for public class names
@@ -29,11 +27,14 @@ class PublisherManager(object):
         """This must be called after creation of all other models, thats why publisher
         must be last application in installed apps.
         """
-        while self.creation_registry: 
+        while self.creation_registry:
+            print "CR" 
             self._create_public_model(*self.creation_registry.pop())
                 
             
     def _create_public_model(self, cls, name, bases, attrs, origin_cls):
+        from publisher.base import Publisher
+        
         for attr, value in attrs.items():
             if isinstance(value, RelatedField):
                 
@@ -69,6 +70,4 @@ class PublisherManager(object):
         
         #print "> public model:", public_cls
         
-
-
 publisher_manager = PublisherManager()

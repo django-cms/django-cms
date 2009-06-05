@@ -202,7 +202,6 @@ $(document).ready(function() {
 		
 		// quick approve
 		if(jtarget.hasClass("approve")) {
-            console.log('xxx');
 			var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
             reloadItem(jtarget, "/admin/cms/page/" + pageId + "/approve/?node=1", { });
 			e.stopPropagation();

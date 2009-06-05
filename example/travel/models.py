@@ -150,5 +150,6 @@ class Destination(Publisher, Mptt):
     class Meta:
         verbose_name=_('Destination')
         verbose_name_plural=_('Destinations')
+        ordering = ('tree_id', 'lft',)
     
     __unicode__ = lambda self: self.name or unicode(self.place)

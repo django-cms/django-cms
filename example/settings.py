@@ -95,7 +95,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'publisher.pre_publisher', # pre publisher
+    #'publisher.pre_publisher', # pre publisher
     
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -119,9 +119,9 @@ INSTALLED_APPS = (
     # sample application
     'sampleapp',
     'store',
-    'travel', # simple app for testing publisher
+    #'travel', # simple app for testing publisher
     
-    'publisher.post_publisher', # post publisher
+    'publisher', # post publisher
 )
 
 gettext = lambda s: s

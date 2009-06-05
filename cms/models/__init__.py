@@ -1,4 +1,5 @@
 import urllib2
+from os.path import join
 from datetime import datetime, date
 from django.db import models
 from django.db.models import Q
@@ -10,9 +11,8 @@ from django.shortcuts import get_object_or_404
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
-from os.path import join
+from publisher import Publisher, Mptt
 from cms.utils.urlutils import urljoin
-
 import mptt
 from cms import settings
 from cms.models.managers import PageManager, TitleManager, PagePermissionsPermissionManager,\
@@ -53,7 +53,7 @@ ACCESS_CHOICES = (
 #if not settings.CMS_TAGGING:
 #    tagging = False
 
-class Page(models.Model):
+class Page(Publisher, Mptt):
     """
     A simple hierarchical page model
     """
@@ -494,10 +494,10 @@ class Page(models.Model):
        
         
 # Don't register the Page model twice.
-try:
-    mptt.register(Page)
-except mptt.AlreadyRegistered:
-    pass
+#try:
+#    mptt.register(Page)
+#except mptt.AlreadyRegistered:
+#    pass
 
 
 class Title(models.Model):
