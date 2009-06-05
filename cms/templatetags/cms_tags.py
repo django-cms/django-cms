@@ -48,31 +48,40 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                    'sites__domain' : site.domain,
                    'level__lte' : to_level}
         #check the ancestors for softroots
+        print alist
+        soft_root_start = 0
         for p in alist:
             ancestors.append(p[0])
+            print p
             if p[1]:
                 soft_root = Page.objects.get(pk=p[0])
                 filters['lft__gte'] = soft_root.lft
                 filters['rght__lte'] = soft_root.rght
                 filters['tree_id'] = soft_root.tree_id
                 from_level = soft_root.level
+                soft_root_start = soft_root.level
+        print 
         if current_page and current_page.soft_root: 
             filters['tree_id'] = current_page.tree_id
             filters['lft__gte'] = current_page.lft
             filters['rght__lte'] = current_page.rght
             from_level = current_page.level
+            soft_root_start = current_page.level
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
+        print filters
+        
         pages = Page.objects.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
+        print pages
         pages = list(pages)
         all_pages = pages[:]
         last = None
         for page in pages:# build the tree
             if page.level >= from_level:
                 ids.append(page.pk)
-            if page.level == 0:
+            if page.level == 0 or page.level == soft_root_start:
                 page.ancestors_ascending = []
                 children.append(page)
                 if current_page and page.pk == current_page.pk and current_page.soft_root:
