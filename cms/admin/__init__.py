@@ -126,6 +126,8 @@ class PageAdmin(admin.ModelAdmin):
                 version = int(url.split("/")[-1])
                 revert_plugins(request, version)
                 return resp
+        if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
+            url = url.split("/?")[0]
         return super(PageAdmin, self).__call__(request, url)
 
     def save_model(self, request, obj, form, change):
