@@ -14,7 +14,9 @@ from cms.urlutils import urljoin
 
 import mptt
 from cms import settings
-from cms.models.managers import PageManager, PagePermissionManager, TitleManager
+from cms.models.managers import PageManager, TitleManager
+if settings.CMS_PERMISSION:
+    from cms.models.managers import PagePermissionManager
 from cms.models import signals as cms_signals
 
 
