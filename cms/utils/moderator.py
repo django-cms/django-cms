@@ -123,3 +123,9 @@ def get_test_moderation_level(page, user=None):
             
     moderator = qs.select_related()[0]
     return moderator.page.level, True
+
+
+def approve_page(page, user):
+    """Main approving function.
+    """
+    pass

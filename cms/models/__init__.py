@@ -486,8 +486,7 @@ class Page(models.Model):
             Q(page__tree_id=self.tree_id, page__level=self.level + 1, moderate_children=True) | \
             Q(page__pk=self.pk, moderate_page=True)
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
-    
-    
+       
         
 # Don't register the Page model twice.
 try:

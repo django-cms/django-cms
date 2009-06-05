@@ -38,7 +38,8 @@ from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 
 from cms.utils.moderator import update_moderation_message,\
-    get_test_moderation_level, moderator_should_approve
+    get_test_moderation_level, moderator_should_approve, approve_page
+from django.core.urlresolvers import reverse
 
 PAGE_ADMIN_INLINES = []
 
@@ -301,7 +302,7 @@ class PageAdmin(admin.ModelAdmin):
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url
         
-        info = "%sadmin_%s_%s_cms" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
+        info = "%sadmin_%s_%s" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
         
         url_patterns = patterns('',
             url(r'^(?:[0-9]+)/add-plugin/$',
@@ -328,11 +329,9 @@ class PageAdmin(admin.ModelAdmin):
             url(r'^([0-9]+)/copy-page/$',
                 self.admin_site.admin_view(self.copy_page),
                 name='%s_moderation_states' % info),                
-                
             url(r'^([0-9]+)/change-status/$',
                 self.admin_site.admin_view(change_status),
                 name='%s_change_status' % info),
-
             url(r'^([0-9]+)/change-navigation/$',
                 self.admin_site.admin_view(change_innavigation),
                 name='%s_change_navigation' % info),
@@ -345,6 +344,10 @@ class PageAdmin(admin.ModelAdmin):
             url(r'^(?:[0-9]+)/(?:((history|version)))/([0-9]+)/$',
                 self.admin_site.admin_view(revert_plugins),
                 name='%s_revert_plugins' % info),
+            # approve page
+            url(r'^([0-9]+)/approve/$',
+                self.admin_site.admin_view(self.approve_page),
+                name='%s_approve_page' % info),
         )
         
         url_patterns.extend(super(PageAdmin, self).get_urls())
@@ -525,7 +528,6 @@ class PageAdmin(admin.ModelAdmin):
         else:
             template = get_template_from_request(request, obj)
             moderation_level, moderation_required = get_test_moderation_level(obj, request.user)
-            
             extra_context = {
                 'placeholders': get_placeholders(request, template),
                 'language': get_language_from_request(request),
@@ -733,7 +735,22 @@ class PageAdmin(admin.ModelAdmin):
             'page': page,
         }
         return render_to_response('admin/cms/page/moderation_messages.html', context)
-
+    
+    def approve_page(self, request, page_id):
+        """Approve changes on current page by user from request.
+        """
+        
+        #TODO: change to POST method !! get isn't safe
+        
+        page = get_object_or_404(Page, id=page_id)
+        if not page.has_moderate_permission(request):
+            raise Http404()
+        
+        approve_page(page, request.user)
+        
+        self.message_user(request, _('Page was successfully approved.'))
+        return HttpResponseRedirect(reverse('admin_cms_page_change', args=[page_id]))
+        
 
 class PageAdminMixins(admin.ModelAdmin):
     pass
