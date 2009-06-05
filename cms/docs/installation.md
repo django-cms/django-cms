@@ -55,7 +55,7 @@ If you don't have already a gettext stub in your settings.py put this in your se
 	
 This allows you to use gettext in the settings.py
 
-Add some template names you use and that have some placeholder templatetags present to your settings.py
+Add some templates you want to use within Django-cms 2.0 that contain at least one {% placeholder %} templatetag, to your settings.py
 	
 	CMS_TEMPLATES = (
     	('base.html', gettext('default')),
