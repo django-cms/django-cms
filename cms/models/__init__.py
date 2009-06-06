@@ -14,9 +14,7 @@ from cms.urlutils import urljoin
 
 import mptt
 from cms import settings
-from cms.models.managers import PageManager, TitleManager
-if settings.CMS_PERMISSION:
-    from cms.models.managers import PagePermissionManager
+from cms.models.managers import PageManager, PagePermissionManager, TitleManager
 from cms.models import signals as cms_signals
 
 
@@ -416,41 +414,40 @@ try:
 except mptt.AlreadyRegistered:
     pass
 
-if settings.CMS_PERMISSION:
-    class PagePermission(models.Model):
-        """
-        Page permission object
-        """
-        
-        ALLPAGES = 0
-        THISPAGE = 1
-        PAGECHILDREN = 2
-        
-        TYPES = (
-            (ALLPAGES, _('All pages')),
-            (THISPAGE, _('This page only')),
-            (PAGECHILDREN, _('This page and all childrens')),
-        )
-        
-        type = models.IntegerField(_("type"), choices=TYPES, default=0)
-        page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
-        user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
-        group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
-        everybody = models.BooleanField(_("everybody"), default=False)
-        can_edit = models.BooleanField(_("can edit"), default=True)
-        can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
-        can_publish = models.BooleanField(_("can publish"), default=True)
-        #can_change_innavigation = models.BooleanField(_("can change in-navigation"), default=True)
-        
-        
-        objects = PagePermissionManager()
-        
-        def __unicode__(self):
-            return "%s :: %s" % (self.user, unicode(PagePermission.TYPES[self.type][1]))
-        
-        class Meta:
-            verbose_name = _('Page Permission')
-            verbose_name_plural = _('Page Permissions')
+class PagePermission(models.Model):
+    """
+    Page permission object
+    """
+
+    ALLPAGES = 0
+    THISPAGE = 1
+    PAGECHILDREN = 2
+
+    TYPES = (
+        (ALLPAGES, _('All pages')),
+        (THISPAGE, _('This page only')),
+        (PAGECHILDREN, _('This page and all childrens')),
+    )
+
+    type = models.IntegerField(_("type"), choices=TYPES, default=0)
+    page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
+    user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
+    group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
+    everybody = models.BooleanField(_("everybody"), default=False)
+    can_edit = models.BooleanField(_("can edit"), default=True)
+    can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
+    can_publish = models.BooleanField(_("can publish"), default=True)
+    #can_change_innavigation = models.BooleanField(_("can change in-navigation"), default=True)
+
+
+    objects = PagePermissionManager()
+
+    def __unicode__(self):
+        return "%s :: %s" % (self.user, unicode(PagePermission.TYPES[self.type][1]))
+
+    class Meta:
+        verbose_name = _('Page Permission')
+        verbose_name_plural = _('Page Permissions')
             
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=5, db_index=True)
