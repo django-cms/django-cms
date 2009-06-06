@@ -1,9 +1,7 @@
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
-from cms.models import Title, Page
+from cms.models import Title, PagePermission, Page
 from cms import settings
-if settings.CMS_PERMISSION:
-    from cms.models import PagePermission
 from cms.utils import get_language_from_request, find_children
 from django.contrib.sites.models import Site
 
