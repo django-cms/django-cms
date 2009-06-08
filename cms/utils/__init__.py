@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from cms import settings
+from cms.utils.moderator import get_page_model
 
 # !IMPORTANT: Page cant be imported here, because we will get cyclic import!!
 
@@ -92,11 +93,11 @@ def get_page_from_request(request):
         return resp['current_page']
 
 
-def make_tree(items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
+def make_tree(request, items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
-    from cms.models import Page
+    PageModel = get_page_model(request)
     
     levels -= 1
     current_level += 1
@@ -113,11 +114,11 @@ def make_tree(items, levels, url, ancestors, descendants=False, current_level=0,
             found = True
             last = None
             for anc in ancestors:
-                if not isinstance(anc, Page) and last:
+                if not isinstance(anc, PageModel) and last:
                     last = None
                     if hasattr(last, 'childrens'):
                         for child in last.childrens:
-                            if isinstance(child, Page):
+                            if isinstance(child, PageModel):
                                 child.sibling = True
                 else:
                     last = anc
@@ -125,14 +126,14 @@ def make_tree(items, levels, url, ancestors, descendants=False, current_level=0,
             if last:
                 if hasattr(last, 'childrens'):
                     for child in last.childrens:
-                        if isinstance(child, Page):
+                        if isinstance(child, PageModel):
                             child.sibling = True
         elif found:
             item.sibling = True
         if levels == 0 and not hasattr(item, "ancestor" ) or item.level == to_levels:
             item.childrens = []
         else:
-            make_tree(item.childrens, levels, url, ancestors+[item], descendants, current_level, to_levels, active_levels) 
+            make_tree(request, item.childrens, levels, url, ancestors+[item], descendants, current_level, to_levels, active_levels) 
     if found:
         for item in items:
             if not hasattr(item, "selected"):
@@ -152,8 +153,8 @@ def get_extended_navigation_nodes(request, levels, ancestors, current_level, to_
             if anc.selected:
                 descendants = True
     if len(ancestors) and hasattr(ancestors[-1], 'ancestor'):
-        make_tree(items, 100, request.path, ancestors, descendants, current_level, 100, active_levels)
-    make_tree(items, levels, request.path, ancestors, descendants, current_level, to_levels, active_levels)
+        make_tree(request, items, 100, request.path, ancestors, descendants, current_level, 100, active_levels)
+    make_tree(request, items, levels, request.path, ancestors, descendants, current_level, to_levels, active_levels)
     if mark_sibling:
         for item in items:
             if not hasattr(item, "selected" ):

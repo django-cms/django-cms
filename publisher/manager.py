@@ -28,7 +28,6 @@ class PublisherManager(object):
         must be last application in installed apps.
         """
         while self.creation_registry:
-            print "CR" 
             self._create_public_model(*self.creation_registry.pop())
                 
             

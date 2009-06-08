@@ -1,3 +1,4 @@
+from publisher.errors import MpttCantPublish
 import urllib2
 from os.path import join
 from datetime import datetime, date
@@ -60,11 +61,14 @@ class Page(Publisher, Mptt):
     MODERATOR_CHANGED = 0
     MODERATOR_NEED_APPROVEMENT = 1
     MODERATOR_APPROVED = 10
+    # special case - page was approved, but some of page parents if not approved yet
+    MODERATOR_APPROVED_WAITING_FOR_PARENTS = 11
     
     moderator_state_choices = (
         (MODERATOR_CHANGED, _('changed')),
         (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
         (MODERATOR_APPROVED, _('approved')),
+        (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
     
     author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
@@ -177,10 +181,15 @@ class Page(Publisher, Mptt):
     
     def save(self, no_signals=False, change_state=True):
         # Published pages should always have a publication date
+        publish_directly = False
         if not settings.CMS_MODERATOR or \
             change_state and self.moderator_state is not Page.MODERATOR_CHANGED:
             # always change state to need approvement when there is some change
             self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+                
+            if self.pk and not self.get_moderator_queryset().count():
+                # existing page without moderator - publish it directly
+                publish_directly = True
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -198,6 +207,10 @@ class Page(Publisher, Mptt):
             super(Page, self).save_base(cls=self.__class__)
         else:
             super(Page, self).save()
+            
+        if publish_directly:
+            print ">>>>>>>>> Publish directly"
+            self.publish()
             
     def get_calculated_status(self):
         """
@@ -480,18 +493,62 @@ class Page(Publisher, Mptt):
                 pass
         return None
     
-    def get_moderator_set(self):
+    def get_moderator_queryset(self):
         """Returns ordered set of all PageModerator instances, which should 
-        moderate this instance
+        moderate this page
         """
         if not settings.CMS_MODERATOR:
             return PageModerator.objects.get_empty_query_set()
         
-        q = Q(page__tree_id=self.tree_id, page__level__gte=self.level, moderate_descendants=True) | \
-            Q(page__tree_id=self.tree_id, page__level=self.level + 1, moderate_children=True) | \
+        q = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
+            Q(page__tree_id=self.tree_id, page__level=self.level - 1, moderate_children=True) | \
             Q(page__pk=self.pk, moderate_page=True)
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
-       
+    
+    def is_approved(self):
+        """Returns true, if page is approved and published, or approved, but
+        parents are missing..
+        """
+        return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+    
+    def publish(self):
+        """Overrides Publisher method, because there may be some descendants, which
+        are waiting for parent to publish, so publish them if possible. 
+        
+        IMPORTANT: @See utils.moderator.approve_page for publishing permissions
+        
+        Returns: True if page was successfully published.
+        """
+        # clean moderation log
+        self.pagemoderatorstate_set.all().delete()
+        
+        # can be this page published?
+        if self.mptt_can_publish():
+            self.moderator_state = Page.MODERATOR_APPROVED
+        else:
+            self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
+        
+        self.save(change_state=False)
+        
+        # TODO: create new version
+        
+        # publish, but only if all parents are published!! - this will need a flag
+        try:
+            published = super(Page, self).publish()
+        except MpttCantPublish:
+            return 
+        
+        # page was published, check if there are some childs, which are waiting
+        # for publishing (because of the parent)
+        publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+        for page in publish_set:
+            print ">> publish children:", page
+            # recursive call to all childrens....
+            page.moderator_state = Page.MODERATOR_APPROVED
+            page.save(change_state=False)
+            page.publish()
+        
+        return published
         
 # Don't register the Page model twice.
 #try:
@@ -500,7 +557,7 @@ class Page(Publisher, Mptt):
 #    pass
 
 
-class Title(models.Model):
+class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
@@ -574,7 +631,7 @@ class EmptyTitle(object):
         return None
     
     
-class CMSPlugin(models.Model):
+class CMSPlugin(Publisher, Mptt):
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
@@ -645,10 +702,10 @@ class CMSPlugin(models.Model):
         else:
             return u''
         
-try:
-    mptt.register(CMSPlugin)
-except mptt.AlreadyRegistered:
-    pass
+#try:
+#    mptt.register(CMSPlugin)
+#except mptt.AlreadyRegistered:
+#    pass
 
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])

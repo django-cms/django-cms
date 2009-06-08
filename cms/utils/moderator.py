@@ -74,9 +74,9 @@ def page_moderator_state(request, page):
             except ObjectDoesNotExist:
                 pass
             
-    elif not state is Page.MODERATOR_APPROVED:
+    elif not page.is_approved():
         # if no moderator, we have just 2 states => changed / unchanged
-        state = Page.MODERATOR_CHANGED
+        state = Page.MODERATOR_NEED_APPROVEMENT
     
     if not label:
         label = dict(page.moderator_state_choices)[state]
@@ -105,7 +105,7 @@ def get_test_moderation_level(page, user=None):
     if not cms_settings.CMS_MODERATOR or (user and user.is_superuser):
         return 0, False
     
-    qs = page.get_moderator_set()
+    qs = page.get_moderator_queryset()
         
     if qs.filter(user__is_superuser=True).count():
         return 0, True
@@ -138,7 +138,6 @@ def approve_page(request, page):
     will be `copied` to public model, page states log will be cleaned.  
     
     """
-    
     moderation_level, moderation_required = get_test_moderation_level(page, request.user)
         
     if not moderator_should_approve(request, page):
@@ -147,12 +146,20 @@ def approve_page(request, page):
     
     if not moderation_required:
         # this is a second case - user can publish changes
-        
-        print ">> approve: should publish!"
-        # clean log
-        page.pagemoderatorstate_set.all().delete()
-        page.moderator_state = Page.MODERATOR_APPROVED
-        page.save(change_state=False)
+        page.publish()
     else:
         # first case - just mark page as approved from this user
         PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 
+        
+        
+def get_page_model(request=None):
+    """Decides which Page model should be used - Draft, or PublicPage depending
+    on request. 
+    
+    !IMPORTANT: All scripts should request Page from here...
+    """
+    
+    if request and 'preview' in request.GET and 'draft' in request.GET \
+        and request.user.is_staff:
+        return Page
+    return Page.PublicModel

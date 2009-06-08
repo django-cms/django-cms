@@ -4,6 +4,7 @@ from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
 from django.db.models.fields.related import RelatedField
 from django.core.exceptions import ObjectDoesNotExist
+from publisher.errors import MpttCantPublish
 
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
@@ -20,9 +21,14 @@ class Publisher(models.Model):
                 relation to self, or there is any cyclic relation back to 
                 current model, this relation will not be included.
                  
-        Returns: saved published instance.
+        Returns: published instance
         """
+        
         assert self.pk is not None, "Can publish only saved instance, save it first."
+        
+        if hasattr(self, "mptt_can_publish") and not self.mptt_can_publish():
+            # this model is also mptt model, and self.parent isn't published
+            raise MpttCantPublish
         
         if fields is None:
             fields = self._meta.fields
@@ -31,21 +37,39 @@ class Publisher(models.Model):
             exclude = []
         exclude.append(self.__class__)
         
-        copy = self.Public(origin=self)
+        public_copy = self.PublicModel(origin=self)
         for field in fields:
             value = getattr(self, field.name)
             if isinstance(field, RelatedField):
+                print self, field, field.rel.to
                 related = field.rel.to
                 if issubclass(related, Publisher):
                     if not related in exclude and value:
                         # can follow
-                        value = value.publish(exclude=exclude)
+                        try:
+                            value = value.publish(exclude=exclude)
+                        except MpttCantPublish:
+                            pass
                     else: 
-                        continue                    
-            setattr(copy, field.name, value)
+                        continue
+            setattr(public_copy, field.name, value)        
         # publish copy
-        self.publish_save(copy)
-        return copy
+        self.publish_save(public_copy)
+        
+        # update many to many relations
+        for field in self._meta.many_to_many:
+            name = field.name
+            m2m_manager = getattr(self, name)
+            public_m2m_manager = getattr(public_copy, name)
+            
+            # clear public manager first!
+            public_m2m_manager.remove()
+            
+            for obj in m2m_manager.all():
+                public_m2m_manager.add(obj.pk)
+            
+        return public_copy
+    
     
     def publish_save(self, copy):
         """Save method for object which should be published. Received instance
@@ -54,7 +78,7 @@ class Publisher(models.Model):
         if hasattr(self, '_is_mptt_model'):
             # ugly hack because of mptt - does'nt fires signal
             return copy.save_base(cls=copy.__class__)
-        copy.save()
+        return copy.save()
     
     def delete(self):
         """Delete published object first if exists.
@@ -75,8 +99,18 @@ class Mptt(models.Model):
     """
     class Meta:
         abstract = True
-    
-
+        
+    def mptt_can_publish(self):
+        """Returns current state of mptt node - if it can be published.
+        In case when node parent exists, check if parent is published.
+        """
+        try:
+            public_parent = self.parent.public
+        except ObjectDoesNotExist:
+            return False
+        except AttributeError:
+            pass
+        return True
 
 def install_publisher():
     """Check if publisher isn't installed already, install it otherwise. But 

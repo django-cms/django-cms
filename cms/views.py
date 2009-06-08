@@ -2,11 +2,11 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from cms import settings
-from cms.models import Page
 from cms.utils import auto_render, get_template_from_request, get_language_from_request
 from django.db.models.query_utils import Q
 from cms.appresolver import applications_page_check
 from django.contrib.sites.models import Site
+from cms.utils.moderator import get_page_model
 
 def _get_current_page(path, lang, queryset):
     """Helper for getting current page from path depending on language
@@ -25,13 +25,22 @@ def _get_current_page(path, lang, queryset):
         return None
 
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
+    # get the right model
+    PageModel = get_page_model(request)
+    
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
     if 'preview' in request.GET.keys():
-        pages = Page.objects.all()
+        pages = PageModel.objects.all()
     else:
-        pages = Page.objects.published()
+        pages = PageModel.objects.published()
+    
+    print "1> ", pages
+        
     root_pages = pages.filter(parent__isnull=True).order_by("tree_id")
+    
+    print "RP", root_pages
+    
     current_page, response = None, None
     if root_pages:
         if page_id:
