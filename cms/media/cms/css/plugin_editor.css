@@ -65,6 +65,8 @@ ul.plugin-list .drag{
 ul.plugin-list .text{
 	float:left;
 	width:255px;
+	height:25px;
+	overflow: hidden;
 }
 ul.plugin-list span.delete{
 	float:left;

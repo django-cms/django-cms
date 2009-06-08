@@ -530,10 +530,15 @@ class CMSPlugin(models.Model):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
+    def __unicode__(self):
+        return ""
+    
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
     
+    def get_short_description(self):
+        return self.get_plugin_instance()[0].__unicode__()        
     
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
@@ -592,6 +597,8 @@ class CMSPlugin(models.Model):
             return unicode(plugin.icon_alt(instance))
         else:
             return u''
+        
+    
         
 try:
     mptt.register(CMSPlugin)
