@@ -90,3 +90,13 @@
 		<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div>
 	</div>
 </div>
+
+ 
+{% comment %}
+<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+				<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>
+				<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
+				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+				<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>
+-->
+{% endcomment %}

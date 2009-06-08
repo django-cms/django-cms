@@ -64,15 +64,12 @@ def page_moderator_state(request, page):
     state, label = page.moderator_state, None
     
     if cms_settings.CMS_MODERATOR:
-        if state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request):
-            try:
-                page.pagemoderator_set.get(user=request.user)
-                if not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
-                    # only if he didn't approve already...
-                    state = I_APPROVE
-                    label = _('approve')
-            except ObjectDoesNotExist:
-                pass
+        if state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request) \
+            and page.get_moderator_queryset().filter(user=request.user).count() \
+            and not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
+                # only if he didn't approve already...
+                state = I_APPROVE
+                label = _('approve')
             
     elif not page.is_approved():
         # if no moderator, we have just 2 states => changed / unchanged
@@ -80,13 +77,13 @@ def page_moderator_state(request, page):
     
     if not label:
         label = dict(page.moderator_state_choices)[state]
+    
     return dict(state=state, label=label)
 
 
 def moderator_should_approve(request, page):
     """Says if user should approve given page. (just helper)
     """
-    print ">> pms:", page_moderator_state(request, page)
     return page_moderator_state(request, page)['state'] is I_APPROVE
 
 

@@ -95,13 +95,25 @@ $(document).ready(function() {
 			data['fitlered'] = 1;
 		}
 		
-		$.post(url, data, function(response){
+		
+		 $.post(url, data, function(response){
 			if (callback) callback(response);
 			var target = $(el).parents('div.cont:first');
 			var parent = target.parent();
 			target.replace(response);
 			parent.find('div.cont:first').yft();
-		})
+		});
+		 
+		/*
+		$.post(url, data, function(response){
+			if (callback) callback(response);
+			var target = $(el).parents('li[id^=page_]:first');
+			var id = $(target).attr('id');
+			target.replace(response);
+			$('#' + id).find('div.cont:first').yft();
+		});
+		tree.refresh();
+		*/
 	}
     
     // let's start event delegation

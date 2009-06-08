@@ -6,13 +6,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
 from cms import settings as cms_settings
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
-from cms.utils import get_language_from_request
-from cms.utils.moderator import page_moderator_state
 from cms.utils.admin import get_admin_menu_item_context
 
 register = template.Library()
 
-def show_admin_menu(context, page, no_children=False, level=None):
+def show_admin_menu(context, page):# , no_children=False):
     """Render the admin table of pages"""
     request = context['request']
     
@@ -20,12 +18,6 @@ def show_admin_menu(context, page, no_children=False, level=None):
         filtered = context['cl'].is_filtered()
     elif context.has_key('filtered'):
         filtered = context['filtered']
-    
-    # level is used to add a left margin on table row
-    if level is None:
-        level = 0
-    else:
-        level = level+2
     
     # following function is newly used for getting the context per item (line)
     # if something more will be required, then get_admin_menu_item_context
@@ -35,11 +27,9 @@ def show_admin_menu(context, page, no_children=False, level=None):
     
     # this here is just context specific for menu rendering - items itself does
     # not use any of following variables
-    context.update({
-        'children': page.childrens,
-        'no_children': no_children,
-        'level': level,
-    })
+    #context.update({
+    #    'no_children': no_children,
+    #})
     return context
 show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
                                          takes_context=True)(show_admin_menu)

@@ -182,11 +182,13 @@ class Page(Publisher, Mptt):
     def save(self, no_signals=False, change_state=True):
         # Published pages should always have a publication date
         publish_directly = False
-        if not settings.CMS_MODERATOR or \
-            change_state and self.moderator_state is not Page.MODERATOR_CHANGED:
-            # always change state to need approvement when there is some change
-            self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
-                
+        if not settings.CMS_MODERATOR or change_state:
+            if self.moderator_state is not Page.MODERATOR_CHANGED:
+                # always change state to need approvement when there is some change
+                self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+            
+            print ">> page.save() page moderators:", self.get_moderator_queryset().all()
+            
             if self.pk and not self.get_moderator_queryset().count():
                 # existing page without moderator - publish it directly
                 publish_directly = True

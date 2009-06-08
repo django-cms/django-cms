@@ -57,7 +57,10 @@ def render_admin_menu_item(request, page):
     """Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
     """
-    context = RequestContext(request)
+    
+    context = RequestContext(request, {
+    })
+    
     filtered = 'filtered' in request.REQUEST
     
     context.update(get_admin_menu_item_context(request, page, filtered))
