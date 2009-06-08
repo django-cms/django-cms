@@ -209,7 +209,7 @@ class Page(Publisher, Mptt):
             super(Page, self).save()
             
         if publish_directly:
-            print ">>>>>>>>> Publish directly"
+            print ">> Publish directly"
             self.publish()
             
     def get_calculated_status(self):

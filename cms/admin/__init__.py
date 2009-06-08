@@ -739,14 +739,13 @@ class PageAdmin(admin.ModelAdmin):
     
     def approve_page(self, request, page_id):
         """Approve changes on current page by user from request.
-        """
-        
-        #TODO: change to POST method !! get isn't safe
+        """        
+        #TODO: change to POST method !! get is not safe
         
         page = get_object_or_404(Page, id=page_id)
         if not page.has_moderate_permission(request):
             raise Http404()
-        
+
         approve_page(request, page)
         
         self.message_user(request, _('Page was successfully approved.'))
