@@ -2,6 +2,7 @@ from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 
 try:
     from threading import local
@@ -123,7 +124,7 @@ def get_subordinate_users(user):
     qs = User.objects.distinct().filter(
         Q(is_staff=True) &
         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
-        | (Q(extuser__created_by=user) & Q(pagepermission__page=None))
+        | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
     return qs
 
@@ -140,7 +141,7 @@ def get_subordinate_groups(user):
     
     qs = Group.objects.distinct().filter(
          (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
-        | (Q(extgroup__created_by=user) & Q(pagepermission__page=None))
+        | (Q(pageusergroup__created_by=user) & Q(pagepermission__page=None))
     )
     return qs
 
@@ -160,3 +161,22 @@ def has_add_page_on_same_level_permission(request, page):
     except AttributeError:
         pass
     return False
+
+def mail_page_user_change(user, created=False, password=""):
+    """Send email notification to given user. Used it PageUser profile creation/
+    update.
+    """
+    from cms.utils.mail import send_mail
+    
+    if created:
+        subject = _('CMS - your user account was created.')
+    else:
+        subject = _('CMS - your user account was changed.')
+    
+    context = {
+        'user': user,
+        'password': password or "*" * 8,
+        'created': created,
+    }
+    send_mail(subject, 'admin/cms/mail/page_user_change.txt', [user.email], context, 'admin/cms/mail/page_user_change.html')
+    

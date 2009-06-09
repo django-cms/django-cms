@@ -244,6 +244,7 @@ def save_all_plugins(request, page, excludes=None):
             plugin.save()
         
 def revert_plugins(request, version_id):
+    print ">> revert_plugins !"
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]

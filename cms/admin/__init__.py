@@ -6,6 +6,9 @@ from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.sites.models import Site
+from django.contrib.auth.models import User
+
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.forms import Widget, TextInput, Textarea, CharField, HiddenInput
@@ -15,14 +18,13 @@ from django.template.context import RequestContext
 from django.template.defaultfilters import title, escapejs, force_escape
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy, ugettext
+
+from django.utils.functional import curry
 from django.views.generic.create_update import redirect
-#from django import template
-from django.contrib.sites.models import Site
-from django.contrib.auth.models import User
 
 from cms import settings
 from cms.admin.change_list import CMSChangeList
-from cms.admin.forms import PageForm, ExtUserCreationForm
+from cms.admin.forms import PageForm, PageUserForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation)
@@ -31,7 +33,8 @@ from cms.models import Page, Title, CMSPlugin, PagePermission
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.permissions import has_page_add_permission,\
-    get_user_permission_level, has_global_change_permissions_permission
+    get_user_permission_level, has_global_change_permissions_permission,\
+    get_subordinate_users
 from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
@@ -41,7 +44,7 @@ from cms.utils.moderator import update_moderation_message,\
     get_test_moderation_level, moderator_should_approve, approve_page
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
-from django.utils.functional import curry
+
 
 PAGE_ADMIN_INLINES = []
 
@@ -50,8 +53,7 @@ PAGE_ADMIN_INLINES = []
 ################################################################################
 
 if settings.CMS_PERMISSION:
-    from cms.models import PagePermission, GlobalPagePermission, ExtUser, \
-        ExtGroup
+    from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
         
     from cms.admin.forms import PagePermissionInlineAdminForm
     
@@ -142,12 +144,15 @@ if settings.CMS_PERMISSION:
     
     from django.contrib.auth.admin import UserAdmin
     
-    class ExtUserAdmin(UserAdmin):
-        form = ExtUserCreationForm
+    class PageUserAdmin(UserAdmin):
+        form = PageUserForm
+        model = PageUser
+        
+        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'created_by')
         
         # get_fieldsets method may add fieldsets depending on user
         fieldsets = [
-            (None, {'fields': ('username', ('password1', 'password2'))}),
+            (None, {'fields': ('username', ('password1', 'password2'), 'notify_user')}),
             (_('User details'), {'fields': (('first_name', 'last_name'), 'email')}),
         ]
         
@@ -160,7 +165,7 @@ if settings.CMS_PERMISSION:
             
             models = (
                 (Page, _('Page permissions')),
-                (User, _('User permissions')),
+                (PageUser, _('User permissions')),
                 (PagePermission, _('Page permission management')),
             )
             
@@ -174,31 +179,29 @@ if settings.CMS_PERMISSION:
             
                 if fields:
                     fieldsets.append((title, {'fields': (fields,)}),)
+            
+            if not '/add' in request.path:
+                fieldsets[0] = (None, {'fields': ('username', 'notify_user')})
+                fieldsets.append((_('Password'), {'fields': ('password1', 'password2'), 'classes': ('collapse',)}))
             return fieldsets
         
+        def queryset(self, request):
+            qs = super(PageUserAdmin, self).queryset(request)
+            user_id_set = get_subordinate_users(request.user).values_list('id', flat=True)
+            return qs.filter(pk__in=user_id_set)
+            
+        
         def add_view(self, request):
-            return super(UserAdmin, self).add_view(request)
+            return super(UserAdmin, self).add_view(request)        
         
-        def has_add_permission(self, request):
-            """Allow add only in popup, this is a shortcut admin view, for other
-            operations might be used the auth user admin
-            """ 
-            if '_popup' in request.REQUEST and (request.user.is_superuser or \
-                request.user.has_perm(User._meta.app_label + '.' + User._meta.get_add_permission())):
-                return True
-            return False
-        
-        has_change_permission = lambda *args: False
-        has_delete_permission = lambda *args: False
     
-    admin.site.register(ExtUser, ExtUserAdmin)
+    admin.site.register(PageUser, PageUserAdmin)
+    
+    admin.site.register(PageUserGroup)
 
 ################################################################################
 # Page
 ################################################################################
-
-if 'reversion' in settings.INSTALLED_APPS:
-    from reversion import revision
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -343,9 +346,9 @@ class PageAdmin(admin.ModelAdmin):
             url(r'^([0-9]+)/jsi18n/$',
                 self.admin_site.admin_view(self.redirect_jsi18n),
                 name='%s_jsi18n' % info),
-            url(r'^(?:[0-9]+)/(?:((history|version)))/([0-9]+)/$',
-                self.admin_site.admin_view(revert_plugins),
-                name='%s_revert_plugins' % info),
+            
+            # NOTE: revert plugin is newly integrated in overriden revision_view
+             
             # approve page
             url(r'^([0-9]+)/approve/$',
                 self.admin_site.admin_view(self.approve_page),
@@ -545,7 +548,7 @@ class PageAdmin(admin.ModelAdmin):
                 'moderator_should_approve': moderator_should_approve(request, obj),
             }
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
-
+        
     def has_add_permission(self, request):
         """
         Return true if the current user has permission to add a new page.
@@ -620,6 +623,19 @@ class PageAdmin(admin.ModelAdmin):
             'admin/change_list.html'
         ], context, context_instance=RequestContext(request))
     
+    def revision_view(self, request, object_id, version_id, extra_context=None):
+        """This will be called only if is reversion installed. If its revert,
+        some plugins need to be restored...
+        """
+        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
+        
+        if request.method == 'POST' \
+            and ('history' in request.path or 'recover' in request.path) \
+            and response.status_code == 302:
+            # revert plugins
+            version = request.path.split("/")[-2]
+            revert_plugins(request, version)
+        return response
     
     def list_pages(self, request, template_name=None, extra_context=None):
         """
@@ -661,7 +677,8 @@ class PageAdmin(admin.ModelAdmin):
         # move page
         page.move_page(target, position)
         return HttpResponse("ok")
-
+    
+    
     def get_permissions(self, request, page_id):
         #if not obj.has_change_permissions_permission(request):
         print ">> get_permissions", page_id
@@ -754,7 +771,7 @@ class PageAdmin(admin.ModelAdmin):
             # if request comes from tree..
             return render_admin_menu_item(request, page)
         return HttpResponseRedirect('../../')
-        
+    
 
 class PageAdminMixins(admin.ModelAdmin):
     pass

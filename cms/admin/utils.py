@@ -14,7 +14,7 @@ def get_placeholders(request, template_name):
     except TemplateDoesNotExist:
         return []
     context = details(request, no404=True, only_context=True)
-    # this sucks - it requests context in admin and eats user messages,
+    # lacks - it requests context in admin and eats user messages,
     # standard context will be hopefully enough here
     
     # temp.render(RequestContext(request, context))

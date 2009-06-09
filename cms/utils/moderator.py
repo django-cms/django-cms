@@ -1,8 +1,7 @@
 import datetime
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
-from cms.models import Page, PageModeratorState
+from cms.models import Page, PageModeratorState, PageModerator
 from cms.utils.permissions import get_current_user
 
 
@@ -125,8 +124,11 @@ def get_test_moderation_level(page, user=None):
     else:
         if qs.filter(user__globalpagepermission__gt=0).count():
             return 0, True
-            
-    moderator = qs.select_related()[0]
+    
+    try:
+        moderator = qs.select_related()[0]
+    except IndexError:
+        return PageModerator.MAX_MODERATION_LEVEL, False
     return moderator.page.level, True
 
 def approve_page(request, page):
@@ -189,23 +191,18 @@ def mail_approvement_request(page, user=None):
     if not recipient_list:
         return
     
-    from django.core.mail import EmailMultiAlternatives
     from django.contrib import admin
     from django.contrib.sites.models import Site
     from cms.utils.urlutils import urljoin
+    from cms.utils.mail import send_mail
     
     site = Site.objects.get_current()
     
-    admin_url = "http://%s" % urljoin(site.domain, admin.site.root_path, 'cms/page', page.id)
-    
     subject = _('CMS - Page %s requires approvement.') % unicode(page)
+    
     context = {
         'page': page,
-        'admin_url': admin_url,
+        'admin_url': "http://%s" % urljoin(site.domain, admin.site.root_path, 'cms/page', page.id),
     }
-    txt_body = "Approve page here: %s" % page.get_absolute_url()
-    body = render_to_string('admin/cms/email/approvement_required.html', context)
-        
-    message = EmailMultiAlternatives(subject=subject, body=txt_body, to=recipient_list)
-    message.attach_alternative(body, 'text/html')
-    message.send(fail_silently=True)
+            
+    send_mail(subject, 'admin/cms/mail/approvement_required.txt', recipient_list, context, 'admin/cms/mail/approvement_required.html')

@@ -8,10 +8,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import BooleanField
 
 from cms import settings as cms_settings
-from cms.models import Page, Title, PagePermission, ExtUser, ACCESS_PAGE
+from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE
 from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
-    get_subordinate_groups
+    get_subordinate_groups, mail_page_user_change
 from cms.admin.widgets import UserSelectAdminWidget
 
     
@@ -160,42 +160,84 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         return instance
     
 
-class ExtUserCreationForm(UserCreationForm):
+class PageUserForm(UserCreationForm):
     can_add_page = forms.BooleanField(label=_('Can add page'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Can change page'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Can delete page'), required=False)
     
-    can_add_user = forms.BooleanField(label=_('Can create user'), required=False)
-    can_change_user = forms.BooleanField(label=_('Can change User'), required=False)
-    can_delete_user = forms.BooleanField(label=_('Can delete User'), required=False)
+    can_add_pageuser = forms.BooleanField(label=_('Can create user'), required=False)
+    can_change_pageuser = forms.BooleanField(label=_('Can change User'), required=False)
+    can_delete_pageuser = forms.BooleanField(label=_('Can delete User'), required=False)
     
     can_add_pagepermission = forms.BooleanField(label=_('Can add page permission'), required=False)
     can_change_pagepermission = forms.BooleanField(label=_('Can change page permission'), required=False)
     can_delete_pagepermission = forms.BooleanField(label=_('Can delete page permission'), required=False)
     
-    class Meta:
-        model = ExtUser
+    notify_user = forms.BooleanField(label=_('Notify user'), required=False, 
+        help_text=_('Send email notification to user about username or password change. Requires user email.'))
     
+    class Meta:
+        model = PageUser
+    
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+        super(PageUserForm, self).__init__(data, files, auto_id, prefix, 
+            initial, error_class, label_suffix, empty_permitted, instance)
+        
+        if instance:
+            # if it is a change form, keep those fields as not required
+            # password will be changed only if there is something entered inside
+            self.fields['password1'].required = False
+            self.fields['password1'].label = _('New password')
+            self.fields['password2'].required = False
+            self.fields['password2'].label = _('New password confirmation')
+        
+        self._password_change = True
+        
+    def clean_username(self):
+        if self.instance:
+            return self.cleaned_data['username']
+        return super(PageUserForm, self).clean_username()
+    
+    def clean_password2(self): 
+        if self.instance and self.cleaned_data['password1'] == '' and self.cleaned_data['password2'] == '':
+            self._password_change = False
+            return u''
+        return super(PageUserForm, self).clean_password2()
+
+    def clean(self):
+        cleaned_data = super(PageUserForm, self).clean()
+        notify_user = self.cleaned_data['notify_user']
+        if notify_user and not self.cleaned_data.get('email', None):
+            raise forms.ValidationError(_("Email notification requires valid email address."))
+        return cleaned_data
+
     def save(self, commit=True):
         """Create user, assign him to staff users, and create permissions for 
         him if required. Also assigns creator to user.
         """
-        user = super(ExtUserCreationForm, self).save(commit=False)
-        user.is_staff=True
+        Super = self._password_change and PageUserForm or UserCreationForm  
+        user = super(Super, self).save(commit=False)
+        
+        user.is_staff = True
         # assign creator to user
         user.created_by = get_current_user()
-        
-        models = (Page, User, PagePermission)
-        
+
         if commit:
             user.save()
+
+        if self.cleaned_data['notify_user']:
+            print "notify!!"
+            created = not bool(self.instance)
+            mail_page_user_change(user, created, self.cleaned_data['password1'])
+        
+        models = (Page, PageUser, PagePermission)
         
         for model in models:
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
             for t in ('add', 'change', 'delete'):
-                if not self.cleaned_data.get('can_%s_%s' % (t, name), None):
-                    continue
                 if not user.pk:
                     # save user, otherwise we can't assign permissions to him
                     user.save()
@@ -203,5 +245,9 @@ class ExtUserCreationForm(UserCreationForm):
                 # add permission `t` to model `model`
                 codename = getattr(model._meta, 'get_%s_permission' % t)()
                 permission = Permission.objects.get(content_type=content_type, codename=codename)
-                user.user_permissions.add(permission)
+                
+                if self.cleaned_data.get('can_%s_%s' % (t, name), None):
+                    user.user_permissions.add(permission)
+                else:
+                    user.user_permissions.remove(permission)
         return user

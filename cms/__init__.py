@@ -15,3 +15,14 @@ def validate_settings():
         raise ImproperlyConfigured('django-cms needs django-mptt installed.')
     
 validate_settings()
+
+
+def validate_dependencies():
+    # check for right version of reversions
+    if 'reversion' in d_settings.INSTALLED_APPS:
+        from reversion.admin import VersionAdmin
+        if not hasattr(VersionAdmin, 'get_urls'):
+            raise ImproperlyConfigured('django-cms requires never version of reversion (VersionAdmin must contain get_urls method)')
+
+validate_dependencies()
+    

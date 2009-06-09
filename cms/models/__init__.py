@@ -1,3 +1,4 @@
+import sys
 import urllib2
 from os.path import join
 from datetime import datetime, date
@@ -785,40 +786,42 @@ class PagePermission(AbstractPagePermission):
         return "%s :: %s has: %s" % (page, self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on][1]))
 
 
-class ExtUser(User):
+class PageUser(User):
     """Cms specific user data, required for permission system
     """
     created_by = models.ForeignKey(User, related_name="created_users")
     
     class Meta:
-        verbose_name = _('Extended user')
-        verbose_name_plural = _('Extended users')
+        verbose_name = _('User - page')
+        verbose_name_plural = _('Users - page')
     
     #__unicode__ = lambda self: unicode(self.user)
         
-class ExtGroup(models.Model):
+class PageUserGroup(Group):
     """Cms specific group data, required for permission system 
     """
-    group = models.OneToOneField(Group)
+    #group = models.OneToOneField(Group)
     created_by = models.ForeignKey(User, related_name="created_usergroups")
     
     class Meta:
-        verbose_name = _('Extended group')
-        verbose_name_plural = _('Extended groups')
+        verbose_name = _('User group - page')
+        verbose_name_plural = _('User groups - page')
         
-        __unicode__ = lambda self: unicode(self.group)
+    #__unicode__ = lambda self: unicode(self.group)
 
 
 ################################################################################
 # Moderation
 ################################################################################
-#MAX_MODERATION_LEVEL = 9999
 
 class PageModerator(models.Model):
     """Page moderator holds user / page / moderation type states. User can be 
     assigned to any page (to which he haves permissions), and say which 
     moderation depth he requires.
     """
+    
+    MAX_MODERATION_LEVEL = sys.maxint # just an number
+    
     page = models.ForeignKey(Page, verbose_name=_('Page')) 
     user = models.ForeignKey(User, verbose_name=_('User'))
     

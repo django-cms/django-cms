@@ -111,18 +111,18 @@ def post_save_user(instance, raw, created, **kwargs):
     if not creator or not created:
         return
     
-    from cms.models import ExtUser
+    from cms.models import PageUser
     from django.db import connection
     
     # i'm not sure if there is a workaround for this, somebody any ideas? What
-    # we are doing here is creating ExtUser on Top of existing user, i'll do it 
+    # we are doing here is creating PageUser on Top of existing user, i'll do it 
     # through plain SQL, its not nice, but...
     
     # TODO: find a better way than an raw sql !!
     
     cursor = connection.cursor()
     query = "INSERT INTO `%s` (`user_ptr_id`, `created_by_id`) VALUES (%d, %d)" % (
-        ExtUser._meta.db_table,
+        PageUser._meta.db_table,
         instance.pk, 
         creator.pk
     )
@@ -138,15 +138,25 @@ def post_save_user_group(instance, raw, created, **kwargs):
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
-    from cms.models import ExtGroup
     # read current user from thread locals
-    user = get_current_user()
-    if not user or not created:
+    creator = get_current_user()
+    if not creator or not created:
         return
-    # only if we got current user and this user object was created
-    ExtGroup(group=instance, created_by=user).save()
-
-
+    
+    from cms.models import PageUserGroup
+    from django.db import connection
+    
+    # TODO: same as in post_save_user - raw sql is just not nice - workaround...?
+    
+    cursor = connection.cursor()
+    query = "INSERT INTO `%s` (`group_ptr_id`, `created_by_id`) VALUES (%d, %d)" % (
+        PageUserGroup._meta.db_table,
+        instance.pk, 
+        creator.pk
+    )
+    cursor.execute(query) 
+    cursor.close()
+    
 if cms_settings.CMS_PERMISSION:
     # only if permissions are in use
     from django.contrib.auth.models import User, Group

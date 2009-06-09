@@ -35,11 +35,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
     else:
         pages = PageModel.objects.published()
     
-    print "1> ", pages
-        
     root_pages = pages.filter(parent__isnull=True).order_by("tree_id")
-    
-    print "RP", root_pages
     
     current_page, response = None, None
     if root_pages:
