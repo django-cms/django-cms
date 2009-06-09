@@ -383,7 +383,6 @@ class PagePermissionsPermissionManager(models.Manager):
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
         
-        
         from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
             MASK_CHILDREN, MASK_DESCENDANTS
             
@@ -400,16 +399,16 @@ class PagePermissionsPermissionManager(models.Manager):
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
         
         # default is denny...
-        
         page_id_allow_list = []
         for permission in qs:
             is_allowed = getattr(permission, attr)
             if is_allowed:
-                if permission.grant_on & MASK_PAGE:
+                # can add is special - we are actually adding page under current page
+                if permission.grant_on & MASK_PAGE or attr is "can_add":
                     page_id_allow_list.append(permission.page.id)
                 if permission.grant_on & MASK_CHILDREN:
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        print "> perm u:", user, "attr:", attr, page_id_allow_list
+        #print "> perm u:", user, "attr:", attr, page_id_allow_list
         return page_id_allow_list

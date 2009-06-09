@@ -1,9 +1,9 @@
 import datetime
-from django.core.exceptions import ObjectDoesNotExist
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
 from cms.models import Page, PageModeratorState
-from cms.utils.permissions import get_current_user, get_user_permission_level
+from cms.utils.permissions import get_current_user
 
 
 I_APPROVE = 100 # current user should approve page
@@ -24,6 +24,12 @@ def page_changed(page, old_page=None):
         (old_page and not old_page.published == page.published):
         action = page.published and PageModeratorState.ACTION_PUBLISH or PageModeratorState.ACTION_UNPUBLISH
         PageModeratorState(user=user, page=page, action=action).save()
+    
+    if ((old_page and not old_page.moderator_state == page.moderator_state) or not old_page) \
+        and page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT:
+        # update_moderation_message can be called after this :S -> recipient will not
+        # see the last message
+        mail_approvement_request(page, user)
     
     # TODO: if page was changed, remove all approvements from hiher instances,
     # but keep approvements by lover instances, if there are some
@@ -159,3 +165,47 @@ def get_page_model(request=None):
         and request.user.is_staff:
         return Page
     return Page.PublicModel
+
+
+def mail_approvement_request(page, user=None):
+    """Sends approvement request over email to all users which should approve 
+    this page if they have an email entered.
+    
+    Don't send it to current user - he should now about it, because he made the 
+    change.
+    """
+    if not cms_settings.CMS_MODERATOR or not page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT:
+        return
+    
+    recipient_list = []
+    for moderator in page.get_moderator_queryset():
+        email = moderator.user.email
+        if email and not email in recipient_list:
+            recipient_list.append(email)
+            
+    if user and user.email in recipient_list:
+        recipient_list.remove(user.email)
+        
+    if not recipient_list:
+        return
+    
+    from django.core.mail import EmailMultiAlternatives
+    from django.contrib import admin
+    from django.contrib.sites.models import Site
+    from cms.utils.urlutils import urljoin
+    
+    site = Site.objects.get_current()
+    
+    admin_url = "http://%s" % urljoin(site.domain, admin.site.root_path, 'cms/page', page.id)
+    
+    subject = _('CMS - Page %s requires approvement.') % unicode(page)
+    context = {
+        'page': page,
+        'admin_url': admin_url,
+    }
+    txt_body = "Approve page here: %s" % page.get_absolute_url()
+    body = render_to_string('admin/cms/email/approvement_required.html', context)
+        
+    message = EmailMultiAlternatives(subject=subject, body=txt_body, to=recipient_list)
+    message.attach_alternative(body, 'text/html')
+    message.send(fail_silently=True)

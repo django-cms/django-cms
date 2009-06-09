@@ -34,7 +34,7 @@ def urljoin(*segments):
     >>> urljoin('/a', '')
     '/a/'
     """
-    cleaned_segments = map(lambda segment: segment.strip("/"), segments)
+    cleaned_segments = map(lambda segment: unicode(segment).strip("/"), segments)
     nonempty_segments = filter(lambda segment: segment > "", cleaned_segments)
     url = ("/").join(nonempty_segments)
     

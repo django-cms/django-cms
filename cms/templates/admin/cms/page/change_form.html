@@ -98,6 +98,7 @@
 			
 			var submitActor;
 			var forceSubmit = false;
+			var seen = false;
 			
 			// change submit states, open dialog
 			$('#page_form').submit(function(event){
@@ -110,6 +111,12 @@
 			
 			function showDialog(event, actor) {
 				if (forceSubmit) return true; // escape sequence
+				
+				if (!seen) {
+					// show previously posted message if there were an error
+					$('#id_df_moderator_message').val($('#id_moderator_message').val());
+				}
+				seen = true
 				event.preventDefault();
 				submitActor = actor;
 				$('#dialog').dialog('open');

@@ -60,14 +60,16 @@
 
 {% block object-tools %}
 
-<ul class="object-tools">
-	{% if has_change_permission %}
-		<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
-	{% endif %}
-	{% if has_add_permission %}
-	<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
-	{% endif %}
-</ul>
+	<ul class="object-tools">
+		{% if has_change_permission %}
+			<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
+		{% endif %}
+		{% if has_add_permission %}
+		<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
+		{% endif %}
+	</ul>
+	
+	{% include "admin/cms/page/loading.html" %}
 
 {% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">

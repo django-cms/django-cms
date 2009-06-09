@@ -75,6 +75,24 @@ $(document).ready(function() {
     var selected_page = false;
     var action = false;
 	
+	var _oldAjax = $.ajax;
+	
+	$.ajax = function(s){
+		// just override ajax function, so the loader message gets displayed 
+		// always
+		$('#loader-message').show();
+		
+		callback = s.success || false;
+		s.success = function(data, status){
+			if (callback) {
+				callback(data, status);
+			}
+			$('#loader-message').hide();
+		}	
+		// TODO: add error state!
+		return _oldAjax(s);
+	}
+	
 	
 	/**
 	 * Reloads tree item (one line). If some filtering is found, adds 
@@ -94,16 +112,13 @@ $(document).ready(function() {
 			
 			data['fitlered'] = 1;
 		}
-		
-		
-		 $.post(url, data, function(response){
+		$.post(url, data, function(response){
 			if (callback) callback(response);
 			var target = $(el).parents('div.cont:first');
 			var parent = target.parent();
 			target.replace(response);
 			parent.find('div.cont:first').yft();
 		});
-		 
 		/*
 		$.post(url, data, function(response){
 			if (callback) callback(response);
@@ -115,8 +130,12 @@ $(document).ready(function() {
 		tree.refresh();
 		*/
 	}
-    
-    // let's start event delegation
+	
+	function refresh(){
+		window.location = window.location.href;
+	}
+	
+	// let's start event delegation
 	
     $('#changelist li').click(function(e) {
         // I want a link to check the class
@@ -207,7 +226,10 @@ $(document).ready(function() {
 				value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
 			})
 			
-			reloadItem(jtarget, "/admin/cms/page/" + pageId + "/change-moderation/", { moderate: value });
+			// just reload the page for now in callback... 
+			// TODO: this must be changed sometimes to reloading just the portion
+			// of the tree = current node + descendants
+			reloadItem(jtarget, "/admin/cms/page/" + pageId + "/change-moderation/", { moderate: value }, refresh);
 			e.stopPropagation();
             return true;
         }
@@ -215,7 +237,10 @@ $(document).ready(function() {
 		// quick approve
 		if(jtarget.hasClass("approve")) {
 			var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-            reloadItem(jtarget, "/admin/cms/page/" + pageId + "/approve/?node=1", { });
+			// just reload the page for now in callback... 
+			// TODO: this must be changed sometimes to reloading just the portion
+			// of the tree = current node + descendants 
+            reloadItem(jtarget, "/admin/cms/page/" + pageId + "/approve/?node=1", {}, refresh);
 			e.stopPropagation();
             return false;
         }
@@ -373,7 +398,7 @@ function moveTreeItem(item_id, target_id, position, tree){
 
 
 function copyTreeItem(item_id, target_id, position, tree, site){
-
+	
 	$.post("./"+item_id+"/copy-page/", {
             position:position,
             target:target_id,
@@ -381,7 +406,7 @@ function copyTreeItem(item_id, target_id, position, tree, site){
         },
         function(html) {
 			if(html=="ok"){
-				window.location=window.location.href
+				window.location = window.location.href;
 			}else{
 				moveError($('#page_'+item_id + " div.col1:eq(0)"))   
 			}

@@ -235,7 +235,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
-#sitemap li .col-actions { width: 65px; }
+#sitemap li .col-actions { width: 80px; }
 #sitemap li .col-published {width:65px;}
 #sitemap li .col-navigation { width: 65px; }
 #sitemap li .col-softroot { width: 20px; }
@@ -444,3 +444,7 @@ div#sitemap ul.header li{
 
 /* softroot icon */
 #sitemap li .col-softroot span.icon { background-position: -80px 0px; }
+
+
+/* loading message */
+#loader-message { position: fixed; top: 0px; right: 0px; padding: 4px 8px; background-color: #f1f8ff; display: none;}

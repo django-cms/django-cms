@@ -1,4 +1,3 @@
-from publisher.errors import MpttCantPublish
 import urllib2
 from os.path import join
 from datetime import datetime, date
@@ -13,6 +12,7 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from publisher import Publisher, Mptt
+from publisher.errors import MpttCantPublish
 from cms.utils.urlutils import urljoin
 import mptt
 from cms import settings
@@ -117,7 +117,11 @@ class Page(Publisher, Mptt):
     def copy_page(self, target, site, position='first-child'):
         """
         copy a page and all its descendants to a new location
+        
+        Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
+        from cms.utils.moderator import update_moderation_message
+        
         descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
         tree = [target]
         level_dif = self.level - target.level - 1
@@ -135,9 +139,13 @@ class Page(Publisher, Mptt):
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.status = Page.DRAFT
+            
+            page.status = Page.MODERATOR_CHANGED
             page.parent = tree[-1]
             page.save()
+            
+            update_moderation_message(self, _('Page was copied.'))
+            
             if first:
                 first = False
                 page.move_to(target, position)
@@ -187,8 +195,6 @@ class Page(Publisher, Mptt):
                 # always change state to need approvement when there is some change
                 self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
             
-            print ">> page.save() page moderators:", self.get_moderator_queryset().all()
-            
             if self.pk and not self.get_moderator_queryset().count():
                 # existing page without moderator - publish it directly
                 publish_directly = True
@@ -211,7 +217,6 @@ class Page(Publisher, Mptt):
             super(Page, self).save()
             
         if publish_directly:
-            print ">> Publish directly"
             self.publish()
             
     def get_calculated_status(self):
@@ -544,7 +549,6 @@ class Page(Publisher, Mptt):
         # for publishing (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         for page in publish_set:
-            print ">> publish children:", page
             # recursive call to all childrens....
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
@@ -750,6 +754,7 @@ class AbstractPagePermission(models.Model):
             # don't allow `empty` objects
             return
         return super(AbstractPagePermission, self).save(force_insert, force_update)    
+
     
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
@@ -761,6 +766,7 @@ class GlobalPagePermission(AbstractPagePermission):
         verbose_name_plural = _('Pages global permissions')
     
     __unicode__ = lambda self: "%s :: GLOBAL" % self.audience
+
 
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
@@ -775,7 +781,9 @@ class PagePermission(AbstractPagePermission):
         verbose_name_plural = _('Page permissions')
         
     def __unicode__(self):
-        return "%s :: %s" % (self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on][1]))
+        page = self.page_id and unicode(self.page) or "None"
+        return "%s :: %s has: %s" % (page, self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on][1]))
+
 
 class ExtUser(User):
     """Cms specific user data, required for permission system

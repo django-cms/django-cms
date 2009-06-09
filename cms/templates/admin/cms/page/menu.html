@@ -3,9 +3,9 @@
 	{% include 'admin/cms/page/menu_item.html' %}
 	
 	{% with page.childrens as children %}
-	{% if children %}<ul{% if page.last %} class="last"{% endif %}>{% for child in children %}
-		{% show_admin_menu child %}{% endfor %}
-	</ul>{% endif %}
+		{% if children %}<ul{% if page.last %} class="last"{% endif %}>{% for child in children %}
+			{% show_admin_menu child %}{% endfor %}
+		</ul>{% endif %}
 	{% endwith %}
 </li>
 

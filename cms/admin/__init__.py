@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.forms import Widget, TextInput, Textarea, CharField, HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse, Http404
@@ -41,6 +41,7 @@ from cms.utils.moderator import update_moderation_message,\
     get_test_moderation_level, moderator_should_approve, approve_page
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
+from django.utils.functional import curry
 
 PAGE_ADMIN_INLINES = []
 
@@ -310,7 +311,7 @@ class PageAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(add_plugin),
                 name='%s_add_plugin' % info),
             url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
-                self.admin_site.admin_view(edit_plugin),
+                self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
             url(r'^(?:[0-9]+)/remove-plugin/$',
                 self.admin_site.admin_view(remove_plugin),
@@ -648,7 +649,7 @@ class PageAdmin(admin.ModelAdmin):
             return HttpResponseRedirect('../../')            
         
         try:
-            page = self.model.get(pk=page_id)
+            page = self.model.objects.get(pk=page_id)
             target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
             return HttpResponse("error")
@@ -709,11 +710,10 @@ class PageAdmin(admin.ModelAdmin):
         if target is not None and position is not None and site is not None:
             try:
                 target = self.model.objects.get(pk=target)
-            except self.model.DoesNotExist:
-                return HttpResponse("error")
-            try:
+                # does he haves permissions to copy this page under target?
+                assert target.has_add_permission(request)
                 site = Site.objects.get(pk=site)
-            except:
+            except (ObjectDoesNotExist, AssertionError):
                 return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:

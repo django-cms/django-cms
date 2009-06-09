@@ -44,12 +44,15 @@ def has_page_add_permission(request):
     target = request.GET.get('target', None)
     position = request.GET.get('position', None)
     
-    if target is not None and position == "first-child":
+    if target is not None:
         try:
             page = Page.objects.get(pk=target)
         except:
             return False
-        return page.has_add_permission(request)
+        if position == "first-child":
+            return page.has_add_permission(request)
+        elif position in ("left", "right"):
+            return has_add_page_on_same_level_permission(request, page)
     return False
     
 def get_user_permission_level(user):
@@ -147,4 +150,13 @@ def has_global_change_permissions_permission(user):
         (user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
             GlobalPagePermission.objects.with_user(user).filter(can_change=True)):
         return True
+    return False
+
+def has_add_page_on_same_level_permission(request, page):
+    """Checks if there can be page added under page parent.
+    """
+    try:
+        return page.parent.has_add_permission(request)
+    except AttributeError:
+        pass
     return False
