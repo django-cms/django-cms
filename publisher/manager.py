@@ -44,7 +44,7 @@ class PublisherManager(object):
         from publisher.base import Publisher
         
         # because of model inheritance
-        rebased, inherited = [], False
+        rebased = []
         for base in bases:
             if issubclass(base, Publisher) and base in self.registry:
                 # rebase it to public model
@@ -64,6 +64,7 @@ class PublisherManager(object):
             if isinstance(value, RelatedField):
                 self.other = value.rel.to
                 
+                # is this still required...?
                 if isinstance(self.other, basestring):
                     def resolve_other(field, model, cls):
                         self.other = model
@@ -79,22 +80,38 @@ class PublisherManager(object):
                     print "R >>", self.other, "remap:", self.other._meta.object_name, "=>", relation_public_name
                     
                     to = model.PublicModel or relation_public_name
-                    
                     attrs[attr].rel.to = to
         
+        #if not inherited:
+        #    attrs['origin'] = models.OneToOneField(origin_cls, related_name="public")
+        
         # setup one to one relation to origin model
+        '''
         if not origin_cls in self.inherited:
             # skip links for inherited models   
-            attrs['origin'] = models.OneToOneField(origin_cls, related_name="public")
+            attrs['origin'] = models.OneToOneField(origin_cls, related_name="public", null=True, blank=True)
         else:
-            attrs['inherited_origin'] = models.OneToOneField(origin_cls, related_name="inherited_public")
-        
+            attrs['inherited_origin'] = models.OneToOneField(origin_cls, related_name="inherited_public", null=True, blank=True)
+        '''
         # mark it as public model, so we can recognize it when required 
         attrs['_is_public_model'] = lambda self: True
         
         # construct class
         public_name = PublisherManager.PUBLISHER_MODEL_NAME % name
         public_cls = ModelBase.__new__(cls, public_name, tuple(rebased), attrs)
+        
+        if not 'mark_delete' in [field.name for field in public_cls._meta.local_fields]:
+            field = models.BooleanField(default=False)
+            public_cls.add_to_class('mark_delete', field)
+            
+        
+        if not origin_cls in self.inherited:
+            # skip links for inherited models   
+            #attrs['origin'] = models.OneToOneField(origin_cls, related_name="public", null=True, blank=True)
+            origin_cls.add_to_class('public', models.OneToOneField(public_cls, related_name="origin", null=True, blank=True))
+        else:
+            #attrs['inherited_origin'] = models.OneToOneField(origin_cls, related_name="inherited_public", null=True, blank=True)
+            origin_cls.add_to_class('inherited_public', models.OneToOneField(origin_cls, related_name="inherited_origin", null=True, blank=True))
         
         print "origin field:", public_name, ">", origin_cls
         

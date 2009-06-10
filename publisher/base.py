@@ -39,21 +39,34 @@ class Publisher(models.Model):
         
         exclude.append(self.__class__)
         
+        created = False
+        public_copy = None
+        
         try:
             try:
-                kw = {'origin': self}
+                #kw = {'origin': self}
                 public_copy = self.public
             except AttributeError:
-                kw = {'inherited_origin': self}
+                #kw = {'inherited_origin': self}
                 public_copy = self.inherited_public
                 print "-- inherited", self.id
         except ObjectDoesNotExist:
-            public_copy = self.__class__.PublicModel(**kw)
+            #public_copy = self.__class__.PublicModel(**kw)
+            pass
+        
+        if not public_copy:
+            created = True
+            public_copy = self.__class__.PublicModel()
+        
+        #public_copy.inherited_origin = self
             
         for field in fields:
             print "> field:", field.name
             value = getattr(self, field.name)
             if isinstance(field, RelatedField):
+                if field.name in ('public', 'inherited_public'):
+                    continue
+                
                 print self, field, field.rel.to
                 related = field.rel.to
                 if issubclass(related, Publisher):
@@ -78,6 +91,13 @@ class Publisher(models.Model):
         # publish copy
         self.publish_save(public_copy)
         
+        if created:
+            try:
+                self.public = public_copy
+            except AttributeError:
+                self.inherited_public = public_copy
+            self.save_base(cls=self.__class__)
+        
         # update many to many relations
         for field in self._meta.many_to_many:
             name = field.name
@@ -92,14 +112,14 @@ class Publisher(models.Model):
             
         # update related objects (FK) / model inheritance
         for obj in self._meta.get_all_related_objects():
-            if obj.model in exclude:
-                continue
-            exclude.append(obj.__class__)
+            #if obj.model in exclude:
+            #    continue
+            #exclude.append(obj.__class__)
             if issubclass(obj.model, Publisher):
                 # get all objects for this, and publish them
                 name = obj.get_accessor_name()
-                if name in ('public', 'inherited_public'):
-                    continue
+                #if name in ('public', 'inherited_public'):
+                #    continue
                 
                 print ">>> publish remote:", obj.model, name
                 
@@ -113,7 +133,7 @@ class Publisher(models.Model):
                 
                 for item in item_set:
                     print "publish remote:", obj.model, item
-                    item.publish(exclude=exclude)
+                    item.publish(exclude=exclude + [obj.__class__])
             
         return public_copy
         
@@ -130,9 +150,17 @@ class Publisher(models.Model):
         """Delete published object first if exists.
         """
         try:
-            self.public.delete()
+            try:
+                public = self.public
+            except AttributeError:
+                public = self.inherited_public
         except ObjectDoesNotExist:
             pass
+        else:
+            if public:
+                public.mark_delete=True
+                public.save_base(cls=public.__class__)
+            
         super(Publisher, self).delete()
         
     class Meta:

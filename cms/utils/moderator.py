@@ -1,7 +1,7 @@
 import datetime
 from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
-from cms.models import Page, PageModeratorState, PageModerator
+from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title
 from cms.utils.permissions import get_current_user
 
 
@@ -154,7 +154,15 @@ def approve_page(request, page):
     else:
         # first case - just mark page as approved from this user
         PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 
-        
+
+def get_model(model, request=None):
+    """Decision function - says which model should b used.
+    """
+    if request and 'preview' in request.GET and 'draft' in request.GET \
+        and request.user.is_staff:
+        return model
+    return model.PublicModel
+     
         
 def get_page_model(request=None):
     """Decides which Page model should be used - Draft, or PublicPage depending
@@ -162,12 +170,24 @@ def get_page_model(request=None):
     
     !IMPORTANT: All scripts should request Page from here...
     """
-    
-    if request and 'preview' in request.GET and 'draft' in request.GET \
-        and request.user.is_staff:
-        return Page
-    return Page.PublicModel
+    return get_model(Page, request)
 
+def get_title_model(request=None):
+    """Decides which Title model should be used - Draft, or PublicPage depending
+    on request. 
+    
+    !IMPORTANT: All scripts should request Title from here...
+    """
+    return get_model(Title, request)
+
+
+def get_cmsplugin_model(request=None):
+    """Decides which CMSPlugin model should be used - Draft, or PublicPage depending
+    on request. 
+    
+    !IMPORTANT: All scripts should request Page from here...
+    """
+    return get_model(CMSPlugin, request)
 
 def mail_approvement_request(page, user=None):
     """Sends approvement request over email to all users which should approve 

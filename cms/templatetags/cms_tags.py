@@ -1,13 +1,12 @@
 from django import template
 from django.core.cache import cache
 from cms import settings
-from cms.models import Title, CMSPlugin
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
-from cms.utils.moderator import get_page_model
+from cms.utils.moderator import get_page_model, get_title_model, get_cmsplugin_model
 register = template.Library()
 
 
@@ -20,6 +19,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     """
     request = context['request']
     PageModel = get_page_model(request)
+    TitleModel = get_title_model(request)
     
     site = Site.objects.get_current()
     CMS_CONTENT_CACHE_DURATION = settings.CMS_CONTENT_CACHE_DURATION
@@ -74,12 +74,9 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             filters['rght__lt'] = root_page.rght
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
-        print filters
         pages = PageModel.objects.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
-        print ">> pages:", pages
-        
         pages = list(pages)
         all_pages = pages[:]
         for page in pages:# build the tree
@@ -99,7 +96,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     page.soft_root = True
         if from_level > 0:
             children = cut_levels(children, from_level)
-        titles = list(Title.objects.filter(page__in=ids, language=lang))
+        titles = list(TitleModel.objects.filter(page__in=ids, language=lang))
         for page in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == page.pk:
@@ -131,6 +128,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     render a nested list of all root's children pages"""
     request = context['request']
     PageModel = get_page_model(request)
+    TitleModel = get_title_model(request)
     
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
@@ -157,7 +155,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         page.selected = True
         find_children(page, pages, levels, levels, [], page.pk, request=request)
         children = page.childrens
-        titles = Title.objects.filter(page__in=ids, language=lang)
+        titles = TitleModel.objects.filter(page__in=ids, language=lang)
         for p in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == p.pk:
@@ -199,6 +197,7 @@ show_sub_menu = register.inclusion_tag('cms/dummy.html',
 def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
     PageModel = get_page_model(request)
+    TitleModel = get_title_model(request)
     
     page = request.current_page
     lang = get_language_from_request(request)
@@ -208,7 +207,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
         ids = [page.pk]
         for anc in ancestors:
             ids.append(anc.pk)
-        titles = Title.objects.filter(page__in=ids, language=lang)
+        titles = TitleModel.objects.filter(page__in=ids, language=lang)
         for anc in ancestors:
             for title in titles:
                 if title.page_id == anc.pk:
@@ -249,7 +248,8 @@ show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          
 
 def render_plugin(context, plugin_id):
-    plugin = CMSPlugin.objects.get(pk=plugin_id)
+    CMSPluginModel = get_cmsplugin_model(context['request'])
+    plugin = CMSPluginModel.objects.get(pk=plugin_id)
     content = plugin.render(context)
     return  locals()
 render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
@@ -380,8 +380,9 @@ class PlaceholderNode(template.Node):
             return ''
         l = get_language_from_request(context['request'])
         request = context['request']
+        CMSPluginModel = get_cmsplugin_model(request)
         page = request.current_page
-        plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+        plugins = CMSPluginModel.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
         c = ""
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name)
@@ -457,6 +458,8 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
     """
     request = context.get('request', False)
     PageModel = get_page_model(request)
+    CMSPluginModel = get_cmsplugin_model(request)
+    
     if not request:
         return {'content':''}
     if lang is None:
@@ -479,7 +482,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
                           settings.MANAGERS,
                           fail_silently=True)
 
-        plugins = CMSPlugin.objects.filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        plugins = CMSPluginModel.objects.filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:
             content += plugin.render_plugin(context, placeholder_name)

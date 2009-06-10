@@ -14,27 +14,7 @@ from cms.utils.admin import render_admin_menu_item
 from django.core.exceptions import ObjectDoesNotExist
 
 
-def catch(func):
-    def inner(*args, **kwargs):
-        from django.conf import settings
-        if not settings.DEBUG:
-            return func(*args, **kwargs)
-        try:
-            return func(*args, **kwargs)
-        except Exception, e:
-            import sys
-            from traceback import print_exception, format_exception
-            exc_type, exc_value, tb = sys.exc_info()
-            #trace_exc = '\n'.join(format_exception(*sys.exc_info()))
-            print "RPC exception"
-            print_exception(exc_type, exc_value, tb, 10)
-            
-            return HttpResponse("remote error")
-    return inner
-
-
 @require_POST
-@catch
 def change_status(request, page_id):
     """
     Switch the status of a page
@@ -97,6 +77,7 @@ def add_plugin(request):
         if parent:
             plugin.parent = parent
         plugin.save()
+        print ">>> plugin saved:", plugin.pk
         if 'reversion' in settings.INSTALLED_APPS:
             page.save()
             save_all_plugins(request, page)

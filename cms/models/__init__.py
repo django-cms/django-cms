@@ -11,7 +11,7 @@ from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import Publisher, Mptt
 from publisher.errors import MpttCantPublish
 from cms.utils.urlutils import urljoin
@@ -665,13 +665,17 @@ class CMSPlugin(Publisher, Mptt):
         from cms.plugin_pool import plugin_pool
         plugin_class = plugin_pool.get_plugin(self.plugin_type)
         plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
-        if plugin.model != CMSPlugin and self.__class__ == CMSPlugin:
+        if plugin.model != CMSPlugin: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
-                instance = getattr(self, plugin.model.__name__.lower())
+                if hasattr(self, '_is_public_model'):
+                    # if it is an public model all field names have public prefix
+                    instance = getattr(self, 'public' + plugin.model.__name__.lower())
+                else:
+                    instance = getattr(self, plugin.model.__name__.lower())
                 # could alternatively be achieved with:
                 # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
-            except:
+            except (AttributeError, ObjectDoesNotExist):
                 instance = None
         else:
             instance = self
