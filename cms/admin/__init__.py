@@ -39,11 +39,24 @@ from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
-
 from cms.utils.moderator import update_moderation_message,\
     get_test_moderation_level, moderator_should_approve, approve_page
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
+
+from cms import settings
+from cms.admin.change_list import CMSChangeList
+from cms.admin.forms import PageForm
+from cms.admin.utils import get_placeholders
+from cms.admin.views import (change_status, change_innavigation, add_plugin, 
+    edit_plugin, remove_plugin, move_plugin, revert_plugins)
+from cms.admin.widgets import PluginEditor
+from cms.models import Page, Title, CMSPlugin, EmptyTitle
+from cms.plugin_pool import plugin_pool
+from cms.settings import CMS_MEDIA_URL
+from cms.utils import (get_template_from_request, has_page_add_permission, 
+    get_language_from_request)
+from cms.views import details
 
 
 PAGE_ADMIN_INLINES = []
@@ -475,7 +488,10 @@ class PageAdmin(admin.ModelAdmin):
         else:
             form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
-            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+            try:
+                title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+            except:
+                title_obj = EmptyTitle()
             for name in ['slug',
                          'title',
                          'application_urls',

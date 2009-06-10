@@ -85,6 +85,7 @@ class CMSChangeList(ChangeList):
         all_pages = pages[:]
         for page in pages:
             children = []
+
             # note: We are using change_list permission here, because we must
             # display also pages which user must not edit, but he haves a 
             # permission for adding a child under this page. Otherwise he would

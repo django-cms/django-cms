@@ -316,7 +316,7 @@ class Page(Publisher, Mptt):
         """
         page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
         if not page_title:
-            return self.get_title(language, True, version_id, force_reload)
+            return self.get_menu_title(language, True, version_id, force_reload)
         return page_title
 
     def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
@@ -557,13 +557,6 @@ class Page(Publisher, Mptt):
         
         return published
         
-# Don't register the Page model twice.
-#try:
-#    mptt.register(Page)
-#except mptt.AlreadyRegistered:
-#    pass
-
-
 class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)
     title = models.CharField(_("title"), max_length=255)
@@ -647,9 +640,15 @@ class CMSPlugin(Publisher, Mptt):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
+    def __unicode__(self):
+        return ""
+    
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
+    
+    def get_short_description(self):
+        return self.get_plugin_instance()[0].__unicode__()        
     
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
@@ -709,11 +708,7 @@ class CMSPlugin(Publisher, Mptt):
         else:
             return u''
         
-#try:
-#    mptt.register(CMSPlugin)
-#except mptt.AlreadyRegistered:
-#    pass
-
+        
 if 'reversion' in settings.INSTALLED_APPS:        
     reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])
     reversion.register(CMSPlugin)

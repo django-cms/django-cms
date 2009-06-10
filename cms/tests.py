@@ -242,3 +242,14 @@ class PagesTestCase(TestCase):
         response = self.client.post('/admin/cms/page/1/copy-page/', {'target':5, 'position':'first-child', 'site':1})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Page.objects.all().count()>count)
+        
+    def test_10_language_change(self):
+        self.client.login(username= 'test', password='test')
+        setattr(settings, "SITE_ID", 1)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/', page_data)
+        pk = Page.objects.all()[0].pk
+        response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"en" })
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
+        self.assertEqual(response.status_code, 200)

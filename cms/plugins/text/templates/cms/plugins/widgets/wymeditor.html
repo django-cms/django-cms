@@ -119,7 +119,7 @@ $(document).ready(function(){
 			// First create db instance using AJAX post back
 			$.post("add-plugin/", {
 				parent_id: parent_id,
-				plugin_type: pluginvalue,
+				plugin_type: pluginvalue
 			}, function(data){
 				if ('error' != data) {
 					// Successfully created, data is pk of object, but object

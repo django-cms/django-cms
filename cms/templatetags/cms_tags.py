@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 
-def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None):
+def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_page=None):
     """
     render a nested list of all children of the pages
     from_level: is the start level
@@ -47,6 +47,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                    'sites__domain' : site.domain,
                    'level__lte' : to_level}
         #check the ancestors for softroots
+        soft_root_start = 0
         for p in alist:
             ancestors.append(p[0])
             if p[1]:
@@ -55,11 +56,18 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 filters['rght__lte'] = soft_root.rght
                 filters['tree_id'] = soft_root.tree_id
                 from_level = soft_root.level
+                soft_root_start = soft_root.level
         if current_page and current_page.soft_root: 
             filters['tree_id'] = current_page.tree_id
             filters['lft__gte'] = current_page.lft
             filters['rght__lte'] = current_page.rght
             from_level = current_page.level
+            soft_root_start = current_page.level
+        if root_page:
+            root_page = Page.objects.get(reverse_id=root_page)
+            filters['tree_id'] = root_page.tree_id
+            filters['lft__gt'] = root_page.lft
+            filters['rght__lt'] = root_page.rght
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
         pages = Page.objects.published().filter(**filters).order_by('tree_id', 
@@ -67,11 +75,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                                                                     'lft')
         pages = list(pages)
         all_pages = pages[:]
-        last = None
         for page in pages:# build the tree
             if page.level >= from_level:
                 ids.append(page.pk)
-            if page.level == 0:
+            if page.level == 0 or page.level == soft_root_start or page.level-1 == getattr(root_page, 'level', None):
                 page.ancestors_ascending = []
                 children.append(page)
                 if current_page and page.pk == current_page.pk and current_page.soft_root:
@@ -106,6 +113,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     return context
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
+
+def show_menu_below_id(context, root_page=None, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template_file="cms/menu.html", next_page=None):
+    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_page=root_page)
+register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
 
 
 def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
