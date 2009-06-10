@@ -65,6 +65,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         template_name = get_template_from_request(request, current_page)
     elif not no404:
         raise Http404("CMS: No page found for site %s" % unicode(site.name))
+    
     if current_page:  
         has_change_permissions = current_page.has_change_permission(request)
         request._current_page_cache = current_page

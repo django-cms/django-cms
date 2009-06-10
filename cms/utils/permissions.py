@@ -119,6 +119,7 @@ def get_subordinate_users(user):
         return User.objects.all() 
     
     page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+    
     user_level = get_user_permission_level(user)
     
     qs = User.objects.distinct().filter(

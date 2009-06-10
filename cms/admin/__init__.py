@@ -37,26 +37,12 @@ from cms.utils.permissions import has_page_add_permission,\
     get_subordinate_users
 from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
-from cms.exceptions import NoPermissionsException
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils.moderator import update_moderation_message,\
     get_test_moderation_level, moderator_should_approve, approve_page
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
-
-from cms import settings
-from cms.admin.change_list import CMSChangeList
-from cms.admin.forms import PageForm
-from cms.admin.utils import get_placeholders
-from cms.admin.views import (change_status, change_innavigation, add_plugin, 
-    edit_plugin, remove_plugin, move_plugin, revert_plugins)
-from cms.admin.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin, EmptyTitle
-from cms.plugin_pool import plugin_pool
-from cms.settings import CMS_MEDIA_URL
-from cms.utils import (get_template_from_request, has_page_add_permission, 
-    get_language_from_request)
-from cms.views import details
+from cms.exceptions import NoPermissionsException
 
 
 PAGE_ADMIN_INLINES = []
@@ -161,7 +147,7 @@ if settings.CMS_PERMISSION:
         form = PageUserForm
         model = PageUser
         
-        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'created_by')
+        list_display = ('username', 'email', 'first_name', 'last_name', 'created_by')
         
         # get_fieldsets method may add fieldsets depending on user
         fieldsets = [
@@ -200,13 +186,33 @@ if settings.CMS_PERMISSION:
         
         def queryset(self, request):
             qs = super(PageUserAdmin, self).queryset(request)
-            user_id_set = get_subordinate_users(request.user).values_list('id', flat=True)
-            return qs.filter(pk__in=user_id_set)
+            try:
+                user_id_set = get_subordinate_users(request.user).values_list('id', flat=True)
+                return qs.filter(pk__in=user_id_set)
+            except NoPermissionsException:
+                return self.model.objects.get_empty_query_set()
             
         
         def add_view(self, request):
             return super(UserAdmin, self).add_view(request)        
         
+        def _has_change_permissions_permission(self, request):
+            """User is able to add/change objects only if he haves can change
+            permission on some page.
+            """
+            try:
+                user_level = get_user_permission_level(request.user)
+            except NoPermissionsException:
+                return False
+            return True
+        
+        def has_add_permission(self, request):
+            return self._has_change_permissions_permission(request) and \
+                super(PageUserAdmin, self).has_add_permission(request)
+    
+        def has_change_permission(self, request, obj=None):
+            return self._has_change_permissions_permission(request) and \
+                super(PageUserAdmin, self).has_change_permission(request, obj)
     
     admin.site.register(PageUser, PageUserAdmin)
     
@@ -432,9 +438,15 @@ class PageAdmin(admin.ModelAdmin):
     # remove permission inlines, if user isn't allowed to change them
     def get_formsets(self, request, obj=None):
         for inline in self.inline_instances:
-            if obj and settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
-                if not obj.has_change_permissions_permission(request):
+            if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
+                if obj and not obj.has_change_permissions_permission(request):
                     continue
+                elif not obj:
+                    try:
+                        get_user_permission_level(request.user)
+                    except NoPermissionsException:
+                        continue
+                
             yield inline.get_formset(request, obj)
     
     

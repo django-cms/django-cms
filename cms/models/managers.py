@@ -296,7 +296,7 @@ class PagePermissionsPermissionManager(models.Manager):
     GRANT_ALL = 'All'
     
     
-class PagePermissionManager(models.Manager):
+#class PagePermissionManager(models.Manager):
     def get_publish_id_list(self, user):
         """
         Give a list of page where the user has publish rights or the string "All" if
@@ -304,14 +304,14 @@ class PagePermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_publish")
     
-    '''
-    def get_edit_id_list(self, user):
+    
+    def get_change_id_list(self, user):
         """
         Give a list of page where the user has edit rights or the string "All" if
         the user has all rights.
         """
         return self.__get_id_list(user, "can_change")
-    '''
+    
     
     def get_add_id_list(self, user):
         """

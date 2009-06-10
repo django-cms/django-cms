@@ -13,7 +13,28 @@ from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
 from django.core.exceptions import ObjectDoesNotExist
 
+
+def catch(func):
+    def inner(*args, **kwargs):
+        from django.conf import settings
+        if not settings.DEBUG:
+            return func(*args, **kwargs)
+        try:
+            return func(*args, **kwargs)
+        except Exception, e:
+            import sys
+            from traceback import print_exception, format_exception
+            exc_type, exc_value, tb = sys.exc_info()
+            #trace_exc = '\n'.join(format_exception(*sys.exc_info()))
+            print "RPC exception"
+            print_exception(exc_type, exc_value, tb, 10)
+            
+            return HttpResponse("remote error")
+    return inner
+
+
 @require_POST
+@catch
 def change_status(request, page_id):
     """
     Switch the status of a page
@@ -244,7 +265,6 @@ def save_all_plugins(request, page, excludes=None):
             plugin.save()
         
 def revert_plugins(request, version_id):
-    print ">> revert_plugins !"
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]

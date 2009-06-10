@@ -1,12 +1,13 @@
 from django import template
 from django.core.cache import cache
 from cms import settings
-from cms.models import Page, Title, CMSPlugin
+from cms.models import Title, CMSPlugin
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, cut_levels, find_selected
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
+from cms.utils.moderator import get_page_model
 register = template.Library()
 
 
@@ -18,11 +19,13 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     render_children: if set to True will render all not direct ascendants too
     """
     request = context['request']
+    PageModel = get_page_model(request)
+    
     site = Site.objects.get_current()
     CMS_CONTENT_CACHE_DURATION = settings.CMS_CONTENT_CACHE_DURATION
     lang = get_language_from_request(request)
     current_page = request.current_page
-   
+    
     if not next_page: #new menu... get all the data so we can save a lot of queries
         ids = []
         children = []
@@ -31,7 +34,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
         else:# maybe the active node is in an extender?
             alist = []
-            extenders = Page.objects.published().filter(in_navigation=True, 
+            extenders = PageModel.objects.published().filter(in_navigation=True, 
                                                         sites__domain=site.domain, 
                                                         level__lte=to_level)
             extenders = extenders.exclude(navigation_extenders__isnull=True).exclude( navigation_extenders__exact="")
@@ -47,11 +50,12 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                    'sites__domain' : site.domain,
                    'level__lte' : to_level}
         #check the ancestors for softroots
+        
         soft_root_start = 0
         for p in alist:
             ancestors.append(p[0])
             if p[1]:
-                soft_root = Page.objects.get(pk=p[0])
+                soft_root = PageModel.objects.get(pk=p[0])
                 filters['lft__gte'] = soft_root.lft
                 filters['rght__lte'] = soft_root.rght
                 filters['tree_id'] = soft_root.tree_id
@@ -64,15 +68,18 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             from_level = current_page.level
             soft_root_start = current_page.level
         if root_page:
-            root_page = Page.objects.get(reverse_id=root_page)
+            root_page = PageModel.objects.get(reverse_id=root_page)
             filters['tree_id'] = root_page.tree_id
             filters['lft__gt'] = root_page.lft
             filters['rght__lt'] = root_page.rght
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
-        pages = Page.objects.published().filter(**filters).order_by('tree_id', 
+        print filters
+        pages = PageModel.objects.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
+        print ">> pages:", pages
+        
         pages = list(pages)
         all_pages = pages[:]
         for page in pages:# build the tree
@@ -123,6 +130,8 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     """Get the root page of the current page and 
     render a nested list of all root's children pages"""
     request = context['request']
+    PageModel = get_page_model(request)
+    
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
     children = []
@@ -137,7 +146,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                   'sites__domain':site.domain}
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
-        pages = Page.objects.published().filter(**filters)
+        pages = PageModel.objects.published().filter(**filters)
         ids = []
         pages = list(pages)
         all_pages = pages[:]
@@ -157,7 +166,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         to_level = page.level+levels
         extra_active = extra_inactive = levels
     else:
-        extenders = Page.objects.published().filter(in_navigation=True, 
+        extenders = PageModel.objects.published().filter(in_navigation=True, 
                                                     sites__domain=site.domain)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         children = []
@@ -189,6 +198,8 @@ show_sub_menu = register.inclusion_tag('cms/dummy.html',
 
 def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
+    PageModel = get_page_model(request)
+    
     page = request.current_page
     lang = get_language_from_request(request)
     if page:
@@ -208,7 +219,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     else:
         site = Site.objects.get_current()
         ancestors = []
-        extenders = Page.objects.published().filter(in_navigation=True, 
+        extenders = PageModel.objects.published().filter(in_navigation=True, 
                                                     sites__domain=site.domain)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         for ext in extenders:
@@ -259,13 +270,16 @@ def page_id_url(context, reverse_id, lang=None):
     request = context.get('request', False)
     if not request:
         return {'content':''}
+    
+    PageModel = get_page_model(request)
+    
     if lang is None:
         lang = get_language_from_request(request)
     key = 'page_id_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
     url = cache.get(key)
     if not url:
         try:
-            page = Page.objects.get(reverse_id=reverse_id)
+            page = PageModel.objects.get(reverse_id=reverse_id)
         except:
             if settings.DEBUG:
                 raise
@@ -442,6 +456,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
     This is mostly used if you want to have static content in a template of a page (like a footer)
     """
     request = context.get('request', False)
+    PageModel = get_page_model(request)
     if not request:
         return {'content':''}
     if lang is None:
@@ -450,7 +465,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
     content = cache.get(key)
     if not content:
         try:
-            page = Page.objects.get(reverse_id=reverse_id)
+            page = PageModel.objects.get(reverse_id=reverse_id)
         except:
             if settings.DEBUG:
                 raise

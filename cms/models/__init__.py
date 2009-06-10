@@ -191,14 +191,19 @@ class Page(Publisher, Mptt):
     def save(self, no_signals=False, change_state=True):
         # Published pages should always have a publication date
         publish_directly = False
-        if not settings.CMS_MODERATOR or change_state:
-            if self.moderator_state is not Page.MODERATOR_CHANGED:
-                # always change state to need approvement when there is some change
-                self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
-            
-            if self.pk and not self.get_moderator_queryset().count():
-                # existing page without moderator - publish it directly
-                publish_directly = True
+        if settings.CMS_MODERATOR:
+            if change_state:
+                if self.moderator_state is not Page.MODERATOR_CHANGED:
+                    # always change state to need approvement when there is some change
+                    self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+                
+                if self.pk and not self.get_moderator_queryset().count():
+                    # existing page without moderator - publish it directly
+                    publish_directly = True
+        elif change_state:
+            publish_directly = True
+        
+        print ">> page.save()"
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -431,6 +436,7 @@ class Page(Publisher, Mptt):
     def has_change_permissions_permission(self, request):
         """Has user ability to change permissions for current page?
         """
+        print ">> hsc:", self.has_generic_permission(request, "change_permissions")
         return self.has_generic_permission(request, "change_permissions")
     
     def has_add_permission(self, request):
@@ -527,6 +533,7 @@ class Page(Publisher, Mptt):
         
         Returns: True if page was successfully published.
         """
+        print ">> page.publish()"
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
         
@@ -707,6 +714,8 @@ class CMSPlugin(Publisher, Mptt):
             return unicode(plugin.icon_alt(instance))
         else:
             return u''
+    
+      
         
         
 if 'reversion' in settings.INSTALLED_APPS:        

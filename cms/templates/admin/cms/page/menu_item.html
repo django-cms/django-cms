@@ -1,5 +1,5 @@
 {% load cms_admin i18n adminmedia %}
-<div class="cont moderatorstate{{ page_moderator_state.state }}">
+<div class="cont{% if CMS_MODERATOR %} moderatorstate{{ page_moderator_state.state }}{% endif %}">
 	<div class="col1">
 		{% if has_change_permission %}
 			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
@@ -61,8 +61,11 @@
 		</div>{% endif %}
 		
 		<div class="col-draft">
-			{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
-			<span class="state">{{ page_moderator_state.label }}</span>
+			{% if CMS_MODERATOR %}
+				{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
+				<span class="state">{{ page_moderator_state.label }}</span>
+			{% endif %}
+			
 			{% if has_publish_permission %}
 				{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
 				{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
