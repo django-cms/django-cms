@@ -259,16 +259,6 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
-                                         
-
-def render_plugin(context, plugin_id):
-    plugin = CMSPlugin.objects.get(pk=plugin_id)
-    content = plugin.render(context)
-    return  locals()
-render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
-
-#def render_plugin_title(context, plugin_id):
-    
 
 def has_permission(page, request):
     return page.has_page_permission(request)
