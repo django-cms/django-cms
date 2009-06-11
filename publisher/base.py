@@ -92,9 +92,10 @@ class Publisher(models.Model):
         self.publish_save(public_copy)
         
         if created:
-            try:
+            # store data about public model
+            if hasattr(self, 'public'):
                 self.public = public_copy
-            except AttributeError:
+            if hasattr(self, 'inherited_public'):
                 self.inherited_public = public_copy
             self.save_base(cls=self.__class__)
         
@@ -134,7 +135,10 @@ class Publisher(models.Model):
                 for item in item_set:
                     print "publish remote:", obj.model, item
                     item.publish(exclude=exclude + [obj.__class__])
-            
+        
+        if not created:
+            # check if there is something marked for delete in public model
+            public_copy.delete_marked_for_deletion()
         return public_copy
         
     
@@ -147,25 +151,55 @@ class Publisher(models.Model):
         
     
     def delete(self):
-        """Delete published object first if exists.
+        """Mark published object for deletion first.
         """
-        try:
-            try:
-                public = self.public
-            except AttributeError:
-                public = self.inherited_public
-        except ObjectDoesNotExist:
-            pass
-        else:
-            if public:
-                public.mark_delete=True
-                public.save_base(cls=public.__class__)
-            
-        super(Publisher, self).delete()
+        print ">> delete:", self.__class__, self
         
+        try:
+            public = self.public
+        except AttributeError:
+            try:
+                public = self.inherited_public
+            except AttributeError:
+                public = None
+    
+        if public:
+            public.mark_delete=True
+            public.save_base(cls=public.__class__)
+    
+        super(Publisher, self).delete()
+    
+    
+    def delete_with_public(self):
+        try:
+            public = self.public
+        except AttributeError:
+            public = self.inherited_public
+    
+        public.delete()
+        super(Publisher, self).delete()        
+    
     class Meta:
         abstract = True
 
+
+class PublicPublisher(models.Model):
+    """This will be always added to public mode bases.
+    """
+    def delete_marked_for_deletion(self):
+        """If this instance, or some remote instances are marked for deletion
+        kill them.
+        """
+        for obj in self._meta.get_all_related_objects():
+            if issubclass(obj.model, PublicPublisher) and obj.mark_delete:
+                obj.delete()
+                
+        if self.mark_delete:
+            self.delete()
+    
+    class Meta:
+        abstract = True
+        
 
 class Mptt(models.Model):
     """Abstract class which have to be extended for installing mptt on class. 

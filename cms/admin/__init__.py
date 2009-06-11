@@ -29,7 +29,8 @@ from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation)
 from cms.admin.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin, PagePermission
+from cms.models import Page, Title, CMSPlugin, PagePermission,\
+    PageModeratorState
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.permissions import has_page_add_permission,\
@@ -365,13 +366,17 @@ class PageAdmin(admin.ModelAdmin):
             url(r'^([0-9]+)/jsi18n/$',
                 self.admin_site.admin_view(self.redirect_jsi18n),
                 name='%s_jsi18n' % info),
-            
             # NOTE: revert plugin is newly integrated in overriden revision_view
              
             # approve page
             url(r'^([0-9]+)/approve/$',
                 self.admin_site.admin_view(self.approve_page),
                 name='%s_approve_page' % info),
+            
+            url(r'^([0-9]+)/remove-delete-state/$',
+                self.admin_site.admin_view(self.remove_delete_state),
+                name='%s_romove_delete_state' % info),
+                
         )
         
         url_patterns.extend(super(PageAdmin, self).get_urls())
@@ -561,6 +566,10 @@ class PageAdmin(admin.ModelAdmin):
         else:
             template = get_template_from_request(request, obj)
             moderation_level, moderation_required = get_test_moderation_level(obj, request.user)
+            
+            # if there is a delete request for this page
+            moderation_delete_request = settings.CMS_MODERATOR and obj.pagemoderatorstate_set.get_delete_actions().count()
+            
             extra_context = {
                 'placeholders': get_placeholders(request, template),
                 'language': get_language_from_request(request),
@@ -574,6 +583,8 @@ class PageAdmin(admin.ModelAdmin):
                 'moderation_level': moderation_level,
                 'moderation_required': moderation_required,
                 'moderator_should_approve': moderator_should_approve(request, obj),
+                
+                'moderation_delete_request': moderation_delete_request,
             }
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
         
@@ -800,6 +811,41 @@ class PageAdmin(admin.ModelAdmin):
             return render_admin_menu_item(request, page)
         return HttpResponseRedirect('../../')
     
+    
+    def delete_view(self, request, object_id, *args, **kwargs):
+        """If page is under modaretion, just mark this page for deletion = add
+        delete action to page states.
+        """
+        page = get_object_or_404(Page, id=object_id)
+        
+        if not self.has_delete_permission(request, obj):
+            raise PermissionDenied
+        
+        if settings.CMS_MODERATOR and page.is_under_moderation():
+            # don't perform a delete action, just mark page for deletion
+            page.force_moderation_action = PageModeratorState.ACTION_DELETE
+            page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+            page.save()
+            
+            if not self.has_change_permission(request, None):
+                return HttpResponseRedirect("../../../../")
+            return HttpResponseRedirect("../../")
+        else:
+            public = page.public
+            response = super(self.__class__, self).delete_view(request, object_id, *args, **kwargs)
+            if response.status_code == 302 and public:
+                public.delete()
+            return response
+     
+    def remove_delete_state(self, request, object_id):
+        """Remove all delete action from page states, requires change permission
+        """
+        page = get_object_or_404(Page, id=object_id)
+        if not self.has_change_permission(request, page):
+            raise PermissionDenied
+        page.pagemoderatorstate_set.get_delete_actions().delete()
+        return HttpResponseRedirect("../../")
+        
 
 class PageAdminMixins(admin.ModelAdmin):
     pass

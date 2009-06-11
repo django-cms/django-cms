@@ -1,4 +1,4 @@
 h1 span { font-size: 10px; color: #999; font-weight: normal;}
-h1 span.requires-approvement { color: #f60; }
-
+h1 span.moderation-requires-approvement { color: #f60; }
+h1.moderation-approve-deletion { color: #c00; }
 div fieldset.module.hidden { position: absolute; left: -1000em; }

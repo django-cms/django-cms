@@ -413,3 +413,9 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
         #print "> perm u:", user, "attr:", attr, page_id_allow_list
         return page_id_allow_list
+
+
+class PageModeratorStateManager(models.Manager):
+    def get_delete_actions(self):
+        from cms.models import PageModeratorState
+        return self.filter(action=PageModeratorState.ACTION_DELETE)

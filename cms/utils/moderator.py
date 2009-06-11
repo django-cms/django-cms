@@ -15,6 +15,11 @@ def page_changed(page, old_page=None):
     # get user from thread locals
     user = get_current_user()
     
+    force_moderation_action = getattr(page, 'force_moderation_action', None)
+    if force_moderation_action:
+        PageModeratorState(user=user, page=page, action=force_moderation_action).save()
+        return
+    
     if not old_page:
         # just newly created page
         PageModeratorState(user=user, page=page, action=PageModeratorState.ACTION_ADD).save()
@@ -150,7 +155,11 @@ def approve_page(request, page):
     
     if not moderation_required:
         # this is a second case - user can publish changes
-        page.publish()
+        if page.pagemoderatorstate_set.get_delete_actions().count():
+            # it is a delete request for this page!!
+            page.delete_with_public()
+        else:
+            page.publish()
     else:
         # first case - just mark page as approved from this user
         PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 

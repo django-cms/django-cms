@@ -216,8 +216,12 @@ def remove_plugin(request):
         
         if not page.has_change_permission(request):
                 raise Http404
-
-        plugin.delete()
+        
+        if settings.CMS_MODERATOR and page.is_under_moderation():
+            plugin.delete()
+        else:
+            plugin.delete_with_public()
+            
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
         if 'reversion' in settings.INSTALLED_APPS:
