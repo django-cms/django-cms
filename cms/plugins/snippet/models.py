@@ -24,6 +24,9 @@ class Snippet(models.Model):
 class SnippetPtr(CMSPlugin):
     snippet = models.ForeignKey(Snippet)
 
+    class Meta:
+        verbose_name = _("Snippet")
+
 if 'reversion' in settings.INSTALLED_APPS:
     # We don't both with SnippetPtr, since all the data is actually in Snippet
     reversion.register(Snippet)
