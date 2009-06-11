@@ -82,7 +82,7 @@ $(document).ready(function(){
 
     function edit_object(obj_id) {
         // Pop up window for editing object.
-        window.open("edit-plugin/" + obj_id + "/?_popup=1",
+        window.open("../../../edit-plugin/" + obj_id + "/?_popup=1",
                     "Edit plugin object",
                     "menubar=no,titlebar=no,toolbar=no,resizable=yes"
                       + ",width=800,height=300,top=0,left=0,scrollbars=yes"
@@ -117,7 +117,7 @@ $(document).ready(function(){
 				return;
 			}
 			// First create db instance using AJAX post back
-			$.post("add-plugin/", {
+			$.post("../../../add-plugin/", {
 				parent_id: parent_id,
 				plugin_type: pluginvalue
 			}, function(data){
