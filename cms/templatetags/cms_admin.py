@@ -67,11 +67,12 @@ def moderator_choices(page, user):
         page_moderator = None
     
     moderate = (
-        ('moderate_page', _('Moderate page'), MASK_PAGE), 
-        ('moderate_children', _('Moderate children'), MASK_CHILDREN),
-        ('moderate_descendants', _('Moderate descendants'), MASK_DESCENDANTS),
+        ('moderate_page', _('Moderate page'), _('Unbind page moderation'), MASK_PAGE), 
+        ('moderate_children', _('Moderate children'), _('Unbind children moderation'), MASK_CHILDREN),
+        ('moderate_descendants', _('Moderate descendants'), _('Unbind descendants moderation'), MASK_DESCENDANTS),
     )
         
-    for name, title, value in moderate:
+    for name, title_yes, title_no, value in moderate:
         active = page_moderator and getattr(page_moderator, name)
+        title = active and title_no or title_yes
         yield value, title, active, name.split('_')[1]

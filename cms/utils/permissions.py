@@ -1,8 +1,10 @@
-from cms.models import Page, PagePermission, GlobalPagePermission
-from cms.exceptions import NoPermissionsException
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from cms.models import Page, PagePermission, GlobalPagePermission, MASK_PAGE
+from cms.exceptions import NoPermissionsException
+from cms import settings as cms_settings
+
 
 try:
     from threading import local
@@ -157,10 +159,19 @@ def has_global_change_permissions_permission(user):
 def has_add_page_on_same_level_permission(request, page):
     """Checks if there can be page added under page parent.
     """
+    if not cms_settings.CMS_PERMISSION or request.user.is_superuser \
+        or GlobalPagePermission.objects.with_user(request.user).filter(can_add=True).count():
+        return True
     try:
         return page.parent.has_add_permission(request)
     except AttributeError:
-        pass
+        # if page doesnt have parent...
+        if page.level == 0:
+            # we are in the root, check if user haves add PAGE paermisson for
+            # this page
+            for perm in PagePermission.objects.with_user(request.user).filter(page=page, can_add=True):
+                if perm.grant_on & MASK_PAGE:
+                    return True 
     return False
 
 def mail_page_user_change(user, created=False, password=""):

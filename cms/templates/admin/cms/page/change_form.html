@@ -9,21 +9,28 @@
 {% endblock %}
 
 {% block content_title %}
+	{% if moderation_delete_request %}
+	<h1 class="moderation-approve-deletion">{% trans "Approve page deletion" %}</h1>
+		
+	{% else %}
+
 	<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}
 	{% if CMS_MODERATOR %}
-		{% if moderation_required %}<span class="requires-approvement">{% blocktrans %}(requires approvement at level {{ moderation_level }}){% endblocktrans %}</span>
+		{% if moderation_required %}<span class="moderation-requires-approvement">{% blocktrans %}(requires approvement at level {{ moderation_level }}){% endblocktrans %}</span>
 		{% else %}<span>{% trans '(you can perform actions on this page directly)' %}</span>
 		{% endif %}
 	{% endif %}
 	</h1>
+	{% endif %}
+	
 {% endblock %}
 
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
-  	
-	{% if moderator_should_approve %}<li><a href="approve/" class="approvelink">{% trans "Approve" %}</a></li>{% endif %}
+	{% if moderation_delete_request %}<li><a href="remove-delete-state/" class="approvelink">{% trans "Remove delete request" %}</a></li>{% endif %}  	
+	{% if moderator_should_approve %}<li><a href="approve/" class="approvelink">{% if moderation_delete_request %}{% trans "Approve delete" %}{% else %}{% trans "Approve" %}{% endif %}</a></li>{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   	{% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
@@ -81,6 +88,19 @@
 		</div>
 	</div>
 {% endif %}
+
+{% if moderation_delete_request %}<script type="text/javascript">
+	$(function(){
+		// disable all fields
+		function lockControls(){ 
+			$('input,select,textarea').attr("disabled", "disabled");
+			$('a[id^=add_],span[class^=add-plugin],a[class^=selector-],p[class^=selector-]').remove(); 
+		}
+		$('fieldset[class=collapsed]').remove();
+		lockControls();
+		setTimeout(lockControls,200);	
+	});
+</script>{% endif %}
 
 {% if CMS_MODERATOR and moderation_required %}
 	<div id="dialog" title="Approve dialog">
@@ -172,7 +192,7 @@
 
 {% block after_related_objects %}{% endblock %}
 
-{% submit_row %}
+{% if not moderation_delete_request %}{% submit_row %}{% endif %}
 
 {% if add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>

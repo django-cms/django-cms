@@ -1,19 +1,25 @@
 import datetime
 from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
-from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title
+from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title,\
+    PagePermission
 from cms.utils.permissions import get_current_user
 
 
 I_APPROVE = 100 # current user should approve page
 
 
-def page_changed(page, old_page=None):
+def page_changed(page, old_page=None, force_moderation_action=None):
     """Called from page post save signal. If page already had pk, old version
     of page is provided in old_page argument.
     """
     # get user from thread locals
     user = get_current_user()
+    
+    force_moderation_action = force_moderation_action or getattr(page, 'force_moderation_action', None)
+    if force_moderation_action:
+        PageModeratorState(user=user, page=page, action=force_moderation_action).save()
+        return
     
     if not old_page:
         # just newly created page
@@ -92,7 +98,7 @@ def moderator_should_approve(request, page):
     return page_moderator_state(request, page)['state'] is I_APPROVE
 
 
-def get_test_moderation_level(page, user=None):
+def get_test_moderation_level(page, user=None, include_user=True):
     """Returns min moderation level for page, and result of user test if 
     user is given, so output is always tuple of:
         
@@ -104,11 +110,14 @@ def get_test_moderation_level(page, user=None):
     NOTE: May require some optimization, might call 3 huge sql queries in 
     worse case
     """
-    if not cms_settings.CMS_MODERATOR or (user and user.is_superuser):
-        return 0, False
     
     qs = page.get_moderator_queryset()
-        
+    
+    if not cms_settings.CMS_MODERATOR or (user and user.is_superuser):
+        if include_user and qs.filter(user__id=user.id, moderate_page=True).count():
+            return 0, True
+        return 0, False
+    
     if qs.filter(user__is_superuser=True).count():
         return 0, True
     
@@ -142,15 +151,21 @@ def approve_page(request, page):
     will be `copied` to public model, page states log will be cleaned.  
     
     """
-    moderation_level, moderation_required = get_test_moderation_level(page, request.user)
-        
+    moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
+    print "A"
     if not moderator_should_approve(request, page):
         # escape soon if there isn't any approvement required by this user
         return
-    
+    print "B"
     if not moderation_required:
+        print "C"
         # this is a second case - user can publish changes
-        page.publish()
+        if page.pagemoderatorstate_set.get_delete_actions().count():
+            # it is a delete request for this page!!
+            page.delete_with_public()
+        else:
+            print ">>>>> page.publish()"
+            page.publish()
     else:
         # first case - just mark page as approved from this user
         PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 

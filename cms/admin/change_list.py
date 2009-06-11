@@ -34,11 +34,7 @@ class CMSChangeList(ChangeList):
             del self.params[COPY_VAR] 
         qs = super(CMSChangeList, self).get_query_set()
         if request:
-            
             permissions = Page.permissions.get_change_list_id_list(request.user)
-            print ">> CA:", permissions
-            #permissions = Page.permissions.get_change_id_list(request.user)
-            
             if permissions != Page.permissions.GRANT_ALL:
                 qs = qs.filter(pk__in=permissions)
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)

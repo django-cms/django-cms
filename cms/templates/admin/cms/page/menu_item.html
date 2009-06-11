@@ -65,17 +65,17 @@
 				{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
 				<span class="state">{{ page_moderator_state.label }}</span>
 			{% endif %}
-			
+			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+		</div>
+		
+		<div class="col-published">
 			{% if has_publish_permission %}
 				{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
 				{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
 				{% endif %}
 			{% else %}{{ page.published|boolean_icon }}
 			{% endif %}
-			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
-		</div>
-		
-		<div class="col-published">
+			
 			{% if page.public.published %}<label>
 				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
 			</label>

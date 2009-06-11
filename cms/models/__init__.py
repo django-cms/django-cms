@@ -18,7 +18,7 @@ from cms.utils.urlutils import urljoin
 import mptt
 from cms import settings
 from cms.models.managers import PageManager, TitleManager, PagePermissionsPermissionManager,\
-    BasicPagePermissionManager, PagePermissionManager
+    BasicPagePermissionManager, PagePermissionManager, PageModeratorStateManager
 from cms.models import signals as cms_signals
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -519,6 +519,9 @@ class Page(Publisher, Mptt):
             Q(page__pk=self.pk, moderate_page=True)
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
     
+    def is_under_moderation(self):
+        return bool(self.get_moderator_queryset().count())
+    
     def is_approved(self):
         """Returns true, if page is approved and published, or approved, but
         parents are missing..
@@ -893,6 +896,8 @@ class PageModeratorState(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=3, choices=_action_choices, null=True, blank=True)
     message = models.TextField(max_length=1000, blank=True, default="")
+    
+    objects = PageModeratorStateManager()
     
     class Meta:
         verbose_name=_('Page moderator state')

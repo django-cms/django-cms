@@ -89,6 +89,15 @@ $(document).ready(function() {
 			}
 			$('#loader-message').hide();
 		}	
+		
+		// just for debuging!! 
+		s.complete = function(xhr, status) {
+			if (status == "error") {
+				$('body').before(xhr.responseText);
+			}
+		}
+		// end just for debuging
+		
 		// TODO: add error state!
 		return _oldAjax(s);
 	}

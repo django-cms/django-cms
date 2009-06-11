@@ -41,7 +41,7 @@ class PublisherManager(object):
                 i += 1
                     
     def _create_public_model(self, cls, name, bases, attrs, origin_cls):
-        from publisher.base import Publisher
+        from publisher.base import Publisher, PublicPublisher
         
         # because of model inheritance
         rebased = []
@@ -56,7 +56,10 @@ class PublisherManager(object):
             rebased.append(base)
         
         if not rebased:
-            rebased = bases
+            rebased = list(bases)
+        
+        if not PublicPublisher in rebased:
+            rebased.append(PublicPublisher)
         
         print "\n>> create public model:", name, "-" * 20
         
@@ -111,7 +114,7 @@ class PublisherManager(object):
             origin_cls.add_to_class('public', models.OneToOneField(public_cls, related_name="origin", null=True, blank=True))
         else:
             #attrs['inherited_origin'] = models.OneToOneField(origin_cls, related_name="inherited_public", null=True, blank=True)
-            origin_cls.add_to_class('inherited_public', models.OneToOneField(origin_cls, related_name="inherited_origin", null=True, blank=True))
+            origin_cls.add_to_class('inherited_public', models.OneToOneField(public_cls, related_name="inherited_origin", null=True, blank=True))
         
         print "origin field:", public_name, ">", origin_cls
         

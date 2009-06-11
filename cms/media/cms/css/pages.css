@@ -241,7 +241,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-softroot { width: 20px; }
 #sitemap li .col-moderator  { width:80px; }
 #sitemap li .col-creator{width:60px;}
-#sitemap li .col-draft{width:110px; text-align: right;}
+#sitemap li .col-draft{width:90px; text-align: right;}
 #sitemap li .col-lastchange { width:100px; text-align: left;}
 
 #sitemap li a.move {

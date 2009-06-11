@@ -2,9 +2,11 @@ from copy import deepcopy
 from django.db import models
 from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
-from django.db.models.fields.related import RelatedField
+from django.db.models.fields.related import RelatedField, OneToOneField,\
+    OneToOneRel
 from django.core.exceptions import ObjectDoesNotExist
 from publisher.errors import MpttCantPublish
+from django.db.models.related import RelatedObject
 
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
@@ -61,7 +63,7 @@ class Publisher(models.Model):
         #public_copy.inherited_origin = self
             
         for field in fields:
-            print "> field:", field.name
+            #print "> field:", field.name
             value = getattr(self, field.name)
             if isinstance(field, RelatedField):
                 if field.name in ('public', 'inherited_public'):
@@ -74,27 +76,28 @@ class Publisher(models.Model):
                     if not related in exclude and value:
                         # can follow
                         try:
-                            print ">> p:", field, value
+                            #print ">> p:", field, value
                             value = value.publish(exclude=exclude)
                         except MpttCantPublish:
                             pass
                     elif value:
                         # if somethings wrong, we may get some erorr here in case
                         # when target isn't publihsed
-                        print ">> XXX:", value
+                        #print ">> XXX:", value
                         try:
                             value = value.public
                         except AttributeError:
                             value = value.inherited_public
-            print "> setattr:", field.name, value
+            #print "> setattr:", field.name, value
             setattr(public_copy, field.name, value)        
         # publish copy
         self.publish_save(public_copy)
         
         if created:
-            try:
+            # store data about public model
+            if hasattr(self, 'public'):
                 self.public = public_copy
-            except AttributeError:
+            if hasattr(self, 'inherited_public'):
                 self.inherited_public = public_copy
             self.save_base(cls=self.__class__)
         
@@ -112,15 +115,14 @@ class Publisher(models.Model):
             
         # update related objects (FK) / model inheritance
         for obj in self._meta.get_all_related_objects():
-            #if obj.model in exclude:
-            #    continue
+            if obj.model in exclude:
+                continue
             #exclude.append(obj.__class__)
             if issubclass(obj.model, Publisher):
                 # get all objects for this, and publish them
                 name = obj.get_accessor_name()
                 #if name in ('public', 'inherited_public'):
                 #    continue
-                
                 print ">>> publish remote:", obj.model, name
                 
                 try:
@@ -134,7 +136,10 @@ class Publisher(models.Model):
                 for item in item_set:
                     print "publish remote:", obj.model, item
                     item.publish(exclude=exclude + [obj.__class__])
-            
+        
+        if not created:
+            # check if there is something marked for delete in public model
+            public_copy.delete_marked_for_deletion()
         return public_copy
         
     
@@ -147,25 +152,66 @@ class Publisher(models.Model):
         
     
     def delete(self):
-        """Delete published object first if exists.
+        """Mark published object for deletion first.
         """
-        try:
-            try:
-                public = self.public
-            except AttributeError:
-                public = self.inherited_public
-        except ObjectDoesNotExist:
-            pass
-        else:
-            if public:
-                public.mark_delete=True
-                public.save_base(cls=public.__class__)
-            
-        super(Publisher, self).delete()
+        print ">> delete:", self.__class__, self
         
+        try:
+            public = self.public
+        except AttributeError:
+            try:
+                public = self.inherited_public
+            except AttributeError:
+                public = None
+    
+        if public:
+            public.mark_delete=True
+            public.save_base(cls=public.__class__)
+    
+        super(Publisher, self).delete()
+    
+    
+    def delete_with_public(self):
+        try:
+            public = self.public
+        except AttributeError:
+            public = self.inherited_public
+        
+        if public:
+            print ">> delete_with_public, go"
+            public.delete()
+        self.delete()        
+    
     class Meta:
         abstract = True
 
+
+class PublicPublisher(models.Model):
+    """This will be always added to public mode bases.
+    """
+    def delete_marked_for_deletion(self, collect=True):
+        """If this instance, or some remote instances are marked for deletion
+        kill them.
+        """
+        print "------------ delete_marked_for_deletion on:", self
+        
+        if collect:
+            from django.db.models.query_utils import CollectedObjects
+            
+            seen = CollectedObjects()
+            
+            self._collect_sub_objects(seen)
+            for cls, items in seen.items():
+                if issubclass(cls, PublicPublisher):
+                    for item in items.values():
+                        item.delete_marked_for_deletion(collect=False)
+                    
+        if self.mark_delete:
+            self.delete()
+
+    class Meta:
+        abstract = True
+        
 
 class Mptt(models.Model):
     """Abstract class which have to be extended for installing mptt on class. 

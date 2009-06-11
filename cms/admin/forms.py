@@ -182,6 +182,11 @@ class PageUserForm(UserCreationForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
+        
+        if instance:
+            initial = initial or {}
+            initial.update(self.populate_initials(instance))
+        
         super(PageUserForm, self).__init__(data, files, auto_id, prefix, 
             initial, error_class, label_suffix, empty_permitted, instance)
         
@@ -194,6 +199,18 @@ class PageUserForm(UserCreationForm):
             self.fields['password2'].label = _('New password confirmation')
         
         self._password_change = True
+        
+    def populate_initials(self, instance):
+        """Read out user permissions from permission system.
+        """
+        initials = {}
+        models = (Page, PageUser, PagePermission)
+        for model in models:
+            name = model.__name__.lower()
+            for t in ('add', 'change', 'delete'):
+                codename = getattr(model._meta, 'get_%s_permission' % t)()
+                initials['can_%s_%s' % (t, name)] = instance.has_perm('%s.%s' % (model._meta.app_label, codename)) 
+        return initials        
         
     def clean_username(self):
         if self.instance:
@@ -233,7 +250,6 @@ class PageUserForm(UserCreationForm):
             mail_page_user_change(user, created, self.cleaned_data['password1'])
         
         models = (Page, PageUser, PagePermission)
-        
         for model in models:
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
