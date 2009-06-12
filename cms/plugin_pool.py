@@ -1,5 +1,6 @@
 from cms.exceptions import PluginAllreadyRegistered
 from django.conf import settings
+from cms import settings as cms_settings
 from cms.plugin_base import CMSPluginBase
 
 class PluginPool(object):
@@ -29,13 +30,12 @@ class PluginPool(object):
         if placeholder:
             final_plugins = []
             for plugin in plugins:
-                found = False
-                if plugin.placeholders:
-                    for p in plugin.placeholders:
-                        if p == placeholder:
-                            found = True
-                else:
-                    found = True
+                found = True
+                if cms_settings.CMS_PLACEHOLDER_CONF:
+                    if placeholder in cms_settings.CMS_PLACEHOLDER_CONF:
+                        if "plugins" in cms_settings.CMS_PLACEHOLDER_CONF[placeholder] \
+                        and not plugin.__name__ in cms_settings.CMS_PLACEHOLDER_CONF[placeholder]["plugins"]:
+                            found = False
                 if found:
                     final_plugins.append(plugin)
             plugins = final_plugins

@@ -392,6 +392,9 @@ class PlaceholderNode(template.Node):
         request = context['request']
         page = request.current_page
         plugins = CMSPlugin.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+        if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
+            if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
+                context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
         c = ""
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name)
