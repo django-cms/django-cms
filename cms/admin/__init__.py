@@ -845,8 +845,7 @@ class PageAdmin(admin.ModelAdmin):
             print ">>> delete public"
             public.delete()
         return response
-        
-     
+             
     def remove_delete_state(self, request, object_id):
         """Remove all delete action from page states, requires change permission
         """

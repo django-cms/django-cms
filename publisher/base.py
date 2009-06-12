@@ -2,11 +2,9 @@ from copy import deepcopy
 from django.db import models
 from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
-from django.db.models.fields.related import RelatedField, OneToOneField,\
-    OneToOneRel
+from django.db.models.fields.related import RelatedField
 from django.core.exceptions import ObjectDoesNotExist
 from publisher.errors import MpttCantPublish
-from django.db.models.related import RelatedObject
 
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
@@ -176,7 +174,7 @@ class Publisher(models.Model):
             public = self.public
         except AttributeError:
             public = self.inherited_public
-        
+
         if public:
             print ">> delete_with_public, go"
             public.delete()
