@@ -192,5 +192,6 @@ if cms_settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page)
     signals.post_save.connect(post_save_page, sender=Page)
+    
         
         

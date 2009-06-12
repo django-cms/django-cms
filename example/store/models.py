@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
+from publisher import Publisher
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -18,7 +19,7 @@ class Store(CMSPlugin):
     __unicode__ = lambda self: self.name
 
 
-class StoreItem(models.Model):
+class StoreItem(Publisher):
     """Store item examle
     """
     store = models.ForeignKey(Store, verbose_name=_('store item'))

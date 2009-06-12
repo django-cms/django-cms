@@ -113,6 +113,10 @@ class Page(Publisher, Mptt):
         """
         self.move_to(target, position)
         # fire signal
+        
+        self.force_moderation_action = PageModeratorState.ACTION_MOVE
+        self.save(change_state=True) # always save the page after move, because of publihser
+        
         cms_signals.page_moved.send(sender=Page, instance=self)
         
     def copy_page(self, target, site, position='first-child'):
@@ -190,7 +194,10 @@ class Page(Publisher, Mptt):
     
     def save(self, no_signals=False, change_state=True):
         # Published pages should always have a publication date
+        print "save()", no_signals, change_state
         publish_directly = False
+        
+        created = not bool(self.pk)
         if settings.CMS_MODERATOR:
             if change_state:
                 if self.moderator_state is not Page.MODERATOR_CHANGED:
@@ -222,8 +229,12 @@ class Page(Publisher, Mptt):
         else:
             super(Page, self).save()
             
-        if publish_directly:
+        if publish_directly or \
+            created and self.pk and not self.get_moderator_queryset().count():
+            print "-- publish directly"
             self.publish()
+            
+        
             
     def get_calculated_status(self):
         """

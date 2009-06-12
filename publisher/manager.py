@@ -30,28 +30,37 @@ class PublisherManager(object):
     def install(self):
         """This must be called after creation of all other models, thats why publisher
         must be last application in installed apps.
+        
+        Installing of models must be processed in special order, because of the 
+        model inheritance. Models which are inherited must be installed first.
         """
         i = 0
         while i < len(self.creation_registry):
-            print "  GW:", self.creation_registry[i][1]
             item = self.creation_registry[i]
             if self._create_public_model(*item):
+                # just take the model out of local registry if he was suceesfully
+                # installed
                 self.creation_registry.pop(i)
             else:
                 i += 1
-                    
+        else:
+            if self.creation_registry:
+                self.install()
+            
     def _create_public_model(self, cls, name, bases, attrs, origin_cls):
         from publisher.base import Publisher, PublicPublisher
         
-        # because of model inheritance
+        # because of model inheritance:
         rebased = []
         for base in bases:
             if issubclass(base, Publisher) and base in self.registry:
-                # rebase it to public model
-                print ">> rebase base:", base, ">", base.PublicModel
+                # model inheritance ? rebases inherited model to his
+                # public version if there is a public version
+                #print ">> rebase base:", base, ">", base.PublicModel
                 base = base.PublicModel
                 if not base:
-                    # inherited model isnt't registered yet, escape
+                    # inherited model isnt't registered yet, escape, we will try
+                    # it again in next round
                     return
             rebased.append(base)
         
@@ -59,6 +68,8 @@ class PublisherManager(object):
             rebased = list(bases)
         
         if not PublicPublisher in rebased:
+            # append PublicPublisher to bases - we want to use some methods he
+            # contains
             rebased.append(PublicPublisher)
         
         print "\n>> create public model:", name, "-" * 20
@@ -81,21 +92,9 @@ class PublisherManager(object):
                     # it is a subclass of Publisher, change relation
                     relation_public_name = PublisherManager.PUBLISHER_MODEL_NAME % self.other._meta.object_name
                     print "R >>", self.other, "remap:", self.other._meta.object_name, "=>", relation_public_name
-                    
                     to = model.PublicModel or relation_public_name
                     attrs[attr].rel.to = to
         
-        #if not inherited:
-        #    attrs['origin'] = models.OneToOneField(origin_cls, related_name="public")
-        
-        # setup one to one relation to origin model
-        '''
-        if not origin_cls in self.inherited:
-            # skip links for inherited models   
-            attrs['origin'] = models.OneToOneField(origin_cls, related_name="public", null=True, blank=True)
-        else:
-            attrs['inherited_origin'] = models.OneToOneField(origin_cls, related_name="inherited_public", null=True, blank=True)
-        '''
         # mark it as public model, so we can recognize it when required 
         attrs['_is_public_model'] = lambda self: True
         
@@ -103,24 +102,21 @@ class PublisherManager(object):
         public_name = PublisherManager.PUBLISHER_MODEL_NAME % name
         public_cls = ModelBase.__new__(cls, public_name, tuple(rebased), attrs)
         
+        # add mark_delete field to public models, maybe will be better to move this
+        # into PublicModel class, since it exists now
         if not 'mark_delete' in [field.name for field in public_cls._meta.local_fields]:
             field = models.BooleanField(default=False)
             public_cls.add_to_class('mark_delete', field)
             
-        
+        # create links between standard and public models
         if not origin_cls in self.inherited:
-            # skip links for inherited models   
-            #attrs['origin'] = models.OneToOneField(origin_cls, related_name="public", null=True, blank=True)
             origin_cls.add_to_class('public', models.OneToOneField(public_cls, related_name="origin", null=True, blank=True))
         else:
-            #attrs['inherited_origin'] = models.OneToOneField(origin_cls, related_name="inherited_public", null=True, blank=True)
+            # this model gets inherited from some other - create link with special name here
+            # so, if model haves inherited_public relation, it is an inherited model
             origin_cls.add_to_class('inherited_public', models.OneToOneField(public_cls, related_name="inherited_origin", null=True, blank=True))
         
-        print "origin field:", public_name, ">", origin_cls
-        
-        #origin_cls.add_to_class('public_model', public_cls)
-        
-        print ">>> cpm:", public_cls, origin_cls.PublicModel
+        print "create origin field from:", public_name, "to:", origin_cls
         return True
         
 publisher_manager = PublisherManager()
