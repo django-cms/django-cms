@@ -13,7 +13,6 @@ from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
 from django.core.exceptions import ObjectDoesNotExist
 
-
 @require_POST
 def change_status(request, page_id):
     """

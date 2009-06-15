@@ -50,13 +50,15 @@ class PublisherManager(object):
     def _create_public_model(self, cls, name, bases, attrs, origin_cls):
         from publisher.base import Publisher, PublicPublisher
         
+        print "\n>> try create with bases:", bases, "\n"
+        
         # because of model inheritance:
         rebased = []
         for base in bases:
             if issubclass(base, Publisher) and base in self.registry:
                 # model inheritance ? rebases inherited model to his
                 # public version if there is a public version
-                #print ">> rebase base:", base, ">", base.PublicModel
+                print ">> rebase base:", base, ">", base.PublicModel
                 base = base.PublicModel
                 if not base:
                     # inherited model isnt't registered yet, escape, we will try
@@ -76,6 +78,7 @@ class PublisherManager(object):
         
         for attr, value in attrs.items():
             if isinstance(value, RelatedField):
+                print ">> V:", value
                 self.other = value.rel.to
                 
                 # is this still required...?
@@ -105,16 +108,16 @@ class PublisherManager(object):
         # add mark_delete field to public models, maybe will be better to move this
         # into PublicModel class, since it exists now
         if not 'mark_delete' in [field.name for field in public_cls._meta.local_fields]:
-            field = models.BooleanField(default=False)
+            field = models.BooleanField(default=False, editable=False)
             public_cls.add_to_class('mark_delete', field)
             
         # create links between standard and public models
         if not origin_cls in self.inherited:
-            origin_cls.add_to_class('public', models.OneToOneField(public_cls, related_name="origin", null=True, blank=True))
+            origin_cls.add_to_class('public', models.OneToOneField(public_cls, related_name="origin", null=True, blank=True, editable=False))
         else:
             # this model gets inherited from some other - create link with special name here
             # so, if model haves inherited_public relation, it is an inherited model
-            origin_cls.add_to_class('inherited_public', models.OneToOneField(public_cls, related_name="inherited_origin", null=True, blank=True))
+            origin_cls.add_to_class('inherited_public', models.OneToOneField(public_cls, related_name="inherited_origin", null=True, blank=True, editable=False))
         
         print "create origin field from:", public_name, "to:", origin_cls
         return True

@@ -122,6 +122,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         self.fields['user'].widget.user = user # assign current user
         self.fields['group'].queryset=get_subordinate_groups(user)
         
+        
     def clean(self):
         super(PagePermissionInlineAdminForm, self).clean()
         for field in self.Meta.model._meta.fields:

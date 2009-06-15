@@ -128,21 +128,29 @@ $(document).ready(function() {
 			target.replace(response);
 			parent.find('div.cont:first').yft();
 		});
-		/*
-		$.post(url, data, function(response){
-			if (callback) callback(response);
-			var target = $(el).parents('li[id^=page_]:first');
-			var id = $(target).attr('id');
-			target.replace(response);
-			$('#' + id).find('div.cont:first').yft();
-		});
-		tree.refresh();
-		*/
 	}
 	
 	function refresh(){
 		window.location = window.location.href;
 	}
+	
+	/**
+	 * Loads remote dialog to dialogs div.
+	 * 
+	 * @param {String} url 
+	 * @param {Object} data Data to be send over post
+	 * @param {Function} noDialogCallback Gets called when response is empty.
+	 * @param {Function} callback Standard callback function.
+	 */
+	function loadDialog(url, data, noDialogCallback, callback){
+		if (data === undefined) data = {};
+		$.post(url, data, function(response) {
+			if (response == '' && noDialogCallback) noDialogCallback();
+			$('#dialogs').empty().append(response);
+			if (callback) callback(response);
+		});
+	}
+	
 	
 	// let's start event delegation
 	
@@ -267,7 +275,7 @@ $(document).ready(function() {
                 $('.move-target-container').hide();
             }else if(action=="copy") {
             	site = $('select#site-select')[0].value
-				copyTreeItem(selected_page, target_id, position, tree, site)
+				copyTreeItem(selected_page, target_id, position, site)
                 $('.move-target-container').hide();
             }else if(action=="add") {
                 site = $('select#site-select')[0].value
@@ -322,6 +330,36 @@ $(document).ready(function() {
 	$('div.col-moderator input').livequery(function() {
 		$(this).checkBox({addLabel:false});
 	});
+	
+	
+	function copyTreeItem(item_id, target_id, position, site){
+		if (viewSettings.cmsPermission || viewSettings.cmsModerator) {
+			return loadDialog('./' + item_id + '/dialog/copy/', {
+				position:position,
+	            target:target_id,
+	            site:site,
+				callback: $.callbackRegister("_copyTreeItem", _copyTreeItem, item_id, target_id, position, site)
+			});	
+		}
+		return _copyTreeItem(item_id, target_id, position, site);
+	};
+	
+	function _copyTreeItem(item_id, target_id, position, site, options) {
+		data = {
+		    position:position,
+		    target:target_id,
+		    site:site
+		}
+		data = $.extend(data, options);
+		
+		$.post("./" + item_id + "/copy-page/", data, function(html) {
+			if(html=="ok"){
+				window.location = window.location.href;
+			}else{
+				moveError($('#page_'+item_id + " div.col1:eq(0)"))   
+			}
+	    });
+	}
 });
 
 
@@ -398,24 +436,6 @@ function moveTreeItem(item_id, target_id, position, tree){
 				}else{
 					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"))
 				}
-			}else{
-				moveError($('#page_'+item_id + " div.col1:eq(0)"))   
-			}
-        }
-    );
-};
-
-
-function copyTreeItem(item_id, target_id, position, tree, site){
-	
-	$.post("./"+item_id+"/copy-page/", {
-            position:position,
-            target:target_id,
-            site:site
-        },
-        function(html) {
-			if(html=="ok"){
-				window.location = window.location.href;
 			}else{
 				moveError($('#page_'+item_id + " div.col1:eq(0)"))   
 			}

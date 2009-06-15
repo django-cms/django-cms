@@ -44,6 +44,7 @@ from cms.utils.moderator import update_moderation_message,\
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
 from cms.exceptions import NoPermissionsException
+from cms.admin.dialog.views import get_copy_dialog
 
 
 PAGE_ADMIN_INLINES = []
@@ -329,6 +330,9 @@ class PageAdmin(admin.ModelAdmin):
         
         info = "%sadmin_%s_%s" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
         
+        # helper for url pattern generation
+        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        
         url_patterns = patterns('',
             url(r'^(?:[0-9]+)/add-plugin/$',
                 self.admin_site.admin_view(add_plugin),
@@ -367,16 +371,13 @@ class PageAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.redirect_jsi18n),
                 name='%s_jsi18n' % info),
             # NOTE: revert plugin is newly integrated in overriden revision_view
-             
-            # approve page
-            url(r'^([0-9]+)/approve/$',
-                self.admin_site.admin_view(self.approve_page),
-                name='%s_approve_page' % info),
             
-            url(r'^([0-9]+)/remove-delete-state/$',
-                self.admin_site.admin_view(self.remove_delete_state),
-                name='%s_romove_delete_state' % info),
-                
+            # approve page           
+            pat(r'^([0-9]+)/approve/$', self.approve_page), 
+            
+            pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
+            # copy dialog
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),
         )
         
         url_patterns.extend(super(PageAdmin, self).get_urls())
@@ -781,7 +782,12 @@ class PageAdmin(admin.ModelAdmin):
                 return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                page.copy_page(target, site, position)
+                kwargs ={
+                    'copy_permissions': request.REQUEST.get('copy_permissions', False),
+                    'copy_moderation': request.REQUEST.get('copy_moderation', False)
+                }
+                
+                page.copy_page(target, site, position, **kwargs)
                 return HttpResponse("ok")
                 #return self.list_pages(request,
                 #    template_name='admin/cms/page/change_list_tree.html')
