@@ -1,5 +1,4 @@
 from _IPython.genutils import page
-from cms.utils.page import get_available_slug
 import sys
 import urllib2
 from os.path import join
@@ -22,6 +21,7 @@ from cms import settings
 from cms.models.managers import PageManager, TitleManager, PagePermissionsPermissionManager,\
     BasicPagePermissionManager, PagePermissionManager, PageModeratorStateManager
 from cms.models import signals as cms_signals
+from cms.utils.page import get_available_slug
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion

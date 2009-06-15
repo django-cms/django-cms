@@ -132,10 +132,13 @@ $(document).ready(function() {
 		window.location = window.location.href;
 	}
 	
+<<<<<<< HEAD:cms/media/cms/js/change_list.js
 	function refreshIfChildren(pageId){
 		return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){};
 	}
 	
+=======
+>>>>>>> e88c28565d4119e89b61339a9e0c916935b97879:cms/media/cms/js/change_list.js
 	/**
 	 * Loads remote dialog to dialogs div.
 	 * 
@@ -277,8 +280,13 @@ $(document).ready(function() {
 				moveTreeItem(selected_page, target_id, position, tree);
                 $('.move-target-container').hide();
             }else if(action=="copy") {
+<<<<<<< HEAD:cms/media/cms/js/change_list.js
             	site = $('select#site-select')[0].value;
 				copyTreeItem(selected_page, target_id, position, site);
+=======
+            	site = $('select#site-select')[0].value
+				copyTreeItem(selected_page, target_id, position, site)
+>>>>>>> e88c28565d4119e89b61339a9e0c916935b97879:cms/media/cms/js/change_list.js
                 $('.move-target-container').hide();
             }else if(action=="add") {
                 site = $('select#site-select')[0].value;

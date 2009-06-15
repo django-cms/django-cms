@@ -384,6 +384,9 @@ class PageAdmin(admin.ModelAdmin):
         # helper for url pattern generation
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
+        # helper for url pattern generation
+        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        
         url_patterns = patterns('',
             pat(r'^(?:[0-9]+)/add-plugin/$', add_plugin),
             url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
@@ -396,8 +399,6 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/change-status/$', change_status),
             pat(r'^([0-9]+)/change-navigation/$', change_innavigation),
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
-            
-            
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/change-moderation/$', change_moderation),
