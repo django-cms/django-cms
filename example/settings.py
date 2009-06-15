@@ -115,7 +115,7 @@ INSTALLED_APPS = (
     'example.categories',
     'debug_toolbar',
 
-    # 'south',
+    'south',
     # sample application
     'sampleapp',
     'store',

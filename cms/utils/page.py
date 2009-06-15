@@ -30,11 +30,6 @@ def get_available_slug(title, new_slug=None):
     Returns: slug
     """
     slug = new_slug or title.slug
-    if validate_page_slug(title.page, title.language, title.page.parent, slug):
+    if validate_page_slug(title.page, title.page.parent, title.language, slug):
         return title.slug
     return get_available_slug(title, title.slug + APPEND_TO_SLUG)
-    
-        
-    
-    
-
