@@ -10,7 +10,7 @@ class Migration:
         # Adding model 'Snippet'
         db.create_table('snippet_snippet', (
             ('id', models.AutoField(primary_key=True)),
-            ('name', models.CharField(_("name"), unique=True, max_length=256)),
+            ('name', models.CharField(_("name"), unique=True, max_length=255)),
             ('html', models.TextField(_("HTML"), blank=True)),
         ))
         db.send_create_signal('snippet', ['Snippet'])
@@ -38,7 +38,7 @@ class Migration:
         'snippet.snippet': {
             'html': ('models.TextField', ['_("HTML")'], {'blank': 'True'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'name': ('models.CharField', ['_("name")'], {'unique': 'True', 'max_length': '256'})
+            'name': ('models.CharField', ['_("name")'], {'unique': 'True', 'max_length': '255'})
         },
         'cms.cmsplugin': {
             '_stub': True,
