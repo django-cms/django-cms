@@ -563,10 +563,11 @@ class CMSPlugin(models.Model):
     def render_plugin(self, context={}, placeholder=None):
         instance, plugin = self.get_plugin_instance()
         if instance:
-            template = plugin.render_template
+            context = plugin.render(context, instance, placeholder)
+            template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
             if not template:
                 raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
-            return mark_safe(render_to_string(template, plugin.render(context, instance, placeholder)))
+            return mark_safe(render_to_string(template, context))
         else:
             return ""
             
