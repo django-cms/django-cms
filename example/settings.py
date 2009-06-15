@@ -118,9 +118,7 @@ INSTALLED_APPS = (
     # 'south',
     # sample application
     'sampleapp',
-    #'store',
-    #'travel', # simple app for testing publisher
-    
+    'store',
     'publisher', # post publisher
 )
 

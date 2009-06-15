@@ -29,7 +29,7 @@ class Publisher(models.Model):
             # this model is also mptt model, and self.parent isn't published
             raise MpttCantPublish
         
-        print "----- publishing:", self, self.__class__.__name__
+        #print "----- publishing:", self, self.__class__.__name__
         
         if fields is None:
             fields = self._meta.fields
@@ -49,7 +49,7 @@ class Publisher(models.Model):
             except AttributeError:
                 #kw = {'inherited_origin': self}
                 public_copy = self.inherited_public
-                print "-- inherited", self.id
+                #print "-- inherited", self.id
         except ObjectDoesNotExist:
             #public_copy = self.__class__.PublicModel(**kw)
             pass
@@ -67,10 +67,10 @@ class Publisher(models.Model):
                 if field.name in ('public', 'inherited_public'):
                     continue
                 
-                print self, field, field.rel.to
+                #print self, field, field.rel.to
                 related = field.rel.to
                 if issubclass(related, Publisher):
-                    print ">> process related:", related
+                    #print ">> process related:", related
                     if not related in exclude and value:
                         # can follow
                         try:
@@ -121,7 +121,7 @@ class Publisher(models.Model):
                 name = obj.get_accessor_name()
                 #if name in ('public', 'inherited_public'):
                 #    continue
-                print ">>> publish remote:", obj.model, name
+                #print ">>> publish remote:", obj.model, name
                 
                 try:
                     try:
@@ -132,7 +132,7 @@ class Publisher(models.Model):
                     continue
                 
                 for item in item_set:
-                    print "publish remote:", obj.model, item
+                    #print "publish remote:", obj.model, item
                     item.publish(exclude=exclude + [obj.__class__])
         
         if not created:

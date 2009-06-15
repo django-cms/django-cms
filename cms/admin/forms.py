@@ -240,7 +240,6 @@ class PageUserForm(UserCreationForm):
             user.save()
 
         if self.cleaned_data['notify_user']:
-            print "notify!!"
             created = not bool(self.instance)
             mail_page_user_change(user, created, self.cleaned_data['password1'])
         

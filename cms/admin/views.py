@@ -76,7 +76,6 @@ def add_plugin(request):
         if parent:
             plugin.parent = parent
         plugin.save()
-        print ">>> plugin saved:", plugin.pk
         if 'reversion' in settings.INSTALLED_APPS:
             page.save()
             save_all_plugins(request, page)

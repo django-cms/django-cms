@@ -761,9 +761,6 @@ class PageAdmin(admin.ModelAdmin):
     
     
     def get_permissions(self, request, page_id):
-        #if not obj.has_change_permissions_permission(request):
-        print ">> get_permissions", page_id
-        
         page = get_object_or_404(Page, id=page_id)
         
         can_change_list = Page.permissions.get_change_id_list(request.user)
@@ -881,7 +878,6 @@ class PageAdmin(admin.ModelAdmin):
         public = page.public
         response = super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
         if request.method == 'POST' and response.status_code == 302 and public:
-            print ">>> delete public"
             public.delete()
         return response
              

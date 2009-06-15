@@ -152,19 +152,16 @@ def approve_page(request, page):
     
     """
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
-    print "A"
     if not moderator_should_approve(request, page):
         # escape soon if there isn't any approvement required by this user
         return
-    print "B"
     if not moderation_required:
-        print "C"
         # this is a second case - user can publish changes
         if page.pagemoderatorstate_set.get_delete_actions().count():
             # it is a delete request for this page!!
             page.delete_with_public()
         else:
-            print ">>>>> page.publish()"
+            #print ">>>>> page.publish()"
             page.publish()
     else:
         # first case - just mark page as approved from this user

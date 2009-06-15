@@ -17,7 +17,6 @@ class CMSChangeList(ChangeList):
         try:
             self.query_set = self.get_query_set(request)
         except:
-            print "exception"
             raise
         self.get_results(request)
         

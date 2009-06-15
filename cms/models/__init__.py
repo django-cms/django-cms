@@ -1,4 +1,3 @@
-from _IPython.genutils import page
 import sys
 import urllib2
 from os.path import join
@@ -122,8 +121,7 @@ class Page(Publisher, Mptt):
         cms_signals.page_moved.send(sender=Page, instance=self)
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
-        print "copy page", self.pagemoderator_set.all()
-        
+        #print "copy page", self.pagemoderator_set.all()
         """
         copy a page and all its descendants to a new location
         
@@ -219,7 +217,7 @@ class Page(Publisher, Mptt):
     
     def save(self, no_signals=False, change_state=True):
         # Published pages should always have a publication date
-        print "save()", no_signals, change_state
+        #print "save()", no_signals, change_state
         publish_directly = False
         
         created = not bool(self.pk)
@@ -235,7 +233,7 @@ class Page(Publisher, Mptt):
         elif change_state:
             publish_directly = True
         
-        print ">> page.save()"
+        #print ">> page.save()"
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -256,7 +254,7 @@ class Page(Publisher, Mptt):
             
         if publish_directly or \
             created and self.pk and not self.get_moderator_queryset().count():
-            print "-- publish directly"
+            #print "-- publish directly"
             self.publish()
             
         
@@ -472,7 +470,6 @@ class Page(Publisher, Mptt):
     def has_change_permissions_permission(self, request):
         """Has user ability to change permissions for current page?
         """
-        print ">> hsc:", self.has_generic_permission(request, "change_permissions")
         return self.has_generic_permission(request, "change_permissions")
     
     def has_add_permission(self, request):
@@ -572,7 +569,7 @@ class Page(Publisher, Mptt):
         
         Returns: True if page was successfully published.
         """
-        print ">> page.publish()"
+        #print ">> page.publish()"
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
         
