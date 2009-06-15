@@ -11,7 +11,7 @@ class Snippet(models.Model):
     """
     A snippet of HTML or a Django template
     """
-    name = models.CharField(_("name"), max_length=256, unique=True)
+    name = models.CharField(_("name"), max_length=255, unique=True)
     html = models.TextField(_("HTML"), blank=True)
 
     def __unicode__(self):
