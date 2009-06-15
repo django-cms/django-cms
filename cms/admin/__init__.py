@@ -44,6 +44,7 @@ from cms.utils.moderator import update_moderation_message,\
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
 from cms.exceptions import NoPermissionsException
+from cms.admin.dialog.views import get_copy_dialog
 
 
 PAGE_ADMIN_INLINES = []
@@ -320,68 +321,99 @@ class PageAdmin(admin.ModelAdmin):
             'js/lib/ui.dialog.js',
             'js/change_form.js',
         )]
-    
-    def redirect_jsi18n(self, request):
-            return HttpResponseRedirect("../../../jsi18n/")
-    
-    def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
         
+    def __call__(self, request, url):
+        """Delegate to the appropriate method, based on the URL.
+        
+        Old way of url handling, so we are compatible with older django 
+        versions.
+        """
+        if url is None:
+            return self.list_pages(request)
+        elif url.endswith('add-plugin'):
+            return add_plugin(request)
+        elif 'edit-plugin' in url:
+            plugin_id = url.split("/")[-1]
+            return edit_plugin(request, plugin_id, self.admin_site)
+        elif 'remove-plugin' in url:
+            return remove_plugin(request)
+        elif 'move-plugin' in url:
+            return move_plugin(request)
+        elif url.endswith('/move-page'):
+            return self.move_page(request, unquote(url[:-10]))
+        elif url.endswith('/copy-page'):
+            return self.copy_page(request, unquote(url[:-10]))
+        elif url.endswith('/change-status'):
+            return change_status(request, unquote(url[:-14]))
+        elif url.endswith('/change-navigation'):
+            return change_innavigation(request, unquote(url[:-18]))
+        elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
+            return HttpResponseRedirect("../../../jsi18n/")
+        elif url.endswith('/permissions'):
+            return self.get_permissions(request, unquote(url[:-12]))
+        elif url.endswith('/moderation-states'):
+            return self.get_moderation_states(request, unquote(url[:-18]))
+        elif url.endswith('/change-moderation'):
+            return change_moderation(request, unquote(url[:-18]))
+        elif url.endswith('/approve'):
+            return self.approve_page(request, unquote(url[:-8]))
+        elif url.endswith('/remove-delete-state'):
+            return self.remove_delete_state(request, unquote(url[:-20]))
+        elif url.endswith('/dialog/copy'):
+            return get_copy_dialog(request, unquote(url[:-12]))
+        
+        # NOTE: revert plugin is newly integrated in overriden revision_view
+        """
+        elif ('history' in url or 'recover' in url) and request.method == "POST":
+            resp = super(PageAdmin, self).__call__(request, url)
+            if resp.status_code == 302:
+                version = int(url.split("/")[-1])
+                revert_plugins(request, version)
+                return resp
+        """
+        if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
+            url = url.split("/?")[0]
+        return super(PageAdmin, self).__call__(request, url)
+
+    def get_urls(self):
+        """New way of urls handling.
+        """
+        from django.conf.urls.defaults import patterns, url
         info = "%sadmin_%s_%s" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
+
+        # helper for url pattern generation
+        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
-            url(r'^(?:[0-9]+)/add-plugin/$',
-                self.admin_site.admin_view(add_plugin),
-                name='%s_add_plugin' % info),
+            pat(r'^(?:[0-9]+)/add-plugin/$', add_plugin),
             url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
-            url(r'^(?:[0-9]+)/remove-plugin/$',
-                self.admin_site.admin_view(remove_plugin),
-                name='%s_remove_plugin' % info),
-            url(r'^(?:[0-9]+)/move-plugin/$',
-                self.admin_site.admin_view(move_plugin),
-                name='%s_move_plugin' % info),
-            url(r'^([0-9]+)/move-page/$',
-                self.admin_site.admin_view(self.move_page),
-                name='%s_move_page' % info),    
-            url(r'^([0-9]+)/permissions/$',
-                self.admin_site.admin_view(self.get_permissions),
-                name='%s_permissions' % info),
-            url(r'^([0-9]+)/moderation-states/$',
-                self.admin_site.admin_view(self.get_moderation_states),
-                name='%s_moderation_states' % info),
-            url(r'^([0-9]+)/copy-page/$',
-                self.admin_site.admin_view(self.copy_page),
-                name='%s_moderation_states' % info),                
-            url(r'^([0-9]+)/change-status/$',
-                self.admin_site.admin_view(change_status),
-                name='%s_change_status' % info),
-            url(r'^([0-9]+)/change-navigation/$',
-                self.admin_site.admin_view(change_innavigation),
-                name='%s_change_navigation' % info),
-            url(r'^([0-9]+)/change-moderation/$',
-                self.admin_site.admin_view(change_moderation),
-                name='%s_change_moderation' % info),
-            url(r'^([0-9]+)/jsi18n/$',
-                self.admin_site.admin_view(self.redirect_jsi18n),
-                name='%s_jsi18n' % info),
-            # NOTE: revert plugin is newly integrated in overriden revision_view
-             
-            # approve page
-            url(r'^([0-9]+)/approve/$',
-                self.admin_site.admin_view(self.approve_page),
-                name='%s_approve_page' % info),
+            pat(r'^(?:[0-9]+)/remove-plugin/$', remove_plugin),
+            pat(r'^(?:[0-9]+)/move-plugin/$', move_plugin),
+            pat(r'^([0-9]+)/move-page/$', self.move_page),
+            pat(r'^([0-9]+)/copy-page/$', self.copy_page),
+            pat(r'^([0-9]+)/change-status/$', change_status),
+            pat(r'^([0-9]+)/change-navigation/$', change_innavigation),
+            pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             
-            url(r'^([0-9]+)/remove-delete-state/$',
-                self.admin_site.admin_view(self.remove_delete_state),
-                name='%s_romove_delete_state' % info),
-                
+            
+            pat(r'^([0-9]+)/permissions/$', self.get_permissions),
+            pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
+            pat(r'^([0-9]+)/change-moderation/$', change_moderation),
+            
+            # NOTE: revert plugin is newly integrated in overriden revision_view
+            pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page 
+            pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
         )
         
         url_patterns.extend(super(PageAdmin, self).get_urls())
         return url_patterns
-
+    
+    def redirect_jsi18n(self, request):
+            return HttpResponseRedirect("../../../jsi18n/")
+    
     def save_model(self, request, obj, form, change):
         """
         Move the page in the tree if neccesary and save every placeholder
@@ -652,6 +684,7 @@ class PageAdmin(admin.ModelAdmin):
             
             'CMS_PERMISSION': settings.CMS_PERMISSION,
             'CMS_MODERATOR': settings.CMS_MODERATOR,
+            'DEBUG': settings.DEBUG,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)
@@ -781,7 +814,12 @@ class PageAdmin(admin.ModelAdmin):
                 return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                page.copy_page(target, site, position)
+                kwargs ={
+                    'copy_permissions': request.REQUEST.get('copy_permissions', False),
+                    'copy_moderation': request.REQUEST.get('copy_moderation', False)
+                }
+                
+                page.copy_page(target, site, position, **kwargs)
                 return HttpResponse("ok")
                 #return self.list_pages(request,
                 #    template_name='admin/cms/page/change_list_tree.html')

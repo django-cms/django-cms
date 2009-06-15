@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     # 'south',
     # sample application
     'sampleapp',
-    'store',
+    #'store',
     #'travel', # simple app for testing publisher
     
     'publisher', # post publisher
@@ -147,7 +147,7 @@ CMS_APPLICATIONS_URLS = (
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_FLAT_URLS = True
+CMS_FLAT_URLS = False
 
 CMS_MODERATOR = True
 

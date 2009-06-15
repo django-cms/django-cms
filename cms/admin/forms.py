@@ -13,6 +13,7 @@ from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups, mail_page_user_change
 from cms.admin.widgets import UserSelectAdminWidget
+from cms.utils.page import validate_page_slug
 
     
 class PageForm(forms.ModelForm):
@@ -58,15 +59,8 @@ class PageForm(forms.ModelForm):
         page = self.instance
         lang = cleaned_data['language']
         parent = cleaned_data['parent']
-        if cms_settings.CMS_UNIQUE_SLUGS:
-            titles = Title.objects.filter(slug=slug)
-        else:
-            titles = Title.objects.filter(slug=slug, language=lang)        
-        if not cms_settings.CMS_FLAT_URLS:
-            titles = titles.filter(page__parent=parent)
-        if self.instance.pk:
-            titles = titles.exclude(language=lang, page=page)
-        if titles.count():
+        
+        if not validate_page_slug(page, parent, slug, lang):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data
@@ -121,6 +115,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         self.fields['user'].queryset=get_subordinate_users(user)
         self.fields['user'].widget.user = user # assign current user
         self.fields['group'].queryset=get_subordinate_groups(user)
+        
         
     def clean(self):
         super(PagePermissionInlineAdminForm, self).clean()

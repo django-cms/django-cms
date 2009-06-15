@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from cms.settings import CMS_MEDIA_URL
 from django.forms.widgets import Widget, Select
-from django.contrib.auth.models import User
+from cms.models import PageUser
 
 
 class PluginEditor(Widget):
@@ -49,7 +49,7 @@ class UserSelectAdminWidget(Select):
     def render(self, name, value, attrs=None, choices=()):
         output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]    
         if hasattr(self, 'user') and (self.user.is_superuser or \
-            self.user.has_perm(User._meta.app_label + '.' + User._meta.get_add_permission())):
+            self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
             # append + icon
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \

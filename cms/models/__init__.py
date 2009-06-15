@@ -1,3 +1,5 @@
+from _IPython.genutils import page
+from cms.utils.page import get_available_slug
 import sys
 import urllib2
 from os.path import join
@@ -119,7 +121,9 @@ class Page(Publisher, Mptt):
         
         cms_signals.page_moved.send(sender=Page, instance=self)
         
-    def copy_page(self, target, site, position='first-child'):
+    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
+        print "copy page", self.pagemoderator_set.all()
+        
         """
         copy a page and all its descendants to a new location
         
@@ -139,17 +143,35 @@ class Page(Publisher, Mptt):
            
             titles = list(page.title_set.all())
             plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            
+            origin_id = page.id
+            # IMPORTANT NOTE: self gets changed in next few lines to page!!
+            
             page.pk = None
             page.level = None
             page.rght = None
             page.lft = None
             page.tree_id = None
-            
             page.status = Page.MODERATOR_CHANGED
             page.parent = tree[-1]
+            page.public_id = None
+            page.reverse_id = None
             page.save()
             
-            update_moderation_message(self, _('Page was copied.'))
+            update_moderation_message(page, _('Page was copied.'))
+                        
+            # copy moderation, permissions if necessary
+            if settings.CMS_PERMISSION and copy_permissions:
+                for permission in PagePermission.objects.filter(page__id=origin_id):
+                    permission.pk = None
+                    permission.page = page
+                    permission.save()
+            
+            if settings.CMS_MODERATOR and copy_moderation:
+                for moderator in PageModerator.objects.filter(page__id=origin_id):
+                    moderator.pk = None
+                    moderator.page = page
+                    moderator.save()
             
             if first:
                 first = False
@@ -157,7 +179,9 @@ class Page(Publisher, Mptt):
             page.sites = [site]
             for title in titles:
                 title.pk = None
+                title.public_id = None
                 title.page = page
+                title.slug = get_available_slug(title)
                 title.save()
             ptree = []
             for p in plugins:
@@ -168,6 +192,7 @@ class Page(Publisher, Mptt):
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
+                p.public_id = None
                 if p.parent:
                     pdif = p.level - ptree[-1].level
                     if pdif < 0:
@@ -794,7 +819,7 @@ class GlobalPagePermission(AbstractPagePermission):
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """ 
-    grant_on = models.IntegerField(_("Grant on"), choices=ACCESS_CHOICES, default=ACCESS_PAGE)
+    grant_on = models.IntegerField(_("Grant on"), choices=ACCESS_CHOICES, default=ACCESS_PAGE_AND_DESCENDANTS)
     page = models.ForeignKey(Page, null=True, blank=True, verbose_name=_("page"))
     
     objects = PagePermissionManager()

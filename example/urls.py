@@ -7,7 +7,8 @@ admin.autodiscover()
 admin.site.root_path = "/admin/" # there is probably a bug in django...
 
 urlpatterns = patterns('',
-    (r'^admin/', include(admin.site.urls)),
+    (r'^admin/(.*)', admin.site.root),
+    #(r'^admin/', include(admin.site.urls)),
     (r'^categories/', include('categories.urls')),
     
     # just for testing - native way to sampleapp urls 
