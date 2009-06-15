@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from os.path import join
+from django.template.context import Context
 import urllib2
 from cms.urlutils import urljoin
 
@@ -560,8 +561,10 @@ class CMSPlugin(models.Model):
             instance = self
         return instance, plugin
     
-    def render_plugin(self, context={}, placeholder=None):
+    def render_plugin(self, context=None, placeholder=None):
         instance, plugin = self.get_plugin_instance()
+        if context is None:
+            context = Context()
         if instance:
             context = plugin.render(context, instance, placeholder)
             template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
