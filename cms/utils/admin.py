@@ -4,7 +4,8 @@ from cms.utils.moderator import page_moderator_state, I_APPROVE
 from cms.utils import get_language_from_request
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from cms.utils.permissions import has_add_page_on_same_level_permission
+from cms.utils.permissions import has_add_page_on_same_level_permission,\
+    has_page_add_permission
 
 
 def get_admin_menu_item_context(request, page, filtered=False):
@@ -64,6 +65,7 @@ def render_admin_menu_item(request, page):
     """
     
     context = RequestContext(request, {
+        'has_add_permission': has_page_add_permission(request),
     })
     
     filtered = 'filtered' in request.REQUEST

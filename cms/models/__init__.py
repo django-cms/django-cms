@@ -150,7 +150,7 @@ class Page(Publisher, Mptt):
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.status = Page.MODERATOR_CHANGED
+            page.status = Page.MODERATOR_NEED_APPROVEMENT
             page.parent = tree[-1]
             page.public_id = None
             page.reverse_id = None
@@ -939,4 +939,4 @@ class PageModeratorState(models.Model):
     
     css_class = lambda self: self.action.lower()
     
-    __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.action)
+    __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.get_action_display())
