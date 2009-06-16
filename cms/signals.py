@@ -166,7 +166,7 @@ if cms_settings.CMS_PERMISSION:
     # regster signals to user related models
     signals.post_save.connect(post_save_user, User)
     signals.post_save.connect(post_save_user_group, Group)
-    
+
 
 def pre_save_page(instance, raw, **kwargs):
     """Helper pre save signal, assigns old_page attribute, so we can still
@@ -194,4 +194,4 @@ if cms_settings.CMS_MODERATOR:
     signals.post_save.connect(post_save_page, sender=Page)
     
         
-        
+from cache import signals

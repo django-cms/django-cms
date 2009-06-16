@@ -167,6 +167,7 @@ def has_add_page_on_same_level_permission(request, page):
         or GlobalPagePermission.objects.with_user(request.user).filter(can_add=True).count():
         return True
     try:
+        # SQL: 7 queries lost
         return page.parent.has_add_permission(request)
     except AttributeError:
         # if page doesnt have parent...

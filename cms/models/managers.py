@@ -6,6 +6,7 @@ from cms import settings
 from cms.utils.urlutils import levelize_path
 from cms.exceptions import NoPermissionsException
 from sets import Set
+from cms.cache.permissions import get_permission_cache, set_permission_cache
 
 class PageManager(models.Manager):
     def on_site(self):
@@ -377,14 +378,21 @@ class PagePermissionsPermissionManager(models.Manager):
         # TODO: result of this method should be cached per user, and cache should
         # be cleaned after some change in permissions / globalpermission
         
+        if not user.is_authenticated() or not user.is_staff:
+            return []
+        
         if user.is_superuser or not settings.CMS_PERMISSION:
             # got superuser, or permissions aren't enabled? just return grant 
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
         
+        # read from cache if posssible
+        cached = get_permission_cache(user, attr)
+        if cached is not None:
+            return cached
+        
         from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
             MASK_CHILDREN, MASK_DESCENDANTS
-            
         # check global permissions
         in_global_permissions = GlobalPagePermission.objects.with_user(user).filter(**{attr: True})
         if in_global_permissions:
@@ -409,7 +417,10 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        #print "> perm u:", user, "attr:", attr, page_id_allow_list
+        print "> perm attr:", attr, "R:", page_id_allow_list
+        
+        # store value in cache
+        set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list
 
 

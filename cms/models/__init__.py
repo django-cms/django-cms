@@ -215,7 +215,7 @@ class Page(Publisher, Mptt):
             if dif != 0:
                 tree.append(page)
     
-    def save(self, no_signals=False, change_state=True):
+    def save(self, no_signals=False, change_state=True, commit=True):
         # Published pages should always have a publication date
         #print "save()", no_signals, change_state
         publish_directly = False
@@ -247,10 +247,11 @@ class Page(Publisher, Mptt):
         if self.reverse_id == "":
             self.reverse_id = None
         
-        if no_signals:# ugly hack because of mptt
-            super(Page, self).save_base(cls=self.__class__)
-        else:
-            super(Page, self).save()
+        if commit:
+            if no_signals:# ugly hack because of mptt
+                super(Page, self).save_base(cls=self.__class__)
+            else:
+                super(Page, self).save()
             
         if publish_directly or \
             created and self.pk and not self.get_moderator_queryset().count():
@@ -495,10 +496,10 @@ class Page(Publisher, Mptt):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        if not request.user.is_authenticated() or not request.user.is_staff:
-            return False
-        if not settings.CMS_PERMISSION or request.user.is_superuser:
-            return True
+        #if not request.user.is_authenticated() or not request.user.is_staff:
+        #    return False
+        #if not settings.CMS_PERMISSION or request.user.is_superuser:
+        #    return True
         
         att_name = "permission_%s_cache" % type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) or request.user.pk != self.permission_user_cache.pk:

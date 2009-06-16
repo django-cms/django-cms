@@ -13,7 +13,7 @@ $(document).ready(function() {
 			if($("#id_title")[0]._changed){
 				changed = true;
 			}
-			if($("#id_status")[0]._changed){
+			if($("#id_published")[0]._changed){
 				changed = true;
 			}
 			if($('iframe').length){
@@ -48,7 +48,7 @@ $(document).ready(function() {
     }
     $("#id_slug").change(function() { this._changed = true; });
 	$('#id_title').change(function() {this._changed = true; })
-	$('#id_status').change(function() {this._changed = true; })
+	$('#id_published').change(function() {this._changed = true; })
     $("#id_title").keyup(function() {
         var e = $("#id_slug")[0];
         if (!e._changed && new_slug) {

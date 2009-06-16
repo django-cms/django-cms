@@ -123,6 +123,9 @@ $(document).ready(function() {
 			if (callback) callback(response);
 			var target = $(el).parents('div.cont:first');
 			var parent = target.parent();
+			if (response == "NotFound") {
+				return parent.remove();
+			}
 			target.replace(response);
 			parent.find('div.cont:first').yft();
 		});

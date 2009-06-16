@@ -30,7 +30,7 @@ from cms.admin.views import (change_status, change_innavigation, add_plugin,
     edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation)
 from cms.admin.widgets import PluginEditor
 from cms.models import Page, Title, CMSPlugin, PagePermission,\
-    PageModeratorState
+    PageModeratorState, EmptyTitle
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.permissions import has_page_add_permission,\
@@ -619,7 +619,24 @@ class PageAdmin(admin.ModelAdmin):
                 
                 'moderation_delete_request': moderation_delete_request,
             }
+        
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
+    
+    def response_add(self, request, obj, post_url_continue='../%s/'):
+        """Called always when new object gets created, there may be some new 
+        stuff, which should be published after all other objects on page are 
+        collected. E.g. title, plugins, etc...
+        """
+        obj.save(commit=False)
+        return super(PageAdmin, self).response_add(request, obj, post_url_continue)
+    
+    def response_change(self, request, obj):
+        """Called always when page gets changed, call save on page, there may be
+        some new stuff, which should be published after all other objects on page 
+        are collected.
+        """
+        obj.save(commit=False)
+        return super(PageAdmin, self).response_change(request, obj)
         
     def has_add_permission(self, request):
         """
