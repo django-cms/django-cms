@@ -2,6 +2,7 @@
 from south.db import db
 from django.db import models
 from cms.models import *
+import datetime
 
 class Migration:
     
@@ -35,9 +36,9 @@ class Migration:
             'can_edit': ('models.BooleanField', ['_("can edit")'], {'default': 'True'}),
             'can_publish': ('models.BooleanField', ['_("can publish")'], {'default': 'True'}),
             'everybody': ('models.BooleanField', ['_("everybody")'], {'default': 'False'}),
-            'group': ('models.ForeignKey', ["orm['auth.Group']"], {'null': 'True', 'blank': 'True'}),
+            'group': ('models.ForeignKey', ['Group'], {'null': 'True', 'blank': 'True'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'page': ('models.ForeignKey', ["orm['cms.Page']"], {'null': 'True', 'blank': 'True'}),
+            'page': ('models.ForeignKey', ['Page'], {'null': 'True', 'blank': 'True'}),
             'type': ('models.IntegerField', ['_("type")'], {'default': '0'}),
             'user': ('models.ForeignKey', ["orm['auth.User']"], {'null': 'True', 'blank': 'True'})
         },
@@ -47,8 +48,8 @@ class Migration:
             'language': ('models.CharField', ['_("language")'], {'db_index': 'True', 'max_length': '3', 'editable': 'False', 'blank': 'False'}),
             'level': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
             'lft': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'page': ('models.ForeignKey', ["orm['cms.Page']"], {'editable': 'False'}),
-            'parent': ('models.ForeignKey', ["orm['cms.CMSPlugin']"], {'null': 'True', 'editable': 'False', 'blank': 'True'}),
+            'page': ('models.ForeignKey', ['Page'], {'editable': 'False'}),
+            'parent': ('models.ForeignKey', ['CMSPlugin'], {'null': 'True', 'editable': 'False', 'blank': 'True'}),
             'placeholder': ('models.CharField', ['_("slot")'], {'max_length': '50', 'editable': 'False', 'db_index': 'True'}),
             'plugin_type': ('models.CharField', ['_("plugin_name")'], {'max_length': '50', 'editable': 'False', 'db_index': 'True'}),
             'position': ('models.PositiveSmallIntegerField', ['_("position")'], {'null': 'True', 'editable': 'False', 'blank': 'True'}),
@@ -62,7 +63,7 @@ class Migration:
             'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
             'language': ('models.CharField', ['_("language")'], {'max_length': '3', 'db_index': 'True'}),
-            'page': ('models.ForeignKey', ["orm['cms.Page']"], {'related_name': '"title_set"'}),
+            'page': ('models.ForeignKey', ['Page'], {'related_name': '"title_set"'}),
             'path': ('models.CharField', ['_("path")'], {'max_length': '255', 'db_index': 'True'}),
             'redirect': ('models.CharField', ['_("redirect")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'slug': ('models.SlugField', ['_("slug")'], {'unique': 'False', 'max_length': '255', 'db_index': 'True'}),
@@ -78,7 +79,7 @@ class Migration:
             'lft': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
             'login_required': ('models.BooleanField', ["_('login required')"], {'default': 'False'}),
             'navigation_extenders': ('models.CharField', ['_("navigation extenders")'], {'blank': 'True', 'max_length': '80', 'null': 'True', 'db_index': 'True'}),
-            'parent': ('models.ForeignKey', ["orm['cms.Page']"], {'db_index': 'True', 'related_name': "'children'", 'null': 'True', 'blank': 'True'}),
+            'parent': ('models.ForeignKey', ['Page'], {'db_index': 'True', 'related_name': "'children'", 'null': 'True', 'blank': 'True'}),
             'publication_date': ('models.DateTimeField', ['_("publication date")'], {'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'publication_end_date': ('models.DateTimeField', ['_("publication end date")'], {'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'reverse_id': ('models.CharField', ['_("id")'], {'blank': 'True', 'max_length': '40', 'null': 'True', 'db_index': 'True'}),

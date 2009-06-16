@@ -245,7 +245,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
-                                         
+""" - not required anymore?
 
 def render_plugin(context, plugin_id):
     CMSPluginModel = get_cmsplugin_model(context['request'])
@@ -253,9 +253,8 @@ def render_plugin(context, plugin_id):
     content = plugin.render(context)
     return  locals()
 render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
+"""
 
-#def render_plugin_title(context, plugin_id):
-    
 
 def has_permission(page, request):
     return page.has_change_permission(request)
@@ -383,6 +382,9 @@ class PlaceholderNode(template.Node):
         CMSPluginModel = get_cmsplugin_model(request)
         page = request.current_page
         plugins = CMSPluginModel.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+        if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
+            if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
+                context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
         c = ""
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name)

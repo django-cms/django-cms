@@ -81,9 +81,9 @@ the instance of the GalleryPlugin model
 
 the name of the placeholder this plugin appears.
 It is normally a good idea to give the placeholder to the template so you can style
-the content differently in the template based on which placholder it is placed.
+the content differently in the template based on which placeholder it is placed.
 
-If you want to process forms in the render function or if you wan't to see if the user is logged in you may want to access the request. 
+If you want to process forms in the render function or if you want to see if the user is logged in you may want to access the request. 
 You can accomplish this simply with:
 
 	request = context['request']

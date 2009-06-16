@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import Publisher, Mptt
 from publisher.errors import MpttCantPublish
 from cms.utils.urlutils import urljoin
+from django.template.context import Context
 import mptt
 from cms import settings
 from cms.models.managers import PageManager, TitleManager, PagePermissionsPermissionManager,\
@@ -724,13 +725,16 @@ class CMSPlugin(Publisher, Mptt):
             instance = self
         return instance, plugin
     
-    def render_plugin(self, context={}, placeholder=None):
+    def render_plugin(self, context=None, placeholder=None):
         instance, plugin = self.get_plugin_instance()
+        if context is None:
+            context = Context()
         if instance:
-            template = plugin.render_template
+            context = plugin.render(context, instance, placeholder)
+            template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
             if not template:
                 raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
-            return mark_safe(render_to_string(template, plugin.render(context, instance, placeholder)))
+            return mark_safe(render_to_string(template, context))
         else:
             return ""
             

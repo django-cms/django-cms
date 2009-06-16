@@ -13,6 +13,20 @@ CMS_TEMPLATES = getattr(settings, 'CMS_TEMPLATES', None)
 if CMS_TEMPLATES is None:
     raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
 
+# Define which placeholders support which plugins. Extra context will appear in the context of the plugins
+# example:
+#CMS_PLACEHOLDER_CONF = {
+#    'placeholder1': {
+#        "plugins": ('plugin1', 'plugin2'),
+#        "extra_context": {},
+#    },
+#    'placeholder2': {
+#        "plugins": ('plugin1', 'plugin3'),
+#        "extra_context": {},
+#    },
+#}
+CMS_PLACEHOLDER_CONF = getattr(settings, 'CMS_PLACEHOLDER_CONF', None)
+
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
 
