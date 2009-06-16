@@ -1,3 +1,4 @@
+from cms.cache.page import is_public_published
 import sys
 import urllib2
 from os.path import join
@@ -257,8 +258,8 @@ class Page(Publisher, Mptt):
             created and self.pk and not self.get_moderator_queryset().count():
             #print "-- publish directly"
             self.publish()
+            cms_signals.post_publish.send(sender=Page, instance=self)
             
-        
             
     def get_calculated_status(self):
         """
@@ -496,21 +497,15 @@ class Page(Publisher, Mptt):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        #if not request.user.is_authenticated() or not request.user.is_staff:
-        #    return False
-        #if not settings.CMS_PERMISSION or request.user.is_superuser:
-        #    return True
-        
         att_name = "permission_%s_cache" % type
-        if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) or request.user.pk != self.permission_user_cache.pk:
-            func = getattr(Page.permissions, "get_%s_id_list" % type)
-            permission = func(request.user)
+        if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
+            or request.user.pk != self.permission_user_cache.pk:
+            
+            from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            if permission == "All" or self.id in permission:
-                setattr(self, att_name, True)
+            setattr(self, att_name, has_generic_permission(self.id, request.user, type))
+            if getattr(self, att_name):
                 self.permission_edit_cache = True
-            else:
-                setattr(self, att_name, False)
         return getattr(self, att_name)
     
     def is_home(self):
@@ -533,10 +528,14 @@ class Page(Publisher, Mptt):
         return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
     
     def last_page_state(self):
+        """Returns last page state if CMS_MODERATOR
+        """
+        
+        # TODO: optimize SQL... 1 query per page 
         if settings.CMS_MODERATOR:
             # unknown state if no moderator
             try:
-                return self.pagemoderatorstate_set.all().order_by('-created')[0]
+                return self.pagemoderatorstate_set.all().order_by('-created',)[0]
             except IndexError:
                 pass
         return None
@@ -599,7 +598,14 @@ class Page(Publisher, Mptt):
             page.save(change_state=False)
             page.publish()
         
+        # fire signal after publishing is done
         return published
+    
+    def is_public_published(self):
+        """Returns true if public model is published.
+        """
+        return is_public_published(self)
+        
         
 class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)
@@ -936,7 +942,7 @@ class PageModeratorState(models.Model):
     class Meta:
         verbose_name=_('Page moderator state')
         verbose_name_plural=_('Page moderator states')
-        ordering = ('page', '-created') # newer first
+        ordering = ('page', 'action', '-created') # newer first
     
     css_class = lambda self: self.action.lower()
     

@@ -53,6 +53,16 @@ class CMSPluginBase(admin.ModelAdmin):
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
     
+    def has_add_permission(self, request, *args, **kwargs):
+        """Permission handling change - if user is allowed to change the page
+        he must be also allowed to add/change/delete plugins..
+        
+        Not sure if there will be plugin permission requirement in future, but
+        if, then this must be changed.
+        """
+        return self.cms_plugin_instance.page.has_change_permission(request)
+    has_delete_permission = has_delete_permission = has_add_permission
+    
     def save_model(self, request, obj, form, change):
         """
         Override original method, and add some attributes to obj

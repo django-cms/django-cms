@@ -58,10 +58,11 @@ function initTree(){
 		}
 	};
 	
+	
 	if (!$($("div.tree").get(0)).hasClass('root_allow_children')){
 		// disalow possibility for adding subnodes to main tree, user doesn't
 		// have permissions for this
-		options.rules.dragrules = ["node inside topnode", "node * node"];
+		options.rules.dragrules = ["node inside topnode", "topnode inside topnode", "node * node"];
 	}
 	
 	//dragrules : [ "folder * folder", "folder inside root", "tree-drop * folder" ],

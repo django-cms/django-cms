@@ -81,7 +81,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.csrf.middleware.CsrfMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
 )
 

@@ -54,8 +54,7 @@ class CMSChangeList(ChangeList):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
             if not self.is_filtered():
-                self.result_count = self.root_query_set.count()
-                self.full_result_count = self.root_query_set.count()
+                self.full_result_count = self.result_count = self.root_query_set.count()
             else:
                 self.full_result_count = self.root_query_set.count()
     
@@ -66,14 +65,12 @@ class CMSChangeList(ChangeList):
         perm_edit_ids = Page.permissions.get_change_id_list(request.user)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user)
         perm_softroot_ids = Page.permissions.get_softroot_id_list(request.user)
-        
-        
         perm_change_list_ids = Page.permissions.get_change_list_id_list(request.user)
         
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
             #pages = pages.filter(pk__in=perm_edit_ids)
             pages = pages.filter(pk__in=perm_change_list_ids)   
-                    
+        
         ids = []
         root_pages = []
         pages = list(pages)
@@ -91,20 +88,13 @@ class CMSChangeList(ChangeList):
                 page.root_node = False
             ids.append(page.pk)
             
-            if settings.CMS_PERMISSION:# caching the permissions
-                if perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids:
-                    page.permission_edit_cache = True
-                else:
-                    page.permission_edit_cache = False
-                if perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids:
-                    page.permission_publish_cache = True
-                else:
-                    page.permission_publish_cache = False
-                if perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_softroot_ids:
-                    page.permission_softroot_cache = True
-                else:
-                    page.permission_softroot_cache = False
+            if settings.CMS_PERMISSION:
+                # caching the permissions
+                page.permission_edit_cache = perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids
+                page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
+                page.permission_softroot_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_softroot_ids
                 page.permission_user_cache = request.user
+                
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
@@ -124,6 +114,7 @@ class CMSChangeList(ChangeList):
                         page.title_cache = title
                     if not title.language in page.languages_cache:
                         page.languages_cache.append(title.language)
+        
         self.root_pages = root_pages
         
     def get_items(self):

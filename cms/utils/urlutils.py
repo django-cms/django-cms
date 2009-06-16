@@ -23,16 +23,16 @@ def urljoin(*segments):
     """Joins url segments together and appends trailing slash if required.
     
     >>> urljoin('a', 'b', 'c')
-    'a/b/c/'
+    u'a/b/c/'
     
     >>> urljoin('a', '//b//', 'c')
-    'a/b/c/'
+    u'a/b/c/'
     
     >>> urljoin('/a', '/b/', '/c/')
-    '/a/b/c/'
+    u'/a/b/c/'
     
     >>> urljoin('/a', '')
-    '/a/'
+    u'/a/'
     """
     cleaned_segments = map(lambda segment: unicode(segment).strip("/"), segments)
     nonempty_segments = filter(lambda segment: segment > "", cleaned_segments)

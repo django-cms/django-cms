@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from cms.models import Page, PagePermission, GlobalPagePermission, MASK_PAGE
+from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
 from cms import settings as cms_settings
 
@@ -57,6 +57,7 @@ def has_page_add_permission(request):
         elif position in ("left", "right"):
             return has_add_page_on_same_level_permission(request, page)
     return False
+
     
 def get_user_permission_level(user):
     """Returns highest user level from the page/permission hierarchy on which
@@ -167,16 +168,19 @@ def has_add_page_on_same_level_permission(request, page):
         or GlobalPagePermission.objects.with_user(request.user).filter(can_add=True).count():
         return True
     try:
-        # SQL: 7 queries lost
-        return page.parent.has_add_permission(request)
+        return has_generic_permission(page.parent_id, request.user, "add")
     except AttributeError:
         # if page doesnt have parent...
+        pass
+        """
         if page.level == 0:
             # we are in the root, check if user haves add PAGE paermisson for
             # this page
             for perm in PagePermission.objects.with_user(request.user).filter(page=page, can_add=True):
                 if perm.grant_on & MASK_PAGE:
-                    return True 
+                    print PagePermission.objects.with_user(request.user).filter(page=page, can_add=True)
+                    return True
+        """ 
     return False
 
 def mail_page_user_change(user, created=False, password=""):
@@ -196,4 +200,12 @@ def mail_page_user_change(user, created=False, password=""):
         'created': created,
     }
     send_mail(subject, 'admin/cms/mail/page_user_change.txt', [user.email], context, 'admin/cms/mail/page_user_change.html')
+
+
+def has_generic_permission(page_id, user, attr):
+    """Permission getter for single page with given id.
+    """    
+    func = getattr(Page.permissions, "get_%s_id_list" % attr)
+    permission = func(user)
+    return permission == Page.permissions.GRANT_ALL or page_id in permission
     

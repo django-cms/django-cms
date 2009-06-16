@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import unittest
+import doctest
 from django.test import TestCase
 from django.conf import settings
 from cms.models import *
@@ -8,14 +10,14 @@ from django.template import TemplateDoesNotExist
 
 
 # doc testing in some modules
-from cms import urlutils
+from cms.utils import urlutils
 
-def suite():
-    suite1 = unittest.TestSuite()
-    suite1.addTest(doctest.DocTestSuite(urlutils))
-    suite2 = unittest.TestLoader().loadTestsFromTestCase(PagesTestCase)
-    alltests = unittest.TestSuite([suite1, suite2])
-    return alltests
+def suite(result=None):
+    #print x
+    s = unittest.TestSuite()
+    s.addTest(doctest.DocTestSuite(urlutils))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PagesTestCase))
+    return s
 
 class PagesTestCase(TestCase):
 

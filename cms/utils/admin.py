@@ -13,7 +13,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     """Used for rendering the page tree, inserts into context everything what
     we need for single item
     """
-    has_add_permission = page.has_add_permission(request)
+    has_add_page_permission = page.has_add_permission(request)
     has_move_page_permission = page.has_move_page_permission(request)
     
     site = Site.objects.get_current()
@@ -23,19 +23,20 @@ def get_admin_menu_item_context(request, page, filtered=False):
     if cms_settings.CMS_PERMISSION:
         # jstree metadata generator 
         md = []
-        if not has_add_permission:
+        
+        if not has_add_page_permission:
             md.append(('valid_children', False))
         if not has_move_page_permission:
             md.append(('draggable', False))
         
-        # just turn it into simple javasript object
-        metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
-            str(e[1]).lower() if isinstance(e[1], bool) else str(e[1])), md)) + "}"
-    
+        if md:
+            # just turn it into simple javasript object
+            metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
+                str(e[1]).lower() if isinstance(e[1], bool) else str(e[1])), md)) + "}"
+        
     moderator_state = page_moderator_state(request, page)
-    
     has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
-    
+
     context = {
         'page': page,
         'site': site,
@@ -47,7 +48,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
         'has_move_page_permission': has_move_page_permission,
-        'has_add_page_permission': has_add_permission,
+        'has_add_page_permission': has_add_page_permission,
         'has_moderate_permission': page.has_moderate_permission(request),
         'page_moderator_state': moderator_state,
         'moderator_should_approve': moderator_state['state'] is I_APPROVE,
