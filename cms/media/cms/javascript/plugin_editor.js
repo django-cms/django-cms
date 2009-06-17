@@ -20,35 +20,33 @@ $(document).ready(function() {
         }
     });
     $('ul.plugin-list').sortable({handle:'span.drag',
-                                  //appendTo:'body',
                                   axis:'y',
                                   opacity:0.9,
                                   zIndex:2000,
                                   update:function(event, ui){
-                                      var array = ui.element.sortable('toArray');
-                                      var d = "";
-                                      for(var i=0;i<array.length;i++){
-                                          d += array[i].split("plugin_")[1];
-                                          if (i!=array.length-1){
-                                              d += "_";
-                                          }
-                                      }
+                                  		var array = ui.element.sortable('toArray');
+                                  		var d = "";
+                                  		for(var i=0;i<array.length;i++){
+                                  			d += array[i].split("plugin_")[1];
+                                  			if (i!=array.length-1){
+                                  				d += "_";
+                                  			}
+                                  		}
+                                  		$.post("move-plugin", 
+                                  				{ ids:d },
+                                  				function(data){},
+                                  				"json");
 
-                                      $.post("move-plugin", { ids:d },
-                                          function(data){
-                                      }, "json");
-
+                                  		}
                                   }
-                                 }
-                                );
+    						);
+    
     setclickfunctions();
 });
 
 function setclickfunctions(){
     $('ul.plugin-list .text').click(function(){
-        var target = $(this).parent().parent().parent().parent().children("div.plugin-editor");
-        var id = $(this).parent().attr("id").split("plugin_")[1];
-        loadPluginForm(target, id);
+    	load_plugin($(this).parent())
         return false;
     });
 
@@ -65,6 +63,12 @@ function setclickfunctions(){
 	        }, "html");
 		}
     });
+}
+
+function load_plugin(li){
+	var target = li.parent().parent().parent().children("div.plugin-editor");
+    var id = li.attr("id").split("plugin_")[1];
+    loadPluginForm(target, id);
 }
 
 function setiframeheight(height, id){
