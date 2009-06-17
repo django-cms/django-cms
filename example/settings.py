@@ -24,6 +24,8 @@ DATABASE_PORT = ''              # Set to empty string for default. Not used with
 TEST_DATABASE_CHARSET = "utf8"
 TEST_DATABASE_COLLATION = "utf8_general_ci"
 
+DATABASE_SUPPORTS_TRANSACTIONS = True
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be avilable on all operating systems.
@@ -81,7 +83,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.csrf.middleware.CsrfMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
 )
 
@@ -114,7 +116,6 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
-
     #'south',
     # sample application
     'sampleapp',
@@ -145,13 +146,13 @@ CMS_APPLICATIONS_URLS = (
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_FLAT_URLS = False
-
+CMS_FLAT_URLS = True
 CMS_MODERATOR = True
 
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True
+
 
 #SOUTH_AUTO_FREEZE_APP = True
 

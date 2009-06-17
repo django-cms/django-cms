@@ -13,7 +13,7 @@ from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups, mail_page_user_change
 from cms.admin.widgets import UserSelectAdminWidget
-from cms.utils.page import validate_page_slug
+from cms.utils.page import is_valid_page_slug
 
     
 class PageForm(forms.ModelForm):
@@ -60,7 +60,7 @@ class PageForm(forms.ModelForm):
         lang = cleaned_data['language']
         parent = cleaned_data['parent']
         
-        if not validate_page_slug(page, parent, slug, lang):
+        if not is_valid_page_slug(page, parent, lang, slug):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data

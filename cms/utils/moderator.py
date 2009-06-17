@@ -99,6 +99,25 @@ def moderator_should_approve(request, page):
     return page_moderator_state(request, page)['state'] is I_APPROVE
 
 
+def requires_moderation(page):
+    """Returns True if page requires moderation
+    """
+    return bool(page.get_moderator_queryset().count())
+
+def will_require_moderation(target_id, position):
+    """Check if newly added page will require moderation
+    """
+    if not cms_settings.CMS_MODERATOR:
+        return False
+    target = Page.objects.get(pk=target_id)
+    if position == 'first-child':
+        return requires_moderation(target)
+    elif position in ('left', 'right'):
+        if target.parent:
+            return requires_moderation(target.parent)
+    return False
+    
+
 def get_test_moderation_level(page, user=None, include_user=True):
     """Returns min moderation level for page, and result of user test if 
     user is given, so output is always tuple of:
@@ -239,3 +258,4 @@ def mail_approvement_request(page, user=None):
     }
             
     send_mail(subject, 'admin/cms/mail/approvement_required.txt', recipient_list, context, 'admin/cms/mail/approvement_required.html')
+    

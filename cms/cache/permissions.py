@@ -6,8 +6,9 @@ from django.core.cache import cache
 TTL = 120  
 
 permission_cache_keys = [] 
+all_keys = []
 
-get_cache_key = lambda user, key: "%s::%s" % (user.username, key)
+get_cache_key = lambda user, key: "Admin::Permission::%s::%s" % (user.username, key)
 
 def get_permission_cache(user, key):
     """Helper for reading values from cache
@@ -19,14 +20,21 @@ def set_permission_cache(user, key, value):
     all of them can be cleaned when clean_permission_cache gets called.
     """
     # store this key, so we can clean it when required
+    cache_key = get_cache_key(user, key)
+    
+    if not cache_key in all_keys:
+        all_keys.append(cache_key)        
     if not key in permission_cache_keys:
         permission_cache_keys.append(key)
-    cache.set(get_cache_key(user, key), value, TTL)
+    cache.set(cache_key, value, TTL)
     
 
-def clear_permission_cache(user):
+def clear_user_permission_cache(user):
     """Cleans permission cache for given user.
     """
     for key in permission_cache_keys:
         cache.delete(get_cache_key(user, key)) 
-    
+
+def clear_permission_cache():
+    for key in all_keys:
+        cache.delete(key)

@@ -3,6 +3,7 @@ from cms import settings as cms_settings, appresolver
 from cms.models import signals as cms_signals, Page, Title
 from cms.models import CMSPlugin        
 from cms.utils.moderator import page_changed
+from django.core.exceptions import ObjectDoesNotExist
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
@@ -173,8 +174,10 @@ def pre_save_page(instance, raw, **kwargs):
     compare changes. Currently used only if CMS_PUBLISHER
     """
     instance.old_page = None
-    if instance.pk:
+    try:
         instance.old_page = Page.objects.get(pk=instance.pk)
+    except ObjectDoesNotExist:
+        pass
         
 
 def post_save_page(instance, raw, created, **kwargs):   

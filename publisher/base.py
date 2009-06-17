@@ -191,8 +191,7 @@ class PublicPublisher(models.Model):
         """If this instance, or some remote instances are marked for deletion
         kill them.
         """
-        print "------------ delete_marked_for_deletion on:", self
-        
+        #print "------------ delete_marked_for_deletion on:", self
         if collect:
             from django.db.models.query_utils import CollectedObjects
             

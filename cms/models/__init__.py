@@ -217,10 +217,21 @@ class Page(Publisher, Mptt):
             if dif != 0:
                 tree.append(page)
     
-    def save(self, no_signals=False, change_state=True, commit=True):
+    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False):
+        """
+        Args:
+            
+            commit: True if model should be really saved
+            force_with_moderation: can be true when new object gets added under 
+                some existing page and this new page will require moderation; 
+                this is because of how this adding works - first save, then move
+        """
         # Published pages should always have a publication date
-        #print "save()", no_signals, change_state
-        publish_directly = False
+        publish_directly, under_moderation = False, False
+        
+        if settings.CMS_MODERATOR:
+            under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
+        
         
         created = not bool(self.pk)
         if settings.CMS_MODERATOR:
@@ -229,13 +240,11 @@ class Page(Publisher, Mptt):
                     # always change state to need approvement when there is some change
                     self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
                 
-                if self.pk and not self.get_moderator_queryset().count():
+                if not under_moderation:
                     # existing page without moderator - publish it directly
                     publish_directly = True
         elif change_state:
             publish_directly = True
-        
-        #print ">> page.save()"
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -254,14 +263,11 @@ class Page(Publisher, Mptt):
                 super(Page, self).save_base(cls=self.__class__)
             else:
                 super(Page, self).save()
-            
-        if publish_directly or \
-            created and self.pk and not self.get_moderator_queryset().count():
-            #print "-- publish directly"
+        
+        if publish_directly or created and not under_moderation:
             self.publish()
             cms_signals.post_publish.send(sender=Page, instance=self)
-            
-            
+
     def get_calculated_status(self):
         """
         get the calculated status of the page based on published_date,
@@ -551,6 +557,7 @@ class Page(Publisher, Mptt):
         q = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
             Q(page__tree_id=self.tree_id, page__level=self.level - 1, moderate_children=True) | \
             Q(page__pk=self.pk, moderate_page=True)
+        
         return PageModerator.objects.distinct().filter(q).order_by('page__level')
     
     def is_under_moderation(self):
@@ -890,12 +897,17 @@ class PageModerator(models.Model):
         verbose_name=_('PageModerator')
         verbose_name_plural=_('PageModerator')
     
-    def set_binary(self, state):
+    def set_decimal(self, state):
         """Converts and sets binary state to local attributes
         """
         self.moderate_page = state & MASK_PAGE
         self.moderate_children = state & MASK_CHILDREN
         self.moderate_descendants = state & MASK_DESCENDANTS
+        
+    def get_decimal(self):
+        return self.moderate_page * MASK_PAGE + \
+            self.moderate_children * MASK_CHILDREN + \
+            self.moderate_descendants * MASK_DESCENDANTS
     
     def save(self, force_insert=False, force_update=False):
         """Just some logical stuff - if user haves moderate_descendants then
@@ -905,7 +917,7 @@ class PageModerator(models.Model):
             self.moderate_children = True
         super(PageModerator, self).save(force_insert, force_update)
     
-    __unicode__ = lambda self: "%s: %s" % (unicode(self.user), unicode(self.page))
+    __unicode__ = lambda self: "%s on %s mod: %d" % (unicode(self.user), unicode(self.page), self.get_decimal())
         
 
 class PageModeratorState(models.Model):
@@ -936,7 +948,7 @@ class PageModeratorState(models.Model):
     )
     
     page = models.ForeignKey(Page)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     created = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=3, choices=_action_choices, null=True, blank=True)
     message = models.TextField(max_length=1000, blank=True, default="")

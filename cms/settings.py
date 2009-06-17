@@ -117,8 +117,8 @@ CMS_PAGE_MEDIA_PATH = getattr(settings, 'CMS_PAGE_MEDIA_PATH', 'cms_page_media/'
 # will be some control over the published stuff
 CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False) 
 
-if CMS_MODERATOR and not CMS_PERMISSION:
-    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
+#if CMS_MODERATOR and not CMS_PERMISSION:
+#    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
 
 # Allow the description and keywords meta tags to be edited from the
 # admin

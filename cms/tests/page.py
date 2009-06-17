@@ -1,25 +1,13 @@
 # -*- coding: utf-8 -*-
-import unittest
-import doctest
-from django.test import TestCase
 from django.conf import settings
 from cms.models import *
 from django.test.client import Client
 from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
+from cms.tests.base import PageBaseTestCase
+from cms import settings as cms_settings
 
-
-# doc testing in some modules
-from cms.utils import urlutils
-
-def suite(result=None):
-    #print x
-    s = unittest.TestSuite()
-    s.addTest(doctest.DocTestSuite(urlutils))
-    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PagesTestCase))
-    return s
-
-class PagesTestCase(TestCase):
+class PagesTestCase(PageBaseTestCase):
 
     fixtures = ['test.json']
     counter = 1
@@ -36,7 +24,12 @@ class PagesTestCase(TestCase):
     def get_new_page_data(self):
         page_data = {'title':'test page %d' % self.counter, 
             'slug':'test-page-%d' % self.counter, 'language':'en',
-            'sites':[1], 'status':Page.PUBLISHED, 'template':'index.html'}
+            'sites':[1], 'published':True, 'template':'index.html'}
+        
+        # required only if user haves can_change_permission
+        page_data['pagepermission_set-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-INITIAL_FORMS'] = 0
+        
         self.counter = self.counter + 1
         return page_data
 
@@ -53,6 +46,7 @@ class PagesTestCase(TestCase):
         """
         Test that a page can be created via the admin
         """
+        
         self.client.login(username= 'test', password='test')
         setattr(settings, "SITE_ID", 1)
         page_data = self.get_new_page_data()
@@ -64,33 +58,31 @@ class PagesTestCase(TestCase):
         page = title.page
         assert(page.get_title() == page_data['title'])
         assert(page.get_slug() == page_data['slug'])
-
+        
+        # were public instanes created?
+        title = Title.PublicModel.objects.get(slug=page_data['slug'])
+        assert(isinstance(title.page, Page.PublicModel))
+        
     def test_03_slug_collision(self):
         """
         Test a slug collision
         """
         setattr(settings, "SITE_ID", 1)
         
-        
         self.client.login(username= 'test', password='test')
         page_data = self.get_new_page_data()
         response = self.client.post('/admin/cms/page/add/', page_data)
         self.assertRedirects(response, '/admin/cms/page/')
         page1 = Title.objects.get(slug=page_data['slug']).page
-
         response = self.client.post('/admin/cms/page/add/', page_data)
         self.assertEqual(response.status_code, 200)
         # TODO: check for slug collisions after move
-        # TODO: check for slug collisions with different settings
-        
-        
+        # TODO: check for slug collisions with different settings         
   
     def test_04_details_view(self):
         """
         Test the details view
         """
-
-        
         self.client.login(username= 'test', password='test')
         try:
             response = self.client.get('/')
@@ -99,7 +91,7 @@ class PagesTestCase(TestCase):
                 raise
 
         page_data = self.get_new_page_data()
-        page_data['status'] = Page.DRAFT
+        page_data['published'] = False
         response = self.client.post('/admin/cms/page/add/', page_data)
         try:
             response = self.client.get('/')
@@ -108,7 +100,7 @@ class PagesTestCase(TestCase):
                 raise
 
         page_data = self.get_new_page_data()
-        page_data['status'] = Page.PUBLISHED
+        page_data['published'] = True
         page_data['slug'] = 'test-page-2'
         response = self.client.post('/admin/cms/page/add/', page_data)
         response = self.client.get('/admin/cms/page/')
@@ -132,11 +124,9 @@ class PagesTestCase(TestCase):
         page = Page.objects.get(id=1)
         assert(page.get_title() == 'changed title')
     
-    ''''
+    '''
     def test_06_site_framework(self):
-        """
-        Test the site framework, and test if it's possible to disable it
-        """
+        #Test the site framework, and test if it's possible to disable it
         setattr(settings, "SITE_ID", 2)
         setattr(settings, "PAGE_USE_SITE_ID", True)
         c = Client()
@@ -189,8 +179,9 @@ class PagesTestCase(TestCase):
         
         self.test_02_create_page()
         self.test_05_edit_page()
-        self.test_04_details_view()'''
-
+        self.test_04_details_view()
+    '''
+    
     def test_07_meta_description_and_keywords_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin

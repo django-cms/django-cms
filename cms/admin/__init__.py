@@ -40,7 +40,8 @@ from cms.views import details
 from cms.admin.models import BaseInlineFormSetWithQuerySet
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils.moderator import update_moderation_message,\
-    get_test_moderation_level, moderator_should_approve, approve_page
+    get_test_moderation_level, moderator_should_approve, approve_page,\
+    requires_moderation, will_require_moderation
 from django.core.urlresolvers import reverse
 from cms.utils.admin import render_admin_menu_item
 from cms.exceptions import NoPermissionsException
@@ -361,16 +362,7 @@ class PageAdmin(admin.ModelAdmin):
             return self.remove_delete_state(request, unquote(url[:-20]))
         elif url.endswith('/dialog/copy'):
             return get_copy_dialog(request, unquote(url[:-12]))
-        
         # NOTE: revert plugin is newly integrated in overriden revision_view
-        """
-        elif ('history' in url or 'recover' in url) and request.method == "POST":
-            resp = super(PageAdmin, self).__call__(request, url)
-            if resp.status_code == 302:
-                version = int(url.split("/")[-1])
-                revert_plugins(request, version)
-                return resp
-        """
         if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
             url = url.split("/?")[0]
         return super(PageAdmin, self).__call__(request, url)
@@ -420,14 +412,19 @@ class PageAdmin(admin.ModelAdmin):
         Move the page in the tree if neccesary and save every placeholder
         Content object.
         """
+        target = request.GET.get('target', None)
+        position = request.GET.get('position', None)
+        
         if 'recover' in request.path:
             obj.save(no_signals=True)
             obj.save()
         else:
-            obj.save()
+            force_with_moderation = target is not None and position is not None and \
+                will_require_moderation(target, position)
+            
+            obj.save(force_with_moderation=force_with_moderation)
         language = form.cleaned_data['language']
-        target = request.GET.get('target', None)
-        position = request.GET.get('position', None)
+        
         if target is not None and position is not None:
             try:
                 target = self.model.objects.get(pk=target)
@@ -435,6 +432,9 @@ class PageAdmin(admin.ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
+                
+        
+        
         Title.objects.set_or_create(
             obj, 
             language, 
@@ -584,6 +584,19 @@ class PageAdmin(admin.ModelAdmin):
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
+    
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        
+        if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
+            moderation_required = will_require_moderation(request.GET['target'], request.GET['position'])
+            
+            extra_context.update({
+                'moderation_required': moderation_required,
+                'moderation_level': '?',
+                'CMS_MODERATOR': settings.CMS_MODERATOR
+            })
+        return super(PageAdmin, self).add_view(request, form_url, extra_context)
     
     def change_view(self, request, object_id, extra_context=None):
         """
