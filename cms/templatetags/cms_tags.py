@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 
-def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_page=None):
+def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_id=None):
     """
     render a nested list of all children of the pages
     from_level: is the start level
@@ -20,7 +20,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     """
     request = context['request']
     site = Site.objects.get_current()
-    CMS_CONTENT_CACHE_DURATION = settings.CMS_CONTENT_CACHE_DURATION
     lang = get_language_from_request(request)
     current_page = request.current_page
    
@@ -48,51 +47,69 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                    'sites__domain' : site.domain,
                    'level__lte' : to_level}
         #check the ancestors for softroots
-        soft_root_start = 0
+        soft_root_pk = None
         for p in alist:
             ancestors.append(p[0])
             if p[1]:
-                soft_root = Page.objects.get(pk=p[0])
-                filters['lft__gte'] = soft_root.lft
-                filters['rght__lte'] = soft_root.rght
-                filters['tree_id'] = soft_root.tree_id
-                from_level = soft_root.level
-                soft_root_start = soft_root.level
-        if current_page and current_page.soft_root: 
-            filters['tree_id'] = current_page.tree_id
-            filters['lft__gte'] = current_page.lft
-            filters['rght__lte'] = current_page.rght
-            from_level = current_page.level
-            soft_root_start = current_page.level
-        if root_page:
+                soft_root_pk = p[0]
+        #modify filters if we don't start from the root
+        root_page = None
+        if root_id:
             root_page = Page.objects.get(reverse_id=root_page)
+        else:
+            print current_page
+            print current_page.soft_root
+            if current_page and current_page.soft_root:
+                root_page = current_page
+                soft_root_pk = current_page.pk
+            elif soft_root_pk:
+                root_page = Page.objects.get(pk=soft_root_pk)
+        if root_page:
+            print "root page found"
             filters['tree_id'] = root_page.tree_id
             filters['lft__gt'] = root_page.lft
             filters['rght__lt'] = root_page.rght
+            filters['level__lte'] = root_page.level + to_level
+            db_from_level = root_page.level + from_level
+        else:
+            db_from_level = from_level
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
         pages = Page.objects.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
         pages = list(pages)
+        if root_page:
+            pages = [root_page] + pages
+        print pages
         all_pages = pages[:]
+        root_level = getattr(root_page, 'level', None)
+        
+        print root_level
+        print from_level
+        print "========="
         for page in pages:# build the tree
-            if page.level >= from_level:
+            
+            if page.level >= db_from_level:
                 ids.append(page.pk)
-            if page.level == 0 or page.level == soft_root_start or page.level-1 == getattr(root_page, 'level', None):
+            print page.level
+            if page.level == 0 or page.level == root_level:
+                print "found"
                 page.ancestors_ascending = []
+                page.menu_level = 0 - from_level
+                page.childrens = []
                 children.append(page)
-                if current_page and page.pk == current_page.pk and current_page.soft_root:
+                if page.pk == soft_root_pk:
                     page.soft_root = False #ugly hack for the recursive function
                 if current_page:
                     pk = current_page.pk
                 else:
                     pk = -1
                 find_children(page, pages, extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
-                if current_page and page.pk == current_page.pk and current_page.soft_root:
+                if page.pk == soft_root_pk:
                     page.soft_root = True
-        if from_level > 0:
-            children = cut_levels(children, from_level)
+        if db_from_level > 0:
+            children = cut_levels(children, db_from_level)
         titles = list(Title.objects.filter(page__in=ids, language=lang))
         for page in all_pages:# add the title and slugs and some meta data
             for title in titles:
@@ -115,8 +132,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
 
-def show_menu_below_id(context, root_page=None, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template_file="cms/menu.html", next_page=None):
-    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_page=root_page)
+def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template_file="cms/menu.html", next_page=None):
+    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_id=root_id)
 register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
 
 
@@ -143,11 +160,19 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         pages = list(pages)
         all_pages = pages[:]
         page.ancestors_ascending = []
+        page.childrens = []
         for p in pages:
             p.descendant  = True
             ids.append(p.pk)
         page.selected = True
+        page.menu_level = -1
+        was_soft_root = False
+        if page.soft_root:
+            was_soft_root = True
+            page.soft_root = False
         find_children(page, pages, levels, levels, [], page.pk, request=request)
+        if was_soft_root:
+            page.soft_root = True
         children = page.childrens
         titles = Title.objects.filter(page__in=ids, language=lang)
         for p in all_pages:# add the title and slugs and some meta data
