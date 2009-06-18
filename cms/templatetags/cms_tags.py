@@ -57,15 +57,12 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         if root_id:
             root_page = Page.objects.get(reverse_id=root_page)
         else:
-            print current_page
-            print current_page.soft_root
             if current_page and current_page.soft_root:
                 root_page = current_page
                 soft_root_pk = current_page.pk
             elif soft_root_pk:
                 root_page = Page.objects.get(pk=soft_root_pk)
         if root_page:
-            print "root page found"
             filters['tree_id'] = root_page.tree_id
             filters['lft__gt'] = root_page.lft
             filters['rght__lt'] = root_page.rght
@@ -81,20 +78,12 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         pages = list(pages)
         if root_page:
             pages = [root_page] + pages
-        print pages
         all_pages = pages[:]
         root_level = getattr(root_page, 'level', None)
-        
-        print root_level
-        print from_level
-        print "========="
         for page in pages:# build the tree
-            
             if page.level >= db_from_level:
                 ids.append(page.pk)
-            print page.level
             if page.level == 0 or page.level == root_level:
-                print "found"
                 page.ancestors_ascending = []
                 page.menu_level = 0 - from_level
                 page.childrens = []
