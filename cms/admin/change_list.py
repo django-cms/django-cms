@@ -98,6 +98,7 @@ class CMSChangeList(ChangeList):
                 page.last = True
                 if len(children):
                     children[-1].last = False
+                page.menu_level = 0
                 root_pages.append(page)
                 page.ancestors_ascending = []
                 if not self.is_filtered():
