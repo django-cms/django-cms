@@ -6,21 +6,21 @@ There are 4 templatetags for use in the templates that are connected to the menu
 show_menu
 ---------
 
-show_menu renders the navigation of the current page.
+show\_menu renders the navigation of the current page.
 You can overwrite the appearance and the html if you add a cms/menu.html template to you project or edit the one provided with django-cms
-show_menu takes 4 parameters:
+show\_menu takes 4 parameters:
 from what level of the navigation to which level should the navigation be rendered?
 
-**start_level** (default=0)  
-**end_level** (default=100)
+**start\_level** (default=0)  
+**end\_level** (default=100)
 
 if you have a home as a root node and don't want to display home you can render the navigation only after level 1
 
-**extra_inactive** (default=0)
+**extra\_inactive** (default=0)
 
 if a node is not a direct ancestor or descendant of the current active node how many levels deep should the navigation be displayed?
 
-**extra_active** (default=100)
+**extra\_active** (default=100)
 
 if a node is the current active, how many levels deep should its descendants be displayed?
 
@@ -54,16 +54,36 @@ Level 1 navigation (as a nested list)
 Navigation with own template:
 
 	{% show_menu 0 100 100 100 "myapp/menu.html" %}
+	
+	
+show\_menu\_below\_id
+---------------------
 
-show_sub_menu
--------------
+If you have a set an id in the advanced settings of a page you can display the submenu of this page with
+a template tag:
+
+For example we have a page called meta that is not displayed in the navigation and that has the id "meta"
+
+	<ul>
+		{% show\_menu\_below\_id "meta" %}
+	</ul>
+
+You can give it the same parameters as show\_menu as well:
+
+	<ul>
+		{% show\_menu\_below\_id "meta" 0 100 100 100 "myapp/menu.html" %}
+	</ul>
+
+
+show\_sub\_menu
+---------------
 
 Display the sub menu of the current page (as a nested list)
 Takes one argument: how many levels deep should the submenu be displayed?
 The template can be found at cms/sub_menu.html
 
 	<ul>
-    	{% show_sub_menu 1 %}
+    	{% show\_sub\_menu 1 %}
 	</ul>
 
 with your own template:
@@ -173,6 +193,11 @@ Comes normally from mptt
 	{{ node.level }}
 
 The level of the node. Starts at 0
+
+	{{ node.menu_level }}
+	
+The level of the node from the root node of the menu. Starts at 0
+If your menu starts at level 1 or you have a soft\_root the first node still would have 0 as menu\_level
 
 	{{ node.get_absolute_url }}
 
