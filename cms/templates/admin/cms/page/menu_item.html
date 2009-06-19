@@ -2,8 +2,8 @@
 <div class="cont{% if CMS_MODERATOR %} moderatorstate{{ page_moderator_state.state }}{% endif %}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
-			<a href="{{ url }}{{ page.id }}/" class="changelink" title="{% trans "edit this page" %}">edit</a>
+			<a href="{{ url }}{{ page.id }}/?language={% page_admin_language page %}" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
+			<a href="{{ url }}{{ page.id }}/?language={% page_admin_language page %}" class="changelink" title="{% trans "edit this page" %}">edit</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>
 		{% endif %}
@@ -65,7 +65,7 @@
 				{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
 				<span class="state">{{ page_moderator_state.label }}</span>
 			{% endif %}
-			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}/{% page_admin_language page %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 		</div>
 		
 		<div class="col-published">
@@ -82,7 +82,7 @@
 			{% else %}<label>
 				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
 			</label>{% endif %}
-			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>			
+			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}/{% page_admin_language page %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 		</div>
 		
 		
