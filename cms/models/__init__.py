@@ -137,9 +137,6 @@ class Page(Publisher, Mptt):
         from cms.utils.moderator import update_moderation_message
         
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
-        print "copy"
-        print target, site, position
-        print descendants
         tree = [target]
         level_dif = self.level - target.level - 1
         first = True
@@ -202,6 +199,8 @@ class Page(Publisher, Mptt):
                 p.lft = None
                 p.rght = None
                 p.public_id = None
+                p.inherited_public_id = None
+                
                 if p.parent:
                     pdif = p.level - ptree[-1].level
                     if pdif < 0:
@@ -222,6 +221,8 @@ class Page(Publisher, Mptt):
                     plugin.rght = p.rght
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
+                    plugin.inherited_public_id = p.inherited_public_id
+                    plugin.public_id = p.pk
                     plugin.save()
             if dif != 0:
                 tree.append(page)

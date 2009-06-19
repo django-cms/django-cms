@@ -21,10 +21,8 @@ class CMSChangeList(ChangeList):
         self.get_results(request)
         
         if SITE_VAR in self.params:
-            try:   
-                self._current_site = Site.objects.get(pk=self.params[SITE_VAR])
-            except:
-                self._current_site = Site.objects.get_current()
+            self._current_site = Site.objects.get(pk=self.params[SITE_VAR])
+            print "in params"
         else:
             site_pk = request.session.get('cms_admin_site', None)
             if site_pk:
@@ -33,7 +31,6 @@ class CMSChangeList(ChangeList):
                 self._current_site = Site.objects.get_current()
         
         request.session['cms_admin_site'] = self._current_site.pk
-        request.session.save()
         
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
@@ -135,5 +132,6 @@ class CMSChangeList(ChangeList):
         return Site.objects.all()
     
     def current_site(self):
+        print self._current_site.pk
         return self._current_site
     
