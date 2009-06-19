@@ -92,6 +92,11 @@ class Page(Publisher, Mptt):
     
     moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
     
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -698,6 +703,11 @@ class CMSPlugin(Publisher, Mptt):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    
     def __unicode__(self):
         return ""
     
@@ -963,3 +973,75 @@ class PageModeratorState(models.Model):
     css_class = lambda self: self.action.lower()
     
     __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.get_action_display())
+    
+    
+#===================== STUBS for south ===================
+'''
+class PublicTitle(models.Model):
+    language = models.CharField(_("language"), max_length=5, db_index=True)
+    title = models.CharField(_("title"), max_length=255)
+    menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
+    path = models.CharField(_("path"), max_length=255, db_index=True)
+    has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
+    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
+    meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
+    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
+    page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
+    page = models.ForeignKey(Page, verbose_name=_("page"), related_name="public_title_set")
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    
+class PublicCMSPlugin(models.Model):
+    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
+    parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
+    placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
+    plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    
+class PublicPage(models.Model):
+    """
+    A simple hierarchical page model
+    """
+    MODERATOR_CHANGED = 0
+    MODERATOR_NEED_APPROVEMENT = 1
+    MODERATOR_APPROVED = 10
+    # special case - page was approved, but some of page parents if not approved yet
+    MODERATOR_APPROVED_WAITING_FOR_PARENTS = 11
+    
+    moderator_state_choices = (
+        (MODERATOR_CHANGED, _('changed')),
+        (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
+        (MODERATOR_APPROVED, _('approved')),
+        (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
+    )
+    
+    author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    creation_date = models.DateTimeField(editable=False, default=datetime.now)
+    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
+    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
+    login_required = models.BooleanField(_('login required'), default=False)
+    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
+    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
+    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
+    navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
+    published = models.BooleanField(_("is published"), blank=True)
+    
+    template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
+    sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    
+    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
+    
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+'''
