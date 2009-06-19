@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from cms import settings as cms_settings
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from cms.utils import get_language_from_request
 
 register = template.Library()
 
@@ -76,3 +77,47 @@ def moderator_choices(page, user):
         active = page_moderator and getattr(page_moderator, name)
         title = active and title_no or title_yes
         yield value, title, active, name.split('_')[1]
+        
+def do_page_admin_language(parser, token):
+    error_string = u'%r tag requires one argument' % token.split_contents()[0]
+    try:
+        # split_contents() knows not to split quoted strings.
+        bits = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError(error_string)
+    if len(bits) >= 2:
+        #tag_name, page
+        return PageAdminLanguageNode(bits[1])
+    else:
+        raise template.TemplateSyntaxError(error_string)
+
+class PageAdminLanguageNode(template.Node):
+    """This template node is used to output GET attribute for selected editing language in admin
+    when entering Page Edit view.
+    
+    eg: {% page_admin_language page %}
+    
+    Keyword arguments:
+    page -- the page for which the language GET should be rendered.
+    """
+    def __init__(self, page):
+        self.page = template.Variable(page)
+
+    def render(self, context):
+        if not 'request' in context:
+            return ''
+        try:
+            lang = get_language_from_request(context['request'])
+            page = self.page.resolve(context)
+            page_languages = page.get_languages()
+            if lang not in page_languages and len(page_languages):
+                return page_languages[0]
+            else:
+                return lang
+        except template.VariableDoesNotExist:
+            return ''
+        
+    def __repr__(self):
+        return "<PageAdminLanguage Node: %s>" % self.page
+
+register.tag('page_admin_language', do_page_admin_language)
