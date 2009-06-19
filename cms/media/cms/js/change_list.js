@@ -53,7 +53,8 @@ function initTree(){
 				moveTreeItem(item_id, target_id, position, false)
 			},
 			onchange: function(node, tree){
-				self.location = node.id.split("page_")[1];
+				var url = $(node).find('a.title').attr("href")
+				self.location = url;
 			}
 		}
 	};
