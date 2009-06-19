@@ -229,11 +229,10 @@ class PageAdmin(admin.ModelAdmin):
     form = PageForm
     
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
-    mandatory_placeholders = ('title', 'slug', 'parent', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
-    filter_horizontal = ['sites']
+    mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = ['language']
-    general_fields = ['title', 'slug', 'parent', 'published']
-    advanced_fields = ['sites', 'in_navigation', 'reverse_id',  'overwrite_url']
+    general_fields = ['title', ('slug', 'parent', 'site'), 'published']
+    advanced_fields = ['in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     
@@ -266,8 +265,6 @@ class PageAdmin(admin.ModelAdmin):
     if settings.CMS_SHOW_META_TAGS:
         advanced_fields.append('meta_description')
         advanced_fields.append('meta_keywords')
-
-    list_filter += ['sites']
     
     if settings.CMS_SEO_FIELDS:
         seo_fields = ('page_title', 'meta_description', 'meta_keywords')
@@ -533,10 +530,6 @@ class PageAdmin(admin.ModelAdmin):
         form = super(PageAdmin, self).get_form(request, obj, **kwargs)
         language = get_language_from_request(request, obj)
         form.base_fields['language'].initial = force_unicode(language)
-        if 'site' in request.GET.keys():
-            form.base_fields['sites'].initial = [int(request.GET['site'])]
-        else:
-            form.base_fields['sites'].initial = Site.objects.all().values_list('id', flat=True)
         if obj:
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
@@ -558,7 +551,12 @@ class PageAdmin(admin.ModelAdmin):
             for name in ['slug','title','application_urls','overwrite_url','meta_description','meta_keywords']:
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
+            print request.session.keys()
+            print request.session
+            print dir(request.session)
+            form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
         form.base_fields['parent'].widget = HiddenInput() 
+        form.base_fields['site'].widget = HiddenInput() 
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)
@@ -846,7 +844,6 @@ class PageAdmin(admin.ModelAdmin):
                     'copy_permissions': request.REQUEST.get('copy_permissions', False),
                     'copy_moderation': request.REQUEST.get('copy_moderation', False)
                 }
-                
                 page.copy_page(target, site, position, **kwargs)
                 return HttpResponse("ok")
                 #return self.list_pages(request,

@@ -88,7 +88,7 @@ class Page(Publisher, Mptt):
     published = models.BooleanField(_("is published"), blank=True)
     
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
-    sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
     
     moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
     
@@ -136,7 +136,10 @@ class Page(Publisher, Mptt):
         """
         from cms.utils.moderator import update_moderation_message
         
-        descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
+        descendants = [self] + list(self.get_descendants().order_by('-rght'))
+        print "copy"
+        print target, site, position
+        print descendants
         tree = [target]
         level_dif = self.level - target.level - 1
         first = True
@@ -181,7 +184,8 @@ class Page(Publisher, Mptt):
             if first:
                 first = False
                 page.move_to(target, position)
-            page.sites = [site]
+            page.site = site
+            page.save()
             for title in titles:
                 title.pk = None
                 title.public_id = None
@@ -1036,7 +1040,7 @@ class PublicPage(models.Model):
     published = models.BooleanField(_("is published"), blank=True)
     
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
-    sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    site = models.ForeignKeyField(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
     
     moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
     

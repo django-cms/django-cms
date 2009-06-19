@@ -322,7 +322,7 @@ $(document).ready(function() {
 		}else{
 			url = remove_from_url(url, "copy");
 		}
-		url = insert_into_url(url, "sites__id__exact", id)
+		url = insert_into_url(url, "site__exact", id)
 		window.location = url;
 	});
 	var copy_splits = window.location.href.split("copy=")

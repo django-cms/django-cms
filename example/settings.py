@@ -81,10 +81,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.doc.XViewMiddleware',
 
     #'django.contrib.csrf.middleware.CsrfMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'cms.middleware.user.CurrentUserMiddleware',
+    
 )
 
 ROOT_URLCONF = 'example.urls'
@@ -146,7 +147,6 @@ CMS_APPLICATIONS_URLS = (
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_FLAT_URLS = True
 CMS_MODERATOR = True
 
 CMS_REDIRECTS = True

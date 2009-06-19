@@ -5,7 +5,7 @@ from cms import settings
 from cms.utils import get_language_from_request, find_children
 from django.contrib.sites.models import Site
 
-SITE_VAR = "sites__id__exact"
+SITE_VAR = "site__exact"
 COPY_VAR = "copy"
 
 class CMSChangeList(ChangeList):
@@ -26,11 +26,20 @@ class CMSChangeList(ChangeList):
             except:
                 self._current_site = Site.objects.get_current()
         else:
-            self._current_site = Site.objects.get_current()
+            site_pk = request.session.get('cms_admin_site', None)
+            if site_pk:
+                self._current_site = Site.objects.get(pk=site_pk)
+            else:
+                self._current_site = Site.objects.get_current()
+        
+        request.session['cms_admin_site'] = self._current_site.pk
+        request.session.save()
         
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
-            del self.params[COPY_VAR] 
+            del self.params[COPY_VAR]
+        
+            
         qs = super(CMSChangeList, self).get_query_set()
         if request:
             permissions = Page.permissions.get_change_list_id_list(request.user)
@@ -38,6 +47,8 @@ class CMSChangeList(ChangeList):
                 qs = qs.filter(pk__in=permissions)
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
+            if not SITE_VAR in self.params:
+                qs = qs.filter(site=request.session.get('cms_admin_site', None))
         qs = qs.order_by('tree_id', 'parent', 'lft')
         return qs
     
