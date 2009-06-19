@@ -379,6 +379,9 @@ function mark_copy_node(id){
 }
 
 function insert_into_url(url, name, value){
+	if(url.substr(url.length-1, url.length)== "&"){
+		url = url.substr(0, url.length-1)
+	}
 	dash_splits = url.split("#")
 	url = dash_splits[0]
 	var splits = url.split(name + "=");
@@ -401,6 +404,9 @@ function insert_into_url(url, name, value){
 	}
 	if(dash_splits.length>1){
 		url += dash_splits[1]
+	}
+	if(url.substr(url.length-1, url.length)== "&"){
+		url = url.substr(0, url.length-1)
 	}
 	return url
 }
