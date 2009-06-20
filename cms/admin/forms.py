@@ -64,23 +64,15 @@ class PageForm(forms.ModelForm):
             slug = cleaned_data['slug']
         else:
             slug = ""
-        print cleaned_data
         page = self.instance
         lang = cleaned_data['language']
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
-        print parent
-        print cleaned_data
-        print is_valid_page_slug(page, parent, lang, slug)
         if not is_valid_page_slug(page, parent, lang, slug):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data
-    
-    def clean_parent(self):
-        print "clean parent"
-        print self.cleaned_data
     
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])

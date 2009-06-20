@@ -97,6 +97,8 @@ def edit_plugin(request, plugin_id, admin_site):
         # history view with reversion
         from reversion.models import Version
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
+        print "version id", version_id
+        Version.objects.get(pk=version_id)
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
         
@@ -104,23 +106,23 @@ def edit_plugin(request, plugin_id, admin_site):
             obj = rev.object
             if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
                 cms_plugin = obj
+                print "cms_plugin found"
                 break
         inst, admin = cms_plugin.get_plugin_instance(admin_site)
         instance = None
-        
-        for rev in revs:
-            obj = rev.object
-            if obj.__class__ == inst.__class__ and int(obj.pk) == plugin_id:
-                instance = obj
-                break
+        if cms_plugin.get_plugin_class().model == CMSPlugin:
+            instance = cms_plugin
+        else:
+            for rev in revs:
+                obj = rev.object
+                if hasattr(obj, "cmsplugin_ptr_id") and int(obj.cmsplugin_ptr_id) == int(cms_plugin.pk):
+                    instance = obj
+                    break
         if not instance:
-            # TODO: this should be changed, and render something else.. There
-            # can be case when plugin is not using (registered) with reversion
-            # so it doesn't haves any version - it should just render plugin
-            # and say something like - not in version system..
-            raise Http404
+            raise Http404("This plugin is not saved in a revision")
     
     if not cms_plugin.page.has_change_permission(request):
+        print "no permission"
         raise Http404
 
     admin.cms_plugin_instance = cms_plugin
@@ -248,29 +250,43 @@ def save_all_plugins(request, page, excludes=None):
             plugin.save()
         
 def revert_plugins(request, version_id):
+    print "revert plugins"
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
+    print dir(version)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+    print revs
+    cms_plugin_list = []
     plugin_list = []
     titles = []
+    others = []
     page = None
     for rev in revs:
         obj = rev.object
         if obj.__class__ == CMSPlugin:
-            plugin_list.append(rev.object)
-        if obj.__class__ == Page:
+            cms_plugin_list.append(obj)
+        elif hasattr(obj, 'cmsplugin_ptr_id'):
+            plugin_list.append(obj)
+        elif obj.__class__ == Page:
             page = Page.objects.get(pk=obj.pk)
-            #obj.save()
-        if obj.__class__ == Title:
+        elif obj.__class__ == Title:
             titles.append(obj)
+        else:
+            others.append(rev)
     if not page.has_change_permission(request):
         raise Http404
     current_plugins = list(CMSPlugin.objects.filter(page=page))
-    for plugin in plugin_list:
+    print plugin_list
+    for plugin in cms_plugin_list:
         plugin.page = page
         
         plugin.save(no_signals=True)
         plugin.save()
+        for p in plugin_list:
+            if int(p.cmsplugin_ptr_id) == int(plugin.pk):
+                for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
+                    setattr(p, attr, getattr(plugin, attr))
+                p.save()
         for old in current_plugins:
             if old.pk == plugin.pk:
                 current_plugins.remove(old)
@@ -281,6 +297,8 @@ def revert_plugins(request, version_id):
         except:
             title.pk = Title.objects.get(page=page, language=title.language).pk
             title.save()
+    for other in others:
+        other.object.save()
     for plugin in current_plugins:
         plugin.delete()
         

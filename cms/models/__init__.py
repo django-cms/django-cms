@@ -731,7 +731,7 @@ class CMSPlugin(Publisher, Mptt):
         from cms.plugin_pool import plugin_pool
         plugin_class = plugin_pool.get_plugin(self.plugin_type)
         plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
-        if plugin.model != CMSPlugin: # and self.__class__ == CMSPlugin:
+        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 if hasattr(self, '_is_public_model'):
@@ -799,7 +799,7 @@ class CMSPlugin(Publisher, Mptt):
         
         
 if 'reversion' in settings.INSTALLED_APPS:        
-    reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])
+    reversion.register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])
     reversion.register(CMSPlugin)
     reversion.register(Title)
 
@@ -869,6 +869,9 @@ class PagePermission(AbstractPagePermission):
         page = self.page_id and unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on][1]))
 
+if 'reversion' in settings.INSTALLED_APPS:        
+    reversion.register(PagePermission)
+    
 
 class PageUser(User):
     """Cms specific user data, required for permission system
