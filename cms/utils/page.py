@@ -8,12 +8,13 @@ def is_valid_page_slug(page, parent, lang, slug):
     from cms.models import Title
     
     if cms_settings.CMS_UNIQUE_SLUGS:
+        print "unique slugs"
         titles = Title.objects.filter(slug=slug)
     else:
         titles = Title.objects.filter(slug=slug, language=lang)
     if not cms_settings.CMS_FLAT_URLS:
         titles = titles.filter(page__parent=parent)
-    
+    titles = titles.filter(page__site=page.site_id)
     if page.pk:
         titles = titles.exclude(language=lang, page=page)
     if titles.count():

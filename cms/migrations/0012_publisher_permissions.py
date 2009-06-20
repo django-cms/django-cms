@@ -18,9 +18,8 @@ class Migration:
         db.rename_table('cms_title', 'cms_publictitle')
         db.add_column('cms_publictitle', 'mark_delete',())
         
-        db.rename_table('cms_page_sites', 'cms_publicpage_sites')
-        db.rename_column('cms_publicpage_sites', 'page', 'publicpage')
-        # Adding ManyToManyField 'PublicPage.sites'
+        db.delete_table('cms_page_sites')
+        # TODO: create pages for every site
         
          # Adding model 'PublicPage'
         db.create_table('cms_page', (
@@ -46,13 +45,6 @@ class Migration:
             ('published', models.BooleanField(_("is published"), blank=True)),
         ))
         db.send_create_signal('cms', ['Page'])
-        
-        
-        db.create_table('cms_page_sites', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('page', models.ForeignKey(orm.Page, null=False)),
-            ('site', models.ForeignKey(orm['sites.Site'], null=False))
-        ))
         
         # Adding model 'PublicCMSPlugin'
         db.create_table('cms_cmsplugin', (

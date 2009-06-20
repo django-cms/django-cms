@@ -207,7 +207,7 @@ Softroot
 
 Softroots are pages that start a new navigation.
 If you are in a child of a softroot node you can only see the path to the softroot.
-This feature is useful if you have big navigation trees with a lot of sites and don't want to overwhelm the user
+This feature is useful if you have big navigation trees with a lot of pages and don't want to overwhelm the user
 
 To enable it put the following to your settings.py
 

@@ -24,7 +24,7 @@ class PagesTestCase(PageBaseTestCase):
     def get_new_page_data(self):
         page_data = {'title':'test page %d' % self.counter, 
             'slug':'test-page-%d' % self.counter, 'language':'en',
-            'sites':[1], 'published':True, 'template':'index.html'}
+            'site':1, 'published':True, 'template':'index.html'}
         
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0

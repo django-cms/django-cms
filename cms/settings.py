@@ -68,8 +68,8 @@ CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
 
 # Whether a slug should be unique ... must be unique in all languages.
-i18n_installed = not 'cms.middleware.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
-CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_installed)
+i18n_not_installed = not 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
+CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_not_installed)
 
 #Should the tree of the pages be also be displayed in the urls? or should a falt slug strucutre be used?
 CMS_FLAT_URLS = getattr(settings, 'CMS_FLAT_URLS', False)

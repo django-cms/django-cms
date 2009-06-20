@@ -11,7 +11,7 @@ from cms.cache.permissions import get_permission_cache, set_permission_cache
 class PageManager(models.Manager):
     def on_site(self):
         site = Site.objects.get_current()
-        return self.filter(sites=site)
+        return self.filter(site=site)
         
     def root(self):
         """
@@ -119,7 +119,7 @@ class TitleManager(models.Manager):
         try:
             titles = self.filter(
                 slug=slug,
-                page__sites__domain=site.domain,
+                page__site=site,
             ).select_related()#'page')
         except self.model.DoesNotExist:
             return None

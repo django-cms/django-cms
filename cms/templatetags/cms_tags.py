@@ -35,7 +35,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         else:# maybe the active node is in an extender?
             alist = []
             extenders = PageModel.objects.published().filter(in_navigation=True, 
-                                                        sites__domain=site.domain, 
+                                                        site=site, 
                                                         level__lte=to_level)
             extenders = extenders.exclude(navigation_extenders__isnull=True).exclude( navigation_extenders__exact="")
             for ext in extenders:
@@ -47,7 +47,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     alist = [(ext.pk, ext.soft_root)] + alist
                     break
         filters = {'in_navigation' : True, 
-                   'sites__domain' : site.domain,
+                   'site' : site,
                    'level__lte' : to_level}
         #check the ancestors for softroots
         
@@ -141,7 +141,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                   'rght__lt':page.rght, 
                   'tree_id':page.tree_id, 
                   'level__lte':page.level+levels, 
-                  'sites__domain':site.domain}
+                  'site':site}
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
         pages = PageModel.objects.published().filter(**filters)
@@ -164,8 +164,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         to_level = page.level+levels
         extra_active = extra_inactive = levels
     else:
-        extenders = PageModel.objects.published().filter(in_navigation=True, 
-                                                    sites__domain=site.domain)
+        extenders = PageModel.objects.published().filter(in_navigation=True, site=site)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         children = []
         from_level = 0
@@ -218,8 +217,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     else:
         site = Site.objects.get_current()
         ancestors = []
-        extenders = PageModel.objects.published().filter(in_navigation=True, 
-                                                    sites__domain=site.domain)
+        extenders = PageModel.objects.published().filter(in_navigation=True, site=site)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         for ext in extenders:
             ext.childrens = []
