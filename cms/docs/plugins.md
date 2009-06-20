@@ -88,7 +88,7 @@ You can accomplish this simply with:
 
 	request = context['request']
 
-because the request will always be in the context as the requescontext processor is required by the cms
+because the request will always be in the context as the requestcontext processor is required by the cms
 
 Template
 --------
@@ -100,30 +100,33 @@ now create a gallery.html template in templates/gallery/ and write the following
 
 Now go into the admin create a gallery and afterwards go into a page and add a gallery plugin and some pictures should appear in your page.
 
+Limiting Plugins per Placeholder
+--------------------------------
+
+You can limit in which placeholder certain plugins can appear. Add a CMS\_PLACEHOLDER\_CONF to your settings.py
+
+Example:
+
+	CMS_PLACEHOLDER_CONF = {                        
+	    'content': {
+	        "plugins": ('ContactFormPlugin','FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin'),
+	        "extra_context": {"theme":"16_16"},
+	    },
+
+	    'right-column': {
+	        "plugins": ('ContactFormPlugin','TextPlugin', 'SimpleGalleryPublicationPlugin'),
+	        "extra_context": {"theme":"16_5"},
+	    },
+	
+"content" and "right-column" are the names of two placeholders. The plugins list are filled with Plugin class names you find in the cms\_plugins.py. You can add extra context to each placeholder so plugin-templates can react to them. In this example we give them some parameters that used in CSS Grid Framework.
+
+
 Advanced
 --------
 
 CMSGalleryPlugin can be even further customized:
 
-you can add some other attributes:
+Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use all the things you are used to with normal admin classes. You can defined inlines, the form, the form template etc.
 
-### form_template ###
+Note: If you want to overwrite the form be sure to extend from "admin/cms/page/plugin\_change\_form.html" to have an unified look across the plugins and to have the preview functionality automatically installed.
 
-the template used to render the form.
-It is good practice to extend from "admin/cms/page/plugin_forms.html" So you get the same look and feel.
-
-### form ###
-
-A reference to a Form that will be displayed if you edit the plugin. If nothing is provided a model form of the model
-will be used.
-
-### placeholders ###
-
-a tuple of placeholder names this plugin can appear:
-
-For exmaple you have 3 placeholders: content, right-column, left-column
-And you want that your plugin only appears in either the left or right column but no in content:
-
-add this to your plugin: 
-	
-	placeholders = ('right-column', 'left-column')
