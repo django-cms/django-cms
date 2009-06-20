@@ -128,7 +128,6 @@ class Page(Publisher, Mptt):
         cms_signals.page_moved.send(sender=Page, instance=self)
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
-        #print "copy page", self.pagemoderator_set.all()
         """
         copy a page and all its descendants to a new location
         
@@ -587,7 +586,6 @@ class Page(Publisher, Mptt):
         
         Returns: True if page was successfully published.
         """
-        #print ">> page.publish()"
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
         
@@ -795,7 +793,9 @@ class CMSPlugin(Publisher, Mptt):
             super(CMSPlugin, self).save()
             
     
-      
+    def set_base_attr(self, plugin):
+        for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
+            setattr(plugin, attr, getattr(self, attr))
         
         
 if 'reversion' in settings.INSTALLED_APPS:        

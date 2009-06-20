@@ -97,7 +97,6 @@ def edit_plugin(request, plugin_id, admin_site):
         # history view with reversion
         from reversion.models import Version
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
-        print "version id", version_id
         Version.objects.get(pk=version_id)
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
@@ -106,7 +105,6 @@ def edit_plugin(request, plugin_id, admin_site):
             obj = rev.object
             if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
                 cms_plugin = obj
-                print "cms_plugin found"
                 break
         inst, admin = cms_plugin.get_plugin_instance(admin_site)
         instance = None
@@ -122,7 +120,6 @@ def edit_plugin(request, plugin_id, admin_site):
             raise Http404("This plugin is not saved in a revision")
     
     if not cms_plugin.page.has_change_permission(request):
-        print "no permission"
         raise Http404
 
     admin.cms_plugin_instance = cms_plugin
@@ -250,12 +247,9 @@ def save_all_plugins(request, page, excludes=None):
             plugin.save()
         
 def revert_plugins(request, version_id):
-    print "revert plugins"
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
-    print dir(version)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-    print revs
     cms_plugin_list = []
     plugin_list = []
     titles = []
@@ -276,7 +270,6 @@ def revert_plugins(request, version_id):
     if not page.has_change_permission(request):
         raise Http404
     current_plugins = list(CMSPlugin.objects.filter(page=page))
-    print plugin_list
     for plugin in cms_plugin_list:
         plugin.page = page
         
@@ -284,8 +277,7 @@ def revert_plugins(request, version_id):
         plugin.save()
         for p in plugin_list:
             if int(p.cmsplugin_ptr_id) == int(plugin.pk):
-                for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
-                    setattr(p, attr, getattr(plugin, attr))
+                plugin.set_base_attr(p)
                 p.save()
         for old in current_plugins:
             if old.pk == plugin.pk:

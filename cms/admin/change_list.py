@@ -22,7 +22,6 @@ class CMSChangeList(ChangeList):
         
         if SITE_VAR in self.params:
             self._current_site = Site.objects.get(pk=self.params[SITE_VAR])
-            print "in params"
         else:
             site_pk = request.session.get('cms_admin_site', None)
             if site_pk:
@@ -132,6 +131,5 @@ class CMSChangeList(ChangeList):
         return Site.objects.all()
     
     def current_site(self):
-        print self._current_site.pk
         return self._current_site
     

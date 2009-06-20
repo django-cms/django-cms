@@ -474,6 +474,8 @@ class PageAdmin(admin.ModelAdmin):
     def get_formsets(self, request, obj=None):
         for inline in self.inline_instances:
             if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
+                if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
+                    continue
                 if obj and not obj.has_change_permissions_permission(request):
                     continue
                 elif not obj:
@@ -481,7 +483,6 @@ class PageAdmin(admin.ModelAdmin):
                         get_user_permission_level(request.user)
                     except NoPermissionsException:
                         continue
-                
             yield inline.get_formset(request, obj)
     
     
@@ -566,11 +567,22 @@ class PageAdmin(admin.ModelAdmin):
                         version = get_object_or_404(Version, pk=version_id)
                         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                         plugin_list = []
+                        plugins = []
+                        bases = {}
                         for rev in revs:
                             obj = rev.object
                             if obj.__class__ == CMSPlugin:
                                 if obj.language == language and obj.placeholder == placeholder.name and not obj.parent_id:
-                                    plugin_list.append(rev.object)
+                                    if obj.get_plugin_class() == CMSPlugin:
+                                        plugin_list.append(obj)
+                                    else:
+                                        bases[int(obj.pk)] = obj
+                            if hasattr(obj, "cmsplugin_ptr_id"): 
+                                plugins.append(obj)
+                        for plugin in plugins:
+                            if int(plugin.cmsplugin_ptr_id) in bases:
+                                bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
+                                plugin_list.append(plugin)
                     else:
                         plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
@@ -758,8 +770,6 @@ class PageAdmin(admin.ModelAdmin):
     
     
     def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
-        print obj.parent_id
-        print version.field_dict['parent']
         # reset parent to null if parent is not found
         if version.field_dict['parent']: 
             try:

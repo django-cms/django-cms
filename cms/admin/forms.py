@@ -94,8 +94,6 @@ class PageForm(forms.ModelForm):
     
     def is_valid(self):
         resp = super(PageForm, self).is_valid()
-        print self.errors
-        print resp
         return resp
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
@@ -106,7 +104,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     """
     
     user = forms.ModelChoiceField('user', label=_('user'), widget=UserSelectAdminWidget, required=False)
-    
+    page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):

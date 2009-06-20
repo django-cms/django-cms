@@ -417,7 +417,6 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        #print "> perm attr:", attr, "R:", page_id_allow_list
         # store value in cache
         set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list

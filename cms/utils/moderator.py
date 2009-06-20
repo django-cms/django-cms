@@ -181,7 +181,6 @@ def approve_page(request, page):
             # it is a delete request for this page!!
             page.delete_with_public()
         else:
-            #print ">>>>> page.publish()"
             page.publish()
     else:
         # first case - just mark page as approved from this user
