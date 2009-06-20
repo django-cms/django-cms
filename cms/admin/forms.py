@@ -223,16 +223,14 @@ class PageUserForm(UserCreationForm):
         user = super(Super, self).save(commit=False)
         
         user.is_staff = True
+        created = not bool(user.pk)
         # assign creator to user
-        user.created_by = get_current_user()
+        if created:
+            user.created_by = get_current_user()
 
         if commit:
             user.save()
 
-        if self.cleaned_data['notify_user']:
-            created = not bool(self.instance)
-            mail_page_user_change(user, created, self.cleaned_data['password1'])
-        
         models = (Page, PageUser, PagePermission)
         for model in models:
             name = model.__name__.lower()
@@ -250,4 +248,8 @@ class PageUserForm(UserCreationForm):
                     user.user_permissions.add(permission)
                 else:
                     user.user_permissions.remove(permission)
+
+        if self.cleaned_data['notify_user']:
+            mail_page_user_change(user, created, self.cleaned_data['password1'])
+        
         return user
