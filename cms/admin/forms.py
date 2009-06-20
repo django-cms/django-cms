@@ -91,6 +91,12 @@ class PageForm(forms.ModelForm):
             if not any_path_re.match(url):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
+    
+    def is_valid(self):
+        resp = super(PageForm, self).is_valid()
+        print self.errors
+        print resp
+        return resp
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """Page permission inline admin form used in inline admin. Required, because

@@ -231,7 +231,7 @@ class PageAdmin(admin.ModelAdmin):
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = ['language']
-    general_fields = ['title', ('slug', ), ( 'published', 'site', 'parent')]
+    general_fields = ['title', 'slug', 'published']
     advanced_fields = ['in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -239,7 +239,7 @@ class PageAdmin(admin.ModelAdmin):
     list_filter = ['published', 'in_navigation', 'template', 'author']
     search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
     
-    hidden_fields = []
+    hidden_fields = ['site', 'parent']
     
     if settings.CMS_MODERATOR:
         list_filter.append('moderator_state')
