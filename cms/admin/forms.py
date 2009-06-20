@@ -90,7 +90,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     but aren't assigned to higher page level than current user.
     """
     
-    user = forms.ModelChoiceField(_('user'), widget=UserSelectAdminWidget)
+    user = forms.ModelChoiceField('user', label=_('user'), widget=UserSelectAdminWidget, required=False)
     
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
