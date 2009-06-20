@@ -8,9 +8,6 @@ import math
 from cms import settings as cms_settings
 from django.conf import settings
 
-if 'reversion' in settings.INSTALLED_APPS:
-    import reversion
-
 class File(CMSPlugin):
     """
     Plugin for storing any type of file.
@@ -55,6 +52,3 @@ class File(CMSPlugin):
     def __unicode__(self):
         if self.title: return self.title;
         return self.get_file_name();
-
-if 'reversion' in settings.INSTALLED_APPS:        
-    reversion.register(File, follow=["cmsplugin_ptr"])

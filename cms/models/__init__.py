@@ -787,6 +787,13 @@ class CMSPlugin(Publisher, Mptt):
             return unicode(plugin.icon_alt(instance))
         else:
             return u''
+        
+    def save(self, no_signals=False, *args, **kwargs):
+        if no_signals:# ugly hack because of mptt
+            super(CMSPlugin, self).save_base(cls=self.__class__)
+        else:
+            super(CMSPlugin, self).save()
+            
     
       
         

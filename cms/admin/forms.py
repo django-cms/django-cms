@@ -14,6 +14,7 @@ from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups, mail_page_user_change
 from cms.admin.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
+from django.forms.widgets import HiddenInput
 
     
 class PageForm(forms.ModelForm):
@@ -48,6 +49,14 @@ class PageForm(forms.ModelForm):
     
     class Meta:
         model = Page
+        
+    def __init__(self, *args, **kwargs):
+        super(PageForm, self).__init__(*args, **kwargs)
+        self.fields['parent'].widget = HiddenInput()
+        self.fields['parent'].label = "" 
+        self.fields['site'].widget = HiddenInput()
+        self.fields['site'].label = ""
+        self.fields['site'].help_text = "" 
     
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -55,15 +64,23 @@ class PageForm(forms.ModelForm):
             slug = cleaned_data['slug']
         else:
             slug = ""
-        
+        print cleaned_data
         page = self.instance
         lang = cleaned_data['language']
-        parent = cleaned_data['parent']
-        
+        if 'parent' not in cleaned_data:
+            cleaned_data['parent'] = None
+        parent = cleaned_data.get('parent', None)
+        print parent
+        print cleaned_data
+        print is_valid_page_slug(page, parent, lang, slug)
         if not is_valid_page_slug(page, parent, lang, slug):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data
+    
+    def clean_parent(self):
+        print "clean parent"
+        print self.cleaned_data
     
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])

@@ -259,17 +259,17 @@ def revert_plugins(request, version_id):
         if obj.__class__ == CMSPlugin:
             plugin_list.append(rev.object)
         if obj.__class__ == Page:
-            page = obj
-            obj.save()
+            page = Page.objects.get(pk=obj.pk)
+            #obj.save()
         if obj.__class__ == Title:
             titles.append(obj)
-    
     if not page.has_change_permission(request):
         raise Http404
-     
     current_plugins = list(CMSPlugin.objects.filter(page=page))
     for plugin in plugin_list:
         plugin.page = page
+        
+        plugin.save(no_signals=True)
         plugin.save()
         for old in current_plugins:
             if old.pk == plugin.pk:

@@ -6,9 +6,6 @@ from os.path import basename
 
 from django.conf import settings
 
-if 'reversion' in settings.INSTALLED_APPS:
-    import reversion
-
 class Picture(CMSPlugin):
     """
     A Picture with or without a link
@@ -22,7 +19,4 @@ class Picture(CMSPlugin):
         if self.alt:
             return self.alt[:40]
         return u"%s" % basename(self.image.path)
-
-if 'reversion' in settings.INSTALLED_APPS:        
-    reversion.register(Picture, follow=["cmsplugin_ptr"])
     

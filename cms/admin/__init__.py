@@ -231,7 +231,7 @@ class PageAdmin(admin.ModelAdmin):
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = ['language']
-    general_fields = ['title', ('slug', 'parent', 'site'), 'published']
+    general_fields = ['title', ('slug', ), ( 'published', 'site', 'parent')]
     advanced_fields = ['in_navigation', 'reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -546,17 +546,11 @@ class PageAdmin(admin.ModelAdmin):
                          'page_title']:
                 form.base_fields[name].initial = getattr(title_obj, name)
         else:
-            # Clear out the customisations made above
-            # TODO - remove this hack, this is v ugly
+            # TODO: Is this "for" needed? 
             for name in ['slug','title','application_urls','overwrite_url','meta_description','meta_keywords']:
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
-            print request.session.keys()
-            print request.session
-            print dir(request.session)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
-        form.base_fields['parent'].widget = HiddenInput() 
-        form.base_fields['site'].widget = HiddenInput() 
         template = get_template_from_request(request, obj)
         if settings.CMS_TEMPLATES:
             template_choices = list(settings.CMS_TEMPLATES)
@@ -745,6 +739,40 @@ class PageAdmin(admin.ModelAdmin):
             version = request.path.split("/")[-2]
             revert_plugins(request, version)
         return response
+    
+    def recover_view(self, request, version_id, extra_context=None):
+        from reversion.models import Version
+        #version = get_object_or_404(Version, pk=version_id)
+        response = super(PageAdmin, self).recover_view(request, version_id, extra_context)
+        if request.method == "POST" \
+            and ('history' in request.path or 'recover' in request.path) \
+            and response.status_code == 302:
+              
+            #page = version.object_version.object
+            #page.pagemoderatorstate_set.all().delete()
+            #if settings.CMS_MODERATOR:
+            #    from cms.utils.moderator import page_changed
+            #    page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            revert_plugins(request, version_id)
+        return response
+    
+    
+    def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
+        print obj.parent_id
+        print version.field_dict['parent']
+        # reset parent to null if parent is not found
+        if version.field_dict['parent']: 
+            try:
+                Page.objects.get(pk=version.field_dict['parent'])
+            except:
+                if revert and obj.parent_id != int(version.field_dict['parent']):
+                    version.field_dict['parent'] = obj.parent_id
+                if recover:
+                    obj.parent = None
+                    obj.parent_id = None
+                    version.field_dict['parent'] = None
+        return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
+            
     
     def list_pages(self, request, template_name=None, extra_context=None):
         """
