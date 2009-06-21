@@ -1,7 +1,7 @@
 Plugins
 =======
 
-Lets say we have the following gallery model:
+Suppose you have the following gallery model
 
 	class Gallery(models.Model):
 		name = models.CharField(max_length=30)
@@ -9,31 +9,30 @@ Lets say we have the following gallery model:
 	class Picture(models.Model):
 		gallery = models.ForeignKey(Gallery)
 		image = models.ImageField(upload_to="uploads/images/")
-		description = models.CharField(max_lenght=60)
+		description = models.CharField(max_length=60)
 
-And we want to display this gallery between two text blocks.
-We can do this with a cms plugin.
-To create a cms plugin you need two components: A CMSPlugin model and a cms_plugins.py
+and that you want to display this gallery between two text blocks.
+You can do this with a CMS plugin.
+To create a CMS plugin you need two components: a CMSPlugin model and a cms_plugins.py file.
 
 Plugin Model
 ------------
 
-First create a model that links the gallery:
+First create a model that links to the gallery via a ForeignKey field:
 
 	from cms.models import CMSPlugin
-
+	
 	class GalleryPlugin(CMSPlugin):
 		gallery = models.ForeignKey(Gallery)
-	
 
-Be sure to extend from CMSPlugin instead of models.Model.
+Be sure that your model inherits the CMSPlugin class.
 The plugin model can have any fields it wants. They are the fields that
 get displayed if you edit the plugin.
 
 cms_plugins.py
 --------------
 
-After that create in the application folder (the same the models.py is) a cms_plugins.py
+After that create in the application folder (the same one where models.py is) a cms_plugins.py file.
 
 In there write the following:
 
@@ -41,27 +40,27 @@ In there write the following:
 	from cms.plugin_pool import plugin_pool
 	from models import GalleryPlugin
 	from django.utils.translation import ugettext as _
-
+	
 	class CMSGalleryPlugin(CMSPluginBase):
 		model = GalleryPlugin
-    	name = _("Gallery")
-    	render_template = "gallery/gallery.html"
-    
-    	def render(self, context, instance, placeholder):
-        	return context.update({'gallery':instance.gallery, 'placeholder':placeholder})
-    
+		name = _("Gallery")
+		render_template = "gallery/gallery.html"
+	
+		def render(self, context, instance, placeholder):
+			return context.update({'gallery':instance.gallery, 'placeholder':placeholder})
+	
 	plugin_pool.register_plugin(CMSGalleryPlugin)		
 
 ### model ###
 
-is the CMSPlugin Model we created earlier
-If you don't need a model because you just want to display some template logic use CMSPlugin from cms.models as the model instead.
+is the CMSPlugin model we created earlier.
+If you don't need a model because you just want to display some template logic, use CMSPlugin from cms.models as the model instead.
 
 ### name ###
 
 will be displayed in the plugin editor
 
-### render_template ###
+### render\_template ###
 
 will be rendered with the context returned by the render function
 
@@ -88,7 +87,7 @@ You can accomplish this simply with:
 
 	request = context['request']
 
-because the request will always be in the context as the requestcontext processor is required by the cms
+because the request will always be in the context as the requestcontext processor is required by the CMS.
 
 Template
 --------
