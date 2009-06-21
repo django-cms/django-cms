@@ -87,6 +87,9 @@ class PageManager(models.Manager):
         Doesn't cares about the application language. 
         """
         return self.published().filter(title_set__application_urls__gt='').distinct()
+    
+    def get_home(self):
+        return self.published().order_by("tree_id")[0]
         
         
 class TitleManager(models.Manager):

@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from cms.utils.moderator import get_page_model, get_title_model, get_cmsplugin_model
+from cms.models import Page
 register = template.Library()
 
 
@@ -77,7 +78,9 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         pages = PageModel.objects.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
+        
         pages = list(pages)
+        print pages
         all_pages = pages[:]
         for page in pages:# build the tree
             if page.level >= from_level:
@@ -197,12 +200,14 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
     PageModel = get_page_model(request)
     TitleModel = get_title_model(request)
-    
     page = request.current_page
     lang = get_language_from_request(request)
     if page:
         ancestors = list(page.get_ancestors())
         ancestors.append(page)
+        home = PageModel.objects.get_home()
+        if ancestors and ancestors[0].pk != home.pk: 
+            ancestors = [home] + ancestors
         ids = [page.pk]
         for anc in ancestors:
             ids.append(anc.pk)
@@ -227,6 +232,9 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                 selected = find_selected(nodes)
                 if selected:
                     ancestors = list(ext.get_ancestors()) + [ext]
+                    home = PageModel.objects.get_home()
+                    if ancestors and ancestors[0].pk != home.pk: 
+                        ancestors = [home] + ancestors
                     ids = []
                     for anc in ancestors:
                         ids.append(anc.pk)

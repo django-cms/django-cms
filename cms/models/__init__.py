@@ -123,9 +123,10 @@ class Page(Publisher, Mptt):
         # fire signal
         
         self.force_moderation_action = PageModeratorState.ACTION_MOVE
-        self.save(change_state=True) # always save the page after move, because of publihser
+        cms_signals.page_moved.send(sender=Page, instance=self) #titles get saved before moderation
+        self.save(change_state=True) # always save the page after move, because of publisher
         
-        cms_signals.page_moved.send(sender=Page, instance=self)
+        
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
         """
@@ -266,16 +267,21 @@ class Page(Publisher, Mptt):
                 self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
-        
+            
+        if publish_directly or created and not under_moderation:
+            self._publish = True
+        else:
+            self._publish = False
+            
         if commit:
             if no_signals:# ugly hack because of mptt
                 super(Page, self).save_base(cls=self.__class__)
             else:
                 super(Page, self).save()
         
-        if publish_directly or created and not under_moderation:
-            self.publish()
-            cms_signals.post_publish.send(sender=Page, instance=self)
+        
+            #self.publish()
+            #cms_signals.post_publish.send(sender=Page, instance=self)
 
     def get_calculated_status(self):
         """
@@ -307,6 +313,8 @@ class Page(Publisher, Mptt):
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):
+        #if self.is_home():
+        #    return "/"
         if settings.CMS_FLAT_URLS:
             path = self.get_slug(language, fallback)
         else:
@@ -528,7 +536,12 @@ class Page(Publisher, Mptt):
         if self.parent_id:
             return False
         else:
-            return Page.objects.filter(parent=None).order_by('tree_id', 'lft')[0].pk == self.pk
+            return self.get_home_pk_cache() == self.pk
+        
+    def get_home_pk_cache(self):
+        if not hasattr(self, "home_pk_cache"):
+            self.home_pk_cache = Page.objects.get_home().pk
+        return self.home_pk_cache
             
     def get_media_path(self, filename):
         """
@@ -578,7 +591,7 @@ class Page(Publisher, Mptt):
         """
         return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
     
-    def publish(self):
+    def publish(self, fields=None, exclude=None):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible. 
         
@@ -597,11 +610,43 @@ class Page(Publisher, Mptt):
         
         self.save(change_state=False)
         
-        # TODO: create new version
+        if not fields:
+            public = self.public
+            if public:
+                if public.tree_id != self.tree_id: #moved over trees
+                    tree_ids = [self.tree_id, public.tree_id]
+                else:
+                    tree_ids = [self.tree_id]
+                
+                dirty = False
+                if self.lft != public.lft or self.rght != public.rght or self.level != public.level:#moved in tree
+                    dirty = True
+                if dirty or len(tree_ids) == 2:
+                    pages = list(Page.objects.filter(tree_id__in=tree_ids).order_by("tree_id", "level", "lft"))
+                    fields = []
+                    names = ["lft","rght","tree_id", "level", "parent"]
+                    for field in self._meta.fields:
+                        if field.name in names:
+                            fields.append(field)
+                    ids = []
+                    for page in pages:
+                        if page.pk != self.pk:
+                            page.publish(fields=fields)
+                            ids.append(page.pk)
+                    titles = Title.objects.filter(page__in=ids)
+                    print titles
+                    title_fields = []
+                    names = ["path"]
+                    for field in Title._meta.fields:
+                        if field.name in names:
+                            title_fields.append(field)
+                    for title in titles:
+                        title.publish(fields=title_fields)
+                        
         
         # publish, but only if all parents are published!! - this will need a flag
         try:
-            published = super(Page, self).publish()
+            published = super(Page, self).publish(fields, exclude)
         except MpttCantPublish:
             return 
         
@@ -650,6 +695,7 @@ class Title(Publisher):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
+        
         slug = u'%s' % self.slug
         if parent_page:
             self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
@@ -667,6 +713,7 @@ class Title(Publisher):
             for descendant_title in descendant_titles:
                 descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
                 descendant_title.save()
+        print self.path
 
     @property
     def overwrite_url(self):
