@@ -227,6 +227,10 @@ if settings.CMS_PERMISSION:
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
+    list_filter = ['published', 'in_navigation', 'template', 'author']
+    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
+    revision_form_template = "admin/cms/page/revision_form.html"
+    recover_form_template = "admin/cms/page/recover_form.html"
     
     exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
@@ -236,8 +240,7 @@ class PageAdmin(admin.ModelAdmin):
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     
-    list_filter = ['published', 'in_navigation', 'template', 'author']
-    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
+    
     
     hidden_fields = ['site', 'parent']
     
