@@ -159,6 +159,7 @@ class PageUserForm(UserCreationForm):
     can_add_page = forms.BooleanField(label=_('Can add page'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Can change page'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Can delete page'), required=False)
+    can_recover_page = forms.BooleanField(label=_('Can recover pages (any)'), required=False)
     
     can_add_pageuser = forms.BooleanField(label=_('Can create user'), required=False)
     can_change_pageuser = forms.BooleanField(label=_('Can change User'), required=False)

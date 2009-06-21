@@ -844,6 +844,8 @@ class AbstractPagePermission(models.Model):
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
+    can_recover_page = models.BooleanField(_("can recover pages"), default=True, help_text=_("can recover any deleted page"))
+    
     objects = BasicPagePermissionManager()
     
     class Meta:

@@ -72,7 +72,7 @@
 {% block object-tools %}
 
 	<ul class="object-tools">
-		{% if has_change_permission %}
+		{% if has_recover_permission %}
 			<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
 		{% endif %}
 		{% if has_add_permission %}

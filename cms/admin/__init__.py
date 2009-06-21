@@ -12,7 +12,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.forms import Widget, TextInput, Textarea, CharField, HiddenInput
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404,\
+    HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title, escapejs, force_escape
@@ -178,6 +179,8 @@ if settings.CMS_PERMISSION:
                     fn = getattr(opts, 'get_%s_permission' % t)
                     if request.user.has_perm(opts.app_label + '.' + fn()):
                         fields.append('can_%s_%s' % (t, name))
+                if model == Page:
+                    fields.append('can_recover_page')
             
                 if fields:
                     fieldsets.append((title, {'fields': (fields,)}),)
@@ -704,6 +707,21 @@ class PageAdmin(admin.ModelAdmin):
             return obj.has_delete_permission(request)
         return super(PageAdmin, self).has_delete_permission(request, obj)
     
+    def has_recover_permission(self, request):
+        """
+        Returns True if the use has the right to recover pages
+        """
+        user = request.user
+        if user.is_superuser:
+            return True
+        try:
+            perm = GlobalPagePermission.objects.get(user=user)
+            if perm.can_recover:
+                return True
+        except:
+            pass
+        return False
+    
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
         from django.contrib.admin.views.main import ERROR_FLAG
@@ -741,6 +759,7 @@ class PageAdmin(admin.ModelAdmin):
             
             'CMS_PERMISSION': settings.CMS_PERMISSION,
             'CMS_MODERATOR': settings.CMS_MODERATOR,
+            'has_recover_permission': self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
         }
         if 'reversion' in settings.INSTALLED_APPS:
@@ -752,6 +771,26 @@ class PageAdmin(admin.ModelAdmin):
             'admin/change_list.html'
         ], context, context_instance=RequestContext(request))
     
+    
+    def recoverlist_view(self, request, extra_context=None):
+        if not self.has_recover_permission(request):
+            raise PermissionDenied
+        return super(PageAdmin, self).recoverlist_view(request, extra_context)
+    
+    def recover_view(self, request, version_id, extra_context=None):
+        if not self.has_recover_permission(request):
+            raise PermissionDenied
+        return super(PageAdmin, self).recover_view(request, version_id, extra_context)
+    
+    def revision_view(self, request, object_id, version_id, extra_context=None):
+        if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
+            raise PermissionDenied
+        return super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
+    
+    def history_view(self, request, object_id, extra_context=None):
+        if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
+            raise PermissionDenied
+        return super(PageAdmin, self).history_view(request, object_id, extra_context)
     
     def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
         # reset parent to null if parent is not found
