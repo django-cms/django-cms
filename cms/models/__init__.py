@@ -560,7 +560,7 @@ class Page(Publisher, Mptt):
         """Returns ordered set of all PageModerator instances, which should 
         moderate this page
         """
-        if not settings.CMS_MODERATOR:
+        if not settings.CMS_MODERATOR or not self.tree_id:
             return PageModerator.objects.get_empty_query_set()
         
         q = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \

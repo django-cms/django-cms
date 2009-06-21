@@ -413,9 +413,28 @@ class PageAdmin(admin.ModelAdmin):
         position = request.GET.get('position', None)
         
         if 'recover' in request.path:
+            pk = obj.pk
+            if obj.parent_id:
+                parent = Page.objects.get(pk=obj.parent_id)
+            else:
+                parent = None
+            obj.lft = 0
+            obj.rght = 0
+            obj.tree_id = 0
+            obj.level = 0
+            obj.pk = None
+            obj.insert_at(parent, commit=False)
+            obj.pk = pk
             obj.save(no_signals=True)
             obj.save()
         else:
+            if 'revert' in request.path:
+                old_obj = Page.objects.get(pk=obj.pk)
+                obj.level = old_obj.level
+                obj.parent_id = old_obj.parent_id
+                obj.rght = old_obj.rght
+                obj.lft = old_obj.lft
+                obj.tree_id = old_obj.tree_id
             force_with_moderation = target is not None and position is not None and \
                 will_require_moderation(target, position)
             
@@ -730,44 +749,6 @@ class PageAdmin(admin.ModelAdmin):
             'admin/change_list.html'
         ], context, context_instance=RequestContext(request))
     
-    def revision_view(self, request, object_id, version_id, extra_context=None):
-        """This will be called only if is reversion installed. If its revert,
-        some plugins need to be restored...
-        """
-        page = get_object_or_404(Page, id=object_id)
-        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
-        
-        if request.method == 'POST' \
-            and ('history' in request.path or 'recover' in request.path) \
-            and response.status_code == 302:
-            
-            # clear moderation states
-            page.pagemoderatorstate_set.all().delete()
-            if settings.CMS_MODERATOR:
-                from cms.utils.moderator import page_changed
-                page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
-                
-            # revert plugins
-            version = request.path.split("/")[-2]
-            revert_plugins(request, version)
-        return response
-    
-    def recover_view(self, request, version_id, extra_context=None):
-        from reversion.models import Version
-        #version = get_object_or_404(Version, pk=version_id)
-        response = super(PageAdmin, self).recover_view(request, version_id, extra_context)
-        if request.method == "POST" \
-            and ('history' in request.path or 'recover' in request.path) \
-            and response.status_code == 302:
-              
-            #page = version.object_version.object
-            #page.pagemoderatorstate_set.all().delete()
-            #if settings.CMS_MODERATOR:
-            #    from cms.utils.moderator import page_changed
-            #    page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
-            revert_plugins(request, version_id)
-        return response
-    
     
     def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
         # reset parent to null if parent is not found
@@ -781,7 +762,19 @@ class PageAdmin(admin.ModelAdmin):
                     obj.parent = None
                     obj.parent_id = None
                     version.field_dict['parent'] = None
-        return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
+
+        response = super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
+        if request.method == "POST" \
+            and ('history' in request.path or 'recover' in request.path) \
+            and response.status_code == 302:
+            obj.pagemoderatorstate_set.all().delete()
+            if settings.CMS_MODERATOR:
+                from cms.utils.moderator import page_changed
+                page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+                
+            # revert plugins
+            revert_plugins(request, version.pk)
+        return response
             
     
     def list_pages(self, request, template_name=None, extra_context=None):
