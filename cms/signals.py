@@ -186,10 +186,6 @@ def post_save_page(instance, raw, created, **kwargs):
     old_page = instance.old_page
     del(instance.old_page)
     
-    if instance._publish:
-        instance.publish()
-        cms_signals.post_publish.send(sender=Page, instance=instance)
-    
     if cms_settings.CMS_MODERATOR:
         # tell moderator something was happen with this page
         page_changed(instance, old_page)

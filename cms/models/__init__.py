@@ -268,10 +268,7 @@ class Page(Publisher, Mptt):
         if self.reverse_id == "":
             self.reverse_id = None
             
-        if publish_directly or created and not under_moderation:
-            self._publish = True
-        else:
-            self._publish = False
+        
             
         if commit:
             if no_signals:# ugly hack because of mptt
@@ -279,9 +276,9 @@ class Page(Publisher, Mptt):
             else:
                 super(Page, self).save()
         
-        
-            #self.publish()
-            #cms_signals.post_publish.send(sender=Page, instance=self)
+        if publish_directly or created and not under_moderation:
+            self.publish()
+            cms_signals.post_publish.send(sender=Page, instance=self)
 
     def get_calculated_status(self):
         """
