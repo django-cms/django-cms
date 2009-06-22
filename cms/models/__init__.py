@@ -631,7 +631,6 @@ class Page(Publisher, Mptt):
                             page.publish(fields=fields)
                             ids.append(page.pk)
                     titles = Title.objects.filter(page__in=ids)
-                    print titles
                     title_fields = []
                     names = ["path"]
                     for field in Title._meta.fields:
@@ -710,7 +709,6 @@ class Title(Publisher):
             for descendant_title in descendant_titles:
                 descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
                 descendant_title.save()
-        print self.path
 
     @property
     def overwrite_url(self):

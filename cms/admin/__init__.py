@@ -475,8 +475,18 @@ class PageAdmin(admin.ModelAdmin):
         if settings.CMS_MODERATOR and 'moderator_message' in form.cleaned_data and \
             form.cleaned_data['moderator_message']:
             update_moderation_message(obj, form.cleaned_data['moderator_message'])
-        
     
+    def get_parent(self, request):    
+        target = request.GET.get('target', None)
+        position = request.GET.get('position', None)
+        parent = None
+        if target:
+            if position == "first_child":
+                parent = Page.objects.get(pk=target)
+            else:
+                parent = Page.objects.get(pk=target).parent
+        return parent
+        
     def get_fieldsets(self, request, obj=None):
         """
         Add fieldsets of placeholders to the list of already existing
@@ -484,70 +494,57 @@ class PageAdmin(admin.ModelAdmin):
         """
         template = get_template_from_request(request, obj)
         given_fieldsets = deepcopy(self.fieldsets)
-        
-        if obj:
+        if obj: # edit
             if not obj.has_publish_permission(request):
                 given_fieldsets[0][1]['fields'].remove('published')
             if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
                 given_fieldsets[2][1]['fields'].remove('soft_root')
+        else: # new page
+            parent = self.get_parent(request)
+            if parent: # check permissions of parent
+                if not parent.has_publish_permission(request):
+                    given_fieldsets[0][1]['fields'].remove('published')
+                if settings.CMS_SOFTROOT and not parent.has_softroot_permission(request):
+                    given_fieldsets[2][1]['fields'].remove('soft_root')
+            else: # check global permissions
+                pass
+                # TODO: check global permissions for soft_root and publish
         for placeholder in get_placeholders(request, template):
             if placeholder.name not in self.mandatory_placeholders:
                 given_fieldsets += [(title(placeholder.name), {'fields':[placeholder.name], 'classes':['plugin-holder']})]        
         return given_fieldsets
     
-    # remove permission inlines, if user isn't allowed to change them
-    def get_formsets(self, request, obj=None):
-        for inline in self.inline_instances:
-            if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
-                if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
-                    continue
-                if obj and not obj.has_change_permissions_permission(request):
-                    continue
-                elif not obj:
-                    try:
-                        get_user_permission_level(request.user)
-                    except NoPermissionsException:
-                        continue
-            yield inline.get_formset(request, obj)
-    
-    
-    def save_form(self, request, form, change):
-        """
-        Given a ModelForm return an unsaved instance. ``change`` is True if
-        the object is being changed, and False if it's being added.
-        """
-        instance = super(PageAdmin, self).save_form(request, form, change)
-        if not change:
-            instance.author = request.user
-        return instance
-
-    def get_widget(self, request, page, lang, name):
-        """
-        Given the request and name of a placeholder return a PluginEditor Widget
-        """
-        installed_plugins = plugin_pool.get_all_plugins(name)
-        widget = PluginEditor(installed=installed_plugins)
-        if not isinstance(widget(), Widget):
-            widget = Textarea
-        return widget
-
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
+        
         if obj:
             if not obj.has_publish_permission(request) and not 'published' in self.exclude:
                 self.exclude.append('published')
             elif 'published' in self.exclude:
                 self.exclude.remove('published')
-            
             if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request) \
                 and not 'soft_root' in self.exclude: 
                     self.exclude.append('soft_root')
             elif 'soft_root' in self.exclude:
                 self.exclude.remove('soft_root')
-        
+        else:
+            parent = self.get_parent(request)
+            if parent: # check permissions of parent
+                if not parent.has_publish_permission(request) and not 'published' in self.exclude:
+                    self.exclude.append('published')
+                elif 'published' in self.exclude:
+                    self.exclude.remove('published')
+                if settings.CMS_SOFTROOT and not parent.has_softroot_permission(request) \
+                and not 'soft_root' in self.exclude: 
+                    self.exclude.append('soft_root')
+                elif 'soft_root' in self.exclude:
+                    self.exclude.remove('soft_root')
+            else: # check global permissions
+                pass
+                # TODO: check global permissions for soft_root and publish
         version_id = None
         versioned = False
         if "history" in request.path or 'recover' in request.path:
@@ -613,6 +610,42 @@ class PageAdmin(admin.ModelAdmin):
                 widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                 form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
         return form
+    
+    # remove permission inlines, if user isn't allowed to change them
+    def get_formsets(self, request, obj=None):
+        for inline in self.inline_instances:
+            if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
+                if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
+                    continue
+                if obj and not obj.has_change_permissions_permission(request):
+                    continue
+                elif not obj:
+                    try:
+                        get_user_permission_level(request.user)
+                    except NoPermissionsException:
+                        continue
+            yield inline.get_formset(request, obj)
+    
+    
+    def save_form(self, request, form, change):
+        """
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
+        """
+        instance = super(PageAdmin, self).save_form(request, form, change)
+        if not change:
+            instance.author = request.user
+        return instance
+
+    def get_widget(self, request, page, lang, name):
+        """
+        Given the request and name of a placeholder return a PluginEditor Widget
+        """
+        installed_plugins = plugin_pool.get_all_plugins(name)
+        widget = PluginEditor(installed=installed_plugins)
+        if not isinstance(widget(), Widget):
+            widget = Textarea
+        return widget
     
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}

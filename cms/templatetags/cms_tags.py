@@ -85,7 +85,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                                                                     'lft')
         
         pages = list(pages)
-        print pages
         all_pages = pages[:]
         for page in pages:# build the tree
             if page.level >= from_level:
