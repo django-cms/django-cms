@@ -6,6 +6,8 @@ from cms.plugins.text.forms import TextForm
 from cms.plugins.text.widgets import WYMEditor
 from cms.plugins.text.utils import plugin_tags_to_user_html
 from django.forms.fields import CharField
+from cms.plugins.text.settings import USE_TINYMCE
+from django.conf import settings
 
 
 class TextPlugin(CMSPluginBase):
@@ -19,7 +21,11 @@ class TextPlugin(CMSPluginBase):
         Returns the Django form Widget to be used for
         the text area
         """
-        return WYMEditor(installed_plugins=plugins)
+        if USE_TINYMCE and "tinymce" in settings.INSTALLED_APPS:
+            from tinymce.widgets import TinyMCE
+            return TinyMCE()
+        else:
+            return WYMEditor(installed_plugins=plugins)
 
     def get_form_class(self, request, plugins):
         """

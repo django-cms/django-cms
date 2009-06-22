@@ -69,7 +69,12 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             from_level = current_page.level
             soft_root_start = current_page.level
         if root_page:
-            root_page = PageModel.objects.get(reverse_id=root_page)
+            if isinstance(root_page, int):
+                root_page = PageModel.objects.get(pk=root_page)
+            if isinstance(root_page, PageModel):
+                root_page = PageModel.objects.get(pk=root_page.id)
+            elif isinstance(root_page, unicode):
+                root_page = PageModel.objects.get(reverse_id=root_page)
             filters['tree_id'] = root_page.tree_id
             filters['lft__gt'] = root_page.lft
             filters['rght__lt'] = root_page.rght
