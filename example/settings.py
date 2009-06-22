@@ -113,6 +113,8 @@ INSTALLED_APPS = (
     'cms.plugins.file',
     'cms.plugins.flash',
     'cms.plugins.link',
+    'cms.plugins.snippet',
+    'cms.plugins.googlemap',
     'mptt',
     'reversion',
     'example.categories',
