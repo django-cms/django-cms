@@ -37,6 +37,7 @@ If your site is not multilingual you can leave out the MutilingualURLMiddleware.
 
 Context Processors
 ------------------
+
 Add the following context processors if not already present:
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
@@ -48,7 +49,6 @@ Add the following context processors if not already present:
 
 Templates
 ---------
-
 
 If you don't have already a gettext stub in your settings.py put this in your settings.py after the imports:
 
@@ -95,3 +95,9 @@ For a list of all settings that can be overridden in your settings.py have a loo
 
 More information is available in the docs folder: [cms/docs/](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs)
 or have a look at the example project.
+
+Media Files
+-----------
+
+If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/) be sure that you copy all files located in cms/media to your static files folder.
+
