@@ -1,6 +1,6 @@
 /*
  * WYMeditor : what you see is What You Mean web-based editor
- * Copyright (c) 2008 Jean-Francois Hovinne, http://www.wymeditor.org/
+ * Copyright (c) 2005 - 2009 Jean-Francois Hovinne, http://www.wymeditor.org/
  * Dual licensed under the MIT (MIT-license.txt)
  * and GPL (GPL-license.txt) licenses.
  *
@@ -13,11 +13,15 @@
  *
  * File Authors:
  *        Peter Eschler (peschler _at_ gmail.com)
+ *        Jean-Francois Hovinne - http://www.hovinne.com/
  *
  * Version:
- *        0.3
+ *        0.4
  *
  * Changelog:
+ *
+ * 0.4
+ *     - Removed UI and UI.resizable scripts loading - see #167 (jfh).
  *
  * 0.3
  *     - Added 'iframeOriginalSize' and removed 'ui.instance' calls (jfh).
@@ -38,6 +42,8 @@
  *
  *         wym.resizable({ handles: "s,e",
  *                         maxHeight: 600 });
+ *
+ * DEPENDENCIES: jQuery UI, jQuery UI resizable
  *
  * @param options options for the plugin  
  */
@@ -79,24 +85,7 @@ WYMeditor.editor.prototype.resizable = function(options) {
     // default ones.
     var final_options = jQuery.extend(default_options, options);
 
-    // Get the jQuery path from the editor, stripping away the jQuery file.
-    // see http://www.oreilly.com/catalog/regex/chapter/ch04.html
-    // The match result array contains the path and the filename.
-    var jQueryPath = wym.computeJqueryPath().match(/^(.*)\/(.*)$/)[1];
-
-    // Make an array of the external JavaScript files required by the plugin.
-    var jQueryPlugins = [jQueryPath + '/jquery.ui.js',
-                         jQueryPath + '/jquery.ui.resizable.js'];
-    
-    // First get the jQuery UI base file
-    $.getScript(jQueryPlugins[0]);
-
-    // Get the jQuery UI resizeable plugin and then init the wymeditor resize
-    // plugin. It is import to do the initialisation after loading the    
-    // necessary jQuery UI files has finished, otherwise the "resizable" method
-    // would not be available.
-    $.getScript(jQueryPlugins[1], function() {     
-        jQuery(wym._box).resizable(final_options);
-    });
+    if(jQuery.isFunction( jQuery.fn.resizable )) jQuery(wym._box).resizable(final_options);
+    else WYMeditor.console.error('Oops, jQuery UI.resizable unavailable.');
 
 };

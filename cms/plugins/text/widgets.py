@@ -16,11 +16,15 @@ class WYMEditor(Textarea):
             'wymeditor/jquery.wymeditor.js',
             'wymeditor/plugins/resizable/jquery.wymeditor.resizable.js',
             'javascript/wymeditor/plugins/wymeditor.placeholdereditor.js',
-            'javascript/ui.core.js',
+            'javascript/jquery.ui.js',
             #'javascript/placeholder_editor.js',
             'javascript/placeholder_editor_registry.js',
         )]
-        
+        css = {
+            'all': [join(CMS_MEDIA_URL, path) for path in (
+                        'css/jquery/cupertino/jquery-ui.css',
+                    )],
+        }
 
     def __init__(self, attrs=None, installed_plugins=None):
         """
