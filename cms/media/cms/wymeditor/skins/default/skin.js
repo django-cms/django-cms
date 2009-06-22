@@ -14,7 +14,7 @@ WYMeditor.SKINS['default'] = {
         jQuery(wym._box).find(wym._options.containersSelector)
           .addClass("wym_dropdown")
           .find(WYMeditor.H2)
-          .append("<span>&nbsp;&gt;</span>");
+          .append("<span>&#160;&gt;</span>");
 
         // auto add some margin to the main area sides if left area
         // or right area are not empty (if they contain sections)
