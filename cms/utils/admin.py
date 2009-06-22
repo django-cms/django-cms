@@ -24,9 +24,10 @@ def get_admin_menu_item_context(request, page, filtered=False):
         # jstree metadata generator 
         md = []
         
-        if not has_add_page_permission:
-            md.append(('valid_children', False))
+        #if not has_add_page_permission:
+            
         if not has_move_page_permission:
+            md.append(('valid_children', False))
             md.append(('draggable', False))
         
         if md:

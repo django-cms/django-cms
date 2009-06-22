@@ -621,7 +621,7 @@ class Page(Publisher, Mptt):
                 if dirty or len(tree_ids) == 2:
                     pages = list(Page.objects.filter(tree_id__in=tree_ids).order_by("tree_id", "level", "lft"))
                     fields = []
-                    names = ["lft","rght","tree_id", "level", "parent"]
+                    names = ["lft","rght","tree_id", "level", "parent", "author", "site"]
                     for field in self._meta.fields:
                         if field.name in names:
                             fields.append(field)
@@ -638,7 +638,8 @@ class Page(Publisher, Mptt):
                             title_fields.append(field)
                     for title in titles:
                         title.publish(fields=title_fields)
-                        
+            else:
+                print "no public found"            
         
         # publish, but only if all parents are published!! - this will need a flag
         try:

@@ -126,6 +126,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             self.cleaned_data[name] = self.cleaned_data.get(name, False)
         
         can_add = self.cleaned_data['can_add']
+        can_edit = self.cleaned_data['can_change']
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
@@ -133,6 +134,8 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # access this page anymore, so avoid this
             raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by his creator.'))
         
+        if can_add and not can_edit:
+            raise forms.ValidationError(ugettext_lazy('Add page permission also requires edit page permission.'))
         # TODO: finish this, but is it really required? might be nice to have 
         
         # check if permissions assigned in cms are correct, and display an message
