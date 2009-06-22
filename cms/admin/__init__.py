@@ -543,7 +543,11 @@ class PageAdmin(admin.ModelAdmin):
                 elif 'soft_root' in self.exclude:
                     self.exclude.remove('soft_root')
             else: # check global permissions
-                pass
+                
+                if 'published' in self.exclude:
+                    self.exclude.remove('published')
+                if 'soft_root' in self.exclude:
+                    self.exclude.remove('soft_root')
                 # TODO: check global permissions for soft_root and publish
         version_id = None
         versioned = False

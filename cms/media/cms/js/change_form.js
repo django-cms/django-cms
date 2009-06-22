@@ -13,8 +13,11 @@ $(document).ready(function() {
 			if($("#id_title")[0]._changed){
 				changed = true;
 			}
-			if($("#id_published")[0]._changed){
-				changed = true;
+			var pub = $("#id_published");
+			if (pub.length){
+				if(pub[0]._changed){
+					changed = true;
+				}
 			}
 			if($('iframe').length){
 				changed = true;
