@@ -8,7 +8,7 @@ $(document).ready(function() {
         var language = $('#id_language').attr('value');
         var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
         if (pluginvalue) {
-            var pluginname = select.children('[@selected]').text();
+            var pluginname = select.children('[selected]').text();
             var ul_list = $(this).parent().parent().children("ul.plugin-list");
             $.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
                 if ('error' != data) {
