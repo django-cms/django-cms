@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia cms_tags %}
+{% load i18n admin_modify adminmedia cms_tags cms_admin %}
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
@@ -30,10 +30,13 @@
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
 	{% if moderation_delete_request %}<li><a href="remove-delete-state/" class="approvelink">{% trans "Remove delete request" %}</a></li>{% endif %}  	
-	{% if moderator_should_approve %}<li><a href="approve/" class="approvelink">{% if moderation_delete_request %}{% trans "Approve delete" %}{% else %}{% trans "Approve" %}{% endif %}</a></li>{% endif %}
+	{% if moderator_should_approve %}
+	<li><a href="approve/" class="approvelink">{% if moderation_delete_request %}{% trans "Approve delete" %}{% else %}{% trans "Approve" %} {% trans "draft" %}{% endif %}</a></li>
+	<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}/{% page_admin_language page %}{{ page.get_absolute_url }}?preview&draft=1" class="previewdraftlink">{% trans "Preview" %} {% trans "draft" %}</a></li>
+	{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}/{% page_admin_language page %}{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
