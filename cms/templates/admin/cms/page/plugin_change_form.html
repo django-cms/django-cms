@@ -73,9 +73,11 @@
     <ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
 {% endif %}
 
+{% block fieldsets %}
 {% for fieldset in adminform %}
   {% include "admin/includes/fieldset.html" %}
 {% endfor %}
+{% endblock %}
  
 {% block after_field_sets %}{% endblock %}
  
