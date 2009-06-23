@@ -227,6 +227,13 @@ class PageUserForm(UserCreationForm):
         notify_user = self.cleaned_data['notify_user']
         if notify_user and not self.cleaned_data.get('email', None):
             raise forms.ValidationError(_("Email notification requires valid email address."))
+        
+        if self.cleaned_data['can_add_page'] and not self.cleaned_data['can_change_page']:
+            raise forms.ValidationError(_("The permission to add new pages requires the permission to change pages!"))
+        if self.cleaned_data['can_add_pageuser'] and not self.cleaned_data['can_change_pageuser']:
+            raise forms.ValidationError(_("The permission to add new users requires the permission to change users!"))
+        if self.cleaned_data['can_add_pagepermission'] and not self.cleaned_data['can_change_pagepermission']:
+            raise forms.ValidationError(_("To add permissions you also need to edit them!"))
         return cleaned_data
 
     def save(self, commit=True):
