@@ -124,7 +124,7 @@ def get_root(self):
     """
     if self.is_root_node():
         return self
-
+    
     opts = self._meta
     return self._default_manager.get(**{
         opts.tree_id_attr: getattr(self, opts.tree_id_attr),

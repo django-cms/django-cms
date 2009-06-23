@@ -22,7 +22,7 @@ Plugins are very easy to write and you can easily write them on your own and con
 
 ![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen3.png "Tree / List view")
 
-The tree supports full drag&drop and only shows the nodes you have permissions. If search or filters are activated a tradtional list view is shown.
+The tree supports full drag&drop and only shows the nodes you have permissions. If search or filters are activated a traditional list view is shown.
 
 ![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen1.png "Edit view")
 

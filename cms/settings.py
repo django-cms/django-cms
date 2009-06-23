@@ -80,7 +80,8 @@ CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
 #Hide untranslated Pages
 CMS_HIDE_UNTRANSLATED = getattr(settings, 'CMS_HIDE_UNTRANSLATED', True)
 
-
+#Fall back to another language if the requested page isn't available in the prefered language
+CMS_LANGUAGE_FALLBACK = getattr(settings, 'CMS_LANGUAGE_FALLBACK', False)
 
 # Defines which languages should be offered.
 CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)
