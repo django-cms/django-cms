@@ -1,45 +1,49 @@
 $(document).ready(function() {
-        var new_slug = true
-        if($('#id_slug')[0].value){
-            new_slug = false
-        }
-	$.each(["language", "template"], function(i, label){
-        var select = $('select#id_'+label);
-        select.change(function() {
-			changed = false;
-			if($("#id_slug")[0]._changed){
-				changed = true;
-			}
-			if($("#id_title")[0]._changed){
-				changed = true;
-			}
-			var pub = $("#id_published");
-			if (pub.length){
-				if(pub[0]._changed){
+    var new_slug = true
+    if($('#id_slug')[0].value){
+        new_slug = false
+    }
+    
+    
+    if(window.location.href.split("history").length == 1 && window.location.href.split("recover").length==1)
+		$.each(["language", "template"], function(i, label){
+	        var select = $('select#id_'+label);
+	        select.change(function() {
+				changed = false;
+				if($("#id_slug")[0]._changed){
 					changed = true;
 				}
-			}
-			if($('iframe').length){
-				changed = true;
-			}
-            var array = window.location.href.split('?');
-            var query = $.query.set(label, this.options[this.selectedIndex].value).toString();
-            if (changed) {
-				var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?")
-				var answer = confirm(interpolate(question, {
-					field_name: select.prev().text().slice(0, -1),
-				}, true));
-			}else{
-				var answer = true;
-			}
-            if (answer) {
-                window.location.href = array[0]+query;
-            } else {
-                this.selectedIndex = index;
-            }
-        
-        });
-    });
+				if($("#id_title")[0]._changed){
+					changed = true;
+				}
+				var pub = $("#id_published");
+				if (pub.length){
+					if(pub[0]._changed){
+						changed = true;
+					}
+				}
+				if($('iframe').length){
+					changed = true;
+				}
+	            var array = window.location.href.split('?');
+	            var query = $.query.set(label, this.options[this.selectedIndex].value).toString();
+	            if (changed) {
+					var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?")
+					var answer = confirm(interpolate(question, {
+						field_name: select.prev().text().slice(0, -1),
+					}, true));
+				}else{
+					var answer = true;
+				}
+	            if (answer) {
+	                window.location.href = array[0]+query;
+	            } else {
+	                this.selectedIndex = index;
+	            }
+	        
+	        });
+	    });
+	}
     document.getElementById("id_title").focus();
     var template = $.query.get('template');
     if(template) {

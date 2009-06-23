@@ -11,7 +11,7 @@ from cms.plugin_pool import plugin_pool
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 @require_POST
 def change_status(request, page_id):
@@ -89,9 +89,11 @@ if 'reversion' in settings.INSTALLED_APPS:
 
 def edit_plugin(request, plugin_id, admin_site):
     plugin_id = int(plugin_id)
-    if not 'history' in request.path:
+    if not 'history' in request.path and not 'recover' in request.path:
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
         instance, admin = cms_plugin.get_plugin_instance(admin_site)
+        if not cms_plugin.page.has_change_permission(request):
+            raise PermissionDenied 
     else:
         # history view with reversion
         from reversion.models import Version
@@ -99,6 +101,7 @@ def edit_plugin(request, plugin_id, admin_site):
         Version.objects.get(pk=version_id)
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+        # TODO: check permissions
         
         for rev in revs:
             obj = rev.object
@@ -118,8 +121,7 @@ def edit_plugin(request, plugin_id, admin_site):
         if not instance:
             raise Http404("This plugin is not saved in a revision")
     
-    if not cms_plugin.page.has_change_permission(request):
-        raise Http404
+   
 
     admin.cms_plugin_instance = cms_plugin
     admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
@@ -129,7 +131,7 @@ def edit_plugin(request, plugin_id, admin_site):
         # view, which actually does'nt exists
         request.POST['_continue'] = True
     
-    if 'reversion' in settings.INSTALLED_APPS and 'history' in request.path:
+    if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
         # in case of looking to history just render the plugin content
         context = RequestContext(request)
         return render_to_response(admin.render_template, admin.render(context, instance, admin.placeholder), context)
