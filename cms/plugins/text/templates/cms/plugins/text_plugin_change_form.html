@@ -1,0 +1,7 @@
+{% extends "admin/cms/page/plugin_change_form.html" %}
+
+{% block fieldsets %}
+{% for fieldset in adminform %}
+  {% include "cms/plugins/text_plugin_fieldset.html" %}
+{% endfor %}
+{% endblock %}

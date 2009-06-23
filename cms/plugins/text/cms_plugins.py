@@ -15,6 +15,7 @@ class TextPlugin(CMSPluginBase):
     name = _("Text")
     form = TextForm
     render_template = "cms/plugins/text.html"
+    change_form_template = "cms/plugins/text_plugin_change_form.html"
 
     def get_editor_widget(self, request, plugins):
         """
