@@ -42,8 +42,7 @@ def change_innavigation(request, page_id):
         page.save()
         return render_admin_menu_item(request, page)
     raise Http404
-    
-change_status = staff_member_required(change_status)
+change_innavigation = staff_member_required(change_innavigation)
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion import revision    
