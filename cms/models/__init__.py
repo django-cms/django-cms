@@ -985,6 +985,8 @@ class PageModerator(models.Model):
         """
         if self.moderate_descendants:
             self.moderate_children = True
+        else:
+            self.moderate_children = False
         super(PageModerator, self).save(force_insert, force_update)
     
     __unicode__ = lambda self: "%s on %s mod: %d" % (unicode(self.user), unicode(self.page), self.get_decimal())
