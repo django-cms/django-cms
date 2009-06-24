@@ -16,7 +16,7 @@ def _get_current_page(path, lang, queryset):
     try:
         if settings.CMS_FLAT_URLS:
             return queryset.filter(Q(title_set__slug=path,
-                                                     title_set__language=lang)).distinct().select_related()[0]
+                                                     title_set__language=lang)).distinct().select_related()[0], None
         else:
             page = queryset.filter(title_set__path=path).distinct().select_related()[0]
             if page:
