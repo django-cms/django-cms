@@ -89,12 +89,12 @@ $(document).ready(function() {
 	});	
 	
 	// load first plugin if there is only one
-	$('ul.plugin-list').each(function(i, a){
+	/*$('ul.plugin-list').each(function(i, a){
 		var lis = $(this).children("li")
 		if (lis.length == 1){
 			load_plugin($($(this).children("li")[0]));
 		}
-    });	
+    });*/
 	    
 });
 
