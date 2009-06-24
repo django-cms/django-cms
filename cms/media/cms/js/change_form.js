@@ -5,7 +5,7 @@ $(document).ready(function() {
     }
     
     
-    if(window.location.href.split("history").length == 1 && window.location.href.split("recover").length==1)
+    if(window.location.href.split("history").length == 1 && window.location.href.split("recover").length==1){
 		$.each(["language", "template"], function(i, label){
 	        var select = $('select#id_'+label);
 	        select.change(function() {
@@ -44,7 +44,8 @@ $(document).ready(function() {
 	        });
 	    });
 	}
-    document.getElementById("id_title").focus();
+	$("#id_title").focus();
+    
     var template = $.query.get('template');
     if(template) {
         $('#id_template').find("option").each(function() {

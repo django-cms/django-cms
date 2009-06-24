@@ -38,6 +38,14 @@
 	runOnLoad(function(){
 		parent.setiframeheight($('body').height()+20, {{ plugin.pk }});
 	});
+
+
+	$(document).ready(function(){
+		$("a.add-another").each(function(i, sign){
+			var href= "../../"+ $(sign).attr("href")
+			 $(sign).attr("href", href);
+		});
+	});
 </script>
 
 
