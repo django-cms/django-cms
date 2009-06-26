@@ -16,47 +16,23 @@ from cms.admin.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
 from django.forms.widgets import HiddenInput
 
-    
-class PageForm(forms.ModelForm):
-    APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
-    
+
+class PageAddForm(forms.ModelForm):
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
-    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
-        help_text=_('Overwrite what is displayed in the menu'), required=False)
-    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
-        help_text=_('Overwrites what is display at the top of your browser or in bookmarks'), required=False)
-    language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
-        help_text=_('The current language of the content fields.'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the url'))
-    application_urls = forms.ChoiceField(label=_('Application'), 
-        choices=APPLICATION_URLS, required=False,  
-        help_text=_('Hook application to this page.'))
-    overwrite_url = forms.CharField(label=_('Overwrite url'), max_length=255, required=False,
-        help_text=_('Keep this field empty if standard path should be used.'))
-    # moderation state
-    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
-    # moderation - message is a fake filed
-    moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
-    
-    redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
-        help_text=_('Redirects to this URL.'))
-    meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
-        help_text=_('A description of the page sometimes used by search engines.'))
-    meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
-        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
+    language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
+        help_text=_('The current language of the content fields.'))
     
     class Meta:
         model = Page
-        
+        exclude = ["author"]
+    
     def __init__(self, *args, **kwargs):
-        super(PageForm, self).__init__(*args, **kwargs)
-        self.fields['parent'].widget = HiddenInput()
-        self.fields['parent'].label = "" 
+        super(PageAddForm, self).__init__(*args, **kwargs)
+        self.fields['parent'].widget = HiddenInput() 
         self.fields['site'].widget = HiddenInput()
-        self.fields['site'].label = ""
-        self.fields['site'].help_text = "" 
     
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -78,6 +54,30 @@ class PageForm(forms.ModelForm):
         slug = slugify(self.cleaned_data['slug'])
         return slug
     
+class PageForm(PageAddForm):
+    APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
+    
+    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
+        help_text=_('Overwrite what is displayed in the menu'), required=False)
+    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
+        help_text=_('Overwrites what is display at the top of your browser or in bookmarks'), required=False)
+    application_urls = forms.ChoiceField(label=_('Application'), 
+        choices=APPLICATION_URLS, required=False,  
+        help_text=_('Hook application to this page.'))
+    overwrite_url = forms.CharField(label=_('Overwrite url'), max_length=255, required=False,
+        help_text=_('Keep this field empty if standard path should be used.'))
+    # moderation state
+    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
+    # moderation - message is a fake filed
+    moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
+    
+    redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
+        help_text=_('Redirects to this URL.'))
+    meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
+        help_text=_('A description of the page sometimes used by search engines.'))
+    meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
+        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
+        
     def clean_reverse_id(self):
         id = self.cleaned_data['reverse_id']
         if id:

@@ -3,8 +3,25 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
 {{ block.super }}
+{% if not add %}
+	<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_form.js"></script>
+{% endif %}
+<script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
+
+{% if add %}
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$("#id_title").keyup(function() {
+	        var e = $("#id_slug")[0];
+	        if (!e._changed) {
+	            e.value = URLify(this.value, 64);
+	        }
+	    });
+	});
+	</script>
+{% endif %}
+
 
 {% endblock %}
 
@@ -14,7 +31,7 @@
 		
 	{% else %}
 
-	<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}
+	<h1>{{ title }}
 	{% if CMS_MODERATOR %}
 		{% if moderation_required %}<span class="moderation-requires-approvement">{% blocktrans %}(requires approvement at level {{ moderation_level }}){% endblocktrans %}</span>
 		{% else %}<span>{% trans '(you can perform actions on this page directly)' %}</span>
@@ -57,146 +74,150 @@
 {% for fieldset in adminform %}
   {% include "admin/cms/page/includes/fieldset.html" %}
 {% endfor %}
-
-{% block after_field_sets %}{% if add %}
-<p class="errornote">
-    {% blocktrans %}You can add plugins only if you have saved the page.{% endblocktrans %}
-    </p>{% endif %}
-{% endblock %}
-
+	
 {% for inline_admin_formset in inline_admin_formsets %}
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
 
-{% if CMS_PERMISSION and has_change_permissions_permission %}
-	<div class="inline-group">
-		<div class="tabular inline-related">
-			<fieldset id="inherited_permissions" class="module aligned collapse">
-			  <h2>{% trans 'All permissions' %}</h2>
-			  <div class="loading">{% trans 'Loading...' %}</div>
-			  <div class="load">./permissions/</div>
-			</fieldset>
+{% if not add %}
+
+	{% if CMS_PERMISSION and has_change_permissions_permission %}
+		<div class="inline-group">
+			<div class="tabular inline-related">
+				<fieldset id="inherited_permissions" class="module aligned collapse">
+				  <h2>{% trans 'All permissions' %}</h2>
+				  <div class="loading">{% trans 'Loading...' %}</div>
+				  <div class="load">./permissions/</div>
+				</fieldset>
+			</div>
 		</div>
-	</div>
-{% endif %}
-
-{% if CMS_MODERATOR and has_moderate_permission %}
-	<div class="inline-group">
-		<div class="tabular inline-related">
-			<fieldset id="inherited_permissions" class="module aligned collapse">
-			  <h2 class="load_remote">{% trans 'Page states' %}</h2>
-			  <div class="loading">{% trans 'Loading...' %}</div>
-			  <div class="load">./moderation-states/</div>
-			</fieldset>
-		</div>
-	</div>
-{% endif %}
-
-{% if moderation_delete_request %}<script type="text/javascript">
-	$(function(){
-		// disable all fields
-		function lockControls(){ 
-			$('input,select,textarea').attr("disabled", "disabled");
-			$('a[id^=add_],span[class^=add-plugin],a[class^=selector-],p[class^=selector-]').remove(); 
-		}
-		$('fieldset[class=collapsed]').remove();
-		lockControls();
-		setTimeout(lockControls,200);	
-	});
-</script>{% endif %}
-
-{% if CMS_MODERATOR and moderation_required %}
-	<div id="dialog" title="Approve dialog">
-		<p>{% blocktrans %}This page must be moderated at level {{ moderation_level }}, post a message for moderator.{% endblocktrans %}</p>
-		<div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
-		<div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label></div>
-	</div>
+	{% endif %}
 	
-	<script type="text/javascript">
+	
+	
+	{% if CMS_MODERATOR and has_moderate_permission %}
+		<div class="inline-group">
+			<div class="tabular inline-related">
+				<fieldset id="inherited_permissions" class="module aligned collapse">
+				  <h2 class="load_remote">{% trans 'Page states' %}</h2>
+				  <div class="loading">{% trans 'Loading...' %}</div>
+				  <div class="load">./moderation-states/</div>
+				</fieldset>
+			</div>
+		</div>
+	{% endif %}
+	
+	{% if moderation_delete_request %}<script type="text/javascript">
 		$(function(){
-			// override standard uncolapse_all javascript function, we need to call it
-			// only if there is submit, but submit might be cancelled over dialog.
-			var old_uncollapse_all = CollapsedFieldsets.uncollapse_all;
-			CollapsedFieldsets.uncollapse_all = function() {}
-			
-			var submitActor;
-			var forceSubmit = false;
-			var seen = false;
-			
-			// change submit states, open dialog
-			$('#page_form').submit(function(event){
-				return showDialog(event);
-			});
-			
-			$('#page_form input[name=_continue]').click(function(event){
-				return showDialog(event, this);
-			});
-			
-			function showDialog(event, actor) {
-				if (forceSubmit) return true; // escape sequence
-				
-				if (!seen) {
-					// show previously posted message if there were an error
-					$('#id_df_moderator_message').val($('#id_moderator_message').val());
-				}
-				seen = true
-				event.preventDefault();
-				submitActor = actor;
-				$('#dialog').dialog('open');
-				return false;
+			// disable all fields
+			function lockControls(){ 
+				$('input,select,textarea').attr("disabled", "disabled");
+				$('a[id^=add_],span[class^=add-plugin],a[class^=selector-],p[class^=selector-]').remove(); 
 			}
-			
-			function dialogSave(){
-				// assign values from dialog form to real form
-				$('#id_moderator_message').val($('#id_df_moderator_message').val());
-				$('#id_moderator_state').val(
-					$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
-				);
-				
-				old_uncollapse_all(); // uncolapse all fields django way
-				$('#dialog').dialog('close');
-				forceSubmit = true;
-				$(submitActor || '#page_form input[name=_save]').click();
-				return false;
-			}
-			
-			$('#dialog').dialog({
-				bgiframe: true,
-				autoOpen: false,
-				height: 200,
-				width: 400,
-				modal: true,
-				buttons: {
-					Cancel: function() {
-						$(this).dialog('close');
-					},
-					Save: function() {
-						dialogSave();
-					}
-					
-				}, 
-				open: function(){
-					var val = $('#id_moderator_state').val();
-					$('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
-					$('#id_df_moderator_message')
-						.focus()
-						.keydown(function(event) { if (event.keyCode == 13) dialogSave()});
-						
-					// add default button class to last rendered button (Save)
-					$(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
-				},
-				close: function(){
-					forceSubmit = false;
-				}
-			});
+			$('fieldset[class=collapsed]').remove();
+			lockControls();
+			setTimeout(lockControls,200);	
 		});
-	</script>
+	</script>{% endif %}
+	
+	{% if CMS_MODERATOR and moderation_required %}
+		<div id="dialog" title="Approve dialog">
+			<p>{% blocktrans %}This page must be moderated at level {{ moderation_level }}, post a message for moderator.{% endblocktrans %}</p>
+			<div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
+			<div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label></div>
+		</div>
+		
+		<script type="text/javascript">
+			$(function(){
+				// override standard uncolapse_all javascript function, we need to call it
+				// only if there is submit, but submit might be cancelled over dialog.
+				var old_uncollapse_all = CollapsedFieldsets.uncollapse_all;
+				CollapsedFieldsets.uncollapse_all = function() {}
+				
+				var submitActor;
+				var forceSubmit = false;
+				var seen = false;
+				
+				// change submit states, open dialog
+				$('#page_form').submit(function(event){
+					return showDialog(event);
+				});
+				
+				$('#page_form input[name=_continue]').click(function(event){
+					return showDialog(event, this);
+				});
+				
+				function showDialog(event, actor) {
+					if (forceSubmit) return true; // escape sequence
+					
+					if (!seen) {
+						// show previously posted message if there were an error
+						$('#id_df_moderator_message').val($('#id_moderator_message').val());
+					}
+					seen = true
+					event.preventDefault();
+					submitActor = actor;
+					$('#dialog').dialog('open');
+					return false;
+				}
+				
+				function dialogSave(){
+					// assign values from dialog form to real form
+					$('#id_moderator_message').val($('#id_df_moderator_message').val());
+					$('#id_moderator_state').val(
+						$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
+					);
+					
+					old_uncollapse_all(); // uncolapse all fields django way
+					$('#dialog').dialog('close');
+					forceSubmit = true;
+					$(submitActor || '#page_form input[name=_save]').click();
+					return false;
+				}
+				
+				$('#dialog').dialog({
+					bgiframe: true,
+					autoOpen: false,
+					height: 200,
+					width: 400,
+					modal: true,
+					buttons: {
+						Cancel: function() {
+							$(this).dialog('close');
+						},
+						Save: function() {
+							dialogSave();
+						}
+						
+					}, 
+					open: function(){
+						var val = $('#id_moderator_state').val();
+						$('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
+						$('#id_df_moderator_message')
+							.focus()
+							.keydown(function(event) { if (event.keyCode == 13) dialogSave()});
+							
+						// add default button class to last rendered button (Save)
+						$(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
+					},
+					close: function(){
+						forceSubmit = false;
+					}
+				});
+			});
+		</script>
+	{% endif %}
+
 {% endif %}
 
 {% block after_related_objects %}{% endblock %}
-
-{% if not moderation_delete_request %}{% submit_row %}{% endif %}
-
+{% if add %}
+<div class="submit-row" {% if is_popup %}style="overflow: auto;"{% endif %}>
+	<input type="submit" class="default" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>
+</div>
+{% else %}
+	{% if not moderation_delete_request %}{% submit_row %}{% endif %}
+{% endif %}
 {% if add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
 {% endif %}

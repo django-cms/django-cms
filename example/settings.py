@@ -145,6 +145,25 @@ CMS_APPLICATIONS_URLS = (
     ('sampleapp.urlstwo', 'Second sample application'),
 )
 
+CMS_PLACEHOLDER_CONF = {                        
+    'right-column': {
+        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
+        "extra_context": {"theme":"16_16"},
+        "name":gettext("right column")
+    },
+    
+    'body': {
+        "plugins": ('TextPlugin', 'LinkPlugin'),
+        "extra_context": {"theme":"16_5"},
+        "name":gettext("body"),
+    },
+    'fancy-content': {
+        "plugins": ('TextPlugin'),
+        "extra_context": {"theme":"16_11"},
+        "name":gettext("fancy content"),
+    },
+}
+
 
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 

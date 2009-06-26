@@ -15,11 +15,15 @@ Add the following to your INSTALLED_APPS in settings.py:
 		'cms.plugins.picture',
 		'cms.plugins.link',
 		'cms.plugins.file',
+		'cms.plugins.snippet',
+		'cms.plugins.googlemap',
 		'mptt',
 		...
 	)
     
-Django-cms 2.0 is compatible with [django-reversion](http://code.google.com/p/django-reversion/) for versioning all the page content and its plugins.
+Django-cms 2.0 is compatible with [django-reversion](http://code.google.com/p/django-reversion/) for versioning all the page content and its plugins. Put "reversion" in your INSTALLED\_APPS if you have it installed.
+
+If you don't need all the plugins you can comment them out here.
 
 Middleware
 ----------
@@ -29,6 +33,7 @@ Add the following middleware classes:
 	MIDDLEWARE_CLASSES = (
     	...
     	'cms.middleware.CurrentPageMiddleware',
+		'cms.middleware.CurrentUserMiddleware',
     	'cms.middleware.multilingual.MultilingualURLMiddleware',
     	...
     	)
@@ -54,7 +59,7 @@ If you don't have already a gettext stub in your settings.py put this in your se
 
 	gettext = lambda s: s
 	
-This allows you to use gettext in settings.py.
+This allows you to use gettext and i18n in your settings.py.
 
 Add some templates you want to use within Django-cms 2.0 that contain at least one {% placeholder %} templatetag, to your settings.py:
 	
