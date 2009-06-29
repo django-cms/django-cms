@@ -16,7 +16,7 @@
 
 	<h1>{% if add %}{% trans "Add" %}{% else %}{% trans "Change" %}{% endif %} {% trans "page" %}
 	{% if CMS_MODERATOR %}
-		{% if moderation_required %}<span class="moderation-requires-approvement">{% blocktrans %}(requires approvement at level {{ moderation_level }}){% endblocktrans %}</span>
+		{% if moderation_required %}<span class="moderation-requires-approvement">{% blocktrans %}(requires approvement at {{ moderation_level }} level){% endblocktrans %}</span>
 		{% else %}<span>{% trans '(you can perform actions on this page directly)' %}</span>
 		{% endif %}
 	{% endif %}
@@ -104,7 +104,7 @@
 
 {% if CMS_MODERATOR and moderation_required %}
 	<div id="dialog" title="Approve dialog">
-		<p>{% blocktrans %}This page must be moderated at level {{ moderation_level }}, post a message for moderator.{% endblocktrans %}</p>
+		<p>{% blocktrans %}This page must be moderated at {{ moderation_level }} level, post a message for moderator.{% endblocktrans %}</p>
 		<div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
 		<div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label></div>
 	</div>

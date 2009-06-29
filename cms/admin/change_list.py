@@ -71,6 +71,11 @@ class CMSChangeList(ChangeList):
             #pages = pages.filter(pk__in=perm_edit_ids)
             pages = pages.filter(pk__in=perm_change_list_ids)   
         
+        if settings.CMS_MODERATOR:
+            # get oll ids of public models, so we can cahce them
+            # TODO: add some filtering here, so the set is the same like page set...
+            public_page_id_set = Page.PublicModel.objects.all().value_list('id', flat=True)
+        
         ids = []
         root_pages = []
         pages = list(pages)
@@ -94,6 +99,11 @@ class CMSChangeList(ChangeList):
                 page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
                 page.permission_softroot_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_softroot_ids
                 page.permission_user_cache = request.user
+            
+            if settings.CMS_MODERATOR:
+                # set public instance existence state
+                page.public_published_cache = page.public_id in public_page_id_set
+                
                 
             if page.root_node or self.is_filtered():
                 page.last = True

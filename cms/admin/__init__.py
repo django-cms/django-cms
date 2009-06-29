@@ -593,7 +593,7 @@ class PageAdmin(admin.ModelAdmin):
             
             extra_context.update({
                 'moderation_required': moderation_required,
-                'moderation_level': '?',
+                'moderation_level': _('higher'),
                 'CMS_MODERATOR': settings.CMS_MODERATOR
             })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)

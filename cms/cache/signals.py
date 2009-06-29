@@ -5,7 +5,6 @@ from cms.models import PagePermission, GlobalPagePermission, Page
 from cms.cache.permissions import clear_user_permission_cache,\
     clear_permission_cache
 from cms.models import signals as cms_signals
-from cms.cache.page import clear_public_page_cache
 
 def pre_save_user(instance, raw, **kwargs):
     clear_user_permission_cache(instance)
@@ -58,12 +57,3 @@ if settings.CMS_PERMISSION:
     
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
-
-
-
-def post_page_publish(instance, **kwargs):
-    """Clear published model cache
-    """
-    clear_public_page_cache()
-    
-cms_signals.post_publish.connect(post_page_publish, sender=Page)

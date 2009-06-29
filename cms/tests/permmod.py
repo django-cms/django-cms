@@ -5,8 +5,10 @@ from cms.tests.base import PageBaseTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE
 from cms.models import Title, Page
 
 
-class PermissionModerationTestCase(PageBaseTestCase):
-    """Fixtures contains 3 users and 1 published page and some other stuff
+class PermissionModeratorTestCase(PageBaseTestCase):
+    """Permissions and moderator together
+    
+    Fixtures contains 3 users and 1 published page and some other stuff
     
     Users:
         1. `super`: superuser
@@ -125,5 +127,27 @@ class PermissionModerationTestCase(PageBaseTestCase):
         # must have public object now
         assert(page.public)
         # and public object must be published
-        assert(page.public.published)         
+        assert(page.public.published)  
+        
+    def _add_plugin(self, user):
+        slave_page = self.slave_page
+        
+        post_data = {
+            'language': 'en',
+            'page_id': slave_page.pk,
+            'placeholder': 'Right-Column',
+            'plugin_type': 'TextPlugin'
+        }
+        self.login_user(user)
+        url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
+        response = self.client.post(url, post_data)
+        assert(response.content == "1")
     
+    def test_06_super_can_add_plugin(self):
+        self._add_plugin(self.user_super)
+    
+    def test_07_master_can_add_plugin(self):
+        self._add_plugin(self.user_master)
+        
+    def test_08_slave_can_add_plugin(self):
+        self._add_plugin(self.user_slave)

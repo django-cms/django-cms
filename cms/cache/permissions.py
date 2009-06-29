@@ -1,9 +1,9 @@
 from django.core.cache import cache
 
-# Time to live for cachce entry 2 minutes, so it gets cleaned if we don't catch 
+# Time to live for cache entry 10 minutes, so it gets cleaned if we don't catch 
 # something - don't make higher; groups may be problematic because of no signals
 # when adding / removing from group
-TTL = 120  
+TTL = 600  
 
 permission_cache_keys = [] 
 all_keys = []

@@ -1,4 +1,3 @@
-from cms.cache.page import is_public_published
 import sys
 import urllib2
 from os.path import join
@@ -612,8 +611,14 @@ class Page(Publisher, Mptt):
     def is_public_published(self):
         """Returns true if public model is published.
         """
-        return is_public_published(self)
-        
+        if hasattr(self, 'public_published_cache'):
+            # if it was cached in change list, return cached value
+            return self.public_published_cache
+        # othervise make db lookup
+        if self.public:
+            return self.public.published
+        #return is_public_published(self)
+        return False
         
 class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)
