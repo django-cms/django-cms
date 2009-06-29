@@ -62,7 +62,7 @@ class Migration:
             'tree_id': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
         },
         'cms.title': {
-            'Meta': {'unique_together': "('language','page')"},
+            'Meta': {'unique_together': "(('language','page'),)"},
             'application_urls': ('models.CharField', ["_('application')"], {'blank': 'True', 'max_length': '200', 'null': 'True', 'db_index': 'True'}),
             'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
             'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),

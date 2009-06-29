@@ -68,7 +68,7 @@ class Migration:
             'tree_id': ('models.PositiveIntegerField', [],{'db_index':True, 'editable':False}),
         },
         'cms.title': {
-            'Meta': {'unique_together': "('language','page')"},
+            'Meta': {'unique_together': "(('language','page'),)"},
             'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
             'language': ('models.CharField', ['_("language")'], {'max_length': '3', 'db_index': 'True'}),
