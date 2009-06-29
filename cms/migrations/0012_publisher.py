@@ -5,6 +5,17 @@ from cms.models import *
 
 class Migration:
     
+    depends_on = (
+        ("file", "0003_publisher"),
+        ("flash", "0003_publisher"),
+        ("googlemap", "0001_initial"),
+        ("link", "0005_publisher"),
+        ("picture", "0004_publisher"),
+        ("snippet", "0002_publisher"),
+        ("text", "0003_publisher"),
+    )
+
+    
     def forwards(self, orm):
         
         # Adding model 'PublicCMSPlugin'
@@ -171,9 +182,6 @@ class Migration:
         # Deleting field 'Page.status'
         db.delete_column('cms_page', 'status')
         
-        # Dropping ManyToManyField 'Page.sites'
-        db.delete_table('cms_page_sites')
-        
         # Deleting field 'PagePermission.can_edit'
         db.delete_column('cms_pagepermission', 'can_edit')
         
@@ -181,11 +189,15 @@ class Migration:
         db.create_unique('cms_publictitle', ['language', 'page_id'])
         
         if not db.dry_run:
-            pages = orm.Page.objects.all()
-            for page in pages:
+            for page in orm.Page.objects.all():
                 page.site_id = 1
                 page.save()
-                
+            from cms.models import Page
+            for page in Page.objects.all():
+                page.publish()
+        
+         # Dropping ManyToManyField 'Page.sites'
+        db.delete_table('cms_page_sites')        
             
     def backwards(self, orm):
         
@@ -451,7 +463,8 @@ class Migration:
             'site': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sites.Site']"}),
             'soft_root': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
             'template': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'sites': ('models.ManyToManyField', ['Site'], {}),
         },
         'cms.pagemoderatorstate': {
             'action': ('django.db.models.fields.CharField', [], {'max_length': '3', 'null': 'True', 'blank': 'True'}),
