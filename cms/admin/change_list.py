@@ -81,7 +81,7 @@ class CMSChangeList(ChangeList):
         if settings.CMS_MODERATOR:
             # get oll ids of public models, so we can cahce them
             # TODO: add some filtering here, so the set is the same like page set...
-            public_page_id_set = Page.PublicModel.objects.all().value_list('id', flat=True)
+            public_page_id_set = Page.PublicModel.objects.all().values_list('id', flat=True)
         
         ids = []
         root_pages = []
