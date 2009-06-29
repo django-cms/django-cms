@@ -87,9 +87,14 @@ class Page(Publisher, Mptt):
     published = models.BooleanField(_("is published"), blank=True)
     
     template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
-    sites = models.ManyToManyField(Site, help_text=_('The site(s) the page is accessible at.'), verbose_name=_("sites"))
+    site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
     
     moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
+    
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
     # Managers
     objects = PageManager()
@@ -117,12 +122,12 @@ class Page(Publisher, Mptt):
         # fire signal
         
         self.force_moderation_action = PageModeratorState.ACTION_MOVE
-        self.save(change_state=True) # always save the page after move, because of publihser
+        cms_signals.page_moved.send(sender=Page, instance=self) #titles get saved before moderation
+        self.save(change_state=True) # always save the page after move, because of publisher
         
-        cms_signals.page_moved.send(sender=Page, instance=self)
+        
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
-        #print "copy page", self.pagemoderator_set.all()
         """
         copy a page and all its descendants to a new location
         
@@ -130,7 +135,7 @@ class Page(Publisher, Mptt):
         """
         from cms.utils.moderator import update_moderation_message
         
-        descendants = [self] + list(self.get_descendants().filter(sites__pk=site.pk).order_by('-rght'))
+        descendants = [self] + list(self.get_descendants().order_by('-rght'))
         tree = [target]
         level_dif = self.level - target.level - 1
         first = True
@@ -175,7 +180,8 @@ class Page(Publisher, Mptt):
             if first:
                 first = False
                 page.move_to(target, position)
-            page.sites = [site]
+            page.site = site
+            page.save()
             for title in titles:
                 title.pk = None
                 title.public_id = None
@@ -192,6 +198,8 @@ class Page(Publisher, Mptt):
                 p.lft = None
                 p.rght = None
                 p.public_id = None
+                p.inherited_public_id = None
+                
                 if p.parent:
                     pdif = p.level - ptree[-1].level
                     if pdif < 0:
@@ -212,6 +220,8 @@ class Page(Publisher, Mptt):
                     plugin.rght = p.rght
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
+                    plugin.inherited_public_id = p.inherited_public_id
+                    plugin.public_id = p.pk
                     plugin.save()
             if dif != 0:
                 tree.append(page)
@@ -256,7 +266,9 @@ class Page(Publisher, Mptt):
                 self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
+            
         
+            
         if commit:
             if no_signals:# ugly hack because of mptt
                 super(Page, self).save_base(cls=self.__class__)
@@ -297,6 +309,8 @@ class Page(Publisher, Mptt):
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):
+        #if self.is_home():
+        #    return "/"
         if settings.CMS_FLAT_URLS:
             path = self.get_slug(language, fallback)
         else:
@@ -518,7 +532,12 @@ class Page(Publisher, Mptt):
         if self.parent_id:
             return False
         else:
-            return Page.objects.filter(parent=None).order_by('tree_id', 'lft')[0].pk == self.pk
+            return self.get_home_pk_cache() == self.pk
+        
+    def get_home_pk_cache(self):
+        if not hasattr(self, "home_pk_cache"):
+            self.home_pk_cache = Page.objects.get_home().pk
+        return self.home_pk_cache
             
     def get_media_path(self, filename):
         """
@@ -550,7 +569,7 @@ class Page(Publisher, Mptt):
         """Returns ordered set of all PageModerator instances, which should 
         moderate this page
         """
-        if not settings.CMS_MODERATOR:
+        if not settings.CMS_MODERATOR or not self.tree_id:
             return PageModerator.objects.get_empty_query_set()
         
         q = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
@@ -568,7 +587,7 @@ class Page(Publisher, Mptt):
         """
         return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
     
-    def publish(self):
+    def publish(self, fields=None, exclude=None):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible. 
         
@@ -576,7 +595,6 @@ class Page(Publisher, Mptt):
         
         Returns: True if page was successfully published.
         """
-        #print ">> page.publish()"
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
         
@@ -588,11 +606,43 @@ class Page(Publisher, Mptt):
         
         self.save(change_state=False)
         
-        # TODO: create new version
+        if not fields:
+            public = self.public
+            if public:
+                if public.tree_id != self.tree_id: #moved over trees
+                    tree_ids = [self.tree_id, public.tree_id]
+                else:
+                    tree_ids = [self.tree_id]
+                
+                dirty = False
+                if self.lft != public.lft or self.rght != public.rght or self.level != public.level:#moved in tree
+                    dirty = True
+                if dirty or len(tree_ids) == 2:
+                    pages = list(Page.objects.filter(tree_id__in=tree_ids).order_by("tree_id", "level", "lft"))
+                    fields = []
+                    names = ["lft","rght","tree_id", "level", "parent", "author", "site"]
+                    for field in self._meta.fields:
+                        if field.name in names:
+                            fields.append(field)
+                    ids = []
+                    for page in pages:
+                        if page.pk != self.pk:
+                            page.publish(fields=fields)
+                            ids.append(page.pk)
+                    titles = Title.objects.filter(page__in=ids)
+                    title_fields = []
+                    names = ["path"]
+                    for field in Title._meta.fields:
+                        if field.name in names:
+                            title_fields.append(field)
+                    for title in titles:
+                        title.publish(fields=title_fields)
+            else:
+                print "no public found"            
         
         # publish, but only if all parents are published!! - this will need a flag
         try:
-            published = super(Page, self).publish()
+            published = super(Page, self).publish(fields, exclude)
         except MpttCantPublish:
             return 
         
@@ -647,6 +697,7 @@ class Title(Publisher):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
+        
         slug = u'%s' % self.slug
         if parent_page:
             self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
@@ -703,6 +754,11 @@ class CMSPlugin(Publisher, Mptt):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    
     def __unicode__(self):
         return ""
     
@@ -721,7 +777,7 @@ class CMSPlugin(Publisher, Mptt):
         from cms.plugin_pool import plugin_pool
         plugin_class = plugin_pool.get_plugin(self.plugin_type)
         plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
-        if plugin.model != CMSPlugin: # and self.__class__ == CMSPlugin:
+        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 if hasattr(self, '_is_public_model'):
@@ -777,12 +833,21 @@ class CMSPlugin(Publisher, Mptt):
             return unicode(plugin.icon_alt(instance))
         else:
             return u''
+        
+    def save(self, no_signals=False, *args, **kwargs):
+        if no_signals:# ugly hack because of mptt
+            super(CMSPlugin, self).save_base(cls=self.__class__)
+        else:
+            super(CMSPlugin, self).save()
+            
     
-      
+    def set_base_attr(self, plugin):
+        for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
+            setattr(plugin, attr, getattr(self, attr))
         
         
 if 'reversion' in settings.INSTALLED_APPS:        
-    reversion.register(Page, follow=["title_set", "cmsplugin_set", "text", "picture"])
+    reversion.register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])
     reversion.register(CMSPlugin)
     reversion.register(Title)
 
@@ -827,6 +892,8 @@ class AbstractPagePermission(models.Model):
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
+    can_recover_page = models.BooleanField(_("can recover pages"), default=True, help_text=_("can recover any deleted page"))
+    
     objects = BasicPagePermissionManager()
     
     class Meta:
@@ -852,6 +919,9 @@ class PagePermission(AbstractPagePermission):
         page = self.page_id and unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on][1]))
 
+if 'reversion' in settings.INSTALLED_APPS:        
+    reversion.register(PagePermission)
+    
 
 class PageUser(User):
     """Cms specific user data, required for permission system
@@ -920,6 +990,8 @@ class PageModerator(models.Model):
         """
         if self.moderate_descendants:
             self.moderate_children = True
+        else:
+            self.moderate_children = False
         super(PageModerator, self).save(force_insert, force_update)
     
     __unicode__ = lambda self: "%s on %s mod: %d" % (unicode(self.user), unicode(self.page), self.get_decimal())
@@ -968,3 +1040,75 @@ class PageModeratorState(models.Model):
     css_class = lambda self: self.action.lower()
     
     __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.get_action_display())
+    
+    
+#===================== STUBS for south ===================
+'''
+class PublicTitle(models.Model):
+    language = models.CharField(_("language"), max_length=5, db_index=True)
+    title = models.CharField(_("title"), max_length=255)
+    menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
+    path = models.CharField(_("path"), max_length=255, db_index=True)
+    has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
+    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
+    meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
+    meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
+    page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
+    page = models.ForeignKey(Page, verbose_name=_("page"), related_name="public_title_set")
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    
+class PublicCMSPlugin(models.Model):
+    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
+    parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
+    placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
+    plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    
+class PublicPage(models.Model):
+    """
+    A simple hierarchical page model
+    """
+    MODERATOR_CHANGED = 0
+    MODERATOR_NEED_APPROVEMENT = 1
+    MODERATOR_APPROVED = 10
+    # special case - page was approved, but some of page parents if not approved yet
+    MODERATOR_APPROVED_WAITING_FOR_PARENTS = 11
+    
+    moderator_state_choices = (
+        (MODERATOR_CHANGED, _('changed')),
+        (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
+        (MODERATOR_APPROVED, _('approved')),
+        (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
+    )
+    
+    author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    creation_date = models.DateTimeField(editable=False, default=datetime.now)
+    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
+    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
+    login_required = models.BooleanField(_('login required'), default=False)
+    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
+    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
+    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
+    navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
+    published = models.BooleanField(_("is published"), blank=True)
+    
+    template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
+    site = models.ForeignKeyField(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
+    
+    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
+    
+    level = models.PositiveIntegerField(db_index=True, editable=False)
+    lft = models.PositiveIntegerField(db_index=True, editable=False)
+    rght = models.PositiveIntegerField(db_index=True, editable=False)
+    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+'''

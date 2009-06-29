@@ -61,7 +61,7 @@ class CMSPluginBase(admin.ModelAdmin):
         if, then this must be changed.
         """
         return self.cms_plugin_instance.page.has_change_permission(request)
-    has_delete_permission = has_delete_permission = has_add_permission
+    has_delete_permission = has_change_permission = has_add_permission
     
     def save_model(self, request, obj, form, change):
         """

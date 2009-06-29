@@ -3,10 +3,10 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.sites.models import Site
 from cms import settings as cms_settings
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from cms.utils import get_language_from_request
 
 register = template.Library()
 

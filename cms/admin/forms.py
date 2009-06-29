@@ -14,21 +14,53 @@ from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups, mail_page_user_change
 from cms.admin.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
+from django.forms.widgets import HiddenInput
 
-    
-class PageForm(forms.ModelForm):
-    APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
-    
+
+class PageAddForm(forms.ModelForm):
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
+    slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
+        help_text=_('The part of the title that is used in the url'))
+    language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
+        help_text=_('The current language of the content fields.'))
+    
+    class Meta:
+        model = Page
+        exclude = ["author"]
+    
+    def __init__(self, *args, **kwargs):
+        super(PageAddForm, self).__init__(*args, **kwargs)
+        self.fields['parent'].widget = HiddenInput() 
+        self.fields['site'].widget = HiddenInput()
+    
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        if 'slug' in cleaned_data.keys():
+            slug = cleaned_data['slug']
+        else:
+            slug = ""
+        page = self.instance
+        lang = cleaned_data['language']
+        if 'parent' not in cleaned_data:
+            cleaned_data['parent'] = None
+        parent = cleaned_data.get('parent', None)
+        if not is_valid_page_slug(page, parent, lang, slug):
+            self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
+            del cleaned_data['slug']
+        return cleaned_data
+    
+    def clean_slug(self):
+        slug = slugify(self.cleaned_data['slug'])
+        return slug
+    
+class PageForm(PageAddForm):
+    APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
+    
     menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
         help_text=_('Overwrite what is displayed in the menu'), required=False)
     page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
         help_text=_('Overwrites what is display at the top of your browser or in bookmarks'), required=False)
-    language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
-        help_text=_('The current language of the content fields.'))
-    slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
-        help_text=_('The part of the title that is used in the url'))
     application_urls = forms.ChoiceField(label=_('Application'), 
         choices=APPLICATION_URLS, required=False,  
         help_text=_('Hook application to this page.'))
@@ -45,30 +77,7 @@ class PageForm(forms.ModelForm):
         help_text=_('A description of the page sometimes used by search engines.'))
     meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
         help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
-    
-    class Meta:
-        model = Page
-    
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        if 'slug' in cleaned_data.keys():
-            slug = cleaned_data['slug']
-        else:
-            slug = ""
         
-        page = self.instance
-        lang = cleaned_data['language']
-        parent = cleaned_data['parent']
-        
-        if not is_valid_page_slug(page, parent, lang, slug):
-            self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
-            del cleaned_data['slug']
-        return cleaned_data
-    
-    def clean_slug(self):
-        slug = slugify(self.cleaned_data['slug'])
-        return slug
-    
     def clean_reverse_id(self):
         id = self.cleaned_data['reverse_id']
         if id:
@@ -83,15 +92,6 @@ class PageForm(forms.ModelForm):
                 raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
         return url
     
-    def clean_sites(self):
-        sites = self.cleaned_data['sites']
-        if self.cleaned_data['parent'] != None:
-            parent_sites = self.cleaned_data['parent'].sites.all().values_list('id', flat=True)
-            for site in sites:
-                if not site.pk in parent_sites:
-                    raise forms.ValidationError(ugettext_lazy('The parent of this page is not on the site %(site)s') % {'site':site } )
-        return sites
-
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """Page permission inline admin form used in inline admin. Required, because
@@ -100,8 +100,8 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     but aren't assigned to higher page level than current user.
     """
     
-    user = forms.ModelChoiceField(_('user'), widget=UserSelectAdminWidget)
-    
+    user = forms.ModelChoiceField('user', label=_('user'), widget=UserSelectAdminWidget, required=False)
+    page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
@@ -126,6 +126,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             self.cleaned_data[name] = self.cleaned_data.get(name, False)
         
         can_add = self.cleaned_data['can_add']
+        can_edit = self.cleaned_data['can_change']
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
@@ -133,6 +134,8 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # access this page anymore, so avoid this
             raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by his creator.'))
         
+        if can_add and not can_edit:
+            raise forms.ValidationError(ugettext_lazy('Add page permission also requires edit page permission.'))
         # TODO: finish this, but is it really required? might be nice to have 
         
         # check if permissions assigned in cms are correct, and display an message
@@ -159,6 +162,7 @@ class PageUserForm(UserCreationForm):
     can_add_page = forms.BooleanField(label=_('Can add page'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Can change page'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Can delete page'), required=False)
+    can_recover_page = forms.BooleanField(label=_('Can recover pages (any)'), required=False)
     
     can_add_pageuser = forms.BooleanField(label=_('Can create user'), required=False)
     can_change_pageuser = forms.BooleanField(label=_('Can change User'), required=False)
@@ -223,6 +227,13 @@ class PageUserForm(UserCreationForm):
         notify_user = self.cleaned_data['notify_user']
         if notify_user and not self.cleaned_data.get('email', None):
             raise forms.ValidationError(_("Email notification requires valid email address."))
+        
+        if self.cleaned_data['can_add_page'] and not self.cleaned_data['can_change_page']:
+            raise forms.ValidationError(_("The permission to add new pages requires the permission to change pages!"))
+        if self.cleaned_data['can_add_pageuser'] and not self.cleaned_data['can_change_pageuser']:
+            raise forms.ValidationError(_("The permission to add new users requires the permission to change users!"))
+        if self.cleaned_data['can_add_pagepermission'] and not self.cleaned_data['can_change_pagepermission']:
+            raise forms.ValidationError(_("To add permissions you also need to edit them!"))
         return cleaned_data
 
     def save(self, commit=True):
@@ -233,16 +244,14 @@ class PageUserForm(UserCreationForm):
         user = super(Super, self).save(commit=False)
         
         user.is_staff = True
+        created = not bool(user.pk)
         # assign creator to user
-        user.created_by = get_current_user()
+        if created:
+            user.created_by = get_current_user()
 
         if commit:
             user.save()
 
-        if self.cleaned_data['notify_user']:
-            created = not bool(self.instance)
-            mail_page_user_change(user, created, self.cleaned_data['password1'])
-        
         models = (Page, PageUser, PagePermission)
         for model in models:
             name = model.__name__.lower()
@@ -260,4 +269,8 @@ class PageUserForm(UserCreationForm):
                     user.user_permissions.add(permission)
                 else:
                     user.user_permissions.remove(permission)
+
+        if self.cleaned_data['notify_user']:
+            mail_page_user_change(user, created, self.cleaned_data['password1'])
+        
         return user

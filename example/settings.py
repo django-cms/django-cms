@@ -14,7 +14,7 @@ CACHE_BACKEND = 'locmem:///'
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
+DATABASE_NAME = 'cms-publisher'           # Or path to database file if using sqlite3.
 DATABASE_USER = 'cms'           # Not used with sqlite3.
 DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
 DATABASE_HOST = '127.0.0.1'     # Set to empty string for localhost. Not used with sqlite3.
@@ -81,10 +81,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.doc.XViewMiddleware',
 
     #'django.contrib.csrf.middleware.CsrfMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'cms.middleware.user.CurrentUserMiddleware',
+    
 )
 
 ROOT_URLCONF = 'example.urls'
@@ -112,6 +113,8 @@ INSTALLED_APPS = (
     'cms.plugins.file',
     'cms.plugins.flash',
     'cms.plugins.link',
+    'cms.plugins.snippet',
+    'cms.plugins.googlemap',
     'mptt',
     'reversion',
     'example.categories',
@@ -142,19 +145,33 @@ CMS_APPLICATIONS_URLS = (
     ('sampleapp.urlstwo', 'Second sample application'),
 )
 
+CMS_PLACEHOLDER_CONF = {                        
+    'right-column': {
+        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
+        "extra_context": {"theme":"16_16"},
+        "name":gettext("right column")
+    },
+    
+    'body': {
+        "plugins": ('TextPlugin', 'LinkPlugin'),
+        "extra_context": {"theme":"16_5"},
+        "name":gettext("body"),
+    },
+    'fancy-content': {
+        "plugins": ('TextPlugin'),
+        "extra_context": {"theme":"16_11"},
+        "name":gettext("fancy content"),
+    },
+}
+
 
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_FLAT_URLS = True
+CMS_MODERATOR = True
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True
-
-CMS_MODERATOR = False
-CMS_PERMISSION = True
-
-#SOUTH_AUTO_FREEZE_APP = True
 
 try:
     from local_settings import *

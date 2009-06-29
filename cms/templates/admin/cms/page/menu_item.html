@@ -2,8 +2,8 @@
 <div class="cont{% if CMS_MODERATOR %} moderatorstate{{ page_moderator_state.state }}{% endif %}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="{{ url }}{{ page.id }}/" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
-			<a href="{{ url }}{{ page.id }}/" class="changelink" title="{% trans "edit this page" %}">edit</a>
+			<a href="{{ url }}{{ page.id }}" class="title" title="{% trans "edit this page" %}">{{ page.get_slug }}</a>	
+			<a href="{{ url }}{{ page.id }}" class="changelink" title="{% trans "edit this page" %}">edit</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>
 		{% endif %}
@@ -65,7 +65,7 @@
 				{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
 				<span class="state">{{ page_moderator_state.label }}</span>
 			{% endif %}
-			<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
+			<a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}/{% page_admin_language page %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 		</div>
 		
 		<div class="col-published">
@@ -73,16 +73,9 @@
 				{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
 				{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
 				{% endif %}
-			{% else %}{{ page.published|boolean_icon }}
 			{% endif %}
-			
-			{% if page.is_public_published %}<label>
-				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>
-			</label>
-			{% else %}<label>
-				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
-			</label>{% endif %}
-			{% if page.public_id %}<a href="{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}			
+			<label>{{ page.is_public_published|boolean_icon }}</label>
+			{% if page.public_id %}<a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}/{% page_admin_language page %}{{ page.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
 		</div>
 		
 		

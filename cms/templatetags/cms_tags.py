@@ -7,10 +7,11 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from cms.utils.moderator import get_page_model, get_title_model, get_cmsplugin_model
+from cms.models import Page
 register = template.Library()
 
 
-def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_page=None):
+def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_id=None):
     """
     render a nested list of all children of the pages
     from_level: is the start level
@@ -22,7 +23,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     TitleModel = get_title_model(request)
     
     site = Site.objects.get_current()
-    CMS_CONTENT_CACHE_DURATION = settings.CMS_CONTENT_CACHE_DURATION
     lang = get_language_from_request(request)
     current_page = request.current_page
     
@@ -35,7 +35,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         else:# maybe the active node is in an extender?
             alist = []
             extenders = PageModel.objects.published().filter(in_navigation=True, 
-                                                        sites__domain=site.domain, 
+                                                        site=site, 
                                                         level__lte=to_level)
             extenders = extenders.exclude(navigation_extenders__isnull=True).exclude( navigation_extenders__exact="")
             for ext in extenders:
@@ -47,55 +47,68 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     alist = [(ext.pk, ext.soft_root)] + alist
                     break
         filters = {'in_navigation' : True, 
-                   'sites__domain' : site.domain,
+                   'site' : site,
                    'level__lte' : to_level}
         #check the ancestors for softroots
-        
-        soft_root_start = 0
+        soft_root_pk = None
         for p in alist:
             ancestors.append(p[0])
             if p[1]:
-                soft_root = PageModel.objects.get(pk=p[0])
-                filters['lft__gte'] = soft_root.lft
-                filters['rght__lte'] = soft_root.rght
-                filters['tree_id'] = soft_root.tree_id
-                from_level = soft_root.level
-                soft_root_start = soft_root.level
-        if current_page and current_page.soft_root: 
-            filters['tree_id'] = current_page.tree_id
-            filters['lft__gte'] = current_page.lft
-            filters['rght__lte'] = current_page.rght
-            from_level = current_page.level
-            soft_root_start = current_page.level
-        if root_page:
+                soft_root_pk = p[0]
+        #modify filters if we don't start from the root
+        root_page = None
+        if root_id:
             root_page = PageModel.objects.get(reverse_id=root_page)
+        else:
+            if current_page and current_page.soft_root:
+                root_page = current_page
+                soft_root_pk = current_page.pk
+            elif soft_root_pk:
+                root_page = PageModel.objects.get(pk=soft_root_pk)
+        if root_page:
+            if isinstance(root_page, int):
+                root_page = PageModel.objects.get(pk=root_page)
+            if isinstance(root_page, PageModel):
+                root_page = PageModel.objects.get(pk=root_page.id)
+            elif isinstance(root_page, unicode):
+                root_page = PageModel.objects.get(reverse_id=root_page)
             filters['tree_id'] = root_page.tree_id
             filters['lft__gt'] = root_page.lft
             filters['rght__lt'] = root_page.rght
+            filters['level__lte'] = root_page.level + to_level
+            db_from_level = root_page.level + from_level
+        else:
+            db_from_level = from_level
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
         pages = PageModel.objects.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
+        
         pages = list(pages)
+        if root_page:
+            pages = [root_page] + pages
         all_pages = pages[:]
+        root_level = getattr(root_page, 'level', None)
         for page in pages:# build the tree
-            if page.level >= from_level:
+            if page.level >= db_from_level:
                 ids.append(page.pk)
-            if page.level == 0 or page.level == soft_root_start or page.level-1 == getattr(root_page, 'level', None):
+            if page.level == 0 or page.level == root_level:
                 page.ancestors_ascending = []
+                page.menu_level = 0 - from_level
+                page.childrens = []
                 children.append(page)
-                if current_page and page.pk == current_page.pk and current_page.soft_root:
+                if page.pk == soft_root_pk:
                     page.soft_root = False #ugly hack for the recursive function
                 if current_page:
                     pk = current_page.pk
                 else:
                     pk = -1
                 find_children(page, pages, extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
-                if current_page and page.pk == current_page.pk and current_page.soft_root:
+                if page.pk == soft_root_pk:
                     page.soft_root = True
-        if from_level > 0:
-            children = cut_levels(children, from_level)
+        if db_from_level > 0:
+            children = cut_levels(children, db_from_level)
         titles = list(TitleModel.objects.filter(page__in=ids, language=lang))
         for page in all_pages:# add the title and slugs and some meta data
             for title in titles:
@@ -118,8 +131,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
 
-def show_menu_below_id(context, root_page=None, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template_file="cms/menu.html", next_page=None):
-    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_page=root_page)
+def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template_file="cms/menu.html", next_page=None):
+    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_id=root_id)
 register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
 
 
@@ -141,7 +154,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                   'rght__lt':page.rght, 
                   'tree_id':page.tree_id, 
                   'level__lte':page.level+levels, 
-                  'sites__domain':site.domain}
+                  'site':site}
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
         pages = PageModel.objects.published().filter(**filters)
@@ -149,11 +162,19 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         pages = list(pages)
         all_pages = pages[:]
         page.ancestors_ascending = []
+        page.childrens = []
         for p in pages:
             p.descendant  = True
             ids.append(p.pk)
         page.selected = True
+        page.menu_level = -1
+        was_soft_root = False
+        if page.soft_root:
+            was_soft_root = True
+            page.soft_root = False
         find_children(page, pages, levels, levels, [], page.pk, request=request)
+        if was_soft_root:
+            page.soft_root = True
         children = page.childrens
         titles = TitleModel.objects.filter(page__in=ids, language=lang)
         for p in all_pages:# add the title and slugs and some meta data
@@ -164,8 +185,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         to_level = page.level+levels
         extra_active = extra_inactive = levels
     else:
-        extenders = PageModel.objects.published().filter(in_navigation=True, 
-                                                    sites__domain=site.domain)
+        extenders = PageModel.objects.published().filter(in_navigation=True, site=site)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         children = []
         from_level = 0
@@ -198,12 +218,14 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
     PageModel = get_page_model(request)
     TitleModel = get_title_model(request)
-    
     page = request.current_page
     lang = get_language_from_request(request)
     if page:
         ancestors = list(page.get_ancestors())
         ancestors.append(page)
+        home = PageModel.objects.get_home()
+        if ancestors and ancestors[0].pk != home.pk: 
+            ancestors = [home] + ancestors
         ids = [page.pk]
         for anc in ancestors:
             ids.append(anc.pk)
@@ -218,8 +240,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     else:
         site = Site.objects.get_current()
         ancestors = []
-        extenders = PageModel.objects.published().filter(in_navigation=True, 
-                                                    sites__domain=site.domain)
+        extenders = PageModel.objects.published().filter(in_navigation=True, site=site)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         for ext in extenders:
             ext.childrens = []
@@ -229,6 +250,9 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                 selected = find_selected(nodes)
                 if selected:
                     ancestors = list(ext.get_ancestors()) + [ext]
+                    home = PageModel.objects.get_home()
+                    if ancestors and ancestors[0].pk != home.pk: 
+                        ancestors = [home] + ancestors
                     ids = []
                     for anc in ancestors:
                         ids.append(anc.pk)

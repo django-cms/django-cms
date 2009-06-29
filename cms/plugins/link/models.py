@@ -3,9 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
 from django.conf import settings
 
-if 'reversion' in settings.INSTALLED_APPS:
-    import reversion
-
 class Link(CMSPlugin):
     """
     A link to an other page or to an external website
@@ -17,6 +14,3 @@ class Link(CMSPlugin):
         
     def __unicode__(self):
         return self.name
-
-if 'reversion' in settings.INSTALLED_APPS:        
-    reversion.register(Link, follow=["cmsplugin_ptr"])

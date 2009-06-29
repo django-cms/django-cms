@@ -53,7 +53,8 @@ function initTree(){
 				moveTreeItem(item_id, target_id, position, false)
 			},
 			onchange: function(node, tree){
-				self.location = node.id.split("page_")[1];
+				var url = $(node).find('a.title').attr("href")
+				self.location = url;
 			}
 		}
 	};
@@ -322,7 +323,7 @@ $(document).ready(function() {
 		}else{
 			url = remove_from_url(url, "copy");
 		}
-		url = insert_into_url(url, "sites__id__exact", id)
+		url = insert_into_url(url, "site__exact", id)
 		window.location = url;
 	});
 	var copy_splits = window.location.href.split("copy=")
@@ -379,6 +380,9 @@ function mark_copy_node(id){
 }
 
 function insert_into_url(url, name, value){
+	if(url.substr(url.length-1, url.length)== "&"){
+		url = url.substr(0, url.length-1)
+	}
 	dash_splits = url.split("#")
 	url = dash_splits[0]
 	var splits = url.split(name + "=");
@@ -401,6 +405,9 @@ function insert_into_url(url, name, value){
 	}
 	if(dash_splits.length>1){
 		url += dash_splits[1]
+	}
+	if(url.substr(url.length-1, url.length)== "&"){
+		url = url.substr(0, url.length-1)
 	}
 	return url
 }

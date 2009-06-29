@@ -11,7 +11,7 @@ from cms.cache.permissions import get_permission_cache, set_permission_cache
 class PageManager(models.Manager):
     def on_site(self):
         site = Site.objects.get_current()
-        return self.filter(sites=site)
+        return self.filter(site=site)
         
     def root(self):
         """
@@ -87,6 +87,9 @@ class PageManager(models.Manager):
         Doesn't cares about the application language. 
         """
         return self.published().filter(title_set__application_urls__gt='').distinct()
+    
+    def get_home(self):
+        return self.published().order_by("tree_id")[0]
         
         
 class TitleManager(models.Manager):
@@ -119,7 +122,7 @@ class TitleManager(models.Manager):
         try:
             titles = self.filter(
                 slug=slug,
-                page__sites__domain=site.domain,
+                page__site=site,
             ).select_related()#'page')
         except self.model.DoesNotExist:
             return None
@@ -417,7 +420,6 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        #print "> perm attr:", attr, "R:", page_id_allow_list
         # store value in cache
         set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list

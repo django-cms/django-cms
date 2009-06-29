@@ -64,6 +64,12 @@ function setclickfunctions(){
     });
 }
 
+function load_plugin(li){
+	var target = li.parent().parent().parent().children("div.plugin-editor");
+    var id = li.attr("id").split("plugin_")[1];
+    loadPluginForm(target, id);
+}
+
 function setiframeheight(height, id){
     $('#iframe_'+id).height(height+"px");
 }

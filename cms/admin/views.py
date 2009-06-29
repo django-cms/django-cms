@@ -11,7 +11,7 @@ from cms.plugin_pool import plugin_pool
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 @require_POST
 def change_status(request, page_id):
@@ -42,8 +42,7 @@ def change_innavigation(request, page_id):
         page.save()
         return render_admin_menu_item(request, page)
     raise Http404
-    
-change_status = staff_member_required(change_status)
+change_innavigation = staff_member_required(change_innavigation)
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion import revision    
@@ -90,15 +89,19 @@ if 'reversion' in settings.INSTALLED_APPS:
 
 def edit_plugin(request, plugin_id, admin_site):
     plugin_id = int(plugin_id)
-    if not 'history' in request.path:
+    if not 'history' in request.path and not 'recover' in request.path:
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
         instance, admin = cms_plugin.get_plugin_instance(admin_site)
+        if not cms_plugin.page.has_change_permission(request):
+            raise PermissionDenied 
     else:
         # history view with reversion
         from reversion.models import Version
         version_id = request.path.split("/edit-plugin/")[0].split("/")[-1]
+        Version.objects.get(pk=version_id)
         version = get_object_or_404(Version, pk=version_id)
         revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+        # TODO: check permissions
         
         for rev in revs:
             obj = rev.object
@@ -107,21 +110,18 @@ def edit_plugin(request, plugin_id, admin_site):
                 break
         inst, admin = cms_plugin.get_plugin_instance(admin_site)
         instance = None
-        
-        for rev in revs:
-            obj = rev.object
-            if obj.__class__ == inst.__class__ and int(obj.pk) == plugin_id:
-                instance = obj
-                break
+        if cms_plugin.get_plugin_class().model == CMSPlugin:
+            instance = cms_plugin
+        else:
+            for rev in revs:
+                obj = rev.object
+                if hasattr(obj, "cmsplugin_ptr_id") and int(obj.cmsplugin_ptr_id) == int(cms_plugin.pk):
+                    instance = obj
+                    break
         if not instance:
-            # TODO: this should be changed, and render something else.. There
-            # can be case when plugin is not using (registered) with reversion
-            # so it doesn't haves any version - it should just render plugin
-            # and say something like - not in version system..
-            raise Http404
+            raise Http404("This plugin is not saved in a revision")
     
-    if not cms_plugin.page.has_change_permission(request):
-        raise Http404
+   
 
     admin.cms_plugin_instance = cms_plugin
     admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
@@ -131,7 +131,7 @@ def edit_plugin(request, plugin_id, admin_site):
         # view, which actually does'nt exists
         request.POST['_continue'] = True
     
-    if 'reversion' in settings.INSTALLED_APPS and 'history' in request.path:
+    if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
         # in case of looking to history just render the plugin content
         context = RequestContext(request)
         return render_to_response(admin.render_template, admin.render(context, instance, admin.placeholder), context)
@@ -251,26 +251,35 @@ def revert_plugins(request, version_id):
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+    cms_plugin_list = []
     plugin_list = []
     titles = []
+    others = []
     page = None
     for rev in revs:
         obj = rev.object
         if obj.__class__ == CMSPlugin:
-            plugin_list.append(rev.object)
-        if obj.__class__ == Page:
-            page = obj
-            obj.save()
-        if obj.__class__ == Title:
+            cms_plugin_list.append(obj)
+        elif hasattr(obj, 'cmsplugin_ptr_id'):
+            plugin_list.append(obj)
+        elif obj.__class__ == Page:
+            page = Page.objects.get(pk=obj.pk)
+        elif obj.__class__ == Title:
             titles.append(obj)
-    
+        else:
+            others.append(rev)
     if not page.has_change_permission(request):
         raise Http404
-     
     current_plugins = list(CMSPlugin.objects.filter(page=page))
-    for plugin in plugin_list:
+    for plugin in cms_plugin_list:
         plugin.page = page
+        
+        plugin.save(no_signals=True)
         plugin.save()
+        for p in plugin_list:
+            if int(p.cmsplugin_ptr_id) == int(plugin.pk):
+                plugin.set_base_attr(p)
+                p.save()
         for old in current_plugins:
             if old.pk == plugin.pk:
                 current_plugins.remove(old)
@@ -281,6 +290,8 @@ def revert_plugins(request, version_id):
         except:
             title.pk = Title.objects.get(page=page, language=title.language).pk
             title.save()
+    for other in others:
+        other.object.save()
     for plugin in current_plugins:
         plugin.delete()
         

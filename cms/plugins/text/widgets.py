@@ -18,7 +18,11 @@ class WYMEditor(Textarea):
             'js/lib/ui.core.js',
             'js/placeholder_editor_registry.js',
         )]
-        
+        css = {
+            'all': [join(CMS_MEDIA_URL, path) for path in (
+                        'css/jquery/cupertino/jquery-ui.css',
+                    )],
+        }
 
     def __init__(self, attrs=None, installed_plugins=None):
         """

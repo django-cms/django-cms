@@ -18,15 +18,16 @@ def get_admin_menu_item_context(request, page, filtered=False):
     
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
-    
+    slug = page.get_slug(language=lang, fallback=True)
     metadata = ""
     if cms_settings.CMS_PERMISSION:
         # jstree metadata generator 
         md = []
         
-        if not has_add_page_permission:
-            md.append(('valid_children', False))
+        #if not has_add_page_permission:
+            
         if not has_move_page_permission:
+            md.append(('valid_children', False))
             md.append(('draggable', False))
         
         if md:
@@ -76,6 +77,6 @@ def render_admin_menu_item(request, page):
     })
     
     filtered = 'filtered' in request.REQUEST
-    
+    print get_admin_menu_item_context(request, page, filtered)
     context.update(get_admin_menu_item_context(request, page, filtered))
     return render_to_response('admin/cms/page/menu_item.html', context) 

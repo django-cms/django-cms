@@ -5,10 +5,6 @@ from django.conf import settings
 from cms.models import CMSPlugin
 from os.path import basename
 
-if 'reversion' in settings.INSTALLED_APPS:
-    import reversion
-
-
 class Flash(CMSPlugin):
     file = models.FileField(_('file'), upload_to=CMSPlugin.get_media_path, help_text=_('use swf file'))
     width = models.CharField(_('width'), max_length=6)
@@ -22,10 +18,6 @@ class Flash(CMSPlugin):
         
     def __unicode__(self):
         return u"%s" % basename(self.file.path)
-
-if 'reversion' in settings.INSTALLED_APPS:        
-    reversion.register(Flash, follow=["cmsplugin_ptr"])
-
 
 def fix_unit(value):
     if not re.match(r'.*[0-9]$', value):

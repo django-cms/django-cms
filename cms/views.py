@@ -11,18 +11,26 @@ from cms.utils.moderator import get_page_model
 def _get_current_page(path, lang, queryset):
     """Helper for getting current page from path depending on language
     
-    returns: Page or None
+    returns: (Page, None) or (None, path_to_alternative language)
     """
     try:
         if settings.CMS_FLAT_URLS:
             return queryset.filter(Q(title_set__slug=path,
-                                                     title_set__language=lang)).distinct().select_related()[0]
+                                                     title_set__language=lang)).distinct().select_related()[0], None
         else:
-            return queryset.filter(Q(title_set__path=path,
-                                                     title_set__language=lang)).distinct().select_related()[0]
-            
+            page = queryset.filter(title_set__path=path).distinct().select_related()[0]
+            if page:
+                langs = page.get_languages() 
+                if lang in langs:
+                    return page, None
+                else:
+                    path = None
+                    for alt_lang in settings.LANGUAGES:
+                        if alt_lang[0] in langs:
+                            path = '/%s%s' % (alt_lang[0][:2], page.get_absolute_url(language=lang, fallback=True))
+                    return None, path
     except IndexError:
-        return None
+        return None, None
 
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
     # get the right model
@@ -49,12 +57,14 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
                     path = slug.replace(reverse('pages-root'), '', 1)
                 else:
                     path = slug
-                current_page = _get_current_page(path, lang, pages)
+                current_page, alternative = _get_current_page(path, lang, pages)
                 if settings.CMS_APPLICATIONS_URLS:
                     # check if it should'nt point to some application, if yes,
                     # change current page if required
                     current_page = applications_page_check(request, current_page, path)
                 if not current_page:
+                    if alternative and settings.CMS_LANGUAGE_FALLBACK:
+                        return HttpResponseRedirect(alternative)
                     if no404:# used for placeholder finder
                         current_page = None
                     else:

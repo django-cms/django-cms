@@ -22,6 +22,13 @@ class PluginPool(object):
             raise PluginAllreadyRegistered, "[%s] a plugin with this name is already registered" % plugin.__name__
         plugin.value = plugin.__name__
         self.plugins[plugin.__name__] = plugin 
+        
+        if 'reversion' in settings.INSTALLED_APPS:   
+            import reversion  
+            try:   
+                reversion.register(plugin.model, follow=["cmsplugin_ptr"])
+            except reversion.revisions.RegistrationError:
+                pass
     
     def get_all_plugins(self, placeholder=None):
         self.discover_plugins()

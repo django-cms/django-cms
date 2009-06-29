@@ -236,12 +236,12 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
 #sitemap li .col-actions { width: 80px; }
-#sitemap li .col-published {width:65px;}
+#sitemap li .col-published {width:100px;}
 #sitemap li .col-navigation { width: 65px; }
 #sitemap li .col-softroot { width: 20px; }
 #sitemap li .col-moderator  { width:80px; }
 #sitemap li .col-creator{width:60px;}
-#sitemap li .col-draft{width:90px; text-align: right;}
+#sitemap li .col-draft{width:119px; text-align: right;}
 #sitemap li .col-lastchange { width:100px; text-align: left;}
 
 #sitemap li a.move {
