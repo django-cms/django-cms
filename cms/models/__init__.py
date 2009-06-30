@@ -73,8 +73,8 @@ class Page(Publisher, Mptt):
         (MODERATOR_APPROVED, _('approved')),
         (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
-    
-    author = models.ForeignKey(User, verbose_name=_("author"), limit_choices_to={'page__isnull' : False})
+    created_by = models.CharField(_("created by"), max_length=70)
+    changed_by = models.CharField(_("changed by"), max_length=70)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
@@ -266,8 +266,12 @@ class Page(Publisher, Mptt):
                 self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
-            
         
+        from cms.utils.permissions import _thread_locals
+        if not self.pk:
+            self.created_by = self.changed_by = _thread_locals.user.username
+        else:
+            self.changed_by = _thread_locals.user.username
             
         if commit:
             if no_signals:# ugly hack because of mptt
@@ -620,7 +624,7 @@ class Page(Publisher, Mptt):
                 if dirty or len(tree_ids) == 2:
                     pages = list(Page.objects.filter(tree_id__in=tree_ids).order_by("tree_id", "level", "lft"))
                     fields = []
-                    names = ["lft","rght","tree_id", "level", "parent", "author", "site"]
+                    names = ["lft","rght","tree_id", "level", "parent", "created_by", "changed_by", "site"]
                     for field in self._meta.fields:
                         if field.name in names:
                             fields.append(field)

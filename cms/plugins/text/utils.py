@@ -1,8 +1,3 @@
-'''
-Created on Apr 8, 2009
-
-@author: patricklauber
-'''
 from cms.models import CMSPlugin
 import re
 

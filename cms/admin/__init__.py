@@ -233,12 +233,12 @@ if settings.CMS_PERMISSION:
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
-    list_filter = ['published', 'in_navigation', 'template', 'author']
+    list_filter = ['published', 'in_navigation', 'template', 'changed_by']
     search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
     revision_form_template = "admin/cms/page/revision_form.html"
     recover_form_template = "admin/cms/page/recover_form.html"
     
-    exclude = ['author', 'lft', 'rght', 'tree_id', 'level']
+    exclude = ['created_by', 'changed_by', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = ['language']
     general_fields = ['title', 'slug', 'published']
@@ -641,8 +641,6 @@ class PageAdmin(admin.ModelAdmin):
         the object is being changed, and False if it's being added.
         """
         instance = super(PageAdmin, self).save_form(request, form, change)
-        if not change:
-            instance.author = request.user
         return instance
 
     def get_widget(self, request, page, lang, name):

@@ -1,6 +1,3 @@
-# Author: Peter Cicman, Divio GmbH, 2009
-# Copyright: moved to public domain
-
 """
 Mptt registering (modified)
 ==========================

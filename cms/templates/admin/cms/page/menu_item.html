@@ -87,6 +87,6 @@
 			
 		{% endwith %}</div>{% endif %}
 		
-		<div class="col-creator">{% firstof page.author.get_full_name page.author.first_name page.author.username %}</div>
+		<div class="col-creator">{{ page.changed_by }}</div>
 	</div>
 </div>
