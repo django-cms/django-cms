@@ -4,7 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
 from cms import settings as cms_settings
-
+from django.contrib.sites.models import Site
+from sets import Set
 
 try:
     from threading import local
@@ -208,4 +209,37 @@ def has_generic_permission(page_id, user, attr):
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
     permission = func(user)
     return permission == Page.permissions.GRANT_ALL or page_id in permission
+
+
+def get_user_sites_queryset(user):
+    """Returns queryset of all sites available for given user.
+    
+    1.  For superuser always returns all sites.
+    2.  For global user returns all sites he haves in global page permissions 
+        together with any sites he is assigned to over an page.
+    3.  For standard user returns just sites he is assigned to over pages.
+    """
+    qs = Site.objects.all()
+    
+    if user.is_superuser:
+        return qs
+    
+    global_ids = GlobalPagePermission.objects.with_user(user) \
+        .filter(Q(can_add=True) | Q(can_change=True)).values_list('id', flat=True)
+    
+    q = Q()
+    if global_ids:
+        q = Q(globalpagepermission__id__in=global_ids)
+        # haves some global permissions assigned
+        if not qs.filter(q).count():
+            # haves global permissions, but none of sites is specified, so he haves 
+            # access to all sites 
+            return qs
+    
+    # add some pages if he haves permission to add / change her    
+    q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
+        Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True))
+    
+    return qs.filter(q)
+    
     

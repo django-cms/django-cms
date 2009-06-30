@@ -86,12 +86,14 @@
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
 {% block search %}
 
-<div id="site-selector">
+
+{% if cl.has_access_to_multiple_sites %}<div id="site-selector">
 {% trans "Pages on:" %}
 <select id="site-select">{% for site in cl.sites %}
 	<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>{% endfor %}
 </select>
-</div>
+</div>{% endif %}
+
 {% search_form cl %}
 {% endblock %}
 {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}

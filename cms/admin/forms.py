@@ -102,6 +102,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     
     user = forms.ModelChoiceField('user', label=_('user'), widget=UserSelectAdminWidget, required=False)
     page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
+    
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
@@ -157,6 +158,14 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             instance.save()
         return instance
     
+
+class GlobalPagePermissionAdminForm(forms.ModelForm):
+    def clean(self):
+        super(GlobalPagePermissionAdminForm, self).clean()
+        if not self.cleaned_data['user'] and not self.cleaned_data['group']:
+            raise forms.ValidationError(ugettext_lazy('Please select user or group first.'))
+        return self.cleaned_data
+
 
 class PageUserForm(UserCreationForm):
     can_add_page = forms.BooleanField(label=_('Can add page'), required=False, initial=True)

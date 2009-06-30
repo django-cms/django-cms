@@ -25,7 +25,8 @@ from django.views.generic.create_update import redirect
 
 from cms import settings
 from cms.admin.change_list import CMSChangeList
-from cms.admin.forms import PageForm, PageUserForm, PageAddForm
+from cms.admin.forms import PageForm, PageUserForm, PageAddForm,\
+    GlobalPagePermissionAdminForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation)
@@ -126,6 +127,8 @@ if settings.CMS_PERMISSION:
     class GlobalPagePermissionAdmin(admin.ModelAdmin):
         list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
         list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+        
+        form = GlobalPagePermissionAdminForm
         
         search_fields = ('user__username', 'user__firstname', 'user__lastname', 'group__name')
         

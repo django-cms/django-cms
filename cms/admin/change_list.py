@@ -4,6 +4,7 @@ from cms.models import Title, PagePermission, Page
 from cms import settings
 from cms.utils import get_language_from_request, find_children
 from django.contrib.sites.models import Site
+from cms.utils.permissions import get_user_sites_queryset
 
 SITE_VAR = "site__exact"
 COPY_VAR = "copy"
@@ -11,9 +12,8 @@ COPY_VAR = "copy"
 class CMSChangeList(ChangeList):
     real_queryset = False
     
-    def __init__(self,  *args, **kwargs):
-        super(CMSChangeList, self).__init__(*args, **kwargs)
-        request = args[0]
+    def __init__(self, request, *args, **kwargs):
+        super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
             self.query_set = self.get_query_set(request)
         except:
@@ -30,6 +30,7 @@ class CMSChangeList(ChangeList):
                 self._current_site = Site.objects.get_current()
         
         request.session['cms_admin_site'] = self._current_site.pk
+        self.set_sites(request)
         
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
@@ -138,8 +139,15 @@ class CMSChangeList(ChangeList):
     def get_items(self):
         return self.root_pages
     
-    def sites(self):
-        return Site.objects.all()
+    def set_sites(self, request):
+        """Sets sites property to current instance - used in tree view for
+        sites combo.
+        """
+        if settings.CMS_PERMISSION:
+            self.sites = get_user_sites_queryset(request.user)   
+        else:
+            self.sites = Site.objects.all()
+        self.has_access_to_multiple_sites = len(self.sites) > 1
     
     def current_site(self):
         return self._current_site
