@@ -188,16 +188,9 @@ class Migration:
         # Creating unique_together for [language, page] on PublicTitle.
         db.create_unique('cms_publictitle', ['language', 'page_id'])
         
-        if not db.dry_run:
-            for page in orm.Page.objects.all():
-                page.site_id = 1
-                page.save()
-            from cms.models import Page
-            for page in Page.objects.all():
-                page.publish()
         
-         # Dropping ManyToManyField 'Page.sites'
-        db.delete_table('cms_page_sites')        
+        
+
             
     def backwards(self, orm):
         
@@ -272,13 +265,6 @@ class Migration:
         
         # Adding field 'Page.status'
         db.add_column('cms_page', 'status', orm['cms.page:status'])
-        
-        # Adding ManyToManyField 'Page.sites'
-        db.create_table('cms_page_sites', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('page', models.ForeignKey(orm.Page, null=False)),
-            ('site', models.ForeignKey(orm['sites.site'], null=False))
-        ))
         
         # Adding field 'PagePermission.can_edit'
         db.add_column('cms_pagepermission', 'can_edit', orm['cms.pagepermission:can_edit'])
