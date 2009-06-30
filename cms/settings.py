@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 # Which templates should be used for extracting the placeholders?
-# example: CMS_TEPLATES = (('base.html', 'default template'),)
+# example: CMS_TEMPLATES = (('base.html', 'default template'),)
 CMS_TEMPLATES = getattr(settings, 'CMS_TEMPLATES', None)
 if CMS_TEMPLATES is None:
     raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
