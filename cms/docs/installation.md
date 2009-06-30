@@ -18,6 +18,7 @@ Add the following to your INSTALLED_APPS in settings.py:
 		'cms.plugins.snippet',
 		'cms.plugins.googlemap',
 		'mptt',
+		'publisher',
 		...
 	)
     

@@ -14,7 +14,7 @@ CACHE_BACKEND = 'locmem:///'
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'cms-publisher'           # Or path to database file if using sqlite3.
+DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
 DATABASE_USER = 'cms'           # Not used with sqlite3.
 DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
 DATABASE_HOST = '127.0.0.1'     # Set to empty string for localhost. Not used with sqlite3.
@@ -119,7 +119,7 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
-    #'south',
+    'south',
     # sample application
     'sampleapp',
     'store',

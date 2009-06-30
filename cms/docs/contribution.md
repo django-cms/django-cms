@@ -7,8 +7,12 @@ You need either [GIT](http://git-scm.com/) or [mercurial](http://www.selenic.com
 
 You need an account on [github](http://www.github.com)
 
+On github you can see all the open [tickets](http://github.com/digi604/django-cms-2.0/issues) be sure to check there first before you open a new one.
+
 Goto the [project-page](http://github.com/digi604/django-cms-2.0/) and click on the fork button.
 This creates your own repository of django-cms2 and enables you to "push" to this repository.
+
+
 
 On your fork you should see "Your Clone URL:". Copy the url and "clone" it with git or hg-git.
 

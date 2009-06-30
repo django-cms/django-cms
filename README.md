@@ -15,10 +15,14 @@ Plugins included at the moment:
 * Flash
 * File
 * Links
+* HTML Snippets
 
 many more are in the works.
 
 Plugins are very easy to write and you can easily write them on your own and connect them with your own models.
+
+Screenshots
+-----------
 
 ![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen3.png "Tree / List view")
 
@@ -32,11 +36,18 @@ The edit page view. Right-Column and Content are placeholders in the default tem
 
 If you select a plugin you can edit it. The text plugin has the unique capability that you can place plugins directly into the text flow. So links inserted with the link plugin stay up to date even if pages are moved in the tree and the urls change.
 
-For a feature comparison of all the cms apps available for django see: [CMSComparison](http://code.djangoproject.com/wiki/CMSAppsComparison)
+Documentation and Help
+----------------------
+
 
 Install instructions you can find in the docs [here](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs).
 
 visit [django-cms.org](http://www.django-cms.org/) or #django-cms on freenet for more info
+
+
+
+
+For a feature comparison of all the cms apps available for django see: [CMSComparison](http://code.djangoproject.com/wiki/CMSAppsComparison)
 
 This is a fork of django-page-cms.
 Some icons are from http://www.famfamfam.com
