@@ -99,5 +99,6 @@ or have a look at the example project.
 Media Files
 -----------
 
-If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/) be sure that you copy all files located in cms/media to your static files folder.
+**ATTENTION:**
 
+If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/) be sure that you copy the cms/media/cms/ folder into your stati files folder.
