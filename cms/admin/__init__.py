@@ -554,10 +554,6 @@ class PageAdmin(admin.ModelAdmin):
             self.inlines = []
             form = PageAddForm
         form.base_fields['language'].initial = force_unicode(language)
-        #print self.form
-        #form = super(PageAdmin, self).get_form(request, obj, **kwargs)
-        #print form
-        
         
         if obj:
             try:

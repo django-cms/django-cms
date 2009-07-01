@@ -6,7 +6,7 @@ from django.db.models.fields.related import RelatedField, add_lazy_relation,\
     
 class PublisherManager(object):
     # common prefix for public class names
-    PUBLISHER_MODEL_NAME = "Public%s"
+    PUBLISHER_MODEL_NAME = "%sPublic"
     
     registry = []
 
@@ -50,15 +50,12 @@ class PublisherManager(object):
             
     def _create_public_model(self, cls, name, bases, attrs, origin_cls):
         from publisher.base import Publisher, PublicPublisher
-        
-        #print "\n>> try create with bases:", bases, "\n"
         # because of model inheritance:
         rebased = []
         for base in bases:
             if issubclass(base, Publisher) and base in self.registry:
                 # model inheritance ? rebases inherited model to his
                 # public version if there is a public version
-                #print ">> rebase base:", base, ">", base.PublicModel
                 base = base.PublicModel
                 if not base:
                     # inherited model isnt't registered yet, escape, we will try
@@ -73,10 +70,6 @@ class PublisherManager(object):
             # append PublicPublisher to bases - we want to use some methods he
             # contains
             rebased.append(PublicPublisher)
-        
-        #print "\n>> create public model:", name, "-" * 20
-        #print "bases:", bases
-        
         for attr, value in attrs.items():
             if isinstance(value, RelatedField):
                 self.other = value.rel.to
@@ -94,7 +87,6 @@ class PublisherManager(object):
                 if issubclass(model, Publisher):
                     # it is a subclass of Publisher, change relation
                     relation_public_name = PublisherManager.PUBLISHER_MODEL_NAME % self.other._meta.object_name
-                    #print "R >>", self.other, "remap:", self.other._meta.object_name, "=>", relation_public_name
                     to = model.PublicModel or relation_public_name
                     attrs[attr].rel.to = to
                     
@@ -107,8 +99,17 @@ class PublisherManager(object):
         
         # construct class
         public_name = PublisherManager.PUBLISHER_MODEL_NAME % name
+#        table_name = "%s_public_%s" % (origin_cls._meta.app_label, origin_cls._meta.object_name.lower())
+#        if not "Meta" in attrs:
+#            class Meta:
+#                db_table = table_name
+#            attrs["Meta"] = Meta
+#        else:
+#            meta = attrs["Meta"]
+#            if not hasattr(meta, "db_table"):
+#                setattr(meta, "db_table", table_name)
+#                
         public_cls = ModelBase.__new__(cls, public_name, tuple(rebased), attrs)
-        
         # add mark_delete field to public models, maybe will be better to move this
         # into PublicModel class, since it exists now
         if not 'mark_delete' in [field.name for field in public_cls._meta.local_fields]:
@@ -122,8 +123,6 @@ class PublisherManager(object):
             # this model gets inherited from some other - create link with special name here
             # so, if model haves inherited_public relation, it is an inherited model
             origin_cls.add_to_class('inherited_public', models.OneToOneField(public_cls, related_name="inherited_origin", null=True, blank=True, editable=False))
-        
-        #print "create origin field from:", public_name, "to:", origin_cls
         return True
         
 publisher_manager = PublisherManager()

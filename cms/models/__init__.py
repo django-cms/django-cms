@@ -1,3 +1,4 @@
+from django.db.models.base import ModelBase
 import sys
 import urllib2
 from os.path import join
@@ -747,9 +748,26 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
-    
+
+class PluginModelBase(ModelBase):
+    """
+    Metaclass for all plugins.
+    """
+    def __new__(cls, name, bases, attrs):
+        new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
+        found = False
+        for base in bases:
+            if base.__name__ == "CMSPlugin":
+                found = True
+        if found:
+            table = "cmsplugin_" + new_class._meta.db_table.split("_")[1]
+            new_class._meta.db_table = table
+        return new_class 
+         
     
 class CMSPlugin(Publisher, Mptt):
+    __metaclass__ = PluginModelBase
+    
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)

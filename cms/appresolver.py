@@ -129,9 +129,7 @@ class DynamicURLConfModule(object):
             
             self._urlpatterns, included = [], []
             PageModel = get_page_model() #!TODO: this must be solved!!
-            
             pages = PageModel.objects.get_all_pages_with_application()
-            
             for page in pages:
                 # get all titles with application
                 title_set = page.title_set.filter(application_urls__gt="")
