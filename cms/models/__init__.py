@@ -126,7 +126,6 @@ class Page(Publisher, Mptt):
         self.save(change_state=True) # always save the page after move, because of publisher
         
         
-        
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
         """
         copy a page and all its descendants to a new location

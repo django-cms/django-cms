@@ -87,12 +87,15 @@
 {% block search %}
 
 
-{% if cl.has_access_to_multiple_sites %}<div id="site-selector">
-{% trans "Pages on:" %}
-<select id="site-select">{% for site in cl.sites %}
-	<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>{% endfor %}
-</select>
-</div>{% endif %}
+{% if cl.has_access_to_multiple_sites %}
+	<div id="site-selector">{% trans "Pages on:" %}
+		<select id="site-select">{% for site in cl.sites %}
+			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>{% endfor %}
+		</select>
+	</div>
+{% else %}
+	<input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
+{% endif %}
 
 {% search_form cl %}
 {% endblock %}

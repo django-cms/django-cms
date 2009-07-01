@@ -282,11 +282,11 @@ $(document).ready(function() {
 				moveTreeItem(selected_page, target_id, position, tree);
                 $('.move-target-container').hide();
             }else if(action=="copy") {
-            	site = $('select#site-select')[0].value;
+            	site = $('#site-select')[0].value;
 				copyTreeItem(selected_page, target_id, position, site);
                 $('.move-target-container').hide();
             }else if(action=="add") {
-                site = $('select#site-select')[0].value;
+                site = $('#site-select')[0].value;
                 window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&position="+position+"&site="+site;
             }else{
             	console.log("no action defined!")
@@ -315,7 +315,7 @@ $(document).ready(function() {
 	$('#sitemap ul .col-template').syncWidth(0);
 	$('#sitemap ul .col-creator').syncWidth(0);	
 	/* Site Selector */
-	$('select#site-select').change(function(event){
+	$('#site-select').change(function(event){
 		var id = this.value
 		var url = window.location.href
 		if(action=="copy"){
