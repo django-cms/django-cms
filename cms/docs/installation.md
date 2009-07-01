@@ -94,6 +94,19 @@ If your site is multilingual be sure to have the LANGUAGES setting present in yo
 		('en', gettext('English')),
 	)
 
+urls.py
+-------
+
+In your main urls.py add the following line at the **END** of the urlpatterns:  
+
+	urlpatterns = patterns('',
+	    url(r'^admin/', include(admin.site.urls)),
+		...
+		...
+		url(r'^', include('cms.urls')),
+	)
+	
+
 Other settings
 --------------
 

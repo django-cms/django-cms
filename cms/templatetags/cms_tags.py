@@ -58,7 +58,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         #modify filters if we don't start from the root
         root_page = None
         if root_id:
-            root_page = PageModel.objects.get(reverse_id=root_page)
+            root_page = PageModel.objects.get(reverse_id=root_id)
         else:
             if current_page and current_page.soft_root:
                 root_page = current_page

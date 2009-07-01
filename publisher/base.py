@@ -29,8 +29,6 @@ class Publisher(models.Model):
             # this model is also mptt model, and self.parent isn't published
             raise MpttCantPublish
         
-        #print "----- publishing:", self, self.__class__.__name__
-        
         if fields is None:
             fields = self._meta.fields
         
@@ -44,49 +42,35 @@ class Publisher(models.Model):
         
         try:
             try:
-                #kw = {'origin': self}
                 public_copy = self.public
             except AttributeError:
-                #kw = {'inherited_origin': self}
                 public_copy = self.inherited_public
-                #print "-- inherited", self.id
         except ObjectDoesNotExist:
-            #public_copy = self.__class__.PublicModel(**kw)
             pass
         
         if not public_copy:
             created = True
-            public_copy = self.__class__.PublicModel()
-        
-        #public_copy.inherited_origin = self
-            
+            public_copy = self.__class__.PublicModel()    
         for field in fields:
-            #print "> field:", field.name
             value = getattr(self, field.name)
             if isinstance(field, RelatedField):
                 if field.name in ('public', 'inherited_public'):
                     continue
-                
-                #print self, field, field.rel.to
                 related = field.rel.to
                 if issubclass(related, Publisher):
-                    #print ">> process related:", related
                     if not related in exclude and value:
                         # can follow
                         try:
-                            #print ">> p:", field, value
                             value = value.publish(exclude=exclude)
                         except MpttCantPublish:
                             pass
                     elif value:
                         # if somethings wrong, we may get some erorr here in case
                         # when target isn't publihsed
-                        #print ">> XXX:", value
                         try:
                             value = value.public
                         except AttributeError:
                             value = value.inherited_public
-            #print "> setattr:", field.name, value
             setattr(public_copy, field.name, value)        
         # publish copy
         self.publish_save(public_copy)
@@ -119,10 +103,6 @@ class Publisher(models.Model):
             if issubclass(obj.model, Publisher):
                 # get all objects for this, and publish them
                 name = obj.get_accessor_name()
-                #if name in ('public', 'inherited_public'):
-                #    continue
-                #print ">>> publish remote:", obj.model, name
-                
                 try:
                     try:
                         item_set = getattr(self, name).all()
@@ -130,9 +110,7 @@ class Publisher(models.Model):
                         item_set = [getattr(self, name)] # for model inheritance
                 except ObjectDoesNotExist:
                     continue
-                
                 for item in item_set:
-                    #print "publish remote:", obj.model, item
                     item.publish(exclude=exclude + [obj.__class__])
         
         if not created:
@@ -152,8 +130,6 @@ class Publisher(models.Model):
     def delete(self):
         """Mark published object for deletion first.
         """
-        print ">> delete:", self.__class__, self
-        
         try:
             public = self.public
         except AttributeError:
@@ -176,7 +152,6 @@ class Publisher(models.Model):
             public = self.inherited_public
 
         if public:
-            print ">> delete_with_public, go"
             public.delete()
         self.delete()        
     
@@ -191,7 +166,6 @@ class PublicPublisher(models.Model):
         """If this instance, or some remote instances are marked for deletion
         kill them.
         """
-        #print "------------ delete_marked_for_deletion on:", self
         if collect:
             from django.db.models.query_utils import CollectedObjects
             

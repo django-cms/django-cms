@@ -77,6 +77,5 @@ def render_admin_menu_item(request, page):
     })
     
     filtered = 'filtered' in request.REQUEST
-    print get_admin_menu_item_context(request, page, filtered)
     context.update(get_admin_menu_item_context(request, page, filtered))
     return render_to_response('admin/cms/page/menu_item.html', context) 
