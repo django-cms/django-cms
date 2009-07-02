@@ -391,7 +391,7 @@ class PageAdmin(admin.ModelAdmin):
         
         url_patterns = patterns('',
             pat(r'^(?:[0-9]+)/add-plugin/$', add_plugin),
-            url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
+            url(r'^.+/edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
             pat(r'^(?:[0-9]+)/remove-plugin/$', remove_plugin),
