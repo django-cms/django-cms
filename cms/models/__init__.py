@@ -803,7 +803,7 @@ class CMSPlugin(Publisher, Mptt):
             try:
                 if hasattr(self, '_is_public_model'):
                     # if it is an public model all field names have public prefix
-                    instance = getattr(self, 'public' + plugin.model.__name__.lower())
+                    instance = getattr(self, plugin.model.__name__.lower()+"public")
                 else:
                     instance = getattr(self, plugin.model.__name__.lower())
                 # could alternatively be achieved with:
