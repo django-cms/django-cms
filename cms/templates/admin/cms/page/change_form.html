@@ -214,8 +214,9 @@
 {% block after_related_objects %}{% endblock %}
 
 {% if add %}
-	<div class="submit-row" {% if is_popup %}style="overflow: auto;"{% endif %}>
-		<input type="submit" class="default" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>
+	<div class="submit-row"{% if is_popup %} style="overflow: auto;"{% endif %}>
+		<input type="submit" name="_save" class="default" value="{% trans 'Save' %}" {{ onclick_attrib }}/>
+		<input type="submit" name="_continue" value="{% trans 'Save and continue editing' %}" {{ onclick_attrib }}/>
 	</div>
 {% else %}
 	{% if not moderation_delete_request %}{% submit_row %}{% endif %}

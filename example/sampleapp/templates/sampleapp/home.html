@@ -6,4 +6,7 @@
 	<h3>{{ message }}</h3>
 	{{ block.super }}
 	<a href="{% url sample-app-sublevel %}">Sample app sublevel reverse test</a>
+	
+	<h4>Sample image  - appmedia works?</h4>
+	<img src="{{ MEDIA_URL }}sampleapp/img/gift.jpg" alt="gift">
 {% endblock content %}

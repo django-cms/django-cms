@@ -3,7 +3,7 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.forms.util import ErrorList
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import BooleanField
 
@@ -168,18 +168,20 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
 
 
 class PageUserForm(UserCreationForm):
-    can_add_page = forms.BooleanField(label=_('Can add page'), required=False, initial=True)
-    can_change_page = forms.BooleanField(label=_('Can change page'), required=False, initial=True)
-    can_delete_page = forms.BooleanField(label=_('Can delete page'), required=False)
-    can_recover_page = forms.BooleanField(label=_('Can recover pages (any)'), required=False)
+    can_add_page = forms.BooleanField(label=_('Add'), required=False, initial=True)
+    can_change_page = forms.BooleanField(label=_('Change'), required=False, initial=True)
+    can_delete_page = forms.BooleanField(label=_('Delete'), required=False)
+    can_recover_page = forms.BooleanField(label=_('Recover (any) pages'), required=False)
     
-    can_add_pageuser = forms.BooleanField(label=_('Can create user'), required=False)
-    can_change_pageuser = forms.BooleanField(label=_('Can change User'), required=False)
-    can_delete_pageuser = forms.BooleanField(label=_('Can delete User'), required=False)
+    # pageuser is for pageuser & group - they are combined together, and readed out
+    # from PageUser model
+    can_add_pageuser = forms.BooleanField(label=_('Add'), required=False)
+    can_change_pageuser = forms.BooleanField(label=_('Change'), required=False)
+    can_delete_pageuser = forms.BooleanField(label=_('Delete'), required=False)
     
-    can_add_pagepermission = forms.BooleanField(label=_('Can add page permission'), required=False)
-    can_change_pagepermission = forms.BooleanField(label=_('Can change page permission'), required=False)
-    can_delete_pagepermission = forms.BooleanField(label=_('Can delete page permission'), required=False)
+    can_add_pagepermission = forms.BooleanField(label=_('Add'), required=False)
+    can_change_pagepermission = forms.BooleanField(label=_('Change'), required=False)
+    can_delete_pagepermission = forms.BooleanField(label=_('Delete'), required=False)
     
     notify_user = forms.BooleanField(label=_('Notify user'), required=False, 
         help_text=_('Send email notification to user about username or password change. Requires user email.'))
@@ -261,9 +263,8 @@ class PageUserForm(UserCreationForm):
         if commit:
             user.save()
 
-        models = (Page, PageUser, PagePermission)
-        for model in models:
-            name = model.__name__.lower()
+        models = ((Page, 'page'), (PageUser, 'pageuser'), (Group, 'pageuser'), (PagePermission, 'pagepermission'))
+        for model, name in models:
             content_type = ContentType.objects.get_for_model(model)
             for t in ('add', 'change', 'delete'):
                 if not user.pk:

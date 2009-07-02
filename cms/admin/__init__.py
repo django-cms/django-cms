@@ -171,8 +171,8 @@ if settings.CMS_PERMISSION:
             
             models = (
                 (Page, _('Page permissions')),
-                (PageUser, _('User permissions')),
-                (PagePermission, _('Page permission management')),
+                (PageUser, _('User & Group permissions')),
+                (PagePermission, _('Page permissions management')),
             )
             
             for model, title in models:
@@ -606,8 +606,7 @@ class PageAdmin(admin.ModelAdmin):
                             plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
                     widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
                     form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
-        else:
-            # TODO: Is this "for" needed? 
+        else: 
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
@@ -700,13 +699,15 @@ class PageAdmin(admin.ModelAdmin):
         
         return super(PageAdmin, self).change_view(request, object_id, extra_context)
     
-    def response_add(self, request, obj, post_url_continue='../%s/'):
-        """Called always when new object gets created, there may be some new 
-        stuff, which should be published after all other objects on page are 
-        collected. E.g. title, plugins, etc...
-        """
-        obj.save(commit=False)
-        return super(PageAdmin, self).response_add(request, obj, post_url_continue)
+    # since we have 2 step wizard now, this is not required anymore
+    
+    #def response_add(self, request, obj, post_url_continue='../%s/'):
+    #    """Called always when new object gets created, there may be some new 
+    #    stuff, which should be published after all other objects on page are 
+    #    collected. E.g. title, plugins, etc...
+    #    """
+    #    obj.save(commit=False)
+    #    return super(PageAdmin, self).response_add(request, obj, post_url_continue)
     
     def response_change(self, request, obj):
         """Called always when page gets changed, call save on page, there may be
