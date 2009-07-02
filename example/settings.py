@@ -119,7 +119,7 @@ INSTALLED_APPS = (
     'reversion',
     'example.categories',
     'debug_toolbar',
-    #'south',
+    'south',
     # sample application
     'sampleapp',
     'store',
@@ -153,12 +153,12 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
-        "plugins": ('TextPlugin', 'LinkPlugin'),
+        
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
     'fancy-content': {
-        "plugins": ('TextPlugin'),
+        "plugins": ('TextPlugin', 'LinkPlugin'),
         "extra_context": {"theme":"16_11"},
         "name":gettext("fancy content"),
     },
