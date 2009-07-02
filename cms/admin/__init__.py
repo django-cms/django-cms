@@ -612,6 +612,7 @@ class PageAdmin(admin.ModelAdmin):
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
+            form.base_fields['template'].initial = settings.CMS_TEMPLATES[0][0]
         return form
     
     # remove permission inlines, if user isn't allowed to change them
