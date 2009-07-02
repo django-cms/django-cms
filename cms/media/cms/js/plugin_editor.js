@@ -2,7 +2,7 @@ $(document).ready(function() {
     $('span.add-plugin').click(function(){
         var select = $(this).parent().children("select");
         var pluginvalue = select.attr('value');
-        var placeholder = $(this).parent().parent().parent().parent().parent().children("h2").text();
+        var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
         var splits = window.location.href.split("/");
         var page_id = splits[splits.length-2];
         var language = $('#id_language').attr('value');
