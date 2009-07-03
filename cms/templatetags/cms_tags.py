@@ -58,7 +58,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         #modify filters if we don't start from the root
         root_page = None
         if root_id:
-            root_page = PageModel.objects.get(reverse_id=root_id)
+            try:
+                root_page = PageModel.objects.get(reverse_id=root_id)
+            except:
+                send_missing_mail(root_id, request)
         else:
             if current_page and current_page.soft_root:
                 root_page = current_page
@@ -285,6 +288,16 @@ def has_permission(page, request):
 register.filter(has_permission)
 
 
+def send_missing_mail(reverse_id, request):
+    site = Site.objects.get_current()
+    send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                  _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                    "The url of the page was: http://%(host)s%(path)s")
+                    % {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
+                  settings.DEFAULT_FROM_EMAIL,
+                  settings.MANAGERS, 
+                  fail_silently=True)
+
 def page_id_url(context, reverse_id, lang=None):
     """
     Show the url of a page with a reverse id in the right language
@@ -304,18 +317,7 @@ def page_id_url(context, reverse_id, lang=None):
         try:
             page = PageModel.objects.get(reverse_id=reverse_id)
         except:
-            if settings.DEBUG:
-                raise
-            else:
-                site = Site.objects.get_current()
-                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                          _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                            "The url of the page was: http://%(host)s%(path)s")
-                            % {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
-                          settings.DEFAULT_FROM_EMAIL,
-                          settings.MANAGERS, 
-                          fail_silently=True)
-
+            send_missing_mail(reverse_id, request)
         url = page.get_absolute_url(language=lang)
         cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
     if url:
