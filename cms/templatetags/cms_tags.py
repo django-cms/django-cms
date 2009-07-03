@@ -8,6 +8,8 @@ from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from cms.utils.moderator import get_page_model, get_title_model, get_cmsplugin_model
 from cms.models import Page
+from django.utils.translation import ugettext_lazy as _
+
 register = template.Library()
 
 
@@ -293,7 +295,7 @@ def send_missing_mail(reverse_id, request):
     send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
                   _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
                     "The url of the page was: http://%(host)s%(path)s")
-                    % {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
+                    % {'reverse_id':reverse_id, 'host':site.domain, 'path':request.path},
                   settings.DEFAULT_FROM_EMAIL,
                   settings.MANAGERS, 
                   fail_silently=True)
