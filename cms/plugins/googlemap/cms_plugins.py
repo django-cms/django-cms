@@ -8,7 +8,6 @@ class GoogleMapPlugin(CMSPluginBase):
     model = GoogleMap
     name = _("Google Map")
     render_template = "cms/plugins/googlemap.html"
-    text_enabled = True
     
     def render(self, context, instance, placeholder):
         if 'GOOGLE_MAPS_API_KEY' in context:
