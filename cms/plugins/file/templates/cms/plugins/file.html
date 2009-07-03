@@ -1,8 +1,8 @@
-{% if instance.file.url %}
+{% if object.file.url %}
 <span class="file">
-<a href="{{ instance.file.url }}"/>
-{% if instance.get_icon_url %}<img src="{{ instance.get_icon_url }}" style="border: 0px" alt="Icon" />{% endif %}
-{% if instance.title %}{{ instance.title }}{% else %}{{ instance.get_file_name }}{% endif %} {% if instance.file_exists %}<span class="filesize">({{ instance.file.size|filesizeformat }})</span>{% else %}(file missing!){% endif %}</a>
+<a href="{{ object.file.url }}"/>
+{% if object.get_icon_url %}<img src="{{ object.get_icon_url }}" style="border: 0px" alt="Icon" />{% endif %}
+{% if object.title %}{{ object.title }}{% else %}{{ object.get_file_name }}{% endif %} {% if object.file_exists %}<span class="filesize">({{ object.file.size|filesizeformat }})</span>{% else %}(file missing!){% endif %}</a>
 </span>
 {% endif %}
 

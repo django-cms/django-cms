@@ -265,9 +265,6 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('application_urls')
     if settings.CMS_REDIRECTS:
         advanced_fields.append('redirect')
-    if settings.CMS_SHOW_META_TAGS:
-        advanced_fields.append('meta_description')
-        advanced_fields.append('meta_keywords')
     if settings.CMS_SEO_FIELDS:
         seo_fields = ('page_title', 'meta_description', 'meta_keywords')
     if settings.CMS_MENU_TITLE_OVERWRITE:

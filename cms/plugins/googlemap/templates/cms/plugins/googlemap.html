@@ -10,9 +10,9 @@
 		var geocoder;
 		var map;
 		
-		var title = "{{ map.get_title }}";
-		var address = "{{ map.street }} {{ map.streetnr }}, {{ map.postcode }} {{ map.city }}";
-		var zoom = {{ map.get_zoom_level }};
+		var title = "{{ object.get_title }}";
+		var address = "{{ object.street }} {{ object.streetnr }}, {{ object.postcode }} {{ object.city }}";
+		var zoom = {{ object.get_zoom_level }};
 		
 		function load()
 		{
@@ -53,7 +53,7 @@
 		  map.addOverlay(marker);
 		
 		  // Add address information to marker
-		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + place.address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ map.get_content }}</i>"{% endifnotequal %});
+		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + place.address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
 		}
 		
 		load();

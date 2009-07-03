@@ -47,7 +47,11 @@ class TextPlugin(CMSPluginBase):
         return super(TextPlugin, self).get_form(request, obj, **kwargs)
 
     def render(self, context, instance, placeholder):
-        return {'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
-                'placeholder':placeholder}
+        context.update({
+            'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
+            'placeholder':placeholder,
+            'object':instance
+        })
+        return context
 
 plugin_pool.register_plugin(TextPlugin)

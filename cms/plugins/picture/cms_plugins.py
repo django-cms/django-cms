@@ -11,7 +11,11 @@ class PicturePlugin(CMSPluginBase):
     text_enabled = True
     
     def render(self, context, instance, placeholder):
-        return {'picture':instance, 'placeholder':placeholder}
+        context.update({
+            'picture':instance, 
+            'placeholder':placeholder
+        })
+        return context 
     
     def icon_src(self, instance):
         # TODO - possibly use 'instance' and provide a thumbnail image

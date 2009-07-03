@@ -15,6 +15,7 @@ class FlashPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,
+            'placeholder':placeholder,
         })
         return context
     
