@@ -37,19 +37,50 @@ function initTree(){
 		},
 		cookies : {},
 		callback: {
+			beforemove  : function(what, where, position, tree) {
+				//console.log("before move")
+				item_id = what.id.split("page_")[1];
+				target_id = where.id.split("page_")[1];
+				old_node = what
+				if($(what).parent().children("li").length > 1){
+					//console.log("has siblings")
+					if($(what).next("li").length){
+						old_target = $(what).next("li")[0];
+						old_position = "right"
+						//console.log("has sibling after")
+						//console.log($(what).next("li"))
+					}
+					if($(what).prev("li").length){
+						old_target = $(what).prev("li")[0];
+						old_position = "left"
+						//console.log("has sibling befor")
+						//console.log($(what).prev("li"))
+					}
+				}else{
+					console.log("no siblings")
+					if($(what).attr("rel") != "topnode"){
+						//console.log("has parent")
+						//console.log($(what).parent().parent())
+						old_target = $(what).parent().parent()[0];
+						old_position = "inside"
+					}else{
+						0/0;
+					}
+				}
+				
+				addUndo(what, where, position)
+				return true 
+			},
 			onmove: function(what, where, position, tree){
 				item_id = what.id.split("page_")[1];
 				target_id = where.id.split("page_")[1];
 				if (position == "before") {
 					position = "left"
+				}else if (position == "after") {
+					position = "right"
+				}else if(position == "inside"){
+					position = "first-child"
 				}
-				else 
-					if (position == "after") {
-						position = "right"
-					}
-					else {
-						position = "first-child"
-					}
 				moveTreeItem(item_id, target_id, position, false)
 			},
 			onchange: function(node, tree){
@@ -455,3 +486,10 @@ function moveTreeItem(item_id, target_id, position, tree){
         }
     );
 };
+
+var undos = []
+function addUndo(node, target, position){
+	//console.log("add undo")
+	undos.push({node:node, target:target, position:position})
+	//console.log(undos)
+}
