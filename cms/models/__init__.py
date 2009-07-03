@@ -642,7 +642,8 @@ class Page(Publisher, Mptt):
                     for title in titles:
                         title.publish(fields=title_fields)
             else:
-                print "no public found"            
+                pass
+                #print "no public found"            
         
         # publish, but only if all parents are published!! - this will need a flag
         try:
