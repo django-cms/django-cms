@@ -1,12 +1,13 @@
 Installation
 ============
 
-Copy the cms and mptt folders into your project or pythonpath.
+Copy the `cms` and `mptt` folders into your project or add them
+to your Python path.
 
 Apps
 ----
 
-Add the following to your INSTALLED_APPS in settings.py:
+Add the following to your project's `INSTALLED_APPS` setting:
 
 	INSTALLED_APPS = (
 		...
@@ -33,12 +34,12 @@ Add the following middleware classes:
 		...
 	)
     
-If your site is not multilingual you can leave out the MutilingualURLMiddleware.
+If your site is not multilingual you can leave out `'cms.middleware.MutilingualURLMiddleware'`.
 
-Context Processors
-------------------
+Template Context Processors
+---------------------------
 
-Add the following context processors if not already present:
+Add the following template context processors if not already present:
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
 		...
@@ -50,24 +51,26 @@ Add the following context processors if not already present:
 Templates
 ---------
 
-If you don't have already a gettext stub in your settings.py put this in your settings.py after the imports:
+If you don't have already a `gettext` stub in your `settings.py` file, insert the following line
+near the beginning of the file but after any import statements that it may have:
 
 	gettext = lambda s: s
 	
-This allows you to use gettext in settings.py.
+This allows you to use `gettext` in `settings.py`.
 
-Add some templates you want to use within Django-cms 2.0 that contain at least one {% placeholder %} templatetag, to your settings.py:
+Add some templates you want to use within Django-cms 2.0 that contain at least one
+`{% placeholder %}` template tag to your `settings.py`:
 	
 	CMS_TEMPLATES = (
-    	('base.html', gettext('default')),
-    	('2col.html', gettext('2 Column')),
-    	('3col.html', gettext('3 Column')),
-    	('extra.html', gettext('Some extra fancy template')),
+		('base.html', gettext('default')),
+		('2col.html', gettext('2 Column')),
+		('3col.html', gettext('3 Column')),
+		('extra.html', gettext('Some extra fancy template')),
 	)
 	
 For some template examples see the templates used in the example project.
 
-A quick example:
+Here's a quick example of what a template might look like:
 
 	{% load cms_tags %}
 	
@@ -77,10 +80,10 @@ A quick example:
 	<div id="content">{% placeholder "content" %}</div>
 	<div id="left_column">{% placeholder "left_column" %}</div>
 
-i18n
-----
+Internationalization
+--------------------
 
-If your site is multilingual be sure to have the LANGUAGES setting present in your settings.py file:
+If your site is multilingual be sure to have the `LANGUAGES` setting present in your `settings.py` file:
 
 	LANGUAGES = (
 		('fr', gettext('French')),
@@ -88,34 +91,34 @@ If your site is multilingual be sure to have the LANGUAGES setting present in yo
 		('en', gettext('English')),
 	)
 
-urls.py
+`urls.py`
 -------
 
-In your main urls.py add the following line at the **END** of the urlpatterns:  
+In your main `urls.py` add the following line at the **end** of the `urlpatterns` definition:
 
-	urlpatterns = patterns('',
-	    url(r'^admin/', include(admin.site.urls)),
-		...
-		...
-		url(r'^', include('cms.urls')),
-	)
-
-
+    urlpatterns = patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        # ...
+        # ...
+        url(r'^', include('cms.urls')),
+    )
 
 Other settings
 --------------
 
-For a list of all settings that can be overridden in your settings.py have a look at cms/settings.py.
+For a list of all settings that can be overridden in your `settings.py` file have a look at `cms/settings.py`.
 
 More information is available in the docs folder: [cms/docs/](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs)
-or have a look at the example project.
+You may also want to have a look at the example project to see what settings it uses.
 
 Media Files
 -----------
 
 **ATTENTION:**
 
-If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/) be sure that you copy the cms/media/cms/ folder into your static files folder.
+If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/)
+be sure to copy the `cms/media/cms/` folder into your media directory or make a symbolic
+link as appropriate.
 
 
 Troubleshooting:
