@@ -1,14 +1,16 @@
 Navigation
 ==========
 
-There are 4 template tags for use in the templates that are connected to the menu:
+There are four template tags for use in the templates that are connected to the menu:
+`show_menu`, `show_menu_below_id`, `show_sub_menu`, and `show_breadcrumb`.
 
-show\_menu
+`show_menu`
 ---------
 
-show\_menu renders the navigation of the current page.
-You can overwrite the appearance and the HTML if you add a cms/menu.html template to you project or edit the one provided with django-cms.
-show\_menu takes 4 parameters:
+`show_menu` renders the navigation of the current page.
+You can overwrite the appearance and the HTML if you add a `cms/menu.html`
+template to your project or edit the one provided with django-cms.
+`show_menu` takes four parameters:
 
 From what level to which level of the navigation should the navigation be rendered?
 
