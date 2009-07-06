@@ -1,7 +1,7 @@
 Plugins
 =======
 
-Suppose you have the following gallery model
+Suppose you have the following gallery model:
 
 	class Gallery(models.Model):
 		name = models.CharField(max_length=30)
@@ -11,7 +11,7 @@ Suppose you have the following gallery model
 		image = models.ImageField(upload_to="uploads/images/")
 		description = models.CharField(max_length=60)
 
-and that you want to display this gallery between two text blocks.
+And that you want to display this gallery between two text blocks.
 You can do this with a CMS plugin.
 To create a CMS plugin you need two components: a CMSPlugin model and a cms_plugins.py file.
 
@@ -53,32 +53,32 @@ In there write the following:
 
 ### model ###
 
-is the CMSPlugin model we created earlier.
+Is the CMSPlugin model we created earlier.
 If you don't need a model because you just want to display some template logic, use CMSPlugin from cms.models as the model instead.
 
 ### name ###
 
-will be displayed in the plugin editor
+Will be displayed in the plugin editor
 
 ### render\_template ###
 
-will be rendered with the context returned by the render function
+Will be rendered with the context returned by the render function
 
 ### render ###
 
-the render function takes 3 arguments:
+The render function takes 3 arguments:
 
 **context**:
 
-the context of the template placeholder was placed.
+The context of the template placeholder was placed.
 
 **instance**:
 
-the instance of the GalleryPlugin model
+The instance of the GalleryPlugin model
 
 **placeholder**:
 
-the name of the placeholder this plugin appears.
+The name of the placeholder this plugin appears.
 It is normally a good idea to give the placeholder to the template so you can style
 the content differently in the template based on which placeholder it is placed.
 
@@ -87,11 +87,11 @@ You can accomplish this simply with:
 
 	request = context['request']
 
-because the request will always be in the context as the requestcontext processor is required by the CMS.
+Because the request will always be in the context as the requestcontext processor is required by the CMS.
 
 Template
 --------
-now create a gallery.html template in templates/gallery/ and write the following in there.
+Now create a gallery.html template in templates/gallery/ and write the following in there.
 
 	{% for image in gallery.picture_set.all %}
 		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
