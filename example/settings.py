@@ -170,6 +170,7 @@ CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categor
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True
+CMS_PERMISSION = True
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True
