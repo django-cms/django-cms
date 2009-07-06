@@ -37,8 +37,8 @@ Add the following middleware classes:
 
 	MIDDLEWARE_CLASSES = (
     	...
-    	'cms.middleware.CurrentPageMiddleware',
-		'cms.middleware.CurrentUserMiddleware',
+    	'cms.middleware.page.CurrentPageMiddleware',
+		'cms.middleware.user.CurrentUserMiddleware',
     	'cms.middleware.multilingual.MultilingualURLMiddleware',
     	...
     	)
