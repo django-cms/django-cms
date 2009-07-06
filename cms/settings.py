@@ -25,7 +25,7 @@ if CMS_TEMPLATES is None:
 #        "extra_context": {},
 #    },
 #}
-CMS_PLACEHOLDER_CONF = getattr(settings, 'CMS_PLACEHOLDER_CONF', None)
+CMS_PLACEHOLDER_CONF = getattr(settings, 'CMS_PLACEHOLDER_CONF', {})
 
 # Whether to enable permissions.
 CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', False)
