@@ -97,6 +97,14 @@ class Page(Publisher, Mptt):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
+    
+    def get_hash(self):
+        """Used in object comparison - if there were some change between objects
+        generates sha1.
+        """
+        
+    
+    
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
