@@ -105,7 +105,6 @@ In your main urls.py add the following line at the **END** of the urlpatterns:
 		...
 		url(r'^', include('cms.urls')),
 	)
-	
 
 Other settings
 --------------
@@ -118,5 +117,14 @@ or have a look at the example project.
 Media Files
 -----------
 
-If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/) be sure that you copy all files located in cms/media to your static files folder.
+**ATTENTION:**
 
+If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/) be sure that you copy the cms/media/cms/ folder into your static files folder.
+
+
+Troubleshooting:
+----------------
+
+If you create a page and you don't see a page in the list view:
+
+- Be sure you copied all the media files. Check with firebug and its "net" panel if you have any 404

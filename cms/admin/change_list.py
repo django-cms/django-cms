@@ -72,7 +72,7 @@ class CMSChangeList(ChangeList):
         
         perm_edit_ids = Page.permissions.get_change_id_list(request.user)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user)
-        perm_softroot_ids = Page.permissions.get_softroot_id_list(request.user)
+        perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user)
         perm_change_list_ids = Page.permissions.get_change_list_id_list(request.user)
         
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
@@ -105,7 +105,7 @@ class CMSChangeList(ChangeList):
                 # caching the permissions
                 page.permission_edit_cache = perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids
                 page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
-                page.permission_softroot_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_softroot_ids
+                page.permission_advanced_settings_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
                 page.permission_user_cache = request.user
             
             if settings.CMS_MODERATOR:

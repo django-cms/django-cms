@@ -329,12 +329,12 @@ class PagePermissionsPermissionManager(models.Manager):
         """
         return self.__get_id_list(user, "can_delete")
     
-    def get_softroot_id_list(self, user):
+    def get_advanced_settings_id_list(self, user):
         """
-        Give a list of page where the user can change the softroot or the string "All" if
-        the user has all rights.
+        Give a list of page where the user can change advanced settings or the 
+        string "All" if the user has all rights.
         """
-        return self.__get_id_list(user, "can_change_softroot")
+        return self.__get_id_list(user, "can_change_advanced_settings")
     
     def get_change_permissions_id_list(self, user):
         """Give a list of page where the user can change permissions.

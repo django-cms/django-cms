@@ -58,7 +58,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         #modify filters if we don't start from the root
         root_page = None
         if root_id:
+#<<<<<<< HEAD:cms/templatetags/cms_tags.py
             root_page = PageModel.objects.get(reverse_id=root_id)
+#=======
+#            root_page = Page.objects.get(reverse_id=root_id)
+#>>>>>>> pattrunk/master:cms/templatetags/cms_tags.py
         else:
             if current_page and current_page.soft_root:
                 root_page = current_page
