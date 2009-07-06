@@ -40,7 +40,10 @@ class PageRegexURLResolver(RegexURLResolver):
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404, e:
-                    tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
+                    if 'tried' in e.args[0]:
+                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
+                    elif 'path' in e.args[0]:
+                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['path']])
                 else:
                     if sub_match:
                         if isinstance(pattern, RegexURLResolver):
