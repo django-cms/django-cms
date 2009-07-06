@@ -261,6 +261,7 @@ class Page(Publisher, Mptt):
                     # existing page without moderator - publish it directly
                     publish_directly = True
         elif change_state:
+            self.moderator_state = Page.MODERATOR_CHANGED
             publish_directly = True
         
         if self.publication_date is None and self.published:
