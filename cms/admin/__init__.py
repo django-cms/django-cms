@@ -26,7 +26,7 @@ from django.views.generic.create_update import redirect
 from cms import settings
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, PageUserForm, PageAddForm,\
-    GlobalPagePermissionAdminForm
+    GlobalPagePermissionAdminForm, PageUserGroupForm
 from cms.admin.utils import get_placeholders
 from cms.admin.views import (change_status, change_innavigation, add_plugin, 
     edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation)
@@ -71,9 +71,6 @@ if settings.CMS_PERMISSION:
         def __init__(self, *args, **kwargs):
             super(PagePermissionInlineAdmin, self).__init__(*args, **kwargs)
         
-        if not settings.CMS_SOFTROOT:
-            exclude = ['can_change_softroot']
-            
         def queryset(self, request):
             """Queryset change, so user with global change permissions can see
             all permissions. Otherwise can user see only permissions for 
@@ -110,8 +107,8 @@ if settings.CMS_PERMISSION:
                     self.exclude.append('can_delete')
                 if not obj.has_publish_permission(request):
                     self.exclude.append('can_publish')
-                if not obj.has_softroot_permission(request):
-                    self.exclude.append('can_change_softroot')
+                if not obj.has_advanced_settings_permission(request):
+                    self.exclude.append('can_change_advanced_settings')
                 if not obj.has_move_page_permission(request):
                     self.exclude.append('can_move_page')
                 if not settings.CMS_MODERATOR or not obj.has_moderate_permission(request):
@@ -134,11 +131,8 @@ if settings.CMS_PERMISSION:
         
         exclude = []
         
-        if settings.CMS_SOFTROOT:
-            list_display.append('can_change_softroot')
-            list_filter.append('can_change_softroot')
-        else:
-            exclude.append('can_change_softroot')
+        list_display.append('can_change_advanced_settings')
+        list_filter.append('can_change_advanced_settings')
             
         if settings.CMS_MODERATOR:
             list_display.append('can_moderate')
@@ -150,19 +144,8 @@ if settings.CMS_PERMISSION:
     
     from django.contrib.auth.admin import UserAdmin
     
-    class PageUserAdmin(UserAdmin):
-        form = PageUserForm
-        model = PageUser
-        
-        list_display = ('username', 'email', 'first_name', 'last_name', 'created_by')
-        
-        # get_fieldsets method may add fieldsets depending on user
-        fieldsets = [
-            (None, {'fields': ('username', ('password1', 'password2'), 'notify_user')}),
-            (_('User details'), {'fields': (('first_name', 'last_name'), 'email')}),
-        ]
-        
-        def get_fieldsets(self, request, obj=None):
+    class GenericCmsPermissionAdmin(object):
+        def update_permission_fieldsets(self, request, obj=None):
             """Nobody can grant more than he haves, so check for user 
             permissions to Page and User model and render fieldset depending on
             them.
@@ -175,6 +158,7 @@ if settings.CMS_PERMISSION:
                 (PagePermission, _('Page permissions management')),
             )
             
+            i = 0
             for model, title in models:
                 opts, fields = model._meta, []
                 name = model.__name__.lower()
@@ -186,7 +170,45 @@ if settings.CMS_PERMISSION:
                     fields.append('can_recover_page')
             
                 if fields:
-                    fieldsets.append((title, {'fields': (fields,)}),)
+                    fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
+                i += 1
+            return fieldsets
+                
+        def _has_change_permissions_permission(self, request):
+            """User is able to add/change objects only if he haves can change
+            permission on some page.
+            """
+            try:
+                user_level = get_user_permission_level(request.user)
+            except NoPermissionsException:
+                return False
+            return True
+        
+        def has_add_permission(self, request):
+            return self._has_change_permissions_permission(request) and \
+                super(self.__class__, self).has_add_permission(request)
+    
+        def has_change_permission(self, request, obj=None):
+            return self._has_change_permissions_permission(request) and \
+                super(self.__class__, self).has_change_permission(request, obj)
+    
+    
+    
+    class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
+        form = PageUserForm
+        model = PageUser
+        
+        list_display = ('username', 'email', 'first_name', 'last_name', 'created_by')
+        
+        # get_fieldsets method may add fieldsets depending on user
+        fieldsets = [
+            (None, {'fields': ('username', ('password1', 'password2'), 'notify_user')}),
+            (_('User details'), {'fields': (('first_name', 'last_name'), 'email')}),
+            (_('Groups'), {'fields': ('groups',)}),
+        ]
+        
+        def get_fieldsets(self, request, obj=None):
+            fieldsets = self.update_permission_fieldsets(request, obj)
             
             if not '/add' in request.path:
                 fieldsets[0] = (None, {'fields': ('username', 'notify_user')})
@@ -200,32 +222,26 @@ if settings.CMS_PERMISSION:
                 return qs.filter(pk__in=user_id_set)
             except NoPermissionsException:
                 return self.model.objects.get_empty_query_set()
-            
         
         def add_view(self, request):
             return super(UserAdmin, self).add_view(request)        
         
-        def _has_change_permissions_permission(self, request):
-            """User is able to add/change objects only if he haves can change
-            permission on some page.
-            """
-            try:
-                user_level = get_user_permission_level(request.user)
-            except NoPermissionsException:
-                return False
-            return True
         
-        def has_add_permission(self, request):
-            return self._has_change_permissions_permission(request) and \
-                super(PageUserAdmin, self).has_add_permission(request)
+    class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
+        form = PageUserGroupForm
+        list_display = ('name', 'created_by')
+        
+        fieldsets = [
+            (None, {'fields': ('name',)}),
+        ]
+        
+        def get_fieldsets(self, request, obj=None):
+            return self.update_permission_fieldsets(request, obj)
     
-        def has_change_permission(self, request, obj=None):
-            return self._has_change_permissions_permission(request) and \
-                super(PageUserAdmin, self).has_change_permission(request, obj)
     
     admin.site.register(PageUser, PageUserAdmin)
+    admin.site.register(PageUserGroup, PageUserGroupAdmin)
     
-    admin.site.register(PageUserGroup)
 
 ################################################################################
 # Page
@@ -241,9 +257,9 @@ class PageAdmin(admin.ModelAdmin):
     exclude = ['created_by', 'changed_by', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = ['language']
-    general_fields = ['title', 'slug', 'published']
+    general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
-    advanced_fields = ['in_navigation', 'reverse_id',  'overwrite_url']
+    advanced_fields = ['reverse_id',  'overwrite_url']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
@@ -501,9 +517,13 @@ class PageAdmin(admin.ModelAdmin):
         if obj: # edit
             given_fieldsets = deepcopy(self.fieldsets)
             if not obj.has_publish_permission(request):
-                given_fieldsets[0][1]['fields'].remove('published')
-            if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request):
-                given_fieldsets[2][1]['fields'].remove('soft_root')
+                l = list(given_fieldsets[0][1]['fields'][2])
+                l.remove('published')
+                given_fieldsets[0][1]['fields'][2] = tuple(l)
+            
+            if not obj.has_advanced_settings_permission(request):
+                given_fieldsets.pop(2)
+                                
             for placeholder in get_placeholders(request, template):
                 if placeholder.name not in self.mandatory_placeholders:
                     if placeholder.name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder.name]:
@@ -535,11 +555,10 @@ class PageAdmin(admin.ModelAdmin):
                 self.exclude.append('published')
             elif 'published' in self.exclude:
                 self.exclude.remove('published')
-            if settings.CMS_SOFTROOT and not obj.has_softroot_permission(request) \
-                and not 'soft_root' in self.exclude: 
-                    self.exclude.append('soft_root')
-            elif 'soft_root' in self.exclude:
+
+            if not settings.CMS_SOFTROOT and 'soft_root' in self.exclude:
                 self.exclude.remove('soft_root')
+            
             form = super(PageAdmin, self).get_form(request, obj, **kwargs)
             form.base_fields['language'].initial = force_unicode(language)
             version_id = None

@@ -103,6 +103,7 @@ If your site is multilingual be sure to have the `LANGUAGES` setting present in 
 `urls.py`
 -------
 
+
 In your main `urls.py` add the following line at the **end** of the `urlpatterns` definition:
 
     urlpatterns = patterns('',

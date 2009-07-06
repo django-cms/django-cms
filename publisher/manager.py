@@ -7,6 +7,7 @@ from django.db.models.fields.related import RelatedField, add_lazy_relation,\
 class PublisherManager(object):
     # common prefix for public class names
     PUBLISHER_MODEL_NAME = "%sPublic"
+    #PUBLISHER_MODEL_NAME = "Public%s"
     
     registry = []
 

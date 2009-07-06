@@ -8,7 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import BooleanField
 
 from cms import settings as cms_settings
-from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE
+from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE,\
+    PageUserGroup
 from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups, mail_page_user_change
@@ -114,9 +115,9 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         
         user = get_current_user() # current user from threadlocals
         
-        self.fields['user'].queryset=get_subordinate_users(user)
+        self.fields['user'].queryset = get_subordinate_users(user)
         self.fields['user'].widget.user = user # assign current user
-        self.fields['group'].queryset=get_subordinate_groups(user)
+        self.fields['group'].queryset = get_subordinate_groups(user)
         
         
     def clean(self):
@@ -168,7 +169,9 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
         return self.cleaned_data
 
 
-class PageUserForm(UserCreationForm):
+class GenericCmsPermissionForm(forms.ModelForm):
+    """Generic form for User & Grup permissions in cms
+    """
     can_add_page = forms.BooleanField(label=_('Add'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Change'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Delete'), required=False)
@@ -184,6 +187,58 @@ class PageUserForm(UserCreationForm):
     can_change_pagepermission = forms.BooleanField(label=_('Change'), required=False)
     can_delete_pagepermission = forms.BooleanField(label=_('Delete'), required=False)
     
+    def populate_initials(self, obj):
+        """Read out permissions from permission system.
+        """
+        initials = {}
+        models = (Page, PageUser, PagePermission)
+        """
+        for model in models:
+            name = model.__name__.lower()
+            for t in ('add', 'change', 'delete'):
+                codename = getattr(model._meta, 'get_%s_permission' % t)()
+                initials['can_%s_%s' % (t, name)] = obj.has_perm('%s.%s' % (model._meta.app_label, codename)) 
+        return initials
+        """
+        permission_acessor = self.permission_acessor(obj)
+        for model in models:
+            name = model.__name__.lower()
+            content_type = ContentType.objects.get_for_model(model)
+            permissions = permission_acessor.filter(content_type=content_type).values_list('codename', flat=True)
+            for t in ('add', 'change', 'delete'):
+                codename = getattr(model._meta, 'get_%s_permission' % t)()
+                initials['can_%s_%s' % (t, name)] = codename in permissions 
+        return initials
+    
+    def permission_acessor(self, obj):
+        if isinstance(obj, PageUser):
+            rel_name = 'user_permissions' 
+        else:
+            rel_name = 'permissions'
+        return getattr(obj, rel_name)
+
+    def save_permissions(self, obj):
+        models = ((Page, 'page'), (PageUser, 'pageuser'), (PageUserGroup, 'pageuser'), (PagePermission, 'pagepermission'))
+        
+        if not obj.pk:
+            # save obj, otherwise we can't assign permissions to him
+            obj.save()
+        permission_acessor = self.permission_acessor(obj)
+        
+        for model, name in models:
+            content_type = ContentType.objects.get_for_model(model)
+            for t in ('add', 'change', 'delete'):
+                # add permission `t` to model `model`
+                codename = getattr(model._meta, 'get_%s_permission' % t)()
+                permission = Permission.objects.get(content_type=content_type, codename=codename)
+                
+                if self.cleaned_data.get('can_%s_%s' % (t, name), None):
+                    permission_acessor.add(permission)
+                else:
+                    permission_acessor.remove(permission)
+        
+
+class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
     notify_user = forms.BooleanField(label=_('Notify user'), required=False, 
         help_text=_('Send email notification to user about username or password change. Requires user email.'))
     
@@ -210,18 +265,6 @@ class PageUserForm(UserCreationForm):
             self.fields['password2'].label = _('New password confirmation')
         
         self._password_change = True
-        
-    def populate_initials(self, instance):
-        """Read out user permissions from permission system.
-        """
-        initials = {}
-        models = (Page, PageUser, PagePermission)
-        for model in models:
-            name = model.__name__.lower()
-            for t in ('add', 'change', 'delete'):
-                codename = getattr(model._meta, 'get_%s_permission' % t)()
-                initials['can_%s_%s' % (t, name)] = instance.has_perm('%s.%s' % (model._meta.app_label, codename)) 
-        return initials        
         
     def clean_username(self):
         if self.instance:
@@ -264,24 +307,42 @@ class PageUserForm(UserCreationForm):
         if commit:
             user.save()
 
-        models = ((Page, 'page'), (PageUser, 'pageuser'), (Group, 'pageuser'), (PagePermission, 'pagepermission'))
-        for model, name in models:
-            content_type = ContentType.objects.get_for_model(model)
-            for t in ('add', 'change', 'delete'):
-                if not user.pk:
-                    # save user, otherwise we can't assign permissions to him
-                    user.save()
-                
-                # add permission `t` to model `model`
-                codename = getattr(model._meta, 'get_%s_permission' % t)()
-                permission = Permission.objects.get(content_type=content_type, codename=codename)
-                
-                if self.cleaned_data.get('can_%s_%s' % (t, name), None):
-                    user.user_permissions.add(permission)
-                else:
-                    user.user_permissions.remove(permission)
+        self.save_permissions(user)
 
         if self.cleaned_data['notify_user']:
             mail_page_user_change(user, created, self.cleaned_data['password1'])
         
         return user
+    
+    
+class PageUserGroupForm(GenericCmsPermissionForm):
+    
+    class Meta:
+        model = PageUserGroup
+        fields = ('name', )
+        
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+        
+        if instance:
+            initial = initial or {}
+            initial.update(self.populate_initials(instance))
+        
+        super(PageUserGroupForm, self).__init__(data, files, auto_id, prefix, 
+            initial, error_class, label_suffix, empty_permitted, instance)
+    
+    def save(self, commit=True):
+        group = super(GenericCmsPermissionForm, self).save(commit=False)
+        
+        created = not bool(group.pk)
+        # assign creator to user
+        if created:
+            group.created_by = get_current_user()
+
+        if commit:
+            group.save()
+
+        self.save_permissions(group)
+
+        return group

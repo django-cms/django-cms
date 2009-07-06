@@ -97,6 +97,14 @@ class Page(Publisher, Mptt):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
+    
+    def get_hash(self):
+        """Used in object comparison - if there were some change between objects
+        generates sha1.
+        """
+        
+    
+    
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -490,8 +498,8 @@ class Page(Publisher, Mptt):
     def has_publish_permission(self, request):
         return self.has_generic_permission(request, "publish")
     
-    def has_softroot_permission(self, request):
-        return self.has_generic_permission(request, "softroot")
+    def has_advanced_settings_permission(self, request):
+        return self.has_generic_permission(request, "advanced_settings")
     
     def has_change_permissions_permission(self, request):
         """Has user ability to change permissions for current page?
@@ -888,7 +896,7 @@ class AbstractPagePermission(models.Model):
     can_change = models.BooleanField(_("can edit"), default=True)
     can_add = models.BooleanField(_("can add"), default=True)
     can_delete = models.BooleanField(_("can delete"), default=True)
-    can_change_softroot = models.BooleanField(_("can change soft-root"), default=False)
+    can_change_advanced_settings = models.BooleanField(_("can change adv. settings"), default=False)
     can_publish = models.BooleanField(_("can publish"), default=True)
     can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
     can_move_page = models.BooleanField(_("can move"), default=True)
