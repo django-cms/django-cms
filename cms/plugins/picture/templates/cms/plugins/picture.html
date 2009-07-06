@@ -1,3 +1,3 @@
-{% if picture.url %}<a href="{{ picture.url }}">{% endif %}
-<img {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}src="{{ picture.image.url }}" />
-{% if picture.url %}</a>{% endif %}
+{% if link %}<a href="{{ link }}">{% endif %}
+<img {% if picture.float %}class="{{ picture.float }}" {% endif %}{% if picture.alt %}alt="{{ picture.alt }}" {% endif %}src="{{ picture.image.url }}" />
+{% if link %}</a>{% endif %}
