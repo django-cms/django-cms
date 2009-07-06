@@ -5,17 +5,6 @@ from cms.models import *
 
 class Migration:
     
-    depends_on = (
-        ("file", "0003_publisher"),
-        ("flash", "0003_publisher"),
-        ("googlemap", "0001_initial"),
-        ("link", "0005_publisher"),
-        ("picture", "0004_publisher"),
-        ("snippet", "0002_publisher"),
-        ("text", "0003_publisher"),
-    )
-
-    
     def forwards(self, orm):
         
         # Adding model 'PublicCMSPlugin'

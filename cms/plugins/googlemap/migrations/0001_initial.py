@@ -4,6 +4,10 @@ from django.db import models
 from cms.plugins.googlemap.models import *
 
 class Migration:
+    depends_on = (
+        ("cms", "0012_publisher"),
+    )
+
     
     def forwards(self, orm):
         

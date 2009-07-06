@@ -5,6 +5,10 @@ from cms.plugins.flash.models import *
 
 class Migration:
     
+    depends_on = (
+        ("cms", "0012_publisher"),
+    )
+
     def forwards(self, orm):
         
         # Adding model 'PublicFlash'
