@@ -27,7 +27,7 @@ class PluginPool(object):
             import reversion  
             try:   
                 reversion.register(plugin.model, follow=["cmsplugin_ptr"])
-            except reversion.revisions.RegistrationError:
+            except reversion.registration.RegistrationError:
                 pass
     
     def get_all_plugins(self, placeholder=None):
