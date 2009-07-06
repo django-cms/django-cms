@@ -281,9 +281,6 @@ class PageAdmin(admin.ModelAdmin):
         advanced_fields.append('application_urls')
     if settings.CMS_REDIRECTS:
         advanced_fields.append('redirect')
-    if settings.CMS_SHOW_META_TAGS:
-        advanced_fields.append('meta_description')
-        advanced_fields.append('meta_keywords')
     if settings.CMS_SEO_FIELDS:
         seo_fields = ('page_title', 'meta_description', 'meta_keywords')
     if settings.CMS_MENU_TITLE_OVERWRITE:
@@ -407,7 +404,7 @@ class PageAdmin(admin.ModelAdmin):
         
         url_patterns = patterns('',
             pat(r'^(?:[0-9]+)/add-plugin/$', add_plugin),
-            url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
+            url(r'^.+/edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
             pat(r'^(?:[0-9]+)/remove-plugin/$', remove_plugin),
@@ -630,6 +627,7 @@ class PageAdmin(admin.ModelAdmin):
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
+            form.base_fields['template'].initial = settings.CMS_TEMPLATES[0][0]
         return form
     
     # remove permission inlines, if user isn't allowed to change them

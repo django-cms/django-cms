@@ -15,7 +15,11 @@ class GoogleMapPlugin(CMSPluginBase):
             key = context['GOOGLE_MAPS_API_KEY']
         else:
             key = GOOGLE_MAPS_API_KEY
-        context.update({'map':instance, 'placeholder':placeholder, 'GOOGLE_MAPS_API_KEY':key})
+        context.update({
+            'object':instance, 
+            'placeholder':placeholder, 
+            'GOOGLE_MAPS_API_KEY':key
+        })
         return context
  
 plugin_pool.register_plugin(GoogleMapPlugin)

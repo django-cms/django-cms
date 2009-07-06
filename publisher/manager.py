@@ -93,23 +93,23 @@ class PublisherManager(object):
                     
                     if isinstance(attrs[attr].rel, ManyToOneRel) and \
                         attrs[attr].rel.field_name and attrs[attr].rel.field_name.endswith('_ptr'):
-                        attrs[attr].rel.field_name = "public%s" % attrs[attr].rel.field_name
+                        attrs[attr].rel.field_name = "%spublic_ptr" % attrs[attr].rel.field_name.split('_ptr')[0]
         
         # mark it as public model, so we can recognize it when required 
         attrs['_is_public_model'] = lambda self: True
         
         # construct class
         public_name = PublisherManager.PUBLISHER_MODEL_NAME % name
-#        table_name = "%s_public_%s" % (origin_cls._meta.app_label, origin_cls._meta.object_name.lower())
-#        if not "Meta" in attrs:
-#            class Meta:
-#                db_table = table_name
-#            attrs["Meta"] = Meta
-#        else:
-#            meta = attrs["Meta"]
-#            if not hasattr(meta, "db_table"):
-#                setattr(meta, "db_table", table_name)
-#                
+        table_name = "%spublic" % (origin_cls._meta.db_table)
+        if not "Meta" in attrs:
+            class Meta:
+                db_table = table_name
+            attrs["Meta"] = Meta
+        else:
+            meta = attrs["Meta"]
+            if not hasattr(meta, "db_table"):
+                setattr(meta, "db_table", table_name)
+                
         public_cls = ModelBase.__new__(cls, public_name, tuple(rebased), attrs)
         # add mark_delete field to public models, maybe will be better to move this
         # into PublicModel class, since it exists now

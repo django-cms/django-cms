@@ -11,8 +11,12 @@ class FilePlugin(CMSPluginBase):
     render_template = "cms/plugins/file.html"
     text_enabled = True
     
-    def render(self, context, instance, placeholder):      
-        return {'instance':instance, 'placeholder':placeholder, 'MEDIA_URL': settings.MEDIA_URL}
+    def render(self, context, instance, placeholder):  
+        context.update({
+            'object':instance, 
+            'placeholder':placeholder
+        })    
+        return context
 
     def icon_src(self, instance):
         file_icon = instance.get_icon_url()

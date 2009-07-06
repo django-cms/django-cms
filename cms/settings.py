@@ -28,7 +28,7 @@ if CMS_TEMPLATES is None:
 CMS_PLACEHOLDER_CONF = getattr(settings, 'CMS_PLACEHOLDER_CONF', None)
 
 # Whether to enable permissions.
-CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', True)
+CMS_PERMISSION = getattr(settings, 'CMS_PERMISSION', False)
 
 # check if is user middleware installed
 if CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in settings.MIDDLEWARE_CLASSES:
@@ -100,12 +100,6 @@ DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 INSTALLED_APPS = settings.INSTALLED_APPS
 LANGUAGES = settings.LANGUAGES
 
-# if the request host is not found in the db, should the default site_id be used or not? False means yes
-CMS_USE_REQUEST_SITE = getattr(settings, 'CMS_USE_REQUEST_SITE', False)
-
-# You can exclude some placeholder from the revision process
-CMS_CONTENT_REVISION_EXCLUDE_LIST = getattr(settings, 'CMS_CONTENT_REVISION_EXCLUDE_LIST', ())
-
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
 CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
 CMS_MEDIA_ROOT = join(settings.MEDIA_ROOT, CMS_MEDIA_PATH)
@@ -121,6 +115,3 @@ CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False)
 #if CMS_MODERATOR and not CMS_PERMISSION:
 #    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
 
-# Allow the description and keywords meta tags to be edited from the
-# admin
-CMS_SHOW_META_TAGS = getattr(settings, 'CMS_SHOW_META_TAGS', False) 

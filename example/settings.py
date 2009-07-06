@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'cms.plugins.link',
     'cms.plugins.snippet',
     'cms.plugins.googlemap',
+    'cms.plugins.teaser',
     'mptt',
     'reversion',
     'example.categories',
@@ -153,12 +154,12 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
-        "plugins": ('TextPlugin', 'LinkPlugin'),
+        
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
     'fancy-content': {
-        "plugins": ('TextPlugin'),
+        "plugins": ('TextPlugin', 'LinkPlugin'),
         "extra_context": {"theme":"16_11"},
         "name":gettext("fancy content"),
     },

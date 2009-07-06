@@ -56,6 +56,8 @@ class PagesTestCase(PageBaseTestCase):
         title = Title.objects.get(slug=page_data['slug'])
         assert(title is not None)
         page = title.page
+        page.published = True
+        page.save()
         assert(page.get_title() == page_data['title'])
         assert(page.get_slug() == page_data['slug'])
         
@@ -208,11 +210,15 @@ class PagesTestCase(PageBaseTestCase):
         page_data["meta_description"] = "I am a page"
         page_data["meta_keywords"] = "page,cms,stuff"
         response = self.client.post('/admin/cms/page/add/', page_data)
+        response = self.client.post('/admin/cms/page/1/', page_data)
         t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
         req = HttpRequest()
-        req.current_page = Page.objects.get(id=1)
+        page = Page.objects.get(id=1)
+        page.published = True
+        page.save()
+        req.current_page = page 
         req.REQUEST = {}
-        assert(t.render(template.Context({"request": req}))=="Hello I am a page page,cms,stuff")
+        self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page,cms,stuff")
 
     def test_09_copy_page(self):
         """

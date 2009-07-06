@@ -650,7 +650,8 @@ class Page(Publisher, Mptt):
                     for title in titles:
                         title.publish(fields=title_fields)
             else:
-                print "no public found"            
+                pass
+                #print "no public found"            
         
         # publish, but only if all parents are published!! - this will need a flag
         try:
@@ -811,7 +812,7 @@ class CMSPlugin(Publisher, Mptt):
             try:
                 if hasattr(self, '_is_public_model'):
                     # if it is an public model all field names have public prefix
-                    instance = getattr(self, 'public' + plugin.model.__name__.lower())
+                    instance = getattr(self, plugin.model.__name__.lower()+"public")
                 else:
                     instance = getattr(self, plugin.model.__name__.lower())
                 # could alternatively be achieved with:

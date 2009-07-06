@@ -46,7 +46,8 @@ class PageAddForm(forms.ModelForm):
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
-        if not is_valid_page_slug(page, parent, lang, slug):
+        site = cleaned_data['site']
+        if not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data

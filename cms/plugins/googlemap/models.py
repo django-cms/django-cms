@@ -8,7 +8,7 @@ from django.conf import settings
 
 class GoogleMap(CMSPlugin):
     """
-    A Picture with or without a link
+    A google maps integration
     """
     title = models.CharField(_("map title"), max_length=100, blank=True, null=True)
     

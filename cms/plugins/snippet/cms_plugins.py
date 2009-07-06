@@ -14,17 +14,17 @@ class SnippetPlugin(CMSPluginBase):
     text_enabled = True
 
     def render(self, context, instance, placeholder):
-        # Need to render instance.html as a Django template, returning the
-        # rendered text as 'content', which is passed through in trivial
-        # template (render_template above).
         t = template.Template(instance.snippet.html)
         try:
-            # We only need 'Context()' here because CMSPlugin has a dodgy
-            # default value.
             content = t.render(Context(context))
         except Exception, e:
             content = str(e)
-        return {'content': mark_safe(content) }
+        context.update({
+            'content': mark_safe(content),
+            'placeholder':placeholder,
+            'object':instance,
+        })
+        return context
 
     def icon_src(self, instance):
         return CMS_MEDIA_URL + u"images/plugins/snippet.png"
