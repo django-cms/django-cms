@@ -5,8 +5,12 @@ from django.db.models import Q
 from cms import settings
 from cms.utils.urlutils import levelize_path
 from cms.exceptions import NoPermissionsException
-from sets import Set
 from cms.cache.permissions import get_permission_cache, set_permission_cache
+
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 class PageManager(models.Manager):
     def on_site(self):
@@ -373,7 +377,7 @@ class PagePermissionsPermissionManager(models.Manager):
             if len(permission_set) is 1:
                 page_id_list = permission_set[0]
             else:
-                page_id_list = list(Set(can_change).union(Set(can_add)))
+                page_id_list = list(set(can_change).union(set(can_add)))
         return page_id_list
         
     

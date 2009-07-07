@@ -5,7 +5,7 @@ from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
 from cms import settings as cms_settings
 from django.contrib.sites.models import Site
-from sets import Set
+
 
 try:
     from threading import local
