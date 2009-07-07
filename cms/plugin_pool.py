@@ -24,10 +24,12 @@ class PluginPool(object):
         self.plugins[plugin.__name__] = plugin 
         
         if 'reversion' in settings.INSTALLED_APPS:   
-            import reversion  
+            import reversion
+            import reversion.registration
+            import reversion.revisions  
             try:   
                 reversion.register(plugin.model, follow=["cmsplugin_ptr"])
-            except reversion.registration.RegistrationError:
+            except reversion.revisions.RegistrationError, reversion.registration.RegistrationError:
                 pass
     
     def get_all_plugins(self, placeholder=None):
