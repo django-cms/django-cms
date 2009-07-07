@@ -3,6 +3,7 @@ from django.conf import settings
 from cms import settings as cms_settings
 from cms.plugin_base import CMSPluginBase
 
+
 class PluginPool(object):
     def __init__(self):
         self.plugins = {}
@@ -25,11 +26,9 @@ class PluginPool(object):
         
         if 'reversion' in settings.INSTALLED_APPS:   
             import reversion
-            import reversion.registration
-            import reversion.revisions  
             try:   
                 reversion.register(plugin.model, follow=["cmsplugin_ptr"])
-            except reversion.revisions.RegistrationError, reversion.registration.RegistrationError:
+            except reversion.revisions.RegistrationError:
                 pass
     
     def get_all_plugins(self, placeholder=None):
