@@ -222,10 +222,8 @@ show_sub_menu = register.inclusion_tag('cms/dummy.html',
 def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     request = context['request']
     PageModel = get_page_model(request)
-    print PageModel
     TitleModel = get_title_model(request)
     page = request.current_page
-    print page
     lang = get_language_from_request(request)
     if page:
         ancestors = list(page.get_ancestors())
