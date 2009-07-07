@@ -98,15 +98,16 @@ class PageAdmin(admin.ModelAdmin):
             'classes': ('low',),
             'description': _('Note: This page reloads if you change the selection. Save it first.'),
         }),
+        (_('Hidden'), {
+            'fields': hidden_fields + additional_hidden_fields,
+            'classes': ('hidden',), 
+        }),
         (_('Advanced Settings'), {
             'fields': advanced_fields,
             'classes': ('collapse',),
         }),
         
-        (_('Hidden'), {
-            'fields': hidden_fields + additional_hidden_fields,
-            'classes': ('hidden',), 
-        }),
+       
     ]
     
     if settings.CMS_SEO_FIELDS:
@@ -308,10 +309,6 @@ class PageAdmin(admin.ModelAdmin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            
-            if not obj.has_advanced_settings_permission(request):
-                given_fieldsets.pop(2)
-                                
             for placeholder in get_placeholders(request, template):
                 if placeholder.name not in self.mandatory_placeholders:
                     if placeholder.name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder.name]:
@@ -319,6 +316,12 @@ class PageAdmin(admin.ModelAdmin):
                     else:
                         name = placeholder.name
                     given_fieldsets += [(title(name), {'fields':[placeholder.name], 'classes':['plugin-holder']})]
+            advanced = given_fieldsets.pop(3)
+            if obj.has_advanced_settings_permission(request):
+                given_fieldsets.append(advanced)
+            if settings.CMS_SEO_FIELDS:
+                seo = given_fieldsets.pop(3)
+                given_fieldsets.append(seo) 
         else: # new page
             given_fieldsets = deepcopy(self.add_fieldsets)
                 
