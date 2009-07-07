@@ -154,7 +154,6 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
-        
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },

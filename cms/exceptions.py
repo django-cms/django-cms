@@ -10,6 +10,9 @@ class SubClassNeededError(Exception):
 class MissingFormError(Exception):
     pass
 
+class NoHomeFound(Exception):
+    pass
+
 
 class PermissionsException(Exception):
     """Base permission exception

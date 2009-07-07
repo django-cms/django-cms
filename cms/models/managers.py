@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Q
 from cms import settings
 from cms.utils.urlutils import levelize_path
-from cms.exceptions import NoPermissionsException
+from cms.exceptions import NoPermissionsException, NoHomeFound
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 
 try:
@@ -93,7 +93,11 @@ class PageManager(models.Manager):
         return self.published().filter(title_set__application_urls__gt='').distinct()
     
     def get_home(self):
-        return self.published().order_by("tree_id")[0]
+        try:
+            home = self.published().order_by("tree_id")[0]
+        except IndexError:
+            raise  NoHomeFound('No Root page found. Publish at least on page!')
+        return home
         
         
 class TitleManager(models.Manager):
