@@ -13,6 +13,7 @@ from cms import settings
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug
+from cms.exceptions import NoHomeFound
 
 
 
@@ -284,12 +285,18 @@ class Page(Publisher, Mptt):
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):
-        #if self.is_home():
-        #    return "/"
+        try:
+            if self.is_home():
+                return reverse('pages-root')
+        except NoHomeFound:
+            pass
         if settings.CMS_FLAT_URLS:
             path = self.get_slug(language, fallback)
         else:
             path = self.get_path(language, fallback)
+            if self.parent_id and self.get_cached_ancestors()[0].pk == self.get_home_pk_cache():
+                path = "/".join(path.split("/")[1:])
+            
         return urljoin(reverse('pages-root'), path)
     
     def get_cached_ancestors(self, ascending=True):
@@ -510,6 +517,12 @@ class Page(Publisher, Mptt):
             return False
         else:
             return self.get_home_pk_cache() == self.pk
+        
+    def is_parent_home(self):
+        if not self.parent_id:
+            return False
+        else:
+            return self.get_home_pk_cache() == self.parent_id
         
     def get_home_pk_cache(self):
         if not hasattr(self, "home_pk_cache"):
