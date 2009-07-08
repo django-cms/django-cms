@@ -14,6 +14,8 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug
 
+
+
 class Page(Publisher, Mptt):
     """
     A simple hierarchical page model
@@ -271,6 +273,7 @@ class Page(Publisher, Mptt):
         """
         get the list of all existing languages for this page
         """
+        from cms.models.titlemodels import Title
         titles = Title.objects.filter(page=self)
         if not hasattr(self, "languages_cache"):
             languages = []
@@ -306,6 +309,7 @@ class Page(Publisher, Mptt):
         self._get_title_cache(language, fallback, version_id, force_reload)
         if self.title_cache:
             return self.title_cache
+        from cms.models.titlemodels import EmptyTitle
         return EmptyTitle()
     
     def get_title_obj_attribute(self, attrname, language=None, fallback=True, version_id=None, force_reload=False):
@@ -391,6 +395,7 @@ class Page(Publisher, Mptt):
         if force_reload:
             load = True
         if load:
+            from cms.models.titlemodels import Title
             if version_id:
                 from reversion.models import Version
                 version = get_object_or_404(Version, pk=version_id)
@@ -602,6 +607,7 @@ class Page(Publisher, Mptt):
                         if page.pk != self.pk:
                             page.publish(fields=fields)
                             ids.append(page.pk)
+                    from cms.models.titlemodels import Title
                     titles = Title.objects.filter(page__in=ids)
                     title_fields = []
                     names = ["path"]
