@@ -6,6 +6,7 @@ from django.db.models.fields.related import RelatedField
 from django.core.exceptions import ObjectDoesNotExist
 from publisher.errors import MpttCantPublish
 
+
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
     """
@@ -124,7 +125,10 @@ class Publisher(models.Model):
         of public model as an argument, use save_base - never use original save
         method.
         """
-        return copy.save_base(cls=copy.__class__)
+        saved = copy.save_base(cls=copy.__class__)
+        #if hasattr(self, 'update_after_save'):
+        #    self.update_after_save()
+        return saved 
         
     
     def delete(self):
@@ -202,6 +206,25 @@ class Mptt(models.Model):
         except AttributeError:
             pass
         return True
+    
+    '''
+    - not cool, problems 
+    
+    def update_after_save(self):
+        # update public model
+        q = """UPDATE %(public_table)s AS A, %(table)s AS B SET
+        A.lft = B.lft, A.rght=B.rght, A.parent_id=B.parent_id, 
+        A.tree_id=B.tree_id
+        WHERE A.id = B.public_id
+        """ % {
+            'public_table': self.__class__.PublicModel._meta.db_table,
+            'table': self._meta.db_table
+        }
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute(q)
+    '''     
+        
 
 def install_publisher():
     """Check if publisher isn't installed already, install it otherwise. But 

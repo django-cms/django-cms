@@ -238,11 +238,11 @@ class Page(Publisher, Mptt):
             self.reverse_id = None
         
         from cms.utils.permissions import _thread_locals
+        
+        self.changed_by = _thread_locals.user.username
         if not self.pk:
-            self.created_by = self.changed_by = _thread_locals.user.username
-        else:
-            self.changed_by = _thread_locals.user.username
-            
+            self.created_by = self.changed_by 
+        
         if commit:
             if no_signals:# ugly hack because of mptt
                 super(Page, self).save_base(cls=self.__class__)
