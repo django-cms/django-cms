@@ -280,7 +280,6 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self._check_published_page_attributes(page)
     
     
-    
     def test_11_create_publish_copy(self):
         # create new page to copy
         self.login_user(self.user_master)
@@ -292,4 +291,22 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         copied_page = self._copy_page(page, self.master_page)
         
         self._check_published_page_attributes(page)
+        self._check_published_page_attributes(copied_page)
+        
+    
+    def test_12_subtree(self):
+        """@Patrick: this test will fail until you finish the mptt property
+        updater.
+        """
+        self.login_user(self.user_master)
+        # create page under slave_page
+        page = self._create_page(self.slave_page)
+        self._check_published_page_attributes(page)
+        
+        # create subpage uner page
+        subpage = self._create_page(page)
+        
+        #check attributes
+        self._check_published_page_attributes(page) # !!! rght not correct anymore before bug fixes
+        self._check_published_page_attributes(subpage)
     

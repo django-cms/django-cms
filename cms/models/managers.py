@@ -80,7 +80,8 @@ class PageManager(models.Manager):
         for path in paths:
             # build q for all the paths
             q |= Q(title_set__path=path, title_set__language=language)
-        app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
+        #app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
+        app_pages = filter(q & Q(title_set__application_urls__gt='') & Q(published=True)).distinct()
         # add proper ordering
         app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
         return app_pages
@@ -90,11 +91,13 @@ class PageManager(models.Manager):
         
         Doesn't cares about the application language. 
         """
-        return self.published().filter(title_set__application_urls__gt='').distinct()
+        #return self.published().filter(title_set__application_urls__gt='').distinct()
+        return self.filter(published=True, title_set__application_urls__gt='').distinct()
     
     def get_home(self):
         try:
-            home = self.published().order_by("tree_id")[0]
+            home = self.filter(published=True).order_by("tree_id")[0]
+            #home = self.published().order_by("tree_id")[0]
         except IndexError:
             raise  NoHomeFound('No Root page found. Publish at least on page!')
         return home
