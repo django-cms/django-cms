@@ -231,7 +231,6 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 # add permission `t` to model `model`
                 codename = getattr(model._meta, 'get_%s_permission' % t)()
                 permission = Permission.objects.get(content_type=content_type, codename=codename)
-                
                 if self.cleaned_data.get('can_%s_%s' % (t, name), None):
                     permission_acessor.add(permission)
                 else:
