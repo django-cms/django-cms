@@ -153,7 +153,6 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     children = []
     page = request.current_page
     if page:
-        root = page.get_root()
         filters = {'in_navigation':True, 
                   'lft__gt':page.lft, 
                   'rght__lt':page.rght, 

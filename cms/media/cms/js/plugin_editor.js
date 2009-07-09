@@ -53,14 +53,18 @@ function setclickfunctions(){
         return false;
     });
 
-    $('ul.plugin-list .delete').click(function(){
+    $('ul.plugin-list span.delete').click(function(){
         var plugin_id = $(this).parent().attr("id").split("plugin_")[1];
-        $.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
-			var splits = data.split(",")
-			id = splits.shift()
-       		$("#plugin_"+id).remove();
-			$("#iframe_"+id).parent().html("<p>" + splits.join(",") + "</p>")
-        }, "html");
+        var question = gettext("Are you sure you want to delete this plugin?")
+		var answer = confirm(question, true);
+        if(answer){
+	        $.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
+				var splits = data.split(",")
+				id = splits.shift()
+	       		$("#plugin_"+id).remove();
+				$("#iframe_"+id).parent().html("<p>" + splits.join(",") + "</p>")
+	        }, "html");
+        }
     });
 }
 

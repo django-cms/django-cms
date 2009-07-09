@@ -8,17 +8,23 @@ from cms.appresolver import applications_page_check
 from django.contrib.sites.models import Site
 from cms.utils.moderator import get_page_model
 
-def _get_current_page(path, lang, queryset):
+def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     """Helper for getting current page from path depending on language
     
     returns: (Page, None) or (None, path_to_alternative language)
     """
     try:
-        if settings.CMS_FLAT_URLS:
-            return queryset.filter(Q(title_set__slug=path,
-                                                     title_set__language=lang)).distinct().select_related()[0], None
+        if home_slug:
+            queryset = queryset.exclude(Q(title_set__path=home_slug)&Q(tree_id=home_tree_id))
+            home_slug += "/"
+            title_q = Q(title_set__path=path)|(Q(title_set__path=home_slug + path)&Q(tree_id=home_tree_id))
+            
         else:
-            page = queryset.filter(title_set__path=path).distinct().select_related()[0]
+            title_q = Q(title_set__slug=path)
+        if settings.CMS_FLAT_URLS:
+            return queryset.filter(title_q & Q(title_set__language=lang)).distinct().select_related()[0], None
+        else:
+            page = queryset.filter(title_q).distinct().select_related()[0]
             if page:
                 langs = page.get_languages() 
                 if lang in langs:
@@ -57,7 +63,13 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
                     path = slug.replace(reverse('pages-root'), '', 1)
                 else:
                     path = slug
-                current_page, alternative = _get_current_page(path, lang, pages)
+                if root_pages:
+                    home_tree_id = root_pages[0].tree_id
+                    home_slug = root_pages[0].get_slug(language=lang)
+                else:
+                    home_slug = ""
+                    home_tree_id = None
+                current_page, alternative = get_current_page(path, lang, pages, home_slug, home_tree_id)
                 if settings.CMS_APPLICATIONS_URLS:
                     # check if it should'nt point to some application, if yes,
                     # change current page if required
