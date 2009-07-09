@@ -47,7 +47,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         response = self.client.post(url, post_data)
         assert(response.content == "1")
         
-    def _create_page(self, parent_page, user=None):
+    def _create_page(self, parent_page=None, user=None):
         if user:
             # change logged in user
             self.login_user(user)
@@ -60,7 +60,10 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         })
         
         # add page
-        url = URL_CMS_PAGE_ADD + "?target=%d&position=first-child" % slave_page.pk
+        if parent_page:
+            url = URL_CMS_PAGE_ADD + "?target=%d&position=first-child" % parent_page.pk
+        else:
+            url = URL_CMS_PAGE_ADD
         response = self.client.post(url, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         
@@ -70,7 +73,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         return self.assertObjectExist(Page.objects, title_set__slug=page_data['slug'])
     
-    def _publish_page(self, page, approve=False, user=None):
+    def _publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
             self.login_user(user)
             
@@ -88,10 +91,11 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         # reload page
         page = self.assertObjectExist(Page.objects, id=page.pk)
         
-        # must have public object now
-        assert(page.public)
-        # and public object must be published
-        assert(page.public.published)
+        if published_check:
+            # must have public object now
+            assert(page.public)
+            # and public object must be published
+            assert(page.public.published)
         
         return page
         
@@ -294,19 +298,44 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self._check_published_page_attributes(copied_page)
         
     
-    def test_12_subtree(self):
-        """@Patrick: this test will fail until you finish the mptt property
-        updater.
-        """
+    def test_12_subtree_needs_approvement(self):
         self.login_user(self.user_master)
         # create page under slave_page
         page = self._create_page(self.slave_page)
-        self._check_published_page_attributes(page)
+        assert(not page.public)
         
         # create subpage uner page
         subpage = self._create_page(page)
+        assert(not subpage.public)
+        
+        # publish both of them in reverse order 
+        subpage = self._publish_page(subpage, True, published_check=False) 
+        assert(not subpage.public) # subpage shouldnot be published !! parent is not published yet, should be marked as `publish when parent`
+        page = self._publish_page(page, True)
+        assert(subpage.public) # parent was published, so subpage should be also published..
         
         #check attributes
         self._check_published_page_attributes(page) # !!! rght not correct anymore before bug fixes
         self._check_published_page_attributes(subpage)
-    
+
+
+    def test_13_subtree_with_super(self):
+        """@Patrick: this test will fail until you finish the mptt property
+        updater.
+        """
+        self.login_user(self.user_super)
+        # create page under root
+        page = self._create_page()
+        assert(not page.public) # why there is a public instance available already?
+        
+        # create subpage under page
+        subpage = self._create_page(page)
+        assert(not subpage.public)
+        
+        # publish both of them in reverse order 
+        page = self._publish_page(page, True)
+        subpage = self._publish_page(subpage, True)
+        
+        #check attributes
+        self._check_published_page_attributes(page) # !!! rght not correct anymore before bug fixes
+        self._check_published_page_attributes(subpage)
