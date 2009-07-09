@@ -4,27 +4,29 @@ Plugins
 File
 ----
 
-Allows you to upload a file. An filetype icon will be assigned based on the file extension.
+Allows you to upload a file. A filetype icon will be assigned based on the file extension.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in the `INSTALLED_APPS` setting
+in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.file',
-		...
+		# ...
 	)
 
 Flash
 -----
 
-Allows you to upload and display a .swf file on your page
+Allows you to upload and display a Flash SWF file on your page.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in the `INSTALLED_APPS` setting
+in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.flash',
-		...
+		# ...
 	)
 	
 
@@ -33,54 +35,52 @@ GoogleMap
 
 Displays a map of an address on your page.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in the `INSTALLED_APPS`
+setting in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.googlemap',
-		...
+		# ...
 	)
 	
-the google maps api key is also required:
-
-either put this in your settings:
-
-	GOOGLE_MAPS_API_KEY = "yourkey"
-	
-or be sure the context has a variable: GOOGLE\_MAPS\_API\_KEY
-
+The Google Maps API key is also required.
+You can either put this in a project setting called `GOOGLE_MAPS_API_KEY`
+or be sure the template context has a variable with the same name.
 
 Link
 ----
 
-Displays a link to an url or to a page. If a page is moved the url still is correct.
+Displays a link to an arbitrary URL or to a page. If a page is moved the URL will still be correct.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure to have the following in the `INSTALLED_APPS`
+setting in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.link',
-		...
+		# ...
 	)
-
 
 Picture
 -------
 
-Displays a picture in a page
+Displays a picture in a page.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in the `INSTALLED_APPS`
+setting in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.picture',
-		...
+		# ...
 	)
 	
-If you want to resize the picture you can get a thumbnail library. We recommend [sorl.thumbnail](http://code.google.com/p/sorl-thumbnail/)
-In your project template directory create a folder called cms/plugins and create a picture.html in there.
-
-Here is an example we use:
+If you want to resize the picture you can get a thumbnail library. We recommend
+[sorl.thumbnail](http://code.google.com/p/sorl-thumbnail/).
+In your project template directory create a folder called `cms/plugins` and create a file
+called `picture.html` in there.
+Here is an example `picture.html` template:
 
 	{% load i18n thumbnail %}
 	{% spaceless %}
@@ -96,33 +96,34 @@ Here is an example we use:
 	
 	{% endspaceless %}
 
-The size of the pictures is different based on which placeholder it was placed.
+In this template the picture is scaled differently based on which placeholder it was placed in.
 
 Snippet
 -------
 
-Just renders some HTML Snippet. Mostly used for development or hackery.
+Just renders some HTML snippet. Mostly used for development or hackery.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in the `INSTALLED_APPS`
+setting in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.snippet',
-		...
+		# ...
 	)
-
 
 Teaser
 ------
 
-Displays a teaser box for an other page or an url. A picture and a description can be added.
+Displays a teaser box for another page or a URL. A picture and a description can be added.
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in the `INSTALLED_APPS` settings
+in your project's `settings.py` file:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.teaser',
-		...
+		# ...
 	)
 
 Text
@@ -136,14 +137,16 @@ If plugins are text-enabled they can be placed inside the text-flow. At this mom
 - file
 - snippet
 
-The current editor is Wymeditor. If you want to use TinyMce you need to install [django-tinymce](http://code.google.com/p/django-tinymce/) first and put the following  in your settings.py:
+The current editor is [Wymeditor](http://www.wymeditor.org/).
+If you want to use TinyMce you need to install [django-tinymce](http://code.google.com/p/django-tinymce/)
+first and put the following in your project's `settings.py` file:
 
 	CMS_USE_TINYMCE = True
 
-For installation be sure you have the following in your INSTALLED\_APPS in your settings.py:
+For installation be sure you have the following in your project's `INSTALLED_APPS` setting:
 
 	INSTALLED_APPS = (
-		...
+		# ...
 		'cms.plugins.text',
-		...
+		# ...
 	)
