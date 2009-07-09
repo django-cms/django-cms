@@ -187,10 +187,12 @@ def approve_page(request, page):
         PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 
 
 def get_model(model, request=None):
-    """Decision function - says which model should b used.
+    """Decision function - says which model should be used. Public models are 
+    used only if CMS_MODERATOR.
     """
-    if request and 'preview' in request.GET and 'draft' in request.GET \
-        and request.user.is_staff:
+    if not cms_settings.CMS_MODERATOR or \
+        (request and 'preview' in request.GET and 
+            'draft' in request.GET and request.user.is_staff):
         return model
     return model.PublicModel
      

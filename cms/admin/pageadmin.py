@@ -192,7 +192,8 @@ class PageAdmin(admin.ModelAdmin):
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
-            pat(r'^(?:[0-9]+)/add-plugin/$', add_plugin),
+            
+            pat(r'^.+/add-plugin/$', add_plugin),
             url(r'^.+/edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
