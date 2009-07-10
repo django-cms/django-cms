@@ -146,33 +146,33 @@ CMS_APPLICATIONS_URLS = (
     ('sampleapp.urlstwo', 'Second sample application'),
 )
 
-#CMS_PLACEHOLDER_CONF = {                        
-#    'right-column': {
-#        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
-#        "extra_context": {"theme":"16_16"},
-#        "name":gettext("right column")
-#    },
-#    
-#    'body': {
-#        "extra_context": {"theme":"16_5"},
-#        "name":gettext("body"),
-#    },
-#    'fancy-content': {
-#        "plugins": ('TextPlugin', 'LinkPlugin'),
-#        "extra_context": {"theme":"16_11"},
-#        "name":gettext("fancy content"),
-#    },
-#}
+CMS_PLACEHOLDER_CONF = {                        
+    'right-column': {
+        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
+        "extra_context": {"theme":"16_16"},
+        "name":gettext("right column")
+    },
+    
+    'body': {
+        "extra_context": {"theme":"16_5"},
+        "name":gettext("body"),
+    },
+    'fancy-content': {
+        "plugins": ('TextPlugin', 'LinkPlugin'),
+        "extra_context": {"theme":"16_11"},
+        "name":gettext("fancy content"),
+    },
+}
 
 
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True
-CMS_PERMISSION = True
-CMS_REDIRECTS = True
-CMS_SEO_FIELDS = True
-CMS_MENU_TITLE_OVERWRITE = True
+CMS_PERMISSION = False
+#CMS_REDIRECTS = True
+#CMS_SEO_FIELDS = True
+#CMS_MENU_TITLE_OVERWRITE = True
 
 try:
     from local_settings import *
