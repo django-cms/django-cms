@@ -85,12 +85,12 @@
 		</div>
 		
 		
-		{% if CMS_MODERATOR %}<div class="col-lastchange">{% with page.last_page_state as last_state %} 
-			{% if last_state %}
-				<span class="icon state-icon {{ last_state.css_class }}"></span>{{ last_state.get_action_display }}
-			{% endif %}
+		{% if CMS_MODERATOR %}<div class="col-lastchange">
+			{% for state in page.last_page_states %}<span class="icon state-icon {{ state.css_class }}" title="{{ state.get_action_display }}"></span>
+			{% endfor %}
 			
-		{% endwith %}</div>{% endif %}
+		
+		</div>{% endif %}
 		
 		<div class="col-creator">{{ page.changed_by }}</div>
 	</div>

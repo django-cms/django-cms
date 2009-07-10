@@ -196,7 +196,7 @@ class Page(Publisher, Mptt):
             if dif != 0:
                 tree.append(page)
     
-    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False):
+    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None):
         """
         Args:
             
@@ -205,16 +205,23 @@ class Page(Publisher, Mptt):
                 some existing page and this new page will require moderation; 
                 this is because of how this adding works - first save, then move
         """
+        
+        print "save(", no_signals, change_state, commit, force_with_moderation, force_state, ")"
+        print ">> ms0:", self.moderator_state
+        
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
         
         if settings.CMS_MODERATOR:
             under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
         
-        #created = not bool(self.pk)
+        created = not bool(self.pk)
         if settings.CMS_MODERATOR:
             if change_state:
-                if self.moderator_state is not Page.MODERATOR_CHANGED:
+                if created:
+                    # new page....
+                    self.moderator_state = Page.MODERATOR_CHANGED
+                elif self.moderator_state is not Page.MODERATOR_CHANGED:
                     # always change state to need approvement when there is some change
                     self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
                 
@@ -222,12 +229,16 @@ class Page(Publisher, Mptt):
                     # existing page without moderator - publish it directly if 
                     # published is True
                     publish_directly = True
-                else:
-                    self.moderator_state = Page.MODERATOR_CHANGED
+                
+                
         elif change_state:
             self.moderator_state = Page.MODERATOR_CHANGED
             #publish_directly = True - no publisher, no publishing!! - we just
             # use draft models in this case
+        
+        if force_state is not None:
+            self.moderator_state = force_state
+            
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -246,6 +257,8 @@ class Page(Publisher, Mptt):
         self.changed_by = _thread_locals.user.username
         if not self.pk:
             self.created_by = self.changed_by 
+        
+        print ">> ms1:", self.moderator_state
         
         if commit:
             if no_signals:# ugly hack because of mptt
@@ -560,17 +573,12 @@ class Page(Publisher, Mptt):
         """
         return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
     
-    def last_page_state(self):
-        """Returns last page state if CMS_MODERATOR
+    def last_page_states(self):
+        """Returns last five page states, if they exist
         """
-        
         # TODO: optimize SQL... 1 query per page 
         if settings.CMS_MODERATOR:
-            # unknown state if no moderator
-            try:
-                return self.pagemoderatorstate_set.all().order_by('-created',)[0]
-            except IndexError:
-                pass
+            return self.pagemoderatorstate_set.all().order_by('created',)[:5]
         return None
     
     def get_moderator_queryset(self):

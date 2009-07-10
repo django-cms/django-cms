@@ -2,6 +2,7 @@ from django.test.testcases import TestCase
 
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
+URL_CMS_PAGE_CHANGE = URL_CMS_PAGE
 
 class PageBaseTestCase(TestCase):
     counter = 1

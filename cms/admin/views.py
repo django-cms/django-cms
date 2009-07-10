@@ -21,7 +21,7 @@ def change_status(request, page_id):
     page = get_object_or_404(Page, pk=page_id)
     if page.has_publish_permission(request):
         page.published = not page.published
-        page.save()    
+        page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)    
         return render_admin_menu_item(request, page)
     raise Http404
 change_status = staff_member_required(change_status)
@@ -39,7 +39,7 @@ def change_innavigation(request, page_id):
         else:
             page.in_navigation = True
             val = 1
-        page.save()
+        page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
         return render_admin_menu_item(request, page)
     raise Http404
 change_innavigation = staff_member_required(change_innavigation)

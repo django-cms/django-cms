@@ -103,7 +103,7 @@ class PageModeratorState(models.Model):
         (ACTION_DELETE, _('delete req.')),
         (ACTION_MOVE, _('move req.')),
         (ACTION_PUBLISH, _('publish req.')),
-        (ACTION_UNPUBLISH, _('Unpublish req.')),
+        (ACTION_UNPUBLISH, _('unpublish req.')),
         (ACTION_APPROVE, _('approved')), # Approved by somebody in approvement process
     )
     
