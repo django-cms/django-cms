@@ -300,7 +300,7 @@ class Page(Publisher, Mptt):
             except NoHomeFound:
                 pass
             ancestors = self.get_cached_ancestors()
-            if self.parent_id and ancestors and ancestors[0].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback):
+            if self.parent_id and ancestors[0].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback):
                 path = "/".join(path.split("/")[1:])
             
         return urljoin(reverse('pages-root'), path)

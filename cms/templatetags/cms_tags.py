@@ -27,10 +27,18 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
     current_page = request.current_page
+    if current_page == "dummy":
+        context.update({'children':[],
+                    'template':template,
+                    'from_level':from_level,
+                    'to_level':to_level,
+                    'extra_inactive':extra_inactive,
+                    'extra_active':extra_active})
+        return context
     if hasattr(current_page, "home_pk_cache"):
         home_pk = current_page.home_pk_cache
     else:
-        home_pk = PageModel.get_home(site)
+        home_pk = PageModel.objects.get_home(site)
         
     if not next_page: #new menu... get all the data so we can save a lot of queries
         ids = []
@@ -160,10 +168,20 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     site = Site.objects.get_current()
     children = []
     page = request.current_page
-    if not hasattr(page, "home_pk_cache"):
-        page.home_pk_cache = PageModel.get_home(site).pk
-    page.get_cached_ancestors()
+    if page == "dummy":
+        context.update({'children':[],
+                        'template':template,
+                        'from_level':0,
+                        'to_level':0,
+                        'extra_inactive':0,
+                        'extra_active':0
+                        })
+        return context
+    
     if page:
+        page.get_cached_ancestors()
+        if not hasattr(page, "home_pk_cache"):
+            page.home_pk_cache = PageModel.objects.get_home(site).pk
         filters = {'in_navigation':True, 
                   'lft__gt':page.lft, 
                   'rght__lt':page.rght, 
@@ -218,6 +236,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                     from_level = selected.level
                     to_level =  from_level+levels
                     extra_active = extra_inactive = levels
+    
     context.update({'children':children,
                     'template':template,
                     'from_level':from_level,
@@ -234,6 +253,9 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     PageModel = get_page_model(request)
     TitleModel = get_title_model(request)
     page = request.current_page
+    if page == "dummy":
+        context.update({'ancestors':[]})
+        return context
     lang = get_language_from_request(request)
     if page:
         ancestors = list(page.get_ancestors())
@@ -272,7 +294,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                     ids = []
                     for anc in ancestors:
                         ids.append(anc.pk)
-                    titles = Title.objects.filter(page__in=ids, language=lang)
+                    titles = TitleModel.objects.filter(page__in=ids, language=lang)
                     ancs = []
                     for anc in ancestors:
                         anc.home_pk_cache = home.pk
@@ -282,20 +304,10 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                             if title.page_id == anc.pk:
                                 anc.title_cache = title
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
-    context.update(locals())
+    context.update({'ancestors':ancestors})
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
-""" - not required anymore?
-
-def render_plugin(context, plugin_id):
-    CMSPluginModel = get_cmsplugin_model(context['request'])
-    plugin = CMSPluginModel.objects.get(pk=plugin_id)
-    content = plugin.render(context)
-    return  locals()
-render_plugin = register.inclusion_tag('cms/plugin_base.html', takes_context=True)(render_plugin)
-"""
-
 
 def has_permission(page, request):
     return page.has_change_permission(request)
@@ -421,6 +433,8 @@ class PlaceholderNode(template.Node):
         request = context['request']
         CMSPluginModel = get_cmsplugin_model(request)
         page = request.current_page
+        if page == "dummy":
+            return ""
         plugins = CMSPluginModel.objects.filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
         if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
             if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
@@ -467,6 +481,8 @@ class PageAttributeNode(template.Node):
         lang = get_language_from_request(context['request'])
         request = context['request']
         page = request.current_page
+        if page == "dummy":
+            return ''
         if page and self.name in ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]:
             f = getattr(page, "get_"+self.name)
             return f(language=lang, fallback=True)
