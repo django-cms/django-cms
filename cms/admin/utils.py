@@ -1,9 +1,9 @@
 from django.template import loader, Context, TemplateDoesNotExist
 from django.template.loader_tags import ExtendsNode
-# must be imported like this for isinstance
-from django.templatetags.cms_tags import PlaceholderNode
+from cms.utils import get_template_from_request
 
-from cms.views import details
+# must be imported like this for isinstance
+from django.templatetags.cms_tags import PlaceholderNode #do not remove
 
 def get_placeholders(request, template_name):
     """
@@ -13,12 +13,17 @@ def get_placeholders(request, template_name):
         temp = loader.get_template(template_name)
     except TemplateDoesNotExist:
         return []
-    context = details(request, no404=True, only_context=True)
+    context = Context()#RequestContext(request)#details(request, no404=True, only_context=True)
+    template = get_template_from_request(request)
+    request.current_page = "dummy"
+    context.update({'template':template,
+                    'request':request,
+                    })
     # lacks - it requests context in admin and eats user messages,
     # standard context will be hopefully enough here
     
     # temp.render(RequestContext(request, context))
-    temp.render(Context(context))
+    temp.render(context)
     
     list = []
     placeholders_recursif(temp.nodelist, list)

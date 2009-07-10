@@ -241,6 +241,7 @@ class PagesTestCase(PageBaseTestCase):
         response = self.client.post('/admin/cms/page/1/copy-page/', {'target':5, 'position':'first-child', 'site':1})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Page.objects.all().count()>count)
+        # TODO: test with m2m fields in plugins
         
     def test_10_language_change(self):
         self.client.login(username= 'test', password='test')
