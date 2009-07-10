@@ -12,11 +12,7 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     else:
         titles = Title.objects.filter(slug=slug, language=lang)
     if not cms_settings.CMS_FLAT_URLS:
-        try:
-            parent_home = parent.is_home()
-        except NoHomeFound:
-            parent_home = False
-        if parent and not parent_home: 
+        if parent and not parent.is_home(): 
             titles = titles.filter(page__parent=parent)
         else:
             titles = titles.filter(page__parent__isnull=True)

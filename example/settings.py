@@ -168,11 +168,11 @@ CMS_PLACEHOLDER_CONF = {
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_MODERATOR = True
+CMS_MODERATOR = False
 CMS_PERMISSION = False
-#CMS_REDIRECTS = True
-#CMS_SEO_FIELDS = True
-#CMS_MENU_TITLE_OVERWRITE = True
+CMS_REDIRECTS = True
+CMS_SEO_FIELDS = True
+CMS_MENU_TITLE_OVERWRITE = True
 
 try:
     from local_settings import *
