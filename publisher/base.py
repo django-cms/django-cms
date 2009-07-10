@@ -200,7 +200,7 @@ class Mptt(models.Model):
         In case when node parent exists, check if parent is published.
         """
         try:
-            public_parent = self.parent.public
+            return bool(self.parent.public)
         except ObjectDoesNotExist:
             return False
         except AttributeError:

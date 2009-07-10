@@ -168,8 +168,8 @@ CMS_APPLICATIONS_URLS = (
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_MODERATOR = False
-CMS_PERMISSION = False
+CMS_MODERATOR = True
+CMS_PERMISSION = True
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True

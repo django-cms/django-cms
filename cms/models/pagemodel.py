@@ -211,20 +211,23 @@ class Page(Publisher, Mptt):
         if settings.CMS_MODERATOR:
             under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
         
-        
-        created = not bool(self.pk)
+        #created = not bool(self.pk)
         if settings.CMS_MODERATOR:
             if change_state:
                 if self.moderator_state is not Page.MODERATOR_CHANGED:
                     # always change state to need approvement when there is some change
                     self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
                 
-                if not under_moderation:
-                    # existing page without moderator - publish it directly
+                if not under_moderation and self.published:
+                    # existing page without moderator - publish it directly if 
+                    # published is True
                     publish_directly = True
+                else:
+                    self.moderator_state = Page.MODERATOR_CHANGED
         elif change_state:
             self.moderator_state = Page.MODERATOR_CHANGED
-            publish_directly = True
+            #publish_directly = True - no publisher, no publishing!! - we just
+            # use draft models in this case
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -250,9 +253,10 @@ class Page(Publisher, Mptt):
             else:
                 super(Page, self).save()
         
-        if publish_directly or created and not under_moderation:
+        #if commit and (publish_directly or created and not under_moderation):
+        if commit and publish_directly:
             self.publish()
-            cms_signals.post_publish.send(sender=Page, instance=self)
+            # post_publish signal moved to end of publish method()
 
     def get_calculated_status(self):
         """
@@ -299,6 +303,7 @@ class Page(Publisher, Mptt):
                 home_pk = self.get_home_pk_cache()
             except NoHomeFound:
                 pass
+            
             if self.parent_id and self.get_cached_ancestors()[0].pk == home_pk:
                 path = "/".join(path.split("/")[1:])
             
@@ -602,16 +607,24 @@ class Page(Publisher, Mptt):
         if not settings.CMS_MODERATOR:
             return
         
+        #print ">> publish(", fields, exclude, ")"
+        
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
         
-        # can be this page published?
-        if self.mptt_can_publish():
+        # publish, but only if all parents are published!!
+        published = None
+        try:
+            published = super(Page, self).publish(fields, exclude)
             self.moderator_state = Page.MODERATOR_APPROVED
-        else:
+        except MpttCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
-        
-        self.save(change_state=False)
+        finally:
+            self.save(change_state=False)
+            if not published:
+                # was not published, escape
+                return
+            
         
         if not fields:
             public = self.public
@@ -647,13 +660,6 @@ class Page(Publisher, Mptt):
                         title.publish(fields=title_fields)
             else:
                 pass
-                #print "no public found"            
-        
-        # publish, but only if all parents are published!! - this will need a flag
-        try:
-            published = super(Page, self).publish(fields, exclude)
-        except MpttCantPublish:
-            return 
         
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
@@ -665,6 +671,7 @@ class Page(Publisher, Mptt):
             page.publish()
         
         # fire signal after publishing is done
+        cms_signals.post_publish.send(sender=Page, instance=self)
         return published
     
     def is_public_published(self):

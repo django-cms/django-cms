@@ -438,8 +438,8 @@ div#sitemap ul.header li{
 #sitemap li .cont.moderatorstate10 {} 
 
 /* moderation - you should approve */
-#sitemap li .cont.moderatorstate100 { background-position: 0px -400px; } 
-#sitemap li .cont.moderatorstate100 .col-draft span.state { color: #44ad41; }
+#sitemap li .cont.moderatorstate11 { background-position: 0px -400px; } 
+#sitemap li .cont.moderatorstate11 .col-draft span.state { color: #44ad41; }
  
 
 /* softroot icon */

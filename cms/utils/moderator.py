@@ -72,9 +72,11 @@ def page_moderator_state(request, page):
     Returns:
         dict(state=state, label=label)
     """
-    state, label = page.moderator_state, None
+    state, label = page.moderator_state, ""
     if cms_settings.CMS_MODERATOR:
-        if state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request) \
+        if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
+            label = _('parent first')
+        elif state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request) \
             and page.get_moderator_queryset().filter(user=request.user).count() \
             and not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
                 # only if he didn't approve already...
@@ -85,9 +87,7 @@ def page_moderator_state(request, page):
         # if no moderator, we have just 2 states => changed / unchanged
         state = Page.MODERATOR_NEED_APPROVEMENT
     
-    if page.is_approved():
-        label = ""
-    elif not label:
+    if not page.is_approved() and not label:
         label = dict(page.moderator_state_choices)[state]
     
     return dict(state=state, label=label)

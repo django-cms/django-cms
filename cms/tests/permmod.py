@@ -82,14 +82,10 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         assert(response.status_code, 200)
         
         if not approve:
-            return page
+            return self._reload(page)
         
-        # approve / publish
-        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        
-        # reload page
-        page = self.assertObjectExist(Page.objects, id=page.pk)
+        # approve
+        page = self._approve_page(page)
         
         if published_check:
             # must have public object now
@@ -98,15 +94,23 @@ class PermissionModeratorTestCase(PageBaseTestCase):
             assert(page.public.published)
         
         return page
-        
+    
+    def _approve_page(self, page, published_check=False):
+        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        # reload page
+        return self._reload(page)
+    
+    def _reload(self, page):
+        page = self.assertObjectExist(Page.objects, id=page.pk)
+        return page
     
     def _check_published_page_attributes(self, page):
         public_page = page.public
         compare = ['id', 'tree_id', 'rght', 'lft', 'parent_id', 'level']
         # compare ids and tree attributes
         for name in compare:
-            assert(getattr(page, name), getattr(public_page, name))
-    
+            assert(getattr(page, name) == getattr(public_page, name))
     
     def _add_page(self, user):
         """Helper for accessing new page creation
@@ -165,6 +169,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self.user_master = User.objects.get(username="master")
         self.user_slave = User.objects.get(username="slave")
     
+    
     def test_00_configuration(self):
         """Just check if we have right configuration for this test. Problem lies
         in cms_settings!! something like cms_settings.CMS_MODERATOR = True just
@@ -181,15 +186,18 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, status_code)
     
+    
     def test_02_master_can_add_page_to_root(self, status_code=403):
         self.login_user(self.user_master)
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, status_code)
+    
         
     def test_03_slave_can_add_page_to_root(self, status_code=403):
         self.login_user(self.user_slave)
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, status_code)
+    
     
     def test_04_moderation_on_slave_home(self):
         assert(self.slave_page.get_moderator_queryset().count()==1)
@@ -229,7 +237,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self.login_user(self.user_master)
         
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        assert(response.status_code, 200)
+        assert(response.status_code == 200)
         
         # approve / publish
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
@@ -247,11 +255,14 @@ class PermissionModeratorTestCase(PageBaseTestCase):
     def test_06_super_can_add_plugin(self):
         self._add_plugin(self.user_super)
     
+    
     def test_07_master_can_add_plugin(self):
         self._add_plugin(self.user_master)
+    
         
     def test_08_slave_can_add_plugin(self):
         self._add_plugin(self.user_slave)
+    
         
     def test_09_public_model_attributes(self):
         self.login_user(self.user_slave)
@@ -271,6 +282,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
             
             public_page = self._publish_page(page, True)
             self._check_published_page_attributes(public_page)
+    
     
     def test_10_create_copy_publish(self):
         # create new page to copy
@@ -297,6 +309,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self._check_published_page_attributes(page)
         self._check_published_page_attributes(copied_page)
         
+        
     def test_12_subtree_needs_approvement(self):
         self.login_user(self.user_master)
         # create page under slave_page
@@ -309,23 +322,34 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         # publish both of them in reverse order 
         subpage = self._publish_page(subpage, True, published_check=False) 
-        assert(not subpage.public) # subpage shouldnot be published !! parent is not published yet, should be marked as `publish when parent`
+        
+        # subpage should not be published, because parent is not published 
+        # yet, should be marked as `publish when parent`
+        assert(not subpage.public) 
+        
+        # pagemoderator state must be set
+        assert(subpage.moderator_state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+        
+        # publish page (parent of subage), so subpage must be published also
         page = self._publish_page(page, True)
-        assert(subpage.public) # parent was published, so subpage should be also published..
+        assert(page.public)
+        
+        # reload subpage, it was probably changed
+        subpage = self._reload(subpage)
+        
+        # parent was published, so subpage must be also published..
+        assert(subpage.public) 
         
         #check attributes
-        self._check_published_page_attributes(page) # !!! rght not correct anymore before bug fixes
+        self._check_published_page_attributes(page)
         self._check_published_page_attributes(subpage)
 
 
     def test_13_subtree_with_super(self):
-        """@Patrick: this test will fail until you finish the mptt property
-        updater.
-        """
         self.login_user(self.user_super)
         # create page under root
         page = self._create_page()
-        assert(not page.public) # why there is a public instance available already?
+        assert(not page.public)
         
         # create subpage under page
         subpage = self._create_page(page)
@@ -336,5 +360,21 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         subpage = self._publish_page(subpage, True)
         
         #check attributes
-        self._check_published_page_attributes(page) # !!! rght not correct anymore before bug fixes
+        self._check_published_page_attributes(page) 
         self._check_published_page_attributes(subpage)
+        
+    def test_14_super_add_page_to_root(self):
+        """Create page which is not under moderation in root, and check if 
+        some properties are correct.
+        """
+        self.login_user(self.user_super)
+        # create page under root
+        page = self._create_page()
+        
+        # public must not exist
+        assert(not page.public)
+        
+        # moderator_state must be changed
+        assert(page.moderator_state == Page.MODERATOR_CHANGED)
+        
+        
