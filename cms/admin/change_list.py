@@ -88,6 +88,7 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:]
+        home = Page.objects.get_home(self.current_site())
         for page in pages:
             children = []
 
@@ -119,7 +120,11 @@ class CMSChangeList(ChangeList):
                     children[-1].last = False
                 page.menu_level = 0
                 root_pages.append(page)
-                page.ancestors_ascending = []
+                if page.parent_id:
+                    page.get_cached_ancestors()
+                else:
+                    page.ancestors_ascending = []
+                page.home_pk_cache = home.pk
                 if not self.is_filtered():
                     find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True, to_levels=1000)
                 else:

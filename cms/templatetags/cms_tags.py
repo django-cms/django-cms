@@ -27,7 +27,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
     current_page = request.current_page
-    
+    if hasattr(current_page, "home_pk_cache"):
+        home_pk = current_page.home_pk_cache
+    else:
+        home_pk = PageModel.get_home(site)
+        
     if not next_page: #new menu... get all the data so we can save a lot of queries
         ids = []
         children = []
@@ -99,7 +103,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             if page.level >= db_from_level:
                 ids.append(page.pk)
             if page.level == 0 or page.level == root_level:
-                page.ancestors_ascending = []
+                if page.parent_id:
+                    page.get_cached_ancestors()
+                else:
+                    page.ancestors_ascending = []
+                page.home_pk_cache = home_pk
                 page.menu_level = 0 - from_level
                 page.childrens = []
                 children.append(page)
@@ -152,6 +160,9 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     site = Site.objects.get_current()
     children = []
     page = request.current_page
+    if not hasattr(page, "home_pk_cache"):
+        page.home_pk_cache = PageModel.get_home(site).pk
+    page.get_cached_ancestors()
     if page:
         filters = {'in_navigation':True, 
                   'lft__gt':page.lft, 
@@ -165,7 +176,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         ids = []
         pages = list(pages)
         all_pages = pages[:]
-        page.ancestors_ascending = []
+        
         page.childrens = []
         for p in pages:
             p.descendant  = True
@@ -235,6 +246,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
             ids.append(anc.pk)
         titles = TitleModel.objects.filter(page__in=ids, language=lang)
         for anc in ancestors:
+            anc.home_pk_cache = home.pk 
             for title in titles:
                 if title.page_id == anc.pk:
                     anc.title_cache = title
@@ -263,6 +275,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                     titles = Title.objects.filter(page__in=ids, language=lang)
                     ancs = []
                     for anc in ancestors:
+                        anc.home_pk_cache = home.pk
                         anc.ancestors_ascending = ancs[:]
                         ancs += [anc]
                         for title in titles:
