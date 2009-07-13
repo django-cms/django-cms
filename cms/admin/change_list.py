@@ -81,7 +81,7 @@ class CMSChangeList(ChangeList):
             pages = pages.filter(pk__in=perm_change_list_ids)   
         
         if settings.CMS_MODERATOR:
-            # get oll ids of public models, so we can cahce them
+            # get all ids of public models, so we can cache them
             # TODO: add some filtering here, so the set is the same like page set...
             published_public_page_id_set = Page.PublicModel.objects.filter(published=True).values_list('id', flat=True)
         
@@ -90,7 +90,7 @@ class CMSChangeList(ChangeList):
         pages = list(pages)
         all_pages = pages[:]
         try:
-            home_pk = Page.objects.get_home(self.current_site())
+            home_pk = Page.objects.get_home(self.current_site()).pk
         except NoHomeFound:
             home_pk = 0
             
