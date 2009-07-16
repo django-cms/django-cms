@@ -5,6 +5,7 @@ from cms import settings
 from cms.utils import get_language_from_request, find_children
 from django.contrib.sites.models import Site
 from cms.utils.permissions import get_user_sites_queryset
+from cms.exceptions import NoHomeFound
 
 SITE_VAR = "site__exact"
 COPY_VAR = "copy"
@@ -80,7 +81,7 @@ class CMSChangeList(ChangeList):
             pages = pages.filter(pk__in=perm_change_list_ids)   
         
         if settings.CMS_MODERATOR:
-            # get oll ids of public models, so we can cahce them
+            # get all ids of public models, so we can cache them
             # TODO: add some filtering here, so the set is the same like page set...
             published_public_page_id_set = Page.PublicModel.objects.filter(published=True).values_list('id', flat=True)
         
@@ -88,7 +89,11 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:]
-        home = Page.objects.get_home(self.current_site())
+        try:
+            home_pk = Page.objects.get_home(self.current_site()).pk
+        except NoHomeFound:
+            home_pk = 0
+            
         for page in pages:
             children = []
 
@@ -124,7 +129,7 @@ class CMSChangeList(ChangeList):
                     page.get_cached_ancestors()
                 else:
                     page.ancestors_ascending = []
-                page.home_pk_cache = home.pk
+                page.home_pk_cache = home_pk
                 if not self.is_filtered():
                     find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True, to_levels=1000)
                 else:

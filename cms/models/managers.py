@@ -52,11 +52,14 @@ class PageManager(models.Manager):
         pub = self.on_site().filter(published=True)
 
         if settings.CMS_SHOW_START_DATE:
-            pub = pub.filter(publication_date__lte=datetime.now())
+            pub = pub.filter(
+                Q(publication_date__gt=datetime.now()) |
+                Q(publication_date__isnull=True)
+            )
 
         if settings.CMS_SHOW_END_DATE:
             pub = pub.filter(
-                Q(publication_end_date__gt=datetime.now()) |
+                Q(publication_end_date__lte=datetime.now()) |
                 Q(publication_end_date__isnull=True)
             )
         return pub

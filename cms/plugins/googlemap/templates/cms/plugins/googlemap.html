@@ -11,7 +11,7 @@
 		var map;
 		
 		var title = "{{ object.get_title }}";
-		var address = "{{ object.street }} {{ object.streetnr }}, {{ object.postcode }} {{ object.city }}";
+		var address = "{{ object.address }}, {{ object.zipcode }} {{ object.city }}";
 		var zoom = {{ object.get_zoom_level }};
 		
 		function load()
