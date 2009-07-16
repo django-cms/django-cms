@@ -336,15 +336,16 @@ def page_id_url(context, reverse_id, lang=None):
     
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'page_id_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
+    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'_type:absolute_url'
     url = cache.get(key)
     if not url:
         try:
             page = PageModel.objects.get(reverse_id=reverse_id)
+            url = page.get_absolute_url(language=lang)
+            cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
         except:
             send_missing_mail(reverse_id, request)
-        url = page.get_absolute_url(language=lang)
-        cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
+        
     if url:
         return {'content':url}
     return {'content':''}
