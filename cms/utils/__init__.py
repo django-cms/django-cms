@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from cms import settings
-from cms.utils.moderator import get_page_model
+from cms.models import Page
 
 # !IMPORTANT: Page cant be imported here, because we will get cyclic import!!
 
@@ -97,8 +97,6 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
-    PageModel = get_page_model(request)
-    
     levels -= 1
     current_level += 1
     found = False
@@ -114,11 +112,11 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
             found = True
             last = None
             for anc in ancestors:
-                if not isinstance(anc, PageModel) and last:
+                if not isinstance(anc, Page) and last:
                     last = None
                     if hasattr(last, 'childrens'):
                         for child in last.childrens:
-                            if isinstance(child, PageModel):
+                            if isinstance(child, Page):
                                 child.sibling = True
                 else:
                     last = anc
@@ -126,7 +124,7 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
             if last:
                 if hasattr(last, 'childrens'):
                     for child in last.childrens:
-                        if isinstance(child, PageModel):
+                        if isinstance(child, Page):
                             child.sibling = True
         elif found:
             item.sibling = True
@@ -208,7 +206,6 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                                                           active_levels,
                                                           mark_sibling,
                                                           target.navigation_extenders)
-        
 
 def cut_levels(nodes, level):
     """

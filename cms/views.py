@@ -6,7 +6,7 @@ from cms.utils import auto_render, get_template_from_request, get_language_from_
 from django.db.models.query_utils import Q
 from cms.appresolver import applications_page_check
 from django.contrib.sites.models import Site
-from cms.utils.moderator import get_page_model
+from cms.utils.moderator import get_page_queryset
 
 def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     """Helper for getting current page from path depending on language
@@ -40,14 +40,14 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
 
 def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
     # get the right model
-    PageModel = get_page_model(request)
+    page_queryset = get_page_queryset(request)
     
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
     if 'preview' in request.GET.keys():
-        pages = PageModel.objects.all()
+        pages = page_queryset.all()
     else:
-        pages = PageModel.objects.published()
+        pages = page_queryset.published()
     
     root_pages = pages.filter(parent__isnull=True).order_by("tree_id")
     

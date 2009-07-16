@@ -166,7 +166,7 @@ CMS_PLACEHOLDER_CONF = {
 CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
 
 CMS_SOFTROOT = True
-CMS_MODERATOR = True
+CMS_MODERATOR = False #True
 CMS_PERMISSION = True
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True

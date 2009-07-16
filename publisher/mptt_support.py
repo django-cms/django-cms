@@ -19,7 +19,6 @@ Requirements:
 
 from django.db.models import signals
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from publisher.base import Mptt
 
 class MpttMeta:

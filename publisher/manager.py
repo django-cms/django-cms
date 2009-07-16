@@ -1,3 +1,4 @@
+'''
 from django.db import models
 from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
@@ -127,3 +128,4 @@ class PublisherManager(object):
         return True
         
 publisher_manager = PublisherManager()
+'''

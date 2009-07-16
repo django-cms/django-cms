@@ -3,8 +3,10 @@ from base import Publisher, Mptt
 
 __all__ = ('Publisher', 'Mptt', 'VERSION')
 
-VERSION = (0, 2, 'pre')
+VERSION = (0, 3, 'sintab')
 
+
+'''
 if settings.DEBUG:
     from django.core.exceptions import ImproperlyConfigured
     # just check if Publisher is last application in INSTALLED_APPS
@@ -13,3 +15,4 @@ if settings.DEBUG:
     if not settings.INSTALLED_APPS[-1] == "publisher":
         raise ImproperlyConfigured("publisher must be last installed application")
     
+'''

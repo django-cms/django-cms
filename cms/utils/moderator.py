@@ -186,42 +186,24 @@ def approve_page(request, page):
         # first case - just mark page as approved from this user
         PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 
 
-def get_model(model, request=None):
-    """Decision function - says which model should be used. Public models are 
-    used only if CMS_MODERATOR.
+
+def get_model_queryset(model, request=None):
+    """Decision function used in frontend - says which model should be used. 
+    Public models are used only if CMS_MODERATOR.
     """
     if not cms_settings.CMS_MODERATOR or \
         (request and 'preview' in request.GET and 
             'draft' in request.GET and request.user.is_staff):
-        return model
-    return model.PublicModel
-     
+        return model.objects.drafts()
+    
+    return model.objects.public()
+
+# queryset helpers for basic models
+get_page_queryset = lambda request=None: get_model_queryset(Page, request) 
+get_title_queryset = lambda request=None: get_model_queryset(Title, request)
+get_cmsplugin_queryset = lambda request=None: get_model_queryset(CMSPlugin, request) 
         
-def get_page_model(request=None):
-    """Decides which Page model should be used - Draft, or PublicPage depending
-    on request. 
     
-    !IMPORTANT: All scripts should request Page from here...
-    """
-    return get_model(Page, request)
-
-def get_title_model(request=None):
-    """Decides which Title model should be used - Draft, or PublicPage depending
-    on request. 
-    
-    !IMPORTANT: All scripts should request Title from here...
-    """
-    return get_model(Title, request)
-
-
-def get_cmsplugin_model(request=None):
-    """Decides which CMSPlugin model should be used - Draft, or PublicPage depending
-    on request. 
-    
-    !IMPORTANT: All scripts should request Page from here...
-    """
-    return get_model(CMSPlugin, request)
-
 def mail_approvement_request(page, user=None):
     """Sends approvement request over email to all users which should approve 
     this page if they have an email entered.

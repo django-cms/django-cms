@@ -1,15 +1,42 @@
-from copy import deepcopy
+#from copy import deepcopy
 from django.db import models
 from django.db.models.base import ModelBase
-from django.db.models.loading import get_model
-from django.db.models.fields.related import RelatedField
+#from django.db.models.loading import get_model
+#from django.db.models.fields.related import RelatedField
 from django.core.exceptions import ObjectDoesNotExist
 from publisher.errors import MpttCantPublish
 
 
+class PublisherManager(models.Manager):
+    """Manager with some support handling publisher.
+    """
+    def drafts(self):
+        return self.filter(publisher_is_draft=True)
+    
+    def public(self):
+        return self.filter(publisher_is_draft=False)
+
+
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
-    """
+    """    
+    PUBLISHER_STATE_DEFAULT = 0
+    PUBLISHER_STATE_DIRTY = 1
+    PUBLISHER_STATE_DELETE = 2
+    
+    publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
+    publisher_public = models.OneToOneField('self', related_name='publisher_draft',  null=True, editable=False)
+    publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
+    
+    objects = PublisherManager()
+    
+    class Meta:
+        abstract = True
+    
+    class PublisherMeta:
+        pass
+    
+    '''
     def publish(self, fields=None, exclude=None):
         """Publish current instance
         
@@ -158,38 +185,12 @@ class Publisher(models.Model):
         if public:
             public.delete()
         self.delete()        
+    '''
     
-    class Meta:
-        abstract = True
-
-
-class PublicPublisher(models.Model):
-    """This will be always added to public mode bases.
-    """
-    def delete_marked_for_deletion(self, collect=True):
-        """If this instance, or some remote instances are marked for deletion
-        kill them.
-        """
-        if collect:
-            from django.db.models.query_utils import CollectedObjects
-            
-            seen = CollectedObjects()
-            
-            self._collect_sub_objects(seen)
-            for cls, items in seen.items():
-                if issubclass(cls, PublicPublisher):
-                    for item in items.values():
-                        item.delete_marked_for_deletion(collect=False)
-                    
-        if self.mark_delete:
-            self.delete()
-
-    class Meta:
-        abstract = True
+       
         
-
 class Mptt(models.Model):
-    """Abstract class which have to be extended for installing mptt on class. 
+    """Abstract class which have to be extended for putting model under mptt. 
     For changing attributes see MpttMeta
     """
     class Meta:
@@ -212,7 +213,14 @@ def install_publisher():
     """Check if publisher isn't installed already, install it otherwise. But 
     install it only once.
     """
+    
+    print ">>> installing publisher"
+    
     from publisher.mptt_support import install_mptt, finish_mptt
+    
+    if hasattr(ModelBase, '_publisher_installed'):
+        # already installed, go away
+        return
     
     _old_new = ModelBase.__new__
     def publisher_modelbase_new(cls, name, bases, attrs):
@@ -225,9 +233,22 @@ def install_publisher():
         
         is_publisher_model = Publisher in bases or base_under_publisher
         
-        if is_publisher_model:
-            attrs['_is_publisher_model'] = lambda self: True
+        if is_publisher_model: #'PublisherMeta' in attrs:
+            if ('objects' in attrs) and (not isinstance(attrs['objects'], PublisherManager)):
+                raise ValueError, ("Model %s extends Publisher, " +
+                                   "so its 'objects' manager must be " +
+                                   "a subclass of publisher.PublisherManager") % (name,)
             
+            attrs['_is_publisher_model'] = lambda self: True
+        
+        # take care of mptt, if required
+        attrs = install_mptt(cls, name, bases, attrs)
+        new_class = _old_new(cls, name, bases, attrs)
+        
+        finish_mptt(new_class)
+        return new_class
+    
+        '''    
         """
         if Publisher in bases or base_under_publisher:            
             # copy attrs, because ModelBase affects them
@@ -243,12 +264,9 @@ def install_publisher():
                     return model
             
             attrs['PublicModel'] = PublicModelProxy()
-        
-        # take care of mptt, if required
         """
         
-        attrs = install_mptt(cls, name, bases, attrs)
-        new_class = _old_new(cls, name, bases, attrs)
+        
         
         if is_publisher_model:
             # register it for future use..., @see publisher.post
@@ -262,7 +280,7 @@ def install_publisher():
             publisher_manager.register(cls, name, tuple(public_bases), public_attrs, new_class)
         
         finish_mptt(new_class)
-        
+        '''
         return new_class
     
     ModelBase.__new__ = staticmethod(publisher_modelbase_new)

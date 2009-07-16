@@ -1,7 +1,9 @@
 from django.conf import settings
 from cms.settings import CMS_FLAT_URLS
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
-from cms.utils.moderator import get_page_model
+from cms.utils.moderator import get_page_queryset
+from cms.models import Page
+
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application. 
@@ -15,8 +17,7 @@ def applications_page_check(request, current_page=None, path=None):
     try:
         page_id = dynamic_app_regex_url_resolver.resolve_page_id(path+"/")
         # yes, it is application page
-        PageModel = get_page_model(request)
-        page = PageModel.objects.get(id=page_id)
+        page = get_page_queryset(request).get(id=page_id)
         # If current page was matched, then we have some override for content
         # from cms, but keep current page. Otherwise return page to which was application assigned.
         return page 
@@ -127,12 +128,20 @@ class DynamicURLConfModule(object):
         """
         if not self._urlpatterns:
             # TODO: will this work with multiple sites? how are they exactly
-            # implemerted ?
+            # implemented ?
             # probably will be better to make caching per site
             
             self._urlpatterns, included = [], []
-            PageModel = get_page_model() #!TODO: this must be solved!!
-            pages = PageModel.objects.get_all_pages_with_application()
+            
+            # we don't have a request here so get_page_queryset() can't be used,
+            # so, if CMS_MODERATOR, use, public() queryset, otherwise 
+            # use draft(). This can be done, because url patterns are used just 
+            # in frontend
+            if settings.CMS_MODERATOR:
+                pages = Page.objects.public()
+            else:
+                pages = Page.objects.drafts()
+            
             for page in pages:
                 # get all titles with application
                 title_set = page.title_set.filter(application_urls__gt="")
