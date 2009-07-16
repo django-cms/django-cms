@@ -15,4 +15,5 @@ if settings.CMS_APPLICATIONS_URLS:
     from cms.appresolver import dynamic_app_regex_url_resolver
     urlpatterns = (dynamic_app_regex_url_resolver, ) + urlpatterns
     
-urlpatterns = patterns('', *urlpatterns)
+urlpatterns = patterns('', *urlpatterns)    
+    
