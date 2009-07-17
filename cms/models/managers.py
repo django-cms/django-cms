@@ -75,7 +75,7 @@ class PageManager(models.Manager):
         for path in paths:
             # build q for all the paths
             q |= Q(title_set__path=path, title_set__language=language)
-        eapp_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
+        app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
         # add proper ordering
         app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
         return app_pages
