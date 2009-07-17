@@ -89,7 +89,7 @@ CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)
 # Defines which language should be used by default and falls back to LANGUAGE_CODE
 CMS_DEFAULT_LANGUAGE = getattr(settings, 'CMS_DEFAULT_LANGUAGE', settings.LANGUAGE_CODE)[:2]
 
-# Defines how long page content should be cached, including navigation and admin menu.
+# Defines how long page content should be cached, including navigation
 CMS_CONTENT_CACHE_DURATION = getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60)
 
 # The id of default Site instance to be used for multisite purposes.

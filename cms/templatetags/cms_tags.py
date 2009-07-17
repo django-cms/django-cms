@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from cms.exceptions import NoHomeFound
 
 from cms import settings
 from cms.models import Page
@@ -39,7 +40,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     if hasattr(current_page, "home_pk_cache"):
         home_pk = current_page.home_pk_cache
     else:
-        home_pk = page_queryset.get_home(site).pk
+        try:
+            home_pk = page_queryset.get_home(site).pk
+        except NoHomeFound:
+            home_pk = 0
     if not next_page: #new menu... get all the data so we can save a lot of queries
         ids = []
         children = []
@@ -335,15 +339,16 @@ def page_id_url(context, reverse_id, lang=None):
     
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'page_id_url_pid:'+reverse_id+'_l:'+str(lang)+'_type:absolute_url'
+    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'_type:absolute_url'
     url = cache.get(key)
     if not url:
         try:
             page = get_page_queryset(request).get(reverse_id=reverse_id)
+            url = page.get_absolute_url(language=lang)
+            cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
         except:
             send_missing_mail(reverse_id, request)
-        url = page.get_absolute_url(language=lang)
-        cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
+        
     if url:
         return {'content':url}
     return {'content':''}
