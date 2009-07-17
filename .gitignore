@@ -1,8 +1,11 @@
 .tmp*
 *.pyc
 *.DS_Store
+
 cms/media/cms_page_media/
 example/run
 
 example/local_settings.py
 reversion/
+
+.ropeproject

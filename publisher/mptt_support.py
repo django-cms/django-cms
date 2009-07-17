@@ -19,7 +19,15 @@ Requirements:
 
 from django.db.models import signals
 from django.db import models
-from publisher.base import Mptt
+
+
+class Mptt(models.Model):
+    """Abstract class which have to be extended for putting model under mptt. 
+    For changing attributes see MpttMeta
+    """
+    class Meta:
+        abstract = True
+
 
 class MpttMeta:
     """Basic mptt configuration class - something like Meta in model

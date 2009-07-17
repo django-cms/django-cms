@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
-from publisher import Publisher, Mptt
+from publisher import MpttPublisher
 from publisher.errors import MpttCantPublish
 from cms.utils.urlutils import urljoin
 from cms import settings
@@ -17,7 +17,7 @@ from cms.exceptions import NoHomeFound
 
 
 
-class Page(Publisher, Mptt):
+class Page(MpttPublisher):
     """
     A simple hierarchical page model
     """

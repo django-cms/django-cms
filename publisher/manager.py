@@ -1,3 +1,15 @@
+from django.db import models
+
+class PublisherManager(models.Manager):
+    """Manager with some support handling publisher.
+    """
+    def drafts(self):
+        return self.filter(publisher_is_draft=True)
+    
+    def public(self):
+        return self.filter(publisher_is_draft=False)
+
+
 '''
 from django.db import models
 from django.db.models.base import ModelBase

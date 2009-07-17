@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from publisher import Publisher, Mptt
+from publisher import MpttPublisher
 from django.template.context import Context
 from cms import settings
 
@@ -27,7 +27,7 @@ class PluginModelBase(ModelBase):
         return new_class 
          
     
-class CMSPlugin(Publisher, Mptt):
+class CMSPlugin(MpttPublisher):
     __metaclass__ = PluginModelBase
     
     page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
