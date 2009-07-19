@@ -4,7 +4,7 @@ from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
 from django.db.models.fields.related import RelatedField
 from django.core.exceptions import ObjectDoesNotExist
-from publisher.errors import MpttCantPublish
+from publisher.errors import MpttPublisherCantPublish
 
 
 class Publisher(models.Model):
