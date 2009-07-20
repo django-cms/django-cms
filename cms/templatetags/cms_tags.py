@@ -307,7 +307,8 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                             if title.page_id == anc.pk:
                                 anc.title_cache = title
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
-    context.update({'ancestors':ancestors})
+    context.update({'ancestors':ancestors,
+                    'template': template})
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
