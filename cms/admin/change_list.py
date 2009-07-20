@@ -38,7 +38,7 @@ class CMSChangeList(ChangeList):
             del self.params[COPY_VAR]
         
             
-        qs = super(CMSChangeList, self).get_query_set()
+        qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
             permissions = Page.permissions.get_change_list_id_list(request.user)
             if permissions != Page.permissions.GRANT_ALL:
@@ -69,7 +69,7 @@ class CMSChangeList(ChangeList):
     
     def set_items(self, request):
         lang = get_language_from_request(request)
-        pages = self.get_query_set(request).order_by('tree_id', 'parent', 'lft').select_related()
+        pages = self.get_query_set(request).drafts().order_by('tree_id', 'parent', 'lft').select_related()
         
         perm_edit_ids = Page.permissions.get_change_id_list(request.user)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user)

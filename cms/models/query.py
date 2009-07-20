@@ -8,6 +8,12 @@ from cms.exceptions import NoHomeFound
 
 
 class PageQuerySet(QuerySet):
+    def drafts(self):
+        return self.filter(publisher_is_draft=True)
+    
+    def public(self):
+        return self.filter(publisher_is_draft=False)
+    
     def on_site(self, site=None):
         if not site:
             site = Site.objects.get_current()

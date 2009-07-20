@@ -47,12 +47,11 @@ class Publisher(models.Model):
             inherited from parents, if there are some
         """
         
-        exclude_fields = ['pk', 'publisher_is_draft', 'publisher_public', 'publisher_state']
+        exclude_fields = ['id', 'publisher_is_draft', 'publisher_public', 'publisher_state']
         exclude_fields_append = []
     
     
-    def save_base(self, raw=False, cls=None, origin=None,
-            force_insert=False, force_update=False):
+    def save_base(self, *args, **kwargs):
         """Overriden save_base. If an instance is draft, and was changed, mark
         it as dirty.
         
@@ -62,8 +61,10 @@ class Publisher(models.Model):
         """
         if self.publisher_is_draft:
             self.publisher_state = Publisher.PUBLISHER_STATE_DIRTY
-        return super(Publisher, self).save_base(raw, cls, origin, force_insert, force_update)
-    
+        print ">> page.save_base pre", self.publisher_is_draft
+        ret = super(Publisher, self).save_base(*args, **kwargs)
+        print ">> page.save_base post", self.publisher_is_draft
+        return ret
     
     def _publisher_can_publish(self):
         """Checks if instance can be published.
@@ -81,6 +82,16 @@ class Publisher(models.Model):
         pass
     '''
     
+    def _publisher_get_public_copy(self):
+        """This is here because of the relation between CMSPlugins - model 
+        inheritance. 
+        
+        eg. Text.objects.get(pk=1).publisher_public returns instance of CMSPlugin
+        instead of instance of Text, thats why this method must be overriden in 
+        CMSPlugin.
+        """
+        return self.publisher_public
+    
     def publish(self, excluded_models=None):
         """Publish current instance
         
@@ -93,13 +104,19 @@ class Publisher(models.Model):
         Returns: published instance
         """
         
+        print "\n", "-" * 30, "publish:", self.__class__.__name__, "-" * 30
+        
+        
         ########################################################################
         # perform checks
         if not self.publisher_is_draft:
-            # its public instance, there isn't anything to publish, just escape
+            # it is public instance, there isn't anything to publish, just escape
+            print ">> publish escape because draft.."
             return
         
         assert self.pk is not None, "Can publish only saved instance, save it first."
+        
+        print ">> publishing A.."
         
         if not self._publisher_can_publish():
             raise PublisherCantPublish
@@ -110,11 +127,20 @@ class Publisher(models.Model):
             excluded_models = []
         excluded_models.append(self.__class__)
         
+        print ">> publishing B.."
         ########################################################################
         # publish self and related fields
-        public_copy, created = self.publisher_public, False
+        public_copy, created = self._publisher_get_public_copy(), False
+        
+        print ">> GPC:", public_copy
+        
         if not public_copy:
-            public_copy, created = self.__class__(), True
+            print ">> NPC"
+            public_copy, created = self.__class__(publisher_is_draft=False), True
+        
+        print ">> KLASS:", public_copy.__class__
+        
+        print "EX", self._publisher_meta.exclude_fields
         
         for field in fields:
             if field.name in self._publisher_meta.exclude_fields:
@@ -122,39 +148,46 @@ class Publisher(models.Model):
             
             value = getattr(self, field.name)
             if isinstance(field, RelatedField):
-                # check it second time, just for sure
-                if field.name in ('public_copy', ):
-                    continue
-            
                 related = field.rel.to
                 if issubclass(related, Publisher):
+                    print ">> got related...", related
+                    print "----------------"
                     if not related in excluded_models and value:
                         # can follow
                         #try:
+                        print ">>> must publish:", value
                         value = value.publish(excluded_models=excluded_models)
                         #except MpttCantPublish:
                         #    pass
                     elif value:
-                        value = value.public_copy
+                        value = value.publisher_public
+            
+            print ">> FIELD:", field.name, ":",  value
             setattr(public_copy, field.name, value)        
         
+        print ">> publishing.. saving with pk:", public_copy.pk, public_copy.__class__
         ########################################################################
         # perform saving
         
         # publish copy - all behind this requires public instance to have pk
+        
         self._publisher_save_public(public_copy)
         
+        
+        print ">> publishing C 1..", self.pk, public_copy.pk
         # store public model relation for current instance (only) for newly 
         # created items
         if created:
             self.publisher_public = public_copy
-        
+        print ">> publishing C 2.."
         # i'm not dirty anymore
         self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
         
+        print ">> publishing C 3.."
         # save changes
         self.save_base(cls=self.__class__)
         
+        print ">> publishing D.."
         ########################################################################
         # update many to many relations
         for field in self._meta.many_to_many:
@@ -192,7 +225,7 @@ class Publisher(models.Model):
             # maybe there was some change in m2m relation
             public_m2m_manager.exclude(pk__in=updated_obj_ids).remove()
                 
-        
+        print ">> publishing E.."
         ########################################################################
         # update related objects (FK) / model inheritance
         for obj in self._meta.get_all_related_objects():
@@ -213,6 +246,8 @@ class Publisher(models.Model):
                     continue
                 for item in item_set:
                     item.publish(excluded_models=excluded_models + [obj.__class__])
+        
+        print ">> publishing done..."
         return public_copy
         
     
@@ -220,6 +255,7 @@ class Publisher(models.Model):
         """Save method for object which should be published. obj is a instance 
         of the same class as self. 
         """
+        print "publisher._publisher_save_public()"
         return obj.save() 
         
     
@@ -239,17 +275,22 @@ class MpttPublisher(Publisher, Mptt):
 
     class PublisherMeta:
         exclude_fields = []
-        exclude_fields_append = ['pk', 'lft', 'rght', 'tree_id', 'parent']
+        exclude_fields_append = ['id', 'lft', 'rght', 'tree_id', 'parent']
     
-    def get_previous_sibling(self, **filters):
+    
+    def _get_prev_sibling(self, **filters):
         """Returns object previous sibling or None if object doesn't haves one
         """
+        filters.update({
+            'lft__lt': self.lft,
+        })
+        
         try:
-            return self.get_siblings().filter(**filters)[0].order_by('-lft')
+            return self.get_siblings().filter(**filters).order_by('-lft')[0]
         except IndexError:
             pass
         return None
-
+    
     
     def _publisher_can_publish(self):
         """Is parent of this object already published?
@@ -265,19 +306,35 @@ class MpttPublisher(Publisher, Mptt):
         """Mptt specific stuff before the object can be saved, overrides original
         publisher method.
         """
+        last_base = self.__class__.mro()[0]
+        if not last_base in (Publisher, MpttPublisher):
+            # special case, is an inherited mptt, use normal save
+            print ">> roll back to publisher.publisher_save_... ", obj
+            return super(MpttPublisher, self)._publisher_save_public(obj)
+        
+        print ">> mptt.publish._publisher_save_public()"
         if not self.publisher_public_id:
             # it is a first time published object, perform insert_at:
+            print "A"
             parent, public_parent = self.parent, None
             if parent:
                 public_parent = parent.publisher_public
-                
-            obj.insert_at(public_parent, commit=False)
-            obj.save(no_signals=True) 
+            print "B", public_parent
+            if public_parent:
+                print "B0"
+                obj.insert_at(public_parent, commit=False)
+            print "C", obj.publisher_is_draft
+            
+            #obj.save(=True)
+            print "D" 
         else:
             # check if object was moved / structural tree change
-            prev_sibling = self.get_previous_sibling(publisher_public__isnull=False)
-            prev_public_sibling = obj.get_previous_sibling()
-    
+            prev_sibling = self._get_prev_sibling(publisher_public__isnull=False)
+            prev_public_sibling = obj._get_prev_sibling()
+            
+            print "S", prev_sibling, "-", prev_public_sibling
+            
+            
             if not (self.level == obj.level and \
                 (prev_sibling == prev_public_sibling == None or \
                 prev_sibling.publisher_public_id == prev_public_sibling.id)):

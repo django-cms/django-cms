@@ -48,6 +48,10 @@ class CMSPlugin(MpttPublisher):
     
     class Meta:
         app_label = 'cms'
+        
+    class PublisherMeta:
+        exclude_fields = []
+        exclude_fields_append = ['plugin_ptr']
     
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -131,7 +135,31 @@ class CMSPlugin(MpttPublisher):
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
-        
+    
+    def _publisher_get_public_copy(self):
+        """Overrides publisher public copy acessor, because of the special
+        kind of relation between Plugins.
+        """   
+        print "-- _publisher_get_public_copy", self.__class__
+        publisher_public = self.publisher_public
+        if not publisher_public:
+            return
+        elif publisher_public.__class__ is self.__class__:
+            print "#a"
+            return publisher_public
+        try:
+            print "#b"
+            return self.__class__.objects.get(pk=self.publisher_public_id)
+        except ObjectDoesNotExist:
+            # extender dosent exist yet
+            public_copy = self.__class__()
+            # copy values of all local fields
+            for field in publisher_public._meta.local_fields:
+                value = getattr(publisher_public, field.name)
+                setattr(public_copy, field.name, value)
+            public_copy.publisher_is_draft=False
+            print "#c", public_copy.__class__ 
+            return public_copy
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion        

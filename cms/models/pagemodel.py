@@ -57,13 +57,6 @@ class Page(MpttPublisher):
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
     
-    def get_hash(self):
-        """Used in object comparison - if there were some change between objects
-        generates sha1.
-        """
-        
-    
-    
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -73,7 +66,9 @@ class Page(MpttPublisher):
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
         app_label = 'cms'
-
+    
+    class PublisherMeta:
+        exclude_fields_append = ['moderator_state']
     
     def __unicode__(self):
         slug = self.get_slug(fallback=True)
@@ -206,42 +201,46 @@ class Page(MpttPublisher):
                 this is because of how this adding works - first save, then move
         """
         
-        print "save(", no_signals, change_state, commit, force_with_moderation, force_state, ")"
-        print ">> ms0:", self.moderator_state
-        
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
         
-        if settings.CMS_MODERATOR:
-            under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
-        
-        created = not bool(self.pk)
-        if settings.CMS_MODERATOR:
-            if change_state:
-                if created:
-                    # new page....
-                    self.moderator_state = Page.MODERATOR_CHANGED
-                elif self.moderator_state is not Page.MODERATOR_CHANGED:
-                    # always change state to need approvement when there is some change
-                    self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
-                
-                if not under_moderation and self.published:
-                    # existing page without moderator - publish it directly if 
-                    # published is True
-                    publish_directly = True
-                
-                
-        elif change_state:
-            self.moderator_state = Page.MODERATOR_CHANGED
-            #publish_directly = True - no publisher, no publishing!! - we just
-            # use draft models in this case
-        
-        if force_state is not None:
-            self.moderator_state = force_state
+        if self.publisher_is_draft:
+            print ">> page.save on draft(", no_signals, change_state, commit, force_with_moderation, force_state, ")"
+            print ">> ms0:", self.moderator_state
+            
+            # publisher specific stuff, but only on draft model, this is here 
+            # because page initializes publish process
+            
+            if settings.CMS_MODERATOR:
+                under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
+            
+            created = not bool(self.pk)
+            if settings.CMS_MODERATOR:
+                if change_state:
+                    if created:
+                        # new page....
+                        self.moderator_state = Page.MODERATOR_CHANGED
+                    elif self.moderator_state is not Page.MODERATOR_CHANGED:
+                        # always change state to need approvement when there is some change
+                        self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+                    
+                    if not under_moderation and self.published:
+                        # existing page without moderator - publish it directly if 
+                        # published is True
+                        publish_directly = True
+                    
+            elif change_state:
+                self.moderator_state = Page.MODERATOR_CHANGED
+                #publish_directly = True - no publisher, no publishing!! - we just
+                # use draft models in this case
+            
+            if force_state is not None:
+                self.moderator_state = force_state
             
         
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
+        
         # Drafts should not, unless they have been set to the future
         if self.published:
             if settings.CMS_SHOW_START_DATE:
@@ -258,16 +257,17 @@ class Page(MpttPublisher):
         if not self.pk:
             self.created_by = self.changed_by 
         
-        print ">> ms1:", self.moderator_state
+        print ">> page.save pre", self.publisher_is_draft
         
         if commit:
             if no_signals:# ugly hack because of mptt
                 super(Page, self).save_base(cls=self.__class__)
             else:
                 super(Page, self).save()
+        print ">> page.save post", self.publisher_is_draft
         
         #if commit and (publish_directly or created and not under_moderation):
-        if commit and publish_directly:
+        if self.publisher_is_draft and commit and publish_directly:
             self.publish()
             # post_publish signal moved to end of publish method()
 
@@ -604,7 +604,7 @@ class Page(MpttPublisher):
         """
         return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
     
-    def publish(self, fields=None, exclude=None):
+    def publish(self):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible. 
         
@@ -615,25 +615,27 @@ class Page(MpttPublisher):
         if not settings.CMS_MODERATOR:
             return
         
-        #print ">> publish(", fields, exclude, ")"
-        
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
+        print ">> page.publish()"
         
         # publish, but only if all parents are published!!
         published = None
+        
         try:
-            published = super(Page, self).publish(fields, exclude)
+            published = super(Page, self).publish()
             self.moderator_state = Page.MODERATOR_APPROVED
         except MpttPublisherCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
-        finally:
-            self.save(change_state=False)
-            if not published:
-                # was not published, escape
-                return
             
+        self.save(change_state=False)
+        if not published:
+            # was not published, escape
+            return
         
+        print ">> page was published..."
+        # clean moderation log
+        self.pagemoderatorstate_set.all().delete()
+            
+        """
         if not fields:
             public = self.public
             if public:
@@ -668,7 +670,7 @@ class Page(MpttPublisher):
                         title.publish(fields=title_fields)
             else:
                 pass
-        
+        """
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
@@ -689,8 +691,8 @@ class Page(MpttPublisher):
             # if it was cached in change list, return cached value
             return self.public_published_cache
         # othervise make db lookup
-        if self.public:
-            return self.public.published
+        if self.publisher_public_id:
+            return self.publisher_public.published
         #return is_public_published(self)
         return False
         

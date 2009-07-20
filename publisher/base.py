@@ -11,8 +11,6 @@ def install_publisher():
     install it only once.
     """
     
-    print ">>> installing publisher"
-    
     if hasattr(ModelBase, '_publisher_installed'):
         # already installed, go away
         return
@@ -25,7 +23,6 @@ def install_publisher():
         """Override modelbase new method, check if Publisher attribute is
         subclass of Publisher.
         """
-        
         # in case of model inheritance
         base_under_publisher = bool(filter(lambda b: issubclass(b, Publisher), bases))
         

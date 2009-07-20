@@ -33,7 +33,7 @@ class MpttMeta:
     """Basic mptt configuration class - something like Meta in model
     """
     
-    parent_attr = 'parent' 
+    parent_attr = 'parent'
     left_attr = 'lft'
     right_attr = 'rght'
     tree_id_attr = 'tree_id' 
@@ -102,8 +102,9 @@ class MpttMeta:
 def install_mptt(cls, name, bases, attrs):
     """Installs mptt - modifies class attrs, and adds required stuff to them.
     """
-
-    if not Mptt in bases:
+    from publisher.models import MpttPublisher
+    
+    if not Mptt in bases and not MpttPublisher in bases:
         return attrs 
     
     if 'MpttMeta' in attrs and not issubclass(attrs['MpttMeta'], MpttMeta):
@@ -122,6 +123,8 @@ def install_mptt(cls, name, bases, attrs):
     
     assert mptt_meta.parent_attr in attrs, ("Mppt model must define parent "
         "field!")
+    
+    print ">>> installing mptt for:", name
     
     # add mptt fields
     fields = (mptt_meta.left_attr, mptt_meta.right_attr, 

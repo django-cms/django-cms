@@ -20,28 +20,40 @@ class PublisherOptions(object):
         """Build publisher meta, and inherit stuff from bases if required 
         """
         if publisher_meta and getattr(publisher_meta, 'exclude_fields', None):
-            self.exclude_fields = getattr(publisher_meta, 'exclude_fields', None)
+            self.exclude_fields = getattr(publisher_meta, 'exclude_fields', [])
             return
         
         exclude_fields = set()
         
-        for base in bases:
-            pmeta = getattr(base, 'PublisherMeta', None) or getattr(base, '_publisher_meta', None)
+        all_bases = []
+        for direct_base in bases:
+            all_bases.append(direct_base)
+            for base in direct_base.mro():
+                if not base in all_bases:
+                    all_bases.append(base)
+        print name, all_bases
+        for base in reversed(all_bases):
+        #for direct_base in bases:
+            #for base in reversed(direct_base.mro()):
+            pmeta = getattr(base, '_publisher_meta', None) or getattr(base, 'PublisherMeta', None)
             if not pmeta:
                 continue
             base_exclude_fields = getattr(pmeta, 'exclude_fields', None)
-            base_exclude_append_fields = getattr(pmeta, 'exclude_append_fields', None)
+            base_exclude_fields_append = getattr(pmeta, 'exclude_fields_append', None)
+            print "p", base, base_exclude_fields
              
-            if base_exclude_fields and base_exclude_append_fields:
+            if base_exclude_fields and base_exclude_fields_append:
                 raise ValueError, ("Model %s extends defines PublisherMeta, but " +
                                    "both - exclude_fields and exclude_fields_append"
                                    "are defined!") % (name,)             
             if base_exclude_fields:
                 exclude_fields = exclude_fields.union(base_exclude_fields)
-            elif base_exclude_append_fields:
-                exclude_fields = exclude_fields.union(base_exclude_append_fields)
+            elif base_exclude_fields_append:
+                exclude_fields = exclude_fields.union(base_exclude_fields_append)
         
         if publisher_meta and getattr(publisher_meta, 'exclude_fields_append', None):
-            exclude_fields = exclude_fields.union(getattr(publisher_meta, 'exclude_fields_append', None))
-                
+            print "se:", publisher_meta.exclude_fields_append
+            exclude_fields = exclude_fields.union(publisher_meta.exclude_fields_append)
+        
         self.exclude_fields = list(exclude_fields)
+        print name, self.exclude_fields, "\n"
