@@ -49,10 +49,19 @@ class PageManager(models.Manager):
             return self.exclude(id__in=exclude_list)
 
     def published(self, site=None):
-        pub = self.on_site().filter(Q(published=True) &
-            (Q(publication_date__gt=datetime.now()) | Q(publication_date__isnull=True)) &
-            (Q(publication_end_date__lte=datetime.now()) | Q(publication_end_date__isnull=True))
-        )
+        pub = self.on_site().filter(published=True)
+
+        if settings.CMS_SHOW_START_DATE:
+            pub = pub.filter(
+                Q(publication_date__gt=datetime.now()) |
+                Q(publication_date__isnull=True)
+            )
+
+        if settings.CMS_SHOW_END_DATE:
+            pub = pub.filter(
+                Q(publication_end_date__lte=datetime.now()) |
+                Q(publication_end_date__isnull=True)
+            )
         return pub
 
     def drafts(self):
