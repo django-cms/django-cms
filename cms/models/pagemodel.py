@@ -2,7 +2,7 @@ from os.path import join
 from datetime import datetime
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
@@ -397,7 +397,7 @@ class Page(Publisher, Mptt):
         default_lang = False
         if not language:
             default_lang = True
-            language = settings.CMS_DEFAULT_LANGUAGE
+            language = get_language()
         load = False
         if not hasattr(self, "title_cache"):
             load = True
