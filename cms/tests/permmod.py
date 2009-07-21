@@ -76,7 +76,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         # public model shouldn't be available yet, because of the moderation
         self.assertObjectExist(Title.objects, slug=page_data['slug'])
-        self.assertObjectDoesNotExist(Title.PublicModel.objects, slug=page_data['slug'])
+        self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
         return self.assertObjectExist(Page.objects, title_set__slug=page_data['slug'])
     
@@ -96,9 +96,9 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         if published_check:
             # must have public object now
-            assert(page.public)
+            assert(page.publisher_public)
             # and public object must be published
-            assert(page.public.published)
+            assert(page.publisher_public.published)
         
         return page
     
@@ -113,7 +113,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         return page
     
     def _check_published_page_attributes(self, page):
-        public_page = page.public
+        public_page = page.publisher_public
         compare = ['id', 'tree_id', 'rght', 'lft', 'parent_id', 'level']
         # compare ids and tree attributes
         for name in compare:
@@ -161,15 +161,15 @@ class PermissionModeratorTestCase(PageBaseTestCase):
     
     @property
     def home_page(self):
-        return Page.objects.get(title_set__slug="home")
+        return Page.objects.drafts().get(title_set__slug="home")
     
     @property
     def slave_page(self):
-        return Page.objects.get(title_set__slug="slave-home")
+        return Page.objects.drafts().get(title_set__slug="slave-home")
     
     @property
     def master_page(self):
-        return Page.objects.get(title_set__slug="master")
+        return Page.objects.drafts().get(title_set__slug="master")
     
     
     # tests
@@ -233,16 +233,16 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         # public model shouldn't be available yet, because of the moderation
         self.assertObjectExist(Title.objects, slug=page_data['slug'])
-        self.assertObjectDoesNotExist(Title.PublicModel.objects, slug=page_data['slug'])
+        self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
         # page created?
-        page = self.assertObjectExist(Page.objects, title_set__slug=page_data['slug'])
+        page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=page_data['slug'])
         # moderators and approvemnt right?
         assert(page.get_moderator_queryset().count()==1)
         #assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
-        assert(not page.public)
+        assert(not page.publisher_public)
         
         # publish / approve page by master
         self.login_user(self.user_master)
@@ -279,7 +279,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self.login_user(self.user_master)
         
         for slug in reversed(slugs[5:]):
-            page = self.assertObjectExist(Page.objects, title_set__slug=slug)
+            page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)
             
             public_page = self._publish_page(page, True)
             self._check_published_page_attributes(public_page)
@@ -315,31 +315,31 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self.login_user(self.user_master)
         # create page under slave_page
         page = self._create_page(self.home_page)
-        assert(not page.public)
+        assert(not page.publisher_public)
         
         # create subpage uner page
         subpage = self._create_page(page)
-        assert(not subpage.public)
+        assert(not subpage.publisher_public)
         
         # publish both of them in reverse order 
         subpage = self._publish_page(subpage, True, published_check=False) 
         
         # subpage should not be published, because parent is not published 
         # yet, should be marked as `publish when parent`
-        assert(not subpage.public) 
+        assert(not subpage.publisher_public) 
         
         # pagemoderator state must be set
         assert(subpage.moderator_state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         
         # publish page (parent of subage), so subpage must be published also
         page = self._publish_page(page, True)
-        assert(page.public)
+        assert(page.publisher_public)
         
         # reload subpage, it was probably changed
         subpage = self._reload(subpage)
         
         # parent was published, so subpage must be also published..
-        assert(subpage.public) 
+        assert(subpage.publisher_public) 
         
         #check attributes
         self._check_published_page_attributes(page)
@@ -350,11 +350,11 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         self.login_user(self.user_super)
         # create page under root
         page = self._create_page()
-        assert(not page.public)
+        assert(not page.publisher_public)
         
         # create subpage under page
         subpage = self._create_page(page)
-        assert(not subpage.public)
+        assert(not subpage.publisher_public)
         
         # publish both of them in reverse order 
         page = self._publish_page(page, True)
@@ -373,7 +373,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         page = self._create_page()
         
         # public must not exist
-        assert(not page.public)
+        assert(not page.publisher_public)
         
         # moderator_state must be changed
         assert(page.moderator_state == Page.MODERATOR_CHANGED)
@@ -401,7 +401,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         page = self._approve_page(page)
         
         # public page must not exist because of parent
-        assert(not page.public)
+        assert(not page.publisher_public)
         
         # waiting for parents
         assert(page.moderator_state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
