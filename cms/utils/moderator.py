@@ -73,11 +73,14 @@ def page_moderator_state(request, page):
         dict(state=state, label=label)
     """
     state, label = page.moderator_state, ""
+    
+    under_moderation = page.get_moderator_queryset()
+    
     if cms_settings.CMS_MODERATOR:
         if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
             label = _('parent first')
         elif state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request) \
-            and page.get_moderator_queryset().filter(user=request.user).count() \
+            and under_moderation.filter(user=request.user).count() \
             and not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
                 # only if he didn't approve already...
                 state = I_APPROVE
@@ -88,8 +91,8 @@ def page_moderator_state(request, page):
         state = Page.MODERATOR_NEED_APPROVEMENT
     
     if not page.is_approved() and not label:
-        label = dict(page.moderator_state_choices)[state]
-    
+        if under_moderation.count():
+            label = dict(page.moderator_state_choices)[state]            
     return dict(state=state, label=label)
 
 
