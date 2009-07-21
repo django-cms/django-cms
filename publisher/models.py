@@ -306,45 +306,52 @@ class MpttPublisher(Publisher, Mptt):
         """Mptt specific stuff before the object can be saved, overrides original
         publisher method.
         """
-        last_base = self.__class__.mro()[0]
+        last_base = self.__class__.mro()[1]
+        print "MRO:", self.__class__.mro()
         if not last_base in (Publisher, MpttPublisher):
             # special case, is an inherited mptt, use normal save
-            print ">> roll back to publisher.publisher_save_... ", obj
+            print ">> roll back to publisher.publisher_save_... ", last_base
             return super(MpttPublisher, self)._publisher_save_public(obj)
         
         print ">> mptt.publish._publisher_save_public()"
         if not self.publisher_public_id:
+            print "-- mptt - new public instance"
             # it is a first time published object, perform insert_at:
-            print "A"
             parent, public_parent = self.parent, None
             if parent:
                 public_parent = parent.publisher_public
-            print "B", public_parent
             if public_parent:
-                print "B0"
+                print ">> _mptt.insert_at()", public_parent.id
                 obj.insert_at(public_parent, commit=False)
-            print "C", obj.publisher_is_draft
-            
-            #obj.save(=True)
-            print "D" 
+            print ">> _mptt.save()"
         else:
             # check if object was moved / structural tree change
             prev_sibling = self._get_prev_sibling(publisher_public__isnull=False)
             prev_public_sibling = obj._get_prev_sibling()
             
-            print "S", prev_sibling, "-", prev_public_sibling
+            print "siblings:", prev_sibling, "-", prev_public_sibling
             
+            if not self.level == obj.level or \
+                not (self.level > 0 and self.parent.publisher_public == obj.parent) or \
+                not prev_sibling == prev_public_sibling == None or \
+                (prev_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id):
             
-            if not (self.level == obj.level and \
-                (prev_sibling == prev_public_sibling == None or \
-                prev_sibling.publisher_public_id == prev_public_sibling.id)):
+            #if not (self.level == obj.level and \
+            #    (prev_sibling == prev_public_sibling == None or \
+            #    (prev_sibling and prev_public_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id))):
                 
-                if prev_sibling is None:
+                print "-- mptt moved instance"
+                
+                if prev_sibling is None and self.parent:
                     # move as a first child to parent
-                    obj.move_to(self.parent, position='first-child')
-                else:
+                    target = self.parent.publisher_public
+                    print "-- mptt move_to as a first-child under parent:", target
+                    obj.move_to(target, position='first-child')
+                elif prev_sibling:
+                    print "-- mptt move_to on right side from:", prev_sibling.publisher_public
                     obj.move_to(prev_sibling.publisher_public, position="right")
-                    
+            else:
+                print "-- mptt new/updated instance"
         # otherwise none structural changes, just save
         return obj.save()
 

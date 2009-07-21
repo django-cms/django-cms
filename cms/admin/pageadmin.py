@@ -522,8 +522,10 @@ class PageAdmin(admin.ModelAdmin):
         some new stuff, which should be published after all other objects on page 
         are collected.
         """
-        #print "!! response_change"
-        #obj.save(commit=False)
+        if settings.CMS_MODERATOR:
+            # save the object again, so all the related changes to page model 
+            # can be published if required
+            obj.save()
         return super(PageAdmin, self).response_change(request, obj)
         
     def has_add_permission(self, request):

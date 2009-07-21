@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
 from publisher import MpttPublisher
-from publisher.errors import MpttPublisherCantPublish
+from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms import settings
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
@@ -623,7 +623,7 @@ class Page(MpttPublisher):
         try:
             published = super(Page, self).publish()
             self.moderator_state = Page.MODERATOR_APPROVED
-        except MpttPublisherCantPublish:
+        except PublisherCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
             
         self.save(change_state=False)
