@@ -20,7 +20,7 @@ class GoogleMap(CMSPlugin):
     zoom = models.IntegerField(_("zoom level"), blank=True, null=True)
     
     def __unicode__(self):
-        return u"%s (%s, %s %s)" % (self.get_title(), self.address, self.postcode, self.city,)
+        return u"%s (%s, %s %s)" % (self.get_title(), self.address, self.zipcode, self.city,)
     
     def get_title(self):
         if self.title == None:

@@ -16,6 +16,7 @@ from cms.utils.permissions import get_current_user, get_subordinate_users,\
 from cms.admin.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
 from django.forms.widgets import HiddenInput
+from django.contrib.sites.models import Site
 
 
 class PageAddForm(forms.ModelForm):
@@ -34,7 +35,9 @@ class PageAddForm(forms.ModelForm):
         super(PageAddForm, self).__init__(*args, **kwargs)
         self.fields['parent'].widget = HiddenInput() 
         self.fields['site'].widget = HiddenInput()
-    
+        if not self.fields['site'].initial:
+            self.fields['site'].initial = Site.objects.get_current().pk
+        
     def clean(self):
         cleaned_data = self.cleaned_data
         if 'slug' in cleaned_data.keys():
@@ -46,7 +49,7 @@ class PageAddForm(forms.ModelForm):
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
-        site = cleaned_data['site']
+        site = self.cleaned_data.get('site', Site.objects.get_current())
         if not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']

@@ -61,30 +61,24 @@ class PageQuerySet(PublisherQuerySet):
             )
         return pub
 
-    #def drafts(self):
-    #    pub = self.on_site().filter(published=False)
-    #    if settings.CMS_SHOW_START_DATE:
-    #        pub = pub.filter(publication_date__gte=datetime.now())
-    #    return pub
-
     def expired(self):
         return self.on_site().filter(
             publication_end_date__lte=datetime.now())
-        
-    
-    #def get_pages_with_application(self, path, language):
-    #    """Returns all pages containing application for current path, or
-    #    any parrent. Returned list is sorted by path length, longer path first.
-    #    """
-    #    paths = levelize_path(path)
-    #    q = Q()
-    #    for path in paths:
-    #        # build q for all the paths
-    #        q |= Q(title_set__path=path, title_set__language=language)
-    #    app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
-    #    # add proper ordering
-    #    app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
-    #    return app_pages
+            
+#    - seems this is not used anymore...  
+#    def get_pages_with_application(self, path, language):
+#        """Returns all pages containing application for current path, or
+#        any parrent. Returned list is sorted by path length, longer path first.
+#        """
+#        paths = levelize_path(path)
+#        q = Q()
+#        for path in paths:
+#            # build q for all the paths
+#            q |= Q(title_set__path=path, title_set__language=language)
+#        app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
+#        # add proper ordering
+#        app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
+#        return app_pages
     
     def get_all_pages_with_application(self):
         """Returns all pages containing applications for all sites.
