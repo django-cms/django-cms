@@ -1,16 +1,3 @@
-'''
-import publisher
-if not getattr(publisher,'_ready', False):
-    """
-    the first time this module is loaded by django it raises an
-    ImportError. this forces it into the postponed list and it will
-    be called again later (after the other postponed apps are loaded.)
-    """
-    publisher._ready = True
-    raise ImportError("Not ready yet")
-from publisher.manager import publisher_manager
-publisher_manager.install()
-'''
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import RelatedField
@@ -280,7 +267,8 @@ class Publisher(models.Model):
             try:
                 self.delete()
             except AttributeError:
-                print "- not deleted..."
+                # this exception may happen because of the plugin relations
+                # to CMSPlugin and mppt way of _meta assignment
                 pass
         
     def delete(self):

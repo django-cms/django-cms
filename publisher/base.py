@@ -34,6 +34,9 @@ def install_publisher():
                                    "so its 'objects' manager must be " +
                                    "a subclass of publisher.PublisherManager") % (name,)
             
+            if not 'objects' in attrs:
+                attrs['objects'] = PublisherManager()
+            
             attrs['_is_publisher_model'] = lambda self: True
             
             # build meta object

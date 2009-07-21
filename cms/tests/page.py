@@ -62,8 +62,8 @@ class PagesTestCase(PageBaseTestCase):
         assert(page.get_slug() == page_data['slug'])
         
         # were public instanes created?
-        title = Title.PublicModel.objects.get(slug=page_data['slug'])
-        assert(isinstance(title.page, Page.PublicModel))
+        title = Title.objects.drafts().get(slug=page_data['slug'])
+
         
     def test_03_slug_collision(self):
         """
@@ -224,6 +224,11 @@ class PagesTestCase(PageBaseTestCase):
         """
         Test that a page can be copied via the admin
         """
+        raise "must be reimplemented, because ids doesnt work with this system"
+    
+        # this case is not written properly, it must always check what was the
+        # id of created page!!
+        
         self.client.login(username= 'test', password='test')
         setattr(settings, "SITE_ID", 1)
         page_data = self.get_new_page_data()

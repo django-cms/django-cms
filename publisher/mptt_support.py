@@ -124,8 +124,6 @@ def install_mptt(cls, name, bases, attrs):
     assert mptt_meta.parent_attr in attrs, ("Mppt model must define parent "
         "field!")
     
-    print ">>> installing mptt for:", name
-    
     # add mptt fields
     fields = (mptt_meta.left_attr, mptt_meta.right_attr, 
         mptt_meta.tree_id_attr, mptt_meta.level_attr)

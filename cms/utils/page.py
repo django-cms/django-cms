@@ -8,9 +8,9 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     """
     from cms.models import Title
     if cms_settings.CMS_UNIQUE_SLUGS:
-        titles = Title.objects.filter(slug=slug)
+        titles = Title.objects.filter(slug=slug, publisher_is_draft=True)
     else:
-        titles = Title.objects.filter(slug=slug, language=lang)
+        titles = Title.objects.filter(slug=slug, language=lang, publisher_is_draft=True)
     if not cms_settings.CMS_FLAT_URLS:
         if parent and not parent.is_home(): 
             titles = titles.filter(page__parent=parent)

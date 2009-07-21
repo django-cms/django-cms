@@ -31,7 +31,7 @@ class PublisherOptions(object):
             for base in direct_base.mro():
                 if not base in all_bases:
                     all_bases.append(base)
-        print name, all_bases
+
         for base in reversed(all_bases):
         #for direct_base in bases:
             #for base in reversed(direct_base.mro()):
@@ -40,7 +40,6 @@ class PublisherOptions(object):
                 continue
             base_exclude_fields = getattr(pmeta, 'exclude_fields', None)
             base_exclude_fields_append = getattr(pmeta, 'exclude_fields_append', None)
-            print "p", base, base_exclude_fields
              
             if base_exclude_fields and base_exclude_fields_append:
                 raise ValueError, ("Model %s extends defines PublisherMeta, but " +
@@ -52,8 +51,6 @@ class PublisherOptions(object):
                 exclude_fields = exclude_fields.union(base_exclude_fields_append)
         
         if publisher_meta and getattr(publisher_meta, 'exclude_fields_append', None):
-            print "se:", publisher_meta.exclude_fields_append
             exclude_fields = exclude_fields.union(publisher_meta.exclude_fields_append)
         
         self.exclude_fields = list(exclude_fields)
-        print name, self.exclude_fields, "\n"

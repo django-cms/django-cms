@@ -67,7 +67,6 @@ def _get_ordered_insertion_target(node, parent):
     return right_sibling
 
 def pre_save(instance, **kwargs):
-    print ">>> mptt pre_save signal"
     """
     If this is a new node, sets tree fields up before it is inserted
     into the database, making room in the tree structure as neccessary,
@@ -126,4 +125,3 @@ def pre_save(instance, **kwargs):
                 # Make sure the instance's new parent is always
                 # restored on the way out in case of errors.
                 setattr(instance, opts.parent_attr, parent)
-    print ">>> mptt pre_save signal over"

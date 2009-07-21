@@ -13,7 +13,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
     
     Users:
         1. `super`: superuser
-        2. `master`: user with permissions to all aplications
+        2. `master`: user with permissions to all applications
         3. `slave`: user assigned to page `slave-home` can add/change/delete page
     
     Pages:
@@ -23,6 +23,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
             
         2. `master`:
             - crated by super
+            - `master` can do anything on it and its descendants
             - subpages:
         
         3.       `slave-home`: 
