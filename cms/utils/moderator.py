@@ -7,7 +7,7 @@ from cms.utils.permissions import get_current_user
 
 
 I_APPROVE = 100 # current user should approve page
-
+I_APPROVE_DELETE = 200
 
 def page_changed(page, old_page=None, force_moderation_action=None):
     """Called from page post save signal. If page already had pk, old version
@@ -31,7 +31,7 @@ def page_changed(page, old_page=None, force_moderation_action=None):
         PageModeratorState(user=user, page=page, action=action).save()
     
     if ((old_page and not old_page.moderator_state == page.moderator_state) or not old_page) \
-        and page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT:
+        and page.requires_approvement():
         # update_moderation_message can be called after this :S -> recipient will not
         # see the last message
         mail_approvement_request(page, user)
@@ -79,12 +79,13 @@ def page_moderator_state(request, page):
     if cms_settings.CMS_MODERATOR:
         if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
             label = _('parent first')
-        elif state == Page.MODERATOR_NEED_APPROVEMENT and page.has_moderate_permission(request) \
+        elif page.requires_approvement() and page.has_moderate_permission(request) \
             and under_moderation.filter(user=request.user).count() \
             and not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
                 # only if he didn't approve already...
-                state = I_APPROVE
-                label = _('approve')
+                is_delete = state == Page.MODERATOR_NEED_DELETE_APPROVEMENT
+                state = is_delete and I_APPROVE_DELETE or I_APPROVE 
+                label = is_delete and _('delete') or _('approve')
             
     elif not page.is_approved():
         # if no moderator, we have just 2 states => changed / unchanged
@@ -93,13 +94,14 @@ def page_moderator_state(request, page):
     if not page.is_approved() and not label:
         if under_moderation.count():
             label = dict(page.moderator_state_choices)[state]            
+    print ">>>", dict(state=state, label=label)
     return dict(state=state, label=label)
 
 
 def moderator_should_approve(request, page):
     """Says if user should approve given page. (just helper)
     """
-    return page_moderator_state(request, page)['state'] is I_APPROVE
+    return page_moderator_state(request, page)['state'] >= I_APPROVE
 
 
 def requires_moderation(page):
@@ -214,7 +216,7 @@ def mail_approvement_request(page, user=None):
     Don't send it to current user - he should now about it, because he made the 
     change.
     """
-    if not cms_settings.CMS_MODERATOR or not page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT:
+    if not cms_settings.CMS_MODERATOR or not page.requires_approvement():
         return
     
     recipient_list = []

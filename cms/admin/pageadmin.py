@@ -816,15 +816,15 @@ class PageAdmin(admin.ModelAdmin):
         if settings.CMS_MODERATOR and page.is_under_moderation():
             # don't perform a delete action, just mark page for deletion
             page.force_moderation_action = PageModeratorState.ACTION_DELETE
-            page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+            page.moderator_state = Page.MODERATOR_NEED_DELETE_APPROVEMENT
             page.save()
             
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
         
-        public = page.public
         response = super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
+        public = page.publisher_public
         if request.method == 'POST' and response.status_code == 302 and public:
             public.delete()
         return response
@@ -836,6 +836,8 @@ class PageAdmin(admin.ModelAdmin):
         if not self.has_change_permission(request, page):
             raise PermissionDenied
         page.pagemoderatorstate_set.get_delete_actions().delete()
+        page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+        page.save()
         return HttpResponseRedirect("../../%d/" % page.id)
         
 

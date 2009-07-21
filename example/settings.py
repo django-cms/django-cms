@@ -106,6 +106,8 @@ INSTALLED_APPS = (
     #'tagging',
     
     'cms',
+    'publisher',
+    
     'cms.plugins.text',
     'cms.plugins.picture',
     'cms.plugins.file',
@@ -121,8 +123,7 @@ INSTALLED_APPS = (
     #'south',
     # sample application
     'sampleapp',
-    'store',
-    'publisher', # post publisher
+    #'store',
 )
 
 gettext = lambda s: s

@@ -52,7 +52,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_add_page_permission': has_add_page_permission,
         'has_moderate_permission': page.has_moderate_permission(request),
         'page_moderator_state': moderator_state,
-        'moderator_should_approve': moderator_state['state'] is I_APPROVE,
+        'moderator_should_approve': moderator_state['state'] >= I_APPROVE,
         
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         

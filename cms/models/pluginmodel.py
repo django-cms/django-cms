@@ -154,13 +154,17 @@ class CMSPlugin(MpttPublisher):
             # extender dosent exist yet
             public_copy = self.__class__()
             # copy values of all local fields
+            print "#c proceed to..."
             for field in publisher_public._meta.local_fields:
+                print "#c for:", field.name
                 value = getattr(publisher_public, field.name)
                 setattr(public_copy, field.name, value)
             public_copy.publisher_is_draft=False
+            print "__________"
             print "#c", public_copy.__class__ 
             return public_copy
-
+        
+        
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion        
     reversion.register(CMSPlugin)

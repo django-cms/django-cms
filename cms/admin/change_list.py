@@ -90,7 +90,7 @@ class CMSChangeList(ChangeList):
         pages = list(pages)
         all_pages = pages[:]
         try:
-            home_pk = Page.objects.get_home(self.current_site()).pk
+            home_pk = Page.objects.drafts().get_home(self.current_site()).pk
         except NoHomeFound:
             home_pk = 0
             

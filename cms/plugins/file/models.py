@@ -3,7 +3,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 from os.path import join, basename, splitext, exists
-import math
 
 from cms import settings as cms_settings
 from django.conf import settings
@@ -50,5 +49,10 @@ class File(CMSPlugin):
         return splitext(self.get_file_name())[1][1:]
         
     def __unicode__(self):
-        if self.title: return self.title;
-        return self.get_file_name();
+        if self.title: 
+            return self.title;
+        elif self.file:
+            # added if, because it raised attribute error when file wasnt defined
+            return self.get_file_name();
+        return "<empty>"
+        

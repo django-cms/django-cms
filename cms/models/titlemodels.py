@@ -25,7 +25,7 @@ class Title(Publisher):
     objects = TitleManager()
     
     class Meta:
-        unique_together = (('language', 'page'),)
+        unique_together = (('publisher_is_draft', 'language', 'page'),)
         app_label = 'cms'
     
     def __unicode__(self):

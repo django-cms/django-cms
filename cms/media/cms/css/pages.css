@@ -441,6 +441,10 @@ div#sitemap ul.header li{
 #sitemap li .cont.moderatorstate1 { background-position: 0px -300px; } 
 #sitemap li .cont.moderatorstate1 .col-draft span.state { color: #ff6600; }
 
+/* moderation - requires deletion approvement */
+#sitemap li .cont.moderatorstate200 { background-position: 0px -600px; } 
+#sitemap li .cont.moderatorstate200 .col-draft span.state { color: #cc0000; }
+
 /* moderation - approved */
 #sitemap li .cont.moderatorstate10 {} 
 

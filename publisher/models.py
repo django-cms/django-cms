@@ -19,8 +19,6 @@ from publisher.manager import PublisherManager
 from publisher.errors import MpttPublisherCantPublish, PublisherCantPublish
 from publisher.mptt_support import Mptt
 
-
-
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
     """    
@@ -49,7 +47,12 @@ class Publisher(models.Model):
         
         exclude_fields = ['id', 'publisher_is_draft', 'publisher_public', 'publisher_state']
         exclude_fields_append = []
-    
+
+    def get_object_queryset(self):
+        """Returns smart queryset depending on object type - draft / public
+        """
+        qs = self.__class__.objects
+        return self.publisher_is_draft and qs.drafts() or qs.public()
     
     def save_base(self, *args, **kwargs):
         """Overriden save_base. If an instance is draft, and was changed, mark
@@ -71,17 +74,6 @@ class Publisher(models.Model):
         """
         return True
     
-    '''
-    def _publisher_copy_simple(self, fields, exclude):
-        pass
-    
-    def _publisher_copy_m2m(self):
-        pass
-    
-    def _publisher_copy_fk(self):
-        pass
-    '''
-    
     def _publisher_get_public_copy(self):
         """This is here because of the relation between CMSPlugins - model 
         inheritance. 
@@ -92,7 +84,7 @@ class Publisher(models.Model):
         """
         return self.publisher_public
     
-    def publish(self, excluded_models=None):
+    def publish(self, excluded_models=None, first_instance=True):
         """Publish current instance
         
         Args:
@@ -105,8 +97,6 @@ class Publisher(models.Model):
         """
         
         print "\n", "-" * 30, "publish:", self.__class__.__name__, "-" * 30
-        
-        
         ########################################################################
         # perform checks
         if not self.publisher_is_draft:
@@ -156,7 +146,7 @@ class Publisher(models.Model):
                         # can follow
                         #try:
                         print ">>> must publish:", value
-                        value = value.publish(excluded_models=excluded_models)
+                        value = value.publish(excluded_models=excluded_models, first_instance=False)
                         #except MpttCantPublish:
                         #    pass
                     elif value:
@@ -209,7 +199,7 @@ class Publisher(models.Model):
                     remote_pk = obj.publisher_public_id
                     if not obj.publisher_public_id:
                         # publish it first...
-                        remote = obj.publish(excluded_models=excluded_models)
+                        remote = obj.publish(excluded_models=excluded_models, first_instance=False)
                         remote_pk = remote.pk
                     
                     updated_obj_ids.append(remote_pk)
@@ -245,29 +235,68 @@ class Publisher(models.Model):
                 except ObjectDoesNotExist:
                     continue
                 for item in item_set:
-                    item.publish(excluded_models=excluded_models + [obj.__class__])
+                    item.publish(excluded_models=excluded_models + [obj.__class__], first_instance=False)
         
+        # perform cleaning on public copy, if instance id marked for deletion,
+        # delete it
+        if not created and first_instance:
+            print ">> -------------- cleaing... ---------------"
+            # perform cleaning if required, makes sense only for already 
+            # existing instances
+            print ">> deleting marked on:", self.__class__
+            public_copy._publisher_delete_marked()
         print ">> publishing done..."
         return public_copy
         
-    
     def _publisher_save_public(self, obj):
         """Save method for object which should be published. obj is a instance 
         of the same class as self. 
         """
         print "publisher._publisher_save_public()"
         return obj.save() 
-        
     
-    def delete(self):
-        """Delete public instance first!
+    def _publisher_delete_marked(self, collect=True):
+        """If this instance, or some remote instances are marked for deletion
+        kill them.
         """
+        if self.publisher_is_draft:
+            # escape soon from draft models
+            return 
+        
+        if collect:
+            from django.db.models.query_utils import CollectedObjects
+            
+            seen = CollectedObjects()
+            self._collect_sub_objects(seen)
+            for cls, items in seen.items():
+                if issubclass(cls, Publisher):
+                    for item in items.values():
+                        print "-try:", item
+                        item._publisher_delete_marked(collect=False)
+                    
+        if self.publisher_state == Publisher.PUBLISHER_STATE_DELETE:
+            print "-delete marked class:", self.__class__
+            print "-delete marked:", self
+            try:
+                self.delete()
+            except AttributeError:
+                print "- not deleted..."
+                pass
+        
+    def delete(self):
+        """Mark public instance for deletion and delete draft.
+        """
+        if self.publisher_public_id:
+            # mark the public instance for deletion
+            self.publisher_public.publisher_state = Publisher.PUBLISHER_STATE_DELETE
+            self.publisher_public.save()
+        super(Publisher, self).delete()
+    
+    def delete_with_public(self):
         if self.publisher_public_id:
             self.publisher_public.delete()
         super(Publisher, self).delete()
-        
-     
-        
+    
     
 class MpttPublisher(Publisher, Mptt):
     class Meta:
@@ -278,18 +307,55 @@ class MpttPublisher(Publisher, Mptt):
         exclude_fields_append = ['id', 'lft', 'rght', 'tree_id', 'parent']
     
     
-    def _get_prev_sibling(self, **filters):
-        """Returns object previous sibling or None if object doesn't haves one
+    def get_next_filtered_sibling(self, **filters):
+        """Very simillar to original mptt method, but adds support for filters.
+        Returns this model instance's next sibling in the tree, or
+        ``None`` if it doesn't have a next sibling.
         """
-        filters.update({
-            'lft__lt': self.lft,
-        })
-        
+        opts = self._meta
+        if self.is_root_node():
+            filters.update({
+                '%s__isnull' % opts.parent_attr: True,
+                '%s__gt' % opts.tree_id_attr: getattr(self, opts.tree_id_attr),
+            })
+        else:
+            filters.update({
+                 opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
+                '%s__gt' % opts.left_attr: getattr(self, opts.right_attr),
+            })
+    
+        sibling = None
         try:
-            return self.get_siblings().filter(**filters).order_by('-lft')[0]
+            sibling = self._tree_manager.filter(**filters)[0]
         except IndexError:
             pass
-        return None
+        return sibling
+    
+    def get_previous_fitlered_sibling(self, **filters):
+        """Very simillar to original mptt method, but adds support for filters.
+        Returns this model instance's previous sibling in the tree, or
+        ``None`` if it doesn't have a previous sibling.
+        """
+        opts = self._meta
+        if self.is_root_node():
+            filters.update({
+                '%s__isnull' % opts.parent_attr: True,
+                '%s__lt' % opts.tree_id_attr: getattr(self, opts.tree_id_attr),
+            })
+            order_by = '-%s' % opts.tree_id_attr
+        else:
+            filters.update({
+                 opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
+                '%s__lt' % opts.right_attr: getattr(self, opts.left_attr),
+            })
+            order_by = '-%s' % opts.right_attr
+    
+        sibling = None
+        try:
+            sibling = self._tree_manager.filter(**filters).order_by(order_by)[0]
+        except IndexError:
+            pass
+        return sibling
     
     
     def _publisher_can_publish(self):
@@ -326,8 +392,8 @@ class MpttPublisher(Publisher, Mptt):
             print ">> _mptt.save()"
         else:
             # check if object was moved / structural tree change
-            prev_sibling = self._get_prev_sibling(publisher_public__isnull=False)
-            prev_public_sibling = obj._get_prev_sibling()
+            prev_sibling = self.get_previous_fitlered_sibling(publisher_public__isnull=False)
+            prev_public_sibling = obj.get_previous_fitlered_sibling()
             
             print "siblings:", prev_sibling, "-", prev_public_sibling
             
@@ -336,20 +402,24 @@ class MpttPublisher(Publisher, Mptt):
                 not prev_sibling == prev_public_sibling == None or \
                 (prev_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id):
             
-            #if not (self.level == obj.level and \
-            #    (prev_sibling == prev_public_sibling == None or \
-            #    (prev_sibling and prev_public_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id))):
-                
                 print "-- mptt moved instance"
-                
-                if prev_sibling is None and self.parent:
+                 
+                if prev_sibling:
+                    print "-- mptt move_to on right side from:", prev_sibling.publisher_public
+                    obj.move_to(prev_sibling.publisher_public, position="right")
+                elif self.parent:
                     # move as a first child to parent
                     target = self.parent.publisher_public
                     print "-- mptt move_to as a first-child under parent:", target
                     obj.move_to(target, position='first-child')
-                elif prev_sibling:
-                    print "-- mptt move_to on right side from:", prev_sibling.publisher_public
-                    obj.move_to(prev_sibling.publisher_public, position="right")
+                else:
+                    # it is a move from the right side or just save
+                    next_sibling = self.get_next_filtered_sibling(publisher_public__isnull=False)
+                    print "-- next sibling:", next_sibling
+                    if next_sibling and next_sibling.publisher_public_id:
+                        print "-- mptt move_to on left side from:", next_sibling.publisher_public
+                        obj.move_to(next_sibling.publisher_public, position="left")
+                    
             else:
                 print "-- mptt new/updated instance"
         # otherwise none structural changes, just save

@@ -183,8 +183,9 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
     
     if page:
         page.get_cached_ancestors()
-        if not hasattr(page, "home_pk_cache"):
-            page.home_pk_cache = page_queryset.get_home(site).pk
+        # this is not required anymore, sice home_pk_cache is a getter 
+        #if not hasattr(page, "home_pk_cache"):
+        #    page.home_pk_cache = page_queryset.get_home(site).pk
         filters = {'in_navigation':True, 
                   'lft__gt':page.lft, 
                   'rght__lt':page.rght, 

@@ -26,5 +26,7 @@ class Picture(CMSPlugin):
     def __unicode__(self):
         if self.alt:
             return self.alt[:40]
-        return u"%s" % basename(self.image.path)
-    
+        elif self.image:
+            # added if, because it raised attribute error when file wasnt defined
+            return u"%s" % basename(self.image.path)
+        return "<empty>"

@@ -23,6 +23,7 @@ class Page(MpttPublisher):
     """
     MODERATOR_CHANGED = 0
     MODERATOR_NEED_APPROVEMENT = 1
+    MODERATOR_NEED_DELETE_APPROVEMENT = 2
     MODERATOR_APPROVED = 10
     # special case - page was approved, but some of page parents if not approved yet
     MODERATOR_APPROVED_WAITING_FOR_PARENTS = 11
@@ -30,6 +31,7 @@ class Page(MpttPublisher):
     moderator_state_choices = (
         (MODERATOR_CHANGED, _('changed')),
         (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
+        (MODERATOR_NEED_DELETE_APPROVEMENT, _('delete')),
         (MODERATOR_APPROVED, _('approved')),
         (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
@@ -220,11 +222,11 @@ class Page(MpttPublisher):
                     if created:
                         # new page....
                         self.moderator_state = Page.MODERATOR_CHANGED
-                    elif self.moderator_state is not Page.MODERATOR_CHANGED:
+                    elif not self.requires_approvement():
                         # always change state to need approvement when there is some change
                         self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
                     
-                    if not under_moderation and self.published:
+                    if not under_moderation and (self.published or self.publisher_public):
                         # existing page without moderator - publish it directly if 
                         # published is True
                         publish_directly = True
@@ -313,7 +315,7 @@ class Page(MpttPublisher):
             path = self.get_path(language, fallback)
             home_pk = None
             try:
-                home_pk = self.get_home_pk_cache()
+                home_pk = self.home_pk_cache
             except NoHomeFound:
                 pass
             ancestors = self.get_cached_ancestors()
@@ -540,26 +542,36 @@ class Page(MpttPublisher):
             return False
         else:
             try:
-                return self.get_home_pk_cache() == self.pk
+                return self.home_pk_cache == self.pk
             except NoHomeFound:
                 pass
         return False
-        
+    
+    """ - not used.. - kill ?
     def is_parent_home(self):
         if not self.parent_id:
             return False
         else:
             try:
-                return self.get_home_pk_cache() == self.parent_id
+                return self.home_pk_cache == self.parent_id
             except NoHomeFound:
                 pass
         return False
-        
+    """ 
+    
     def get_home_pk_cache(self):
-        if not hasattr(self, "home_pk_cache"):
-            self.home_pk_cache = Page.objects.get_home().pk
-        return self.home_pk_cache
-            
+        attr = "%s_home_pk_cache" % (self.publisher_is_draft and "draft" or "public")
+        if not hasattr(self, attr):
+            setattr(self, attr, self.get_object_queryset().get_home().pk)
+        return getattr(self, attr)
+
+    
+    def set_home_pk_cache(self, value):
+        attr = "%s_home_pk_cache" % (self.publisher_is_draft and "draft" or "public")
+        setattr(self, attr, value)
+    
+    home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
+    
     def get_media_path(self, filename):
         """
         Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
@@ -696,7 +708,8 @@ class Page(MpttPublisher):
         #return is_public_published(self)
         return False
         
-
+    def requires_approvement(self):
+        return self.moderator_state in (Page.MODERATOR_NEED_APPROVEMENT, Page.MODERATOR_NEED_DELETE_APPROVEMENT)
     
 if 'reversion' in settings.INSTALLED_APPS: 
     import reversion       
