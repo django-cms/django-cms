@@ -76,7 +76,7 @@
 
 			{% if CMS_MODERATOR %}
 				<label>{{ page.is_public_published|boolean_icon }}</label>
-				{% if page.is_public_published %}<a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page.publisher_public.get_absolute_url }}?preview" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
+				{% if page.is_public_published %}<a href="#" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
 			{% else %}
 				<a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview&amp;draft=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 			{% endif %}

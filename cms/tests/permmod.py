@@ -22,11 +22,13 @@ class PermissionModeratorTestCase(PageBaseTestCase):
             - master can do anything on its subpages, but not on home!
             
         2. `master`:
+            - published page
             - crated by super
             - `master` can do anything on it and its descendants
             - subpages:
         
-        3.       `slave-home`: 
+        3.       `slave-home`:
+                    - not published
                     - assigned slave user which can add/change/delete this page and its descendants
                     - `master` user want to moderate this page and all descendants
                     
@@ -114,11 +116,30 @@ class PermissionModeratorTestCase(PageBaseTestCase):
     
     def _check_published_page_attributes(self, page):
         public_page = page.publisher_public
-        compare = ['id', 'tree_id', 'rght', 'lft', 'parent_id', 'level']
-        # compare ids and tree attributes
-        for name in compare:
-            assert(getattr(page, name) == getattr(public_page, name))
-    
+        
+        if page.parent:
+            assert(page.parent_id == public_page.parent.publisher_draft.id)
+        
+        assert(page.level == public_page.level)
+        
+        # TODO: add check for siblings
+        
+        draft_siblings = list(page.get_siblings(True). \
+            filter(publisher_is_draft=True).order_by('tree_id', 'parent', 'lft'))
+        public_siblings = list(public_page.get_siblings(True). \
+            filter(publisher_is_draft=False).order_by('tree_id', 'parent', 'lft'))
+        
+        print "D:", draft_siblings
+        print "P:", public_siblings
+        
+        skip = 0
+        for i, sibling in enumerate(draft_siblings):
+            if not sibling.publisher_public_id:
+                skip += 1
+                continue
+            print "i", i, skip, public_siblings[i - skip]
+            assert(sibling.id == public_siblings[i - skip].publisher_draft.id) 
+            
     def _add_page(self, user):
         """Helper for accessing new page creation
         """
@@ -265,24 +286,22 @@ class PermissionModeratorTestCase(PageBaseTestCase):
     def test_08_slave_can_add_plugin(self):
         self._add_plugin(self.user_slave)
     
-    def test_09_public_model_attributes(self):
+    def test_09_same_order(self):
         self.login_user(self.user_master)
         
-        # create 10 pages
+        # create 4 pages
         slugs = []
-        for i in range(0, 10):
+        for i in range(0, 4):
             page = self._create_page(self.home_page)
-            slug = page.title_set.all()[0].slug
+            slug = page.title_set.drafts()[0].slug
             slugs.append(slug)
         
-        # approve last 5 pages in reverse order
-        self.login_user(self.user_master)
-        
-        for slug in reversed(slugs[5:]):
+        # approve last 2 pages in reverse order
+        for slug in reversed(slugs[2:]):
             page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)
-            
-            public_page = self._publish_page(page, True)
-            self._check_published_page_attributes(public_page)
+            print "\n\n************************************ publish:", page, "\n\n"
+            page = self._publish_page(page, True)
+            self._check_published_page_attributes(page)
     
     
     def test_10_create_copy_publish(self):
@@ -356,9 +375,19 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         subpage = self._create_page(page)
         assert(not subpage.publisher_public)
         
-        # publish both of them in reverse order 
+        # tree id must be the same
+        assert(page.tree_id == subpage.tree_id)
+        
+        # publish both of them  
         page = self._publish_page(page, True)
+        assert(page.tree_id == subpage.tree_id)
+        
         subpage = self._publish_page(subpage, True)
+        # tree id must stay the same
+        assert(page.tree_id == subpage.tree_id)
+        
+        # published pages must also have the same tree_id
+        assert(page.publisher_public.tree_id == subpage.publisher_public.tree_id)
         
         #check attributes
         self._check_published_page_attributes(page) 
@@ -406,11 +435,17 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         # waiting for parents
         assert(page.moderator_state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         
-        # publish master page
-        master = self._publish_page(self.master_page)
+        # publish slave page
+        slave_page = self._publish_page(self.slave_page)
+        
+        assert(not page.publisher_public)
+        assert(not slave_page.publisher_public)
+        
+        # they must be approved first
+        slave_page = self._approve_page(slave_page)
         
         # master is approved
-        assert(master.moderator_state == Page.MODERATOR_APPROVED)
+        assert(slave_page.moderator_state == Page.MODERATOR_APPROVED)
         
         # reload page
         page = self._reload(page)
@@ -419,6 +454,9 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         assert(page.moderator_state == Page.MODERATOR_APPROVED)
         
         
+    def test_16_patricks_move(self):
+        """Special name, special case test, thanks Patrick!
+        """
         
         
         

@@ -124,7 +124,7 @@ class Page(MpttPublisher):
             page.tree_id = None
             page.status = Page.MODERATOR_NEED_APPROVEMENT
             page.parent = tree[-1]
-            page.public_id = None
+            page.publisher_public_id = None
             page.reverse_id = None
             page.save()
             
@@ -151,7 +151,7 @@ class Page(MpttPublisher):
             page.save()
             for title in titles:
                 title.pk = None
-                title.public_id = None
+                title.publisher_public_id = None
                 title.page = page
                 title.slug = get_available_slug(title)
                 title.save()
@@ -164,8 +164,7 @@ class Page(MpttPublisher):
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
-                p.public_id = None
-                p.inherited_public_id = None
+                p.publisher_public_id = None
                 
                 if p.parent:
                     pdif = p.level - ptree[-1].level
@@ -187,8 +186,7 @@ class Page(MpttPublisher):
                     plugin.rght = p.rght
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
-                    plugin.inherited_public_id = p.inherited_public_id
-                    plugin.public_id = p.pk
+                    plugin.publisher_public_id = p.pk
                     plugin.save()
             if dif != 0:
                 tree.append(page)
@@ -319,6 +317,12 @@ class Page(MpttPublisher):
             except NoHomeFound:
                 pass
             ancestors = self.get_cached_ancestors()
+            
+            print "xA", self.parent_id
+            print "xB", ancestors
+            print "xC", self.publisher_is_draft
+            print "xD", self.id
+            print "xE", getattr(self, "ancestors_ascending", "nema")
             if self.parent_id and ancestors[0].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback):
                 path = "/".join(path.split("/")[1:])
             

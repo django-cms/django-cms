@@ -368,19 +368,27 @@ class MpttPublisher(Publisher, Mptt):
             return super(MpttPublisher, self)._publisher_save_public(obj)
         
         print ">> mptt.publish._publisher_save_public()"
+        
+        prev_sibling = self.get_previous_fitlered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
+        
         if not self.publisher_public_id:
             print "-- mptt - new public instance"
-            # it is a first time published object, perform insert_at:
-            parent, public_parent = self.parent, None
-            if parent:
-                public_parent = parent.publisher_public
-            if public_parent:
-                print ">> _mptt.insert_at()", public_parent.id
-                obj.insert_at(public_parent, commit=False)
+            
+            # is there anybody on left side?
+            if prev_sibling:
+                print ">> _mptt.insert_at() - on right side of previous:", prev_sibling.publisher_public
+                obj.insert_at(prev_sibling.publisher_public, position='right', commit=False)
+            else:
+                # it is a first time published object, perform insert_at:
+                parent, public_parent = self.parent, None
+                if parent:
+                    public_parent = parent.publisher_public
+                if public_parent:
+                    print ">> _mptt.insert_at() - on left side of parent:", public_parent.id
+                    obj.insert_at(public_parent, commit=False)
             print ">> _mptt.save()"
         else:
             # check if object was moved / structural tree change
-            prev_sibling = self.get_previous_fitlered_sibling(publisher_public__isnull=False)
             prev_public_sibling = obj.get_previous_fitlered_sibling()
             
             print "siblings:", prev_sibling, "-", prev_public_sibling
@@ -402,7 +410,7 @@ class MpttPublisher(Publisher, Mptt):
                     obj.move_to(target, position='first-child')
                 else:
                     # it is a move from the right side or just save
-                    next_sibling = self.get_next_filtered_sibling(publisher_public__isnull=False)
+                    next_sibling = self.get_next_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
                     print "-- next sibling:", next_sibling
                     if next_sibling and next_sibling.publisher_public_id:
                         print "-- mptt move_to on left side from:", next_sibling.publisher_public
