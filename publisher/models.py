@@ -49,8 +49,13 @@ class Publisher(models.Model):
         takes place. After current changes are published, state is set back to
         PUBLISHER_STATE_DEFAULT (in publish method).
         """
-        if self.publisher_is_draft:
+        keep_state = getattr(self, '_publisher_keep_state', None)
+        
+        if self.publisher_is_draft and not keep_state:
             self.publisher_state = Publisher.PUBLISHER_STATE_DIRTY
+        if keep_state:
+            delattr(self, '_publisher_keep_state')
+
         print ">> page.save_base pre", self.publisher_is_draft
         ret = super(Publisher, self).save_base(*args, **kwargs)
         print ">> page.save_base post", self.publisher_is_draft
@@ -154,16 +159,23 @@ class Publisher(models.Model):
         print ">> publishing C 1..", self.pk, public_copy.pk
         # store public model relation for current instance (only) for newly 
         # created items
+        
+        # insert_at() was maybe calling _create_tree_space() method, in this
+        # case may tree_id change, so we must update tree_id from db first
+        # before save
+        if getattr(self, 'tree_id', None):
+            me = self._default_manager.get(pk=self.pk)
+            self.tree_id = me.tree_id
+        
         if created:
             self.publisher_public = public_copy
         print ">> publishing C 2.."
-        # i'm not dirty anymore
+        
+        # save changes, i'm not dirty anymore
         self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
-        
-        print ">> publishing C 3.."
-        # save changes
+        self._publisher_keep_state = True
         self.save_base(cls=self.__class__)
-        
+
         print ">> publishing D.."
         ########################################################################
         # update many to many relations
@@ -194,7 +206,8 @@ class Publisher(models.Model):
                 
                 # save obj if it was dirty
                 if obj.publisher_state == Publisher.PUBLISHER_STATE_DIRTY:
-                    obj.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
+                    self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
+                    self._publisher_keep_state = True
                     obj.save_base(cls=obj.__class__)
             
             # remove all not updated instances

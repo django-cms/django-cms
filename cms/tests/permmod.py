@@ -380,6 +380,8 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         # publish both of them  
         page = self._publish_page(page, True)
+        # reload subpage, there were an tree_id change
+        subpage = self._reload(subpage)
         assert(page.tree_id == subpage.tree_id)
         
         subpage = self._publish_page(subpage, True)
