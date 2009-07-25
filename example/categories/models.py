@@ -15,6 +15,9 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('category_view', args=[self.pk])
     
+    class Meta:
+        verbose_name_plural = 'categories'
+    
 try:
     mptt.register(Category)
 except mptt.AlreadyRegistered:
