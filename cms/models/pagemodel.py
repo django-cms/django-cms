@@ -205,9 +205,6 @@ class Page(MpttPublisher):
         publish_directly, under_moderation = False, False
         
         if self.publisher_is_draft:
-            print ">> page.save on draft(", no_signals, change_state, commit, force_with_moderation, force_state, ")"
-            print ">> ms0:", self.moderator_state
-            
             # publisher specific stuff, but only on draft model, this is here 
             # because page initializes publish process
             
@@ -257,14 +254,11 @@ class Page(MpttPublisher):
         if not self.pk:
             self.created_by = self.changed_by 
         
-        print ">> page.save pre", self.publisher_is_draft
-        
         if commit:
             if no_signals:# ugly hack because of mptt
                 super(Page, self).save_base(cls=self.__class__)
             else:
                 super(Page, self).save()
-        print ">> page.save post", self.publisher_is_draft
         
         #if commit and (publish_directly or created and not under_moderation):
         if self.publisher_is_draft and commit and publish_directly:
@@ -318,11 +312,6 @@ class Page(MpttPublisher):
                 pass
             ancestors = self.get_cached_ancestors()
             
-            print "xA", self.parent_id
-            print "xB", ancestors
-            print "xC", self.publisher_is_draft
-            print "xD", self.id
-            print "xE", getattr(self, "ancestors_ascending", "nema")
             if self.parent_id and ancestors[0].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback):
                 path = "/".join(path.split("/")[1:])
             
@@ -631,8 +620,6 @@ class Page(MpttPublisher):
         if not settings.CMS_MODERATOR:
             return
         
-        print ">> page.publish()"
-        
         # publish, but only if all parents are published!!
         published = None
         
@@ -647,46 +634,9 @@ class Page(MpttPublisher):
             # was not published, escape
             return
         
-        print ">> page was published..."
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
             
-        """
-        if not fields:
-            public = self.public
-            if public:
-                if public.tree_id != self.tree_id: #moved over trees
-                    tree_ids = [self.tree_id, public.tree_id]
-                else:
-                    tree_ids = [self.tree_id]
-                
-                dirty = False
-                if self.lft != public.lft or self.rght != public.rght or self.level != public.level:#moved in tree
-                    dirty = True
-                if dirty or len(tree_ids) == 2:
-                    pages = list(Page.objects.filter(tree_id__in=tree_ids).order_by("tree_id", "level", "lft"))
-                    fields = []
-                    names = ["lft","rght","tree_id", "level", "parent", "created_by", "changed_by", "site"]
-                    for field in self._meta.fields:
-                        if field.name in names:
-                            fields.append(field)
-                    ids = []
-                    for page in pages:
-                        if page.pk != self.pk:
-                            page.publish(fields=fields)
-                            ids.append(page.pk)
-                    from cms.models.titlemodels import Title
-                    titles = Title.objects.filter(page__in=ids)
-                    title_fields = []
-                    names = ["path"]
-                    for field in Title._meta.fields:
-                        if field.name in names:
-                            title_fields.append(field)
-                    for title in titles:
-                        title.publish(fields=title_fields)
-            else:
-                pass
-        """
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)

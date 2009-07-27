@@ -13,9 +13,6 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     
     returns: (Page, None) or (None, path_to_alternative language)
     """
-    
-    print "gcp:", path, lang, queryset, home_slug, home_tree_id
-    
     try:
         if home_slug:
             queryset = queryset.exclude(Q(title_set__path=home_slug)&Q(tree_id=home_tree_id))
@@ -53,7 +50,6 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         pages = page_queryset.published()
     
     root_pages = pages.all_root().order_by("tree_id")
-    print root_pages
     current_page, response = None, None
     if root_pages:
         if page_id:

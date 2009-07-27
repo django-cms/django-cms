@@ -133,15 +133,11 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         public_siblings = list(public_page.get_siblings(True). \
             filter(publisher_is_draft=False).order_by('tree_id', 'parent', 'lft'))
         
-        print "D:", draft_siblings
-        print "P:", public_siblings
-        
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1
                 continue
-            print "i", i, skip, public_siblings[i - skip]
             assert(sibling.id == public_siblings[i - skip].publisher_draft.id) 
             
     def _add_page(self, user):

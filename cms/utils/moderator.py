@@ -94,7 +94,6 @@ def page_moderator_state(request, page):
     if not page.is_approved() and not label:
         if under_moderation.count():
             label = dict(page.moderator_state_choices)[state]            
-    print ">>>", dict(state=state, label=label)
     return dict(state=state, label=label)
 
 

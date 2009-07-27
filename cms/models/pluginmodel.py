@@ -140,28 +140,21 @@ class CMSPlugin(MpttPublisher):
         """Overrides publisher public copy acessor, because of the special
         kind of relation between Plugins.
         """   
-        print "-- _publisher_get_public_copy", self.__class__
         publisher_public = self.publisher_public
         if not publisher_public:
             return
         elif publisher_public.__class__ is self.__class__:
-            print "#a"
             return publisher_public
         try:
-            print "#b"
             return self.__class__.objects.get(pk=self.publisher_public_id)
         except ObjectDoesNotExist:
             # extender dosent exist yet
             public_copy = self.__class__()
             # copy values of all local fields
-            print "#c proceed to..."
             for field in publisher_public._meta.local_fields:
-                print "#c for:", field.name
                 value = getattr(publisher_public, field.name)
                 setattr(public_copy, field.name, value)
             public_copy.publisher_is_draft=False
-            print "__________"
-            print "#c", public_copy.__class__ 
             return public_copy
         
         
