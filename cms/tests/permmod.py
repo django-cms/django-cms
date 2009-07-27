@@ -4,6 +4,7 @@ from cms import settings as cms_settings
 from cms.tests.base import PageBaseTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE,\
     URL_CMS_PAGE_CHANGE
 from cms.models import Title, Page
+from publisher.models import Publisher
 
 
 class PermissionModeratorTestCase(PageBaseTestCase):
@@ -56,7 +57,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         response = self.client.post(url, post_data)
         assert(response.content == "1")
         
-    def _create_page(self, parent_page=None, user=None):
+    def _create_page(self, parent_page=None, user=None, position="first-child", title=None):
         if user:
             # change logged in user
             self.login_user(user)
@@ -68,9 +69,12 @@ class PermissionModeratorTestCase(PageBaseTestCase):
             '_save': 'Save',
         })
         
+        if title is not None:
+            page_data['title'] = page_data['slug'] = title
+        
         # add page
         if parent_page:
-            url = URL_CMS_PAGE_ADD + "?target=%d&position=first-child" % parent_page.pk
+            url = URL_CMS_PAGE_ADD + "?target=%d&position=%s" % (parent_page.pk, position)
         else:
             url = URL_CMS_PAGE_ADD
         response = self.client.post(url, page_data)
@@ -165,6 +169,16 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         copied_slug = get_available_slug(title)
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
         return copied_page
+    
+    def _move_page(self, page, target_page, position="first-child"):       
+        data = {
+            'position': position,
+            'target': target_page.pk,
+        }
+        response = self.client.post(URL_CMS_PAGE + "%d/move-page/" % page.pk, data)
+        assert(response.status_code, 200)        
+        return self._reload(page)
+
     
     def assertObjectExist(self, qs, **filter):
         try:
@@ -299,7 +313,6 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         # approve last 2 pages in reverse order
         for slug in reversed(slugs[2:]):
             page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)
-            print "\n\n************************************ publish:", page, "\n\n"
             page = self._publish_page(page, True)
             self._check_published_page_attributes(page)
     
@@ -426,7 +439,7 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         # approve it by master
         self.login_user(self.user_master)
-        
+
         # approve this page - but it doesn't get published yet, because 
         # slave home is not published
         page = self._approve_page(page)
@@ -457,10 +470,123 @@ class PermissionModeratorTestCase(PageBaseTestCase):
         
         
     def test_16_patricks_move(self):
-        """Special name, special case test, thanks Patrick!
+        """Special name, special case..
+
+        1. build following tree (msater node is approved and published)
+        
+                 slave-home
+                /    |    \
+               A     B     C
+                   /  \     
+                  D    E     
+                    /  |  \ 
+                   F   G   H               
+
+        2. perform move oparations:
+            1. move G under C
+            2. move E under G
+            
+                 slave-home
+                /    |    \
+               A     B     C
+                   /        \
+                  D          G
+                              \   
+                               E
+                             /   \
+                            F     H       
+        
+        3. approve nodes in following order:
+            1. approve H
+            2. approve G
+            3. approve E
+            4. approve F
         """
+        self.login_user(self.user_slave)
+        
+        # all of them are under moderation... 
+        pa = self._create_page(self.slave_page, title="pa")
+        pb = self._create_page(pa, position="right", title="pb")
+        pc = self._create_page(pb, position="right", title="pc")
+        
+        pd = self._create_page(pb, title="pd")
+        pe = self._create_page(pd, position="right", title="pe")
+        
+        pf = self._create_page(pe, title="pf")
+        pg = self._create_page(pf, position="right", title="pg")
+        ph = self._create_page(pf, position="right", title="ph")
         
         
+        assert(not pg.publisher_public)
+        
+        # login as master for approvement
+        self.login_user(self.user_master)
+        
+        # first approve slave-home
+        self._publish_page(self.slave_page, approve=True)
+        
+        # publish and approve them all
+        pa = self._publish_page(pa, approve=True)
+        pb = self._publish_page(pb, approve=True)
+        pc = self._publish_page(pc, approve=True)
+        pd = self._publish_page(pd, approve=True)
+        pe = self._publish_page(pe, approve=True)
+        pf = self._publish_page(pf, approve=True)
+        pg = self._publish_page(pg, approve=True)
+        ph = self._publish_page(ph, approve=True)
+        
+        # parent check
+        self.assertEqual(pe.parent, pb)
+        self.assertEqual(pg.parent, pe)
+        self.assertEqual(ph.parent, pe)
+        
+        # not published yet, cant exist
+        assert(pg.publisher_public)
+        
+        # check urls
+        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
+        
+        # perform movings under slave...
+        self.login_user(self.user_slave)
+        pg = self._move_page(pg, pc)
+        pe = self._move_page(pe, pg)
+        
+        # reload all - moving has changed some attributes
+        pa = self._reload(pa)
+        pb = self._reload(pb)
+        pc = self._reload(pc)
+        pd = self._reload(pd)
+        pe = self._reload(pe)
+        pf = self._reload(pf)
+        pg = self._reload(pg)
+        ph = self._reload(ph)
+        
+        
+        # check urls - they should stay them same, there wasn't approvement yet
+        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
+        
+        # pg & pe should require approvement
+        self.assertEqual(pg.requires_approvement(), True)
+        self.assertEqual(pe.requires_approvement(), True)
+        self.assertEqual(ph.requires_approvement(), False)
+        
+        # login as master, and approve moves
+        self.login_user(self.user_master)
+        pg = self._approve_page(pg)
+        pe = self._approve_page(pe)
+        ph = self._approve_page(ph)
+        pf = self._approve_page(pf)
+        
+        # public parent check after move
+        self.assertEqual(pg.publisher_public.parent.pk, pc.publisher_public_id)
+        self.assertEqual(pe.publisher_public.parent.pk, pg.publisher_public_id)
+        self.assertEqual(ph.publisher_public.parent.pk, pe.publisher_public_id)
+        
+        # check if urls are correct after move
+        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')        
         
         
         

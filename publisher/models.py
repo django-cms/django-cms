@@ -132,19 +132,19 @@ class Publisher(models.Model):
             if isinstance(field, RelatedField):
                 related = field.rel.to
                 if issubclass(related, Publisher):
-                    print ">> got related...", related
-                    print "----------------"
+                    #print ">> got related...", related
+                    #print "----------------"
                     if not related in excluded_models and value:
                         # can follow
                         #try:
-                        print ">>> must publish:", value
+                        #print ">>> must publish:", value
                         value = value.publish(excluded_models=excluded_models, first_instance=False)
                         #except MpttCantPublish:
                         #    pass
                     elif value:
                         value = value.publisher_public
             
-            print ">> FIELD:", field.name, ":",  value
+            #print ">> FIELD:", field.name, ":",  value
             setattr(public_copy, field.name, value)        
         
         print ">> publishing.. saving with pk:", public_copy.pk, public_copy.__class__

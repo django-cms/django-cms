@@ -174,6 +174,8 @@ class PageAdmin(admin.ModelAdmin):
             return self.remove_delete_state(request, unquote(url[:-20]))
         elif url.endswith('/dialog/copy'):
             return get_copy_dialog(request, unquote(url[:-12]))
+        elif url.endswith('/preview'):
+            return self.preview_page(request, unquote(url[:-8]))
         # NOTE: revert plugin is newly integrated in overriden revision_view
         if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
             url = url.split("/?")[0]
@@ -212,6 +214,7 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page 
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog            
         )
         
         url_patterns.extend(super(PageAdmin, self).get_urls())
@@ -839,6 +842,25 @@ class PageAdmin(admin.ModelAdmin):
         page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
         page.save()
         return HttpResponseRedirect("../../%d/" % page.id)
+    
+    def preview_page(self, request, object_id):
+        """Redirecting preview function based on draft_id 
+        """
+        instance = page = get_object_or_404(Page, id=object_id)
+        attrs = "?preview=1"
+        if request.REQUEST.get('public', None):
+            if not page.publisher_public_id:
+                raise Http404
+            instance = page.publisher_public
+        else:
+            attrs += "&draft=1"
+        
+        url = instance.get_absolute_url() + attrs
+        site = Site.objects.get_current()
+        
+        if not site == instance.site:
+            url = "http://%s%s%s" % (site.domain, url)
+        return HttpResponseRedirect(url)
         
 
 class PageAdminMixins(admin.ModelAdmin):
