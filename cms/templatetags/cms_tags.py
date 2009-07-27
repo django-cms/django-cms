@@ -333,10 +333,12 @@ def page_id_url(context, reverse_id, lang=None):
     Show the url of a page with a reverse id in the right language
     This is mostly used if you want to have a static link in a template to a page
     """
+    
     request = context.get('request', False)
     if not request:
         return {'content':''}
-    
+    if request.current_page == "dummy":
+        return {'content': ''}
     PageModel = get_page_model(request)
     
     if lang is None:
@@ -368,6 +370,8 @@ def page_language_url(context, lang):
     
     request = context['request']
     page = request.current_page
+    if page == "dummy":
+        return ''
     if hasattr(request, "_language_changer"):
         url = "/%s" % lang + request._language_changer(lang)
     else:
