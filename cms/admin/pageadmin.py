@@ -270,15 +270,15 @@ class PageAdmin(admin.ModelAdmin):
         Title.objects.set_or_create(
             obj, 
             language, 
-            form.cleaned_data['slug'],
-            form.cleaned_data['title'],
-            form.cleaned_data.get('application_urls', None),
-            form.cleaned_data.get('overwrite_url', None),
-            form.cleaned_data.get('redirect', None),
-            form.cleaned_data.get('meta_description', None),
-            form.cleaned_data.get('meta_keywords', None),
-            form.cleaned_data.get('page_title', None),
-            form.cleaned_data.get('menu_title', None),
+            slug=form.cleaned_data['slug'],
+            title=form.cleaned_data['title'],
+            application_urls=form.cleaned_data.get('application_urls', None),
+            overwrite_url=form.cleaned_data.get('overwrite_url', None),
+            redirect=form.cleaned_data.get('redirect', None),
+            meta_description=form.cleaned_data.get('meta_description', None),
+            meta_keywords=form.cleaned_data.get('meta_keywords', None),
+            page_title=form.cleaned_data.get('page_title', None),
+            menu_title=form.cleaned_data.get('menu_title', None),
         )
         
         # is there any moderation message? save/update state
@@ -371,13 +371,16 @@ class PageAdmin(admin.ModelAdmin):
             for name in ['slug',
                          'title',
                          'application_urls',
-                         'overwrite_url',
                          'redirect',
                          'meta_description',
                          'meta_keywords', 
                          'menu_title', 
                          'page_title']:
                 form.base_fields[name].initial = getattr(title_obj, name)
+            if title_obj.overwrite_url:
+                form.base_fields['overwrite_url'].initial = title_obj.path
+            else:
+                form.base_fields['overwrite_url'].initial = ""
             if settings.CMS_TEMPLATES:
                 template = get_template_from_request(request, obj)
                 template_choices = list(settings.CMS_TEMPLATES)
