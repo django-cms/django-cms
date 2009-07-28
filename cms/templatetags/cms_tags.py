@@ -89,7 +89,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         if root_page:
             if isinstance(root_page, int):
                 root_page = page_queryset.get(pk=root_page)
-            if isinstance(root_page, PageModel):
+            if isinstance(root_page, Page):
                 root_page = page_queryset.get(pk=root_page.id)
             elif isinstance(root_page, unicode):
                 root_page = page_queryset.get(reverse_id=root_page)

@@ -31,7 +31,6 @@ class Publisher(models.Model):
         - exlude_fields_append: appends given fields to exclude_fields set 
             inherited from parents, if there are some
         """
-        
         exclude_fields = ['id', 'publisher_is_draft', 'publisher_public', 'publisher_state']
         exclude_fields_append = []
 
@@ -372,7 +371,7 @@ class MpttPublisher(Publisher, Mptt):
                     next_sibling = self.get_next_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.move_to(next_sibling.publisher_public, position="left")
-        # or none structural changes, just save
+        # or none structural change, just save
         return obj.save()
 
 # install publisher on first import from this module...
