@@ -28,7 +28,7 @@ $(document).ready(function() {
 		zIndex:2000,
 		
 		update:function(event, ui){
-			var array = $('ul.plugin-list').sortable('toArray');
+			var array = $(this).sortable('toArray');
 			var d = "";
 			for(var i=0;i<array.length;i++){
 				d += array[i].split("plugin_")[1];

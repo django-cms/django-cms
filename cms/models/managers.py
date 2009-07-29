@@ -157,7 +157,7 @@ class TitleManager(PublisherManager):
                 application_urls=application_urls, redirect=redirect,
                 meta_description=meta_description, meta_keywords=meta_keywords,
                 page_title=page_title, menu_title=menu_title)
-        if overwrite_url > "":
+        if overwrite_url:
             obj.has_url_overwrite = True
             obj.path = overwrite_url
         else:
