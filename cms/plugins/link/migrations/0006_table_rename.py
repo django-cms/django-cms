@@ -4,17 +4,22 @@ from django.db import models
 from cms.plugins.link.models import *
 
 class Migration:
-    
+    depends_on = (
+        ("cms", "0018_site_permissions"),
+    )
     def forwards(self, orm):
         
         db.rename_table("link_link", "cmsplugin_link")
         db.rename_table("link_publiclink", "cmsplugin_linkpublic")
         db.alter_column('cmsplugin_link', 'public_id', orm['link.link:public'])
+        db.delete_foreign_key('cmsplugin_link' ,'public_id')
         db.drop_primary_key("cmsplugin_linkpublic")
         db.rename_column("cmsplugin_linkpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_linkpublic", ("cmspluginpublic_ptr_id",))
+        db.foreign_key_sql('cmsplugin_link' ,'public_id', 'cmsplugin_linkpublic', 'cmspluginpublic_ptr_id')
     
     def backwards(self, orm):
+        db.delete_foreign_key('cmsplugin_link' ,'public_id')
         db.drop_primary_key("cmsplugin_linkpublic")
         db.rename_column("cmsplugin_linkpublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
         db.create_primary_key("cmsplugin_linkpublic", ("publiccmsplugin_ptr_id",))

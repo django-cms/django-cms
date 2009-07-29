@@ -4,17 +4,22 @@ from django.db import models
 from cms.plugins.googlemap.models import *
 
 class Migration:
-    
+    depends_on = (
+        ("cms", "0018_site_permissions"),
+    )
     def forwards(self, orm):
         
         db.rename_table("googlemap_googlemap", "cmsplugin_googlemap")
         db.rename_table("googlemap_publicgooglemap", "cmsplugin_googlemappublic")
         db.alter_column('cmsplugin_googlemap', 'public_id', orm['googlemap.googlemap:public'])
+        db.delete_foreign_key('cmsplugin_googlemap' ,'public_id')
         db.drop_primary_key("cmsplugin_googlemappublic")
         db.rename_column("cmsplugin_googlemappublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_googlemappublic", ("cmspluginpublic_ptr_id",))
+        db.foreign_key_sql('cmsplugin_googlemap' ,'public_id', 'cmsplugin_googlemappublic', 'cmspluginpublic_ptr_id')
     
     def backwards(self, orm):
+        db.delete_foreign_key('cmsplugin_googlemap' ,'public_id')
         db.drop_primary_key("cmsplugin_googlemappublic")
         db.rename_column("cmsplugin_googlemappublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
         db.create_primary_key("cmsplugin_googlemappublic", ("publiccmsplugin_ptr_id",))

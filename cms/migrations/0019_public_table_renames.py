@@ -5,6 +5,16 @@ from cms.models import *
 
 class Migration:
     
+    depends_on = (
+        ("text", "0003_publisher"),
+        ("flash", "0003_publisher"),
+        ("googlemap", "0001_initial"),
+        ("link", "0005_publisher"),
+        ("picture", "0004_publisher"),
+        ("snippet", "0002_publisher"),
+        ('file', '0003_publisher'),
+    )
+    
     def forwards(self, orm):
         db.rename_table("cms_publicpage", "cms_pagepublic")
         db.rename_table("cms_publictitle", "cms_titlepublic")

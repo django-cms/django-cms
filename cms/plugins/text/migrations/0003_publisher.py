@@ -11,6 +11,8 @@ class Migration:
 
     def forwards(self, orm):
         
+        # Adding field 'Text.public'
+        db.add_column('text_text', 'public', orm['text.text:public'])
         # Adding model 'PublicText'
         db.create_table('text_publictext', (
             ('body', orm['text.publictext:body']),
@@ -19,8 +21,7 @@ class Migration:
         ))
         db.send_create_signal('text', ['PublicText'])
         
-        # Adding field 'Text.public'
-        db.add_column('text_text', 'public', orm['text.text:public'])
+        
         
     
     

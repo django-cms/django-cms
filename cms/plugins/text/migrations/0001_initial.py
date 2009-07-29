@@ -5,6 +5,10 @@ from cms.plugins.text.models import *
 
 class Migration:
     
+    depends_on = (
+        ("cms", "0005_mptt_added_to_plugins"),
+    )
+    
     def forwards(self, orm):
         
         # Adding model 'Text'

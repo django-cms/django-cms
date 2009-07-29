@@ -4,17 +4,23 @@ from django.db import models
 from cms.plugins.snippet.models import *
 
 class Migration:
+    depends_on = (
+        ("cms", "0018_site_permissions"),
+    )
     def forwards(self, orm):
         
         db.rename_table("snippet_snippetptr", "cmsplugin_snippetptr")
         db.rename_table("snippet_publicsnippetptr", "cmsplugin_snippetptrpublic")
         db.alter_column('cmsplugin_snippetptr', 'public_id', orm['snippet.snippetptr:public'])
+        db.delete_foreign_key('cmsplugin_snippetptr' ,'public_id')
         db.drop_primary_key("cmsplugin_snippetptrpublic")
         db.rename_column("cmsplugin_snippetptrpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_snippetptrpublic", ("cmspluginpublic_ptr_id",))
+        db.foreign_key_sql('cmsplugin_snippetptr' ,'public_id', 'cmsplugin_snippetptrpublic', 'cmspluginpublic_ptr_id')
     
     
     def backwards(self, orm):
+        db.delete_foreign_key('cmsplugin_snippetptr' ,'public_id')
         db.drop_primary_key("cmsplugin_snippetptrpublic")
         db.rename_column("cmsplugin_snippetptrpublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
         db.create_primary_key("cmsplugin_snippetptrpublic", ("publiccmsplugin_ptr_id",))
