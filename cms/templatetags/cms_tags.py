@@ -430,7 +430,9 @@ class PlaceholderNode(template.Node):
         a look into pages.admin.widgets to see which widgets are available.
     """
     def __init__(self, name, plugins=None):
-        self.name = name.lower()
+        self.name = "".join(name.lower().split('"'))
+        name = "".join(name.split('"'))
+        print name
         if plugins:
             self.plugins = plugins
         else:
