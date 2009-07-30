@@ -12,7 +12,10 @@ class Migration:
         db.rename_table("flash_flash", "cmsplugin_flash")
         db.rename_table("flash_publicflash", "cmsplugin_flashpublic")
         db.alter_column('cmsplugin_flash', 'public_id', orm['flash.flash:public'])
-        db.delete_foreign_key('cmsplugin_flash' ,'public_id')
+        try:
+            db.delete_foreign_key('cmsplugin_flash' ,'public_id')
+        except:
+            pass
         db.drop_primary_key("cmsplugin_flashpublic")
         db.rename_column("cmsplugin_flashpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_flashpublic", ("cmspluginpublic_ptr_id",))

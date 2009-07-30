@@ -10,7 +10,10 @@ class Migration:
         db.rename_table("picture_picture", "cmsplugin_picture")
         db.rename_table("picture_publicpicture", "cmsplugin_picturepublic")
         db.alter_column('cmsplugin_picture', 'public_id', orm['picture.picture:public'])
-        db.delete_foreign_key('cmsplugin_picture' ,'public_id')
+        try:
+            db.delete_foreign_key('cmsplugin_picture' ,'public_id')
+        except:
+            pass
         db.drop_primary_key("cmsplugin_picturepublic")
         db.rename_column("cmsplugin_picturepublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_picturepublic", ("cmspluginpublic_ptr_id",))

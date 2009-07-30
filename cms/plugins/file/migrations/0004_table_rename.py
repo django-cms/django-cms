@@ -12,7 +12,10 @@ class Migration:
         db.rename_table("file_file", "cmsplugin_file")
         db.rename_table("file_publicfile", "cmsplugin_filepublic")
         db.alter_column('cmsplugin_file', 'public_id', orm['file.file:public'])
-        db.delete_foreign_key('cmsplugin_file' ,'public_id')
+        try:
+            db.delete_foreign_key('cmsplugin_file' ,'public_id')
+        except:
+            pass
         db.drop_primary_key("cmsplugin_filepublic")
         db.rename_column("cmsplugin_filepublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_filepublic", ("cmspluginpublic_ptr_id",))

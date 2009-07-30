@@ -12,7 +12,10 @@ class Migration:
         db.rename_table("link_link", "cmsplugin_link")
         db.rename_table("link_publiclink", "cmsplugin_linkpublic")
         db.alter_column('cmsplugin_link', 'public_id', orm['link.link:public'])
-        db.delete_foreign_key('cmsplugin_link' ,'public_id')
+        try:
+            db.delete_foreign_key('cmsplugin_link' ,'public_id')
+        except:
+            pass
         db.drop_primary_key("cmsplugin_linkpublic")
         db.rename_column("cmsplugin_linkpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_linkpublic", ("cmspluginpublic_ptr_id",))
