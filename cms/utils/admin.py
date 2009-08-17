@@ -33,7 +33,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         if md:
             # just turn it into simple javasript object
             metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
-                str(e[1]).lower() if isinstance(e[1], bool) else str(e[1])), md)) + "}"
+                isinstance(e[1], bool) and str(e[1]) or e[1].lower() ), md)) + "}"
         
     moderator_state = page_moderator_state(request, page)
     has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
