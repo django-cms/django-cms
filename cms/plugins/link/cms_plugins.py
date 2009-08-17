@@ -14,7 +14,9 @@ class LinkPlugin(CMSPluginBase):
     text_enabled = True
     
     def render(self, context, instance, placeholder):
-        if instance.url:
+        if instance.mailto:
+            link = "mailto:%s" % instance.mailto
+        elif instance.url:
             link = instance.url
         elif instance.page_link:
             link = instance.page_link.get_absolute_url()

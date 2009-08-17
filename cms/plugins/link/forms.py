@@ -6,7 +6,7 @@ from cms.models import Page
 
 
 class LinkForm(ModelForm):
-    page_link = forms.ModelChoiceField(label=_("page"), queryset=Page.objects.drafts())
+    page_link = forms.ModelChoiceField(label=_("page"), queryset=Page.objects.drafts(), required=False)
     
     class Meta:
         model = Link
