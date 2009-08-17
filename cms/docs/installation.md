@@ -51,8 +51,10 @@ Template Context Processors
 Add the following template context processors if not already present:
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
-		...
+		"django.core.context_processors.auth",
+		"django.core.context_processors.i18n",
 		"django.core.context_processors.request",
+		"django.core.context_processors.media",
 		"cms.context_processors.media",
 		...
 	)
@@ -129,6 +131,24 @@ Media Files
 If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/)
 be sure to copy the `cms/media/cms/` folder into your media directory or make a symbolic
 link as appropriate.
+
+South
+-----
+
+Django-cms 2.0 has support for [django-south](http://south.aeracode.org/). South is a database migration tool.
+So if you get a new version of django-cms you also get the db-migrations automatically. Please read the documentation of south
+first before you use it the first time. 
+
+If there is a problem with python manage.py migrate:
+
+Create a new ticket on github with your database engine (mysql), database type (MyIsam), south version
+
+Quick fix:
+
+Remove `south` from the installed apps. 
+run `manage.py syncdb`
+add `south` to the installed apps again.
+run `manage.py migrate --fake`
 
 
 Troubleshooting:
