@@ -23,7 +23,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     to_level: is the max level rendered
     render_children: if set to True will render all not direct ascendants too
     """
-    request = context['request']
+    try:
+        # If there's an exception (500), default context_processors may not be called.
+        request = context['request']
+    except KeyError:
+        return {'template': 'cms/empty.html'}
     page_queryset = get_page_queryset(request)
     
     site = Site.objects.get_current()
@@ -402,7 +406,7 @@ def language_chooser(context, template="cms/language_chooser.html"):
 language_chooser = register.inclusion_tag('cms/dummy.html', takes_context=True)(language_chooser)
 
 def do_placeholder(parser, token):
-    error_string = '%r tag requires three arguments' % token.contents[0]
+    error_string = '%r tag requires at least 1 and accepts at most 2 arguments' % token.contents[0]
     try:
         # split_contents() knows not to split quoted strings.
         bits = token.split_contents()
@@ -412,7 +416,7 @@ def do_placeholder(parser, token):
         #tag_name, name
         return PlaceholderNode(bits[1])
     elif len(bits) == 3:
-        #tag_name, name, widget
+        #tag_name, name, theme
         return PlaceholderNode(bits[1], bits[2])
     else:
         raise template.TemplateSyntaxError(error_string)
@@ -424,20 +428,12 @@ class PlaceholderNode(template.Node):
     eg: {% placeholder content-type-name page-object widget-name %}
     
     Keyword arguments:
-    content-type-name -- the content type you want to show/create
-    page-object -- the page object
-    widget-name -- the widget name you want into the admin interface. Take
-        a look into pages.admin.widgets to see which widgets are available.
+    name -- the name of the placeholder
+    theme -- additional theme attribute string which gets added to the context
     """
-    def __init__(self, name, plugins=None):
+    def __init__(self, name, theme=None):
         self.name = "".join(name.lower().split('"'))
-        name = "".join(name.split('"'))
-        print name
-        if plugins:
-            self.plugins = plugins
-        else:
-            self.plugins = []
-        
+        self.theme = theme
 
     def render(self, context):
         if not 'request' in context:
@@ -452,6 +448,9 @@ class PlaceholderNode(template.Node):
         if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
             if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
                 context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
+        if self.theme:
+            # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
+            context.update({'theme': self.theme,})
         c = ""
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name)
