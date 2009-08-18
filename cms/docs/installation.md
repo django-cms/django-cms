@@ -1,8 +1,7 @@
 Installation
 ============
 
-Copy the `cms` and `mptt` and `publisher` folders into your project or add them
-to your Python path.
+Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
 
 Apps
 ----
