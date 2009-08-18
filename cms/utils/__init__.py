@@ -50,7 +50,7 @@ def get_template_from_request(request, obj=None):
 
 def get_language_in_settings(iso):
     for language in settings.CMS_LANGUAGES:
-        if language[0][:2] == iso:
+        if language[0] == iso:
             return iso
     return None
 
@@ -69,7 +69,7 @@ def get_language_from_request(request, current_page=None):
                 language = languages[0]
     if language is None:
         language = settings.CMS_DEFAULT_LANGUAGE
-    return language[:2]
+    return language
 
 
 def get_page_from_request(request):
