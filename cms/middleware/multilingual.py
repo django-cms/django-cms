@@ -23,12 +23,8 @@ class MultilingualURLMiddleware:
         check = re.match(r"^/(%s)/.*" % langs, request.path_info)
         changed = False
         if check is not None:
-            
             request.path = "/" + "/".join(request.path.split("/")[2:])
             request.path_info = "/" + "/".join(request.path_info.split("/")[2:]) 
-            print "mod path"
-            print request.path
-            print request.path_info
             t = check.group(1)
             if t in supported:
                 lang = t
@@ -54,11 +50,9 @@ class MultilingualURLMiddleware:
     
     def process_request(self, request):
         language = self.get_language_from_request(request)
-        print language
         if language is None:
             language = settings.LANGUAGE_CODE
         translation.activate(language)
-        
         request.LANGUAGE_CODE = translation.get_language()
         
         
@@ -68,5 +62,4 @@ class MultilingualURLMiddleware:
         if response.status_code == 200 and not request.path.startswith(settings.MEDIA_URL) and response._headers['content-type'][1].split(';')[0] == "text/html":
             response.content = SUB.sub(ur'<a\1href="/%s/\3"\4>' % request.LANGUAGE_CODE, response.content.decode('utf-8'))
             response.content = SUB2.sub(ur'<form\1action="/%s/\3"\4>' % request.LANGUAGE_CODE, response.content.decode('utf-8'))
-            print request.LANGUAGE_CODE
         return response

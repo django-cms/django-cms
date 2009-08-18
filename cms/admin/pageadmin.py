@@ -344,7 +344,6 @@ class PageAdmin(admin.ModelAdmin):
                 language = get_language_from_request(request, obj)
         else:
             language = get_language_from_request(request, obj)
-        print language
         if obj:
             self.inlines = PAGE_ADMIN_INLINES
             if not obj.has_publish_permission(request) and not 'published' in self.exclude:

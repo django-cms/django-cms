@@ -137,7 +137,7 @@ class DynamicURLConfModule(object):
             # so, if CMS_MODERATOR, use, public() queryset, otherwise 
             # use draft(). This can be done, because url patterns are used just 
             # in frontend
-            if settings.CMS_MODERATOR:
+            if getattr(settings, "CMS_MODERATOR", False):
                 pages = Page.objects.public()
             else:
                 pages = Page.objects.drafts()
