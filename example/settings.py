@@ -131,6 +131,7 @@ LANGUAGES = (
     ('fr', gettext('French')),
     ('de', gettext('German')),
     ('en', gettext('English')),
+    ('pt-br', gettext("Brazil")),
 )
 
 CMS_TEMPLATES = (

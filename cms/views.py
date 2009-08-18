@@ -33,7 +33,7 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
                     path = None
                     for alt_lang in settings.LANGUAGES:
                         if alt_lang[0] in langs:
-                            path = '/%s%s' % (alt_lang[0][:2], page.get_absolute_url(language=lang, fallback=True))
+                            path = '/%s%s' % (alt_lang[0], page.get_absolute_url(language=lang, fallback=True))
                     return None, path
     except IndexError:
         return None, None
