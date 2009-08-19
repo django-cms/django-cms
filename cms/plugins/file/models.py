@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
-from os.path import join, basename, splitext, exists
+from posixpath import join, basename, splitext, exists
 
 from cms import settings as cms_settings
 from django.conf import settings

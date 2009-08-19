@@ -229,7 +229,7 @@ class Publisher(models.Model):
             return 
         
         if collect:
-            from django.db.models.query_utils import CollectedObjects
+            from django.db.models.query import CollectedObjects
             seen = CollectedObjects()
             self._collect_sub_objects(seen)
             for cls, items in seen.items():
