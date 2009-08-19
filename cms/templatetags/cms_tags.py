@@ -15,6 +15,17 @@ from cms.utils import get_language_from_request,\
 
 register = template.Library()
 
+def get_site_id(site):
+    if site:
+        if isinstance(site, Site):
+            site_id = site.id
+        elif isinstance(site, int):
+            site_id = site
+        else:
+            site_id = settings.SITE_ID
+    else:
+        site_id = settings.SITE_ID
+    return site_id
 
 def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_id=None):
     """
@@ -81,7 +92,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         root_page = None
         if root_id:
             try:
-                root_page = page_queryset.get(reverse_id=root_id)
+                root_page = page_queryset.get(reverse_id=root_id, site=site)
             except:
                 send_missing_mail(root_id, request)
         else:
@@ -96,7 +107,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             if isinstance(root_page, Page):
                 root_page = page_queryset.get(pk=root_page.id)
             elif isinstance(root_page, unicode):
-                root_page = page_queryset.get(reverse_id=root_page)
+                root_page = page_queryset.get(reverse_id=root_page, site=site)
             filters['tree_id'] = root_page.tree_id
             filters['lft__gt'] = root_page.lft
             filters['rght__lt'] = root_page.rght
@@ -334,13 +345,14 @@ def send_missing_mail(reverse_id, request):
                   settings.MANAGERS, 
                   fail_silently=True)
 
-def page_id_url(context, reverse_id, lang=None):
+def page_id_url(context, reverse_id, lang=None, site=None):
     """
     Show the url of a page with a reverse id in the right language
     This is mostly used if you want to have a static link in a template to a page
     """
-    
+    site_id = get_site_id(site)
     request = context.get('request', False)
+    print site_id
     if not request:
         return {'content':''}
 
@@ -349,11 +361,11 @@ def page_id_url(context, reverse_id, lang=None):
     
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'_type:absolute_url'
+    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'site:'+str(site_id)+'_type:absolute_url'
     url = cache.get(key)
     if not url:
         try:
-            page = get_page_queryset(request).get(reverse_id=reverse_id)
+            page = get_page_queryset(request).get(reverse_id=reverse_id,site=site_id)
             url = page.get_absolute_url(language=lang)
             cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
         except:
@@ -521,22 +533,23 @@ def clean_admin_list_filter(cl, spec):
 clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
 
 
-def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None):
+def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
     """
     Show the content of a page with a placeholder name and a reverse id in the right language
     This is mostly used if you want to have static content in a template of a page (like a footer)
     """
     request = context.get('request', False)
+    site_id = get_site_id(site)
     
     if not request:
         return {'content':''}
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'show_placeholder_by_id_pid:'+reverse_id+'placeholder:'+placeholder_name+'_l:'+str(lang)
+    key = 'show_placeholder_by_id_pid:'+reverse_id+'placeholder:'+placeholder_name+'site:'+str(site_id)+'_l:'+str(lang)
     content = cache.get(key)
     if not content:
         try:
-            page = get_page_queryset(request).get(reverse_id=reverse_id)
+            page = get_page_queryset(request).get(reverse_id=reverse_id, site=site_id)
         except:
             if settings.DEBUG:
                 raise
