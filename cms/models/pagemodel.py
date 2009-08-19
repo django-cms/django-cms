@@ -105,6 +105,9 @@ class Page(MpttPublisher):
         tree = [target]
         level_dif = self.level - target.level - 1
         first = True
+        
+        all_reverse_ids = Page.objects.filter(site=site, reverse_id__gt='').values('reverse_id').values()
+        
         for page in descendants:
             new_level = page.level - level_dif
             dif = new_level - tree[-1].level 
@@ -125,7 +128,9 @@ class Page(MpttPublisher):
             page.status = Page.MODERATOR_NEED_APPROVEMENT
             page.parent = tree[-1]
             page.publisher_public_id = None
-            page.reverse_id = None
+            if page.reverse_id in all_reverse_ids:
+                # reverse_id already exists for some page on the target site
+                page.reverse_id = None
             page.save()
             
             update_moderation_message(page, _('Page was copied.'))
