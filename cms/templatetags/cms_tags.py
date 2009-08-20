@@ -352,7 +352,6 @@ def page_id_url(context, reverse_id, lang=None, site=None):
     """
     site_id = get_site_id(site)
     request = context.get('request', False)
-    print site_id
     if not request:
         return {'content':''}
 
@@ -361,7 +360,7 @@ def page_id_url(context, reverse_id, lang=None, site=None):
     
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'site:'+str(site_id)+'_type:absolute_url'
+    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'_site:'+str(site_id)+'_type:absolute_url'
     url = cache.get(key)
     if not url:
         try:
@@ -545,7 +544,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
         return {'content':''}
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'show_placeholder_by_id_pid:'+reverse_id+'placeholder:'+placeholder_name+'site:'+str(site_id)+'_l:'+str(lang)
+    key = 'show_placeholder_by_id_pid:'+reverse_id+'_placeholder:'+placeholder_name+'_site:'+str(site_id)+'_l:'+str(lang)
     content = cache.get(key)
     if not content:
         try:
@@ -562,7 +561,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
                           settings.DEFAULT_FROM_EMAIL,
                           settings.MANAGERS,
                           fail_silently=True)
-
+                return {'content':''}
         plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:

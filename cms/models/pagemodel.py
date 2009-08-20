@@ -106,7 +106,8 @@ class Page(MpttPublisher):
         level_dif = self.level - target.level - 1
         first = True
         
-        all_reverse_ids = Page.objects.filter(site=site, reverse_id__gt='').values('reverse_id').values()
+        # list of all reverse_id values in the target site
+        all_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
         
         for page in descendants:
             new_level = page.level - level_dif
