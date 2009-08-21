@@ -9,3 +9,5 @@ example/local_settings.py
 reversion/
 
 .ropeproject
+.project
+.pydevproject
