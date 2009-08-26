@@ -121,10 +121,10 @@ class Migration:
             'url': ('models.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
         'link.linkpublic': {
-            'cmspluginpublic_ptr': "django.db.models.fields.related.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
+            'cmspluginpublic_ptr': "models.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
             'name': 'models.CharField(max_length=256)',
-            'page_link': "django.db.models.fields.related.ForeignKey(to=orm['cms.PagePublic'], null=True, blank=True)",
+            'page_link': "models.ForeignKey(to=orm['cms.PagePublic'], null=True, blank=True)",
             'url': 'models.URLField(max_length=200, null=True, blank=True)'
         },
         'sites.site': {
