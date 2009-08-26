@@ -274,7 +274,10 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     
     page = request.current_page
     if page == "dummy":
-        context.update({'ancestors':[]})
+        context.update({
+            'ancestors': [],
+            'template': template,
+        })
         return context
     lang = get_language_from_request(request)
     if page:
