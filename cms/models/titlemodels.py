@@ -38,11 +38,13 @@ class Title(Publisher):
         
         slug = u'%s' % self.slug
         if not self.has_url_overwrite:
+            self.path = u'%s' % slug
             if parent_page:
-                self.path = u'%s/%s' % (Title.objects.get_title(parent_page, language=self.language, language_fallback=True).path, slug)
-            else:
-                self.path = u'%s' % slug
+                parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
+                if parent_title:
+                    self.path = u'%s/%s' % (parent_title.path, slug)
         super(Title, self).save()
+        
         # Update descendants only if path changed
         if current_path != self.path:
             descendant_titles = Title.objects.filter(

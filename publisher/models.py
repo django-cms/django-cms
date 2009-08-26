@@ -332,6 +332,10 @@ class MpttPublisher(Publisher, Mptt):
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides original
         publisher method.
+        
+        Args:
+            obj - public variant of `self` to be saved.
+        
         """
         last_base = self.__class__.mro()[1]
         if not last_base in (Publisher, MpttPublisher):
@@ -359,7 +363,7 @@ class MpttPublisher(Publisher, Mptt):
                 not (self.level > 0 and self.parent.publisher_public == obj.parent) or \
                 not prev_sibling == prev_public_sibling == None or \
                 (prev_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id):
-            
+                
                 if prev_sibling:
                     obj.move_to(prev_sibling.publisher_public, position="right")
                 elif self.parent:
