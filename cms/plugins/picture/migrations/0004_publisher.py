@@ -40,33 +40,33 @@ class Migration:
     models = {
         'cms.publiccmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'picture.publicpicture': {
-            'alt': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'mark_delete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'publiccmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+            'alt': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'image': ('models.files.ImageField', [], {'max_length': '100'}),
+            'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'url': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'cms.publicpage': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.cmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.page': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'picture.picture': {
-            'alt': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'public': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['picture.PublicPicture']"}),
-            'url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+            'alt': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'image': ('models.files.ImageField', [], {'max_length': '100'}),
+            'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['picture.PublicPicture']"}),
+            'url': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         }
     }
     

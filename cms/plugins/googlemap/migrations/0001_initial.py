@@ -54,41 +54,41 @@ class Migration:
     models = {
         'cms.publiccmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.publicpage': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.cmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'googlemap.publicgooglemap': {
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mark_delete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'postcode': ('django.db.models.fields.IntegerField', [], {}),
-            'publiccmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'street': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'streetnr': ('django.db.models.fields.IntegerField', [], {}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'zoom': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'city': ('models.CharField', [], {'max_length': '100'}),
+            'content': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'postcode': ('models.IntegerField', [], {}),
+            'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'street': ('models.CharField', [], {'max_length': '100'}),
+            'streetnr': ('models.IntegerField', [], {}),
+            'title': ('models.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'zoom': ('models.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         'cms.page': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'googlemap.googlemap': {
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'content': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'postcode': ('django.db.models.fields.IntegerField', [], {}),
-            'public': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['googlemap.PublicGoogleMap']"}),
-            'street': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'streetnr': ('django.db.models.fields.IntegerField', [], {}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'zoom': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'city': ('models.CharField', [], {'max_length': '100'}),
+            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'content': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'postcode': ('models.IntegerField', [], {}),
+            'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['googlemap.PublicGoogleMap']"}),
+            'street': ('models.CharField', [], {'max_length': '100'}),
+            'streetnr': ('models.IntegerField', [], {}),
+            'title': ('models.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'zoom': ('models.IntegerField', [], {'null': 'True', 'blank': 'True'})
         }
     }
     

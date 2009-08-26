@@ -15,17 +15,17 @@ class Migration:
     
     models = {
         'file.file': {
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'cms.cmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.page': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         }
     }
     
