@@ -3,10 +3,8 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
-from cms import settings as cms_settings
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
-from cms.utils import get_language_from_request
 
 register = template.Library()
 
@@ -61,6 +59,10 @@ def moderator_choices(page, user):
     """Returns simple moderator choices used for checkbox rendering, as a value
     is used mask value.
     """
+    
+    # this is called once per page, when moderation is activated! Should be
+    # optimized
+    
     try:
         page_moderator = page.pagemoderator_set.get(user=user)
     except ObjectDoesNotExist:
