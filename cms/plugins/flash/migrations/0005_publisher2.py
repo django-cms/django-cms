@@ -121,7 +121,7 @@ class Migration:
             'width': ('models.CharField', [], {'max_length': '6'})
         },
         'flash.flashpublic': {
-            'cmspluginpublic_ptr': "django.db.models.fields.related.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
+            'cmspluginpublic_ptr': "models.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
             'file': 'models.FileField(max_length=100)',
             'height': 'models.CharField(max_length=6)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',

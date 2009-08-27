@@ -126,11 +126,11 @@ class Migration:
         },
         'picture.picturepublic': {
             'alt': 'models.CharField(max_length=255, null=True, blank=True)',
-            'cmspluginpublic_ptr': "django.db.models.fields.related.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
+            'cmspluginpublic_ptr': "models.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
             'float': 'models.CharField(max_length=10, null=True, blank=True)',
             'image': 'models.ImageField(max_length=100)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
-            'page_link': "django.db.models.fields.related.ForeignKey(to=orm['cms.PagePublic'], null=True, blank=True)",
+            'page_link': "models.ForeignKey(to=orm['cms.PagePublic'], null=True, blank=True)",
             'url': 'models.CharField(max_length=255, null=True, blank=True)'
         },
         'sites.site': {

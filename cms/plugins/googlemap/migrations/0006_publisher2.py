@@ -129,7 +129,7 @@ class Migration:
         'googlemap.googlemappublic': {
             'address': 'models.CharField(max_length=150)',
             'city': 'models.CharField(max_length=100)',
-            'cmspluginpublic_ptr': "django.db.models.fields.related.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
+            'cmspluginpublic_ptr': "models.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
             'content': 'models.CharField(max_length=255, null=True, blank=True)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
             'title': 'models.CharField(max_length=100, null=True, blank=True)',

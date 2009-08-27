@@ -1,7 +1,7 @@
 
 from south.db import db
-from django.db import models
 from cms.models import *
+from django.db import models
 
 class Migration:
     
@@ -222,8 +222,8 @@ class Migration:
             'level': 'models.PositiveIntegerField(db_index=True)',
             'lft': 'models.PositiveIntegerField(db_index=True)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
-            'page': "django.db.models.fields.related.ForeignKey(to=orm['cms.PagePublic'])",
-            'parent': "django.db.models.fields.related.ForeignKey(to=orm['cms.CMSPluginPublic'], null=True, blank=True)",
+            'page': "models.ForeignKey(to=orm['cms.PagePublic'])",
+            'parent': "models.ForeignKey(to=orm['cms.CMSPluginPublic'], null=True, blank=True)",
             'placeholder': 'models.CharField(max_length=50, db_index=True)',
             'plugin_type': 'models.CharField(max_length=50, db_index=True)',
             'position': 'models.PositiveSmallIntegerField(null=True, blank=True)',
@@ -313,13 +313,13 @@ class Migration:
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
             'moderator_state': 'models.SmallIntegerField(default=1, blank=True)',
             'navigation_extenders': 'models.CharField(blank=True, max_length=80, null=True, db_index=True)',
-            'parent': "django.db.models.fields.related.ForeignKey(related_name='children', null=True, to=orm['cms.PagePublic'], blank=True)",
+            'parent': "models.ForeignKey(related_name='children', null=True, to=orm['cms.PagePublic'], blank=True)",
             'publication_date': 'models.DateTimeField(blank=True, null=True, db_index=True)',
             'publication_end_date': 'models.DateTimeField(blank=True, null=True, db_index=True)',
             'published': 'models.BooleanField(default=False, blank=True)',
             'reverse_id': 'models.CharField(blank=True, max_length=40, null=True, db_index=True)',
             'rght': 'models.PositiveIntegerField(db_index=True)',
-            'site': "django.db.models.fields.related.ForeignKey(to=orm['sites.Site'])",
+            'site': "models.ForeignKey(to=orm['sites.Site'])",
             'soft_root': 'models.BooleanField(default=False, blank=True, db_index=True)',
             'template': 'models.CharField(max_length=100)',
             'tree_id': 'models.PositiveIntegerField(db_index=True)'
@@ -339,8 +339,8 @@ class Migration:
             'level': 'models.PositiveIntegerField(db_index=True)',
             'lft': 'models.PositiveIntegerField(db_index=True)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
-            'page': "django.db.models.fields.related.ForeignKey(to=orm['cms.PublicPage'])",
-            'parent': "django.db.models.fields.related.ForeignKey(to=orm['cms.PublicCMSPlugin'], null=True, blank=True)",
+            'page': "models.ForeignKey(to=orm['cms.PublicPage'])",
+            'parent': "models.ForeignKey(to=orm['cms.PublicCMSPlugin'], null=True, blank=True)",
             'placeholder': 'models.CharField(max_length=50, db_index=True)',
             'plugin_type': 'models.CharField(max_length=50, db_index=True)',
             'position': 'models.PositiveSmallIntegerField(null=True, blank=True)',
@@ -359,13 +359,13 @@ class Migration:
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
             'moderator_state': 'models.SmallIntegerField(default=1, blank=True)',
             'navigation_extenders': 'models.CharField(blank=True, max_length=80, null=True, db_index=True)',
-            'parent': "django.db.models.fields.related.ForeignKey(related_name='children', null=True, to=orm['cms.PublicPage'], blank=True)",
+            'parent': "models.ForeignKey(related_name='children', null=True, to=orm['cms.PublicPage'], blank=True)",
             'publication_date': 'models.DateTimeField(blank=True, null=True, db_index=True)',
             'publication_end_date': 'models.DateTimeField(blank=True, null=True, db_index=True)',
             'published': 'models.BooleanField(default=False, blank=True)',
             'reverse_id': 'models.CharField(blank=True, max_length=40, null=True, db_index=True)',
             'rght': 'models.PositiveIntegerField(db_index=True)',
-            'site': "django.db.models.fields.related.ForeignKey(to=orm['sites.Site'])",
+            'site': "models.ForeignKey(to=orm['sites.Site'])",
             'soft_root': 'models.BooleanField(default=False, blank=True, db_index=True)',
             'template': 'models.CharField(max_length=100)',
             'tree_id': 'models.PositiveIntegerField(db_index=True)'
@@ -400,7 +400,7 @@ class Migration:
             'menu_title': 'models.CharField(max_length=255, null=True, blank=True)',
             'meta_description': 'models.TextField(max_length=255, null=True, blank=True)',
             'meta_keywords': 'models.CharField(max_length=255, null=True, blank=True)',
-            'page': "django.db.models.fields.related.ForeignKey(related_name='title_set', to=orm['cms.PagePublic'])",
+            'page': "models.ForeignKey(related_name='title_set', to=orm['cms.PagePublic'])",
             'page_title': 'models.CharField(max_length=255, null=True, blank=True)',
             'path': 'models.CharField(max_length=255, db_index=True)',
             'redirect': 'models.CharField(max_length=255, null=True, blank=True)',
