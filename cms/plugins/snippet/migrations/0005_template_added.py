@@ -111,7 +111,8 @@ class Migration:
         'snippet.snippet': {
             'html': ('models.TextField', [], {'blank': 'True'}),
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'name': ('models.CharField', [], {'max_length': '255', 'unique': 'True'})
+            'name': ('models.CharField', [], {'max_length': '255', 'unique': 'True'}),
+            'template': ('models.CharField', [], {'max_length': '50', 'blank': 'True'}),
         },
         'snippet.snippetptr': {
             'Meta': {'db_table': "'cmsplugin_snippetptr'"},
