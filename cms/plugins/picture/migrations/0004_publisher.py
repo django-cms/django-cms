@@ -44,7 +44,7 @@ class Migration:
         },
         'picture.publicpicture': {
             'alt': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'image': ('models.files.ImageField', [], {'max_length': '100'}),
+            'image': ('models.ImageField', [], {'max_length': '100'}),
             'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'url': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
@@ -64,7 +64,7 @@ class Migration:
         'picture.picture': {
             'alt': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'image': ('models.files.ImageField', [], {'max_length': '100'}),
+            'image': ('models.ImageField', [], {'max_length': '100'}),
             'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['picture.PublicPicture']"}),
             'url': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         }

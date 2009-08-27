@@ -104,7 +104,7 @@ class Migration:
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'float': ('models.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'longdesc': ('models.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'image': ('models.files.ImageField', [], {'max_length': '100'}),
+            'image': ('models.ImageField', [], {'max_length': '100'}),
             'page_link': ('models.ForeignKey', [], {'to': "orm['cms.Page']", 'null': 'True', 'blank': 'True'}),
             'url': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
@@ -113,7 +113,7 @@ class Migration:
             'cmspluginpublic_ptr': "django.db.models.fields.related.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
             'float': 'models.CharField(max_length=10, null=True, blank=True)',
             'longdesc': ('models.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'image': 'models.files.ImageField(max_length=100)',
+            'image': 'models.ImageField(max_length=100)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
             'page_link': "django.db.models.fields.related.ForeignKey(to=orm['cms.PagePublic'], null=True, blank=True)",
             'url': 'models.CharField(max_length=255, null=True, blank=True)'

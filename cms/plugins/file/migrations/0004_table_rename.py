@@ -41,14 +41,14 @@ class Migration:
         'file.filepublic': {
             'Meta': {'db_table': "'cmsplugin_filepublic'"},
             'cmspluginpublic_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPluginPublic']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'file.file': {
             'Meta': {'db_table': "'cmsplugin_file'"},
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['file.FilePublic']"}),
             'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },

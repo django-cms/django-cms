@@ -21,7 +21,7 @@ class Migration:
         'picture.picture': {
             'alt': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'image': ('models.files.ImageField', [], {'max_length': '100'}),
+            'image': ('models.ImageField', [], {'max_length': '100'}),
             'url': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'cms.page': {

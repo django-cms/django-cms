@@ -39,7 +39,7 @@ class Migration:
     models = {
         'flash.flash': {
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'height': ('models.CharField', [], {'max_length': '6'}),
             'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['flash.PublicFlash']"}),
             'width': ('models.CharField', [], {'max_length': '6'})
@@ -61,7 +61,7 @@ class Migration:
             'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'flash.publicflash': {
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'height': ('models.CharField', [], {'max_length': '6'}),
             'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),

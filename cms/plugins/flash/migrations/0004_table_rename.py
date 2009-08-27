@@ -57,7 +57,7 @@ class Migration:
         'flash.flash': {
             'Meta': {'db_table': "'cmsplugin_flash'"},
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'height': ('models.CharField', [], {'max_length': '6'}),
             'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['flash.FlashPublic']"}),
             'width': ('models.CharField', [], {'max_length': '6'})
@@ -111,7 +111,7 @@ class Migration:
         'flash.flashpublic': {
             'Meta': {'db_table': "'cmsplugin_flashpublic'"},
             'cmspluginpublic_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPluginPublic']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'height': ('models.CharField', [], {'max_length': '6'}),
             'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'width': ('models.CharField', [], {'max_length': '6'})

@@ -16,7 +16,7 @@ class Migration:
     models = {
         'file.file': {
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'cms.cmsplugin': {

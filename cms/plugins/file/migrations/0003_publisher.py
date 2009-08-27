@@ -45,7 +45,7 @@ class Migration:
         },
         'file.file': {
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['file.PublicFile']"}),
             'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
@@ -153,7 +153,7 @@ class Migration:
             'tree_id': ('models.PositiveIntegerField', [], {'db_index': 'True'})
         },
         'file.publicfile': {
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})

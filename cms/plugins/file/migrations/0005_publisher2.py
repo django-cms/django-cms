@@ -115,12 +115,12 @@ class Migration:
         'file.file': {
             'Meta': {'db_table': "'cmsplugin_file'"},
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'title': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'file.filepublic': {
             'cmspluginpublic_ptr': "django.db.models.fields.related.OneToOneField(to=orm['cms.CMSPluginPublic'], unique=True, primary_key=True)",
-            'file': 'models.files.FileField(max_length=100)',
+            'file': 'models.FileField(max_length=100)',
             'mark_delete': 'models.BooleanField(default=False, blank=True)',
             'title': 'models.CharField(max_length=255, null=True, blank=True)'
         },

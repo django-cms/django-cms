@@ -16,7 +16,7 @@ class Migration:
     models = {
         'flash.flash': {
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('models.files.FileField', [], {'max_length': '100'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
             'height': ('models.CharField', [], {'max_length': '6'}),
             'width': ('models.CharField', [], {'max_length': '6'})
         },
