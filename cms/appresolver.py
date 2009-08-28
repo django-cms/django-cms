@@ -143,6 +143,8 @@ class DynamicURLConfModule(object):
             else:
                 pages = Page.objects.drafts()
             
+            urls = []
+            
             for page in pages:
                 # get all titles with application
                 title_set = page.title_set.filter(application_urls__gt="")
@@ -154,8 +156,10 @@ class DynamicURLConfModule(object):
                     if mixid in included:
                         # don't add the same thing twice
                         continue  
-                    self._urlpatterns.append(ApplicationRegexUrlResolver(title))
+                    urls.append(ApplicationRegexUrlResolver(title))
                     included.append(mixid)
+            
+            self._urlpatterns = urls
         return self._urlpatterns
         
     def reset_cache(self):
