@@ -5,7 +5,6 @@ from publisher.base import install_publisher
 from publisher.manager import PublisherManager
 from publisher.errors import MpttPublisherCantPublish, PublisherCantPublish
 from publisher.mptt_support import Mptt
-from django.db.backends.dummy.base import IntegrityError
 
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
