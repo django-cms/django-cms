@@ -5,6 +5,7 @@ from publisher.base import install_publisher
 from publisher.manager import PublisherManager
 from publisher.errors import MpttPublisherCantPublish, PublisherCantPublish
 from publisher.mptt_support import Mptt
+from django.db.backends.dummy.base import IntegrityError
 
 class Publisher(models.Model):
     """Abstract class which have to be extended for adding class to publisher.
@@ -85,6 +86,8 @@ class Publisher(models.Model):
         Returns: published instance
         """
         
+        #print "publishing:", self.__class__.__name__, self
+        
         ########################################################################
         # perform checks
         if not self.publisher_is_draft:
@@ -121,7 +124,10 @@ class Publisher(models.Model):
                         value = value.publish(excluded_models=excluded_models, first_instance=False)
                     elif value:
                         value = value.publisher_public
-            setattr(public_copy, field.name, value)        
+            try:
+                setattr(public_copy, field.name, value)
+            except ValueError:
+                pass
         
         ########################################################################
         # perform saving        
@@ -192,10 +198,13 @@ class Publisher(models.Model):
                 continue
             #excluded_models.append(obj.__class__)
             if issubclass(obj.model, Publisher):
+                
+                
                 # get all objects for this, and publish them
                 name = obj.get_accessor_name()
                 if name in self._publisher_meta.exclude_fields:
                     continue
+                
                 try:
                     try:
                         item_set = getattr(self, name).all()
@@ -204,7 +213,14 @@ class Publisher(models.Model):
                 except ObjectDoesNotExist:
                     continue
                 for item in item_set:
-                    item.publish(excluded_models=excluded_models + [obj.__class__], first_instance=False)
+                    try:
+                        # this is a reverse relation, in may happen, that we
+                        # are trying to publish something we are not allow to,
+                        # thats why IntegrityError may be received in case when
+                        # it is not possible to publish this object
+                        item.publish(excluded_models=excluded_models + [obj.__class__], first_instance=False)
+                    except:
+                        pass
         
         # perform cleaning on public copy, if instance id marked for deletion,
         # delete it
