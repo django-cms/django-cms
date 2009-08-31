@@ -47,12 +47,13 @@ def pre_save_title(instance, raw, **kwargs):
     else:
         parent_page = instance.page.parent
         slug = u'%s' % instance.slug
+        
+        instance.path = u'%s' % slug
         if parent_page:
-            parent_path = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True).path
-            instance.path = (u'%s/%s' % (parent_path, slug)).lstrip("/")
-        else:
-            instance.path = u'%s' % slug
-
+            parent_title = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True)
+            if parent_title:
+                instance.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+        
 signals.pre_save.connect(pre_save_title, sender=Title)
 
 

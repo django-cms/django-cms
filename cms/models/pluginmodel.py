@@ -44,8 +44,8 @@ class CMSPlugin(MpttPublisher):
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
     def __unicode__(self):
-        return ""
-    
+        return str(self.id) #""
+        
     class Meta:
         app_label = 'cms'
         

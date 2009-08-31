@@ -85,6 +85,8 @@ class Publisher(models.Model):
         Returns: published instance
         """
         
+        #print "publishing:", self.__class__.__name__, self
+        
         ########################################################################
         # perform checks
         if not self.publisher_is_draft:
@@ -121,7 +123,10 @@ class Publisher(models.Model):
                         value = value.publish(excluded_models=excluded_models, first_instance=False)
                     elif value:
                         value = value.publisher_public
-            setattr(public_copy, field.name, value)        
+            try:
+                setattr(public_copy, field.name, value)
+            except ValueError:
+                pass
         
         ########################################################################
         # perform saving        
@@ -192,10 +197,13 @@ class Publisher(models.Model):
                 continue
             #excluded_models.append(obj.__class__)
             if issubclass(obj.model, Publisher):
+                
+                
                 # get all objects for this, and publish them
                 name = obj.get_accessor_name()
                 if name in self._publisher_meta.exclude_fields:
                     continue
+                
                 try:
                     try:
                         item_set = getattr(self, name).all()
@@ -204,7 +212,14 @@ class Publisher(models.Model):
                 except ObjectDoesNotExist:
                     continue
                 for item in item_set:
-                    item.publish(excluded_models=excluded_models + [obj.__class__], first_instance=False)
+                    try:
+                        # this is a reverse relation, in may happen, that we
+                        # are trying to publish something we are not allow to,
+                        # thats why IntegrityError may be received in case when
+                        # it is not possible to publish this object
+                        item.publish(excluded_models=excluded_models + [obj.__class__], first_instance=False)
+                    except:
+                        pass
         
         # perform cleaning on public copy, if instance id marked for deletion,
         # delete it
@@ -332,6 +347,10 @@ class MpttPublisher(Publisher, Mptt):
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides original
         publisher method.
+        
+        Args:
+            obj - public variant of `self` to be saved.
+        
         """
         last_base = self.__class__.mro()[1]
         if not last_base in (Publisher, MpttPublisher):
@@ -359,7 +378,7 @@ class MpttPublisher(Publisher, Mptt):
                 not (self.level > 0 and self.parent.publisher_public == obj.parent) or \
                 not prev_sibling == prev_public_sibling == None or \
                 (prev_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id):
-            
+                
                 if prev_sibling:
                     obj.move_to(prev_sibling.publisher_public, position="right")
                 elif self.parent:

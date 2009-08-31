@@ -1,5 +1,5 @@
 from django.conf import settings
-from cms.settings import CMS_FLAT_URLS
+from cms import settings as cms_settings 
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
 from cms.utils.moderator import get_page_queryset
 from cms.models import Page
@@ -93,7 +93,8 @@ class ApplicationRegexUrlResolver(PageRegexURLResolver):
         # will they be be than passed to pattern, and from pattern to view? 
         # If it will work, will be give us possibility to configure one
         # application for multiple hooks. 
-        if CMS_FLAT_URLS:
+        
+        if cms_settings.CMS_FLAT_URLS:
             regex = r'^%s' % title.slug
         else:
             regex = r'^%s' % title.path
@@ -126,35 +127,39 @@ class DynamicURLConfModule(object):
         Caches result, so db lookup is required only once, or when the cache
         is reseted.
         """
+        
         if not self._urlpatterns:
             # TODO: will this work with multiple sites? how are they exactly
             # implemented ?
             # probably will be better to make caching per site
             
             self._urlpatterns, included = [], []
-            
             # we don't have a request here so get_page_queryset() can't be used,
             # so, if CMS_MODERATOR, use, public() queryset, otherwise 
             # use draft(). This can be done, because url patterns are used just 
             # in frontend
-            if getattr(settings, "CMS_MODERATOR", False):
+            if cms_settings.CMS_MODERATOR:
                 pages = Page.objects.public()
             else:
                 pages = Page.objects.drafts()
+            
+            urls = []
             
             for page in pages:
                 # get all titles with application
                 title_set = page.title_set.filter(application_urls__gt="")
                 for title in title_set:
-                    if CMS_FLAT_URLS:
+                    if cms_settings.CMS_FLAT_URLS:
                         mixid = "%s:%s" % (title.slug + "/", title.application_urls)
                     else:
                         mixid = "%s:%s" % (title.path + "/", title.application_urls)
                     if mixid in included:
                         # don't add the same thing twice
                         continue  
-                    self._urlpatterns.append(ApplicationRegexUrlResolver(title))
+                    urls.append(ApplicationRegexUrlResolver(title))
                     included.append(mixid)
+            
+            self._urlpatterns = urls
         return self._urlpatterns
         
     def reset_cache(self):

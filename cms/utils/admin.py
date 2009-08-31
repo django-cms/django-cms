@@ -18,7 +18,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
-    slug = page.get_slug(language=lang, fallback=True)
+    #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
     if cms_settings.CMS_PERMISSION:
         # jstree metadata generator 
