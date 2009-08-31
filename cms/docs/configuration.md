@@ -18,11 +18,17 @@ Example:
 		('2col.html', gettext('2 Column')),
 		('3col.html', gettext('3 Column')),
 		('extra.html', gettext('Some extra fancy template')),
-		('INHERIT', gettext('Inherit template')),
 	)
 
-Adding the magic INHERIT is optional and allows pages to
-inherit the template from their nearest ancestor. Adding new
+CMS\_TEMPLATE\_INHERITANCE
+--------------------------
+
+Example:
+
+    CMS_TEMPLATE_INHERITANCE = True
+
+If this is enabled, pages have the additional template option
+to inherit their template from the nearest ancestor. Adding new
 pages defaults to this iff the new page is not a root page.  
 
 CMS\_PLACEHOLDER\_CONF

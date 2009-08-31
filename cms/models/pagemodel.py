@@ -451,7 +451,8 @@ class Page(MpttPublisher):
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
         template = None
-        if self.template and len(self.template)>0 and self.template != "INHERIT":
+        if self.template and len(self.template)>0 and \
+            self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
             template = self.template
         else:
             for p in self.get_ancestors(ascending=True):

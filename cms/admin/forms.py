@@ -38,9 +38,10 @@ class PageAddForm(forms.ModelForm):
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
         if self.fields['parent'].initial and \
-            'INHERIT' in [name for name, value in cms_settings.CMS_TEMPLATES]:
+            cms_settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
+            [name for name, value in cms_settings.CMS_TEMPLATES]:
             # non-root pages default to inheriting their template
-            self.fields['template'].initial = "INHERIT"
+            self.fields['template'].initial = cms_settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         
     def clean(self):
         cleaned_data = self.cleaned_data
