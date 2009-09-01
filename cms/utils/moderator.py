@@ -76,6 +76,8 @@ def page_moderator_state(request, page):
     
     under_moderation = page.get_moderator_queryset()
     
+    # TODO: OPTIMIZE!! calls 1 or 2 q per list item (page)
+    
     if cms_settings.CMS_MODERATOR:
         if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
             label = _('parent first')

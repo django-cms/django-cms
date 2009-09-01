@@ -14,6 +14,7 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug
 from cms.exceptions import NoHomeFound
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -417,6 +418,7 @@ class Page(MpttPublisher):
             default_lang = True
             language = get_language()
         load = False
+        
         if not hasattr(self, "title_cache"):
             load = True
         elif self.title_cache and self.title_cache.language != language and language and not default_lang:
@@ -424,7 +426,7 @@ class Page(MpttPublisher):
         elif fallback and not self.title_cache:
             load = True 
         if force_reload:
-            load = True
+            load = True            
         if load:
             from cms.models.titlemodels import Title
             if version_id:
@@ -588,10 +590,14 @@ class Page(MpttPublisher):
         return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
     
     def last_page_states(self):
-        """Returns last five page states, if they exist
+        """Returns last five page states, if they exist, optimized, calls sql
+        query only if some states available
         """
         # TODO: optimize SQL... 1 query per page 
         if settings.CMS_MODERATOR:
+            has_moderator_state = getattr(self, '_has_moderator_state_chache', None)
+            if has_moderator_state == False:
+                return None
             return self.pagemoderatorstate_set.all().order_by('created',)[:5]
         return None
     
@@ -673,6 +679,28 @@ class Page(MpttPublisher):
         
     def requires_approvement(self):
         return self.moderator_state in (Page.MODERATOR_NEED_APPROVEMENT, Page.MODERATOR_NEED_DELETE_APPROVEMENT)
+    
+    def get_moderation_value(self, user):
+        """Returns page moderation value for given user, moderation value is
+        sum of moderations.
+        """
+        moderation_value = getattr(self, '_moderation_value_cahce', None)
+        if moderation_value is not None and self._moderation_value_cache_for_user_id == user.pk:
+            return moderation_value
+        try:
+            page_moderator = self.pagemoderator_set.get(user=user)
+        except ObjectDoesNotExist:
+            return 0
+        
+        moderation_value = page_moderator.get_decimal()
+        
+        self._moderation_value_cahce = moderation_value
+        self._moderation_value_cache_for_user_id = user
+            
+        return moderation_value 
+        
+        
+        
     
 if 'reversion' in settings.INSTALLED_APPS: 
     import reversion       
