@@ -2,7 +2,7 @@ from django.conf import settings
 from cms import settings as cms_settings 
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
 from cms.utils.moderator import get_page_queryset
-from cms.models import Page
+from cms.models import Title
 
 
 def applications_page_check(request, current_page=None, path=None):
@@ -138,27 +138,21 @@ class DynamicURLConfModule(object):
             # so, if CMS_MODERATOR, use, public() queryset, otherwise 
             # use draft(). This can be done, because url patterns are used just 
             # in frontend
-            if cms_settings.CMS_MODERATOR:
-                pages = Page.objects.public()
-            else:
-                pages = Page.objects.drafts()
+            
+            is_draft = not cms_settings.CMS_MODERATOR
+            title_qs = Title.objects.filter(page__publisher_is_draft=is_draft)
             
             urls = []
-            
-            for page in pages:
-                # get all titles with application
-                title_set = page.title_set.filter(application_urls__gt="")
-                for title in title_set:
-                    if cms_settings.CMS_FLAT_URLS:
-                        mixid = "%s:%s" % (title.slug + "/", title.application_urls)
-                    else:
-                        mixid = "%s:%s" % (title.path + "/", title.application_urls)
-                    if mixid in included:
-                        # don't add the same thing twice
-                        continue  
-                    urls.append(ApplicationRegexUrlResolver(title))
-                    included.append(mixid)
-            
+            for title in title_qs.filter(application_urls__gt=""):
+                if cms_settings.CMS_FLAT_URLS:
+                    mixid = "%s:%s" % (title.slug + "/", title.application_urls)
+                else:
+                    mixid = "%s:%s" % (title.path + "/", title.application_urls)
+                if mixid in included:
+                    # don't add the same thing twice
+                    continue  
+                urls.append(ApplicationRegexUrlResolver(title))
+                included.append(mixid)
             self._urlpatterns = urls
         return self._urlpatterns
         

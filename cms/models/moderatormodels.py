@@ -58,25 +58,21 @@ class PageModerator(models.Model):
     def set_decimal(self, state):
         """Converts and sets binary state to local attributes
         """
-        self.moderate_page = state & MASK_PAGE
-        self.moderate_children = state & MASK_CHILDREN
-        self.moderate_descendants = state & MASK_DESCENDANTS
+        self.moderate_page = bool(state & MASK_PAGE)
+        moderate_children = bool(state & MASK_CHILDREN)
+        moderate_descendants = bool(state & MASK_DESCENDANTS)
+        
+        if moderate_descendants:
+            moderate_children = True
+        
+        self.moderate_children = moderate_children
+        self.moderate_descendants = moderate_descendants
         
     def get_decimal(self):
         return self.moderate_page * MASK_PAGE + \
             self.moderate_children * MASK_CHILDREN + \
             self.moderate_descendants * MASK_DESCENDANTS
-    
-    def save(self, force_insert=False, force_update=False):
-        """Just some logical stuff - if user haves moderate_descendants then
-        moderate_children
-        """
-        if self.moderate_descendants:
-            self.moderate_children = True
-        else:
-            self.moderate_children = False
-        super(PageModerator, self).save(force_insert, force_update)
-    
+
     __unicode__ = lambda self: "%s on %s mod: %d" % (unicode(self.user), unicode(self.page), self.get_decimal())
      
         
