@@ -38,34 +38,34 @@ class Migration:
     
     models = {
         'flash.flash': {
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'height': ('django.db.models.fields.CharField', [], {'max_length': '6'}),
-            'public': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['flash.PublicFlash']"}),
-            'width': ('django.db.models.fields.CharField', [], {'max_length': '6'})
+            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'file': ('models.FileField', [], {'max_length': '100'}),
+            'height': ('models.CharField', [], {'max_length': '6'}),
+            'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['flash.PublicFlash']"}),
+            'width': ('models.CharField', [], {'max_length': '6'})
         },
         'cms.publiccmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.publicpage': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.cmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'cms.page': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'flash.publicflash': {
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'height': ('django.db.models.fields.CharField', [], {'max_length': '6'}),
-            'mark_delete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'publiccmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'width': ('django.db.models.fields.CharField', [], {'max_length': '6'})
+            'file': ('models.FileField', [], {'max_length': '100'}),
+            'height': ('models.CharField', [], {'max_length': '6'}),
+            'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'width': ('models.CharField', [], {'max_length': '6'})
         }
     }
     

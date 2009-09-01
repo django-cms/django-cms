@@ -4,7 +4,7 @@ from cms.settings import CMS_MEDIA_URL
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.template.context import RequestContext, Context
+from django.template.context import Context
 from models import SnippetPtr
 
 class SnippetPlugin(CMSPluginBase):
@@ -14,9 +14,16 @@ class SnippetPlugin(CMSPluginBase):
     text_enabled = True
 
     def render(self, context, instance, placeholder):
-        t = template.Template(instance.snippet.html)
         try:
-            content = t.render(Context(context))
+            if instance.snippet.template:
+                t = template.loader.get_template(instance.snippet.template)
+                context.update({'html': mark_safe(instance.snippet.html)})
+                content = t.render(Context(context))
+            else:
+                t = template.Template(instance.snippet.html)
+                content = t.render(Context(context))
+        except template.TemplateDoesNotExist, e:
+            content = _('Template %(template)s does not exist.') % {'template': instance.snippet.template}
         except Exception, e:
             content = str(e)
         context.update({

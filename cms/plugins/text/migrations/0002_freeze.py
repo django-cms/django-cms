@@ -16,15 +16,15 @@ class Migration:
     models = {
         'cms.cmsplugin': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         },
         'text.text': {
-            'body': ('django.db.models.fields.TextField', [], {}),
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'})
+            'body': ('models.TextField', [], {}),
+            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'})
         },
         'cms.page': {
             '_stub': True,
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
         }
     }
     

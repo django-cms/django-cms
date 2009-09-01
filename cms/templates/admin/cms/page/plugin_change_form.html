@@ -42,8 +42,12 @@
 
 	$(document).ready(function(){
 		$("a.add-another").each(function(i, sign){
-			var href= "../../"+ $(sign).attr("href")
-			 $(sign).attr("href", href);
+			var href = $(sign).attr("href")
+			if (href.substr(0,2) == ".."){
+				href += "../../"
+				$(sign).attr("href", href); 
+			}
+			
 		});
 	});
 </script>
