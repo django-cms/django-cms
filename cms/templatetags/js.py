@@ -7,3 +7,8 @@ register = template.Library()
 @register.filter
 def js(value):
     return simplejson.dumps(value, cls=DjangoJSONEncoder)
+
+@register.filter
+def bool(value):
+    return value and "true" or "false" 
+        

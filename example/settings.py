@@ -116,11 +116,12 @@ INSTALLED_APPS = (
     'cms.plugins.snippet',
     'cms.plugins.googlemap',
     'cms.plugins.teaser',
+    'cms.plugins.video',
     'mptt',
     'reversion',
     #'example.categories',
     #'debug_toolbar',
-    'south',
+    #'south',
     # sample application
     'sampleapp',
     #'store',
@@ -154,6 +155,7 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
+        "plugins": ("VideoPlugin", ),
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
