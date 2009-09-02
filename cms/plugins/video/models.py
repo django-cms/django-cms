@@ -26,7 +26,7 @@ class Video(CMSPlugin):
     )
     # player settings
     movie = models.FileField(_('movie'), upload_to=CMSPlugin.get_media_path, help_text=_('use swf file'))
-    image = models.ImageField(_('image'), upload_to=CMSPlugin.get_media_path, help_text=_('use image file'), null=True)
+    image = models.ImageField(_('image'), upload_to=CMSPlugin.get_media_path, help_text=_('use image file'), null=True, blank=True)
     
     width = models.CharField(_('width'), max_length=6)
     height = models.CharField(_('height'), max_length=6)

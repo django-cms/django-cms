@@ -322,11 +322,7 @@ def change_moderation(request, page_id):
         elif moderate <= MASK_PAGE + MASK_CHILDREN + MASK_DESCENDANTS:
             page_moderator, created = page.pagemoderator_set.get_or_create(user=request.user)
             # split value to attributes
-            print "> SEEET", moderate
             page_moderator.set_decimal(moderate)
-            
-            print page_moderator.get_decimal()
-            
             page_moderator.save()
             return render_admin_menu_item(request, page)
     raise Http404
