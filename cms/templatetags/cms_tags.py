@@ -491,12 +491,12 @@ def do_page_attribute(parser, token):
 class PageAttributeNode(template.Node):
     """This template node is used to output attribute from page such
     as its title and slug.
-    
-    eg: {% page attribute field-name %}
-    
+
+    eg: {% page_attribute field-name %}
+
     Keyword arguments:
     field-name -- the name of the field to output. One of "title",
-    "slug", "meta_description" or "meta_keywords"
+    "slug", "meta_description" or "meta_keywords" -- Use without qoutes!
     """
     def __init__(self, name):
         self.name = name.lower()
