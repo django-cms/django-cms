@@ -127,7 +127,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         all_pages = pages[:]
         root_level = getattr(root_page, 'level', None)
         for page in pages:# build the tree
-            print page.menu_login_required
             if page.level >= db_from_level:
                 ids.append(page.pk)
             if page.level == 0 or page.level == root_level:
@@ -220,7 +219,6 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         
         page.childrens = []
         for p in pages:
-            print p.menu_login_required
             p.descendant  = True
             ids.append(p.pk)
         page.selected = True
