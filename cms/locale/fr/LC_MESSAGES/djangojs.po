@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -17,13 +16,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: media/cms/js/change_form.js:25
-msgid ""
-"Are you sure you want to change the %(field_name)s without saving the page "
-"first?"
-msgstr ""
+msgid "Are you sure you want to change the %(field_name)s without saving the page first?"
+msgstr "Êtes-vous sûr de vouloir changer le %(field_name)s  sans enregistrer la page?"
 
 #: media/cms/js/change_form.js:60
-msgid ""
-"Not all plugins are saved. Are you sure you want to save the page? All "
-"unsaved plugin content will be lost."
-msgstr ""
+#, fuzzy
+msgid "Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost."
+msgstr "Pas tous les plugins sont enregistrés. Êtes-vous sûr de vouloir sauvegarder la page? Tout le contenu plugin non sauvegardées seront perdues."
