@@ -58,6 +58,8 @@ class Page(MpttPublisher):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
+    login_required = models.BooleanField(_("login required"),default=False)
+    menu_login_required = models.BooleanField(_("menu login required"),default=False, help_text=_("only show this page in the menu if the user is logged in"))
     
     # Managers
     objects = PageManager()

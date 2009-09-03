@@ -48,7 +48,7 @@ class PageAdmin(admin.ModelAdmin):
     top_fields = ['language']
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
-    advanced_fields = ['reverse_id',  'overwrite_url']
+    advanced_fields = ['reverse_id',  'overwrite_url', 'login_required', 'menu_login_required']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
