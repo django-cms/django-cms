@@ -17,6 +17,8 @@ class CMSPluginBase(admin.ModelAdmin):
     placeholders = None # a tupple with placeholder names this plugin can be placed. All if empty
     text_enabled = False
     
+    cache_ttl = 0
+    
     def __init__(self, model=None,  admin_site=None):
         if self.model:
             if not CMSPlugin in self.model._meta.parents and self.model != CMSPlugin:

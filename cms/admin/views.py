@@ -310,8 +310,6 @@ def change_moderation(request, page_id):
         except:
             moderate = 0
         
-        print "> M:", moderate 
-        
         if moderate == 0:
             # kill record with moderation which equals zero
             try:
