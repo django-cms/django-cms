@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
@@ -14,8 +15,7 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug
 from cms.exceptions import NoHomeFound
-from django.core.exceptions import ObjectDoesNotExist
-
+from cms.utils.helpers import reversion_register
 
 
 class Page(MpttPublisher):
@@ -699,9 +699,4 @@ class Page(MpttPublisher):
             
         return moderation_value 
         
-        
-        
-    
-if 'reversion' in settings.INSTALLED_APPS: 
-    import reversion       
-    reversion.register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])
+reversion_register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])

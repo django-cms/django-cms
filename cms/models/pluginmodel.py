@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import MpttPublisher
 from django.template.context import Context
 from cms import settings
+from cms.utils.helpers import reversion_register
 
 class PluginModelBase(ModelBase):
     """
@@ -156,8 +157,5 @@ class CMSPlugin(MpttPublisher):
                 setattr(public_copy, field.name, value)
             public_copy.publisher_is_draft=False
             return public_copy
-        
-        
-if 'reversion' in settings.INSTALLED_APPS:
-    import reversion        
-    reversion.register(CMSPlugin)
+                
+reversion_register(CMSPlugin)
