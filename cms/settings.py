@@ -6,12 +6,20 @@ contain the appropriate settings.
 from os.path import join
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext as _
 
 # Which templates should be used for extracting the placeholders?
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
 CMS_TEMPLATES = getattr(settings, 'CMS_TEMPLATES', None)
 if CMS_TEMPLATES is None:
     raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
+
+CMS_TEMPLATE_INHERITANCE = getattr(settings, 'CMS_TEMPLATE_INHERITANCE', None)
+CMS_TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
+if CMS_TEMPLATE_INHERITANCE:
+    # Append the magic inheritance template
+    CMS_TEMPLATES = tuple([x for x in CMS_TEMPLATES]+[(CMS_TEMPLATE_INHERITANCE_MAGIC,
+                    _('Inherit the template of the nearest ancestor'))])
 
 # Define which placeholders support which plugins. Extra context will appear in the context of the plugins
 # example:

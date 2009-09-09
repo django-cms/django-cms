@@ -43,6 +43,10 @@ def get_template_from_request(request, obj=None):
         return settings.CMS_TEMPLATES[0][0]
     template = request.REQUEST.get('template', None)
     if template is not None and template in dict(settings.CMS_TEMPLATES).keys():
+        if template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC and obj:
+            # Happens on admin's request when changing the template for a page
+            # to "inherit".
+            return obj.get_template()
         return template
     if obj is not None:
         return obj.get_template()

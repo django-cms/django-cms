@@ -449,25 +449,28 @@ class Page(MpttPublisher):
                 
     def get_template(self):
         """
-        get the template of this page.
-        """
-        return self.template
-
-    def get_template_name(self):
-        """
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
         template = None
-        if self.template:
+        if self.template and len(self.template)>0 and \
+            self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
             template = self.template
-        if not template:
+        else:
             for p in self.get_ancestors(ascending=True):
-                if p.template:
-                    template =  p.template
-                    break
+                template = p.get_template()
+                break
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
+        return template
+
+    def get_template_name(self):
+        """
+        get the textual name (2nd parameter in settings.CMS_TEMPLATES)
+        of the template of this page or of the nearest
+        ancestor. failing to find that, return the name of the default template.
+        """
+        template = self.get_template()
         for t in settings.CMS_TEMPLATES:
             if t[0] == template:
                 return t[1] 
@@ -696,4 +699,5 @@ class Page(MpttPublisher):
             
         return moderation_value 
         
+
 reversion_register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])

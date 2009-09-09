@@ -20,6 +20,17 @@ Example:
 		('extra.html', gettext('Some extra fancy template')),
 	)
 
+CMS\_TEMPLATE\_INHERITANCE
+--------------------------
+
+Example:
+
+    CMS_TEMPLATE_INHERITANCE = True
+
+If this is enabled, pages have the additional template option
+to inherit their template from the nearest ancestor. Adding new
+pages defaults to this iff the new page is not a root page.  
+
 CMS\_PLACEHOLDER\_CONF
 ----------------------
 

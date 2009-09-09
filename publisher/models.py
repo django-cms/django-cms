@@ -253,7 +253,6 @@ class Publisher(models.Model):
             import reversion
             reversion.revision.start()
         
-    
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
         if excluded_models is None:
             excluded_models = [self.__class__]
