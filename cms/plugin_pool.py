@@ -2,7 +2,7 @@ from cms.exceptions import PluginAllreadyRegistered
 from django.conf import settings
 from cms import settings as cms_settings
 from cms.plugin_base import CMSPluginBase
-
+from cms.utils.helpers import reversion_register
 
 class PluginPool(object):
     def __init__(self):
@@ -25,13 +25,12 @@ class PluginPool(object):
         self.plugins[plugin.__name__] = plugin 
         
         if 'reversion' in settings.INSTALLED_APPS:   
-            import reversion
             try:
                 from reversion.registration import RegistrationError
             except ImportError:
                 from reversion.revisions import RegistrationError
             try:
-                reversion.register(plugin.model, follow=["cmsplugin_ptr"])
+                reversion_register(plugin.model, follow=["cmsplugin_ptr"])
             except RegistrationError:
                 pass
     

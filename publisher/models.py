@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import RelatedField, OneToOneRel
@@ -131,7 +132,11 @@ class Publisher(models.Model):
         # perform saving        
         # publish copy - all behind this requires public instance to have pk
         
+        self._publisher_pre_save_public(public_copy)
+        
         self._publisher_save_public(public_copy)
+        
+        self._publisher_post_save_public(public_copy)
         
         # store public model relation for current instance (only) for newly 
         # created items
@@ -225,13 +230,29 @@ class Publisher(models.Model):
             # existing instances
             public_copy._publisher_delete_marked()
         return public_copy
-        
+    
+    def _publisher_pre_save_public(self, obj):
+        """We dont wanna public object to be under reversions. If they are 
+        installed, just stop reversioning.
+        """
+        if 'reversion' in settings.INSTALLED_APPS:
+            import reversion
+            reversion.revision.start()
+            
+    
     def _publisher_save_public(self, obj):
         """Save method for object which should be published. obj is a instance 
         of the same class as self. 
         """
         return obj.save() 
     
+    def _publisher_post_save_public(self, obj):
+        """Public objects were saved, start reversioning.
+        """
+        if 'reversion' in settings.INSTALLED_APPS:
+            import reversion
+            reversion.revision.start()
+        
     
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
         if excluded_models is None:
