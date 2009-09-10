@@ -102,8 +102,11 @@ class Page(MpttPublisher):
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
         from cms.utils.moderator import update_moderation_message
-        
+        # get a flat list of all tree nodes in reverse tree order
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
+        #for d in descendants:
+        #    print u"%s %s (id: %s parent: %s level: %s lft: %s rght: %s)" %("  "*d.level, d, d.id, d.parent_id, d.level, d.lft, d.rght)
+        #print "====="
         tree = [target]
         level_dif = self.level - target.level - 1
         first = True
@@ -115,8 +118,18 @@ class Page(MpttPublisher):
             new_level = page.level - level_dif
             dif = new_level - tree[-1].level 
             if dif < 0:
+                # hopping back up.. remove the obsolete pages from the stack
                 tree = tree[:dif-1]
-           
+            elif dif==0:
+                # same level as before... remove the item from
+                # the last iteration (it did not have any children)
+                tree = tree[:-1]
+            # assign the parent for this page
+            current_parent = tree[-1]
+            # append the current page to the stack... we don't know if it has children
+            # but if it does they need this to be in the stack the use it as parent
+            tree.append(page)
+            
             titles = list(page.title_set.all())
             plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
             
@@ -129,13 +142,13 @@ class Page(MpttPublisher):
             page.lft = None
             page.tree_id = None
             page.status = Page.MODERATOR_NEED_APPROVEMENT
-            page.parent = tree[-1]
+            page.parent = current_parent
             page.publisher_public_id = None
             if page.reverse_id in all_reverse_ids:
                 # reverse_id already exists for some page on the target site
                 page.reverse_id = None
             page.save()
-            
+            #print "%s%s (id: %s new_level: %s dif: %s parent_id: %s)    current stack: %s" % ("   "*new_level,page,page.id,new_level,dif,page.parent_id,[ u"%s"%z for z in tree])
             update_moderation_message(page, _('Page was copied.'))
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
@@ -196,8 +209,6 @@ class Page(MpttPublisher):
                     plugin.cmsplugin_ptr = p
                     plugin.publisher_public_id = p.pk
                     plugin.save()
-            if dif != 0:
-                tree.append(page)
     
     def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None):
         """
