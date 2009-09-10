@@ -206,8 +206,8 @@ class Migration:
             'title': ('models.CharField', [], {'max_length': '255'})
         },
         'cms.page': {
-            'changed_by': ('models.CharField', [], {'max_length': '70'}),
-            'created_by': ('models.CharField', [], {'max_length': '70'}),
+            'changed_by': ('models.CharField', [], {'max_length': '70', 'default': '""'}),
+            'created_by': ('models.CharField', [], {'max_length': '70', 'default': '""'}),
             'author': ('models.ForeignKey', [], {'to': "orm['auth.User']"}),
             'creation_date': ('models.DateTimeField', [], {'default': 'datetime.datetime(2009, 6, 30, 4, 55, 15, 872195)'}),
             'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'}),
