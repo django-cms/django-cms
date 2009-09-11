@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields.related import RelatedField
+from django.db.models.fields.related import RelatedField, OneToOneRel
 from publisher.base import install_publisher
 from publisher.manager import PublisherManager
 from publisher.errors import MpttPublisherCantPublish, PublisherCantPublish
@@ -84,7 +85,6 @@ class Publisher(models.Model):
                  
         Returns: published instance
         """
-        
         #print "publishing:", self.__class__.__name__, self
         
         ########################################################################
@@ -132,7 +132,11 @@ class Publisher(models.Model):
         # perform saving        
         # publish copy - all behind this requires public instance to have pk
         
+        self._publisher_pre_save_public(public_copy)
+        
         self._publisher_save_public(public_copy)
+        
+        self._publisher_post_save_public(public_copy)
         
         # store public model relation for current instance (only) for newly 
         # created items
@@ -195,15 +199,13 @@ class Publisher(models.Model):
         for obj in self._meta.get_all_related_objects():
             if obj.model in excluded_models:
                 continue
+            
             #excluded_models.append(obj.__class__)
             if issubclass(obj.model, Publisher):
-                
-                
                 # get all objects for this, and publish them
                 name = obj.get_accessor_name()
                 if name in self._publisher_meta.exclude_fields:
                     continue
-                
                 try:
                     try:
                         item_set = getattr(self, name).all()
@@ -228,12 +230,86 @@ class Publisher(models.Model):
             # existing instances
             public_copy._publisher_delete_marked()
         return public_copy
-        
+    
+    def _publisher_pre_save_public(self, obj):
+        """We dont wanna public object to be under reversions. If they are 
+        installed, just stop reversioning.
+        """
+        if 'reversion' in settings.INSTALLED_APPS:
+            import reversion
+            reversion.revision.start()
+            
+    
     def _publisher_save_public(self, obj):
         """Save method for object which should be published. obj is a instance 
         of the same class as self. 
         """
         return obj.save() 
+    
+    def _publisher_post_save_public(self, obj):
+        """Public objects were saved, start reversioning.
+        """
+        if 'reversion' in settings.INSTALLED_APPS:
+            import reversion
+            reversion.revision.start()
+        
+    
+    def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
+        if excluded_models is None:
+            excluded_models = [self.__class__]
+        elif not isinstance(self, Publisher) or self.__class__ in excluded_models:
+            return
+        
+        pk_val = self._get_pk_val()
+        if seen_objs.add(self.__class__, pk_val, self, parent, nullable):
+            return
+        
+        for related in self._meta.get_all_related_objects():
+            rel_opts_name = related.get_accessor_name()
+            
+            if not issubclass(related.model, Publisher) or related.model in excluded_models:
+                continue
+            
+            if isinstance(related.field.rel, OneToOneRel):
+                try:
+                    sub_obj = getattr(self, rel_opts_name)
+                except ObjectDoesNotExist:
+                    pass
+                else:
+                    sub_obj._collect_delete_marked_sub_objects(seen_objs, self.__class__, related.field.null, excluded_models=excluded_models)
+            else:
+                # To make sure we can access all elements, we can't use the
+                # normal manager on the related object. So we work directly
+                # with the descriptor object.
+                for cls in self.__class__.mro():
+                    if rel_opts_name in cls.__dict__:
+                        rel_descriptor = cls.__dict__[rel_opts_name]
+                        break
+                else:
+                    raise AssertionError("Should never get here.")
+                delete_qs = rel_descriptor.delete_manager(self).all()
+                #filter(publisher_state=Publisher.PUBLISHER_STATE_DELETE)
+                for sub_obj in delete_qs:
+                    if not isinstance(sub_obj, Publisher) or sub_obj.__class__ in excluded_models:
+                        continue
+                    sub_obj._collect_delete_marked_sub_objects(seen_objs, self.__class__, related.field.null, excluded_models=excluded_models)
+
+        # Handle any ancestors (for the model-inheritance case). We do this by
+        # traversing to the most remote parent classes -- those with no parents
+        # themselves -- and then adding those instances to the collection. That
+        # will include all the child instances down to "self".
+        parent_stack = [p for p in self._meta.parents.values() if p is not None]
+        while parent_stack:
+            link = parent_stack.pop()
+            parent_obj = getattr(self, link.name)
+            if parent_obj._meta.parents:
+                parent_stack.extend(parent_obj._meta.parents.values())
+                continue
+            # At this point, parent_obj is base class (no ancestor models). So
+            # delete it and all its descendents.
+                
+            parent_obj._collect_delete_marked_sub_objects(seen_objs, excluded_models=excluded_models)
+
     
     def _publisher_delete_marked(self, collect=True):
         """If this instance, or some remote instances are marked for deletion
@@ -246,7 +322,7 @@ class Publisher(models.Model):
         if collect:
             from django.db.models.query import CollectedObjects
             seen = CollectedObjects()
-            self._collect_sub_objects(seen)
+            self._collect_delete_marked_sub_objects(seen)
             for cls, items in seen.items():
                 if issubclass(cls, Publisher):
                     for item in items.values():

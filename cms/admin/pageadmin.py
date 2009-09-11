@@ -190,9 +190,6 @@ class PageAdmin(admin.ModelAdmin):
         # helper for url pattern generation
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
-        # helper for url pattern generation
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
-        
         url_patterns = patterns('',
             
             pat(r'^.+/add-plugin/$', add_plugin),
@@ -669,7 +666,7 @@ class PageAdmin(admin.ModelAdmin):
                 page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
                 
             # revert plugins
-            revert_plugins(request, version.pk)
+            revert_plugins(request, version.pk, obj)
         return response
             
     

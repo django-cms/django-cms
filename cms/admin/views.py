@@ -247,7 +247,7 @@ def save_all_plugins(request, page, excludes=None):
         else:
             plugin.save()
         
-def revert_plugins(request, version_id):
+def revert_plugins(request, version_id, obj):
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
@@ -255,15 +255,17 @@ def revert_plugins(request, version_id):
     plugin_list = []
     titles = []
     others = []
-    page = None
+    page = obj
     for rev in revs:
         obj = rev.object
+        
         if obj.__class__ == CMSPlugin:
             cms_plugin_list.append(obj)
         elif hasattr(obj, 'cmsplugin_ptr_id'):
             plugin_list.append(obj)
         elif obj.__class__ == Page:
-            page = Page.objects.get(pk=obj.pk)
+            pass
+            #page = obj #Page.objects.get(pk=obj.pk)
         elif obj.__class__ == Title:
             titles.append(obj)
         else:

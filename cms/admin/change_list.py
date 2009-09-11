@@ -1,11 +1,13 @@
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
-from cms.models import Title, PagePermission, Page
+from cms.models import Title, PagePermission, Page, PageModerator
 from cms import settings
 from cms.utils import get_language_from_request, find_children
 from django.contrib.sites.models import Site
 from cms.utils.permissions import get_user_sites_queryset
 from cms.exceptions import NoHomeFound
+from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN,\
+    MASK_DESCENDANTS, PageModeratorState
 
 SITE_VAR = "site__exact"
 COPY_VAR = "copy"
@@ -84,7 +86,22 @@ class CMSChangeList(ChangeList):
             # get all ids of public instances, so we can cache them
             # TODO: add some filtering here, so the set is the same like page set...
             published_public_page_id_set = Page.objects.public().filter(published=True).values_list('id', flat=True)
-        
+            
+            # get all moderations for current user and all pages
+            pages_moderator_set = PageModerator.objects \
+                .filter(user=request.user, page__site__id=self._current_site.pk) \
+                .values_list('page', 'moderate_page', 'moderate_children', 'moderate_descendants')
+            # put page / moderations into singe dictionary, where key is page.id 
+            # and value is sum of moderations, so if he can moderate page and descendants
+            # value will be MASK_PAGE + MASK_DESCENDANTS
+            page_moderator = map(lambda item: (item[0], item[1] * MASK_PAGE + item[2] * MASK_CHILDREN + item[3] * MASK_DESCENDANTS), pages_moderator_set)
+            page_moderator = dict(page_moderator)
+            
+            # page moderator states
+            pm_qs = PageModeratorState.objects.filter(page__site=self._current_site)
+            pm_qs.query.group_by = ['page_id']
+            pagemoderator_states_id_set = pm_qs.values_list('page', flat=True)
+            
         ids = []
         root_pages = []
         pages = list(pages)
@@ -118,6 +135,17 @@ class CMSChangeList(ChangeList):
                 # set public instance existence state
                 page.public_published_cache = page.publisher_public_id in published_public_page_id_set
                 
+                # moderation for current user
+                moderation_value = 0
+                try:
+                    moderation_value = page_moderator[page.pk]
+                except:
+                    pass
+                page._moderation_value_cahce = moderation_value
+                page._moderation_value_cache_for_user_id = request.user.pk
+                
+                #moderation states
+                page._has_moderator_state_chache = page.pk in pagemoderator_states_id_set
                 
             if page.root_node or self.is_filtered():
                 page.last = True
@@ -134,6 +162,9 @@ class CMSChangeList(ChangeList):
                     find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True, to_levels=1000)
                 else:
                     page.childrens = []
+        
+        
+        # TODO: OPTIMIZE!!
         titles = Title.objects.filter(page__in=ids)
         for page in all_pages:# add the title and slugs and some meta data
             page.languages_cache = []

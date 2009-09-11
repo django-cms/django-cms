@@ -57,24 +57,20 @@ def boolean_icon(value):
 @register.filter
 def moderator_choices(page, user):    
     """Returns simple moderator choices used for checkbox rendering, as a value
-    is used mask value.
+    is used mask value. Optimized, uses caching from change list.
     """
-    
-    # this is called once per page, when moderation is activated! Should be
-    # optimized
-    
-    try:
-        page_moderator = page.pagemoderator_set.get(user=user)
-    except ObjectDoesNotExist:
-        page_moderator = None
+    moderation_value = page.get_moderation_value(user)
     
     moderate = (
-        ('moderate_page', _('Moderate page'), _('Unbind page moderation'), MASK_PAGE), 
-        ('moderate_children', _('Moderate children'), _('Unbind children moderation'), MASK_CHILDREN),
-        ('moderate_descendants', _('Moderate descendants'), _('Unbind descendants moderation'), MASK_DESCENDANTS),
+        (MASK_PAGE, _('Moderate page'), _('Unbind page moderation'), 'page'), 
+        (MASK_CHILDREN, _('Moderate children'), _('Unbind children moderation'), 'children'),
+        (MASK_DESCENDANTS, _('Moderate descendants'), _('Unbind descendants moderation'), 'descendants'),
     )
-        
-    for name, title_yes, title_no, value in moderate:
-        active = page_moderator and getattr(page_moderator, name)
+    
+    choices = []
+    for mask_value, title_yes, title_no, kind in moderate:
+        active = moderation_value and moderation_value & mask_value
         title = active and title_no or title_yes
-        yield value, title, active, name.split('_')[1]
+        choices.append((mask_value, title, active, kind))
+    
+    return choices

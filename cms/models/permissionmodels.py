@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from cms.utils.helpers import reversion_register
 
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
@@ -105,6 +105,4 @@ class PageUserGroup(Group):
     #__unicode__ = lambda self: unicode(self.group)
 
 
-if 'reversion' in settings.INSTALLED_APPS:
-    import reversion        
-    reversion.register(PagePermission)
+reversion_register(PagePermission)
