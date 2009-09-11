@@ -1,7 +1,7 @@
 // some very small jquery extensions
 (function($) {
 	// very simple yellow fade plugin..
-	//$.fn.yft = function(){ this.effect("highlight", {}, 1000); }
+	$.fn.yft = function(){ this.effect("highlight", {}, 1000); }
 	
 	// jquery replace plugin :)
 	$.fn.replace = function(o) { 
