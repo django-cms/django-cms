@@ -156,6 +156,7 @@ div#sitemap {
 	margin:0px;
 	padding:0px 0px 5px 0px;
 }
+
 div#sitemap a{text-decoration:none; border:none; outline:none;}
 div#sitemap a:hover{text-decoration:underline;}
 div#sitemap li, div#sitemap ul{list-style-type: none;}
@@ -235,6 +236,13 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 
 #sitemap li .col-language a{text-transform:uppercase;}
 #sitemap li .col-language a:hover{text-decoration:underline;}
+
+#sitemap li .col-actions a{ vertical-align:middle}
+#sitemap li .col-published a, #sitemap li .col-published input, #sitemap li .col-published label{ vertical-align:middle;}
+#sitemap li .col-draft a, #sitemap li .col-draft span{vertical-align:middle; margin-top:0;}
+#sitemap li  .col-navigation img{vertical-align:middle;}
+
+
 /*
 #sitemap li .col-actions { width: 80px; }
 #sitemap li .col-published {width:100px;}
@@ -246,9 +254,9 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-lastchange { width:96px; text-align: left;}
 */
 
-#sitemap li .col-draft { text-align: right;}
+#sitemap li .col-draft {text-align: right;}
 #sitemap li .col-lastchange, 
-#sitemap li .col-published { text-align: left;}
+#sitemap li .col-published {text-align: left;}
 
 
 #sitemap li a.move {
@@ -263,7 +271,6 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	width:15px;
 	height:15px;
 	margin-left:4px;
-	margin-top:5px;
 	display:inline-block;
 	background:url(../images/copy.gif) 0px 0px no-repeat; 
 }
@@ -278,6 +285,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-draft a.approve {
 	margin-left:4px;
 	background-position: -60px -80px;
+	margin-top:-4px;
 }
 
 #sitemap li a.selector-add span{display:none;}
@@ -309,6 +317,9 @@ div#sitemap ul.header li{
 	font-weight:bold;
 	height:auto;
 }
+* html div#sitemap ul.header li{height:16px;}
+
+
 #sitemap ul.header li .cont{
 	background:none;
 	height:15px;
@@ -359,6 +370,8 @@ div#sitemap ul.header li{
 .activ-filter #sitemap .tree li .cont{border-left:none;}
 .activ-filter #sitemap .tree li .col1 .title{background-image:none; padding-left:8px;}
 
+* html #sitemap ul.header{margin:0;height:21px;overflow:hidden;}
+* html #sitemap ul.header li{}
 
 #changelist{
 	width:auto;
@@ -380,12 +393,16 @@ div#sitemap ul.header li{
 	line-height:30px;
 	padding-left:10px;	
 }
+* html #changelist-filter-button{margin-right:-1px;}
+* html #changelist #toolbar{height:23px;overflow:hidden;}
+
 #changelist-filter-button:hover{background-position:0px -50px;}
 .activ-filter #changelist-filter-button{background-position:0px -100px; color:#fff;}
 .activ-filter #changelist-filter-button:hover{background-position:0px -100px;}
 
 #changelist-filter{top:30px;}
 #changelist-filter h2{	display:none;}
+* html #changelist-filter{margin-right:-1px;}
 
 .change-list .filtered {background:#fff none repeat-y scroll right top !important;}
 
