@@ -17,7 +17,6 @@ from cms.utils.page import get_available_slug
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
 
-
 class Page(MpttPublisher):
     """
     A simple hierarchical page model

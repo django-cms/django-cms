@@ -233,11 +233,12 @@ class Publisher(models.Model):
     
     def _publisher_pre_save_public(self, obj):
         """We dont wanna public object to be under reversions. If they are 
-        installed, just stop reversioning.
+        installed, just stop reversioning - bit of hacking to reversion.
         """
         if 'reversion' in settings.INSTALLED_APPS:
             import reversion
-            reversion.revision.start()
+            self.old_reversion_state_depth = reversion.revision._state.depth
+            reversion.revision._state.depth = - 10000
             
     
     def _publisher_save_public(self, obj):
@@ -251,9 +252,8 @@ class Publisher(models.Model):
         """
         if 'reversion' in settings.INSTALLED_APPS:
             import reversion
-            reversion.revision.start()
+            reversion.revision._state.depth = self.old_reversion_state_depth
         
-    
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
         if excluded_models is None:
             excluded_models = [self.__class__]
