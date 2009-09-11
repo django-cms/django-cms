@@ -69,6 +69,9 @@ CMS_SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False)
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 
+# a tuple with a 
+CMS_NAVIGATION_MODIFIERS = getattr(settings, 'CMS_NAVIGATION_MODIFIERS', ())
+
 # a tuple of hookable applications, e.g.:
 # CMS_APPLICATIONS_URLS = (
 #    ('sampleapp.urls', 'Sample application'),
