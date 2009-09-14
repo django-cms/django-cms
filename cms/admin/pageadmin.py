@@ -32,6 +32,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title
+from django.utils.translation import activate
 from django.utils.encoding import force_unicode
 from django.utils.functional import curry
 from django.utils.translation import ugettext as _
@@ -485,7 +486,6 @@ class PageAdmin(admin.ModelAdmin):
         """
         The 'change' admin view for the Page model.
         """
-        from django.utils import translation
 
         try:
             obj = self.model.objects.get(pk=object_id)
@@ -505,7 +505,7 @@ class PageAdmin(admin.ModelAdmin):
 
             user_lang_set = request.GET.get('language',
                                             django_settings.LANGUAGE_CODE)
-            translation.activate(user_lang_set)
+            activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
                 'language': user_lang_set,
