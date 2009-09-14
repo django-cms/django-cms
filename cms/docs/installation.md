@@ -35,13 +35,17 @@ Middleware
 Add the following middleware classes:
 
 	MIDDLEWARE_CLASSES = (
+
+        # needed for add/edit page
+        'django.middleware.locale.LocaleMiddleware',
+
     	...
     	'cms.middleware.page.CurrentPageMiddleware',
 		'cms.middleware.user.CurrentUserMiddleware',
     	'cms.middleware.multilingual.MultilingualURLMiddleware',
     	...
     	)
-    
+
 If your site is not multilingual you can leave out `'cms.middleware.MutilingualURLMiddleware'`.
 
 Template Context Processors
