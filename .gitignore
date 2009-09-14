@@ -1,7 +1,7 @@
 .tmp*
 *.pyc
 *.DS_Store
-
+*.svn
 cms/media/cms_page_media/
 example/run
 
