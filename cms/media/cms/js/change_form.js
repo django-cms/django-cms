@@ -64,7 +64,6 @@ $(document).ready(function() {
 					changed = true;
 				}
 
-	            var array = window.location.href.split('?');
 	            if (changed) {
 					var question = gettext("Are you sure you want to change tabs without saving the page first?")
 					var answer = confirm(question);
