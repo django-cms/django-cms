@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
-VERSION = (2, 0, 0, 'alpha')
+VERSION = (2, 0, 0, 'RC1')
 __version__ = '.'.join(map(str, VERSION))
 
 import signals

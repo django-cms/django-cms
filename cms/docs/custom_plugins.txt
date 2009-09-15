@@ -1,7 +1,7 @@
-Plugins
-=======
+Custom Plugins
+==============
 
-Suppose you have the following gallery model:
+Suppose you have the following gallery model::
 
 	class Gallery(models.Model):
 		name = models.CharField(max_length=30)
@@ -18,7 +18,7 @@ To create a CMS plugin you need two components: a CMSPlugin model and a cms_plug
 Plugin Model
 ------------
 
-First create a model that links to the gallery via a ForeignKey field:
+First create a model that links to the gallery via a ForeignKey field::
 
 	from cms.models import CMSPlugin
 	
@@ -34,7 +34,7 @@ cms_plugins.py
 
 After that create in the application folder (the same one where models.py is) a cms_plugins.py file.
 
-In there write the following:
+In there write the following::
 
 	from cms.plugin_base import CMSPluginBase
 	from cms.plugin_pool import plugin_pool
@@ -51,20 +51,20 @@ In there write the following:
 	
 	plugin_pool.register_plugin(CMSGalleryPlugin)		
 
-### model ###
+**model**
 
 Is the CMSPlugin model we created earlier.
 If you don't need a model because you just want to display some template logic, use CMSPlugin from cms.models as the model instead.
 
-### name ###
+**name**
 
 Will be displayed in the plugin editor
 
-### render\_template ###
+**render_template**
 
 Will be rendered with the context returned by the render function
 
-### render ###
+**render**
 
 The render function takes 3 arguments:
 
@@ -83,7 +83,7 @@ It is normally a good idea to give the placeholder to the template so you can st
 the content differently in the template based on which placeholder it is placed.
 
 If you want to process forms in the render function or if you want to see if the user is logged in you may want to access the request. 
-You can accomplish this simply with:
+You can accomplish this simply with::
 
 	request = context['request']
 
@@ -92,6 +92,7 @@ Because the request will always be in the context as the requestcontext processo
 Template
 --------
 Now create a gallery.html template in templates/gallery/ and write the following in there.
+::
 
 	{% for image in gallery.picture_set.all %}
 		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
@@ -104,7 +105,7 @@ Limiting Plugins per Placeholder
 
 You can limit in which placeholder certain plugins can appear. Add a CMS\_PLACEHOLDER\_CONF to your settings.py
 
-Example:
+Example::
 
 	CMS_PLACEHOLDER_CONF = {                        
 	    'content': {

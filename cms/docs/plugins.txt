@@ -7,7 +7,7 @@ File
 Allows you to upload a file. A filetype icon will be assigned based on the file extension.
 
 For installation be sure you have the following in the `INSTALLED_APPS` setting
-in your project's `settings.py` file:
+in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -21,7 +21,7 @@ Flash
 Allows you to upload and display a Flash SWF file on your page.
 
 For installation be sure you have the following in the `INSTALLED_APPS` setting
-in your project's `settings.py` file:
+in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -36,7 +36,7 @@ GoogleMap
 Displays a map of an address on your page.
 
 For installation be sure you have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file:
+setting in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -54,7 +54,7 @@ Link
 Displays a link to an arbitrary URL or to a page. If a page is moved the URL will still be correct.
 
 For installation be sure to have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file:
+setting in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -68,7 +68,7 @@ Picture
 Displays a picture in a page.
 
 For installation be sure you have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file:
+setting in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -80,7 +80,7 @@ If you want to resize the picture you can get a thumbnail library. We recommend
 [sorl.thumbnail](http://code.google.com/p/sorl-thumbnail/).
 In your project template directory create a folder called `cms/plugins` and create a file
 called `picture.html` in there.
-Here is an example `picture.html` template:
+Here is an example `picture.html` template::
 
 	{% load i18n thumbnail %}
 	{% spaceless %}
@@ -104,7 +104,7 @@ Snippet
 Just renders some HTML snippet. Mostly used for development or hackery.
 
 For installation be sure you have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file:
+setting in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -118,7 +118,7 @@ Teaser
 Displays a teaser box for another page or a URL. A picture and a description can be added.
 
 For installation be sure you have the following in the `INSTALLED_APPS` settings
-in your project's `settings.py` file:
+in your project's `settings.py` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -139,11 +139,11 @@ If plugins are text-enabled they can be placed inside the text-flow. At this mom
 
 The current editor is [Wymeditor](http://www.wymeditor.org/).
 If you want to use TinyMce you need to install [django-tinymce](http://code.google.com/p/django-tinymce/)
-first and put the following in your project's `settings.py` file:
+first and put the following in your project's `settings.py` file::
 
 	CMS_USE_TINYMCE = True
 
-For installation be sure you have the following in your project's `INSTALLED_APPS` setting:
+For installation be sure you have the following in your project's `INSTALLED_APPS` setting::
 
 	INSTALLED_APPS = (
 		# ...

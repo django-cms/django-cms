@@ -123,7 +123,7 @@ INSTALLED_APPS = (
     #'debug_toolbar',
     'south',
     # sample application
-    'sampleapp',
+    'example.sampleapp',
     #'store',
 )
 

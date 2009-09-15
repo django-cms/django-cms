@@ -6,12 +6,12 @@ All settings described here can be found in cms/settings.py or in the plugins fo
 
 All thoose settings should be placed in your project settings.py
 
-CMS\_TEMPLATES 
+CMS_TEMPLATES 
 --------------
 
 A list of the templates you can select for a page.
 
-Example:
+Example::
 
 	CMS_TEMPLATES = (
 		('base.html', gettext('default')),
@@ -20,10 +20,12 @@ Example:
 		('extra.html', gettext('Some extra fancy template')),
 	)
 
-CMS\_TEMPLATE\_INHERITANCE
+CMS_TEMPLATE_INHERITANCE
 --------------------------
 
-Example:
+This is optional
+
+Example::
 
     CMS_TEMPLATE_INHERITANCE = True
 
@@ -31,12 +33,13 @@ If this is enabled, pages have the additional template option
 to inherit their template from the nearest ancestor. Adding new
 pages defaults to this iff the new page is not a root page.  
 
-CMS\_PLACEHOLDER\_CONF
+CMS_PLACEHOLDER_CONF
 ----------------------
 
-Is used to configure the placeholders.
+Is used to configure the placeholders. 
+This is optional
 
-Example:
+Example::
 
 	CMS_PLACEHOLDER_CONF = {
 		'content': {
@@ -55,7 +58,7 @@ Example:
 
 A list of plugins that can be added to this placeholder. If not supplied all plugins can be selected.
 
-**extra\_context**
+**extra_context**
 
 Extra context that plugins in this placeholder receive.
 
@@ -64,10 +67,10 @@ Extra context that plugins in this placeholder receive.
 The name displayed in admin. With the gettext stub it can be internationalized.
 
 
-CMS\_PERMISSION
+CMS_PERMISSION
 ---------------
 
-Example:
+Example::
 
 	CMS_PERMISSION = True
 	
@@ -84,10 +87,10 @@ If a user has the right to create new users he can now do so in the "Users - pag
 The users he created also can only have the rights he already has. So if he has only the right to edit a certain page all users he created also only can edit this page. Naturally he can even more limit the rights of the users he creates.
 
 
-CMS\_MODERATOR
+CMS_MODERATOR
 --------------
 
-Example:
+Example::
 
 	CMS_MODERATOR = True
 	
@@ -96,10 +99,10 @@ You can select to moderate pages or hole trees. If a page is under moderation yo
 
 
 
-CMS\_SHOW\_START\_DATE & CMS\_SHOW\_END\_DATE
+CMS_SHOW_START_DATE & CMS_SHOW_END_DATE
 ----------------------------------------------
 
-Example:
+Example::
 
 	CMS_SHOW_END_DATE = True
 	CMS_SHOW_START_DATE = True
@@ -107,10 +110,10 @@ Example:
 This adds 2 new date-time fields in the advanced-settings tab of the page.
 With this option you can limit the time a page is published.
 
-CMS\_URL\_OVERWRITE
+CMS_URL_OVERWRITE
 -------------------
 
-Example:
+Example::
 
 	CMS_URL_OVERWRITE = True
 	
@@ -118,24 +121,24 @@ This adds a new field "url overwrite" in your in the advanced-settings tab of th
 With this field you can overwrite the whole relative url of the page.
 
 
-CMS\_MENU\_TITLE\_OVERWRITE
+CMS_MENU_TITLE_OVERWRITE
 ---------------------------
 
-Example:
+Example::
 
 	CMS_MENU_TITLE_OVERWRITE = True
 
 This adds a new field "menu title" besides the title field.
 With this field you can overwrite the title that is displayed in the menu.
 
-To access the menu title in the template use:
+To access the menu title in the template use::
 
 	{{ page.get_menu_title }}
 
-CMS\_REDIRECTS
+CMS_REDIRECTS
 --------------
 
-Example:
+Example::
 
 	CMS_REDIRECTS = True
 	
@@ -144,16 +147,16 @@ You can enter a url and if someone visits this page he gets redirected to this u
 
 Note: Don't use this too much. There is django.contrib.redirect for this purpose
 
-CMS\_SEO\_FIELDS
+CMS_SEO_FIELDS
 ----------------
 
-Example:
+Example::
 
 	CMS_SEO_FIELDS = True
 
 This adds a new Fieldset "SEO Fields" in the page. You can set there the Page Title, Meta Keywords and the Meta Description
 
-To access the fields in the template use:
+To access the fields in the template use::
 	
 	{% load cms_tags %}
 	<head>
@@ -165,10 +168,10 @@ To access the fields in the template use:
 	</head>
 
 
-CMS\_FLAT\_URLS
+CMS_FLAT_URLS
 ---------------
 
-Example:
+Example::
 
 	CMS_FLAT_URLS = True
 	
@@ -178,10 +181,10 @@ So a page with slug "world" will have an url "/world" even it is a child of the 
 If disabled the page would have an url: "/hello/world/"
 
 
-CMS\_NAVIGATION\_EXTENDERS
+CMS_NAVIGATION_EXTENDERS
 --------------------------
 
-Example:
+Example::
 
 	CMS_NAVIGATION_EXTENDERS = (
 		('shop.navigation.get_nodes', 'Shop Categories'),
@@ -195,11 +198,11 @@ For detailed explanation have a look in navigation.md in the section "Extending 
 
 This gives you a new field in the advanced-settings tab of the page. You can there say that one navigation extender is attached to this page.
 
-CMS\_APPLICATIONS\_URLS
+CMS_APPLICATIONS_URLS
 -----------------------
 
 
-Example:
+Example::
 
 	CMS_APPLICATIONS_URLS = (
     	('someapp.urls', 'Some application'),
@@ -212,10 +215,10 @@ For example you have a page named blog and a blog application. You can attach th
 
 At the moment if you change this settings you should restart the server as we some cache invalidation bug. 
 
-CMS\_UNIQUE\_SLUGS
+CMS_UNIQUE_SLUGS
 ------------------
 
-Example:
+Example::
 
 	CMS_UNIQUE_SLUGS = True
 	
@@ -223,41 +226,41 @@ Defines if the slugs should be unique over all sites and languages.
 This setting is changed automatically according to other settings.
 Do not set it in you settings.py if you don't know what you are doing.
 
-CMS\_SOFTROOT 
+CMS_SOFTROOT 
 -------------
 
-Example:
+Example::
 
 	CMS_SOFTROOT = True
 	
 This adds a new field "softroot" to you advanced-settings tab in the page.
 If a page is marked as softroot the menu will only display the items till the softroot. If you have a huge site you can partition the menu with this.
 
-CMS\_HIDE\_UNTRANSLATED
+CMS_HIDE_UNTRANSLATED
 -----------------------
 
-Example:
+Example::
 
 	CMS_HIDE_UNTRANSLATED = False
 	
 By default django-cms hides the menu items that are not translated yet in the current language. With this setting set to False they will show up anyway.
 
 
-CMS\_LANGUAGE\_FALLBACK
+CMS_LANGUAGE_FALLBACK
 -----------------------
 
-Example:
+Example::
 
 	CMS_LANGUAGE_FALLBACK = True
 	
 This will redirect the browser to an same page in an other language uf the page is not available in the current language.
 
-CMS\_LANGUAGES
+CMS_LANGUAGES
 --------------
 
 Which language should be used by the cms?
 
-Example:
+Example::
 
 	CMS_LANGUAGES = (
 	    ('fr', gettext('French')),
@@ -268,63 +271,63 @@ Example:
 Normally the cms takes the LANGUAGES from the settings.py. With this you can overwrite this. Be sure that you don't have more language in here than in the LANGUAGES setting.
 
 
-CMS\_DEFAULT\_LANGUAGE
+CMS_DEFAULT_LANGUAGE
 ----------------------
 
-Example:
+Example::
 
 	CMS_DEFAULT_LANGUAGE = "de"
 	
 The default language is used if no other language could be found in the browser. Normally will the take the first of the LANGUAGES setting.
 
 
-CMS\_CONTENT\_CACHE\_DURATION
+CMS_CONTENT_CACHE_DURATION
 -----------------------------
 
-Example:
+Example::
 
 	CMS_CONTENT_CACHE_DURATION = 60
 
 Defines how long page content should be cached, including navigation and admin menu.
 Default is 60
 
-CMS\_MEDIA\_PATH
+CMS_MEDIA_PATH
 ----------------
 
-Example:
+Example::
 	
 	CMS_MEDIA_PATH = "cms/"
 	
-The path from MEDIA\_ROOT to the media files located in cms/media/
+The path from MEDIA_ROOT to the media files located in cms/media/
 default: "cms/"
 
-CMS\_MEDIA\_ROOT
+CMS_MEDIA_ROOT
 ----------------
 
-Example:
+Example::
 
 	CMS_MEDIA_ROOT = "settings.MEDIA_ROOT + "/cms/"
 
 The path to the media root of the cms media files. 
 Default: settings.MEDIA_ROOT + CMS_MEDIA_PATH
 
-CMS\_MEDIA\_URL
+CMS_MEDIA_URL
 ---------------
 
-Example:
+Example::
 
 	CMS_MEDIA_URL = "/media/cms/"
 	
 The location of the media files that are located in cms/media/cms/
-default: MEDIA\_URL + CMS\_MEDIA\_PATH
+default: MEDIA_URL + CMS_MEDIA_PATH
 
-CMS\_PAGE\_MEDIA\_PATH
+CMS_PAGE_MEDIA_PATH
 ----------------------
 
-By default the cms creates a folder in called 'cms\_page\_media' in your static files folder where all uploaded media files are stored.
+By default the cms creates a folder in called 'cms_page_media' in your static files folder where all uploaded media files are stored.
 The media files are stored in subfolders numbered with the id of the page.
 
-Example:
+Example::
 
 	CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
 
