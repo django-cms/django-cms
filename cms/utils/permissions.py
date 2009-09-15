@@ -240,6 +240,6 @@ def get_user_sites_queryset(user):
     q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
         Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True))
     
-    return qs.filter(q)
+    return qs.filter(q).distinct()
     
     
