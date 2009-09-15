@@ -23,6 +23,7 @@ function add_plugin(type, parent_id, language){
 			// is called by dismissEditPluginPopup().
 			var plugin_id = data;
 			editPluginPopupCallbacks[data] = function(plugin_id, icon_src, icon_alt){
+                texteditor = get_editor("{{ name }}");
 				texteditor.insertText(plugin_admin_html(plugin_id, icon_src, icon_alt));
 				editPluginPopupCallbacks[data] = null; // Unbind callback
 			};
@@ -66,7 +67,7 @@ function get_editor(placeholder) {
     if (typeof(PlaceholderEditorRegistry) == "undefined") {
         // This could occur if javascript defining PlaceholderEditorRegistry
         // has not been loaded for some reason.
-        alert("{% trans "A programming error occurred - cannot find text editor widgets." %}");
+        alert("{% filter escapejs %}{% trans "A programming error occurred - cannot find text editor widgets." %}{% endfilter %}");
         return null;
     }
     return PlaceholderEditorRegistry.retrieveEditor(placeholder);

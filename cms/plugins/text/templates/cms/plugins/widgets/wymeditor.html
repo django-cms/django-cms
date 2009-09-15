@@ -61,13 +61,13 @@ $(document).ready(function(){
 			var language = $('#id_language').attr('value');
 			
 			if (pluginvalue == "") {
-				alert("{% trans "Please select a plugin type." %}");
+				alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
 				return;
 			}
 			
 			var texteditor = get_editor(placeholder);
 			if (texteditor == null || texteditor.insertText == null) {
-				alert("{% trans "Text editor does not support inserting objects." %}");
+				alert("{% filter escapejs %}{% trans "Text editor does not support inserting objects." %}{% endfilter %}");
 				return;
 			}
 			// First create db instance using AJAX post back
@@ -79,16 +79,16 @@ $(document).ready(function(){
 		$('span.edit-object').click(function(){
 			var texteditor = get_editor(placeholder);
 			if (texteditor == null || texteditor.selectedObject == null) {
-				alert("{% trans "Text editor does not support editing objects." %}");
+				alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
 				return;
 			}
 			var imgobj = texteditor.selectedObject();
 			if (imgobj == null) {
-				alert("{% trans "No object selected." %}");
+				alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
 				return;
 			}
 			if (imgobj.id == null || imgobj.id.indexOf("plugin_obj_") != 0) {
-				alert("{% trans "Not a plugin object" %}");
+				alert("{% filter escapejs %}{% trans "Not a plugin object" %}{% endfilter %}");
 				return;
 			}
 			var plugin_id = imgobj.id.substr("plugin_obj_".length);
@@ -102,11 +102,11 @@ $(document).ready(function(){
 function get_plugin_html(){
 	html = '<div class="plugin-select-holder">'
 		 + '<select name="plugins">'
-		 + '<option value="" selected="selected">{% trans "Available Plugins" %}</option>'{% for p in installed_plugins %}
+		 + '<option value="" selected="selected">{% filter escapejs %}{% trans "Available Plugins" %}{% endfilter %}</option>'{% for p in installed_plugins %}
 	     + '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
 		 + '</select>'
-		 + '<span class="insert-object addlink">{% trans "Insert plugin" %}</span>'
-		 + '<span class="edit-object changelink">{% trans "Edit selected plugin" %}</span>'
+		 + '<span class="insert-object addlink">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
+		 + '<span class="edit-object changelink">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
 		 + '</div>';
 	return html;
 }

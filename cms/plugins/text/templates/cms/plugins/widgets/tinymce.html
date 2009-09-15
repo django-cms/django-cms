@@ -27,7 +27,7 @@ tinymce.create('tinymce.plugins.CMSPluginEditor', {
     	switch (n) {
             case 'cmsplugins':        
 		        var mlb = cm.createListBox('mylistbox', {
-		             title : '{% trans "Plugins" %}',
+		             title : '{% filter escapejs %}{% trans "Plugins" %}{% endfilter %}',
 		             onselect : function(v) {
 		             	var pluginvalue = v;
 						var splits = window.location.href.split("?")[0].split("/");
@@ -35,7 +35,7 @@ tinymce.create('tinymce.plugins.CMSPluginEditor', {
 						var language = $('#id_language').attr('value');
 						
 						if (pluginvalue == "") {
-							alert("{% trans "Please select a plugin type." %}");
+							alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
 							return;
 						}
 						texteditor = get_editor("{{ name }}");
@@ -51,16 +51,16 @@ tinymce.create('tinymce.plugins.CMSPluginEditor', {
                 return mlb;
         	case 'cmspluginsedit':
         		var bt = cm.createButton('editplugins', {
-            		title : '{% trans "Edit selected plugin" %}',
+            		title : '{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}',
             		onclick : function() {
                  		var texteditor = get_editor("{{ name }}");
 						if (texteditor == null || texteditor.selectedObject == null) {
-							alert("{% trans "Text editor does not support editing objects." %}");
+							alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
 							return;
 						}
 						var imgobj = texteditor.selectedObject();
 						if (imgobj == null) {
-							alert("{% trans "No object selected." %}");
+							alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
 							return;
 						}
 						
@@ -103,13 +103,13 @@ function init_buttons(placeholder){
 		var language = $('#id_language').attr('value');
 		
 		if (pluginvalue == "") {
-			alert("{% trans "Please select a plugin type." %}");
+			alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
 			return;
 		}
 		
 		var texteditor = get_editor(placeholder);
 		if (texteditor == null || texteditor.insertText == null) {
-			alert("{% trans "Text editor does not support inserting objects." %}");
+			alert("{% filter escapejs %}{% trans "Text editor does not support inserting objects." %}{% endfilter %}");
 			return;
 		}
 		// First create db instance using AJAX post back
@@ -121,16 +121,16 @@ function init_buttons(placeholder){
 	$('span.edit-object').click(function(){
 		var texteditor = get_editor(placeholder);
 		if (texteditor == null || texteditor.selectedObject == null) {
-			alert("{% trans "Text editor does not support editing objects." %}");
+			alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
 			return;
 		}
 		var imgobj = texteditor.selectedObject();
 		if (imgobj == null) {
-			alert("{% trans "No object selected." %}");
+			alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
 			return;
 		}
 		if (imgobj.id == null || imgobj.id.indexOf("plugin_obj_") != 0) {
-			alert("{% trans "Not a plugin object" %}");
+			alert("{% filter escapejs %}{% trans "Not a plugin object" %}{% endfilter %}");
 			return;
 		}
 		var plugin_id = imgobj.id.substr("plugin_obj_".length);
