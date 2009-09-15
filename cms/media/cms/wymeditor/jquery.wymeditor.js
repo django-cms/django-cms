@@ -1330,21 +1330,27 @@ WYMeditor.editor.prototype.configureEditorUsingRawCss = function() {
 /********** EVENTS **********/
 
 WYMeditor.editor.prototype.listen = function() {
-
-  //don't use jQuery.find() on the iframe body
-  //because of MSIE + jQuery + expando issue (#JQ1143)
-  //jQuery(this._doc.body).find("*").bind("mouseup", this.mouseup);
-  
   jQuery(this._doc.body).bind("mousedown", this.mousedown);
-  var images = this._doc.body.getElementsByTagName("img");
-  for(var i=0; i < images.length; i++) {
-    jQuery(images[i]).bind("mousedown", this.mousedown);
+  jQuery("img", jQuery(this._doc.body)).bind("mousedown", this.mousedown);
+  var self = this;
+  if (this._doc.body.addEventListener) {
+      // Mozilla specific fix: after dragging object around,
+      // event handlers are lost.  So we rebind (after)
+      this._doc.body.addEventListener("dragdrop", function(evt) {
+                                          setTimeout(
+                                              function() {
+                                                  self.listen();
+                                                  }, 100);
+                                      }, false);
   }
+
+
 };
 
 WYMeditor.editor.prototype.mousedown = function(evt) {
   
   var wym = WYMeditor.INSTANCES[this.ownerDocument.title];
+  if (!wym) return;
   wym._selected_image = (this.tagName.toLowerCase() == WYMeditor.IMG) ? this : null;
   evt.stopPropagation();
 };
