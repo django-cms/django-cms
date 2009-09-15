@@ -102,68 +102,90 @@ class Page(MpttPublisher):
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
         from cms.utils.moderator import update_moderation_message
-        # list of all reverse_id values in the target site
-        all_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
-        page_ids_that_need_publishing = []
-        def copy_page_to_parent(page, parent):
-            # re-fetch the page we are about to copy, so we don't overwrite our selves in the process
-            new_page = Page.objects.get(pk=page.pk)            
+        
+        descendants = [self] + list(self.get_descendants().order_by('-rght'))
+        site_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
+        target.old_pk = -1
+        if position == "first_child":
+            tree = [target]
+        elif target.parent_id:
+            tree = [target.parent]
+        else:
+            tree = []
+        first = True
+        for page in descendants:
+           
             titles = list(page.title_set.all())
             plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
-            
-            new_page.pk = None
-            new_page.level = None
-            new_page.rght = None
-            new_page.lft = None
-            new_page.tree_id = None
-            #new_page.status = Page.MODERATOR_NEED_APPROVEMENT
-            new_page.publisher_status = Page.MODERATOR_CHANGED
-            new_page.parent = parent
-            new_page.publisher_public_id = None
-            # copied pages do not have a published version yet            
-            #new_page.published = False
-            #new_page.publisher_state = Page.PUBLISHER_STATE_DIRTY
-            if new_page.reverse_id in all_reverse_ids:
-                # reverse_id already exists for some page on the target site
-                new_page.reverse_id = None
-            new_page.save()
-            #new_page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)  
-            
-            update_moderation_message(new_page, _('Page was copied.'))
+            origin_id = page.id
+            page.old_pk = page.pk
+            page.pk = None
+            page.level = None
+            page.rght = None
+            page.lft = None
+            page.tree_id = None
+            page.published = False
+            page.publisher_status = Page.MODERATOR_CHANGED
+            page.publisher_public_id = None
+            if page.reverse_id in site_reverse_ids:
+                page.reverse_id = None
+            if first:
+                first = False
+                if tree:
+                    page.parent = tree[0]
+                else:
+                    page.parent = None
+                page.insert_at(target, position)
+            else:
+                count = 1
+                found = False
+                for prnt in tree:
+                    if prnt.old_pk == page.parent_id:
+                        page.parent = prnt
+                        tree = tree[0:count]
+                        found = True
+                        break
+                    count += 1
+                if not found:
+                    page.parent = None
+            tree.append(page)
+            page.site = site
+            page.save()
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
-                for permission in PagePermission.objects.filter(page__id=page.id):
+                for permission in PagePermission.objects.filter(page__id=origin_id):
                     permission.pk = None
-                    permission.page = new_page
+                    permission.page = page
                     permission.save()
-            
             if settings.CMS_MODERATOR and copy_moderation:
                 from cms.models.moderatormodels import PageModerator
-                for moderator in PageModerator.objects.filter(page__id=page.id):
+                for moderator in PageModerator.objects.filter(page__id=origin_id):
                     moderator.pk = None
-                    moderator.page = new_page
+                    moderator.page = page
                     moderator.save()
-            
-            new_page.site = site
-            new_page.save()
+            update_moderation_message(page, unicode(_('Page was copied.')))
             for title in titles:
                 title.pk = None
                 title.publisher_public_id = None
-                title.page = new_page
+                title.published = False
+                title.page = page
                 title.slug = get_available_slug(title)
                 title.save()
             ptree = []
             for p in plugins:
-                plugin, cls = p.get_plugin_instance()
-                p.page = new_page
+                try:
+                    plugin, cls = p.get_plugin_instance()
+                except KeyError: #plugin type not found anymore
+                    continue
+                p.page = page
                 p.pk = None
                 p.id = None
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
+                p.inherited_public_id = None
                 p.publisher_public_id = None
-                
                 if p.parent:
                     pdif = p.level - ptree[-1].level
                     if pdif < 0:
@@ -178,36 +200,16 @@ class Page(MpttPublisher):
                 if plugin:
                     plugin.pk = p.pk
                     plugin.id = p.pk
-                    plugin.page = new_page
+                    plugin.page = page
                     plugin.tree_id = p.tree_id
                     plugin.lft = p.lft
                     plugin.rght = p.rght
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
-                    #plugin.publisher_public_id = p.pk
-                    plugin.publisher_public_id = None # better, right?
+                    plugin.publisher_public_id = None
+                    plugin.public_id = None
+                    plugin.plubished = False
                     plugin.save()
-            #print u"%scopied page %s (%s) to page %s (%s)" % (u"  "*new_page.level,page, page.id, new_page, new_page.id)
-            if page.published:
-                #print u"%s    original page was published -> adding to list!" % (u"  "*new_page.level,)
-                page_ids_that_need_publishing.append(new_page.id)
-            for subpage in page.children.all().order_by('-rght'):
-                copy_page_to_parent(page=subpage, parent=new_page)
-            return new_page
-            
-        new_page = copy_page_to_parent(page=self, parent=None)
-        #print new_page, target, position
-        for page_id in page_ids_that_need_publishing:
-            publish_page = Page.objects.get(pk=page_id)
-            publish_page.publish()
-            #print u"published page %s" % publish_page
-        # re-fetch the new page
-        #new_page = Page.objects.get(pk=new_page.pk)
-        #new_page.move_page(target, position)
-        #new_page.save()
-        #print new_page.parent
-            
-            
     
     def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None):
         """
