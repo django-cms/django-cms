@@ -150,7 +150,7 @@ CMS_APPLICATIONS_URLS = (
 
 CMS_PLACEHOLDER_CONF = {                        
     'right-column': {
-        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
+        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
         "extra_context": {"theme":"16_16"},
         "name":gettext("right column")
     },
