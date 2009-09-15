@@ -117,6 +117,7 @@ INSTALLED_APPS = (
     'cms.plugins.googlemap',
     'cms.plugins.teaser',
     'cms.plugins.video',
+    'cms.plugins.twitter',
     'mptt',
     'reversion',
     #'example.categories',
