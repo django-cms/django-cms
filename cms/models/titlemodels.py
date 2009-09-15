@@ -9,9 +9,9 @@ from cms.models.pagemodel import Page
 
 class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)
-    title = models.CharField(_("Title"), max_length=255)
+    title = models.CharField(_("title"), max_length=255)
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
-    slug = models.SlugField(_("Slug"), max_length=255, db_index=True, unique=False)
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
