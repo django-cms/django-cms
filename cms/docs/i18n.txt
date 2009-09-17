@@ -12,15 +12,15 @@ Example::
 	/de/account/login/
 	/fr/account/login/
 
-It also adds this prefix automatically to every `href` and `form` tag.
-To install it, include `'cms.middleware.multilingual.MultilingualURLMiddleware'` in
-your project's `MIDDLEWARE_CLASSES` setting.
+It also adds this prefix automatically to every ``href`` and ``form`` tag.
+To install it, include ``'cms.middleware.multilingual.MultilingualURLMiddleware'`` in
+your project's ``MIDDLEWARE_CLASSES`` setting.
 
 Language Chooser
 ----------------
 
-The `language_chooser` template tag will display a language chooser for the current page.
-You can modify the template in `cms/language_chooser.html` or provide your own template if necessary.
+The ``language_chooser`` template tag will display a language chooser for the current page.
+You can modify the template in ``cms/language_chooser.html`` or provide your own template if necessary.
 
 Example::
 
@@ -28,15 +28,15 @@ Example::
 	{% language_chooser "myapp/language_chooser.html" %}
 
 If the current URL is not handled by the CMS and you have some i18n slugs in the URL you may use
-the `set_language_changer` function in the view that handles the current URL.
+the ``set_language_changer`` function in the view that handles the current URL.
 
-In the models of the current object add an optional language parameter to the `get_absolute_url` function::
+In the models of the current object add an optional language parameter to the ``get_absolute_url`` function::
 
 	def get_absolute_url(self, language=None):
 		reverse("product_view", args=[self.get_slug(language=language)])
 
 
-In the view pass the `get_absolute_url` function to the `set_language_chooser` function::
+In the view pass the ``get_absolute_url`` function to the ``set_language_chooser`` function::
 
 	from cms.utils import set_language_changer
 	
@@ -46,7 +46,7 @@ In the view pass the `get_absolute_url` function to the `set_language_chooser` f
 		# ...
 	
 This allows the language chooser to have another URL then the current one.
-If the current URL is not handled by the CMS and no `set_language_changer`
+If the current URL is not handled by the CMS and no ``set_language_changer``
 function is provided it will take the exact same URL as the current one and
 will only change the language prefix.
 
@@ -66,10 +66,10 @@ Example::
 CMS_HIDE_UNTRANSLATED
 ---------------------
 
-If you put `CMS_HIDE_UNTRANSLATED = False` in your settings.py all pages will be displayed in all 
+If you put ``CMS_HIDE_UNTRANSLATED = False`` in your ``settings.py`` all pages will be displayed in all 
 languages even if they are not translated yet.
 
-If `CMS_HIDE_UNTRANSLATED = True' is in your settings.py.
+If ``CMS_HIDE_UNTRANSLATED = True`` is in your ``settings.py``.
 And you are on a page that hasn't got a english translation yet and you view the german version then the language chooser
-will redirect to `/`. The same goes for urls that not handled by the cms and display a language chooser.
+will redirect to ``/``. The same goes for urls that are not handled by the cms and display a language chooser.
 

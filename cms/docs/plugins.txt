@@ -6,8 +6,8 @@ File
 
 Allows you to upload a file. A filetype icon will be assigned based on the file extension.
 
-For installation be sure you have the following in the `INSTALLED_APPS` setting
-in your project's `settings.py` file::
+For installation be sure you have the following in the ``INSTALLED_APPS`` setting
+in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -20,8 +20,8 @@ Flash
 
 Allows you to upload and display a Flash SWF file on your page.
 
-For installation be sure you have the following in the `INSTALLED_APPS` setting
-in your project's `settings.py` file::
+For installation be sure you have the following in the ``INSTALLED_APPS`` setting
+in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -35,8 +35,8 @@ GoogleMap
 
 Displays a map of an address on your page.
 
-For installation be sure you have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file::
+For installation be sure you have the following in the ``INSTALLED_APPS``
+setting in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -45,7 +45,7 @@ setting in your project's `settings.py` file::
 	)
 	
 The Google Maps API key is also required.
-You can either put this in a project setting called `GOOGLE_MAPS_API_KEY`
+You can either put this in a project setting called ``GOOGLE_MAPS_API_KEY``
 or be sure the template context has a variable with the same name.
 
 Link
@@ -53,8 +53,8 @@ Link
 
 Displays a link to an arbitrary URL or to a page. If a page is moved the URL will still be correct.
 
-For installation be sure to have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file::
+For installation be sure to have the following in the ``INSTALLED_APPS``
+setting in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -67,8 +67,8 @@ Picture
 
 Displays a picture in a page.
 
-For installation be sure you have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file::
+For installation be sure you have the following in the ``INSTALLED_APPS``
+setting in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -77,10 +77,10 @@ setting in your project's `settings.py` file::
 	)
 	
 If you want to resize the picture you can get a thumbnail library. We recommend
-[sorl.thumbnail](http://code.google.com/p/sorl-thumbnail/).
-In your project template directory create a folder called `cms/plugins` and create a file
-called `picture.html` in there.
-Here is an example `picture.html` template::
+`sorl.thumbnail <http://code.google.com/p/sorl-thumbnail/>`_.
+In your project template directory create a folder called ``cms/plugins`` and create a file
+called ``picture.html`` in there.
+Here is an example ``picture.html`` template::
 
 	{% load i18n thumbnail %}
 	{% spaceless %}
@@ -103,8 +103,8 @@ Snippet
 
 Just renders some HTML snippet. Mostly used for development or hackery.
 
-For installation be sure you have the following in the `INSTALLED_APPS`
-setting in your project's `settings.py` file::
+For installation be sure you have the following in the ``INSTALLED_APPS``
+setting in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -117,8 +117,8 @@ Teaser
 
 Displays a teaser box for another page or a URL. A picture and a description can be added.
 
-For installation be sure you have the following in the `INSTALLED_APPS` settings
-in your project's `settings.py` file::
+For installation be sure you have the following in the ``INSTALLED_APPS`` settings
+in your project's ``settings.py`` file::
 
 	INSTALLED_APPS = (
 		# ...
@@ -137,13 +137,14 @@ If plugins are text-enabled they can be placed inside the text-flow. At this mom
 - file
 - snippet
 
-The current editor is [Wymeditor](http://www.wymeditor.org/).
-If you want to use TinyMce you need to install [django-tinymce](http://code.google.com/p/django-tinymce/)
-first and put the following in your project's `settings.py` file::
+The current editor is `Wymeditor <http://www.wymeditor.org/>`_.
+If you want to use TinyMce you need to install `django-tinymce <http://code.google.com/p/django-tinymce/>`_.
+If ``tinymce`` is in your ``INSTALLED_APPS`` it will be automatically enabled. If you have tinymce installed but don't
+want to use it in the cms put the following in your ``settings.py``::
 
-	CMS_USE_TINYMCE = True
+	CMS_USE_TINYMCE = False
 
-For installation be sure you have the following in your project's `INSTALLED_APPS` setting::
+For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
 
 	INSTALLED_APPS = (
 		# ...

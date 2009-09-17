@@ -1,20 +1,30 @@
 Contribution Guide
 ==================
 
+Translators
+-----------
+
+For translators we have a `transifex account <http://www.transifex.net/projects/p/django-cms/>`_ 
+where you can translate the .po files and don't need install git or mercurial to be able to contribute.
+All changes there will be automatically sent to the project.
+
+Developers
+----------
+
 For contributing to django-cms follow these steps:
 
-You need either [git](http://git-scm.com/) or [Mercurial](http://www.selenic.com/mercurial/)
-with the [hg-git](http://hg-git.github.com/) extension installed.
+* You need either `git <http://git-scm.com/>`_ or `Mercurial <http://www.selenic.com/mercurial/>`_
+  with the `hg-git <http://hg-git.github.com/>`_ extension installed.
 
-You need an account on [github](http://www.github.com/).
+* You need an account on `github <http://www.github.com/>`_.
 
-On github you can see all the [open tickets](http://github.com/digi604/django-cms-2.0/issues).
-Please be sure to check there first before you open a new one.
+* On github you can see all the `open tickets <http://github.com/digi604/django-cms-2.0/issues>`_.
+  Please be sure to check there first before you open a new one.
 
-Go to the [project-page](http://github.com/digi604/django-cms-2.0/) and click on the fork button.
-This creates your own repository of django-cms2 and enables you to push updates to this repository.
+* Go to the `project-page <http://github.com/digi604/django-cms-2.0/>`_ and click on the fork button.
+  This creates your own repository of django-cms2 and enables you to push updates to this repository.
+  On your fork you should see "Your Clone URL:". Copy the URL and clone it with git or hg-git.
 
-On your fork you should see "Your Clone URL:". Copy the URL and clone it with git or hg-git.
 ::
 
 	$ git clone YOURURL
@@ -42,7 +52,7 @@ or::
 	$ hg gpush origin
 
 After you have done the push, your changes should show up in the
-[project network](http://github.com/digi604/django-cms-2.0/network).
+`project network <http://github.com/digi604/django-cms-2.0/network>`_.
 
 You can now press on "pull request" to send the project leaders a message of what
 your changes contain and inform them that there are new changes ready to be

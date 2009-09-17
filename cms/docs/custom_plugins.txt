@@ -91,7 +91,7 @@ Because the request will always be in the context as the requestcontext processo
 
 Template
 --------
-Now create a gallery.html template in templates/gallery/ and write the following in there.
+Now create a gallery.html template in ``templates/gallery/`` and write the following in there.
 ::
 
 	{% for image in gallery.picture_set.all %}
@@ -103,7 +103,7 @@ Now go into the admin create a gallery and afterwards go into a page and add a g
 Limiting Plugins per Placeholder
 --------------------------------
 
-You can limit in which placeholder certain plugins can appear. Add a CMS\_PLACEHOLDER\_CONF to your settings.py
+You can limit in which placeholder certain plugins can appear. Add a ``CMS_PLACEHOLDER_CONF`` to your ``settings.py``.
 
 Example::
 
@@ -120,7 +120,7 @@ Example::
 			"name": gettext("right column")
 	    },
 	
-"**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with Plugin class names you find in the *cms\_plugins.py*. You can add extra context to each placeholder so plugin-templates can react to them. In this example we give them some parameters that are used in a CSS Grid Framework.
+"**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so plugin-templates can react to them. In this example we give them some parameters that are used in a CSS Grid Framework.
 You can change the displayed name in the admin with the **name** parameter. In combination with gettext you can translate this names according to the language of the user.
 
 
@@ -131,5 +131,5 @@ CMSGalleryPlugin can be even further customized:
 
 Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use all the things you are used to with normal admin classes. You can defined inlines, the form, the form template etc.
 
-Note: If you want to overwrite the form be sure to extend from "admin/cms/page/plugin\_change\_form.html" to have an unified look across the plugins and to have the preview functionality automatically installed.
+Note: If you want to overwrite the form be sure to extend from ``admin/cms/page/plugin_change_form.html`` to have an unified look across the plugins and to have the preview functionality automatically installed.
 

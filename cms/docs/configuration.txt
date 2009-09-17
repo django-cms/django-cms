@@ -21,7 +21,7 @@ Example::
 	)
 
 CMS_TEMPLATE_INHERITANCE
---------------------------
+------------------------
 
 This is optional
 
@@ -31,7 +31,7 @@ Example::
 
 If this is enabled, pages have the additional template option
 to inherit their template from the nearest ancestor. Adding new
-pages defaults to this iff the new page is not a root page.  
+pages defaults to this if the new page is not a root page.  
 
 CMS_PLACEHOLDER_CONF
 ----------------------
@@ -68,7 +68,7 @@ The name displayed in admin. With the gettext stub it can be internationalized.
 
 
 CMS_PERMISSION
----------------
+--------------
 
 Example::
 
@@ -84,7 +84,8 @@ In the edit-view of the pages you can now assign users to pages and grant them p
 In the global permissions you can set the permissions for users globaly.
 
 If a user has the right to create new users he can now do so in the "Users - page". But he will only see the users he created.
-The users he created also can only have the rights he already has. So if he has only the right to edit a certain page all users he created also only can edit this page. Naturally he can even more limit the rights of the users he creates.
+The users he created also can only have the rights he already has. So if he has only the right to edit a certain page all users he created also only can edit this page. 
+Naturally he can even more limit the rights of the users he creates.
 
 
 CMS_MODERATOR
@@ -154,7 +155,7 @@ Example::
 
 	CMS_SEO_FIELDS = True
 
-This adds a new Fieldset "SEO Fields" in the page. You can set there the Page Title, Meta Keywords and the Meta Description
+This adds a new Fieldset "SEO Fields" in the page admin. You can set there the Page Title, Meta Keywords and the Meta Description
 
 To access the fields in the template use::
 	
@@ -182,7 +183,7 @@ If disabled the page would have an url: "/hello/world/"
 
 
 CMS_NAVIGATION_EXTENDERS
---------------------------
+------------------------
 
 Example::
 
@@ -194,9 +195,24 @@ Example::
 
 Navigation extenders allow you to extend the menu. 
 In Brief: A tuble with a python path to a function that returns a list of navigation nodes	
-For detailed explanation have a look in navigation.md in the section "Extending the menu".
+For detailed explanation read the navigation docs section :ref:`extending_the_menu`.
 
 This gives you a new field in the advanced-settings tab of the page. You can there say that one navigation extender is attached to this page.
+
+CMS_NAVIGATION_MODIFIERS
+------------------------
+
+Example::
+
+	CMS_NAVIGATION_MODIFIERS = (
+		('blog.navigation.add_blog_categories'),
+	)
+	
+Navigation modifiers are functions in other apps that can modify the navigation. They can add, remove,
+reorder navigation nodes. 
+
+#TODO: more docs needed
+
 
 CMS_APPLICATIONS_URLS
 -----------------------
@@ -211,9 +227,11 @@ Example::
 	)
 
 You can let cms handle the urls of other 3th party apps and attach them to pages.
-For example you have a page named blog and a blog application. You can attach the blog urls.py to the blog page. After this the every url after blog page will be handled by the blog application. The nice thing about this is the cms can be used in the templates of the blog application. So you can use placeholders in the templates and they will be filled up with plugins that are defined in the blog page. Also the blog menu item will be selected if you are on a page that is handled by the blog application.
+For example you have a page named blog and a blog application. You can attach the blog urls.py to the blog page. After this every url after blog page will be handled by the blog application. The nice thing about this is the cms can be used in the templates of the blog application. So you can use placeholders in the templates and they will be filled up with plugins that are defined in the blog page. Also the blog menu item will be selected if you are on a page that is handled by the blog application.
 
-At the moment if you change this settings you should restart the server as we some cache invalidation bug. 
+At the moment if you change this settings you should restart the server as there is a cache invalidation bug.
+
+An simpler way is to have a page with the same url as the app. This will give you also the plugin and menu abilities but has some limitations when it comes to i18n and urls. 
 
 CMS_UNIQUE_SLUGS
 ------------------
@@ -253,7 +271,7 @@ Example::
 
 	CMS_LANGUAGE_FALLBACK = True
 	
-This will redirect the browser to an same page in an other language uf the page is not available in the current language.
+This will redirect the browser to the same page in an other language if the page is not available in the current language.
 
 CMS_LANGUAGES
 --------------
@@ -278,7 +296,7 @@ Example::
 
 	CMS_DEFAULT_LANGUAGE = "de"
 	
-The default language is used if no other language could be found in the browser. Normally will the take the first of the LANGUAGES setting.
+The default language is used if no other language could be found in the browser. Normally it will take the first of the LANGUAGES setting.
 
 
 CMS_CONTENT_CACHE_DURATION
@@ -289,6 +307,7 @@ Example::
 	CMS_CONTENT_CACHE_DURATION = 60
 
 Defines how long page content should be cached, including navigation and admin menu.
+
 Default is 60
 
 CMS_MEDIA_PATH
@@ -298,8 +317,9 @@ Example::
 	
 	CMS_MEDIA_PATH = "cms/"
 	
-The path from MEDIA_ROOT to the media files located in cms/media/
-default: "cms/"
+The path from MEDIA_ROOT to the media files located in ``cms/media/``
+
+default: ``cms/``
 
 CMS_MEDIA_ROOT
 ----------------
@@ -308,8 +328,9 @@ Example::
 
 	CMS_MEDIA_ROOT = "settings.MEDIA_ROOT + "/cms/"
 
-The path to the media root of the cms media files. 
-Default: settings.MEDIA_ROOT + CMS_MEDIA_PATH
+The path to the media root of the cms media files.
+ 
+Default: ``settings.MEDIA_ROOT + CMS_MEDIA_PATH``
 
 CMS_MEDIA_URL
 ---------------
@@ -319,7 +340,8 @@ Example::
 	CMS_MEDIA_URL = "/media/cms/"
 	
 The location of the media files that are located in cms/media/cms/
-default: MEDIA_URL + CMS_MEDIA_PATH
+
+default: ``MEDIA_URL + CMS_MEDIA_PATH``
 
 CMS_PAGE_MEDIA_PATH
 ----------------------
