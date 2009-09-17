@@ -19,6 +19,7 @@ setup(
             'templates/cms/*.html',
             'plugins/*/templates/cms/plugins/*.html',
             'plugins/*/templates/cms/plugins/*/*.html',
+            'plugins/*/templates/cms/plugins/*/*.js',
             'locale/*/LC_MESSAGES/*'
         ]
     },
