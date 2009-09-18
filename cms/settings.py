@@ -111,6 +111,10 @@ DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 INSTALLED_APPS = settings.INSTALLED_APPS
 LANGUAGES = settings.LANGUAGES
 
+if not i18n_not_installed and not settings.LANGUAGE_CODE in dict(settings.LANGUAGES).keys():
+    raise ImproperlyConfigured('cms.middleware.multilingual.MultilingualURLMiddleware requires that LANGUAGE_CODE "%s" is missing in LANGUAGES.')
+
+
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
 CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
 CMS_MEDIA_ROOT = getattr(settings, 'CMS_MEDIA_ROOT', join(settings.MEDIA_ROOT, CMS_MEDIA_PATH))
