@@ -14,7 +14,7 @@ CMS_TEMPLATES = getattr(settings, 'CMS_TEMPLATES', None)
 if CMS_TEMPLATES is None:
     raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
 
-CMS_TEMPLATE_INHERITANCE = getattr(settings, 'CMS_TEMPLATE_INHERITANCE', None)
+CMS_TEMPLATE_INHERITANCE = getattr(settings, 'CMS_TEMPLATE_INHERITANCE', True)
 CMS_TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 if CMS_TEMPLATE_INHERITANCE:
     # Append the magic inheritance template
@@ -68,6 +68,9 @@ CMS_SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False)
 
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
+
+# a tuple with a 
+CMS_NAVIGATION_MODIFIERS = getattr(settings, 'CMS_NAVIGATION_MODIFIERS', ())
 
 # a tuple of hookable applications, e.g.:
 # CMS_APPLICATIONS_URLS = (

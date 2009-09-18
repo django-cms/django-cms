@@ -1,12 +1,15 @@
+from cms import settings
+from cms.appresolver import applications_page_check
+from cms.utils import auto_render, get_template_from_request, \
+    get_language_from_request
+from cms.utils.moderator import get_page_queryset
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
-from cms import settings
-from cms.utils import auto_render, get_template_from_request, get_language_from_request
-from django.db.models.query_utils import Q
-from cms.appresolver import applications_page_check
-from django.contrib.sites.models import Site
-from cms.utils.moderator import get_page_queryset
+from django.utils.http import urlquote
+from django.conf import settings as django_settings
 
 def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     """Helper for getting current page from path depending on language
@@ -92,6 +95,13 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         request._current_page_cache = current_page
         if current_page.get_redirect(language=lang):
             return HttpResponseRedirect(current_page.get_redirect(language=lang))
+        if current_page.login_required and not request.user.is_authenticated():
+            if 'cms.middleware.multilingual.MultilingualURLMiddleware' in django_settings.MIDDLEWARE_CLASSES:
+                path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
+            else:
+                path = urlquote(request.get_full_path())
+            tup = django_settings.LOGIN_URL , "next", path
+            return HttpResponseRedirect('%s?%s=%s' % tup)
     else:
         has_change_permissions = False
     return template_name, locals()

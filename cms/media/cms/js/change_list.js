@@ -22,7 +22,7 @@ function initTree(){
 			dragrules: "all",
 			droppable: "all",
 			metadata : "mdata",
-			use_inline: true,
+			use_inline: true
 			//droppable : ["tree_drop"]
 		},
 		path: false,
@@ -57,7 +57,7 @@ function initTree(){
 						//console.log($(what).prev("li"))
 					}
 				}else{
-					console.log("no siblings")
+					//console.log("no siblings")
 					if($(what).attr("rel") != "topnode"){
 						//console.log("has parent")
 						//console.log($(what).parent().parent())
@@ -68,8 +68,8 @@ function initTree(){
 					}
 				}
 				
-				addUndo(what, where, position)
-				return true 
+				addUndo(what, where, position);
+				return true; 
 			},
 			onmove: function(what, where, position, tree){
 				item_id = what.id.split("page_")[1];
@@ -102,7 +102,7 @@ function initTree(){
 	tree.init($("div.tree"), options);
 };
 
-$(document).ready(function() { 
+$(document).ready(function() {	
     var selected_page = false;
     var action = false;
 	
@@ -120,19 +120,19 @@ $(document).ready(function() {
 			}
 			$('#loader-message').hide();
 			syncCols();
-		}	
+		};
 		
 		// just for debuging!! 
-		s.complete = function(xhr, status) {
+		/*s.complete = function(xhr, status) {
 			if (status == "error" && cmsSettings.debug) {
 				$('body').before(xhr.responseText);
 			}
-		}
+		}*/
 		// end just for debuging
 		
 		// TODO: add error state!
 		return _oldAjax(s);
-	}
+	};
 	
 	
 	/**
@@ -321,7 +321,7 @@ $(document).ready(function() {
                 site = $('#site-select')[0].value;
                 window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&position="+position+"&site="+site;
             }else{
-            	console.log("no action defined!")
+            	//console.log("no action defined!")
             }
 			e.stopPropagation();
             return false;
@@ -339,8 +339,7 @@ $(document).ready(function() {
 		});
 		return this;
 	};
-	$("div#sitemap").show()
-	
+	$("div#sitemap").show();
 	function syncCols(){
 		$('#sitemap ul .col-actions').syncWidth(0);
 		$('#sitemap ul .col-published').syncWidth(0);

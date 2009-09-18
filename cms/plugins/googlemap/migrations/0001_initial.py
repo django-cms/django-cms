@@ -7,6 +7,10 @@ class Migration:
     depends_on = (
         ("cms", "0012_publisher"),
     )
+    
+    needed_by = (
+        ("cms", "0019_public_table_renames"),
+    )
 
     
     def forwards(self, orm):

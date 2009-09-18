@@ -17,9 +17,9 @@
 <link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}jstree/tree_component.css" />
 <link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/jquery.dialog.css" />
 
-
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.livequery.js"></script>
+
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.bind.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.checkbox.js"></script>
@@ -39,6 +39,14 @@
 
 {% block content %}
 <script type="text/javascript">
+	//<![CDATA[	
+
+	$(document).ready(function() {
+		{% if not cl.is_filtered %}
+			initTree();
+		{% endif %}		
+	});
+	
 	function showchangelistfilter(){
 		$("#changelist-filter").toggle();
 	}
@@ -51,13 +59,6 @@
 		var msg = $('<span class="success">An error occured. Please reload the page</span>');
 		node.append(msg);
 	}
-	
-	$(document).ready(function() {
-		{% if not cl.is_filtered %}
-		initTree();
-		{% endif %}
-		
-	});	
 	// some settings used by javascript functions
 
 	cmsSettings = {
@@ -65,7 +66,9 @@
 		cmsModerator: {{ CMS_MODERATOR|js }},
 		debug: {{ DEBUG|js }}
 	};
+	//]]>
 </script>
+
 
 <div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
 

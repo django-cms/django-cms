@@ -4,24 +4,9 @@
 // Global var, for storing callbacks, see below.
 var editPluginPopupCallbacks = {};
 
-// Global function, needed for popup window to call the parent via opener.dismissEditPluginPopup
-function dismissEditPluginPopup(win, plugin_id, icon_src, icon_alt) {
-    // This is called after user presses 'Save' in popup.
-    win.close();
-    var callback = editPluginPopupCallbacks[plugin_id];
-    if (callback != null) {
-        callback(plugin_id, icon_src, icon_alt);
-    }
-}
+{% include "cms/plugins/widgets/widget_lib.js" %}
 
-// TODO - move this html escape function somewhere nicer
 
-function escapeHtml(html) {
-    return html.replace(/&/g,"&amp;")
-        .replace(/\"/g,"&quot;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;");
-}
 
 $(document).ready(function(){
     $('#id_{{ name }}').wymeditor({
@@ -46,14 +31,7 @@ $(document).ready(function(){
         postInit: function(wym) {
 			 //wym.resizable({handles: "s", maxHeight: 600});
             //construct the insertLinkButton html
-            html = '<div class="plugin-select-holder">'
-				 + '<select name="plugins">'
-				 + '<option value="" selected="selected">{% trans "Available Plugins" %}</option>'{% for p in installed_plugins %}
-      			 + '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
-    			 + '</select>'
-    			 + '<span class="insert-object addlink">{% trans "Insert plugin" %}</span>'
-    			 + '<span class="edit-object changelink">{% trans "Edit selected plugin" %}</span>'
-  				 + '</div>';
+            html = get_plugin_html()
             //add the button to the tools box
             jQuery(wym._box)
             .find(wym._options.toolsSelector + wym._options.toolsListSelector)
@@ -68,33 +46,9 @@ $(document).ready(function(){
      
         }
     });
-	  /* General functions */
-    function get_editor(placeholder) {
-        // Find the placeholder text editor widget
-        if (typeof(PlaceholderEditorRegistry) == "undefined") {
-            // This could occur if javascript defining PlaceholderEditorRegistry
-            // has not been loaded for some reason.
-            alert("{% trans "A programming error occurred - cannot find text editor widgets." %}");
-            return null;
-        }
-        return PlaceholderEditorRegistry.retrieveEditor(placeholder);
-    }
+	
 
-    function edit_object(obj_id) {
-        // Pop up window for editing object.
-        window.open("edit-plugin/" + obj_id + "/?_popup=1",
-                    "Edit plugin object",
-                    "menubar=no,titlebar=no,toolbar=no,resizable=yes"
-                      + ",width=800,height=300,top=0,left=0,scrollbars=yes"
-                      + ",location=no"
-                   );
-    }
-
-    function plugin_admin_html(plugin_id, icon_src, icon_alt) {
-        return '<img src="' + escapeHtml(icon_src) + '" ' +
-            'alt="'+ escapeHtml(icon_alt) + '" ' +
-            'id="plugin_obj_' + plugin_id + '"/>';
-    }
+   
 
     /* onclick for 'Insert object' */
 	
@@ -107,38 +61,17 @@ $(document).ready(function(){
 			var language = $('#id_language').attr('value');
 			
 			if (pluginvalue == "") {
-				alert("{% trans "Please select a plugin type." %}");
+				alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
 				return;
 			}
 			
 			var texteditor = get_editor(placeholder);
 			if (texteditor == null || texteditor.insertText == null) {
-				alert("{% trans "Text editor does not support inserting objects." %}");
+				alert("{% filter escapejs %}{% trans "Text editor does not support inserting objects." %}{% endfilter %}");
 				return;
 			}
 			// First create db instance using AJAX post back
-			$.post("add-plugin/", {
-				parent_id: parent_id,
-				plugin_type: pluginvalue
-			}, function(data){
-				if ('error' != data) {
-					// Successfully created, data is pk of object, but object
-					// is 'blank'. We now want to show the edit popup.
-					
-					// We only want to insert the text if the user actually
-					// *saved* the object.  We don't have modal dialogs, so we
-					// register a callback against the id number.  This callback
-					// is called by dismissEditPluginPopup().
-					var plugin_id = data;
-					editPluginPopupCallbacks[data] = function(plugin_id, icon_src, icon_alt){
-						texteditor.insertText(plugin_admin_html(plugin_id, icon_src, icon_alt));
-						editPluginPopupCallbacks[data] = null; // Unbind callback
-					};
-					
-					// Show popup for editing
-					edit_object(plugin_id);
-				}
-			}, "html");
+			add_plugin(pluginvalue, parent_id, language)
 			
 		}).css("cursor", "pointer").css("margin", "5px");
 		
@@ -146,21 +79,35 @@ $(document).ready(function(){
 		$('span.edit-object').click(function(){
 			var texteditor = get_editor(placeholder);
 			if (texteditor == null || texteditor.selectedObject == null) {
-				alert("{% trans "Text editor does not support editing objects." %}");
+				alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
 				return;
 			}
 			var imgobj = texteditor.selectedObject();
 			if (imgobj == null) {
-				alert("{% trans "No object selected." %}");
+				alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
 				return;
 			}
 			if (imgobj.id == null || imgobj.id.indexOf("plugin_obj_") != 0) {
-				alert("{% trans "Not a plugin object" %}");
+				alert("{% filter escapejs %}{% trans "Not a plugin object" %}{% endfilter %}");
 				return;
 			}
 			var plugin_id = imgobj.id.substr("plugin_obj_".length);
-			edit_object(plugin_id);
+			edit_plugin(plugin_id);
 		}).css("cursor", "pointer").css("margin","5px");
 	}
 });
+
+
+
+function get_plugin_html(){
+	html = '<div class="plugin-select-holder">'
+		 + '<select name="plugins">'
+		 + '<option value="" selected="selected">{% filter escapejs %}{% trans "Available Plugins" %}{% endfilter %}</option>'{% for p in installed_plugins %}
+	     + '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
+		 + '</select>'
+		 + '<span class="insert-object addlink">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
+		 + '<span class="edit-object changelink">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
+		 + '</div>';
+	return html;
+}
     </script>

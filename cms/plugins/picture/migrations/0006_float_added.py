@@ -5,6 +5,10 @@ from cms.plugins.picture.models import *
 
 class Migration:
     
+    needed_by = (
+        ("cms", "0020_advanced_permissions"),
+    )
+    
     def forwards(self, orm):
         
         # Adding field 'PicturePublic.float'

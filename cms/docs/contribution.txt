@@ -15,26 +15,29 @@ Go to the [project-page](http://github.com/digi604/django-cms-2.0/) and click on
 This creates your own repository of django-cms2 and enables you to push updates to this repository.
 
 On your fork you should see "Your Clone URL:". Copy the URL and clone it with git or hg-git.
+::
 
 	$ git clone YOURURL
 	
-or 
+or::
 	
 	$ hg gclone YOURURL
 
 Make your changes and commit.
+::
 
 	$ git commit
 	
-or 
+or::
 	
 	$ hg commit
 	
 After you are finished you can push to github. 
+::
 
 	$ git push origin
 	
-or 
+or::
 	
 	$ hg gpush origin
 
@@ -47,19 +50,21 @@ incorporated into the master tree.
 
 After some time you local and github repository will probably become
 out-of-date.  To get the newest changesets add a new remote:
+::
 
 	$ git remote add upstream git://github.com/digi604/django-cms-2.0.git
 	
-or 
+or::
 	
 	$ hg gremote add upstream git://github.com/digi604/django-cms-2.0.git
 	
 After this you can do a fetch from upstream:
+::
 
 	$ git fetch upstream 	# only download
 	$ git pull upstream 	# download and merge
 	
-or 
+or::
 	
 	$ hg gfetch upstream 	# download
 	$ hg update 		# merge

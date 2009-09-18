@@ -26,6 +26,7 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
@@ -48,7 +49,7 @@ class PageAdmin(admin.ModelAdmin):
     top_fields = ['language']
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
-    advanced_fields = ['reverse_id',  'overwrite_url']
+    advanced_fields = ['reverse_id',  'overwrite_url', 'login_required', 'menu_login_required']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
@@ -161,7 +162,7 @@ class PageAdmin(admin.ModelAdmin):
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
         elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
-            return HttpResponseRedirect("../../../jsi18n/")
+            return HttpResponseRedirect(reverse('admin:jsi18n'))
         elif url.endswith('/permissions'):
             return self.get_permissions(request, unquote(url[:-12]))
         elif url.endswith('/moderation-states'):
@@ -218,7 +219,7 @@ class PageAdmin(admin.ModelAdmin):
         return url_patterns
     
     def redirect_jsi18n(self, request):
-            return HttpResponseRedirect("../../../jsi18n/")
+            return HttpResponseRedirect(reverse('admin:jsi18n'))
     
     def save_model(self, request, obj, form, change):
         """

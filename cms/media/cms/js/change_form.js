@@ -30,7 +30,7 @@ $(document).ready(function() {
 	            if (changed) {
 					var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?")
 					var answer = confirm(interpolate(question, {
-						field_name: select.prev().text().slice(0, -1),
+						field_name: select.prev().text().slice(0, -1)
 					}, true));
 				}else{
 					var answer = true;

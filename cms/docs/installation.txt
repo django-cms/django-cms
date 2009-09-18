@@ -6,7 +6,7 @@ Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
 Apps
 ----
 
-Add the following to your project's `INSTALLED_APPS` setting:
+Add the following to your project's `INSTALLED_APPS` setting::
 
 	INSTALLED_APPS = (
 		...
@@ -18,12 +18,9 @@ Add the following to your project's `INSTALLED_APPS` setting:
 		'cms.plugins.snippet',
 		'cms.plugins.googlemap',
 		'mptt',
-		...
-
 		'publisher'
+		...
 	)
-
-Publisher needs to be at the end of the list.
 
 Django-cms 2.0 is compatible with [django-reversion](http://code.google.com/p/django-reversion/) for versioning all the page content and its plugins. Put "reversion" in your INSTALLED\_APPS if you have it installed.
 
@@ -32,22 +29,22 @@ If you don't need all the plugins you can comment them out here.
 Middleware
 ----------
 
-Add the following middleware classes:
+Add the following middleware classes::
 
 	MIDDLEWARE_CLASSES = (
-    	...
-    	'cms.middleware.page.CurrentPageMiddleware',
+		...
+		'cms.middleware.page.CurrentPageMiddleware',
 		'cms.middleware.user.CurrentUserMiddleware',
-    	'cms.middleware.multilingual.MultilingualURLMiddleware',
-    	...
-    	)
+		'cms.middleware.multilingual.MultilingualURLMiddleware',
+		...
+	)
     
 If your site is not multilingual you can leave out `'cms.middleware.MutilingualURLMiddleware'`.
 
 Template Context Processors
 ---------------------------
 
-Add the following template context processors if not already present:
+Add the following template context processors if not already present::
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
 		"django.core.context_processors.auth",
@@ -62,14 +59,14 @@ Templates
 ---------
 
 If you don't have already a `gettext` stub in your `settings.py` file, insert the following line
-near the beginning of the file but after any import statements that it may have:
+near the beginning of the file but after any import statements that it may have::
 
 	gettext = lambda s: s
 	
 This allows you to use `gettext` in `settings.py`.
 
 Add some templates you want to use within Django-cms 2.0 that contain at least one
-`{% placeholder %}` template tag to your `settings.py`:
+`{% placeholder %}` template tag to your `settings.py`::
 	
 	CMS_TEMPLATES = (
 		('base.html', gettext('default')),
@@ -80,7 +77,7 @@ Add some templates you want to use within Django-cms 2.0 that contain at least o
 	
 For some template examples see the templates used in the example project.
 
-Here's a quick example of what a template might look like:
+Here's a quick example of what a template might look like::
 
 	{% load cms_tags %}
 	
@@ -93,7 +90,7 @@ Here's a quick example of what a template might look like:
 Internationalization
 --------------------
 
-If your site is multilingual be sure to have the `LANGUAGES` setting present in your `settings.py` file:
+If your site is multilingual be sure to have the `LANGUAGES` setting present in your `settings.py` file::
 
 	LANGUAGES = (
 		('fr', gettext('French')),
@@ -101,11 +98,11 @@ If your site is multilingual be sure to have the `LANGUAGES` setting present in 
 		('en', gettext('English')),
 	)
 
-`urls.py`
+urls.py
 -------
 
 
-In your main `urls.py` add the following line at the **end** of the `urlpatterns` definition:
+In your main `urls.py` add the following line at the **end** of the `urlpatterns` definition::
 
     urlpatterns = patterns('',
         url(r'^admin/', include(admin.site.urls)),
@@ -140,19 +137,21 @@ first before you use it the first time.
 
 If there is a problem with python manage.py migrate:
 
-Create a new ticket on github with your database engine (mysql), database type (MyIsam), south version
+Create a new ticket on github with your database engine (mysql, postgres), database type (MyIsam, InnoDB), south version
 
 Quick fix:
 
-Remove `south` from the installed apps. 
-run `manage.py syncdb`
-add `south` to the installed apps again.
-run `manage.py migrate --fake`
+* Remove `south` from the installed apps.
+* Reset database 
+* run `manage.py syncdb`
+* add `south` to the installed apps again.
+* run `manage.py syncdb`
+* run `manage.py migrate --fake`
 
 
-Troubleshooting:
-----------------
+Troubleshooting
+---------------
 
 If you create a page and you don't see a page in the list view:
 
-- Be sure you copied all the media files. Check with firebug and its "net" panel if you have any 404
+- Be sure you copied all the media files. Check with firebug and its "net" panel if you have any 404s
