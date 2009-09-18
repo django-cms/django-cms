@@ -112,7 +112,7 @@ INSTALLED_APPS = settings.INSTALLED_APPS
 LANGUAGES = settings.LANGUAGES
 
 if not i18n_not_installed and not settings.LANGUAGE_CODE in dict(settings.LANGUAGES).keys():
-    raise ImproperlyConfigured('cms.middleware.multilingual.MultilingualURLMiddleware requires that LANGUAGE_CODE "%s" is missing in LANGUAGES.')
+    raise ImproperlyConfigured('cms.middleware.multilingual.MultilingualURLMiddleware requires that the exact LANGUAGE_CODE (%s) is also present in LANGUAGES.')
 
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
