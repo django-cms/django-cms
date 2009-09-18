@@ -27,7 +27,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
 extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['templates']
 
 # The suffix of source filenames.
 source_suffix = '.txt'

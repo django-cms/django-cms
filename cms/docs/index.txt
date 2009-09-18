@@ -6,6 +6,8 @@
 Welcome to django cms's documentation!
 ======================================
 
+This document refers to version |release|
+
 Contents:
 
 .. toctree::

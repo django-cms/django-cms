@@ -6,7 +6,7 @@ Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
 Apps
 ----
 
-Add the following to your project's `INSTALLED_APPS` setting::
+Add the following to your project's ``INSTALLED_APPS`` setting::
 
 	INSTALLED_APPS = (
 		...
@@ -22,9 +22,9 @@ Add the following to your project's `INSTALLED_APPS` setting::
 		...
 	)
 
-Django-cms 2.0 is compatible with [django-reversion](http://code.google.com/p/django-reversion/) for versioning all the page content and its plugins. Put "reversion" in your INSTALLED\_APPS if you have it installed.
+Django-cms 2.0 is compatible with `django-reversion <http://code.google.com/p/django-reversion/>`_ for versioning all the page content and its plugins. Put ``reversion`` in your ``INSTALLED_APPS`` if you have it installed.
 
-If you don't need all the plugins you can comment them out here.
+If you don't need all the plugins you can comment them out here. For a list of all the plugins have a look inside ``cms/plugins/``.
 
 Middleware
 ----------
@@ -39,7 +39,7 @@ Add the following middleware classes::
 		...
 	)
     
-If your site is not multilingual you can leave out `'cms.middleware.MutilingualURLMiddleware'`.
+If your site is not multilingual you can leave out ``'cms.middleware.MutilingualURLMiddleware'``.
 
 Template Context Processors
 ---------------------------
@@ -58,15 +58,15 @@ Add the following template context processors if not already present::
 Templates
 ---------
 
-If you don't have already a `gettext` stub in your `settings.py` file, insert the following line
+If you don't have already a ``gettext`` stub in your ``settings.py`` file, insert the following line
 near the beginning of the file but after any import statements that it may have::
 
 	gettext = lambda s: s
 	
-This allows you to use `gettext` in `settings.py`.
+This allows you to use ``gettext`` in ``settings.py``.
 
 Add some templates you want to use within Django-cms 2.0 that contain at least one
-`{% placeholder %}` template tag to your `settings.py`::
+``{% placeholder %}`` template tag to your ``settings.py``::
 	
 	CMS_TEMPLATES = (
 		('base.html', gettext('default')),
@@ -90,7 +90,7 @@ Here's a quick example of what a template might look like::
 Internationalization
 --------------------
 
-If your site is multilingual be sure to have the `LANGUAGES` setting present in your `settings.py` file::
+If your site is multilingual be sure to have the ``LANGUAGES`` setting present in your ``settings.py`` file::
 
 	LANGUAGES = (
 		('fr', gettext('French')),
@@ -102,7 +102,7 @@ urls.py
 -------
 
 
-In your main `urls.py` add the following line at the **end** of the `urlpatterns` definition::
+In your main ``urls.py`` add the following line at the **end** of the ``urlpatterns`` definition::
 
     urlpatterns = patterns('',
         url(r'^admin/', include(admin.site.urls)),
@@ -114,9 +114,9 @@ In your main `urls.py` add the following line at the **end** of the `urlpatterns
 Other settings
 --------------
 
-For a list of all settings that can be overridden in your `settings.py` file have a look at `cms/settings.py`.
+For a list of all settings that can be overridden in your ``settings.py`` file have a look at ``cms/settings.py``.
 
-More information is available in the docs folder: [cms/docs/](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs)
+More information is available in the docs folder: `cms/docs/ <http://github.com/digi604/django-cms-2.0/tree/master/cms/docs>`_
 You may also want to have a look at the example project to see what settings it uses.
 
 Media Files
@@ -124,14 +124,14 @@ Media Files
 
 **ATTENTION:**
 
-If you don't use something like [django-appmedia](http://code.google.com/p/django-appmedia/)
-be sure to copy the `cms/media/cms/` folder into your media directory or make a symbolic
+If you don't use something like `django-appmedia <http://code.google.com/p/django-appmedia/>`_
+be sure to copy the ``cms/media/cms/`` folder into your media directory or make a symbolic
 link as appropriate.
 
 South
 -----
 
-Django-cms 2.0 has support for [django-south](http://south.aeracode.org/). South is a database migration tool.
+Django-cms 2.0 has support for `django-south <http://south.aeracode.org/>`_. South is a database migration tool.
 So if you get a new version of django-cms you also get the db-migrations automatically. Please read the documentation of south
 first before you use it the first time. 
 
@@ -141,12 +141,12 @@ Create a new ticket on github with your database engine (mysql, postgres), datab
 
 Quick fix:
 
-* Remove `south` from the installed apps.
+* Remove ``south`` from the installed apps.
 * Reset database 
-* run `manage.py syncdb`
-* add `south` to the installed apps again.
-* run `manage.py syncdb`
-* run `manage.py migrate --fake`
+* run ``manage.py syncdb``
+* add ``south`` to the installed apps again.
+* run ``manage.py syncdb``
+* run ``manage.py migrate --fake``
 
 
 Troubleshooting
