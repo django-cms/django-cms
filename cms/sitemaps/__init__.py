@@ -1,0 +1,1 @@
+from cms_sitemap import *
