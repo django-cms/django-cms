@@ -29,6 +29,6 @@ In your main ``urls.py`` add the following import at the top of the file:
 Then add the following line at the **start** of the ``urlpatterns`` definition::
 
     	urlpatterns = (
-	url(r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}}),),
+	url(r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}}),
 	...
 	)
