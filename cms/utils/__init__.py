@@ -132,7 +132,7 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
                             child.sibling = True
         elif found:
             item.sibling = True
-        if levels == 0 and not hasattr(item, "ancestor" ) or item.level == to_levels:
+        if levels == 0 and not hasattr(item, "ancestor" ) or item.level == to_levels or not hasattr(item, "childrens"):
             item.childrens = []
         else:
             make_tree(request, item.childrens, levels, url, ancestors+[item], descendants, current_level, to_levels, active_levels) 

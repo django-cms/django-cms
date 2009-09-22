@@ -2,10 +2,9 @@ $(document).ready(function() {
     var new_slug = true;
     if($('#id_slug')[0].value){
         new_slug = false;
-    }
+    }    
     
-    
-    if(window.location.href.split("history").length == 1 && window.location.href.split("recover").length==1){
+    if(window.location.href.split("history").length == 1 && window.location.href.split("recover").length==1){
 		$.each(["template"], function(i, label){
 	        var select = $('select#id_'+label);
 	        select.change(function() {
@@ -28,9 +27,9 @@ $(document).ready(function() {
 	            var array = window.location.href.split('?');
 	            var query = $.query.set(label, this.options[this.selectedIndex].value).toString();
 	            if (changed) {
-					var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?")
+					var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?");
 					var answer = confirm(interpolate(question, {
-						field_name: select.prev().text().slice(0, -1),
+						field_name: select.prev().text().slice(0, -1)
 					}, true));
 				}else{
 					var answer = true;
@@ -52,11 +51,11 @@ $(document).ready(function() {
             this.selected = false;
             if (template==this.value)
                 this.selected = true;
-        })
+        });
     }
     $("#id_slug").change(function() { this._changed = true; });
-	$('#id_title').change(function() {this._changed = true; })
-	$('#id_published').change(function() {this._changed = true; })
+	$('#id_title').change(function() {this._changed = true; });
+	$('#id_published').change(function() {this._changed = true; });
     $("#id_title").keyup(function() {
         var e = $("#id_slug")[0];
         if (!e._changed && new_slug) {
@@ -65,12 +64,11 @@ $(document).ready(function() {
     });
 	$('#page_form').submit(function(){
 		if($('iframe').length){
-			var question = gettext("Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost.")
+			var question = gettext("Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost.");
 			var answer = confirm(question, true);
-			return answer
+			return answer;
 		}
-	})
-	
+	});
 	
 	// inline group loader
 	$('h2').click(function(){

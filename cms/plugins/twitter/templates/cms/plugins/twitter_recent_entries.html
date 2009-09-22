@@ -1,0 +1,7 @@
+<div class="plugin_twitter teaser_twitter">
+	<h3>{{ object.title }}<a class="icon_twitter" href="http://twitter.com/{{ object.twitter_user }}">Twitter</a></h3>
+	<ul id="twitter_update_list"></ul>
+	<a href="http://twitter.com/{{ object.twitter_user }}" id="twitter-link">{{ object.link_hint }}</a>
+</div>
+<script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+<script type="text/javascript" src="http://twitter.com/statuses/user_timeline/{{ object.twitter_user }}.json?callback=twitterCallback2&amp;count={{ object.count }}"></script>

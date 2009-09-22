@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
@@ -14,8 +15,7 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug
 from cms.exceptions import NoHomeFound
-
-
+from cms.utils.helpers import reversion_register
 
 class Page(MpttPublisher):
     """
@@ -58,6 +58,8 @@ class Page(MpttPublisher):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
+    login_required = models.BooleanField(_("login required"),default=False)
+    menu_login_required = models.BooleanField(_("menu login required"),default=False, help_text=_("only show this page in the menu if the user is logged in"))
     
     # Managers
     objects = PageManager()
@@ -102,39 +104,53 @@ class Page(MpttPublisher):
         from cms.utils.moderator import update_moderation_message
         
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
-        tree = [target]
-        level_dif = self.level - target.level - 1
+        site_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
+        target.old_pk = -1
+        if position == "first_child":
+            tree = [target]
+        elif target.parent_id:
+            tree = [target.parent]
+        else:
+            tree = []
         first = True
-        
-        # list of all reverse_id values in the target site
-        all_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
-        
         for page in descendants:
-            new_level = page.level - level_dif
-            dif = new_level - tree[-1].level 
-            if dif < 0:
-                tree = tree[:dif-1]
            
             titles = list(page.title_set.all())
             plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
-            
             origin_id = page.id
-            # IMPORTANT NOTE: self gets changed in next few lines to page!!
-            
+            page.old_pk = page.pk
             page.pk = None
             page.level = None
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.status = Page.MODERATOR_NEED_APPROVEMENT
-            page.parent = tree[-1]
+            page.published = False
+            page.publisher_status = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
-            if page.reverse_id in all_reverse_ids:
-                # reverse_id already exists for some page on the target site
+            if page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
+            if first:
+                first = False
+                if tree:
+                    page.parent = tree[0]
+                else:
+                    page.parent = None
+                page.insert_at(target, position)
+            else:
+                count = 1
+                found = False
+                for prnt in tree:
+                    if prnt.old_pk == page.parent_id:
+                        page.parent = prnt
+                        tree = tree[0:count]
+                        found = True
+                        break
+                    count += 1
+                if not found:
+                    page.parent = None
+            tree.append(page)
+            page.site = site
             page.save()
-            
-            update_moderation_message(page, _('Page was copied.'))
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
@@ -142,36 +158,34 @@ class Page(MpttPublisher):
                     permission.pk = None
                     permission.page = page
                     permission.save()
-            
             if settings.CMS_MODERATOR and copy_moderation:
                 from cms.models.moderatormodels import PageModerator
                 for moderator in PageModerator.objects.filter(page__id=origin_id):
                     moderator.pk = None
                     moderator.page = page
                     moderator.save()
-            
-            if first:
-                first = False
-                page.move_to(target, position)
-            page.site = site
-            page.save()
+            update_moderation_message(page, unicode(_('Page was copied.')))
             for title in titles:
                 title.pk = None
                 title.publisher_public_id = None
+                title.published = False
                 title.page = page
                 title.slug = get_available_slug(title)
                 title.save()
             ptree = []
             for p in plugins:
-                plugin, cls = p.get_plugin_instance()
+                try:
+                    plugin, cls = p.get_plugin_instance()
+                except KeyError: #plugin type not found anymore
+                    continue
                 p.page = page
                 p.pk = None
                 p.id = None
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
+                p.inherited_public_id = None
                 p.publisher_public_id = None
-                
                 if p.parent:
                     pdif = p.level - ptree[-1].level
                     if pdif < 0:
@@ -192,10 +206,10 @@ class Page(MpttPublisher):
                     plugin.rght = p.rght
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
-                    plugin.publisher_public_id = p.pk
+                    plugin.publisher_public_id = None
+                    plugin.public_id = None
+                    plugin.plubished = False
                     plugin.save()
-            if dif != 0:
-                tree.append(page)
     
     def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None):
         """
@@ -417,6 +431,7 @@ class Page(MpttPublisher):
             default_lang = True
             language = get_language()
         load = False
+        
         if not hasattr(self, "title_cache"):
             load = True
         elif self.title_cache and self.title_cache.language != language and language and not default_lang:
@@ -424,7 +439,7 @@ class Page(MpttPublisher):
         elif fallback and not self.title_cache:
             load = True 
         if force_reload:
-            load = True
+            load = True            
         if load:
             from cms.models.titlemodels import Title
             if version_id:
@@ -588,10 +603,14 @@ class Page(MpttPublisher):
         return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
     
     def last_page_states(self):
-        """Returns last five page states, if they exist
+        """Returns last five page states, if they exist, optimized, calls sql
+        query only if some states available
         """
         # TODO: optimize SQL... 1 query per page 
         if settings.CMS_MODERATOR:
+            has_moderator_state = getattr(self, '_has_moderator_state_chache', None)
+            if has_moderator_state == False:
+                return None
             return self.pagemoderatorstate_set.all().order_by('created',)[:5]
         return None
     
@@ -674,6 +693,23 @@ class Page(MpttPublisher):
     def requires_approvement(self):
         return self.moderator_state in (Page.MODERATOR_NEED_APPROVEMENT, Page.MODERATOR_NEED_DELETE_APPROVEMENT)
     
-if 'reversion' in settings.INSTALLED_APPS: 
-    import reversion       
-    reversion.register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])
+    def get_moderation_value(self, user):
+        """Returns page moderation value for given user, moderation value is
+        sum of moderations.
+        """
+        moderation_value = getattr(self, '_moderation_value_cahce', None)
+        if moderation_value is not None and self._moderation_value_cache_for_user_id == user.pk:
+            return moderation_value
+        try:
+            page_moderator = self.pagemoderator_set.get(user=user)
+        except ObjectDoesNotExist:
+            return 0
+        
+        moderation_value = page_moderator.get_decimal()
+        
+        self._moderation_value_cahce = moderation_value
+        self._moderation_value_cache_for_user_id = user
+            
+        return moderation_value 
+        
+reversion_register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])

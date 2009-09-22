@@ -224,7 +224,7 @@ class PagesTestCase(PageBaseTestCase):
         """
         Test that a page can be copied via the admin
         """
-        raise "must be reimplemented, because ids doesnt work with this system"
+        raise "test must be reimplemented, because ids doesnt work with this system"
     
         # this case is not written properly, it must always check what was the
         # id of created page!!

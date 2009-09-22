@@ -5,4 +5,4 @@ from manager import PublisherManager
 
 __all__ = ('Publisher', 'PublisherManager', 'MpttPublisher', 'Mptt', 'VERSION')
 
-VERSION = (0, 3, 'sintab')
+VERSION = (0, 4, 'sintab')

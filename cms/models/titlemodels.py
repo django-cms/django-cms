@@ -5,7 +5,7 @@ from publisher import Publisher
 from cms import settings
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
-
+from cms.utils.helpers import reversion_register
 
 class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)

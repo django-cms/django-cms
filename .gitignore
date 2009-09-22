@@ -3,3 +3,15 @@
 *.lock
 *.pid
 cms/django
+*.DS_Store
+*.svn
+cms/media/cms_page_media/
+cms/docs/build
+example/run
+
+example/local_settings.py
+reversion/
+
+.ropeproject
+.project
+.pydevproject
