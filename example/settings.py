@@ -128,6 +128,8 @@ INSTALLED_APPS = (
     #'store',
 )
 
+LANGUAGE_CODE = "de"
+
 gettext = lambda s: s
 LANGUAGES = (
     ('fr', gettext('French')),
