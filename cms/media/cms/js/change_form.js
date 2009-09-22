@@ -5,7 +5,7 @@ $(document).ready(function() {
     }    
     
     if(window.location.href.split("history").length == 1 && window.location.href.split("recover").length==1){
-		$.each(["language", "template"], function(i, label){
+		$.each(["template"], function(i, label){
 	        var select = $('select#id_'+label);
 	        select.change(function() {
 				changed = false;
@@ -34,15 +34,15 @@ $(document).ready(function() {
 				}else{
 					var answer = true;
 				}
+
 	            if (answer) {
 	                window.location.href = array[0]+query;
-	            } else {
-	                this.selectedIndex = index;
 	            }
 	        
 	        });
 	    });
 	}
+
 	$("#id_title").focus();
     
     var template = $.query.get('template');
@@ -96,3 +96,40 @@ $(document).ready(function() {
 	    
 });
 
+
+function trigger_lang_button(e, url) {
+    // also make sure that we will display the confirm dialog
+    // in case users switch tabs while editing plugins
+    changed = false;
+    if($("#id_slug")[0]._changed){
+        changed = true;
+    }
+
+    if($("#id_title")[0]._changed){
+        changed = true;
+    }
+
+    var pub = $("#id_published");
+    if (pub.length){
+        if(pub[0]._changed){
+            changed = true;
+        }
+    }
+
+    if($('iframe').length){
+        changed = true;
+    }
+
+    if (changed) {
+        var question = gettext("Are you sure you want to change tabs without saving the page first?")
+        var answer = confirm(question);
+    }else{
+        var answer = true;
+    }
+
+    if (!answer) {
+        return false;
+    } else {   
+        window.location = url;
+    }
+}

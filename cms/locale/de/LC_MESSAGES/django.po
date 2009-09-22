@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-03 14:46+0200\n"
+"POT-Creation-Date: 2009-09-15 04:53+0200\n"
 "PO-Revision-Date: 2009-06-22 18:02+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio <developers@divio.ch>\n"
@@ -191,25 +191,25 @@ msgstr ""
 msgid "To add permissions you also need to edit them!"
 msgstr ""
 
-#: admin/pageadmin.py:85 admin/pageadmin.py:101
+#: admin/pageadmin.py:87 admin/pageadmin.py:103
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: admin/pageadmin.py:96
+#: admin/pageadmin.py:98
 msgid "Basic Settings"
 msgstr "Grundeinstellungen"
 
-#: admin/pageadmin.py:99
+#: admin/pageadmin.py:101
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "Achtung: Diese Seite wird neu geladen wenn sie die Auswahl ändern. Sichern "
 "Sie vorher!"
 
-#: admin/pageadmin.py:105
+#: admin/pageadmin.py:107
 msgid "Advanced Settings"
 msgstr "Erweiterte Einstellungen"
 
-#: admin/pageadmin.py:114
+#: admin/pageadmin.py:116
 msgid "SEO Settings"
 msgstr "Suchmaschinen-Einstellungen"
 
@@ -218,11 +218,11 @@ msgstr "Suchmaschinen-Einstellungen"
 msgid "higher"
 msgstr "höhe"
 
-#: admin/pageadmin.py:600
+#: admin/pageadmin.py:612
 msgid "Database error"
 msgstr "Datenbankfehler"
 
-#: admin/pageadmin.py:685 migrations/0001_initial.py:13
+#: admin/pageadmin.py:697 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
 #: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
 #: models/pagemodel.py:67 models/permissionmodels.py:69
@@ -233,7 +233,7 @@ msgstr "Datenbankfehler"
 msgid "page"
 msgstr "Seite"
 
-#: admin/pageadmin.py:805
+#: admin/pageadmin.py:817
 msgid "Page was successfully approved."
 msgstr "Seite erfolgreich freigegeben"
 
@@ -337,7 +337,7 @@ msgstr "Plugin-Name"
 msgid "title"
 msgstr "Titel"
 
-#: migrations/0001_initial.py:28 models/titlemodels.py:15
+#: migrations/0001_initial.py:28
 msgid "path"
 msgstr "Pfad"
 
@@ -686,6 +686,11 @@ msgstr "Benutzergruppen (Seite)"
 msgid "overwrite the title in the menu"
 msgstr "Titel im Menü überschreiben"
 
+#: models/titlemodels.py:15
+#, fuzzy
+msgid "Path"
+msgstr "Pfad"
+
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
 msgstr "Titel überschreiben (HTML Title Tag)"
@@ -708,18 +713,17 @@ msgid "use swf file"
 msgstr ".swf datei"
 
 #: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:12
-#: plugins/video/models.py:31 plugins/videoplayer/models.py:13
+#: plugins/video/models.py:31
 msgid "width"
 msgstr "breite"
 
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:15
-#: plugins/video/models.py:32 plugins/videoplayer/models.py:14
+#: plugins/video/models.py:32
 msgid "height"
 msgstr "höhe"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
 #: plugins/video/templates/cms/plugins/video.html:3
-#: plugins/videoplayer/templates/cms/plugins/videoplayer.html:3
 msgid "Missing flash plugin."
 msgstr "Flash plugin wurde nicht gefunden."
 
@@ -953,7 +957,7 @@ msgstr ""
 msgid "movie"
 msgstr "Anzeigen"
 
-#: plugins/video/models.py:29 plugins/videoplayer/models.py:11
+#: plugins/video/models.py:29
 #, fuzzy
 msgid "use image file"
 msgstr ".swf datei"
@@ -1006,29 +1010,6 @@ msgstr "moderieren"
 
 #: plugins/video/models.py:46
 msgid "flash menu"
-msgstr ""
-
-#: plugins/videoplayer/cms_plugins.py:8
-#, fuzzy
-msgid "Videoplayer"
-msgstr "Im Web anzeigen"
-
-#: plugins/videoplayer/models.py:10
-msgid "video file"
-msgstr ""
-
-#: plugins/videoplayer/models.py:10
-#, fuzzy
-msgid "use video file"
-msgstr ".swf datei"
-
-#: plugins/videoplayer/models.py:11
-#, fuzzy
-msgid "splash image"
-msgstr "Letzte Änderung"
-
-#: plugins/videoplayer/models.py:12
-msgid "autoplay"
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
@@ -1107,28 +1088,28 @@ msgstr "Geschichte"
 msgid "View on site"
 msgstr "Im Web anzeigen"
 
-#: templates/admin/cms/page/change_form.html:70
+#: templates/admin/cms/page/change_form.html:80
 #: templates/admin/cms/page/plugin_change_form.html:83
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Bitte korrigieren Sie unterhalb den Fehler."
 msgstr[1] "Bitte korrigieren Sie unterhalb alle Fehler."
 
-#: templates/admin/cms/page/change_form.html:89
+#: templates/admin/cms/page/change_form.html:100
 msgid "All permissions"
 msgstr "Alle Berechtigungen"
 
-#: templates/admin/cms/page/change_form.html:90
-#: templates/admin/cms/page/change_form.html:104
+#: templates/admin/cms/page/change_form.html:101
+#: templates/admin/cms/page/change_form.html:113
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
 msgstr "Lade..."
 
-#: templates/admin/cms/page/change_form.html:103
+#: templates/admin/cms/page/change_form.html:112
 msgid "Page states"
 msgstr "Seiten Status"
 
-#: templates/admin/cms/page/change_form.html:126
+#: templates/admin/cms/page/change_form.html:135
 #, python-format
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
@@ -1137,16 +1118,16 @@ msgstr ""
 "Diese Seite muss auf der Ebene %(moderation_level)s moderiert werden. Senden "
 "Sie eine Nachricht an den Moderator."
 
-#: templates/admin/cms/page/change_form.html:128
+#: templates/admin/cms/page/change_form.html:137
 msgid "Request approvemet"
 msgstr "Freigabe anfordern"
 
-#: templates/admin/cms/page/change_form.html:218
+#: templates/admin/cms/page/change_form.html:227
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
 msgstr "Sichern"
 
-#: templates/admin/cms/page/change_form.html:219
+#: templates/admin/cms/page/change_form.html:228
 msgid "Save and continue editing"
 msgstr ""
 
@@ -1453,6 +1434,18 @@ msgstr "CMS - ihr Benutzer wurde erstellt."
 #: utils/permissions.py:196
 msgid "CMS - your user account was changed."
 msgstr "CMS - ihr Benutzer wurde verändert."
+
+#, fuzzy
+#~ msgid "Videoplayer"
+#~ msgstr "Im Web anzeigen"
+
+#, fuzzy
+#~ msgid "use video file"
+#~ msgstr ".swf datei"
+
+#, fuzzy
+#~ msgid "splash image"
+#~ msgstr "Letzte Änderung"
 
 #~ msgid "Can add page"
 #~ msgstr "Kann Seite hinzufügen"

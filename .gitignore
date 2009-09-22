@@ -1,5 +1,8 @@
-.tmp*
 *.pyc
+*.swp
+*.lock
+*.pid
+cms/django
 *.DS_Store
 *.svn
 cms/media/cms_page_media/

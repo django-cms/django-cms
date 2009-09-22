@@ -21,6 +21,7 @@ from cms.utils.moderator import update_moderation_message, \
 from cms.utils.permissions import has_page_add_permission, \
     get_user_permission_level, has_global_change_permissions_permission
 from copy import deepcopy
+from django.conf import settings as django_settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
@@ -32,6 +33,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title
+from django.utils.translation import activate
 from django.utils.encoding import force_unicode
 from django.utils.functional import curry
 from django.utils.translation import ugettext as _
@@ -46,7 +48,7 @@ class PageAdmin(admin.ModelAdmin):
     
     exclude = ['created_by', 'changed_by', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
-    top_fields = ['language']
+    top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
     advanced_fields = ['reverse_id',  'overwrite_url', 'login_required', 'menu_login_required']
@@ -326,9 +328,9 @@ class PageAdmin(admin.ModelAdmin):
                 given_fieldsets.append(seo) 
         else: # new page
             given_fieldsets = deepcopy(self.add_fieldsets)
-                
+
         return given_fieldsets
-    
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
@@ -351,9 +353,8 @@ class PageAdmin(admin.ModelAdmin):
 
             if not settings.CMS_SOFTROOT and 'soft_root' in self.exclude:
                 self.exclude.remove('soft_root')
-            
+
             form = super(PageAdmin, self).get_form(request, obj, **kwargs)
-            form.base_fields['language'].initial = force_unicode(language)
             version_id = None
             versioned = False
             if "history" in request.path or 'recover' in request.path:
@@ -362,8 +363,7 @@ class PageAdmin(admin.ModelAdmin):
         else:
             self.inlines = []
             form = PageAddForm
-        form.base_fields['language'].initial = force_unicode(language)
-        
+
         if obj:
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
@@ -460,24 +460,31 @@ class PageAdmin(admin.ModelAdmin):
         if not isinstance(widget(), Widget):
             widget = Textarea
         return widget
-    
+
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        
+
         if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
             moderation_required = will_require_moderation(request.GET['target'], request.GET['position'])
-            
+
             extra_context.update({
                 'moderation_required': moderation_required,
                 'moderation_level': _('higher'),
                 'show_save_and_continue':True,
             })
+
+        user_lang_set = request.GET.get('language',
+                                        django_settings.LANGUAGE_CODE)
+        extra_context.update({
+            'language': user_lang_set,
+        })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
     
     def change_view(self, request, object_id, extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
+
         try:
             obj = self.model.objects.get(pk=object_id)
         except self.model.DoesNotExist:
@@ -490,11 +497,16 @@ class PageAdmin(admin.ModelAdmin):
             moderation_level, moderation_required = get_test_moderation_level(obj, request.user)
             
             # if there is a delete request for this page
-            moderation_delete_request = settings.CMS_MODERATOR and obj.pagemoderatorstate_set.get_delete_actions().count()
-            
+            moderation_delete_request = (settings.CMS_MODERATOR and
+                    obj.pagemoderatorstate_set.get_delete_actions(
+                    ).count())
+
+            user_lang_set = request.GET.get('language',
+                                            django_settings.LANGUAGE_CODE)
+            activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
-                'language': get_language_from_request(request),
+                'language': user_lang_set,
                 'traduction_language': settings.CMS_LANGUAGES,
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
