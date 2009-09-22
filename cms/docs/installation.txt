@@ -104,6 +104,8 @@ The ´´LANGUAGE_CODE``also must be set to a language that is present in the LAN
 
 	LANGUAGE_CODE = 'en'
 
+This defines the default language.
+
 urls.py
 -------
 
