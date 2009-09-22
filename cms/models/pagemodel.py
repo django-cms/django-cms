@@ -105,11 +105,14 @@ class Page(MpttPublisher):
         
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
         site_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
-        target.old_pk = -1
-        if position == "first_child":
-            tree = [target]
-        elif target.parent_id:
-            tree = [target.parent]
+        if target:
+            target.old_pk = -1
+            if position == "first_child":
+                tree = [target]
+            elif target.parent_id:
+                tree = [target.parent]
+            else:
+                tree = []
         else:
             tree = []
         first = True
