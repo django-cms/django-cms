@@ -65,14 +65,18 @@
 
 <input type="hidden" name="language" value="{{language}}" />
 
-<ul id="page_form_lang_tabs">
+<div id="page_form_lang_tabs">
     {% for lang_code, lang_name in traduction_language %}
-        <li {% ifequal lang_code language %}class="active_tab"{% endifequal %}
-                ><a href="./?language={{lang_code}}">{{lang_name}}</a></li>
+        <input type="button" onclick="window.location='./?language={{lang_code}}';"
+            class="language_button {% ifequal lang_code language %}selected{% endifequal %}"
+            id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
     {% endfor %}
-</ul>
+</div>
 
-<div>
+
+
+<div id="lang_tab_content">
+<h2 class="header"></h2>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if errors %}
