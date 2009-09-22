@@ -1,9 +1,8 @@
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 from posixpath import join, basename, splitext, exists
-
+from django.db.models import Q
 from cms import settings as cms_settings
 from django.conf import settings
 
@@ -55,4 +54,8 @@ class File(CMSPlugin):
             # added if, because it raised attribute error when file wasnt defined
             return self.get_file_name();
         return "<empty>"
-        
+
+    @staticmethod
+    def search(q):
+        """ Return Q object (relative to Page) for PageManager.search """
+        return Q(cmsplugin__file__title__icontains=q)

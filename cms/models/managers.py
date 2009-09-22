@@ -93,9 +93,8 @@ class PageManager(PublisherManager):
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
         
-        NOTE:For future may be better if every plugin defines Q object relative 
-        to page, and search function just takes them. This will give us 
-        posibillity to search over custom plugins. 
+        Plugins can define a 'search' method which returns a Q object relative 
+        to the page Q(cmsplugin__pluginname__...).
         """
         qs = self.public()
         
@@ -105,20 +104,13 @@ class PageManager(PublisherManager):
         
         qt = Q(title_set__title__icontains=q)
         
-        plugins = (
-            ('cms.plugins.text', Q(cmsplugin__text__body__icontains=q)),
-            ('cms.plugins.file', Q(cmsplugin__file__title__icontains=q)),
-            ('cms.plugins.snippet', Q(cmsplugin__snippetptr__snippet__html__icontains=q)),
-            ('cms.plugins.link', Q(cmsplugin__link__name__icontains=q)),
-            ('cms.plugins.teaser', Q(cmsplugin__teaser__description__icontains=q)),
-        )
-        
+        # find 'searchable' plugins and build query
         qp = Q()
-        # build plugin query depending on installed plugins
-        for app_name, q in plugins:
-            if not app_name in settings.INSTALLED_APPS:
-                continue
-            qp |= q
+        # cannot import CMSPlugin due to Manager -> Page -> Plugin circle!
+        CMSPlugin = models.get_model('cms','cmsplugin')
+        for c in CMSPlugin.__subclasses__():
+            if hasattr(c, 'search'):
+                qp |= c.search(q)
         
         if language:
             qt &= Q(title_set__language=language)
@@ -127,7 +119,6 @@ class PageManager(PublisherManager):
         qs = qs.filter(qt | qp)
             
         return qs.distinct()
-        
         
         
 class TitleManager(PublisherManager):
