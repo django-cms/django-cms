@@ -99,6 +99,10 @@ If your site is multilingual be sure to have the ``LANGUAGES`` setting present i
 		('de', gettext('German')),
 		('en', gettext('English')),
 	)
+	
+The ´´LANGUAGE_CODE``also must be set to a language that is present in the LANGUAGES touple::
+
+	LANGUAGE_CODE = 'en'
 
 urls.py
 -------
