@@ -21,38 +21,24 @@ Plugins included at the moment include the following:
 
 Many more are in the works.  Plugins are very easy to write and integrate with your own models.  
 
-Screenshots
------------
+Tour & Screenshots
+------------------
 
-![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/static/screen3.png "Tree / List view")
+can be found [here](http://www.django-cms.org/en/tour/)
 
-The tree view supports full drag and drop and only shows the nodes for which you have sufficient permissions.
-A traditional list view is shown instead if search or filters are activated.
-
-![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/static/screen1.png "Edit view")
-
-The edit page view. "Right-Column" and "Body" are placeholders in the default template.
-If a different template were chosen, its corresponding placeholders would appear instead.
-
-![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/static/screen2.png "Plugin Editor with Textplugin")
-
-If you select a plugin you can edit it. The text plugin has the unique
-capability that you can place plugins directly into the text flow. So links
-inserted with the link plugin stay up-to-date even if pages are moved in the
-tree and the URLs change.
 
 Documentation
 -------------
 
-Can be found [here](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs).
+Can be found [here](http://www.django-cms.org/en/documentation/).
 
-Installation instructions are in the [installation.txt](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs/installation.txt) file.
+Installation instructions can be found [here](http://www.django-cms.org/en/documentation/2.0/installation/).
 
 
 Sourcecode
 ----------
 
-Can be found [here](http://github.com/digi604/django-cms-2.0/)
+Can be found [here](http://github.com/digi604/django-cms-2.0/) on github.
 
 Help
 ----
