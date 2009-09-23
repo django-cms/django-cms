@@ -138,6 +138,8 @@ LANGUAGES = (
     ('pt-br', gettext("Brazil")),
 )
 
+DEFAULT_LANGUAGE = 0 
+
 CMS_TEMPLATES = (
     ('index.html', gettext('default')),
     ('nice.html', gettext('nice one')),
