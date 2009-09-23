@@ -29,7 +29,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, QueryDict
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title
@@ -503,11 +503,12 @@ class PageAdmin(admin.ModelAdmin):
 
             user_lang_set = request.GET.get('language',
                                             django_settings.LANGUAGE_CODE)
-            activate(user_lang_set)
+            #activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
                 'language': user_lang_set,
                 'traduction_language': settings.CMS_LANGUAGES,
+                'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
@@ -520,19 +521,13 @@ class PageAdmin(admin.ModelAdmin):
                 
                 'moderation_delete_request': moderation_delete_request,
             }
-        
-        return super(PageAdmin, self).change_view(request, object_id, extra_context)
-    
-    # since we have 2 step wizard now, this is not required anymore
-    
-    #def response_add(self, request, obj, post_url_continue='../%s/'):
-    #    """Called always when new object gets created, there may be some new 
-    #    stuff, which should be published after all other objects on page are 
-    #    collected. E.g. title, plugins, etc...
-    #    """
-    #    obj.save(commit=False)
-    #    return super(PageAdmin, self).response_add(request, obj, post_url_continue)
-    
+        tab_language = request.GET.get("language", None)
+        response = super(PageAdmin, self).change_view(request, object_id, extra_context)
+        if tab_language and response.status_code == 302:
+            location = response._headers['location']
+            response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+        return response
+  
     def response_change(self, request, obj):
         """Called always when page gets changed, call save on page, there may be
         some new stuff, which should be published after all other objects on page 
