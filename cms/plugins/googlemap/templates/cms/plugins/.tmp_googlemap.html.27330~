@@ -7,7 +7,6 @@
 <script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ lang }}"></script>
 <script type="text/javascript">
 	//<![CDATA[
-	function(){
 		var geocoder;
 		var map;
 		
@@ -21,40 +20,34 @@
 		  map = new GMap2(document.getElementById("google-map"));
 		  map.addControl(new GSmallZoomControl());
 		  map.addControl(new GMapTypeControl());
-		 
-		  {% if object.get_lat_lng %}
-		  var latLng=new GLatLng({{ object.get_lat_lng|join:", " }});
-		  addToMap(latLng);
-		  {% else %}
+		
 		  // Create new geocoding object
 		  geocoder = new GClientGeocoder();
+		
 		  // Retrieve location information, pass it to addToMap()
-		  geocoder.getLocations(address, onResponse);
-		  {% endif %}
+		  geocoder.getLocations(address, addToMap);
 		}
 		
 		// This function adds the point to the map
 		
-		function onResponse(response){
+		function addToMap(response)
+		{
 		  // Retrieve the object
 		  place = response.Placemark[0];
 		
 		  // Retrieve the latitude and longitude
-		  latLng = new GLatLng(place.Point.coordinates[1],
-		                       place.Point.coordinates[0]);
-		  addToMap(latLng);	
-		}
-		
-		function addToMap(latLng)
-		{
+		  point1 = new GLatLng(place.Point.coordinates[1],
+		                      place.Point.coordinates[0]);
+		  
 		  // Retrieve the latitude and longitude
-		  center = new GLatLng(latLng.lat() + 0.01, latLng.lng());
+		  point2 = new GLatLng(place.Point.coordinates[1] + 0.01,
+		                      place.Point.coordinates[0]);
 		
 		  // Center the map on this point
-		  map.setCenter(center, zoom);
+		  map.setCenter(point2, zoom);
 		
 		  // Create a marker
-		  marker = new GMarker(latLng);
+		  marker = new GMarker(point1);
 		
 		  // Add the marker to map
 		  map.addOverlay(marker);
@@ -64,6 +57,5 @@
 		}
 		
 		load();
-	})();
 	//]]>
 </script>
