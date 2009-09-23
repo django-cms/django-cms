@@ -11,7 +11,7 @@
  */
 (function(){
 
-var 
+var
 	// Will speed up references to window, and allows munging its name.
 	window = this,
 	// Will speed up references to undefined, and allows munging its name.
@@ -2877,7 +2877,7 @@ var withinElement = function(event) {
 	}
 };
 	
-jQuery.each({ 
+jQuery.each({
 	mouseover: 'mouseenter', 
 	mouseout: 'mouseleave'
 }, function( orig, fix ){
@@ -3108,7 +3108,7 @@ jQuery( window ).bind( 'unload', function(){
 		// Skip the window
 		if ( id != 1 && jQuery.cache[ id ].handle )
 			jQuery.event.remove( jQuery.cache[ id ].handle.elem );
-}); 
+});
 (function(){
 
 	jQuery.support = {};
@@ -4179,7 +4179,7 @@ if ( document.documentElement["getBoundingClientRect"] )
 			left = box.left + (self.pageXOffset || jQuery.boxModel && docElem.scrollLeft || body.scrollLeft) - clientLeft;
 		return { top: top, left: left };
 	};
-else 
+else
 	jQuery.fn.offset = function() {
 		if ( !this[0] ) return { top: 0, left: 0 };
 		if ( this[0] === this[0].ownerDocument.body ) return jQuery.offset.bodyOffset( this[0] );
