@@ -5,7 +5,7 @@ $(document).ready(function() {
         var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
         var splits = window.location.href.split("/");
         var page_id = splits[splits.length-2];
-        var language = $('#id_language').attr('value');
+        var language = $('input.language_button.selected').attr('name');
         var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
         if (pluginvalue) {
             var pluginname = select.children('[selected]').text();

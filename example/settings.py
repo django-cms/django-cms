@@ -117,15 +117,18 @@ INSTALLED_APPS = (
     'cms.plugins.googlemap',
     'cms.plugins.teaser',
     'cms.plugins.video',
+    'cms.plugins.twitter',
     'mptt',
     'reversion',
     #'example.categories',
     #'debug_toolbar',
-    #'south',
+    'south',
     # sample application
-    'sampleapp',
+    'example.sampleapp',
     #'store',
 )
+
+LANGUAGE_CODE = "de"
 
 gettext = lambda s: s
 LANGUAGES = (
@@ -151,7 +154,7 @@ CMS_APPLICATIONS_URLS = (
 
 CMS_PLACEHOLDER_CONF = {                        
     'right-column': {
-        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
+        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
         "extra_context": {"theme":"16_16"},
         "name":gettext("right column")
     },

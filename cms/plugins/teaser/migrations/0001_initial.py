@@ -8,6 +8,10 @@ class Migration:
     depends_on = (
         ("cms", "0012_publisher"),
     )
+    
+    needed_by = (
+        ("cms", "0020_advanced_permissions"),
+    )
 
     def forwards(self, orm):
         

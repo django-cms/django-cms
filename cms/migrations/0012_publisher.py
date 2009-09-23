@@ -435,7 +435,7 @@ class Migration:
             'published': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'reverse_id': ('models.CharField', [], {'db_index': 'True', 'max_length': '40', 'null': 'True', 'blank': 'True'}),
             'rght': ('models.PositiveIntegerField', [], {'db_index': 'True'}),
-            'site': ('models.ForeignKey', [], {'to': "orm['sites.Site']"}),
+            'site': ('models.ForeignKey', [], {'to': "orm['sites.Site']", 'default': '1'}),
             'soft_root': ('models.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
             'template': ('models.CharField', [], {'max_length': '100'}),
             'tree_id': ('models.PositiveIntegerField', [], {'db_index': 'True'}),

@@ -14,7 +14,7 @@ class WYMEditor(Textarea):
         js = [join(CMS_MEDIA_URL, path) for path in (
             'wymeditor/jquery.wymeditor.js',
             'wymeditor/plugins/resizable/jquery.wymeditor.resizable.js',
-            'js/wymeditor/plugins/wymeditor.placeholdereditor.js',
+            'js/wymeditor.placeholdereditor.js',
             'js/lib/ui.core.js',
             'js/placeholder_editor_registry.js',
         )]
@@ -57,5 +57,3 @@ class WYMEditor(Textarea):
     def render(self, name, value, attrs=None):
         return self.render_textarea(name, value, attrs) + \
             self.render_additions(name, value, attrs)
-
-

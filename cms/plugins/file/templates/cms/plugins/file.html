@@ -5,5 +5,3 @@
 {% if object.title %}{{ object.title }}{% else %}{{ object.get_file_name }}{% endif %} {% if object.file_exists %}<span class="filesize">({{ object.file.size|filesizeformat }})</span>{% else %}(file missing!){% endif %}</a>
 </span>
 {% endif %}
-
-

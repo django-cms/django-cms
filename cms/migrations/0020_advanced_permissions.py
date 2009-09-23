@@ -5,11 +5,6 @@ from cms.models import *
 
 class Migration:
     
-    depends_on = (
-        ("picture", "0006_float_added"),
-        ("teaser", "0001_initial"),
-    )
-    
     def forwards(self, orm):
         
         # Adding field 'PagePermission.can_change_advanced_settings'

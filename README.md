@@ -9,46 +9,41 @@ and the navigation can be extended by your own models.
 Pages are rendered with a template that has placeholders which get filled via plugins.
 Plugins included at the moment include the following:
 
-* Text
-* Picture
-* Flash
 * File
-* Links
-* HTML Snippets
+* Flash
+* Google Map
+* Link
+* Picture
+* HTML Snippet
+* Teaser
+* Text
+* Video
 
 Many more are in the works.  Plugins are very easy to write and integrate with your own models.  
 
-Screenshots
------------
+Tour & Screenshots
+------------------
 
-![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen3.png "Tree / List view")
-
-The tree view supports full drag and drop and only shows the nodes for which you have sufficient permissions.
-A traditional list view is shown instead if search or filters are activated.
-
-![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen1.png "Edit view")
-
-The edit page view. "Right-Column" and "Body" are placeholders in the default template.
-If a different template were chosen, its corresponding placeholders would appear instead.
-
-![alt text](http://github.com/digi604/django-cms-2.0/raw/master/cms/docs/screen2.png "Plugin Editor with Textplugin")
-
-If you select a plugin you can edit it. The text plugin has the unique
-capability that you can place plugins directly into the text flow. So links
-inserted with the link plugin stay up-to-date even if pages are moved in the
-tree and the URLs change.
-
-Documentation and Help
-----------------------
+can be found [here](http://www.django-cms.org/en/tour/)
 
 
-You can see the very latest documentation in the docs directory of the cms app [here](http://github.com/digi604/django-cms-2.0/tree/master/cms/docs).  Installation instructions are in the installation.md file.  Note that the
-documentation is written with [Markdown](http://en.wikipedia.org/wiki/Markdown).  If
-you view the files through github, they will be formatted fairly well.  Various tools are available
-for converting Markdown to HTML if you wish to edit the docs, including the
-[original markdown program](http://daringfireball.net/projects/markdown/) (written in Perl) and
-[python-markdown](http://www.freewisdom.org/projects/python-markdown/).
+Documentation
+-------------
 
+Can be found [here](http://www.django-cms.org/en/documentation/).
+
+Installation instructions can be found [here](http://www.django-cms.org/en/documentation/2.0/installation/).
+
+
+Sourcecode
+----------
+
+Can be found [here](http://github.com/digi604/django-cms-2.0/) on github.
+
+Help
+----
+
+There is a [google group mailinglist](http://groups.google.com/group/django-cms)
 You can also visit the project website at [django-cms.org](http://www.django-cms.org/)
 or #django-cms on freenet IRC for more info.
 

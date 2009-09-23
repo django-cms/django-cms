@@ -10,7 +10,9 @@ from cms import settings
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
 from cms.utils import get_language_from_request,\
-    get_extended_navigation_nodes, find_children, cut_levels, find_selected
+    get_extended_navigation_nodes, find_children, \
+    cut_levels, find_selected
+from cms.utils import navigation
 
 
 register = template.Library()
@@ -40,7 +42,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     except KeyError:
         return {'template': 'cms/empty.html'}
     page_queryset = get_page_queryset(request)
-    
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
     current_page = request.current_page
@@ -117,10 +118,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             db_from_level = from_level
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
+        if not request.user.is_authenticated():
+            filters['menu_login_required'] = False
         pages = page_queryset.published().filter(**filters).order_by('tree_id', 
                                                                     'parent', 
                                                                     'lft')
-        
         pages = list(pages)
         if root_page:
             pages = [root_page] + pages
@@ -159,6 +161,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 page.ancestor = True
             if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
                 page.sibling = True
+        children = navigation.handle_navigation_manipulators(children, request)
     else:
         children = next_page.childrens
     context.update({'children':children,
@@ -209,7 +212,10 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                   'site':site}
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
+        if not request.user.is_authenticated():
+            filters['menu_login_required'] = False
         pages = page_queryset.published().filter(**filters)
+       
         ids = []
         pages = list(pages)
         all_pages = pages[:]
@@ -255,7 +261,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                     from_level = selected.level
                     to_level =  from_level+levels
                     extra_active = extra_inactive = levels
-    
+    children = navigation.handle_navigation_manipulators(children, request)
     context.update({'children':children,
                     'template':template,
                     'from_level':from_level,

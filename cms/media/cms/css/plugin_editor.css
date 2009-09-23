@@ -74,7 +74,9 @@ ul.plugin-list span.delete{
 	width:15px;
 	background:url(../images/pluginlist-delete.png) no-repeat 0px 0px;
 	text-indent:-7777px;
-	cursor:pointer;
+	cursor:pointer;	
+	_background:none;
+	_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/media/cms/images/pluginlist-delete.png',sizingMethod='crop');	
 }
 
 ul.plugin-list li:hover{background-position:0px -300px; color:#fff;}

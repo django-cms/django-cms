@@ -5,6 +5,14 @@ from cms.plugins.picture.models import *
 
 class Migration:
     
+    depends_on = (
+        ("cms", "0019_public_table_renames"),
+    )
+    
+    needed_by = (
+        ("cms", "0020_advanced_permissions"),
+    )
+    
     def forwards(self, orm):
         
         # Adding field 'PicturePublic.float'

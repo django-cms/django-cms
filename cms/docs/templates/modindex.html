@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% set title = _('Global Module Index') %}
+{% block extrahead %}
+{{ super() }}
+{% if not embedded and collapse_modindex %}
+    <script type="text/javascript">
+      DOCUMENTATION_OPTIONS.COLLAPSE_MODINDEX = true;
+    </script>
+{% endif %}
+{% endblock %}
+{% block body %}
+
+   <h1 id="global-module-index">{{ _('Global Module Index') }}</h1>
+
+   {%- for letter in letters %}
+   <a href="#cap-{{ letter }}"><strong>{{ letter }}</strong></a> {% if not loop.last %}| {% endif %}
+   {%- endfor %}
+   <hr/>
+
+   <table width="100%" class="indextable" cellspacing="0" cellpadding="2">
+   {%- for modname, collapse, cgroup, indent, fname, synops, pform, dep, stripped in modindexentries %}
+   {%- if not modname -%}
+   <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+   <tr class="cap"><td></td><td><a name="cap-{{ fname }}"><strong>{{ fname }}</strong></a></td><td></td></tr>
+   {%- else -%}
+   <tr{% if indent %} class="cg-{{ cgroup }}"{% endif %}>
+     <td>{% if collapse -%}
+       <img src="{{ pathto('_static/minus.png', 1) }}" id="toggle-{{ cgroup }}"
+            class="toggler" style="display: none" alt="-" />
+         {%- endif %}</td>
+     <td>{% if indent %}&nbsp;&nbsp;&nbsp;{% endif %}
+     {% if fname %}<a href="{{ fname }}">{% endif -%}
+     <tt class="xref">{{ stripped|e }}{{ modname|e }}</tt>
+     {%- if fname %}</a>{% endif %}
+   {%- if pform and pform[0] %} <em>({{ pform|join(', ') }})</em>{% endif -%}
+   </td><td>{% if dep %}<strong>{{ _('Deprecated')}}:</strong>{% endif %}
+     <em>{{ synops|e }}</em></td></tr>
+   {%- endif -%}
+   {% endfor %}
+   </table>
+
+{% endblock %}

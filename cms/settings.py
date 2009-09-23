@@ -14,7 +14,7 @@ CMS_TEMPLATES = getattr(settings, 'CMS_TEMPLATES', None)
 if CMS_TEMPLATES is None:
     raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
 
-CMS_TEMPLATE_INHERITANCE = getattr(settings, 'CMS_TEMPLATE_INHERITANCE', None)
+CMS_TEMPLATE_INHERITANCE = getattr(settings, 'CMS_TEMPLATE_INHERITANCE', True)
 CMS_TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 if CMS_TEMPLATE_INHERITANCE:
     # Append the magic inheritance template
@@ -69,6 +69,9 @@ CMS_SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False)
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 
+# a tuple with a 
+CMS_NAVIGATION_MODIFIERS = getattr(settings, 'CMS_NAVIGATION_MODIFIERS', ())
+
 # a tuple of hookable applications, e.g.:
 # CMS_APPLICATIONS_URLS = (
 #    ('sampleapp.urls', 'Sample application'),
@@ -107,6 +110,10 @@ MANAGERS = settings.MANAGERS
 DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 INSTALLED_APPS = settings.INSTALLED_APPS
 LANGUAGES = settings.LANGUAGES
+
+if not i18n_not_installed and not settings.LANGUAGE_CODE in dict(settings.LANGUAGES).keys():
+    raise ImproperlyConfigured('cms.middleware.multilingual.MultilingualURLMiddleware requires that the exact LANGUAGE_CODE (%s) is also present in LANGUAGES.')
+
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
 CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
