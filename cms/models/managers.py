@@ -93,8 +93,7 @@ class PageManager(PublisherManager):
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
         
-        Plugins can define a 'search' method which returns a Q object relative 
-        to the page Q(cmsplugin__pluginname__...).
+        Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
         """
         qs = self.public()
         
@@ -109,8 +108,10 @@ class PageManager(PublisherManager):
         # cannot import CMSPlugin due to Manager -> Page -> Plugin circle!
         CMSPlugin = models.get_model('cms','cmsplugin')
         for c in CMSPlugin.__subclasses__():
-            if hasattr(c, 'search'):
-                qp |= c.search(q)
+            if hasattr(c, 'search_fields'):
+                for field in c.search_fields:
+                    qp |= Q(**{'cmsplugin__%s__%s__icontains' % \
+                                   (c.__name__.lower(), field):q})
         
         if language:
             qt &= Q(title_set__language=language)

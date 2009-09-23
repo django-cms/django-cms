@@ -17,7 +17,4 @@ class Link(CMSPlugin):
     def __unicode__(self):
         return self.name
 
-    @staticmethod
-    def search(q):
-        """ Return Q object (relative to Page) for PageManager.search """
-        return Q(cmsplugin__link__name__icontains=q)
+    search_fields = ('name',)

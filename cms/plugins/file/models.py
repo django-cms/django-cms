@@ -55,7 +55,4 @@ class File(CMSPlugin):
             return self.get_file_name();
         return "<empty>"
 
-    @staticmethod
-    def search(q):
-        """ Return Q object (relative to Page) for PageManager.search """
-        return Q(cmsplugin__file__title__icontains=q)
+    search_fields = ('title',)

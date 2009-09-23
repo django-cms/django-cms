@@ -30,10 +30,7 @@ class SnippetPtr(CMSPlugin):
     class Meta:
         verbose_name = _("Snippet")
 
-    @staticmethod
-    def search(q):
-        """ Return Q object (relative to Page) for PageManager.search """
-        return Q(cmsplugin__snippetptr__snippet__html__icontains=q)
+    search_fields = ('snippet__html',)
 
 # We don't both with SnippetPtr, since all the data is actually in Snippet
 reversion_register(Snippet)

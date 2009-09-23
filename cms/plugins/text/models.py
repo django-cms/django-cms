@@ -25,10 +25,7 @@ class Text(CMSPlugin):
                               admin. Read/write.
                               """)
 
-    @staticmethod
-    def search(q):
-        """ Return Q object (relative to Page) for PageManager.search """
-        return Q(cmsplugin__text__body__icontains=q)
+    search_fields = ('body',)
     
     def __unicode__(self):
         return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")

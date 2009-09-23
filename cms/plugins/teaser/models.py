@@ -18,7 +18,4 @@ class Teaser(CMSPlugin):
     def __unicode__(self):
         return self.title
     
-    @staticmethod
-    def search(q):
-        """ Return Q object (relative to Page) for PageManager.search """
-        return Q(cmsplugin__teaser__description__icontains=q)
+    search_fields = ('description',)
