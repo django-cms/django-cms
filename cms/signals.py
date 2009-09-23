@@ -154,7 +154,7 @@ def post_save_user_group(instance, raw, created, **kwargs):
     # TODO: same as in post_save_user - raw sql is just not nice - workaround...?
     
     cursor = connection.cursor()
-    query = "INSERT INTO `%s` (`group_ptr_id`, `created_by_id`) VALUES (%d, %d)" % (
+    query = "INSERT INTO %s (group_ptr_id, created_by_id) VALUES (%d, %d)" % (
         PageUserGroup._meta.db_table,
         instance.pk, 
         creator.pk

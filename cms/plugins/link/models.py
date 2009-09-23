@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
 from django.conf import settings
+from django.db.models import Q
 
 class Link(CMSPlugin):
     """
@@ -15,3 +16,5 @@ class Link(CMSPlugin):
     
     def __unicode__(self):
         return self.name
+
+    search_fields = ('name',)
