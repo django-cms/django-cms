@@ -872,7 +872,7 @@ class PageAdmin(admin.ModelAdmin):
         site = Site.objects.get_current()
         
         if not site == instance.site:
-            url = "http://%s%s%s" % (site.domain, url)
+            url = "http://%s%s" % (site.domain, url)
         return HttpResponseRedirect(url)
         
 

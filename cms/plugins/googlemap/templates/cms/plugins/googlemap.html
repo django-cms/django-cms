@@ -60,7 +60,7 @@
 		  map.addOverlay(marker);
 		
 		  // Add address information to marker
-		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + place.address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
+		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
 		}
 		
 		load();
