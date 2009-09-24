@@ -23,8 +23,9 @@ class PluginModelBase(ModelBase):
             if base.__name__ == "CMSPlugin":
                 found = True
         if found:
-            table = "cmsplugin_" + new_class._meta.db_table.split("_")[1]
-            new_class._meta.db_table = table
+            if new_class._meta.db_table.startswith("%s_" % new_class._meta.app_label):
+                table = "cmsplugin_" + new_class._meta.db_table.partition("%s_" % new_class._meta.app_label)[2]
+                new_class._meta.db_table = table
         return new_class 
          
     
