@@ -1,4 +1,11 @@
 from setuptools import setup, find_packages
+import os
+
+media_files = []
+
+for dirpath, dirnames, filenames in os.walk('cms/media'):
+    media_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames]])
+
 setup(
     name='django-cms',
     version='2.0.0.alpha',
@@ -10,6 +17,7 @@ setup(
         'mptt': 'mptt',
         'publisher': 'publisher',
     },
+    data_files = media_files,
     package_data = {
         'cms': [
             'templates/admin/cms/mail/*.html',

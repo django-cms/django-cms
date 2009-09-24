@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 from django.conf import settings
 from cms.utils.helpers import reversion_register
-from django.db.models import Q
+
 
 # Stores the actual data
 class Snippet(models.Model):
