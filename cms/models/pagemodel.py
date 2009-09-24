@@ -309,13 +309,10 @@ class Page(MpttPublisher):
         get the list of all existing languages for this page
         """
         from cms.models.titlemodels import Title
-        titles = Title.objects.filter(page=self)
+
         if not hasattr(self, "languages_cache"):
-            languages = []
-            for t in titles:
-                if t.language not in languages:
-                    languages.append(t.language)
-            self.languages_cache = languages
+            self.languages_cache = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
+
         return self.languages_cache
 
     def get_absolute_url(self, language=None, fallback=True):

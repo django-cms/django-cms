@@ -6,7 +6,6 @@ from django.utils.html import strip_tags
 from django.utils.text import truncate_words
 from cms.plugins.text.utils import plugin_admin_html_to_tags,\
     plugin_tags_to_admin_html
-from django.db.models import Q
 
 class Text(CMSPlugin):
     """A block of content, tied to a page, for a particular language"""

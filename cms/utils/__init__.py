@@ -62,17 +62,25 @@ def get_language_from_request(request, current_page=None):
     """
     Return the most obvious language according the request
     """
-    language = get_language_in_settings(request.REQUEST.get('language', None))
+    language = request.REQUEST.get('language', None)
+    
+    if language:
+        language = get_language_in_settings(language)
+
     if language is None:
         language = getattr(request, 'LANGUAGE_CODE', None)
-    if language is None:
+
+    # TODO: This smells like a refactoring oversight - was current_page ever a page object? It appears to be a string now
+    if language is None and isinstance(current_page, Page):
         # in last resort, get the first language available in the page
-        if current_page:
-            languages = current_page.get_languages()
-            if len(languages) > 0:
-                language = languages[0]
+        languages = current_page.get_languages()
+
+        if len(languages) > 0:
+            language = languages[0]
+
     if language is None:
         language = settings.CMS_DEFAULT_LANGUAGE
+
     return language
 
 
