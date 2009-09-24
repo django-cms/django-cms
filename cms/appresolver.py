@@ -76,6 +76,9 @@ class DynamicAppRegexURLResolver(PageRegexURLResolver):
     
     def reset_cache(self):
         self._dynamic_url_conf_module.reset_cache()
+        from django.core import urlresolvers
+        urlresolvers._resolver_cache = {}
+            
     
 
 class ApplicationRegexUrlResolver(PageRegexURLResolver):
@@ -162,6 +165,6 @@ class DynamicURLConfModule(object):
         """
         self._urlpatterns = None
         # recache patterns with new state
-        fake = self.urlpatterns
-
+        #fake = self.urlpatterns        
+    
 dynamic_app_regex_url_resolver = DynamicAppRegexURLResolver()
