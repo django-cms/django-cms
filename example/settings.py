@@ -13,11 +13,11 @@ CACHE_BACKEND = 'locmem:///'
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'#'postgresql_psycopg2'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
-DATABASE_USER = 'cms'           # Not used with sqlite3.
-DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
-DATABASE_HOST = '127.0.0.1'     # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_ENGINE = 'sqlite3'#'postgresql_psycopg2'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'dev.db'           # Or path to database file if using sqlite3.
+DATABASE_USER = ''           # Not used with sqlite3.
+DATABASE_PASSWORD = ''       # Not used with sqlite3.
+DATABASE_HOST = ''     # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''              # Set to empty string for default. Not used with sqlite3.
 
 # Test database settings
@@ -32,10 +32,6 @@ DATABASE_SUPPORTS_TRANSACTIONS = True
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'America/Chicago'
-
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
@@ -162,7 +158,7 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
-        "plugins": ("VideoPlugin", ),
+        "plugins": ("VideoPlugin", "TextPlugin", ),
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
