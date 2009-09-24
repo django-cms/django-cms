@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render_to_response
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpResponseBadRequest
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.translation import ugettext_lazy as _
 from django.template.context import RequestContext
@@ -68,7 +68,11 @@ def add_plugin(request):
             position = None
 
         if not page.has_change_permission(request):
-            raise Http404
+            return HttpResponseForbidden(_("You do not have permission to change this page"))
+
+        # Sanity check to make sure we're not getting bogus values from JavaScript:
+        if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
+            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
         
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
 
