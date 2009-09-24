@@ -125,8 +125,6 @@ def edit_plugin(request, plugin_id, admin_site):
         if not instance:
             raise Http404("This plugin is not saved in a revision")
     
-   
-
     admin.cms_plugin_instance = cms_plugin
     admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
     
@@ -138,7 +136,7 @@ def edit_plugin(request, plugin_id, admin_site):
     if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
         # in case of looking to history just render the plugin content
         context = RequestContext(request)
-        return render_to_response(admin.render_template, admin.render(context, instance, admin.placeholder), context)
+        return render_to_response(admin.render_template, admin.render(context, instance, admin.placeholder))
     
     
     if not instance:

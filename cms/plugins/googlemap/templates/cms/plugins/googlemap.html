@@ -7,7 +7,7 @@
 <script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ lang }}"></script>
 <script type="text/javascript">
 	//<![CDATA[
-	function(){
+	(function(){
 		var geocoder;
 		var map;
 		
@@ -60,7 +60,7 @@
 		  map.addOverlay(marker);
 		
 		  // Add address information to marker
-		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + place.address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
+		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
 		}
 		
 		load();
