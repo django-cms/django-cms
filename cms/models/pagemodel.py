@@ -311,7 +311,7 @@ class Page(MpttPublisher):
         from cms.models.titlemodels import Title
 
         if not hasattr(self, "languages_cache"):
-            self.languages_cache = list(Title.objects.filter(page=self).values_list("language").distinct())
+            self.languages_cache = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
 
         return self.languages_cache
 
