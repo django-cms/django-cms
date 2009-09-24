@@ -5,7 +5,17 @@ $(document).ready(function() {
         var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
         var splits = window.location.href.split("/");
         var page_id = splits[splits.length-2];
+
         var language = $('input.language_button.selected').attr('name');
+
+        if (!language) {
+            language = $('input[name=language]').attr("value");
+        }
+
+        if (!language) {
+            alert("Unable to determine the correct language for this plugin! Please report the bug!");
+        }
+
         var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
         if (pluginvalue) {
             var pluginname = select.children('[selected]').text();
