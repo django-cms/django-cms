@@ -53,3 +53,11 @@ WYM_STYLES = ",\n".join([
 
 WYM_CLASSES = getattr(settings, "WYM_CLASSES", WYM_CLASSES)
 WYM_STYLES = getattr(settings, "WYM_STYLES", WYM_STYLES)
+
+#Advantageously replaces WYM_CLASSES and WYM_STYLES
+##Prepare url for wymeditor.css
+CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
+WYM_STYLESHEET_PATH = getattr(settings, 'CMS_MEDIA_URL', ''.join((settings.MEDIA_URL, CMS_MEDIA_PATH)) )
+WYM_STYLESHEET = getattr(settings, "WYM_STYLESHEET",  '"%scss/wymeditor.css"' % WYM_STYLESHEET_PATH  )
+##If you don't want to use WYM_STYLESHEET enable the line below. And disable 3 lines above.
+#WYM_STYLESHEET = getattr(settings, "WYM_STYLESHEET", '""' )
