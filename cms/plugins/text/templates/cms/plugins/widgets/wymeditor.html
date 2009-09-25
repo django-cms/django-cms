@@ -28,6 +28,11 @@ $(document).ready(function(){
 		editorStyles: [
 			{{ WYM_STYLES }}
 			],
+		{% if WYM_STYLESHEET %}
+		stylesheet:
+			{{ WYM_STYLESHEET }}
+		,
+		{% endif %}
         postInit: function(wym) {
 			 //wym.resizable({handles: "s", maxHeight: 600});
             //construct the insertLinkButton html
