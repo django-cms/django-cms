@@ -224,6 +224,8 @@ class Page(MpttPublisher):
                 this is because of how this adding works - first save, then move
         """
         
+        print "\nsave(", no_signals, change_state, commit, force_with_moderation, force_state, ")"
+        
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
         
@@ -235,6 +237,7 @@ class Page(MpttPublisher):
                 under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
             
             created = not bool(self.pk)
+            print "created?", created
             if settings.CMS_MODERATOR:
                 if change_state:
                     if created:
