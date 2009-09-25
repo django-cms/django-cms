@@ -474,7 +474,7 @@ class PageAdmin(admin.ModelAdmin):
             })
 
         user_lang_set = request.GET.get('language',
-                                        django_settings.LANGUAGE_CODE)
+                                        get_language_from_request(request))
         extra_context.update({
             'language': user_lang_set,
         })
@@ -502,7 +502,7 @@ class PageAdmin(admin.ModelAdmin):
                     ).count())
 
             user_lang_set = request.GET.get('language',
-                                            django_settings.LANGUAGE_CODE)
+                                            get_language_from_request(request, obj))
             #activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
