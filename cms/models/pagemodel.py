@@ -273,7 +273,11 @@ class Page(MpttPublisher):
         
         from cms.utils.permissions import _thread_locals
         
-        self.changed_by = _thread_locals.user.username
+        try:
+            self.changed_by = _thread_locals.user.username
+        except AttributeError:
+            self.changed_by = ""
+            
         if not self.pk:
             self.created_by = self.changed_by 
         
