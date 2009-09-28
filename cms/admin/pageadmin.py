@@ -336,14 +336,9 @@ class PageAdmin(admin.ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        if not "language" in request.GET and obj:
-            titles = Title.objects.filter(page=obj)
-            try:
-                language = titles[0].language
-            except:
-                language = get_language_from_request(request, obj)
-        else:
-            language = get_language_from_request(request, obj)
+        
+        language = get_language_from_request(request, obj)
+        
         if obj:
             self.inlines = PAGE_ADMIN_INLINES
             if not obj.has_publish_permission(request) and not 'published' in self.exclude:
@@ -473,8 +468,9 @@ class PageAdmin(admin.ModelAdmin):
                 'show_save_and_continue':True,
             })
 
+        language = get_language_from_request(request)
         extra_context.update({
-            'language': get_language_from_request(request),
+            'language': language,
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
     
@@ -499,12 +495,11 @@ class PageAdmin(admin.ModelAdmin):
                     obj.pagemoderatorstate_set.get_delete_actions(
                     ).count())
 
-            user_lang_set = request.GET.get('language',
-                                            django_settings.LANGUAGE_CODE)
+            language = get_language_from_request(request, obj)
             #activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
-                'language': user_lang_set,
+                'language': language,
                 'traduction_language': settings.CMS_LANGUAGES,
                 'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
                 'page': obj,
@@ -521,7 +516,8 @@ class PageAdmin(admin.ModelAdmin):
             }
         tab_language = request.GET.get("language", None)
         response = super(PageAdmin, self).change_view(request, object_id, extra_context)
-        if tab_language and response.status_code == 302:
+        
+        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response

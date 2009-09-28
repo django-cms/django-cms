@@ -52,8 +52,6 @@ class MultilingualURLMiddleware:
     
     def process_request(self, request):
         language = self.get_language_from_request(request)
-        print "L", language
-        
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
         

@@ -123,11 +123,3 @@ CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False)
 
 #if CMS_MODERATOR and not CMS_PERMISSION:
 #    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
-
-
-"""
-Multilingual refactor
-
-    - removed from settings CMS_DEFAULT_LANGUAGE, we don't need this, settings.LANGUAGE_CODE is used instead of this
-    
-"""
