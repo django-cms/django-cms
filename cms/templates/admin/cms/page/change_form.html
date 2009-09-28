@@ -54,7 +54,7 @@
 	{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
