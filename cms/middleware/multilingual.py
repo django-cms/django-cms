@@ -47,7 +47,7 @@ class MultilingualURLMiddleware:
                     return lang
             if not lang:
                 lang = translation.get_language_from_request(request)
-        lang = get_default_language()
+        lang = get_default_language(lang)
         return lang
     
     def process_request(self, request):
