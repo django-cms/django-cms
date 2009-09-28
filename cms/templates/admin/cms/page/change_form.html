@@ -63,7 +63,7 @@
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% block form_top %}{% endblock %}
 {{ adminForm.fields.parent }}
 
-<input type="hidden" name="language" value="{{language}}" />
+<input type="hidden" name="language" value="{{ language }}" />
 
 {% if show_language_tabs %}
 <div id="page_form_lang_tabs">

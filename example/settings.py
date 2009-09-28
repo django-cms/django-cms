@@ -122,21 +122,22 @@ INSTALLED_APPS = (
     'reversion',
     #'example.categories',
     #'debug_toolbar',
-    #'south',
+    'south',
     # sample application
     'example.sampleapp',
     #'store',
+    'simplegallery',
 )
 
-LANGUAGE_CODE = "de"
+#LANGUAGE_CODE = "en"
 
 gettext = lambda s: s
 
 LANGUAGES = (
-    ('fr', gettext('French')),
-    ('de', gettext('German')),
+#    ('fr', gettext('French')),
+#    ('de', gettext('German')),
     ('en', gettext('English')),
-    ('pt-br', gettext("Brazil")),
+#    ('pt-br', gettext("Brazil")),
 )
 
 

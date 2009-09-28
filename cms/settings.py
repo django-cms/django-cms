@@ -97,9 +97,6 @@ CMS_LANGUAGE_FALLBACK = getattr(settings, 'CMS_LANGUAGE_FALLBACK', True)
 # Defines which languages should be offered.
 CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)
 
-# Defines which language should be used by default and falls back to LANGUAGE_CODE
-CMS_DEFAULT_LANGUAGE = getattr(settings, 'CMS_DEFAULT_LANGUAGE', settings.LANGUAGE_CODE)[:2]
-
 # Defines how long page content should be cached, including navigation
 CMS_CONTENT_CACHE_DURATION = getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60)
 
@@ -110,9 +107,6 @@ MANAGERS = settings.MANAGERS
 DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 INSTALLED_APPS = settings.INSTALLED_APPS
 LANGUAGES = settings.LANGUAGES
-
-if not i18n_not_installed and not settings.LANGUAGE_CODE in dict(settings.LANGUAGES).keys():
-    raise ImproperlyConfigured('cms.middleware.multilingual.MultilingualURLMiddleware requires that the exact LANGUAGE_CODE (%s) is also present in LANGUAGES.')
 
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
@@ -130,3 +124,10 @@ CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False)
 #if CMS_MODERATOR and not CMS_PERMISSION:
 #    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
 
+
+"""
+Multilingual refactor
+
+    - removed from settings CMS_DEFAULT_LANGUAGE, we don't need this, settings.LANGUAGE_CODE is used instead of this
+    
+"""

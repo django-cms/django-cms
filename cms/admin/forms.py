@@ -17,6 +17,7 @@ from cms.admin.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
 from django.forms.widgets import HiddenInput
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 
 
 class PageAddForm(forms.ModelForm):
@@ -51,6 +52,7 @@ class PageAddForm(forms.ModelForm):
             slug = ""
         page = self.instance
         lang = cleaned_data['language']
+        
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
@@ -63,6 +65,13 @@ class PageAddForm(forms.ModelForm):
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
         return slug
+    
+    def clean_language(self):
+        language = self.cleaned_data['language']
+        if not language in dict(cms_settings.CMS_LANGUAGES).keys():
+            raise ValidationError("Given language does not match language settings.")
+        return language
+        
     
 class PageForm(PageAddForm):
     APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS

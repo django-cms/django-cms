@@ -473,10 +473,8 @@ class PageAdmin(admin.ModelAdmin):
                 'show_save_and_continue':True,
             })
 
-        user_lang_set = request.GET.get('language',
-                                        django_settings.LANGUAGE_CODE)
         extra_context.update({
-            'language': user_lang_set,
+            'language': get_language_from_request(request),
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
     
