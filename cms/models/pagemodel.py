@@ -177,11 +177,7 @@ class Page(MpttPublisher):
                 title.publisher_public_id = None
                 title.published = False
                 title.page = page
-                
-                print "copy with slug:", title.slug
                 title.slug = get_available_slug(title)
-                print "new slug:", title.slug
-                
                 title.save()
             ptree = []
             for p in plugins:

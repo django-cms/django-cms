@@ -1,6 +1,8 @@
+import re
 from cms import settings as cms_settings
 
 APPEND_TO_SLUG = "-copy"
+copy_slug_re = re.compile(r'^.*-copy(?:-(\d)*)?$')
 
 def is_valid_page_slug(page, parent, lang, slug, site):
     """Validates given slug depending on settings.
@@ -35,7 +37,19 @@ def get_available_slug(title, new_slug=None):
     slug = new_slug or title.slug
     if is_valid_page_slug(title.page, title.page.parent, title.language, slug, title.page.site):
         return slug
-    return get_available_slug(title, slug + APPEND_TO_SLUG)
+    
+    # add nice copy attribute, first is -copy, then -copy-2, -copy-3, .... 
+    match = copy_slug_re.match(slug)
+    if match:
+        try:
+            next = int(match.groups()[0]) + 1
+            slug = "-".join(slug.split('-')[:-1]) + "-%d" % next
+        except TypeError:
+            slug = slug + "-2"
+         
+    else:
+        slug = slug + APPEND_TO_SLUG
+    return get_available_slug(title, slug)
 
 
 def check_title_slugs(page):
