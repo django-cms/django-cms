@@ -28,7 +28,8 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404,\
+    HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title
@@ -701,15 +702,17 @@ class PageAdmin(admin.ModelAdmin):
             page = self.model.objects.get(pk=page_id)
             target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
-            return HttpResponse("error")
+            return HttpResponseBadRequest("error")
             
         # does he haves permissions to do this...?
         if not page.has_move_page_permission(request) or \
             not target.has_add_permission(request):
-                return HttpResponse("Denied")
+                return HttpResponseForbidden("Denied")
+        
         # move page
         page.move_page(target, position)
-        return HttpResponse("ok")
+        return render_admin_menu_item(request, page)
+        
     
     
     def get_permissions(self, request, page_id):
