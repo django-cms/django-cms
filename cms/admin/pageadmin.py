@@ -858,10 +858,11 @@ class PageAdmin(admin.ModelAdmin):
             attrs += "&draft=1"
         
         url = instance.get_absolute_url() + attrs
+        
         site = Site.objects.get_current()
         
         if not site == instance.site:
-            url = "http://%s%s" % (site.domain, url)
+            url = "http://%s%s" % (instance.site.domain, url)
         return HttpResponseRedirect(url)
         
 
