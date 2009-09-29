@@ -18,6 +18,7 @@ Plugins included at the moment include the following:
 * Teaser
 * Text
 * Video
+* Twitter
 
 Many more are in the works.  Plugins are very easy to write and integrate with your own models.  
 

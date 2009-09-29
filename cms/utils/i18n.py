@@ -2,7 +2,7 @@ from django.conf import settings
 from cms import settings as cms_settings
 from django.core.exceptions import ImproperlyConfigured
 
-def get_default_language():
+def get_default_language(language_code=None):
     """Returns default language depending on settings.LANGUAGE_CODE merged with
     best match from settings.CMS_LANGUAGES
     
@@ -11,16 +11,19 @@ def get_default_language():
     Raises ImproperlyConfigured if no match found
     """
     
-    language_codes = dict(cms_settings.CMS_LANGUAGES).keys()
+    if not language_code:
+        language_code = settings.LANGUAGE_CODE
+    
+    languages = dict(cms_settings.CMS_LANGUAGES).keys()
     
     # first try if there is an exact language
-    if settings.LANGUAGE_CODE in language_codes:
-        return settings.LANGUAGE_CODE 
+    if language_code in languages:
+        return language_code
     
     # otherwise split the language code if possible, so iso3
-    language_code = settings.LANGUAGE_CODE.split("-")[0]
+    language_code = language_code.split("-")[0]
     
-    if not language_code in language_codes:
+    if not language_code in languages:
         raise ImproperlyConfigured("No match in CMS_LANGUAGES for LANGUAGE_CODE %s" % settings.LANGUAGE_CODE)
     
     return language_code
