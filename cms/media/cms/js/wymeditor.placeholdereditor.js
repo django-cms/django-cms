@@ -30,8 +30,6 @@ WymPlaceholderBridge.prototype.replaceContent = function(old, rep) {
     /* Replaces occurence of `old` with `new` in the editor. 
      */
 	var html = this.wym.html()
-	console.log(html);
-	console.log("replaced", html.replace(old, rep));
 	this.wym.html(html.replace(old, rep));
 };
 

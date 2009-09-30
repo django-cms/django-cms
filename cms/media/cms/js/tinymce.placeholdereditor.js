@@ -27,6 +27,13 @@ TinyMCEPlaceholderBridge.prototype.insertText = function(text) {
 
 };
 
+TinyMCEPlaceholderBridge.prototype.replaceContent = function(old, rep) {
+    /* Replaces occurence of `old` with `new` in the editor. 
+     */
+	
+	// todo: implement
+};
+
 
 TinyMCEPlaceholderBridge.prototype.selectedObject = function() {
     /* If an image/object is selected, returns the HTMLImageObject for that image,
