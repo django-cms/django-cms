@@ -34,6 +34,7 @@ Add the following middleware classes::
 	MIDDLEWARE_CLASSES = (
         # needed for add/edit page
         'django.middleware.locale.LocaleMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
 		...
 		'cms.middleware.page.CurrentPageMiddleware',
 		'cms.middleware.user.CurrentUserMiddleware',
@@ -42,6 +43,11 @@ Add the following middleware classes::
 	)
     
 If your site is not multilingual you can leave out ``'cms.middleware.MutilingualURLMiddleware'``.
+
+Note:
+
+- Be sure that ``cms.middleware.user.CurrentUserMiddleware`` comes after ``django.contrib.auth.middleware.AuthenticationMiddleware``. 
+- Be sure that ``cms.middleware.multilingual.MultilingualURLMiddleware`` comes after ``django.middleware.locale.LocaleMiddlewar``.
 
 Template Context Processors
 ---------------------------
