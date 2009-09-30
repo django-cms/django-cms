@@ -9,7 +9,6 @@ function escapeHtml(html) {
 
 
 function add_plugin(type, parent_id, language){
-	console.log('add plugin');
 	$.post("add-plugin/", {
 		parent_id: parent_id,
 		plugin_type: type
@@ -62,12 +61,8 @@ function plugin_admin_html(plugin_id, icon_src, icon_alt) {
 
 // Global function, needed for popup window to call the parent via opener.dismissEditPluginPopup
 function dismissEditPluginPopup(win, plugin_id, icon_src, icon_alt) {
-	console.log('dismiss', arguments);
     // This is called after user presses 'Save' in popup.
     win.close();
-	
-	console.log("plugin id:", plugin_id);
-	console.log(editPluginPopupCallbacks);
 	
     var callback = editPluginPopupCallbacks[plugin_id];
     if (callback != null) {
