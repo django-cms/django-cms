@@ -97,13 +97,15 @@ class PageForm(PageAddForm):
     meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
         help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
         
-    def clean_reverse_id(self):
-        id = self.cleaned_data['reverse_id']
-        site_id = self.cleaned_data['site']
+    def clean(self):
+        cleaned_data = super(PageForm, self).clean()
+        id = cleaned_data['reverse_id']
+        print dir(self)
+        site_id = cleaned_data['site']
         if id:
             if Page.objects.filter(reverse_id=id, site=site_id).exclude(pk=self.instance.pk).count():
                 raise forms.ValidationError(ugettext_lazy('A page with this reverse URL id exists already.'))
-        return id
+        return cleaned_data
 
     def clean_overwrite_url(self):
         url = self.cleaned_data['overwrite_url']
