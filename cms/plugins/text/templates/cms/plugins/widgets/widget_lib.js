@@ -38,7 +38,9 @@ function edit_plugin(obj_id) {
     editPluginPopupCallbacks[obj_id] = function(plugin_id, icon_src, icon_alt){
         var texteditor = get_editor("{{ name }}");
 		var rExp = new RegExp('<img src="[^>]*" alt="[^>]*" id="plugin_obj_' + obj_id + '"[^>]*>', "g");
-		texteditor.replaceContent(rExp, plugin_admin_html(plugin_id, icon_src, icon_alt));
+		try {
+			texteditor.replaceContent(rExp, plugin_admin_html(plugin_id, icon_src, icon_alt));
+		} catch (e) {}
 		editPluginPopupCallbacks[obj_id] = null; // Unbind callback
 	};
 	

@@ -32,7 +32,7 @@ TinyMCEPlaceholderBridge.prototype.replaceContent = function(old, rep) {
      */
 	
 	// todo: implement
-	// tinyMCE.activeEditor
+	throw new Error("NotImplemented");
 };
 
 
