@@ -27,6 +27,7 @@ TinyMCEPlaceholderBridge.prototype.insertText = function(text) {
 
 };
 
+
 TinyMCEPlaceholderBridge.prototype.selectedObject = function() {
     /* If an image/object is selected, returns the HTMLImageObject for that image,
      * otherwise undefined/null.

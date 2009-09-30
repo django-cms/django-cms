@@ -9,6 +9,7 @@ function escapeHtml(html) {
 
 
 function add_plugin(type, parent_id, language){
+	console.log('add plugin');
 	$.post("add-plugin/", {
 		parent_id: parent_id,
 		plugin_type: type
@@ -35,7 +36,15 @@ function add_plugin(type, parent_id, language){
 }
 
 function edit_plugin(obj_id) {
-    // Pop up window for editing object.
+    editPluginPopupCallbacks[obj_id] = function(plugin_id, icon_src, icon_alt){
+        var texteditor = get_editor("{{ name }}");
+		var rExp = new RegExp('<img src="[^>]*" alt="[^>]*" id="plugin_obj_' + obj_id + '"[^>]*>', "g");
+		texteditor.replaceContent(rExp, plugin_admin_html(plugin_id, icon_src, icon_alt));
+		editPluginPopupCallbacks[obj_id] = null; // Unbind callback
+	};
+	
+	
+	// Pop up window for editing object.
     window.open("edit-plugin/" + obj_id + "/?_popup=1",
                 "Edit plugin object",
                 "menubar=no,titlebar=no,toolbar=no,resizable=yes"
@@ -53,8 +62,13 @@ function plugin_admin_html(plugin_id, icon_src, icon_alt) {
 
 // Global function, needed for popup window to call the parent via opener.dismissEditPluginPopup
 function dismissEditPluginPopup(win, plugin_id, icon_src, icon_alt) {
+	console.log('dismiss', arguments);
     // This is called after user presses 'Save' in popup.
     win.close();
+	
+	console.log("plugin id:", plugin_id);
+	console.log(editPluginPopupCallbacks);
+	
     var callback = editPluginPopupCallbacks[plugin_id];
     if (callback != null) {
         callback(plugin_id, icon_src, icon_alt);
