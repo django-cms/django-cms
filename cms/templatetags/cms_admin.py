@@ -74,3 +74,9 @@ def moderator_choices(page, user):
         choices.append((mask_value, title, active, kind))
     
     return choices
+
+@register.filter
+def preview_link(page, language):
+    if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
+        return "/%s%s" % (language, page.get_absolute_url(language))
+    return page.get_absolute_url(language)

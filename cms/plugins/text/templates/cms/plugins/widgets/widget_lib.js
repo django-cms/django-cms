@@ -35,7 +35,17 @@ function add_plugin(type, parent_id, language){
 }
 
 function edit_plugin(obj_id) {
-    // Pop up window for editing object.
+    editPluginPopupCallbacks[obj_id] = function(plugin_id, icon_src, icon_alt){
+        var texteditor = get_editor("{{ name }}");
+		var rExp = new RegExp('<img src="[^>]*" alt="[^>]*" id="plugin_obj_' + obj_id + '"[^>]*>', "g");
+		try {
+			texteditor.replaceContent(rExp, plugin_admin_html(plugin_id, icon_src, icon_alt));
+		} catch (e) {}
+		editPluginPopupCallbacks[obj_id] = null; // Unbind callback
+	};
+	
+	
+	// Pop up window for editing object.
     window.open("edit-plugin/" + obj_id + "/?_popup=1",
                 "Edit plugin object",
                 "menubar=no,titlebar=no,toolbar=no,resizable=yes"
@@ -55,6 +65,7 @@ function plugin_admin_html(plugin_id, icon_src, icon_alt) {
 function dismissEditPluginPopup(win, plugin_id, icon_src, icon_alt) {
     // This is called after user presses 'Save' in popup.
     win.close();
+	
     var callback = editPluginPopupCallbacks[plugin_id];
     if (callback != null) {
         callback(plugin_id, icon_src, icon_alt);

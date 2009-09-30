@@ -38,33 +38,22 @@ function initTree(){
 		cookies : {},
 		callback: {
 			beforemove  : function(what, where, position, tree) {
-				//console.log("before move")
 				item_id = what.id.split("page_")[1];
 				target_id = where.id.split("page_")[1];
 				old_node = what;
 				if($(what).parent().children("li").length > 1){
-					//console.log("has siblings")
 					if($(what).next("li").length){
 						old_target = $(what).next("li")[0];
 						old_position = "right";
-						//console.log("has sibling after")
-						//console.log($(what).next("li"))
 					}
 					if($(what).prev("li").length){
 						old_target = $(what).prev("li")[0];
 						old_position = "left";
-						//console.log("has sibling befor")
-						//console.log($(what).prev("li"))
 					}
 				}else{
-					//console.log("no siblings")
 					if($(what).attr("rel") != "topnode"){
-						//console.log("has parent")
-						//console.log($(what).parent().parent())
 						old_target = $(what).parent().parent()[0];
 						old_position = "inside";
-					}else{
-						0/0;
 					}
 				}
 				
@@ -79,9 +68,9 @@ function initTree(){
 				}else if (position == "after") {
 					position = "right";
 				}else if(position == "inside"){
-					position = "first-child";
+					position = "last-child";
 				}
-				moveTreeItem(item_id, target_id, position, false);
+				moveTreeItem(what, item_id, target_id, position, false);
 			},
 			onchange: function(node, tree){
 				var url = $(node).find('a.title').attr("href");
@@ -123,47 +112,17 @@ $(document).ready(function() {
 		};
 		
 		// just for debuging!! 
-		/*s.complete = function(xhr, status) {
+		s.complete = function(xhr, status) {
 			if (status == "error" && cmsSettings.debug) {
 				$('body').before(xhr.responseText);
 			}
-		}*/
+		}
 		// end just for debuging
 		
 		// TODO: add error state!
 		return _oldAjax(s);
 	};
 	
-	
-	/**
-	 * Reloads tree item (one line). If some filtering is found, adds 
-	 * filtered variable into posted data. 
-	 * 
-	 * @param {HTMLElement} el Any child element of tree item
-	 * @param {String} url Requested url
-	 * @param {Object} data Optional posted data
-	 * @param {Function} callback Optional calback function
-	 */
-	function reloadItem(el, url, data, callback) {
-		if (data === undefined) data = {};
-	
-		if (/\/\?/ig.test(window.location.href)) {
-			// probably some filter here, tell backend, we need a filtered
-			// version of item	
-			
-			data['fitlered'] = 1;
-		}
-		$.post(url, data, function(response){
-			if (callback) callback(response);
-			var target = $(el).parents('div.cont:first');
-			var parent = target.parent();
-			if (response == "NotFound") {
-				return parent.remove();
-			}
-			target.replace(response);
-			parent.find('div.cont:first').yft();
-		});
-	}
 	
 	function refresh(){
 		window.location = window.location.href;
@@ -307,11 +266,12 @@ $(document).ready(function() {
                 var position = "left";
             if(jtarget.hasClass("right"))
                 var position = "right";
-            if(jtarget.hasClass("first-child"))
-                var position = "first-child";
+            if(jtarget.hasClass("last-child"))
+                var position = "last-child";
             var target_id = target.parentNode.id.split("move-target-")[1];
-            if(action=="move") {
-				moveTreeItem(selected_page, target_id, position, tree);
+            
+			if(action=="move") {
+				moveTreeItem(jtarget, selected_page, target_id, position, tree);
                 $('.move-target-container').hide();
             }else if(action=="copy") {
             	site = $('#site-select')[0].value;
@@ -320,8 +280,6 @@ $(document).ready(function() {
             }else if(action=="add") {
                 site = $('#site-select')[0].value;
                 window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&position="+position+"&site="+site;
-            }else{
-            	//console.log("no action defined!")
             }
 			e.stopPropagation();
             return false;
@@ -400,102 +358,149 @@ $(document).ready(function() {
 		
 		$.post("./" + item_id + "/copy-page/", data, function(html) {
 			if(html=="ok"){
+				// reload tree
 				window.location = window.location.href;
 			}else{
 				moveError($('#page_'+item_id + " div.col1:eq(0)"));  
 			}
 	    });
 	}
+	
+	function mark_copy_node(id){
+		$('a.move-target, span.move-target-container, span.line').show();
+	    $('#page_'+id).addClass("selected");
+		$('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
+	    $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
+	    return "copy";
+	}
+	
+	function insert_into_url(url, name, value){
+		if(url.substr(url.length-1, url.length)== "&"){
+			url = url.substr(0, url.length-1);
+		}
+		dash_splits = url.split("#");
+		url = dash_splits[0];
+		var splits = url.split(name + "=");
+		var get_args = false;
+		if(url.split("?").length>1){
+			get_args = true;
+		}
+		if(splits.length > 1){
+			var after = "";
+			if (splits[1].split("&").length > 1){
+				after = splits[1].split("&")[1];
+			}
+			url = splits[0] + name + "=" + value + "&" + after;
+		}else{
+			if(get_args){
+				url = url + "&" + name + "=" + value;
+			}else{
+				url = url + "?" + name + "=" + value;
+			}
+		}
+		if(dash_splits.length>1){
+			url += dash_splits[1];
+		}
+		if(url.substr(url.length-1, url.length)== "&"){
+			url = url.substr(0, url.length-1);
+		}
+		return url;
+	}
+	
+	function remove_from_url(url, name){
+		var splits = url.split(name + "=");
+		if(splits.length > 1){
+			var after = "";
+			if (splits[1].split("&").length > 1){
+				after = splits[1].split("&")[1];
+			}
+			if (splits[0].substr(splits[0].length-2, splits[0]-length-1)=="?"){
+				url = splits[0] + after;
+			}else{
+				url = splits[0] + "&" + after;
+			}
+		}
+		return url;
+	}	
+	
 });
 
+/**
+ * Reloads tree item (one line). If some filtering is found, adds 
+ * filtered variable into posted data. 
+ * 
+ * @param {HTMLElement} el Any child element of tree item
+ * @param {String} url Requested url
+ * @param {Object} data Optional posted data
+ * @param {Function} callback Optional calback function
+ */
+function reloadItem(el, url, data, callback, errorCallback) {
+	if (data === undefined) data = {};
 
-function mark_copy_node(id){
-	$('a.move-target, span.move-target-container, span.line').show();
-    $('#page_'+id).addClass("selected");
-	$('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
-    $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
-    return "copy";
+	if (/\/\?/ig.test(window.location.href)) {
+		// probably some filter here, tell backend, we need a filtered
+		// version of item	
+		
+		data['fitlered'] = 1;
+	}
+	
+	function onSuccess(response, textStatus) {
+		if (callback) callback(response, textStatus);
+		
+		if (/page_\d+/.test($(el).attr('id'))) {
+			// one level higher
+			var target = $(el).find('div.cont:first');
+		} else { 
+			var target = $(el).parents('div.cont:first');
+		}
+		
+		var parent = target.parent();
+		if (response == "NotFound") {
+			return parent.remove();
+		}
+		target.replace(response);
+		parent.find('div.cont:first').yft();
+	}
+	
+	function onError(XMLHttpRequest, textStatus, errorThrown) {
+		if (errorCallback) errorCallback(XMLHttpRequest, textStatus, errorThrown);
+	}
+	
+	$.ajax({
+		'data': data,
+		'success': onSuccess,
+		'error': onError,
+		'type': 'POST',
+		'url': url	
+	});
 }
 
-function insert_into_url(url, name, value){
-	if(url.substr(url.length-1, url.length)== "&"){
-		url = url.substr(0, url.length-1);
-	}
-	dash_splits = url.split("#");
-	url = dash_splits[0];
-	var splits = url.split(name + "=");
-	var get_args = false;
-	if(url.split("?").length>1){
-		get_args = true;
-	}
-	if(splits.length > 1){
-		var after = "";
-		if (splits[1].split("&").length > 1){
-			after = splits[1].split("&")[1];
-		}
-		url = splits[0] + name + "=" + value + "&" + after;
-	}else{
-		if(get_args){
-			url = url + "&" + name + "=" + value;
-		}else{
-			url = url + "?" + name + "=" + value;
-		}
-	}
-	if(dash_splits.length>1){
-		url += dash_splits[1];
-	}
-	if(url.substr(url.length-1, url.length)== "&"){
-		url = url.substr(0, url.length-1);
-	}
-	return url;
-}
 
-function remove_from_url(url, name){
-	var splits = url.split(name + "=");
-	if(splits.length > 1){
-		var after = "";
-		if (splits[1].split("&").length > 1){
-			after = splits[1].split("&")[1];
+function moveTreeItem(jtarget, item_id, target_id, position, tree){
+	reloadItem(
+		jtarget, "./" + item_id + "/move-page/", 
+		
+		{ position: position, target: target_id }, 
+		
+		// on success
+		function(response){
+			if (tree) {
+				var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
+				tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
+			} else {
+				moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
+			}			
+		},
+		
+		// on error
+		function(){
+			moveError($('#page_'+item_id + " div.col1:eq(0)"));
 		}
-		if (splits[0].substr(splits[0].length-2, splits[0]-length-1)=="?"){
-			url = splits[0] + after;
-		}else{
-			url = splits[0] + "&" + after;
-		}
-	}
-	return url;
-}
-
-function moveTreeItem(item_id, target_id, position, tree){
-	$.post("./"+item_id+"/move-page/", {
-            position:position,
-            target:target_id
-        },
-        function(html) {
-			if(html=="ok"){
-				if (tree) {
-					var tree_pos = false;
-					if (position == "left") {
-						tree_pos = "before";
-					}else if (position == "right") {
-						tree_pos = "after";
-					}else {
-						tree_pos = "inside";
-					}
-					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
-				}else{
-					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
-				}
-			}else{
-				moveError($('#page_'+item_id + " div.col1:eq(0)"));
-			}
-        }
-    );
+	);
 };
 
 var undos = [];
+	
 function addUndo(node, target, position){
-	//console.log("add undo")
 	undos.push({node:node, target:target, position:position});
-	//console.log(undos)
 }

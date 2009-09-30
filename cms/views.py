@@ -96,11 +96,13 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         
         redirect_url = current_page.get_redirect(language=lang)
         if redirect_url:
+            if not settings.i18n_installed:
+                redirect_url = "/%s/%s" % (lang, redirect_url.lstrip("/"))
             # add language prefix to url
-            return HttpResponseRedirect("/%s/%s" % (lang, redirect_url.lstrip("/")))
+            return HttpResponseRedirect(redirect_url)
         
         if current_page.login_required and not request.user.is_authenticated():
-            if 'cms.middleware.multilingual.MultilingualURLMiddleware' in django_settings.MIDDLEWARE_CLASSES:
+            if settings.i18n_installed:
                 path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
             else:
                 path = urlquote(request.get_full_path())

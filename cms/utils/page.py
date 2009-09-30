@@ -1,25 +1,27 @@
+import re
 from cms import settings as cms_settings
-from cms.exceptions import NoHomeFound
 
-APPEND_TO_SLUG = "_copy"
+APPEND_TO_SLUG = "-copy"
+copy_slug_re = re.compile(r'^.*-copy(?:-(\d)*)?$')
 
 def is_valid_page_slug(page, parent, lang, slug, site):
     """Validates given slug depending on settings.
     """
     from cms.models import Title
-    if cms_settings.CMS_UNIQUE_SLUGS:
-        titles = Title.objects.filter(slug=slug, publisher_is_draft=True)
-    else:
-        titles = Title.objects.filter(slug=slug, language=lang, publisher_is_draft=True)
+    qs = Title.objects.filter(page__site=site, slug=slug, publisher_is_draft=True)
+    
+    if not cms_settings.CMS_UNIQUE_SLUGS:
+        qs = qs.filter(language=lang)
+    
     if not cms_settings.CMS_FLAT_URLS:
         if parent and not parent.is_home(): 
-            titles = titles.filter(page__parent=parent)
+            qs = qs.filter(page__parent=parent)
         else:
-            titles = titles.filter(page__parent__isnull=True)
-    titles = titles.filter(page__site=site)
+            qs = qs.filter(page__parent__isnull=True)
+
     if page.pk:
-        titles = titles.exclude(language=lang, page=page)
-    if titles.count():
+        qs = qs.exclude(language=lang, page=page)
+    if qs.count():
         return False
     return True
 
@@ -33,6 +35,29 @@ def get_available_slug(title, new_slug=None):
     Returns: slug
     """
     slug = new_slug or title.slug
-    if is_valid_page_slug(title.page, title.page.parent, title.language, slug, title.page.site_id):
-        return title.slug
-    return get_available_slug(title, title.slug + APPEND_TO_SLUG)
+    if is_valid_page_slug(title.page, title.page.parent, title.language, slug, title.page.site):
+        return slug
+    
+    # add nice copy attribute, first is -copy, then -copy-2, -copy-3, .... 
+    match = copy_slug_re.match(slug)
+    if match:
+        try:
+            next = int(match.groups()[0]) + 1
+            slug = "-".join(slug.split('-')[:-1]) + "-%d" % next
+        except TypeError:
+            slug = slug + "-2"
+         
+    else:
+        slug = slug + APPEND_TO_SLUG
+    return get_available_slug(title, slug)
+
+
+def check_title_slugs(page):
+    """Checks page title slugs for duplicity if required, used after page move/
+    cut/paste.
+    """
+    for title in page.title_set.all():
+        old_slug = title.slug
+        title.slug = get_available_slug(title)
+        if title.slug != old_slug:
+            title.save()

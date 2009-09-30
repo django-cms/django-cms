@@ -21,7 +21,6 @@ from cms.utils.moderator import update_moderation_message, \
 from cms.utils.permissions import has_page_add_permission, \
     get_user_permission_level, has_global_change_permissions_permission
 from copy import deepcopy
-from django.conf import settings as django_settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
@@ -29,11 +28,11 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404, QueryDict
+from django.http import HttpResponseRedirect, HttpResponse, Http404,\
+    HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title
-from django.utils.translation import activate
 from django.utils.encoding import force_unicode
 from django.utils.functional import curry
 from django.utils.translation import ugettext as _
@@ -336,14 +335,9 @@ class PageAdmin(admin.ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        if not "language" in request.GET and obj:
-            titles = Title.objects.filter(page=obj)
-            try:
-                language = titles[0].language
-            except:
-                language = get_language_from_request(request, obj)
-        else:
-            language = get_language_from_request(request, obj)
+        
+        language = get_language_from_request(request, obj)
+        
         if obj:
             self.inlines = PAGE_ADMIN_INLINES
             if not obj.has_publish_permission(request) and not 'published' in self.exclude:
@@ -473,10 +467,9 @@ class PageAdmin(admin.ModelAdmin):
                 'show_save_and_continue':True,
             })
 
-        user_lang_set = request.GET.get('language',
-                                        django_settings.LANGUAGE_CODE)
+        language = get_language_from_request(request)
         extra_context.update({
-            'language': user_lang_set,
+            'language': language,
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
     
@@ -501,12 +494,11 @@ class PageAdmin(admin.ModelAdmin):
                     obj.pagemoderatorstate_set.get_delete_actions(
                     ).count())
 
-            user_lang_set = request.GET.get('language',
-                                            django_settings.LANGUAGE_CODE)
+            language = get_language_from_request(request, obj)
             #activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
-                'language': user_lang_set,
+                'language': language,
                 'traduction_language': settings.CMS_LANGUAGES,
                 'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
                 'page': obj,
@@ -523,7 +515,8 @@ class PageAdmin(admin.ModelAdmin):
             }
         tab_language = request.GET.get("language", None)
         response = super(PageAdmin, self).change_view(request, object_id, extra_context)
-        if tab_language and response.status_code == 302:
+        
+        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
@@ -709,15 +702,17 @@ class PageAdmin(admin.ModelAdmin):
             page = self.model.objects.get(pk=page_id)
             target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
-            return HttpResponse("error")
+            return HttpResponseBadRequest("error")
             
         # does he haves permissions to do this...?
         if not page.has_move_page_permission(request) or \
             not target.has_add_permission(request):
-                return HttpResponse("Denied")
+                return HttpResponseForbidden("Denied")
+        
         # move page
         page.move_page(target, position)
-        return HttpResponse("ok")
+        return render_admin_menu_item(request, page)
+        
     
     
     def get_permissions(self, request, page_id):
@@ -864,10 +859,11 @@ class PageAdmin(admin.ModelAdmin):
             attrs += "&draft=1"
         
         url = instance.get_absolute_url() + attrs
+        
         site = Site.objects.get_current()
         
         if not site == instance.site:
-            url = "http://%s%s" % (site.domain, url)
+            url = "http://%s%s" % (instance.site.domain, url)
         return HttpResponseRedirect(url)
         
 

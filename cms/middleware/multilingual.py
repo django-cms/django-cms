@@ -1,6 +1,7 @@
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 from django.conf import settings
+from cms.utils.i18n import get_default_language
 import re    
 
 SUB = re.compile(ur'<a([^>]+)href="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % (
@@ -18,7 +19,7 @@ SUB2 = re.compile(ur'<form([^>]+)action="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % (
 class MultilingualURLMiddleware:
     def get_language_from_request (self,request):
         supported = dict(settings.LANGUAGES)
-        lang = settings.LANGUAGE_CODE
+        #lang = settings.LANGUAGE_CODE
         langs = "|".join(map(lambda l: l[0], settings.LANGUAGES))
         check = re.match(r"^/(%s)/.*" % langs, request.path_info)
         changed = False
@@ -45,13 +46,12 @@ class MultilingualURLMiddleware:
                 if lang in supported and lang is not None:
                     return lang
             if not lang:
-                lang = translation.get_language_from_request(request) 
+                lang = translation.get_language_from_request(request)
+        lang = get_default_language(lang)
         return lang
     
     def process_request(self, request):
         language = self.get_language_from_request(request)
-        if language is None:
-            language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
         

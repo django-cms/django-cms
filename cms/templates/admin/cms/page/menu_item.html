@@ -16,7 +16,7 @@
 						<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a><span class="line first"> |</span>
 						<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a><span class="line second"> |</span>
 					{% endif %}
-				<a href="#" class="move-target first-child" title="{% trans "insert inside" %}">↘</a>
+				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">↘</a>
 			{% endif %}
 		</span>
 		
@@ -38,7 +38,7 @@
 			{% else %}
 				{% if has_add_page_permission %}
 					{# if he can add page under current page, go directly to thi url #}
-					<a href="./add/?target={{ page.id }}&amp;position=first-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+					<a href="./add/?target={{ page.id }}&amp;position=last-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
 				{% endif %}
 			{% endif %}
 			{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}

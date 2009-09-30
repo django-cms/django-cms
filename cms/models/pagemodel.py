@@ -13,7 +13,7 @@ from cms.utils.urlutils import urljoin
 from cms import settings
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
-from cms.utils.page import get_available_slug
+from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
 
@@ -88,11 +88,15 @@ class Page(MpttPublisher):
         to mptt, but after move is done page_moved signal is fired.
         """
         self.move_to(target, position)
+        
         # fire signal
         from cms.models.moderatormodels import PageModeratorState
         self.force_moderation_action = PageModeratorState.ACTION_MOVE
         cms_signals.page_moved.send(sender=Page, instance=self) #titles get saved before moderation
         self.save(change_state=True) # always save the page after move, because of publisher
+        
+        # check the slugs
+        check_title_slugs(self)
         
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):

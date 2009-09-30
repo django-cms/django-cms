@@ -54,7 +54,7 @@
 	{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
@@ -63,7 +63,7 @@
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% block form_top %}{% endblock %}
 {{ adminForm.fields.parent }}
 
-<input type="hidden" name="language" value="{{language}}" />
+<input type="hidden" name="language" value="{{ language }}" />
 
 {% if show_language_tabs %}
 <div id="page_form_lang_tabs">
