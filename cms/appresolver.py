@@ -150,10 +150,16 @@ class DynamicURLConfModule(object):
             urls = []
             for title in title_qs.filter(application_urls__gt="").select_related():
                 if cms_settings.CMS_FLAT_URLS:
-                    path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
+                    if title.language in home_slugs:
+                        path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
+                    else:
+                        path = title.slug
                     mixid = "%s:%s" % (path + "/", title.application_urls)
                 else:
-                    path = title.path.split(home_slugs[title.language] + "/", 1)[-1]
+                    if title.language in home_slugs:
+                        path = title.path.split(home_slugs[title.language] + "/", 1)[-1]
+                    else:
+                        path = title.path
                     mixid = "%s:%s" % (path + "/", title.application_urls)
                 if mixid in included:
                     # don't add the same thing twice
