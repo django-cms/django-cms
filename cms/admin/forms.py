@@ -63,6 +63,8 @@ class PageAddForm(forms.ModelForm):
     
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
+        if not slug:
+            raise ValidationError("Slug must not be empty.")
         return slug
     
     def clean_language(self):
