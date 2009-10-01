@@ -158,7 +158,6 @@ class DynamicURLConfModule(object):
                 if mixid in included:
                     # don't add the same thing twice
                     continue  
-                print path
                 urls.append(ApplicationRegexUrlResolver(path, title))
                 included.append(mixid)
             self._urlpatterns = urls
