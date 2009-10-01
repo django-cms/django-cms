@@ -96,7 +96,9 @@ class PageManager(PublisherManager):
         
         Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
         """
-        qs = self.public()
+        qs = self.get_query_set()
+        if settings.CMS_MODERATOR:
+            qs = qs.public()
         
         if current_site_only:
             site = Site.objects.get_current()
