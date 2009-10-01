@@ -13,6 +13,7 @@ from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, \
     cut_levels, find_selected
 from cms.utils import navigation
+from cms.utils.i18n import get_fallback_languages
 
 
 register = template.Library()
@@ -61,7 +62,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         except NoHomeFound:
             home_pk = 0
     if not next_page: #new menu... get all the data so we can save a lot of queries
-        ids = []
+        
         children = []
         ancestors = []
         if current_page:
@@ -128,6 +129,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             pages = [root_page] + pages
         all_pages = pages[:]
         root_level = getattr(root_page, 'level', None)
+        ids = []
         for page in pages:# build the tree
             if page.level >= db_from_level:
                 ids.append(page.pk)
@@ -155,12 +157,23 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         for page in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == page.pk:
-                    page.title_cache = title
-                    #titles.remove(title)
+                    page.title_cache[title.language] = title
+                    ids.remove(page.pk)
             if page.pk in ancestors:
                 page.ancestor = True
             if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
                 page.sibling = True
+        if ids:
+            fallbacks = get_fallback_languages(lang)
+            for l in fallbacks:
+                titles = list(get_title_queryset(request).filter(page__in=ids, language=l))
+                for page in all_pages:# add the title and slugs and some meta data
+                    for title in titles:
+                        if title.page_id == page.pk:
+                            page.title_cache[title.language] = title
+                            ids.remove(page.pk)
+                if not ids:
+                    break
         children = navigation.handle_navigation_manipulators(children, request)
     else:
         children = next_page.childrens

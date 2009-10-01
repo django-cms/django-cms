@@ -6,6 +6,7 @@ from cms.exceptions import NoPermissionsException
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from publisher import PublisherManager
 from cms.models.query import PageQuerySet
+from cms.utils.i18n import get_fallback_languages
 
 try:
     set
@@ -123,7 +124,7 @@ class PageManager(PublisherManager):
         
         
 class TitleManager(PublisherManager):
-    def get_title(self, page, language, language_fallback=False, latest_by='creation_date'):
+    def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back
         to another language if wanted.
@@ -134,15 +135,20 @@ class TitleManager(PublisherManager):
         except self.model.DoesNotExist:
             if language_fallback:
                 try:
-                    title = self.filter(page=page).latest(latest_by)
-                    return title
+                    titles = self.filter(page=page)
+                    fallbacks = get_fallback_languages(language)
+                    for l in fallbacks:
+                        for title in titles:
+                            if l == title.language:
+                                return title
+                    return None
                 except self.model.DoesNotExist:
                     pass
             else:
                 raise
         return None        
     
-    def get_page_slug(self, slug, site=None, latest_by='creation_date'):
+    def get_page_slug(self, slug, site=None):
         """
         Returns the latest slug for the given slug and checks if it's available 
         on the current site.

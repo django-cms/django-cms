@@ -16,6 +16,7 @@ from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
+from cms.utils.i18n import get_fallback_languages
 
 class Page(MpttPublisher):
     """
@@ -314,10 +315,11 @@ class Page(MpttPublisher):
         """
         from cms.models.titlemodels import Title
 
-        if not hasattr(self, "languages_cache"):
-            self.languages_cache = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
-
-        return self.languages_cache
+        if not hasattr(self, "all_languages"):
+            self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
+            self.all_languages = list(self.all_languages)
+            self.all_languages.sort()    
+        return self.all_languages
 
     def get_absolute_url(self, language=None, fallback=True):
         try:
@@ -356,8 +358,12 @@ class Page(MpttPublisher):
         If wanted title doesn't exists, EmptyTitle instance will be returned.
         """
         self._get_title_cache(language, fallback, version_id, force_reload)
-        if self.title_cache:
-            return self.title_cache
+        if language in self.title_cache:
+            return self.title_cache[language]
+        fallbacks = get_fallback_languages(language)
+        for l in fallbacks:
+            if l in self.title_cache:
+                return self.title_cache[l]
         from cms.models.titlemodels import EmptyTitle
         return EmptyTitle()
     
@@ -430,20 +436,22 @@ class Page(MpttPublisher):
         return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
     
     def _get_title_cache(self, language, fallback, version_id, force_reload):
-        default_lang = False
         if not language:
-            default_lang = True
             language = get_language()
         load = False
-        
-        if not hasattr(self, "title_cache"):
+        if not hasattr(self, "title_cache") or force_reload:
             load = True
-        elif self.title_cache and self.title_cache.language != language and language and not default_lang:
+            self.title_cache = {}
+        if not language in self.title_cache and not fallback:
             load = True
-        elif fallback and not self.title_cache:
-            load = True 
-        if force_reload:
-            load = True            
+        elif fallback:
+            fallback_langs = get_fallback_languages(language)
+            found = False
+            for lang in fallback_langs:
+                if lang in self.title_cache:
+                    found = True
+            if not found:
+                load = True 
         if load:
             from cms.models.titlemodels import Title
             if version_id:
@@ -453,16 +461,10 @@ class Page(MpttPublisher):
                 for rev in revs:
                     obj = rev.object
                     if obj.__class__ == Title:
-                        if obj.language == language and obj.page_id == self.pk:
-                            self.title_cache = obj
-                if not self.title_cache and fallback:
-                    for rev in revs:
-                        obj = rev.object
-                        if obj.__class__ == Title:
-                            if obj.page_id == self.pk:
-                                self.title_cache = obj
+                        self.title_cache[obj.language] = obj
             else:
-                self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
+                title = Title.objects.get_title(self, language, language_fallback=fallback)
+                self.title_cache[title.language] = title 
                 
     def get_template(self):
         """
@@ -492,12 +494,6 @@ class Page(MpttPublisher):
             if t[0] == template:
                 return t[1] 
         return _("default")
-
-    #def traductions(self):
-    #    langs = ""
-    #    for lang in self.get_languages():
-    #        langs += '%s, ' % lang
-    #    return langs[0:-2]
 
     def has_change_permission(self, request):
         opts = self._meta
@@ -567,18 +563,6 @@ class Page(MpttPublisher):
             except NoHomeFound:
                 pass
         return False
-    
-    """ - not used.. - kill ?
-    def is_parent_home(self):
-        if not self.parent_id:
-            return False
-        else:
-            try:
-                return self.home_pk_cache == self.parent_id
-            except NoHomeFound:
-                pass
-        return False
-    """ 
     
     def get_home_pk_cache(self):
         attr = "%s_home_pk_cache" % (self.publisher_is_draft and "draft" or "public")

@@ -101,7 +101,6 @@ class PageForm(PageAddForm):
     def clean(self):
         cleaned_data = super(PageForm, self).clean()
         id = cleaned_data['reverse_id']
-        print dir(self)
         site_id = cleaned_data['site']
         if id:
             if Page.objects.filter(reverse_id=id, site=site_id).exclude(pk=self.instance.pk).count():
