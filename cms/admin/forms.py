@@ -52,7 +52,6 @@ class PageAddForm(forms.ModelForm):
             slug = ""
         page = self.instance
         lang = cleaned_data['language']
-        
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
