@@ -3,6 +3,7 @@ from cms import settings as cms_settings
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
 from cms.utils.moderator import get_page_queryset
 from cms.models import Title
+from cms.models.pagemodel import Page
 
 
 def applications_page_check(request, current_page=None, path=None):
@@ -82,7 +83,7 @@ class DynamicAppRegexURLResolver(PageRegexURLResolver):
     
 
 class ApplicationRegexUrlResolver(PageRegexURLResolver):
-    def __init__(self, title, default_kwargs={}):
+    def __init__(self, path, title, default_kwargs={}):
         """Creates standard variant of RegexUrlResolver, but adds some usefull
         functionality to it.
         
@@ -96,11 +97,7 @@ class ApplicationRegexUrlResolver(PageRegexURLResolver):
         # will they be be than passed to pattern, and from pattern to view? 
         # If it will work, will be give us possibility to configure one
         # application for multiple hooks. 
-        
-        if cms_settings.CMS_FLAT_URLS:
-            regex = r'^%s' % title.slug
-        else:
-            regex = r'^%s' % title.path
+        regex = r'^%s' % path    
         if settings.APPEND_SLASH:
             regex += r'/'  
         urlconf_name = title.application_urls
@@ -143,18 +140,26 @@ class DynamicURLConfModule(object):
             # in frontend
             
             is_draft = not cms_settings.CMS_MODERATOR
+            home = Page.objects.get_home()
+            home_titles = home.title_set.all()
+            home_slugs = {}
+            for title in home_titles:
+                home_slugs[title.language] = title.slug
             title_qs = Title.objects.filter(page__publisher_is_draft=is_draft)
             
             urls = []
-            for title in title_qs.filter(application_urls__gt=""):
+            for title in title_qs.filter(application_urls__gt="").select_related():
                 if cms_settings.CMS_FLAT_URLS:
-                    mixid = "%s:%s" % (title.slug + "/", title.application_urls)
+                    path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
+                    mixid = "%s:%s" % (path + "/", title.application_urls)
                 else:
-                    mixid = "%s:%s" % (title.path + "/", title.application_urls)
+                    path = title.path.split(home_slugs[title.language] + "/", 1)[-1]
+                    mixid = "%s:%s" % (path + "/", title.application_urls)
                 if mixid in included:
                     # don't add the same thing twice
                     continue  
-                urls.append(ApplicationRegexUrlResolver(title))
+                print path
+                urls.append(ApplicationRegexUrlResolver(path, title))
                 included.append(mixid)
             self._urlpatterns = urls
         return self._urlpatterns
