@@ -4,6 +4,7 @@ from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
 from cms.utils.moderator import get_page_queryset
 from cms.models import Title
 from cms.models.pagemodel import Page
+from cms.exceptions import NoHomeFound
 
 
 def applications_page_check(request, current_page=None, path=None):
@@ -140,8 +141,11 @@ class DynamicURLConfModule(object):
             # in frontend
             
             is_draft = not cms_settings.CMS_MODERATOR
-            home = Page.objects.get_home()
-            home_titles = home.title_set.all()
+            try:
+                home = Page.objects.get_home()
+                home_titles = home.title_set.all()
+            except NoHomeFound:
+                home_titles = []
             home_slugs = {}
             for title in home_titles:
                 home_slugs[title.language] = title.slug
