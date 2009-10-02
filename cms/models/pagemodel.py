@@ -447,6 +447,7 @@ class Page(MpttPublisher):
             for lang in fallback_langs:
                 if lang in self.title_cache:
                     found = True
+                    language = lang
             if not found:
                 load = True 
         if load:
@@ -462,6 +463,7 @@ class Page(MpttPublisher):
             else:
                 title = Title.objects.get_title(self, language, language_fallback=fallback)
                 self.title_cache[title.language] = title 
+                language = title.language
         return language
                 
     def get_template(self):
