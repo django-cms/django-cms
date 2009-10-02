@@ -312,13 +312,13 @@ class PageAdmin(admin.ModelAdmin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder in get_placeholders(request, template):
-                if placeholder.name not in self.mandatory_placeholders:
-                    if placeholder.name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder.name]:
-                        name = settings.CMS_PLACEHOLDER_CONF[placeholder.name]["name"]
+            for placeholder_name in get_placeholders(request, template):
+                if placeholder_name not in self.mandatory_placeholders:
+                    if placeholder_name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
+                        name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]["name"]
                     else:
-                        name = placeholder.name
-                    given_fieldsets += [(title(name), {'fields':[placeholder.name], 'classes':['plugin-holder']})]
+                        name = placeholder_name
+                    given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
@@ -382,9 +382,9 @@ class PageAdmin(admin.ModelAdmin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(template)
             
-            for placeholder in get_placeholders(request, template):
-                if placeholder.name not in self.mandatory_placeholders:
-                    installed_plugins = plugin_pool.get_all_plugins(placeholder.name)
+            for placeholder_name in get_placeholders(request, template):
+                if placeholder_name not in self.mandatory_placeholders:
+                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name)
                     plugin_list = []
                     if obj:
                         if versioned:
@@ -397,7 +397,7 @@ class PageAdmin(admin.ModelAdmin):
                             for rev in revs:
                                 obj = rev.object
                                 if obj.__class__ == CMSPlugin:
-                                    if obj.language == language and obj.placeholder == placeholder.name and not obj.parent_id:
+                                    if obj.language == language and obj.placeholder == placeholder_name and not obj.parent_id:
                                         if obj.get_plugin_class() == CMSPlugin:
                                             plugin_list.append(obj)
                                         else:
@@ -409,9 +409,9 @@ class PageAdmin(admin.ModelAdmin):
                                     bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
                                     plugin_list.append(plugin)
                         else:
-                            plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
+                            plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
                     widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
-                    form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
+                    form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
