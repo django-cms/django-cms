@@ -67,3 +67,14 @@
 	})();
 	//]]>
 </script>
+{% if object.route_planer %}
+<form method="get" action="http://maps.google.ch/" class="routeplaner_box">
+	<p>{{ object.route_planer_title }}:</p>
+	<fieldset>
+		<label for="saddr">{% trans "Your address" %}:</label>
+		<input id="saddr" name="saddr" class="textinput" value="" type="text" />
+		<input name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" type="hidden" />
+		<input value="{% trans "Calculate route" %}" class="input_submit" type="submit" />
+	</fieldset>
+</form>
+{% endif %}
