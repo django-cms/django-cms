@@ -4,7 +4,6 @@ from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.contrib import admin
 from cms import settings as cms_settings
-from django.template.context import RequestContext
  
 class CMSPluginBase(admin.ModelAdmin):
     name = ""
@@ -18,7 +17,6 @@ class CMSPluginBase(admin.ModelAdmin):
     opts = {}
     placeholders = None # a tupple with placeholder names this plugin can be placed. All if empty
     text_enabled = False
-    
     
     def __init__(self, model=None,  admin_site=None):
         if self.model:
@@ -68,15 +66,12 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         We just need the popup interface here
         """
-        a = RequestContext(request)
-        for d in a:
-            context.update(d)
-        print request.LANGUAGE_CODE
         context.update({
             'is_popup': True,
             'plugin': self.cms_plugin_instance,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
+        
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
     
     def has_add_permission(self, request, *args, **kwargs):

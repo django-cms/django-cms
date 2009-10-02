@@ -8,12 +8,12 @@ class GoogleMapPlugin(CMSPluginBase):
     model = GoogleMap
     name = _("Google Map")
     render_template = "cms/plugins/googlemap.html"
+    
     def render(self, context, instance, placeholder):
         if 'GOOGLE_MAPS_API_KEY' in context:
             key = context['GOOGLE_MAPS_API_KEY']
         else:
             key = GOOGLE_MAPS_API_KEY
-        
         context.update({
             'object':instance, 
             'placeholder':placeholder, 
