@@ -26,4 +26,4 @@ def get_placeholders(request, template_name):
     
     # temp.render(RequestContext(request, context))
     output = temp.render(context)
-    return re.findall("<!-- PlaceholderNode: (\w+?) -->", output)
+    return re.findall("<!-- PlaceholderNode: (.*?) -->", output)
