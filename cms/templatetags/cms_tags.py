@@ -481,6 +481,8 @@ class PlaceholderNode(template.Node):
         self.theme = theme
 
     def render(self, context):
+        if context.get('display_placeholder_names_only'):
+            return "<!-- PlaceholderNode: %s -->" % self.name
         if not 'request' in context:
             return ''
         l = get_language_from_request(context['request'])
