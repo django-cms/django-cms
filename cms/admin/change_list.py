@@ -163,7 +163,6 @@ class CMSChangeList(ChangeList):
                 else:
                     page.childrens = []
         
-        
         # TODO: OPTIMIZE!!
         titles = Title.objects.filter(page__in=ids)
         for page in all_pages:# add the title and slugs and some meta data
@@ -175,7 +174,6 @@ class CMSChangeList(ChangeList):
                     if not title.language in page.all_languages:
                         page.all_languages.append(title.language)
             page.all_languages.sort()
-        
         self.root_pages = root_pages
         
     def get_items(self):
