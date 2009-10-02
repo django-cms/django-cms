@@ -324,8 +324,6 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                     anc.title_cache[title.language] = title
         for title in titles:
             if title.page_id == page.pk:
-                print page.pk
-                print page.title_cache
                 if not hasattr(page, "title_cache"):
                     page.title_cache = {}
                 page.title_cache[title.language] = title

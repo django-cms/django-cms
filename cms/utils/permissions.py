@@ -179,7 +179,6 @@ def has_add_page_on_same_level_permission(request, page):
             # this page
             for perm in PagePermission.objects.with_user(request.user).filter(page=page, can_add=True):
                 if perm.grant_on & MASK_PAGE:
-                    print PagePermission.objects.with_user(request.user).filter(page=page, can_add=True)
                     return True
         """ 
     return False
