@@ -257,7 +257,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                 if title.page_id == p.pk:
                     if not hasattr(page, "title_cache"):
                         page.title_cache = {}
-                    p.title_cache[title.language] = title
+                    page.title_cache[title.language] = title
         from_level = page.level
         to_level = page.level+levels
         extra_active = extra_inactive = levels
@@ -321,9 +321,11 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                 if title.page_id == anc.pk:
                     if not hasattr(anc, "title_cache"):
                         anc.title_cache = {}
-                    anc.title_cache = title
+                    anc.title_cache[title.language] = title
         for title in titles:
             if title.page_id == page.pk:
+                print page.pk
+                print page.title_cache
                 if not hasattr(page, "title_cache"):
                     page.title_cache = {}
                 page.title_cache[title.language] = title
