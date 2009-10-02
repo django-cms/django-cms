@@ -357,13 +357,10 @@ class Page(MpttPublisher):
         """Helper function for accessing wanted / current title. 
         If wanted title doesn't exists, EmptyTitle instance will be returned.
         """
-        self._get_title_cache(language, fallback, version_id, force_reload)
+        
+        language = self._get_title_cache(language, fallback, version_id, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]
-        fallbacks = get_fallback_languages(language)
-        for l in fallbacks:
-            if l in self.title_cache:
-                return self.title_cache[l]
         from cms.models.titlemodels import EmptyTitle
         return EmptyTitle()
     
@@ -465,6 +462,7 @@ class Page(MpttPublisher):
             else:
                 title = Title.objects.get_title(self, language, language_fallback=fallback)
                 self.title_cache[title.language] = title 
+        return language
                 
     def get_template(self):
         """
