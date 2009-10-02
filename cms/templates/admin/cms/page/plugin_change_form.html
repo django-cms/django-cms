@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_modify adminmedia %}
+{% load i18n admin_modify adminmedia cms_admin %}
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
@@ -73,7 +73,7 @@
 {% block content_title %}<h2>{{ plugin.get_plugin_name }}</h2>{% endblock %}
  
 {% block content %}<div id="content-main">
-{% block top %}{{ plugin.render_plugin }}{% endblock %}
+{% block top %}{% render_plugin plugin %}{% endblock %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
