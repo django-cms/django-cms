@@ -82,12 +82,18 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
                     if no404:# used for placeholder finder
                         current_page = None
                     else:
+                        if not slug and settings.DEBUG:
+                            CMS_MEDIA_URL = settings.CMS_MEDIA_URL
+                            return "cms/new.html", locals()
                         raise Http404('CMS: Page not found for "%s"' % slug)
         else:
             current_page = applications_page_check(request)
             #current_page = None
         template_name = get_template_from_request(request, current_page)
     elif not no404:
+        if not slug and settings.DEBUG:
+            CMS_MEDIA_URL = settings.CMS_MEDIA_URL
+            return "cms/new.html", locals()
         raise Http404("CMS: No page found for site %s" % unicode(site.name))
     
     if current_page:  
