@@ -157,6 +157,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         for page in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == page.pk:
+                    if not hasattr(page, "title_cache"):
+                        page.title_cache = {}
                     page.title_cache[title.language] = title
                     ids.remove(page.pk)
             if page.pk in ancestors:
@@ -170,6 +172,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 for page in all_pages:# add the title and slugs and some meta data
                     for title in titles:
                         if title.page_id == page.pk:
+                            if not hasattr(page, "title_cache"):
+                                page.title_cache = {}
                             page.title_cache[title.language] = title
                             ids.remove(page.pk)
                 if not ids:
@@ -251,7 +255,9 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         for p in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == p.pk:
-                    p.title_cache = title
+                    if not hasattr(page, "title_cache"):
+                        page.title_cache = {}
+                    p.title_cache[title.language] = title
         from_level = page.level
         to_level = page.level+levels
         extra_active = extra_inactive = levels
@@ -313,10 +319,14 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
             anc.home_pk_cache = home.pk 
             for title in titles:
                 if title.page_id == anc.pk:
+                    if not hasattr(anc, "title_cache"):
+                        anc.title_cache = {}
                     anc.title_cache = title
         for title in titles:
             if title.page_id == page.pk:
-                page.title_cache = title
+                if not hasattr(page, "title_cache"):
+                    page.title_cache = {}
+                page.title_cache[title.language] = title
     else:
         site = Site.objects.get_current()
         ancestors = []
@@ -344,7 +354,9 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                         ancs += [anc]
                         for title in titles:
                             if title.page_id == anc.pk:
-                                anc.title_cache = title
+                                if not hasattr(anc, "title_cache"):
+                                    anc.title_cache = {}
+                                anc.title_cache[title.language] = title
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
     context.update({'ancestors':ancestors,
                     'template': template})
