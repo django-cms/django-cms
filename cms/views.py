@@ -10,6 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from django.conf import settings as django_settings
+from cms.utils.i18n import get_fallback_languages
 
 def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     """Helper for getting current page from path depending on language
@@ -34,9 +35,10 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
                     return page, None
                 else:
                     path = None
-                    for alt_lang in settings.LANGUAGES:
-                        if alt_lang[0] in langs:
-                            path = '/%s%s' % (alt_lang[0], page.get_absolute_url(language=lang, fallback=True))
+                    for alt_lang in get_fallback_languages(lang):
+                        if alt_lang in langs:
+                            path = '/%s%s' % (alt_lang, page.get_absolute_url(language=lang, fallback=True))
+                            return None, path
                     return None, path
     except IndexError:
         return None, None

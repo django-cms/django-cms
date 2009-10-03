@@ -390,7 +390,7 @@ class Page(MpttPublisher):
         """
         return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
     
-    def get_menu_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+    def get_menu_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the menu title of the page depending on the given language
         """
@@ -399,7 +399,7 @@ class Page(MpttPublisher):
             return self.get_title(language, True, version_id, force_reload)
         return menu_title
     
-    def get_page_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+    def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
         """
@@ -436,20 +436,17 @@ class Page(MpttPublisher):
         if not language:
             language = get_language()
         load = False
-        print language
         if not hasattr(self, "title_cache") or force_reload:
             load = True
             self.title_cache = {}
-        if not language in self.title_cache:
+        elif not language in self.title_cache:
             if fallback:
                 fallback_langs = get_fallback_languages(language)
                 for lang in fallback_langs:
                     if lang in self.title_cache:
-                        print "fallback found:", lang
                         return lang    
             load = True 
         if load:
-            print "load"
             from cms.models.titlemodels import Title
             if version_id:
                 from reversion.models import Version
@@ -461,10 +458,9 @@ class Page(MpttPublisher):
                         self.title_cache[obj.language] = obj
             else:
                 title = Title.objects.get_title(self, language, language_fallback=fallback)
-                self.title_cache[title.language] = title 
+                if title:
+                    self.title_cache[title.language] = title 
                 language = title.language
-        else:
-            print "no load"
         return language
                 
     def get_template(self):
