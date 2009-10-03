@@ -9,6 +9,7 @@ import tinymce.settings
 from django.utils import simplejson
 from django.template.defaultfilters import escape
 from django.forms.widgets import flatatt
+import cms.plugins.text.settings
 
 class TinyMCEEditor(TinyMCE):
     
@@ -48,7 +49,7 @@ class TinyMCEEditor(TinyMCE):
         final_attrs = self.build_attrs(attrs)
         final_attrs['name'] = name
         assert 'id' in final_attrs, "TinyMCE widget attributes must contain 'id'"
-        mce_config = tinymce.settings.DEFAULT_CONFIG.copy()
+        mce_config = cms.plugins.text.settings.TINYMCE_CONFIG.copy()
         mce_config.update(get_language_config(self.content_language))
         if tinymce.settings.USE_FILEBROWSER:
             mce_config['file_browser_callback'] = "djangoFileBrowser"
