@@ -219,7 +219,7 @@ class Page(MpttPublisher):
                     plugin.plubished = False
                     plugin.save()
     
-    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None):
+    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None, **kwargs):
         """
         Args:
             
@@ -284,9 +284,9 @@ class Page(MpttPublisher):
         
         if commit:
             if no_signals:# ugly hack because of mptt
-                super(Page, self).save_base(cls=self.__class__)
+                super(Page, self).save_base(cls=self.__class__, **kwargs)
             else:
-                super(Page, self).save()
+                super(Page, self).save(**kwargs)
         
         #if commit and (publish_directly or created and not under_moderation):
         if self.publisher_is_draft and commit and publish_directly:

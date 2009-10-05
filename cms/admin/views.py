@@ -23,7 +23,8 @@ def change_status(request, page_id):
         page.published = not page.published
         page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)    
         return render_admin_menu_item(request, page)
-    raise Http404
+    else:
+        return HttpResponseForbidden(_("You do not have permission to publish this page"))
 change_status = staff_member_required(change_status)
 
 @require_POST
@@ -41,7 +42,7 @@ def change_innavigation(request, page_id):
             val = 1
         page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
         return render_admin_menu_item(request, page)
-    raise Http404
+    return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 change_innavigation = staff_member_required(change_innavigation)
 
 if 'reversion' in settings.INSTALLED_APPS:
