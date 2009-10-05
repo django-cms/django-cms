@@ -427,7 +427,7 @@ def page_language_url(context, lang):
         url = "/%s" % lang + request._language_changer(lang)
     else:
         try:
-            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=not settings.CMS_HIDE_UNTRANSLATED)
+            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=False)
         except:
             url = "/%s/" % lang 
     if url:
