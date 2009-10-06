@@ -22,14 +22,13 @@ function add_plugin(type, parent_id, language){
 			// register a callback against the id number.  This callback
 			// is called by dismissEditPluginPopup().
 			var plugin_id = data;
+			edit_plugin(plugin_id);
 			editPluginPopupCallbacks[data] = function(plugin_id, icon_src, icon_alt){
                 texteditor = get_editor("{{ name }}");
 				texteditor.insertText(plugin_admin_html(plugin_id, icon_src, icon_alt));
 				editPluginPopupCallbacks[data] = null; // Unbind callback
 			};
 			
-			// Show popup for editing
-			edit_plugin(plugin_id);
 		}
 	}, "html");
 }
@@ -65,7 +64,6 @@ function plugin_admin_html(plugin_id, icon_src, icon_alt) {
 function dismissEditPluginPopup(win, plugin_id, icon_src, icon_alt) {
     // This is called after user presses 'Save' in popup.
     win.close();
-	
     var callback = editPluginPopupCallbacks[plugin_id];
     if (callback != null) {
         callback(plugin_id, icon_src, icon_alt);

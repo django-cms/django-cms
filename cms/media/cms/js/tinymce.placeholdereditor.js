@@ -20,29 +20,18 @@ function TinyMCEPlaceholderBridge(wym) {
 }
 
 TinyMCEPlaceholderBridge.prototype.insertText = function(text) {
-    /* Inserts the text given at the current insertion point
-     * in the text editor
-     */
 	tinyMCE.activeEditor.selection.setContent(text);
 
 };
 
 TinyMCEPlaceholderBridge.prototype.replaceContent = function(old, rep) {
-    /* Replaces occurence of `old` with `new` in the editor. 
-     */
-	
-	// todo: implement
-	throw new Error("NotImplemented");
+	var content = tinyMCE.activeEditor.getContent()
+	content = content.split(old).join(rep)
+	tinyMCE.activeEditor.setContent(content)
 };
 
 
 TinyMCEPlaceholderBridge.prototype.selectedObject = function() {
-    /* If an image/object is selected, returns the HTMLImageObject for that image,
-     * otherwise undefined/null.
-     */
-
-    // We rely on a private attribute that is set in 'mousedown' event
-    // if the user clicks on an image. This could be fragile :-)
     return tinyMCE.activeEditor.selection.getContent();
 };
 
