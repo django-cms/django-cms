@@ -80,6 +80,7 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     
 )

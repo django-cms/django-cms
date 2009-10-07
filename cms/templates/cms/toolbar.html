@@ -1,0 +1,371 @@
+<style type="text/css">
+	#cms_toolbar_spacer{height:41px;}
+	* html #cms_toolbar_spacer{display:none;}
+	
+	#cms_toolbar_mini{z-index:70010;position:fixed;right:0;top:0;height:41px;padding-top:6px;padding-right:10px;}
+		
+	#cms_toolbar{
+		z-index:70011;position:fixed;left:0;top:0;height:41px;width:100%;min-width: 960px;color:#656565;border-bottom: 2px solid #ddd;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x 0 0;
+	}
+	* html #cms_toolbar{
+		position: absolute; left: 0px; top: 0px;
+		background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);
+		left: expression( ( 0 + ( ignoreMe2 = document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft ) ) + 'px' );
+		top: expression( ( 0 + ( ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop ) ) + 'px' );		
+	}
+	
+	.cms_toolbar a{text-decoration:none;color:#656565;}
+	.cms_toolbar a:hover{text-decoration:none;color:#656565;}
+	
+	#cms_toolbar_col1{float:left;padding-top:6px;zoom:1;overflow:hidden;height:35px;}
+	/** html #cms_toolbar_col1{background:red; height:30px;}*/
+	
+	#cms_toolbar_col2{float:right;height:100%;padding-top:6px;padding-right:10px;height:35px;}
+	
+	/* RESET */	
+	.cms_toolbar strong, .cms_toolbar em{font-style:normal;font-weight:normal;margin:0;padding:0;}
+	.cms_toolbar ul, .cms_toolbar li{margin:0;list-style:none;}
+	
+	/* LOGO */
+	#cms_toolbar_logo{}
+	#cms_toolbar_logo span{
+		display:block;float:left;margin-top:3px;width:110px;height:22px;text-indent:-7777px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat 0px -122px;
+	}
+	* html #cms_toolbar_logo span{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	/* EDIT MODE */
+	#cms_toolbar_editmode_toggle{display:block;float:left;line-height:27px;margin-left:15px;}
+	#cms_toolbar_editmode_toggle a{
+		display:inline-block;width:63px;height:27px;text-indent:-7777px;margin-left:5px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat;
+	}
+	* html #cms_toolbar_editmode_toggle a{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	.cms_toolbar_editmode_toggle_on #cms_toolbar_editmode_toggle a{background-position:-110px -122px;}
+	.cms_toolbar_editmode_toggle_off #cms_toolbar_editmode_toggle a{background-position:-180px -122px;}
+	
+	/* STATUSBAR */
+	#cms_toolbar_statusbar{
+		display:block;float:left;margin-left:10px;line-height:26px;padding-right:10px;font-size:11px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat right -95px;
+	}
+	* html #cms_toolbar_statusbar{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	#cms_toolbar_statusbar div{
+		padding-left:10px;width:400px;color:#656565;overflow:hidden;height:27px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat left -95px;
+	}	
+	* html #cms_toolbar_statusbar div{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	#cms_toolbar_statusbar span{color:#5b81b3;}
+	#cms_toolbar_statusbar em{font-style:normal;}
+	
+	/* BUTTON */
+	.cms_toolbar_button{
+		display:block;float:left;color:#5b81b3;padding-right:10px;margin-left:10px;cursor:pointer;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat right -41px;
+	}
+	* html .cms_toolbar_button{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif); height:27px; }
+	
+	.cms_toolbar_button:hover{color:#264064;}
+	.cms_toolbar_button span{
+		display:block;float:left;height:27px;padding-left:10px;line-height:26px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat left -41px;
+	}
+	* html .cms_toolbar_button span{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	/* SETTINGS BUTTON */
+	/*.cms_toolbar .cms_toolbar_settingsbutton{height:27px; overflow:hidden;}*/
+	.cms_toolbar .cms_toolbar_settingsbutton strong{
+		margin-top:6px;text-indent:-7777px;width:15px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -170px -158px;		
+	}	
+	
+	* html .cms_toolbar .cms_toolbar_settingsbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar .cms_toolbar_settingsbutton:hover strong{background-position:-170px -188px;} 
+	
+	
+	/* SUBMENU / SUBMENUBUTTON */	
+	.cms_toolbar .cms_toolbar_submenubutton{position:relative;}
+	.cms_toolbar .cms_toolbar_submenubutton strong{display:block;float:left;}
+	.cms_toolbar .cms_toolbar_submenubutton em{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:7px;height:10px;margin-left:5px;line-height:10px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -190px -158px;	
+	}
+	* html .cms_toolbar .cms_toolbar_submenubutton em{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar .cms_toolbar_submenubutton:hover em{background-position:-190px -188px;}
+	.cms_toolbar_submenu li{
+		clear:both;zoom:1;height:27px;overflow:hidden;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -790px -125px;
+	}
+	* html .cms_toolbar_submenu li{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar_submenu li.first{background-position:-790px -122px;}
+	.cms_toolbar_submenu li.last{background-position:-790px -248px;}
+	
+	.cms_toolbar_submenu a{float:none;display:block;padding-left:10px;padding-top:2px;height:27px;line-height:23px;}
+	.cms_toolbar_submenu a:hover{color:#264064;}
+	
+	.cms_toolbar_submenu a span{text-indent:-7777px;width:9px;height:17px;margin-right:4px;}	
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_edit{background-position:-9px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_edit{background-position:-9px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_move{background-position:-30px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_move{background-position:-30px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_padeadmin{background-position:-47px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_padeadmin{background-position:-47px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_pageunpublish{background-position:-67px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_pageunpublish{background-position:-67px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_history{background-position:-88px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_history{background-position:-88px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_delete{background-position:-108px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_delete{background-position:-108px -185px;}
+	
+	.cms_toolbar_submenu{z-index:70012;display:none;position:absolute;width:170px;top:29px;right:0px;}
+	.open .cms_toolbar_submenu{display:block;}
+	
+	/* SETTINGS MENU */
+	#cms_toolbar_settings_menu{z-index:70012;top:29px;left:-124px;}
+	/*#cms_toolbar_settingsbutton.open .cms_toolbar_submenu{display:block;}*/
+	
+	/* LOGOUT BUTTON */
+	#cms_toolbar #cms_toolbar_logoutbutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:15px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -150px -158px;
+	}
+	* html #cms_toolbar #cms_toolbar_logoutbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	#cms_toolbar #cms_toolbar_logoutbutton:hover strong{background-position:-150px -188px;}
+	#cms_toolbar #cms_toolbar_logoutbutton em{margin-left:5px;}
+	
+	/* CLOSE BUTTON */
+	#cms_toolbar #cms_toolbar_closebutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:7px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -210px -158px;
+	}
+	* html #cms_toolbar #cms_toolbar_closebutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	#cms_toolbar #cms_toolbar_closebutton:hover strong{background-position:-210px -188px;}
+	
+	/* OPEN BUTTON */
+	#cms_toolbar_mini #cms_toolbar_openbutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:8px;height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -225px -158px;
+	}
+	* html #cms_toolbar_mini #cms_toolbar_openbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	#cms_toolbar_mini #cms_toolbar_openbutton:hover strong{background-position:-225px -188px;}
+	
+	
+	/* TOOLBAR PLUGINTOOLS */
+	#cms_plugin_overlay{
+		position:absolute;
+		z-index:70000;
+		display:none;
+		border:3px solid #5b80b2;
+	}
+	#cms_plugin_overlay_bg{
+		z-index:70001;
+		background:#5b80b2;
+		opacity: .65;
+		-ms-filter: “alpha(opacity=65)”;
+		filter: alpha(opacity=65);
+		-khtml-opacity: .65;
+		-moz-opacity: .65;
+		height:100%;		
+	}
+	.cms_toolbar_plugintools{position:relative;z-index:70002;}
+	.cms_toolbar_plugintools_holder{position:absolute; right:10px; top:10px;}
+	
+	
+</style>
+
+<script type="text/javascript" charset="utf-8">
+	// When jQuery is sourced, it's going to overwrite whatever might be in the
+	// '$' variable, so store a reference of it in a temporary variable...
+	var _$ = window.$;
+	if (typeof jQuery == 'undefined') {
+		var jquery_url = 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js';
+		document.write(unescape('%3Cscript src="' + jquery_url + '" type="text/javascript"%3E%3C/script%3E'));
+	}
+</script>
+
+
+
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script>{# bitte zu mir kommen bei integration ins cms! #}
+
+<script type="text/javascript">
+	//<![CDATA[
+	
+		var page_id = -1;
+		var plugin_id = -1;
+		
+		function hide_iframe(){
+			$('#cms_plugin_edit_overlay').html("");
+			window.location.reload();
+		}
+		
+		$(document).ready(function () {
+			if ($.cookie("CMStoolbarColsed") == "true") {
+				$('#cms_toolbar').hide();
+				$('#cms_toolbar_mini').show();
+				$('#cms_toolbar_spacer').hide();
+			}else{
+				$('#cms_toolbar').show();
+				$('#cms_toolbar_mini').hide();
+				$('#cms_toolbar_spacer').show();
+			}			
+			
+      		$(document).bind('click', function(e){ 	
+				var cmsClicked = $(e.target);
+				var cmsSubmenuHit = false;
+				if(cmsClicked.parent().is('.cms_toolbar_submenubutton')){
+					cmsClicked = $(cmsClicked.parent())
+				}
+				if(cmsClicked.parent().parent().is('.cms_toolbar_submenubutton')){
+					cmsClicked = $(cmsClicked.parent().parent())
+				}				
+				if(cmsClicked.is('.cms_toolbar_submenubutton')) {
+					cmsSubmenuHit = true;
+					wasOpen = false;					
+					if(cmsClicked.hasClass("open")){wasOpen = true;}										
+					hideCMStoolbarSubmenus();					
+					if(wasOpen == false){cmsClicked.addClass("open");}					
+				}
+				if(cmsSubmenuHit == false){
+					hideCMStoolbarSubmenus();
+				}
+    		});
+			
+			$('#cms_toolbar_closebutton').click(function () {
+				closeCMStoolbar();		
+				return false; 
+			});
+			
+			$('#cms_toolbar_openbutton').click(function () {
+				openCMStoolbar();			
+				return false; 
+			});			
+			
+			$('a.cms_toolbar_plugin_edit').click(function () {
+				var html = '<iframe id="iframe_'+page_id+'_'+plugin_id+'" src="{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true" frameborder="0"></iframe>';
+    			$('#cms_plugin_edit_overlay').html(html);
+			});
+			
+			function closeCMStoolbar(){
+				$('#cms_toolbar').slideUp();				
+				$('#cms_toolbar_mini').show();
+				$('#cms_toolbar_spacer').slideUp();
+				$.cookie("CMStoolbarColsed", "true", {path:'/', expires:7 });
+				hideCMStoolbarSubmenus();
+			}
+			function openCMStoolbar(){
+				$('#cms_toolbar').slideDown();				
+				$('#cms_toolbar_mini').hide();
+				$('#cms_toolbar_spacer').slideDown();
+				$.cookie("CMStoolbarColsed", "false", {path:'/', expires:7 });
+			}
+			
+			function hideCMStoolbarSubmenus(){			
+				$('.cms_toolbar_submenubutton').removeClass("open");
+			}			
+			
+			/* PLUGIN */			
+			$(".cms_plugin_holder").live("mouseover", function(){	
+				var splits = $(this).attr("id").split("_");
+				page_id = splits[2];
+				plugin_id = splits[3];
+				console.log(splits);			
+				$("#cms_plugin_overlay").show();
+				$("#cms_plugin_overlay").css({
+					'width'		: $(this).width()+10+3+'px',
+					'height'	: $(this).height()+10+3+'px',
+					'left'		: $(this).offset().left-10+'px',
+					'top'		: $(this).offset().top-10+'px'
+				})
+			});			
+			
+			$("#cms_plugin_overlay").mouseenter(function(){
+				$("#cms_plugin_overlay").show();
+			}).mouseleave(function(){
+				$("#cms_plugin_overlay").hide();
+				hideCMStoolbarSubmenus();
+			});
+			
+		});
+	//]]>
+</script>
+
+<script type="text/javascript" charset="utf-8">
+	// Now that jQuery is done loading, put the '$' variable back to what it was...
+	//var $ = _$;
+</script>
+
+<div id="cms_toolbar_mini">
+	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
+</div>
+<div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_on">
+	<div id="cms_toolbar_col1">
+		<a href="#" id="cms_toolbar_logo"><span>django CMS</span></a>
+		<div id="cms_toolbar_editmode_toggle">
+			<span>Edit mode</span>
+			<a href="#">toggle</a>
+		</div>
+		<div id="cms_toolbar_statusbar">
+			<div>
+				<span>Status:</span>
+				<em>Waiting for approval</em>
+			</div>
+		</div>			
+	</div>
+	<div id="cms_toolbar_col2">
+		<a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a>
+		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
+			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
+				<li class="first"><a href="#"><span class="cms_toolbar_icon_edit">edit</span>Site Administration</a></li>
+				<li><a href="#"><span class="cms_toolbar_icon_move">Icon</span>Move/add Page</a></li>
+				<li><a href="#"><span class="cms_toolbar_icon_padeadmin">Icon</span>Page Administration</a></li>
+				<li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li>
+				<li><a href="#"><span class="cms_toolbar_icon_history">Icon</span>View History</a></li>
+				<li class="last"><a href="#"><span class="cms_toolbar_icon_delete">delete</span>Delete Page</a></li>			
+			</ul>
+		</div>
+		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>Lock</strong><em>Logout</em></span></a>
+		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button"><span><strong>Close</strong></span></a>
+	</div>
+</div>
+<div id="cms_toolbar_spacer">&nbsp;</div>
+
+<div id="cms_plugin_overlay">
+	<div class="cms_toolbar_plugintools cms_toolbar">
+		<div class="cms_toolbar_plugintools_holder">		
+			<div class="cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Slots</strong><em>arrow</em></span>		
+				<ul class="cms_toolbar_submenu">				
+					<li class="first"><a href="#">Slot1</a></li>
+					<li><a href="#">Slot zwei</a></li>
+					<li><a href="#">Slot drei</a></li>
+					<li class="last"><a href="#">Slot 4</a></li>			
+				</ul>
+			</div>
+			
+			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button"><span><strong>up</strong></span></a>
+			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button"><span><strong>down</strong></span></a>				
+			
+			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
+				<ul class="cms_toolbar_submenu">				
+					<li class="first"><a class="cms_toolbar_plugin_edit" href="#"><span class="cms_toolbar_icon_edit">edit</span>Edit Plugin</a></li>
+					<li class="last"><a class="cms_toolbar_plugin_delete" href="#"><span class="cms_toolbar_icon_delete">delete</span>Delete Plugin</a></li>			
+				</ul>
+			</div>
+		</div>	
+	</div>
+	<div id="cms_plugin_overlay_bg">&nbsp;</div>
+</div>
+
+<div id="cms_plugin_edit_overlay">
+
+</div>
+	

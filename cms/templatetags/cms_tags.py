@@ -4,8 +4,8 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings as django_settings
 from cms.exceptions import NoHomeFound
-
 from cms import settings
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
@@ -499,8 +499,11 @@ class PlaceholderNode(template.Node):
             # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
             context.update({'theme': self.theme,})
         c = ""
+        edit = False
+        if "edit" in request.GET and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
+            edit = True
         for plugin in plugins:
-            c += plugin.render_plugin(context, self.name)
+            c += plugin.render_plugin(context, self.name, edit=edit)
         return c
         
     def __repr__(self):

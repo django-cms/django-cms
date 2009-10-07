@@ -86,16 +86,24 @@ class CMSPlugin(MpttPublisher):
             instance = self
         return instance, plugin
     
-    def render_plugin(self, context=None, placeholder=None, admin=False):
+    def render_plugin(self, context=None, placeholder=None, admin=False, edit=False):
         instance, plugin = self.get_plugin_instance()
         if context is None:
             context = Context()
+        
         if instance and not (admin and not plugin.admin_preview):
+            if edit:
+                content = '<div id="cms_plugin_%s_%s" class="cms_plugin_holder">' % (instance.page_id, instance.pk)
+            else:
+                content = ""
             context = plugin.render(context, instance, placeholder)
             template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
             if not template:
                 raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
-            return mark_safe(render_to_string(template, context))
+            content += render_to_string(template, context)
+            if edit:
+                content += "</div>"
+            return mark_safe(content)
         else:
             return ""
             
