@@ -18,7 +18,7 @@ def plugin_tags_to_admin_html(text):
             # end user, or edited, so just remove it from the HTML
             # altogether
             return u''
-        return u'<img src="%(icon_src)s" alt="%(icon_alt)s" id="plugin_obj_%(id)d" />' % \
+        return u'<img src="%(icon_src)s" alt="%(icon_alt)s" title="%(icon_alt)s" id="plugin_obj_%(id)d" />' % \
                dict(id=plugin_id,
                     icon_src=force_escape(obj.get_instance_icon_src()),
                     icon_alt=force_escape(obj.get_instance_icon_alt()),

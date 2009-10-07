@@ -36,7 +36,7 @@ function add_plugin(type, parent_id, language){
 function edit_plugin(obj_id) {
     editPluginPopupCallbacks[obj_id] = function(plugin_id, icon_src, icon_alt){
         var texteditor = get_editor("{{ name }}");
-		var rExp = new RegExp('<img src="[^>]*" alt="[^>]*" id="plugin_obj_' + obj_id + '"[^>]*>', "g");
+		var rExp = new RegExp('<img[^>]* id="plugin_obj_' + obj_id + '"[^>]*>', "g");
 		try {
 			texteditor.replaceContent(rExp, plugin_admin_html(plugin_id, icon_src, icon_alt));
 		} catch (e) {}
@@ -56,6 +56,7 @@ function edit_plugin(obj_id) {
 function plugin_admin_html(plugin_id, icon_src, icon_alt) {
     return '<img src="' + escapeHtml(icon_src) + '" ' +
         'alt="'+ escapeHtml(icon_alt) + '" ' +
+        'title="'+ escapeHtml(icon_alt) + '" ' +
         'id="plugin_obj_' + plugin_id + '"/>';
 }
 
