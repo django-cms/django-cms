@@ -4,6 +4,7 @@ from cms.models import signals as cms_signals, Page, Title
 from cms.models import CMSPlugin        
 from cms.utils.moderator import page_changed
 from django.core.exceptions import ObjectDoesNotExist
+
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
