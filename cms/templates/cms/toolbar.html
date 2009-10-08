@@ -196,6 +196,7 @@
 
 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script>{# bitte zu mir kommen bei integration ins cms! #}
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/tools.js"></script>{# bitte zu mir kommen bei integration ins cms! #}
 
 <script type="text/javascript">
 	//<![CDATA[
@@ -241,11 +242,11 @@
     		});
 
     		$('#cms_toolbar_edit_button_on').click(function(){
-        		console.log("on clicked")
+        		window.location = remove_from_url(window.location.href, "edit")
     		});
 
     		$('#cms_toolbar_edit_button_off').click(function(){
-        		console.log("off clicked")
+        		window.location = insert_into_url(window.location.href, "edit", "")
     		});
 			
 			$('#cms_toolbar_closebutton').click(function () {
