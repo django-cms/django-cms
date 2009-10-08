@@ -27,3 +27,23 @@ def get_default_language(language_code=None):
         raise ImproperlyConfigured("No match in CMS_LANGUAGES for LANGUAGE_CODE %s" % settings.LANGUAGE_CODE)
     
     return language_code
+
+def get_fallback_languages(language):
+    """
+    returns a list of fallback languages for the given language
+    """
+    conf = cms_settings.CMS_LANGUAGE_CONF
+    if language in conf:
+        l_list = conf[language]
+    else:
+        languages = cms_settings.CMS_LANGUAGES
+        l_list = []
+        for l in languages:
+            l_list.append(l[0])
+    if language in l_list:
+        l_list.remove(language)
+    return l_list
+    
+    
+    
+    

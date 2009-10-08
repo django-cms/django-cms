@@ -3,7 +3,6 @@ from django.utils.translation import ugettext as _
 from cms import settings as cms_settings
 from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title,\
     PagePermission
-from cms.utils.permissions import get_current_user
 
 
 I_APPROVE = 100 # current user should approve page
@@ -14,6 +13,7 @@ def page_changed(page, old_page=None, force_moderation_action=None):
     of page is provided in old_page argument.
     """
     # get user from thread locals
+    from cms.utils.permissions import get_current_user
     user = get_current_user()
     
     force_moderation_action = force_moderation_action or getattr(page, 'force_moderation_action', None)
@@ -52,6 +52,7 @@ def update_moderation_message(page, message):
     
     UPDATE_TOLERANCE = 30 # max in last 30 seconds
     
+    from cms.utils.permissions import get_current_user
     user = get_current_user()
     created = datetime.datetime.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
     try:

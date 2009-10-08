@@ -91,5 +91,5 @@ class PageQuerySet(PublisherQuerySet):
         try:
             home = self.published(site).all_root().order_by("tree_id")[0]
         except IndexError:
-            raise  NoHomeFound('No Root page found. Publish at least on page!')
+            raise  NoHomeFound('No Root page found. Publish at least one page!')
         return home

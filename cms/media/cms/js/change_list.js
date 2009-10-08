@@ -112,11 +112,11 @@ $(document).ready(function() {
 		};
 		
 		// just for debuging!! 
-		s.complete = function(xhr, status) {
+		/*s.complete = function(xhr, status) {
 			if (status == "error" && cmsSettings.debug) {
 				$('body').before(xhr.responseText);
 			}
-		}
+		}*/
 		// end just for debuging
 		
 		// TODO: add error state!

@@ -24,7 +24,7 @@ Add the following to your project's ``INSTALLED_APPS`` setting::
 
 Django-cms 2.0 is compatible with `django-reversion <http://code.google.com/p/django-reversion/>`_ for versioning all the page content and its plugins. Put ``reversion`` in your ``INSTALLED_APPS`` if you have it installed.
 
-If you don't need all the plugins you can comment them out here. For a list of all the plugins have a look inside ``cms/plugins/``.
+If you don't need all the plugins you can comment them out here. For a complete list of all the plugins have a look inside ``cms/plugins/``.
 
 Middleware
 ----------
@@ -32,8 +32,9 @@ Middleware
 Add the following middleware classes::
 
 	MIDDLEWARE_CLASSES = (
-        # needed for add/edit page
-        'django.middleware.locale.LocaleMiddleware',
+		# needed for add/edit page
+		'django.middleware.locale.LocaleMiddleware',
+		'django.contrib.auth.middleware.AuthenticationMiddleware',
 		...
 		'cms.middleware.page.CurrentPageMiddleware',
 		'cms.middleware.user.CurrentUserMiddleware',
@@ -42,6 +43,11 @@ Add the following middleware classes::
 	)
     
 If your site is not multilingual you can leave out ``'cms.middleware.MutilingualURLMiddleware'``.
+
+Note:
+
+- Be sure that ``cms.middleware.user.CurrentUserMiddleware`` comes after ``django.contrib.auth.middleware.AuthenticationMiddleware``. 
+- Be sure that ``cms.middleware.multilingual.MultilingualURLMiddleware`` comes after ``django.middleware.locale.LocaleMiddlewar``.
 
 Template Context Processors
 ---------------------------

@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from cms import settings
-from cms.models import Page
+
 from cms.utils.i18n import get_default_language
 
 # !IMPORTANT: Page cant be imported here, because we will get cyclic import!!
@@ -54,6 +54,7 @@ def get_template_from_request(request, obj=None):
 
 
 def get_language_from_request(request, current_page=None):
+    from cms.models import Page
     """
     Return the most obvious language according the request
     """
@@ -109,6 +110,7 @@ def get_page_from_request(request):
 
 
 def make_tree(request, items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
+    from cms.models import Page
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
