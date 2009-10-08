@@ -85,7 +85,6 @@ class Publisher(models.Model):
                  
         Returns: published instance
         """
-        #print "publishing:", self.__class__.__name__, self
         
         ########################################################################
         # perform checks

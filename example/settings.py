@@ -135,8 +135,10 @@ LANGUAGES = (
     ('pt-br', gettext("Brazil")),
 )
 
-
-DEFAULT_LANGUAGE = 0 
+CMS_LANGUAGE_CONF = {
+    'de':['fr'],
+    'en':['fr'],
+}
 
 CMS_TEMPLATES = (
     ('index.html', gettext('default')),
@@ -178,6 +180,8 @@ CMS_PERMISSION = True
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True
+CMS_HIDE_UNTRANSLATED = False
+
 
 try:
     from local_settings import *

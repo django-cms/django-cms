@@ -4,7 +4,7 @@
 	<div id="google-map" style="height:385px; width:auto; display: block;"></div>
 </div>
 
-<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ lang }}"></script>
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ request.LANGUAGE_CODE }}"></script>
 <script type="text/javascript">
 	//<![CDATA[
 	(function(){
@@ -67,3 +67,14 @@
 	})();
 	//]]>
 </script>
+{% if object.route_planer %}
+<form method="get" action="http://maps.google.ch/" class="routeplaner_box">
+	<p>{{ object.route_planer_title }}:</p>
+	<fieldset>
+		<label for="saddr">{% trans "Your address" %}:</label>
+		<input id="saddr" name="saddr" class="textinput" value="" type="text" />
+		<input name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" type="hidden" />
+		<input value="{% trans "Calculate route" %}" class="input_submit" type="submit" />
+	</fieldset>
+</form>
+{% endif %}

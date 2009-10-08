@@ -28,6 +28,9 @@ class Picture(CMSPlugin):
         if self.alt:
             return self.alt[:40]
         elif self.image:
-            # added if, because it raised attribute error when file wasnt defined
-            return u"%s" % basename(self.image.path)
+            # added if, because it raised attribute error when file wasn't defined
+            try:
+                return u"%s" % basename(self.image.path)
+            except:
+                pass
         return "<empty>"

@@ -10,6 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from django.conf import settings as django_settings
+from cms.utils.i18n import get_fallback_languages
 
 def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     """Helper for getting current page from path depending on language
@@ -34,9 +35,10 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
                     return page, None
                 else:
                     path = None
-                    for alt_lang in settings.LANGUAGES:
-                        if alt_lang[0] in langs:
-                            path = '/%s%s' % (alt_lang[0], page.get_absolute_url(language=lang, fallback=True))
+                    for alt_lang in get_fallback_languages(lang):
+                        if alt_lang in langs:
+                            path = '/%s%s' % (alt_lang, page.get_absolute_url(language=lang, fallback=True))
+                            return None, path
                     return None, path
     except IndexError:
         return None, None
@@ -82,12 +84,18 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
                     if no404:# used for placeholder finder
                         current_page = None
                     else:
+                        if not slug and settings.DEBUG:
+                            CMS_MEDIA_URL = settings.CMS_MEDIA_URL
+                            return "cms/new.html", locals()
                         raise Http404('CMS: Page not found for "%s"' % slug)
         else:
             current_page = applications_page_check(request)
             #current_page = None
         template_name = get_template_from_request(request, current_page)
     elif not no404:
+        if not slug and settings.DEBUG:
+            CMS_MEDIA_URL = settings.CMS_MEDIA_URL
+            return "cms/new.html", locals()
         raise Http404("CMS: No page found for site %s" % unicode(site.name))
     
     if current_page:  
@@ -96,7 +104,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         
         redirect_url = current_page.get_redirect(language=lang)
         if redirect_url:
-            if not settings.i18n_installed:
+            if settings.i18n_installed:
                 redirect_url = "/%s/%s" % (lang, redirect_url.lstrip("/"))
             # add language prefix to url
             return HttpResponseRedirect(redirect_url)

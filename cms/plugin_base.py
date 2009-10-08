@@ -10,6 +10,7 @@ class CMSPluginBase(admin.ModelAdmin):
     form = None
     
     change_form_template = "admin/cms/page/plugin_change_form.html"
+    admin_preview = True #Should the plugin be rendered in the admin?
     
     render_template = None
     model = CMSPlugin
