@@ -239,6 +239,12 @@
 					hideCMStoolbarSubmenus();
 				}
     		});
+
+    		$('#cms_toolbar_edit_button_on').click(function(){
+    		});
+
+    		$('#cms_toolbar_edit_button_off').click(function(){
+    		});
 			
 			$('#cms_toolbar_closebutton').click(function () {
 				closeCMStoolbar();		
@@ -307,12 +313,12 @@
 <div id="cms_toolbar_mini">
 	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
 </div>
-<div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_on">
+<div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
 	<div id="cms_toolbar_col1">
-		<a href="#" id="cms_toolbar_logo"><span>django CMS</span></a>
+		<a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
 		<div id="cms_toolbar_editmode_toggle">
 			<span>Edit mode</span>
-			<a href="#">toggle</a>
+			<a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
 		</div>
 		<div id="cms_toolbar_statusbar">
 			<div>
@@ -325,12 +331,12 @@
 		<a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a>
 		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
 			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
-				<li class="first"><a href="#"><span class="cms_toolbar_icon_edit">edit</span>Site Administration</a></li>
-				<li><a href="#"><span class="cms_toolbar_icon_move">Icon</span>Move/add Page</a></li>
-				<li><a href="#"><span class="cms_toolbar_icon_padeadmin">Icon</span>Page Administration</a></li>
-				<li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li>
-				<li><a href="#"><span class="cms_toolbar_icon_history">Icon</span>View History</a></li>
-				<li class="last"><a href="#"><span class="cms_toolbar_icon_delete">delete</span>Delete Page</a></li>			
+				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">edit</span>Site Administration</a></li>
+				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">Icon</span>Move/add Page</a></li>
+				<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>Page Administration</a></li>
+				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
+				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">Icon</span>View History</a></li>
+				<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">delete</span>Delete Page</a></li>			
 			</ul>
 		</div>
 		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>Lock</strong><em>Logout</em></span></a>

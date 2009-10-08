@@ -7,6 +7,7 @@ from django.conf.urls.defaults import include, patterns
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 import debug_toolbar.urls
+from django.core.urlresolvers import reverse
 import os
 
 
@@ -30,57 +31,36 @@ class ToolbarMiddleware(object):
     Middleware to set up CMS Toolbar on incoming request and render toolbar
     on outgoing response.
     """
-    def __init__(self):
-        self.debug_toolbar = None
-        #self.original_pattern = patterns('', ('', include(self.original_urlconf)),)
-        #self.override_url = True
 
-        # Set method to use to decide to show toolbar
-        self.show_toolbar = self._show_toolbar # default
-
-    def _show_toolbar(self, request):
-        if request.is_ajax() and not \
-            request.path.startswith(os.path.join('/', debug_toolbar.urls._PREFIX)):
-            # Allow ajax requests from the debug toolbar
+    def show_toolbar(self, request, response):
+        if request.is_ajax():
             return False 
-        if not request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
+        if not hasattr(request, "user"):
+            return False
+        if not request.user.is_authenticated() or not request.user.is_staff:
+            return False
+        if response.status_code != 200:
+            return False
+        if not response['Content-Type'].split(';')[0] in _HTML_TYPES:
+            return False
+        if request.path_info.startswith(reverse("admin:index")):
             return False
         return True
 
-    def process_request(self, request):
-        if self.show_toolbar(request):
-            #if self.override_url:
-            #    debug_toolbar.urls.urlpatterns += self.original_pattern
-            #    self.override_url = False
-            #request.urlconf = 'debug_toolbar.urls'
-
-            #self.debug_toolbar = DebugToolbar(request)
-            #for panel in self.debug_toolbar.panels:
-            #    panel.process_request(request)
-            pass
-        return None
-
-    def process_view(self, request, view_func, view_args, view_kwargs):
-        if self.debug_toolbar:
-            for panel in self.debug_toolbar.panels:
-                panel.process_view(request, view_func, view_args, view_kwargs)
-
     def process_response(self, request, response):
-        print request.user
-        if not request.user.is_authenticated() or not request.user.is_staff:
-            return response
-        if response.status_code != 200:
-            return response
-        if response['Content-Type'].split(';')[0] in _HTML_TYPES:
-            response.content = replace_insensitive(smart_unicode(response.content), u'</body>', smart_unicode(self.render_toolbar(request) + u'</body>'))
+        if self.show_toolbar(request, response):
+            response.content = replace_insensitive(smart_unicode(response.content), u'<body>', '<body>' + smart_unicode(self.render_toolbar(request) ))
         return response
     
     def render_toolbar(self, request):
         """
         Renders the Toolbar.
         """
+        page = request.current_page
+        
         return render_to_string('cms/toolbar.html', {
-            
+            'page':page,
+            'edit':"edit" in request.GET,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
 
