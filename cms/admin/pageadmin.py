@@ -187,7 +187,7 @@ class PageAdmin(admin.ModelAdmin):
         """New way of urls handling.
         """
         from django.conf.urls.defaults import patterns, url
-        info = "%sadmin_%s_%s" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
 
         # helper for url pattern generation
         print info
@@ -195,8 +195,8 @@ class PageAdmin(admin.ModelAdmin):
         
         url_patterns = patterns('',
             
-            pat(r'^.+/add-plugin/$', add_plugin),
-            url(r'^.+/edit-plugin/([0-9]+)/$',
+            pat(r'^(?:[0-9]+)/add-plugin/$', add_plugin),
+            url(r'^(?:[0-9]+)/edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
             pat(r'^(?:[0-9]+)/remove-plugin/$', remove_plugin),

@@ -34,16 +34,18 @@ class ToolbarMiddleware(object):
 
     def show_toolbar(self, request, response):
         if request.is_ajax():
+            return False
+        if response.status_code != 200:
             return False 
         if not hasattr(request, "user"):
             return False
         if not request.user.is_authenticated() or not request.user.is_staff:
             return False
-        if response.status_code != 200:
-            return False
         if not response['Content-Type'].split(';')[0] in _HTML_TYPES:
             return False
         if request.path_info.startswith(reverse("admin:index")):
+            return False
+        if not request.current_page:
             return False
         return True
 

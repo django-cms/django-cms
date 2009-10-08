@@ -507,7 +507,13 @@ class PlaceholderNode(template.Node):
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name, edit=edit)
         installed_plugins = plugin_pool.get_all_plugins(self.name)
-        c += render_to_string("admin/cms/page/widgets/installed_plugins_inc.html", {'installed_plugins':installed_plugins})
+        print page
+        print page.pk
+        if edit:
+            c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
+                                                                                    'language':request.LANGUAGE_CODE,
+                                                                                    'placeholder_name':self.name,
+                                                                                    'page':page})
         return c
         
     def __repr__(self):
