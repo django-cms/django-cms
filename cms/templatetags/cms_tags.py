@@ -14,6 +14,8 @@ from cms.utils import get_language_from_request,\
     cut_levels, find_selected
 from cms.utils import navigation
 from cms.utils.i18n import get_fallback_languages
+from django.template.loader import render_to_string
+from cms.plugin_pool import plugin_pool
 
 
 register = template.Library()
@@ -504,6 +506,8 @@ class PlaceholderNode(template.Node):
             edit = True
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name, edit=edit)
+        installed_plugins = plugin_pool.get_all_plugins(self.name)
+        c += render_to_string("admin/cms/page/widgets/installed_plugins_inc.html", {'installed_plugins':installed_plugins})
         return c
         
     def __repr__(self):

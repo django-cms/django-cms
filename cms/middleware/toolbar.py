@@ -58,7 +58,7 @@ class ToolbarMiddleware(object):
         """
         page = request.current_page
         
-        return render_to_string('cms/toolbar.html', {
+        return render_to_string('cms/toolbar/toolbar.html', {
             'page':page,
             'edit':"edit" in request.GET,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
