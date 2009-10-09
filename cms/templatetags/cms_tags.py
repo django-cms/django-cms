@@ -507,8 +507,6 @@ class PlaceholderNode(template.Node):
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name, edit=edit)
         installed_plugins = plugin_pool.get_all_plugins(self.name)
-        print page
-        print page.pk
         if edit:
             c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                                     'language':request.LANGUAGE_CODE,

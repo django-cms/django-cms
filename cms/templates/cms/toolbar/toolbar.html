@@ -284,14 +284,20 @@
 					result = result.concat([plugin_id], after);
 				}
 			}
+
+
 			$.post("{% url admin:cms_page_move_plugin %}", { ids:result.join("_") }, function(data){
-				var current = $('#cms_plugin_'+page_id+'_'+plugin_id)
-				if(direction == 1){
-					current.swapWith(current.next());
-				}else if(direction == -1){
-					current.swapWith(current.before());
-				}
+				
 			});
+
+			var current = $('#cms_plugin_'+page_id+'_'+plugin_id)
+			if(direction == 1){
+				current.swapWith(current.next());
+			}else if(direction == -1){
+				current.swapWith(current.prev());
+			}
+			$("#cms_plugin_overlay").hide();
+			hideCMStoolbarSubmenus();
 		}
 		
 		function hide_iframe(){

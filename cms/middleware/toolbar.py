@@ -66,6 +66,5 @@ class ToolbarMiddleware(object):
             'edit':"edit" in request.GET,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
-        print context
         return render_to_string('cms/toolbar/toolbar.html', context )
 
