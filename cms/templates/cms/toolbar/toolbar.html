@@ -6,7 +6,8 @@
 	#cms_toolbar_mini{z-index:70010;position:fixed;right:0;top:0;height:41px;padding-top:6px;padding-right:10px;}
 		
 	#cms_toolbar{
-		z-index:70011;position:fixed;left:0;top:0;height:41px;width:100%;min-width: 960px;color:#656565;border-bottom: 2px solid #ddd;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;
+		z-index:70011;position:fixed;left:0;top:0;height:41px;width:100%;min-width: 960px;color:#656565;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;
+		border-bottom: 2px solid #ddd;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x 0 0;
 	}
 	* html #cms_toolbar{
@@ -16,7 +17,7 @@
 		top: expression( ( 0 + ( ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop ) ) + 'px' );		
 	}
 	
-	.cms_toolbar a{text-decoration:none;color:#656565;}
+	.cms_toolbar a{text-decoration:none;color:#656565; outline:none;}
 	.cms_toolbar a:hover{text-decoration:none;color:#656565;}
 	
 	#cms_toolbar_col1{float:left;padding-top:6px;zoom:1;overflow:hidden;height:35px;}
@@ -96,11 +97,11 @@
 	
 	/* BUTTON */
 	.cms_toolbar_button{
-		display:block;float:left;color:#5b81b3;padding-right:10px;margin-left:10px;cursor:pointer;
+		display:block;float:left;color:#5b81b3;padding-right:10px;margin-left:10px;cursor:pointer;text-decoration:none;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat right -41px;
 	}
 	* html .cms_toolbar_button{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif); height:27px; }
-	
+		
 	.cms_toolbar_button:hover{color:#264064;}
 	.cms_toolbar_button span{
 		display:block;float:left;height:27px;padding-left:10px;line-height:26px;
@@ -108,15 +109,29 @@
 	}
 	* html .cms_toolbar_button span{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	
+	
+	.cms_toolbar_iconbutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:11px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -260px -158px;	
+	}
+	* html .cms_toolbar_iconbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
 	/* SETTINGS BUTTON */
 	/*.cms_toolbar .cms_toolbar_settingsbutton{height:27px; overflow:hidden;}*/
 	.cms_toolbar .cms_toolbar_settingsbutton strong{
 		margin-top:6px;text-indent:-7777px;width:15px;height:14px;line-height:14px;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -170px -158px;		
 	}	
-	
 	* html .cms_toolbar .cms_toolbar_settingsbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	.cms_toolbar .cms_toolbar_settingsbutton:hover strong{background-position:-170px -188px;} 
+	
+	/* ADD BUTTON */
+	.cms_toolbar .cms_toolbar_addbutton strong{
+		margin-top:6px;text-indent:-7777px;width:9px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -225px -158px;	
+	}	
+	* html .cms_toolbar .cms_toolbar_addbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar .cms_toolbar_addbutton:hover strong{background-position:-225px -188px;} 
 	
 	
 	/* SUBMENU / SUBMENUBUTTON */	
@@ -135,6 +150,11 @@
 	* html .cms_toolbar_submenu li{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	.cms_toolbar_submenu li.first{background-position:-790px -122px;}
 	.cms_toolbar_submenu li.last{background-position:-790px -248px;}
+	
+	.cms_toolbar_submenuselect .cms_toolbar_submenu{
+		height:200px;
+		overflow:auto;
+	}	
 	
 	.cms_toolbar_submenu a{float:none;display:block;padding-left:10px;padding-top:2px;height:27px;line-height:23px;}
 	.cms_toolbar_submenu a:hover{color:#264064;}
@@ -164,7 +184,6 @@
 	
 	/* SETTINGS MENU */
 	#cms_toolbar_settings_menu{z-index:70012;top:29px;left:-124px;}
-	/*#cms_toolbar_settingsbutton.open .cms_toolbar_submenu{display:block;}*/
 	
 	/* LOGOUT BUTTON */
 	#cms_toolbar #cms_toolbar_logoutbutton strong{
@@ -177,10 +196,9 @@
 	
 	/* CLOSE BUTTON */
 	#cms_toolbar #cms_toolbar_closebutton strong{
-		margin-top:6px;text-indent:-7777px;display:block;float:left;width:7px;height:14px;line-height:14px;
-		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -210px -158px;
+		width:7px;
+		background-position:-210px -158px;
 	}
-	* html #cms_toolbar #cms_toolbar_closebutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	#cms_toolbar #cms_toolbar_closebutton:hover strong{background-position:-210px -188px;}
 	
 	/* OPEN BUTTON */
@@ -197,20 +215,89 @@
 		position:absolute;
 		z-index:70000;
 		display:none;
-		border:3px solid #5b80b2;
+		border:1px solid #5b80b2;
 	}
+	#cms_plugin_overlay .cms_toolbar_button{
+		margin-left:0;
+		padding-right:0;
+		border-right:1px solid #DDDDDD;
+	}
+	#cms_plugin_overlay a.cms_toolbar_button span, 
+	#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content{
+		padding-left:5px;
+		padding-right:5px;
+		background-position:-5px -41px;
+	}
+	#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content{
+		padding-right:0;
+	}
+	
 	#cms_plugin_overlay_bg{
 		z-index:70001;
 		background:#5b80b2;
-		opacity: .65;
-		-ms-filter: “alpha(opacity=65)”;
-		filter: alpha(opacity=65);
-		-khtml-opacity: .65;
-		-moz-opacity: .65;
+		opacity: .50;
+		-ms-filter: “alpha(opacity=50)”;
+		filter: alpha(opacity=50);
+		-khtml-opacity: .50;
+		-moz-opacity: .50;
 		height:100%;		
 	}
 	.cms_toolbar_plugintools{position:relative;z-index:70002;}
-	.cms_toolbar_plugintools_holder{position:absolute; right:10px; top:10px;}
+	.cms_toolbar_plugintools_holder{position:absolute; right:1px; top:1px;width:106px;}
+	
+	#cms_plugin_overlay a.cms_toolbar_plugin_edit span{
+		background-position:0px -41px;
+		padding-left:7px;
+	}	
+	#cms_plugin_overlay a.cms_toolbar_plugin_edit strong{
+		width:12px;height:14px;
+		background-position:-11px -159px;
+	}
+	#cms_plugin_overlay a.cms_toolbar_plugin_edit:hover strong{
+		background-position:-11px -189px;
+	}
+	
+	#cms_plugin_overlay .cms_toolbar_upbutton strong{
+		width:11px;height:14px;
+		background-position:-240px -158px;		
+	}
+	#cms_plugin_overlay .cms_toolbar_upbutton:hover strong{
+		background-position:-240px -188px;
+	}
+	
+	#cms_plugin_overlay .cms_toolbar_downbutton strong{		
+		width:11px;height:14px;
+		background-position:-260px -158px;	
+	}
+	#cms_plugin_overlay .cms_toolbar_downbutton:hover strong{
+		background-position:-260px -188px;
+	}
+	
+	#cms_plugin_overlay .cms_toolbar_settingsbutton{
+		padding-right:5px;
+		border:none;
+	}
+	
+	.cms_toolbar_placeholder_plugins{
+		height:40px;
+		border:1px solid #ddd;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x 0 0;
+		padding-left:10px;
+		padding-right:10px;
+		position:relative;
+	}
+	.cms_toolbar_placeholder_plugins_title{
+		float:left;
+		color:#5b80b2;
+		font-size:12px;
+		margin-top:10px;
+	}
+		
+	.cms_toolbar_placeholder_plugins .cms_toolbar_submenubutton{
+		float:right;
+		position:relative;
+		margin-top:6px;
+	}
 	
 	
 	
@@ -228,8 +315,8 @@
 
 
 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script>{# bitte zu mir kommen bei integration ins cms! #}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/tools.js"></script>{# bitte zu mir kommen bei integration ins cms! #}
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script> 
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/tools.js"></script>
 
 <script type="text/javascript">
 	//<![CDATA[
@@ -361,6 +448,12 @@
 				}
 				return false;
     		});
+			
+			$(".cms_toolbar_submenu li a").click(function () { 
+				window.location = $(this).attr("href");
+				return false;
+			});
+			
 
     		$('#cms_toolbar_edit_button_on').click(function(){
         		window.location = remove_from_url(window.location.href, "edit")
@@ -402,13 +495,16 @@
 				var splits = $(this).attr("id").split("_");
 				page_id = splits[2];
 				plugin_id = splits[3];
-				placeholder = $(this).attr("rel")		
+				placeholder = $(this).attr("rel");
+				var pluginH = $(this).height();
+				var pluginHmin = 10;				
+				if(pluginH<pluginHmin){pluginH=pluginHmin}	
 				$("#cms_plugin_overlay").show();
 				$("#cms_plugin_overlay").css({
-					'width'		: $(this).width()+10+3+'px',
-					'height'	: $(this).height()+10+3+'px',
-					'left'		: $(this).offset().left-10+'px',
-					'top'		: $(this).offset().top-10+'px'
+					'width'		: $(this).width()+'px',
+					'height'	: pluginH+'px',
+					'left'		: $(this).offset().left+'px',
+					'top'		: $(this).offset().top+'px'
 				})
 			});			
 			
@@ -418,14 +514,16 @@
 				$("#cms_plugin_overlay").hide();
 				hideCMStoolbarSubmenus();
 			});
-
-			$('div.cms_toolbar_placeholder_plugins span.add-plugin').click(function(){
-		        var select = $(this).parent().children("select");
-		        var pluginvalue = select.attr('value');
-		        var div = $(this).parent().parent()
+			
+			$("div.cms_toolbar_placeholder_plugins .cms_toolbar_submenuselect li a").click(function(){
+		        var select = $(this);
+		        var pluginvalue = select.attr('rel');
+		        var div = $(this).parent().parent().parent().parent();
 		       
 		        var placeholder = div.attr("rel")
+		        
 		        var splits = div.attr("id").split("cms_placeholder_")[1].split("_");
+
 		        var page_id = splits[1];
 		        var language = splits[0];
 		        if (!language) {
@@ -439,11 +537,10 @@
 		                    edit_plugin(page_id, data);
 		                }
 		            }, "html" );
-		        }
-		        return false;
-		    });
-
-
+		        }			
+				return false;
+			});
+			
 			$('a.cms_toolbar_plugin_delete').click(function(){
 		        var question = "{% trans "Are you sure you want to delete this plugin?" %}"
 		        var answer = confirm(question, true);
@@ -476,37 +573,11 @@
 		<div id="cms_toolbar_statusbar">
 			<div>
 				<span>Status:</span>
-				<ul class="cms_toolbar_status">
-					{% if page.published %}
-					<li>
-						<span class="cms_toolbar_icon cms_toolbar_state-icon published"></span>
-						<em>{% trans "Published" %}</em>
-					</li>{% else %}
-					<li>
-						<span class="cms_toolbar_icon cms_toolbar_state-icon not_published"></span>
-						<em>{% trans "Not Published" %}</em>
-					</li>{% endif %}
-					{% if page.in_navigation %}
-					<li>
-						<span class="cms_toolbar_icon cms_toolbar_state-icon in_menu"></span>
-						<em>{% trans "In Menu" %}</em>
-					</li>
-					{% else %}
-					<li>
-						<span class="cms_toolbar_icon cms_toolbar_state-icon not_in_menu"></span>
-						<em>{% trans "Not In Menu" %}</em>
-					</li>
-					{% endif %}
-					
-					{% for state in page.last_page_states %}
-					<li>
-						<span class="cms_toolbar_icon cms_toolbar_state-icon {{ state.css_class }}"></span>
-						<em>{{ state.get_action_display }}</em>
-					</li>{% empty %}
-					
-					
-					{% endfor %}
-				</ul>
+				<em>
+					{% for state in page.last_page_states %}					
+						{{ state.get_action_display }}	
+					{% endfor %}				
+				</em>
 			</div>
 		</div>			
 	</div>
@@ -527,30 +598,26 @@
 			</ul>
 		</div>
 		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>Lock</strong><em>Logout</em></span></a>
-		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button"><span><strong>Close</strong></span></a>
+		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>Close</strong></span></a>
 	</div>
 </div>
 <div id="cms_toolbar_spacer">&nbsp;</div>
 
 <div id="cms_plugin_overlay">
 	<div class="cms_toolbar_plugintools cms_toolbar">
-		<div class="cms_toolbar_plugintools_holder">		
-			<div class="cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Slots</strong><em>arrow</em></span>		
-				<ul class="cms_toolbar_submenu">				
-					<li class="first"><a href="#">Slot1</a></li>
-					<li><a href="#">Slot zwei</a></li>
-					<li><a href="#">Slot drei</a></li>
-					<li class="last"><a href="#">Slot 4</a></li>			
-				</ul>
-			</div>
+		<div class="cms_toolbar_plugintools_holder">
+			<a href="#" class="cms_toolbar_plugin_edit cms_toolbar_button cms_toolbar_iconbutton"><span><strong class="cms_toolbar_icon_edit">edit</strong></span></a>			
 			
-			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button"><span><strong>up</strong></span></a>
-			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button"><span><strong>down</strong></span></a>				
-			<a href="#" class="cms_toolbar_plugin_edit"><span class="cms_toolbar_icon_edit">edit</span>Edit Plugin</a>
-			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
+			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>up</strong></span></a>
+			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>down</strong></span></a>				
+			
+			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span class="cms_toolbar_submenubutton_content"><strong>Settings</strong><em>arrow</em></span>		
 				<ul class="cms_toolbar_submenu">				
-					<li class="first"><a class="cms_toolbar_plugin_edit" href="#"><span class="cms_toolbar_icon_edit">edit</span>Edit Plugin</a></li>
-					<li class="last"><a class="cms_toolbar_plugin_delete" href="#"><span class="cms_toolbar_icon_delete">delete</span>Delete Plugin</a></li>			
+					<li class="first"><a href="#">Move to Slot1</a></li>
+					<li><a href="#">Move to Slot zwei</a></li>
+					<li><a href="#">Move to Slot drei</a></li>
+					<li><a href="#">Move to Slot 4</a></li>
+					<li class="last"><a href="#"><span class="cms_toolbar_icon_delete">delete</span>Delete Plugin</a></li>			
 				</ul>
 			</div>
 		</div>	

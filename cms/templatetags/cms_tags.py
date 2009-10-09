@@ -504,14 +504,15 @@ class PlaceholderNode(template.Node):
         edit = False
         if "edit" in request.GET and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
             edit = True
-        for plugin in plugins:
-            c += plugin.render_plugin(context, self.name, edit=edit)
-        installed_plugins = plugin_pool.get_all_plugins(self.name)
+        
         if edit:
+            installed_plugins = plugin_pool.get_all_plugins(self.name)
             c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                                     'language':request.LANGUAGE_CODE,
                                                                                     'placeholder_name':self.name,
                                                                                     'page':page})
+        for plugin in plugins:
+            c += plugin.render_plugin(context, self.name, edit=edit)                
         return c
         
     def __repr__(self):

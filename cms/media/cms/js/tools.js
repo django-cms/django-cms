@@ -6,7 +6,6 @@ function insert_into_url(url, name, value){
 	dash_splits = url.split("#");
 	url = dash_splits[0];
 	var splits = url.split(name + "=");
-	console.log(splits);
 	if (splits.length == 1){
 		splits = url.split(name);
 	}
@@ -14,8 +13,6 @@ function insert_into_url(url, name, value){
 	if(url.split("?").length>1){
 		get_args = true;
 	}
-	console.log(splits)
-	console.log(get_args)
 	if(splits.length > 1){
 		var after = "";
 		if (splits[1].split("&").length > 1){

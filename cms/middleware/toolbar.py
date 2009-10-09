@@ -15,16 +15,14 @@ import os
 
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
-def replace_insensitive(string, target, replacement):
-    """
-    Similar to string.replace() but is case insensitive
-    Code borrowed from: http://forums.devshed.com/python-programming-11/case-insensitive-string-replace-490921.html
-    """
+def inster_after_tag(string, tag, insertion):
     no_case = string.lower()
-    index = no_case.rfind(target.lower())
-    if index >= 0:
-        return string[:index] + replacement + string[index + len(target):]
-    else: # no results so return the original string
+    index = no_case.find("<%s" % tag.lower())
+    if index:
+        start_tag = index
+        end_tag = start_tag + no_case[start_tag:].find(">") + 1
+        return string[:end_tag] + insertion + string[end_tag:]
+    else:
         return string
 
 class ToolbarMiddleware(object):
@@ -52,7 +50,7 @@ class ToolbarMiddleware(object):
 
     def process_response(self, request, response):
         if self.show_toolbar(request, response):
-            response.content = replace_insensitive(smart_unicode(response.content), u'<body>', '<body>' + smart_unicode(self.render_toolbar(request) ))
+            response.content = inster_after_tag(smart_unicode(response.content), u'body', smart_unicode(self.render_toolbar(request)))
         return response
     
     def render_toolbar(self, request):
