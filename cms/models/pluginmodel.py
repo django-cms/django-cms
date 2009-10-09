@@ -93,7 +93,7 @@ class CMSPlugin(MpttPublisher):
         
         if instance and not (admin and not plugin.admin_preview):
             if edit:
-                content = '<div id="cms_plugin_%s_%s" class="cms_plugin_holder">' % (instance.page_id, instance.pk)
+                content = '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s">' % (instance.page_id, instance.pk, instance.placeholder)
             else:
                 content = ""
             context = plugin.render(context, instance, placeholder)

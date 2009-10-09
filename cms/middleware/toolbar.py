@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 import debug_toolbar.urls
 from django.core.urlresolvers import reverse
+from cms.utils.admin import get_admin_menu_item_context
 import os
 
 
@@ -59,10 +60,12 @@ class ToolbarMiddleware(object):
         Renders the Toolbar.
         """
         page = request.current_page
-        
-        return render_to_string('cms/toolbar/toolbar.html', {
+        context = get_admin_menu_item_context(request, page, filtered=False)
+        context.update({
             'page':page,
             'edit':"edit" in request.GET,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
+        print context
+        return render_to_string('cms/toolbar/toolbar.html', context )
 

@@ -190,7 +190,7 @@ class PageAdmin(admin.ModelAdmin):
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
 
         # helper for url pattern generation
-        print info
+        print move_plugin.__name__
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',

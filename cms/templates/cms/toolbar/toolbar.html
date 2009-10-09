@@ -54,6 +54,13 @@
 	}
 	* html #cms_toolbar_statusbar{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	
+	
+	ul.cms_toolbar_status {
+		display:inline;
+		
+	}
+	ul.cms_toolbar_status li {display:inline;}
+	
 	#cms_toolbar_statusbar div{
 		padding-left:10px;width:400px;color:#656565;overflow:hidden;height:27px;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat left -95px;
@@ -62,6 +69,30 @@
 	
 	#cms_toolbar_statusbar span{color:#5b81b3;}
 	#cms_toolbar_statusbar em{font-style:normal;}
+	
+	ul.cms_toolbar_status span.cms_toolbar_icon {
+		width: 18px;
+		height: 18px;
+		display: inline-block;
+		background: url({{ CMS_MEDIA_URL }}/images/icons.png) 0px 0px no-repeat;
+		margin-top: 5px;
+	}
+	
+	span.cms_toolbar_icon.cms_toolbar_state-icon.cha {
+		background-position:-40px -20px;
+	}
+	
+	span.cms_toolbar_icon.cms_toolbar_state-icon.add {
+		background-position:-40px 0;
+	}
+	span.cms_toolbar_icon.cms_toolbar_state-icon.mov {
+		background-position:-60px 0;
+	}
+	
+	span.cms_toolbar_icon.cms_toolbar_state-icon.del {
+		background-position:-40px -40px;
+	}
+
 	
 	/* BUTTON */
 	.cms_toolbar_button{
@@ -182,6 +213,7 @@
 	.cms_toolbar_plugintools_holder{position:absolute; right:10px; top:10px;}
 	
 	
+	
 </style>
 
 <script type="text/javascript" charset="utf-8">
@@ -201,9 +233,66 @@
 
 <script type="text/javascript">
 	//<![CDATA[
-	
+		
+		jQuery.fn.swapWith = function(to) {
+		    return this.each(function() {
+		        var copy_to = $(to).clone(true);
+		        var copy_from = $(this).clone(true);
+		        $(to).replaceWith(copy_from);
+		        $(this).replaceWith(copy_to);
+		    });
+		};
+				
+		
 		var page_id = -1;
 		var plugin_id = -1;
+		var placeholder = "";
+
+		function move(direction){
+			var result = new Array();
+			var index = -1;
+			var plugins = $("div.cms_plugin_holder[rel='" + placeholder+"']");
+			var before = new Array();
+			var after = new Array();
+			for(var i=0; i<plugins.length; i++){
+				var plugin = $(plugins[i]);
+				var id = plugin.attr("id").split("cms_plugin_")[1].split("_")[1]
+				if (id == plugin_id){
+					index = i;
+				}else{
+					if(index == -1){
+						before.push(id);
+					}else{
+						after.push(id);
+					}
+				}
+			}
+			if(direction == 1){
+				if(after.length){
+					result = result.concat(before, [after.shift(), plugin_id], after);
+				}else{
+					direction = 0;
+					result = result.concat(before, [plugin_id]);
+				}
+			}
+			if(direction == -1){
+				if(before.length){
+					var mover = before.pop();
+					result = result.concat(before, [plugin_id, mover], after);
+				}else{
+					direction = 0;
+					result = result.concat([plugin_id], after);
+				}
+			}
+			$.post("{% url admin:cms_page_move_plugin %}", { ids:result.join("_") }, function(data){
+				var current = $('#cms_plugin_'+page_id+'_'+plugin_id)
+				if(direction == 1){
+					current.swapWith(current.next());
+				}else if(direction == -1){
+					current.swapWith(current.before());
+				}
+			});
+		}
 		
 		function hide_iframe(){
 			$('#cms_plugin_edit_overlay').html("");
@@ -291,15 +380,23 @@
 				edit_plugin(page_id, plugin_id);
 				return false;
 			});
-			
-						
+
+			$('a.cms_toolbar_downbutton').click(function () {
+				move(1);
+				return false;
+			});
+
+			$('a.cms_toolbar_upbutton').click(function () {
+				move(-1);
+				return false;
+			});		
 			
 			/* PLUGIN */			
 			$(".cms_plugin_holder").live("mouseover", function(){	
 				var splits = $(this).attr("id").split("_");
 				page_id = splits[2];
 				plugin_id = splits[3];
-				console.log(splits);			
+				placeholder = $(this).attr("rel")		
 				$("#cms_plugin_overlay").show();
 				$("#cms_plugin_overlay").css({
 					'width'		: $(this).width()+10+3+'px',
@@ -331,7 +428,6 @@
 		        //var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
 		        if (pluginvalue) {
 		            var pluginname = select.children('[selected]').text();
-		            console.log( { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language });
 		            $.post("{% url admin:cms_page_add_plugin %}", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
 		                if ('error' != data) {
 		                    edit_plugin(page_id, data);
@@ -374,25 +470,54 @@
 		<div id="cms_toolbar_statusbar">
 			<div>
 				<span>Status:</span>
-				<ul>{% for state in page.last_page_states %}
-					<li><span class="icon state-icon {{ state.css_class }}"></span>
-					{{ state.get_action_display }}
-					</li>{% endfor %}
+				<ul class="cms_toolbar_status">
+					{% if page.published %}
+					<li>
+						<span class="cms_toolbar_icon cms_toolbar_state-icon published"></span>
+						<em>{% trans "Published" %}</em>
+					</li>{% else %}
+					<li>
+						<span class="cms_toolbar_icon cms_toolbar_state-icon not_published"></span>
+						<em>{% trans "Not Published" %}</em>
+					</li>{% endif %}
+					{% if page.in_navigation %}
+					<li>
+						<span class="cms_toolbar_icon cms_toolbar_state-icon in_menu"></span>
+						<em>{% trans "In Menu" %}</em>
+					</li>
+					{% else %}
+					<li>
+						<span class="cms_toolbar_icon cms_toolbar_state-icon not_in_menu"></span>
+						<em>{% trans "Not In Menu" %}</em>
+					</li>
+					{% endif %}
+					
+					{% for state in page.last_page_states %}
+					<li>
+						<span class="cms_toolbar_icon cms_toolbar_state-icon {{ state.css_class }}"></span>
+						<em>{{ state.get_action_display }}</em>
+					</li>{% empty %}
+					
+					
+					{% endfor %}
 				</ul>
-				<em>Waiting for approval</em>
 			</div>
 		</div>			
 	</div>
 	<div id="cms_toolbar_col2">
+		{% if moderator_should_approve and has_moderate_permission %}<a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="icon approve cms_toolbar_button" title="{% trans 'Approve directly' %}">
+			<span class="state">{{ page_moderator_state.label }}</span>
+		</a>{% endif %}
 		<!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
 		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
 			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
-				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">edit</span>Site Administration</a></li>
-				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">Icon</span>Move/add Page</a></li>
-				<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>Page Administration</a></li>
+				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">edit</span>{% trans "Site Administration" %}</a></li>
+				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">Icon</span>{% trans "Move/add Pages" %}</a></li>
+				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Administration" %}</a></li>
 				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
-				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">Icon</span>View History</a></li>
-				<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">delete</span>Delete Page</a></li>			
+				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">Icon</span>{% trans "View History" %}</a></li>
+				{% endif %}
+				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">delete</span>{% trans "Delete Page" %}</a></li>{% endif %}			
 			</ul>
 		</div>
 		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>Lock</strong><em>Logout</em></span></a>
@@ -415,7 +540,7 @@
 			
 			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button"><span><strong>up</strong></span></a>
 			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button"><span><strong>down</strong></span></a>				
-			
+			<a href="#" class="cms_toolbar_plugin_edit"><span class="cms_toolbar_icon_edit">edit</span>Edit Plugin</a>
 			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
 				<ul class="cms_toolbar_submenu">				
 					<li class="first"><a class="cms_toolbar_plugin_edit" href="#"><span class="cms_toolbar_icon_edit">edit</span>Edit Plugin</a></li>
