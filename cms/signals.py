@@ -61,7 +61,7 @@ def post_save_title(instance, raw, created, **kwargs):
     # Update descendants only if path changed
     application_changed = False
     
-    if instance.path != instance.tmp_path and not hasattr(instance, 'tmp_prevent_descendant_update'):
+    if instance.path != getattr(instance,'tmp_path',None) and not hasattr(instance, 'tmp_prevent_descendant_update'):
         descendant_titles = Title.objects.filter(
             page__lft__gt=instance.page.lft, 
             page__rght__lt=instance.page.rght, 
@@ -77,13 +77,15 @@ def post_save_title(instance, raw, created, **kwargs):
             descendant_title.save()
         
     if not hasattr(instance, 'tmp_prevent_descendant_update') and \
-        (instance.application_urls != instance.tmp_application_urls or application_changed):
+        (instance.application_urls != getattr(instance, 'tmp_application_urls', None) or application_changed):
         # fire it if we have some application linked to this page or some descendant
         cms_signals.application_post_changed.send(sender=Title, instance=instance)
     
     # remove temporary attributes
-    del(instance.tmp_path)
-    del(instance.tmp_application_urls)
+    if getattr( instance, 'tmp_path', None):
+        del(instance.tmp_path)
+    if getattr( instance, 'tmp_application_urls' , None):
+        del(instance.tmp_application_urls)
     
     try:
         del(instance.tmp_prevent_descendant_update)
