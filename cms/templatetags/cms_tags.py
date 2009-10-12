@@ -1,6 +1,6 @@
 from django import template
 from django.core.cache import cache
-from django.core.mail import send_mail
+from django.core.mail import send_mail, mail_managers
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -371,13 +371,11 @@ register.filter(has_permission)
 
 def send_missing_mail(reverse_id, request):
     site = Site.objects.get_current()
-    send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                  _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                    "The url of the page was: http://%(host)s%(path)s")
-                    % {'reverse_id':reverse_id, 'host':site.domain, 'path':request.path},
-                  settings.DEFAULT_FROM_EMAIL,
-                  settings.MANAGERS, 
-                  fail_silently=True)
+    mail_managers(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                   _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                     "The url of the page was: http://%(host)s%(path)s")
+                     % {'reverse_id':reverse_id, 'host':site.domain, 'path':request.path}, 
+                   fail_silently=True)
 
 def page_id_url(context, reverse_id, lang=None, site=None):
     """
