@@ -320,6 +320,8 @@
 
 <script type="text/javascript">
 	//<![CDATA[
+	
+		var placeholder_data = {{ placeholder_data }};
 		
 		jQuery.fn.swapWith = function(to) {
 		    return this.each(function() {
@@ -334,6 +336,7 @@
 		var page_id = -1;
 		var plugin_id = -1;
 		var placeholder = "";
+		var plugin_type = "";
 
 		function move(direction){
 			var result = new Array();
@@ -496,6 +499,7 @@
 				page_id = splits[2];
 				plugin_id = splits[3];
 				placeholder = $(this).attr("rel");
+				plugin_type = $(this).attr("type");
 				var pluginH = $(this).height();
 				var pluginHmin = 10;				
 				if(pluginH<pluginHmin){pluginH=pluginHmin}	
@@ -506,6 +510,35 @@
 					'left'		: $(this).offset().left+'px',
 					'top'		: $(this).offset().top+'px'
 				})
+				$("div.cms_toolbar_plugintools_holder ul.cms_toolbar_submenu li:not(:last)").remove();
+				var last = $("div.cms_toolbar_plugintools_holder ul.cms_toolbar_submenu li.last")
+				var first = true;
+				for(var i = 0; i < placeholder_data.length; i++){
+					var data = placeholder_data[i];
+					var found = false;
+					if(data.type != placeholder){
+						for(j = 0; j < data.plugins.length; j++){
+							console.log(data.plugins[j]);
+							console.log(plugin_type)
+							if(data.plugins[j] == plugin_type){
+								found = true;
+							}
+						}
+					}
+					if(found){
+						var html = '<li class="%(extra_class)"><a class="cms_toolbar_move_slot" href="#" rel="%(type)s">{% trans 'Move to slot %(name)s' %}</a></li>'
+						if (first){
+							first = false;
+							html = html.split("%(extra_class)s").join("first")
+						}else{
+							html = html.split("%(extra_class)s").join("")
+						}
+						html = html.split("%(name)s").join('"'+data.name+'"')
+						html = html.split("%(type)s").join(data.type)
+						last.before(html)
+					}
+				}
+				
 			});			
 			
 			$("#cms_plugin_overlay").mouseenter(function(){
@@ -529,7 +562,6 @@
 		        if (!language) {
 		            alert("Unable to determine the correct language for this plugin! Please report the bug!");
 		        }
-		        //var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
 		        if (pluginvalue) {
 		            var pluginname = select.children('[selected]').text();
 		            $.post("{% url admin:cms_page_add_plugin %}", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
@@ -549,6 +581,7 @@
 		                window.location.reload();
 		            }, "html");
 		        }
+		        return false;
 		    });
 			
 		});

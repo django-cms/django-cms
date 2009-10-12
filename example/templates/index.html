@@ -160,42 +160,5 @@
 
 </div>
 
-<script type="text/javascript">
-    // quick and dirty edit in place example
-    {% if has_change_permissions %}
-        $('.placeholder').addClass('placeholder-editable');
-    {% endif %}
-    $('.placeholder-editable').mouseover(function() {
-        $(this).addClass('placeholder-over');
-    });
-    $('.placeholder-editable').mouseout(function() {
-        $(this).removeClass('placeholder-over');
-    });
-    $('.placeholder-editable').click(function() {
-        var p = $(this);
-        if(p.hasClass('edit')) {
-            return false;
-        }
-        p.addClass('edit');
-        var height = p.height()+20;
-        var width = p.width()-10;
-        p.html('<textarea style="width:'+width+'px;height:'+height+'px">'+ this.innerHTML +'</textarea><input type="submit" value="Save" />');
-        $('input', p).click( function() {
-            var content = $('textarea', p).val();
-            $.post('/admin/cms/page/{{ current_page.id }}/modify-content/'+p.attr('id')+'/{{ lang }}/', {'content':content}, function(response) {
-                if(response=="ok") {
-                    p.html(content);
-                    p.removeClass('edit');
-                    p.removeClass('placeholder-over');
-                } else {
-                    alert("You need to authenticate to the admin to edit the content");
-                }
-            });
-            return false;
-        });
-    });
-</script>
-
-
 </body>
 </html>

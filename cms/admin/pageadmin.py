@@ -4,7 +4,6 @@ from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
-from cms.admin.utils import get_placeholders
 from cms.admin.views import change_status, change_innavigation, add_plugin, \
     edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation
 from cms.admin.widgets import PluginEditor
@@ -37,6 +36,7 @@ from django.utils.encoding import force_unicode
 from django.utils.functional import curry
 from django.utils.translation import ugettext as _
 from os.path import join
+from cms.utils.plugins import get_placeholders
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm

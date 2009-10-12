@@ -39,17 +39,23 @@ def get_template_from_request(request, obj=None):
     Gets a valid template from different sources or falls back to the default
     template.
     """
+    template = None
     if len(settings.CMS_TEMPLATES) == 1:
         return settings.CMS_TEMPLATES[0][0]
-    template = request.REQUEST.get('template', None)
+    if "template" in request.REQUEST:
+        template = request.REQUEST['template']
+    if not template and obj is not None:
+        template = obj.get_template()
+    if not template and hasattr(request, "current_page"):
+        current_page = request.current_page
+        if hasattr(current_page, "get_template"):
+            template = current_page.get_template()
     if template is not None and template in dict(settings.CMS_TEMPLATES).keys():
         if template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC and obj:
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
-        return template
-    if obj is not None:
-        return obj.get_template()
+        return template    
     return settings.CMS_TEMPLATES[0][0]
 
 

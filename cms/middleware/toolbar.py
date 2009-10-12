@@ -9,6 +9,10 @@ from django.utils.encoding import smart_unicode
 import debug_toolbar.urls
 from django.core.urlresolvers import reverse
 from cms.utils.admin import get_admin_menu_item_context
+from cms.utils.plugins import get_placeholders
+from django.template.defaultfilters import title, safe
+from cms.plugin_pool import plugin_pool
+from django.utils import simplejson
 import os
 
 
@@ -57,11 +61,31 @@ class ToolbarMiddleware(object):
         """
         Renders the Toolbar.
         """
+        edit = "edit" in request.GET
         page = request.current_page
+        move_dict = []
+        if edit:
+            placeholders = get_placeholders(request)
+            for placeholder in placeholders:
+                d = {}
+                if placeholder in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder]:
+                    d['name'] =  title(settings.CMS_PLACEHOLDER_CONF[placeholder]["name"])
+                else:
+                    d['name'] =  title(placeholder)
+                plugins = plugin_pool.get_all_plugins(placeholder)
+                d['plugins'] = [] 
+                for p in plugins:
+                    d['plugins'].append(p.value)
+                d['type'] = placeholder
+                move_dict.append(d)
+            data = safe(simplejson.dumps(move_dict))
+        else:
+            data = {}
         context = get_admin_menu_item_context(request, page, filtered=False)
         context.update({
             'page':page,
-            'edit':"edit" in request.GET,
+            'placeholder_data':data,
+            'edit':edit,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
         return render_to_string('cms/toolbar/toolbar.html', context )
