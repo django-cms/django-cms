@@ -6,7 +6,7 @@ contain the appropriate settings.
 from os.path import join
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy  as _
 
 # Which templates should be used for extracting the placeholders?
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)

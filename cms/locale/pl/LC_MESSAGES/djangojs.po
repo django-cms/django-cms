@@ -2,18 +2,22 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django-cms 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-06-19 14:47+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2009-10-10 00:09+0100\n"
+"Last-Translator: Maciej Wiśniowski <pigletto@gmail.com>\n"
+"Language-Team: Pigletto <pigletto@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Poedit-Language: Polish\n"
+"X-Poedit-Country: POLAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
 
 #: media/cms/js/change_form.js:25
 msgid "Are you sure you want to change the %(field_name)s without saving the page first?"
@@ -22,3 +26,4 @@ msgstr "Czy na pewno chcesz zmienić %(field_name)s nie zapisując wcześniej st
 #: media/cms/js/change_form.js:60
 msgid "Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost."
 msgstr "Nie wszystkie pluginy zostały zapisane. Czy na pewno chcesz zapisać stronę? Cała niezapisana treść pluginów zostanie utracona."
+
