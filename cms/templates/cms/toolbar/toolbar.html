@@ -596,8 +596,8 @@
 		        }			
 				return false;
 			});
-			
-			$('a.cms_toolbar_plugin_delete').click(function(){
+			console.log($('a.cms_toolbar_icon_delete'))
+			$('#cms_plugin_overlay a.cms_toolbar_icon_delete').click(function(){
 		        var question = "{% trans "Are you sure you want to delete this plugin?" %}"
 		        var answer = confirm(question, true);
 		        if(answer){

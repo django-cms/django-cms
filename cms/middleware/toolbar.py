@@ -13,6 +13,9 @@ from cms.utils.plugins import get_placeholders
 from django.template.defaultfilters import title, safe
 from cms.plugin_pool import plugin_pool
 from django.utils import simplejson
+from django.http import HttpResponseRedirect
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.utils.http import urlquote
 import os
 
 
@@ -51,12 +54,20 @@ class ToolbarMiddleware(object):
         if not request.current_page:
             return False
         return True
+    
+    def process_request(self, request):
+        print "hello"
+        print request.GET
+        if "edit" in request.GET and not request.user.is_authenticated():
+            tup=(settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path()))
+            return HttpResponseRedirect('%s?%s=%s' % tup)
+            
 
     def process_response(self, request, response):
         if self.show_toolbar(request, response):
             response.content = inster_after_tag(smart_unicode(response.content), u'body', smart_unicode(self.render_toolbar(request)))
         return response
-    
+
     def render_toolbar(self, request):
         """
         Renders the Toolbar.
