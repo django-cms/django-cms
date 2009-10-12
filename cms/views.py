@@ -91,7 +91,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         else:
             current_page = applications_page_check(request)
             #current_page = None
-        template_name = get_template_from_request(request, current_page)
+        template_name = get_template_from_request(request, current_page, no_current_page=True)
     elif not no404:
         if not slug and settings.DEBUG:
             CMS_MEDIA_URL = settings.CMS_MEDIA_URL

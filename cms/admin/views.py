@@ -12,6 +12,7 @@ from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from cms.utils.plugins import get_placeholders
 
 @require_POST
 def change_status(request, page_id):
@@ -185,18 +186,35 @@ def move_plugin(request):
     if request.method == "POST" and not 'history' in request.path:
         pos = 0
         page = None
-        for id in request.POST['ids'].split("_"):
-            plugin = CMSPlugin.objects.get(pk=id)
-            if not page:
-                page = plugin.page
-            
-            if not page.has_change_permission(request):
-                raise Http404
-
-            if plugin.position != pos:
-                plugin.position = pos
-                plugin.save()
-            pos += 1
+        if 'ids' in request.POST:
+            for id in request.POST['ids'].split("_"):
+                plugin = CMSPlugin.objects.get(pk=id)
+                if not page:
+                    page = plugin.page
+                
+                if not page.has_change_permission(request):
+                    raise Http404
+    
+                if plugin.position != pos:
+                    plugin.position = pos
+                    plugin.save()
+                pos += 1
+        elif 'plugin_id' in request.POST:
+            plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
+            placeholder = request.POST['placeholder']
+            placeholders = get_placeholders(request, plugin.page.template)
+            if not placeholder in placeholders:
+                return HttpResponse(str("error"))
+            plugin.placeholder = placeholder
+            position = 0
+            try:
+                position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).order_by('position')[0].position + 1
+            except IndexError:
+                pass
+            plugin.position = position
+            plugin.save()
+        else:
+            HttpResponse(str("error"))
         if page and 'reversion' in settings.INSTALLED_APPS:
             page.save()
             save_all_plugins(request, page)
@@ -204,7 +222,7 @@ def move_plugin(request):
             revision.comment = unicode(_(u"Plugins where moved")) 
         return HttpResponse(str("ok"))
     else:
-        raise Http404
+        return HttpResponse(str("error"))
     
 if 'reversion' in settings.INSTALLED_APPS:
     move_plugin = revision.create_on_success(move_plugin)

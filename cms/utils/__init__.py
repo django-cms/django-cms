@@ -34,7 +34,7 @@ def auto_render(func):
         return render_to_response(t, context, context_instance=RequestContext(request))
     return _dec
 
-def get_template_from_request(request, obj=None):
+def get_template_from_request(request, obj=None, no_current_page=False):
     """
     Gets a valid template from different sources or falls back to the default
     template.
@@ -46,7 +46,7 @@ def get_template_from_request(request, obj=None):
         template = request.REQUEST['template']
     if not template and obj is not None:
         template = obj.get_template()
-    if not template and hasattr(request, "current_page"):
+    if not template and not no_current_page and hasattr(request, "current_page"):
         current_page = request.current_page
         if hasattr(current_page, "get_template"):
             template = current_page.get_template()

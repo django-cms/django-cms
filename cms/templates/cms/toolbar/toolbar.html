@@ -493,7 +493,19 @@
 				return false;
 			});		
 			
-			/* PLUGIN */			
+			/* PLUGIN */	
+			
+			$("a.cms_toolbar_move_slot").live("click", function(){
+				var target = $(this).attr("rel")
+				$.post(
+					"{% url admin:cms_page_move_plugin %}", 
+					{ placeholder: target, plugin_id: plugin_id },
+					function(data){
+				    	window.location.reload();
+					});
+				return false;
+			});
+					
 			$(".cms_plugin_holder").live("mouseover", function(){	
 				var splits = $(this).attr("id").split("_");
 				page_id = splits[2];
@@ -526,14 +538,14 @@
 						}
 					}
 					if(found){
-						var html = '<li class="%(extra_class)"><a class="cms_toolbar_move_slot" href="#" rel="%(type)s">{% trans 'Move to slot %(name)s' %}</a></li>'
+						var html = '<li class="%(extra_class)"><a class="cms_toolbar_move_slot" href="#" rel="%(type)s">{% trans 'Move to %(name)s' %}</a></li>'
 						if (first){
 							first = false;
 							html = html.split("%(extra_class)s").join("first")
 						}else{
 							html = html.split("%(extra_class)s").join("")
 						}
-						html = html.split("%(name)s").join('"'+data.name+'"')
+						html = html.split("%(name)s").join(data.name)
 						html = html.split("%(type)s").join(data.type)
 						last.before(html)
 					}
