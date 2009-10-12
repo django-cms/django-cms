@@ -317,6 +317,7 @@
 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/tools.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.nyroModal-1.5.2.min.js"></script>
 
 <script type="text/javascript">
 	//<![CDATA[
@@ -391,13 +392,22 @@
 		}
 		
 		function hide_iframe(){
-			$('#cms_plugin_edit_overlay').html("");
+			$.nyroModalRemove();
+			$('div.wrappe').html("");
 			window.location.reload();
 		}
 
 		function edit_plugin(page_id, plugin_id){
 			var html = '<iframe id="iframe_'+page_id+'_'+plugin_id+'" src="{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true" frameborder="0"></iframe>';
-			$('#cms_plugin_edit_overlay').html(html);
+			$.nyroModalManual({
+				zIndexStart: 100000,
+			    content: html,
+			    width: "200",
+			    height: "200"
+			   
+			});
+						
+			//$('#cms_plugin_edit_overlay').html(html);
 		}
 
 		function closeCMStoolbar(){
@@ -669,8 +679,3 @@
 	</div>
 	<div id="cms_plugin_overlay_bg">&nbsp;</div>
 </div>
-
-<div id="cms_plugin_edit_overlay">
-
-</div>
-	
