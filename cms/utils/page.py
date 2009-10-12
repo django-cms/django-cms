@@ -8,7 +8,7 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     """Validates given slug depending on settings.
     """
     from cms.models import Title
-    qs = Title.objects.filter(page__site=site, slug=slug, publisher_is_draft=True)
+    qs = Title.objects.filter(page__site=site, slug=slug, publisher_is_draft=True).exclude(page=page)
     
     if not cms_settings.CMS_UNIQUE_SLUGS:
         qs = qs.filter(language=lang)
