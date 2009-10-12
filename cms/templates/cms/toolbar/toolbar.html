@@ -454,12 +454,14 @@
 					wasOpen = false;					
 					if(cmsClicked.hasClass("open")){wasOpen = true;}										
 					hideCMStoolbarSubmenus();					
-					if(wasOpen == false){cmsClicked.addClass("open");}					
+					if(wasOpen == false){
+						cmsClicked.addClass("open");
+					}					
+					return false;
 				}
 				if(cmsSubmenuHit == false){
 					hideCMStoolbarSubmenus();
 				}
-				return false;
     		});
 			
 			$(".cms_toolbar_submenu li a").click(function () { 
