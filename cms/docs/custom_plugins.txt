@@ -47,7 +47,10 @@ In there write the following::
 		render_template = "gallery/gallery.html"
 	
 		def render(self, context, instance, placeholder):
-			return context.update({'gallery':instance.gallery, 'placeholder':placeholder})
+			context.update({'gallery':instance.gallery,
+							'object':instance, 
+							'placeholder':placeholder})
+			return context
 	
 	plugin_pool.register_plugin(CMSGalleryPlugin)		
 
