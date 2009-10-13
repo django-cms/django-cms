@@ -159,7 +159,7 @@
 	}	
 	
 	.cms_toolbar_submenu a{float:none;display:block;padding-left:10px;padding-top:2px;height:27px;line-height:23px;}
-	.cms_toolbar_submenu a:hover{color:#264064;}
+	.cms_toolbar_submenu a:hover, .cms_toolbar_submenu li.selected a{color:#264064;}
 	
 	.cms_toolbar_submenu a span{text-indent:-7777px;width:9px;height:17px;margin-right:4px;}	
 	
@@ -213,7 +213,7 @@
 	
 	
 	/* TOOLBAR PLUGINTOOLS */
-	#cms_plugin_overlay{
+	#cms_plugin_overlay, #cms_plugin_overlay2{
 		position:absolute;
 		z-index:70000;
 		display:none;
@@ -233,17 +233,29 @@
 	#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content{
 		padding-right:0;
 	}
-	
-	#cms_plugin_overlay_bg{
+	#cms_plugin_overlay .cms_plugin_overlay_bg, #cms_plugin_overlay2 .cms_plugin_overlay_bg{
 		z-index:70001;
+		height:100%;			
+	}
+	#cms_plugin_overlay .cms_plugin_overlay_bg{
 		background:#5b80b2;
 		opacity: .50;
 		-ms-filter: “alpha(opacity=50)”;
 		filter: alpha(opacity=50);
 		-khtml-opacity: .50;
-		-moz-opacity: .50;
-		height:100%;		
+		-moz-opacity: .50;	
 	}
+	#cms_plugin_overlay2 .cms_plugin_overlay_bg{
+		background:#59E140;
+		opacity: .50;
+		-ms-filter: “alpha(opacity=50)”;
+		filter: alpha(opacity=50);
+		-khtml-opacity: .50;
+		-moz-opacity: .50;	
+	}
+	
+	#cms_plugin_overlay2{border:1px solid #59E140;}
+	
 	.cms_toolbar_plugintools{position:relative;z-index:70002;}
 	.cms_toolbar_plugintools_holder{position:absolute; right:1px; top:1px;width:106px;}
 	
@@ -415,8 +427,8 @@
 				if(after.length){
 					result = result.concat(before, [after.shift(), plugin_id], after);
 				}else{
-					direction = 0;
-					result = result.concat(before, [plugin_id]);
+					direction = 2;
+					result = result.concat([plugin_id], before);
 				}
 			}
 			if(direction == -1){
@@ -424,7 +436,7 @@
 					var mover = before.pop();
 					result = result.concat(before, [plugin_id, mover], after);
 				}else{
-					direction = 0;
+					direction = -2;
 					result = result.concat([plugin_id], after);
 				}
 			}
@@ -435,13 +447,22 @@
 			});
 
 			var current = $('#cms_plugin_'+page_id+'_'+plugin_id)
+			
 			if(direction == 1){
 				current.swapWith(current.next());
 			}else if(direction == -1){
 				current.swapWith(current.prev());
+			}else if(direction == 2){
+				$(plugins[0]).before(current.clone());
+				current.remove();
+			}else if(direction == -2){
+				$(plugins[plugins.length-1]).after(current.clone());
+				current.remove();
 			}
 			$("#cms_plugin_overlay").hide();
 			hideCMStoolbarSubmenus();
+			$('#cms_plugin_'+page_id+'_'+plugin_id).makeoverlay("#cms_plugin_overlay2");
+			//$('#cms_plugin_'+page_id+'_'+plugin_id).css("background","red")
 		}
 		
 		function hide_iframe(){
@@ -669,23 +690,35 @@
 					});
 				return false;
 			});
+			
+			$.fn.makeoverlay = function(options){
+				var pluginH = $(this).height();
+				var pluginHmin = 10;				
+				if(pluginH<pluginHmin){pluginH=pluginHmin}				
+				$(options).show();
+				$(options).css({
+					'width'		: $(this).width()+'px',
+					'height'	: pluginH+'px',
+					'left'		: $(this).offset().left+'px',
+					'top'		: $(this).offset().top+'px'
+				})
+				if(options == "#cms_plugin_overlay2"){
+					$(options).fadeIn(0);
+					$(options).fadeOut(800, function () {
+						$(options).hide();
+					})
+				}
+			}
 					
 			$(".cms_plugin_holder").live("mouseover", function(){	
 				var splits = $(this).attr("id").split("_");
 				page_id = splits[2];
 				plugin_id = splits[3];
 				placeholder = $(this).attr("rel");
-				plugin_type = $(this).attr("type");
-				var pluginH = $(this).height();
-				var pluginHmin = 10;				
-				if(pluginH<pluginHmin){pluginH=pluginHmin}	
-				$("#cms_plugin_overlay").show();
-				$("#cms_plugin_overlay").css({
-					'width'		: $(this).width()+'px',
-					'height'	: pluginH+'px',
-					'left'		: $(this).offset().left+'px',
-					'top'		: $(this).offset().top+'px'
-				})
+				plugin_type = $(this).attr("type");	
+				
+				$(this).makeoverlay("#cms_plugin_overlay");
+				
 				$("div.cms_toolbar_plugintools_holder ul.cms_toolbar_submenu li:not(:last)").remove();
 				var last = $("div.cms_toolbar_plugintools_holder ul.cms_toolbar_submenu li.last")
 				var first = true;
@@ -813,7 +846,7 @@
 		<div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>		
 			<ul id="cms_toolbar_template_menu" class="cms_toolbar_submenu">
 				{% for template in templates %}
-				<li class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">{% ifequal template.0 page.template %}<span class="selected">selected</span>{% endifequal %}<a href="#{{ template.0 }}">{{ template.1 }}</a></li>
+				<li class="{% ifequal template.0 page.template %}selected {% endifequal %}{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}"><a href="#{{ template.0 }}">{{ template.1 }}</a></li>
 				{% endfor %}
 			</ul>
 		</div>
@@ -859,5 +892,8 @@
 			</div>
 		</div>	
 	</div>
-	<div id="cms_plugin_overlay_bg">&nbsp;</div>
+	<div class="cms_plugin_overlay_bg">&nbsp;</div>
+</div>
+<div id="cms_plugin_overlay2">
+	<div class="cms_plugin_overlay_bg">&nbsp;</div>
 </div>
