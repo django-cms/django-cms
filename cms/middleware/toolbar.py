@@ -89,7 +89,7 @@ class ToolbarMiddleware(object):
             data = safe(simplejson.dumps(move_dict))
         else:
             data = {}
-        if auth:
+        if auth and page:
             context = get_admin_menu_item_context(request, page, filtered=False)
         else:
             context = Context()

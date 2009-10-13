@@ -200,7 +200,7 @@ def get_model_queryset(model, request=None):
     """
     if not cms_settings.CMS_MODERATOR or \
         (request and (('preview' in request.GET and 
-            'draft' in request.GET) or 'edit' in request.GET) and request.user.is_staff):
+            'draft' in request.GET) or ('edit' in request.GET or request.session.get("cms_edit", False))) and request.user.is_staff):
         return model.objects.drafts()
     
     return model.objects.public()

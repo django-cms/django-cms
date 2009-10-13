@@ -21,13 +21,15 @@
 	.cms_toolbar a:hover{text-decoration:none;color:#656565;}
 	
 	#cms_toolbar_col1{float:left;padding-top:6px;zoom:1;overflow:hidden;height:35px;}
-	/** html #cms_toolbar_col1{background:red; height:30px;}*/
 	
 	#cms_toolbar_col2{float:right;height:100%;padding-top:6px;padding-right:10px;height:35px;}
 	
 	/* RESET */	
 	.cms_toolbar strong, .cms_toolbar em{font-style:normal;font-weight:normal;margin:0;padding:0;}
 	.cms_toolbar ul, .cms_toolbar li{margin:0;list-style:none;}
+	.cms_toolbar form, .cms_toolbar input, .cms_toolbar label{
+		color:#656565;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;margin:0;padding:0;
+	}
 	
 	/* LOGO */
 	#cms_toolbar_logo{}
@@ -299,6 +301,21 @@
 		margin-top:6px;
 	}
 	
+	/* LOGINFORM */
+	#cms_toolbar_loginform,#cms_toolbar_loginform label, #cms_toolbar_loginform input{float:left;}
+	#cms_toolbar_loginform{}
+	#cms_toolbar_loginform .cms_submit{display:none;}
+	#cms_toolbar_loginform .cms_toolbar_button{margin-left:0;}
+	#cms_toolbar_loginform label{line-height:20px;padding:3px 5px 0px 5px;}
+	.cms_toolbar input.cms_textinput{
+		border:1px solid #ccc;
+		padding:3px;
+		margin-top:2px;margin-right:5px;
+	}
+	.cms_toolbar .cms_toolbar_error input.cms_textinput{
+		border-color:#990000;
+	}
+	
 	/* OVERLAY */
 	#nyroModalContent{
 		background:#fff;
@@ -489,16 +506,32 @@
 		function initBodyBackgroundPos(s){
 			if(bodyBackgroundPosUnit=="px"){
 				if(s==undefined){s=400;}
-				var bodyBackgroundPosYnew = Number(bodyBackgroundPosY)+41;				
-				$("body").animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosYnew+"px)"},s);
+				var bodyBackgroundPosYnew = Number(bodyBackgroundPosY)+41;
+				var bodyBackgroundPosYnew = ""+bodyBackgroundPosYnew;
+				if ($.browser.msie) {//for IE
+					$("body").css("background-position-x",bodyBackgroundPosXFull);
+					$("body").css("background-position-y",bodyBackgroundPosYnew+"px");
+				}else {
+					$("body").stop().animate({backgroundPosition: "(" + bodyBackgroundPosXFull + " " + bodyBackgroundPosYnew + "px)"}, s);
+				}			
 			}			
 		}
 		function resetBodyBackgroundPos(s){
 			if(bodyBackgroundPosUnit=="px") {
 				if(s==undefined){s=400;}
-				$("body").animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosY+"px)"},s);
+				if ($.browser.msie){//for IE
+					$("body").css("background-position-x",bodyBackgroundPosXFull);
+					$("body").css("background-position-y",bodyBackgroundPosYFull);
+				}else{
+					$("body").stop().animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosY+"px)"},s);
+				}			
 			}else{
-				$("body").css("background-position",bodyBackgroundPos)
+				if ($.browser.msie){//for IE
+					$("body").css("background-position-x",bodyBackgroundPosXFull);
+					$("body").css("background-position-y",bodyBackgroundPosYFull);
+				}else{
+					$("body").css("background-position",bodyBackgroundPos)
+				}								
 			}
 		}
 		
@@ -507,9 +540,17 @@
 		}
 		
 		$(document).ready(function () {
-			bodyBackgroundPos = $("body").css("background-position");
-			bodyBackgroundPosXFull = bodyBackgroundPos.split(" ")[0];
-			bodyBackgroundPosYFull	= bodyBackgroundPos.split(" ")[1];
+			bodyBackgroundPos = $("body").css("background-position");			
+			if (bodyBackgroundPos == 'undefined' || bodyBackgroundPos == null) {
+				//for IE
+				bodyBackgroundPosXFull = $("body").css("background-position-x");
+				bodyBackgroundPosYFull = $("body").css("background-position-y");				
+				bodyBackgroundPos = bodyBackgroundPosXFull+" "+bodyBackgroundPosYFull;
+			} else {
+				bodyBackgroundPosXFull = bodyBackgroundPos.split(" ")[0];
+				bodyBackgroundPosYFull = bodyBackgroundPos.split(" ")[1];
+			}			
+
 			bodyBackgroundPosUnit = bodyBackgroundPosYFull.substr(bodyBackgroundPosYFull.length-1, bodyBackgroundPosYFull.length);
 			
 			if(bodyBackgroundPosUnit=="%"){
@@ -518,7 +559,7 @@
 				bodyBackgroundPosUnit = "px";
 				bodyBackgroundPosY = bodyBackgroundPosYFull.substr(0, bodyBackgroundPosYFull.length-2);				
 			}
-			if(bodyBackgroundPosYFull == "0%"){
+			if(bodyBackgroundPosYFull == "0%" || bodyBackgroundPosYFull == "top"){
 				bodyBackgroundPosUnit = "px";
 				bodyBackgroundPosY = 0;
 			}
@@ -594,6 +635,12 @@
 				move(-1);
 				return false;
 			});		
+			$('#cms_toolbar_loginform a.cms_toolbar_button').click(function () {				
+				$('#cms_toolbar_loginform .cms_submit').trigger('click');
+				return false;
+			});		
+			
+			
 			$(".cms_plugin_holder").each(function (i) {				
 				var cmsPluginHolderFirstObj = $(this).children().eq(0)				
 				$(this).css({
@@ -602,15 +649,15 @@
 				})
 		      });	
 
-
-		     $('#cms_toolbar_templatebutton li a').click(function(){
-			     template = $(this).attr("href").split("#")[1];
-			     $.post("{% url admin:cms_page_change_template page.pk %}", {template:template}, function(){
-				     window.location.reload();
-				     });
-			     return false;
-		     });		
-			
+			{% if page %}
+			     $('#cms_toolbar_templatebutton li a').click(function(){
+				     template = $(this).attr("href").split("#")[1];
+				     $.post("{% url admin:cms_page_change_template page.pk %}", {template:template}, function(){
+					     window.location.reload();
+					     });
+				     return false;
+			     });		
+		    {% endif %}
 			/* PLUGIN */			
 			$("a.cms_toolbar_move_slot").live("click", function(){
 				var target = $(this).attr("rel")
@@ -653,7 +700,7 @@
 						}
 					}
 					if(found){
-						var html = '<li class="%(extra_class)"><a class="cms_toolbar_move_slot" href="#" rel="%(type)s">{% trans 'Move to %(name)s' %}</a></li>'
+						var html = '<li class="%(extra_class)s"><a class="cms_toolbar_move_slot" href="#" rel="%(type)s">{% trans 'Move to %(name)s' %}</a></li>'
 						if (first){
 							first = false;
 							html = html.split("%(extra_class)s").join("first")
@@ -721,38 +768,38 @@
 </script>
 
 <div id="cms_toolbar_mini">
-	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>{% trans "Open" %}</strong></span></a>
+	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
 </div>
 <div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
 	<div id="cms_toolbar_col1">
 		<a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
 		{% if auth %}
-		<div id="cms_toolbar_editmode_toggle">
-			<span>{% trans "Edit mode" %}</span>
-			<a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
-		</div>
-		{% if page.last_page_states %}
-		<div id="cms_toolbar_statusbar">
-			<div>
-				<span>{% trans "Status" %}:</span>
-				<em>
-					{% for state in page.last_page_states %}					
-						{{ state.get_action_display }}	
-					{% endfor %}				
-				</em>
+			{% if page %}
+			<div id="cms_toolbar_editmode_toggle">
+				<span>{% trans "Edit mode" %}</span>
+				<a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
 			</div>
-		</div>		
-		{% endif %}
-		{% else %}
-		<form method="post">
-			<label for="cms_username">{% trans "Username" %}</label>
-			<input type="text" name="cms_username"></input>
-			<label for="cms_password">{% trans "Password" %}</label>
-			<input type="password" name="cms_password"></input>
-			<input type="submit" name="submit" value="{% trans "login" %}"></input>
-			{% if auth_error %}
-			<span class="cms_error">{% trans "Please enter a correct username and password. Note that both fields are case-sensitive." %}</span>
 			{% endif %}
+			{% if page.last_page_states %}
+			<div id="cms_toolbar_statusbar">
+				<div>
+					<span>{% trans "Status" %}:</span>
+					<em>
+						{% for state in page.last_page_states %}					
+							{{ state.get_action_display }}	
+						{% endfor %}				
+					</em>
+				</div>
+			</div>		
+			{% endif %}
+		{% else %}
+		<form method="post" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>
+			<label for="cms_username">{% trans "Username" %}</label>
+			<input type="text" name="cms_username" class="cms_textinput"></input>
+			<label for="cms_password">{% trans "Password" %}</label>
+			<input type="password" name="cms_password" class="cms_textinput"></input>
+			<input type="submit" name="submit" value="{% trans "login" %}" class="cms_submit"></input>
+			<a href="#" class="cms_toolbar_button"><span>{% trans "login" %}</span></a>		
 		</form>
 		{% endif %}	
 	</div>
@@ -807,7 +854,7 @@
 					<li><a href="#">Move to Slot zwei</a></li>
 					<li><a href="#">Move to Slot drei</a></li>
 					<li><a href="#">Move to Slot 4</a></li-->
-					<li class="last"><a href="#"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Plugin" %}</a></li>			
+					<li class="last"><a href="#" class="cms_toolbar_plugin_delete"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Plugin" %}</a></li>			
 				</ul>
 			</div>
 		</div>	
