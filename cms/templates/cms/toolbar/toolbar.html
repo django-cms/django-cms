@@ -299,8 +299,37 @@
 		margin-top:6px;
 	}
 	
-	
-	
+	/* OVERLAY */
+	#nyroModalContent{
+		background:#fff;
+	}
+	.wrapperIframe{
+		position:relative;
+	}
+	h1#nyroModalTitle{
+		font-size:12px;
+		margin:0;
+		padding:0 10px 0 10px;
+		background:transparent url(/media/cms/images/cms_toolbar.png) repeat-x scroll 0 0;
+		border:1px solid #DDDDDD;
+		height:40px;
+		position:relative;
+		color:#5B80B2;
+		line-height:40px;
+		font-weight:normal;
+		overflow:hidden;	
+	}
+	a#closeBut{
+		margin:0;
+		position:absolute;
+		right:10px;
+		top:-36px;
+	}
+	a#closeBut strong{
+		width:7px;
+		background-position:-210px -158px;
+	}
+	a#closeBut:hover strong{background-position:-210px -188px;}	
 </style>
 
 <script type="text/javascript" charset="utf-8">
@@ -398,16 +427,27 @@
 		}
 
 		function edit_plugin(page_id, plugin_id){
-			var html = '<iframe id="iframe_'+page_id+'_'+plugin_id+'" src="{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true" frameborder="0"></iframe>';
+			/*
+			 
+			 var html = '<iframe id="iframe_'+page_id+'_'+plugin_id+'" src="{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true" frameborder="0"></iframe>';
+			*/			
 			$.nyroModalManual({
-				zIndexStart: 100000,
-			    content: html,
-			    width: "200",
-			    height: "200"
-			   
+				zIndexStart: 80000,
+			    type: 'iframe',
+				modal: false,
+				forceType: 'iframe',
+				url: '{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true',
+				padding: 0,
+				minWidth: 800,
+				minHeight: 300,
+				height: 400,
+				closeButton: '<a class="cms_toolbar_button cms_toolbar_iconbutton nyroModalClose" href="#" id="closeBut"><span><strong>Close</strong></span></a>',
+				css: {
+					content: {
+						overflow: 'hidden'
+					}
+				}
 			});
-						
-			//$('#cms_plugin_edit_overlay').html(html);
 		}
 
 		function closeCMStoolbar(){
@@ -467,8 +507,7 @@
 			$(".cms_toolbar_submenu li a").click(function () { 
 				window.location = $(this).attr("href");
 				return false;
-			});
-			
+			});			
 
     		$('#cms_toolbar_edit_button_on').click(function(){
         		window.location = remove_from_url(window.location.href, "edit")
@@ -504,9 +543,14 @@
 				move(-1);
 				return false;
 			});		
+			$(".cms_plugin_holder").each(function (i) {				
+				var cmsPluginHolderFirstObj = $(this).children().eq(0)				
+				$(this).css({
+					float:cmsPluginHolderFirstObj.css("float")
+				})
+		      });			
 			
-			/* PLUGIN */	
-			
+			/* PLUGIN */			
 			$("a.cms_toolbar_move_slot").live("click", function(){
 				var target = $(this).attr("rel")
 				$.post(
@@ -542,8 +586,6 @@
 					var found = false;
 					if(data.type != placeholder){
 						for(j = 0; j < data.plugins.length; j++){
-							console.log(data.plugins[j]);
-							console.log(plugin_type)
 							if(data.plugins[j] == plugin_type){
 								found = true;
 							}
@@ -596,8 +638,8 @@
 		        }			
 				return false;
 			});
-			console.log($('a.cms_toolbar_icon_delete'))
-			$('#cms_plugin_overlay a.cms_toolbar_icon_delete').click(function(){
+			
+			$('a.cms_toolbar_plugin_delete').click(function(){
 		        var question = "{% trans "Are you sure you want to delete this plugin?" %}"
 		        var answer = confirm(question, true);
 		        if(answer){
