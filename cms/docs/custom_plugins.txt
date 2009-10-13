@@ -47,7 +47,10 @@ In there write the following::
 		render_template = "gallery/gallery.html"
 	
 		def render(self, context, instance, placeholder):
-			return context.update({'gallery':instance.gallery, 'placeholder':placeholder})
+			context.update({'gallery':instance.gallery,
+							'object':instance, 
+							'placeholder':placeholder})
+			return context
 	
 	plugin_pool.register_plugin(CMSGalleryPlugin)		
 
@@ -108,17 +111,17 @@ You can limit in which placeholder certain plugins can appear. Add a ``CMS_PLACE
 Example::
 
 	CMS_PLACEHOLDER_CONF = {                        
-	    'content': {
-	        "plugins": ('ContactFormPlugin','FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin'),
-	        "extra_context": {"theme":"16_16"},
+		'content': {
+			"plugins": ('ContactFormPlugin','FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin'),
+			"extra_context": {"theme":"16_16"},
 			"name": gettext("content")
-	    },
+		},
 
-	    'right-column': {
-	        "plugins": ('ContactFormPlugin','TextPlugin', 'SimpleGalleryPublicationPlugin'),
+		'right-column': {
+			"plugins": ('ContactFormPlugin','TextPlugin', 'SimpleGalleryPublicationPlugin'),
 	        "extra_context": {"theme":"16_5"},
 			"name": gettext("right column")
-	    },
+		},
 	
 "**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so plugin-templates can react to them. In this example we give them some parameters that are used in a CSS Grid Framework.
 You can change the displayed name in the admin with the **name** parameter. In combination with gettext you can translate this names according to the language of the user.

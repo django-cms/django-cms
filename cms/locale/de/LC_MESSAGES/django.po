@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-10-10 20:43+0200\n"
-"PO-Revision-Date: 2009-10-12 10:06+0100\n"
+"PO-Revision-Date: 2009-10-12 12:54+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: plugin_base.py:47
-#, fuzzy
 msgid "Advanced options"
 msgstr "Erweiterte Einstellungen"
 
@@ -41,7 +40,6 @@ msgid "Slug"
 msgstr "Slug"
 
 #: admin/forms.py:27
-#, fuzzy
 msgid "The part of the title that is used in the URL"
 msgstr "Die Kurzform des Titels, die in URLs verwendet wird."
 
@@ -70,7 +68,6 @@ msgid "Page Title"
 msgstr "Seitentitel"
 
 #: admin/forms.py:83
-#, fuzzy
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Überschreiben, was im Titel des Browsers oder in den Favoriten erscheint"
 
@@ -83,9 +80,8 @@ msgid "Hook application to this page."
 msgstr "Schliessen sie Applikationen an diese Seite an."
 
 #: admin/forms.py:87
-#, fuzzy
 msgid "Overwrite URL"
-msgstr "Url Überschreibung"
+msgstr "URL Überschreibung"
 
 #: admin/forms.py:88
 msgid "Keep this field empty if standard path should be used."
@@ -108,12 +104,10 @@ msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "Eine Liste von mit Kommas getrennter Schlüsselwörter (wird teilweise von Suchmaschinen genutzt)"
 
 #: admin/forms.py:107
-#, fuzzy
 msgid "A page with this reverse URL id exists already."
-msgstr "Eine andere Seite mit dieser Reverse-URL-ID ist bereits vorhanden"
+msgstr "Eine andere Seite mit dieser Reverse-URL-ID ist bereits vorhanden."
 
 #: admin/forms.py:114
-#, fuzzy
 msgid "Invalid URL, use /my/url format."
 msgstr "Keine korrekte URL. Bitte verwenden sie das Format: /meine/url/ !"
 
@@ -125,7 +119,6 @@ msgid "user"
 msgstr "Benutzer"
 
 #: admin/forms.py:158
-#, fuzzy
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Zum hinzufügen von Seiten muss der Zugriff auf Unterseiten auch ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten Speichervorgang nicht mehr editiert werden."
 
@@ -318,9 +311,8 @@ msgid "Copy moderation"
 msgstr "Moderationen kopieren"
 
 #: docs/templates/defindex.html:2
-#, fuzzy
 msgid "Overview"
-msgstr "Vorschau"
+msgstr "Übersicht"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
@@ -353,9 +345,8 @@ msgid "quick access to all modules"
 msgstr "schnell zugriff auf alle Module"
 
 #: docs/templates/defindex.html:21
-#, fuzzy
 msgid "General Index"
-msgstr "Allgemein"
+msgstr "Allgemeiner Index"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
@@ -387,9 +378,8 @@ msgid "can be huge"
 msgstr "kann gross sein"
 
 #: docs/templates/layout.html:10
-#, fuzzy
 msgid "Navigation"
-msgstr "im Menü"
+msgstr "Navigation"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
@@ -412,7 +402,6 @@ msgid "next chapter"
 msgstr "nächstes Kapitel"
 
 #: docs/templates/layout.html:60
-#, fuzzy
 msgid "This Page"
 msgstr "Nur diese Seite"
 
@@ -443,19 +432,16 @@ msgid "Search"
 msgstr "Suche"
 
 #: docs/templates/layout.html:137
-#, fuzzy
 msgid "Copyright"
-msgstr "rechts"
+msgstr "Copyright"
 
 #: docs/templates/modindex.html:36
-#, fuzzy
 msgid "Deprecated"
-msgstr "erstellt am"
+msgstr "Veraltet"
 
 #: docs/templates/search.html:21
-#, fuzzy
 msgid "search"
-msgstr "Benutzer"
+msgstr "suche"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
@@ -796,9 +782,8 @@ msgid "moderator state"
 msgstr "Moderator Status"
 
 #: models/pagemodel.py:63
-#, fuzzy
 msgid "menu login required"
-msgstr "Login erforderlich!"
+msgstr "Menu Login erforderlich"
 
 #: models/pagemodel.py:63
 msgid "only show this page in the menu if the user is logged in"
@@ -857,7 +842,6 @@ msgid "If none selected, user haves granted permissions to all sites."
 msgstr "Wenn nichts ausgewählt hat der Benutzer Rechte auf allen Seiten."
 
 #: models/permissionmodels.py:53
-#, fuzzy
 msgid "sites"
 msgstr "Website"
 
@@ -972,9 +956,8 @@ msgid "zoom level"
 msgstr "zoom level"
 
 #: plugins/googlemap/models.py:18
-#, fuzzy
 msgid "latitude"
-msgstr "Titel"
+msgstr "Breite"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
@@ -993,23 +976,20 @@ msgid "Calculate your fastest way to here"
 msgstr "Berechne den schnellsten weg hierher"
 
 #: plugins/googlemap/models.py:23
-#, fuzzy
 msgid "route planer"
-msgstr "Vorlage"
+msgstr "Routen Planer"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
 msgstr "Karte"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:74
-#, fuzzy
 msgid "Your address"
-msgstr "adresse"
+msgstr "Ihre Adresse"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:77
-#, fuzzy
 msgid "Calculate route"
-msgstr "Kann Benutzer erstellen"
+msgstr "Route berechnen"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
@@ -1134,9 +1114,8 @@ msgid "body"
 msgstr "Body"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
-#, fuzzy
 msgid "Plugins"
-msgstr "Plugin hinzufügen"
+msgstr "Plugins"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
@@ -1185,23 +1164,20 @@ msgid "Twitter recent entries plugin"
 msgstr "Neuste Twitter Nachrichten Plugin"
 
 #: plugins/twitter/models.py:7
-#, fuzzy
 msgid "twitter user"
-msgstr "Benutzer benachrichtigen"
+msgstr "Twitter Benutzer"
 
 #: plugins/twitter/models.py:8
-#, fuzzy
 msgid "count"
-msgstr "ausschneiden"
+msgstr "anzahl"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
 msgstr "Anzahl Einträge die dargestellt werden"
 
 #: plugins/twitter/models.py:9
-#, fuzzy
 msgid "link hint"
-msgstr "Link"
+msgstr "Link Tip"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
@@ -1403,9 +1379,8 @@ msgid "Save and continue editing"
 msgstr "Speichern und weiter editieren"
 
 #: templates/admin/cms/page/change_list.html:3
-#, fuzzy
 msgid "List of pages"
-msgstr "Letzte Änderungen"
+msgstr "Liste der Seiten"
 
 #: templates/admin/cms/page/change_list.html:8
 #: templates/admin/cms/page/plugin_change_form.html:66
@@ -1437,9 +1412,8 @@ msgid "Pages on:"
 msgstr "Seiten auf: "
 
 #: templates/admin/cms/page/change_list.html:111
-#, fuzzy
 msgid "Filter:"
-msgstr "Filter"
+msgstr "Filter:"
 
 #: templates/admin/cms/page/change_list.html:111
 msgid "on"
@@ -1475,9 +1449,8 @@ msgid "edit this page"
 msgstr "Diese Seite editieren"
 
 #: templates/admin/cms/page/menu_item.html:6
-#, fuzzy
 msgid "edit"
-msgstr "Umleiten"
+msgstr "editieren"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
@@ -1602,7 +1575,6 @@ msgid "All"
 msgstr "Alle"
 
 #: templates/admin/cms/page/permissions.html:49
-#, fuzzy
 msgid "Page doesn't inherit any permissions."
 msgstr "Seite erbt keine Berechtigungen."
 
