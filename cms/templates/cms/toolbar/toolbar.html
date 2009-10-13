@@ -345,6 +345,7 @@
 
 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script> 
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.backgroundposition.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/tools.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.nyroModal-1.5.2.min.js"></script>
 
@@ -428,7 +429,6 @@
 
 		function edit_plugin(page_id, plugin_id){
 			/*
-			 
 			 var html = '<iframe id="iframe_'+page_id+'_'+plugin_id+'" src="{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true" frameborder="0"></iframe>';
 			*/			
 			$.nyroModalManual({
@@ -448,14 +448,15 @@
 					}
 				}
 			});
-		}
-
+		}		
+		
 		function closeCMStoolbar(){
 			$('#cms_toolbar').slideUp();				
 			$('#cms_toolbar_mini').show();
 			$('#cms_toolbar_spacer').slideUp();
 			$.cookie("CMStoolbarColsed", "true", {path:'/', expires:7 });
 			hideCMStoolbarSubmenus();
+			resetBodyBackgroundPos();
 		}
 		
 		function openCMStoolbar(){
@@ -463,6 +464,36 @@
 			$('#cms_toolbar_mini').hide();
 			$('#cms_toolbar_spacer').slideDown();
 			$.cookie("CMStoolbarColsed", "false", {path:'/', expires:7 });
+			initBodyBackgroundPos();
+		}
+		
+		function hideCMSToolbar(){
+			$('#cms_toolbar').hide();
+			$('#cms_toolbar_mini').show();
+			$('#cms_toolbar_spacer').hide();
+			resetBodyBackgroundPos(0);
+		}
+		function showCMSToolbar(){
+			$('#cms_toolbar').show();
+			$('#cms_toolbar_mini').hide();
+			$('#cms_toolbar_spacer').show();			
+			initBodyBackgroundPos(0);						
+		}
+		
+		function initBodyBackgroundPos(s){
+			if(bodyBackgroundPosUnit=="px"){
+				if(s==undefined){s=400;}
+				bodyBackgroundPosYnew = Number(bodyBackgroundPosY)+41;				
+				$("body").animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosYnew+"px)"},s);
+			}			
+		}
+		function resetBodyBackgroundPos(s){
+			if(bodyBackgroundPosUnit=="px") {
+				if(s==undefined){s=400;}
+				$("body").animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosY+"px)"},s);
+			}else{
+				$("body").css("background-position",bodyBackgroundPos)
+			}
 		}
 		
 		function hideCMStoolbarSubmenus(){			
@@ -470,14 +501,26 @@
 		}
 		
 		$(document).ready(function () {
-			if ($.cookie("CMStoolbarColsed") == "true") {
-				$('#cms_toolbar').hide();
-				$('#cms_toolbar_mini').show();
-				$('#cms_toolbar_spacer').hide();
+			bodyBackgroundPos = $("body").css("background-position");
+			bodyBackgroundPosXFull = bodyBackgroundPos.split(" ")[0];
+			bodyBackgroundPosYFull	= bodyBackgroundPos.split(" ")[1];
+			bodyBackgroundPosUnit = bodyBackgroundPosYFull.substr(bodyBackgroundPosYFull.length-1, bodyBackgroundPosYFull.length);
+			
+			if(bodyBackgroundPosUnit=="%"){
+				bodyBackgroundPosY = bodyBackgroundPosYFull.substr(0, bodyBackgroundPosYFull.length-1);
 			}else{
-				$('#cms_toolbar').show();
-				$('#cms_toolbar_mini').hide();
-				$('#cms_toolbar_spacer').show();
+				bodyBackgroundPosUnit = "px";
+				bodyBackgroundPosY = bodyBackgroundPosYFull.substr(0, bodyBackgroundPosYFull.length-2);				
+			}
+			if(bodyBackgroundPosYFull == "0%"){
+				bodyBackgroundPosUnit = "px";
+				bodyBackgroundPosY = 0;
+			}
+			
+			if ($.cookie("CMStoolbarColsed") == "true") {
+				hideCMSToolbar();
+			}else{
+				showCMSToolbar();
 			}			
 			
       		$(document).bind('click', function(e){ 	
@@ -548,7 +591,8 @@
 			$(".cms_plugin_holder").each(function (i) {				
 				var cmsPluginHolderFirstObj = $(this).children().eq(0)				
 				$(this).css({
-					float:cmsPluginHolderFirstObj.css("float")
+					float:cmsPluginHolderFirstObj.css("float"),
+					clear:cmsPluginHolderFirstObj.css("clear")
 				})
 		      });			
 			
@@ -702,8 +746,7 @@
 		</a>{% endif %}
 		<!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
 		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
-			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">	
-						
+			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
 				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">edit</span>{% trans "Site Administration" %}</a></li>
 				{% if auth %}
 				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">Icon</span>{% trans "Move/add Pages" %}</a></li>

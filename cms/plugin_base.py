@@ -66,7 +66,6 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         We just need the popup interface here
         """
-        
         context.update({
             'preview': not "no_preview" in request.GET,
             'is_popup': True,
