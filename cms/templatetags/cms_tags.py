@@ -500,7 +500,7 @@ class PlaceholderNode(template.Node):
             context.update({'theme': self.theme,})
         c = ""
         edit = False
-        if "edit" in request.GET and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
+        if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
             edit = True
         
         if edit:

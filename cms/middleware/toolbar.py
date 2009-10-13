@@ -1,24 +1,18 @@
 """
-Debug Toolbar middleware
+Edit Toolbar middleware
 """
 from cms import settings as cms_settings
-from django.conf import settings
-from django.conf.urls.defaults import include, patterns
-from django.template.loader import render_to_string
-from django.utils.encoding import smart_unicode
-import debug_toolbar.urls
-from django.core.urlresolvers import reverse
+from cms.plugin_pool import plugin_pool
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.plugins import get_placeholders
+from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.core.urlresolvers import reverse
+from django.template.context import Context
 from django.template.defaultfilters import title, safe
-from cms.plugin_pool import plugin_pool
+from django.template.loader import render_to_string
 from django.utils import simplejson
-from django.http import HttpResponseRedirect
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.utils.http import urlquote
-import os
-
-
+from django.utils.encoding import smart_unicode
 
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
@@ -34,8 +28,7 @@ def inster_after_tag(string, tag, insertion):
 
 class ToolbarMiddleware(object):
     """
-    Middleware to set up CMS Toolbar on incoming request and render toolbar
-    on outgoing response.
+    Middleware to set up CMS Toolbar.
     """
 
     def show_toolbar(self, request, response):
@@ -43,25 +36,28 @@ class ToolbarMiddleware(object):
             return False
         if response.status_code != 200:
             return False 
-        if not hasattr(request, "user"):
-            return False
-        if not request.user.is_authenticated() or not request.user.is_staff:
-            return False
         if not response['Content-Type'].split(';')[0] in _HTML_TYPES:
             return False
         if request.path_info.startswith(reverse("admin:index")):
             return False
-        if not request.current_page:
+        if "edit" in request.GET:
+            return True
+        if not hasattr(request, "user"):
+            return False
+        if not request.user.is_authenticated() or not request.user.is_staff:
             return False
         return True
     
     def process_request(self, request):
-        print "hello"
-        print request.GET
-        if "edit" in request.GET and not request.user.is_authenticated():
-            tup=(settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path()))
-            return HttpResponseRedirect('%s?%s=%s' % tup)
-            
+        if request.user.is_authenticated() and request.user.is_staff:
+            if "edit-off" in request.GET:
+                request.session['cms_edit'] = False
+            if "edit" in request.GET:
+                request.session['cms_edit'] = True
+        elif request.method == "POST" and "edit" in request.GET and "cms_username" in request.POST:
+            user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
+            if user:
+                login(request, user)
 
     def process_response(self, request, response):
         if self.show_toolbar(request, response):
@@ -72,7 +68,8 @@ class ToolbarMiddleware(object):
         """
         Renders the Toolbar.
         """
-        edit = "edit" in request.GET
+        auth = request.user.is_authenticated() and request.user.is_staff
+        edit = request.session.get('cms_edit', False) and auth
         page = request.current_page
         move_dict = []
         if edit:
@@ -92,9 +89,14 @@ class ToolbarMiddleware(object):
             data = safe(simplejson.dumps(move_dict))
         else:
             data = {}
-        context = get_admin_menu_item_context(request, page, filtered=False)
+        if auth:
+            context = get_admin_menu_item_context(request, page, filtered=False)
+        else:
+            context = Context()
         context.update({
+            'auth':auth,
             'page':page,
+            'auth_error':not auth and 'cms_username' in request.POST,
             'placeholder_data':data,
             'edit':edit,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,

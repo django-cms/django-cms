@@ -436,7 +436,7 @@
 			    type: 'iframe',
 				modal: false,
 				forceType: 'iframe',
-				url: '{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true',
+				url: '{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true&no_preview',
 				padding: 0,
 				minWidth: 800,
 				minHeight: 300,
@@ -510,12 +510,14 @@
 			});			
 
     		$('#cms_toolbar_edit_button_on').click(function(){
-        		window.location = remove_from_url(window.location.href, "edit")
+        		var url = remove_from_url(window.location.href, "edit");
+        		url = insert_into_url(url, "edit-off", "");
+        		window.location = url;
         		return false;
     		});
 
     		$('#cms_toolbar_edit_button_off').click(function(){
-        		window.location = insert_into_url(window.location.href, "edit", "")
+        		window.location = insert_into_url(window.location.href, "edit", "");
         		return false;
     		});
 			
@@ -665,6 +667,7 @@
 <div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
 	<div id="cms_toolbar_col1">
 		<a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
+		{% if auth %}
 		<div id="cms_toolbar_editmode_toggle">
 			<span>Edit mode</span>
 			<a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
@@ -678,27 +681,46 @@
 					{% endfor %}				
 				</em>
 			</div>
-		</div>			
+		</div>		
+		{% else %}
+		<form method="post">
+			<label for="cms_username">{% trans "Username" %}</label>
+			<input type="text" name="cms_username"></input>
+			<label for="cms_password">{% trans "Password" %}</label>
+			<input type="password" name="cms_password"></input>
+			<input type="submit" name="submit" value="{% trans "login" %}"></input>
+			{% if auth_error %}
+			<span class="cms_error">{% trans "Please enter a correct username and password. Note that both fields are case-sensitive." %}</span>
+			{% endif %}
+		</form>
+		{% endif %}	
 	</div>
+	
 	<div id="cms_toolbar_col2">
-		{% if moderator_should_approve and has_moderate_permission %}<a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="icon approve cms_toolbar_button" title="{% trans 'Approve directly' %}">
+		{% if moderator_should_approve and has_moderate_permission and auth %}<a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="icon approve cms_toolbar_button" title="{% trans 'Approve directly' %}">
 			<span class="state">{{ page_moderator_state.label }}</span>
 		</a>{% endif %}
 		<!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
 		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
-			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
+			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">	
+						
 				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">edit</span>{% trans "Site Administration" %}</a></li>
+				{% if auth %}
 				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">Icon</span>{% trans "Move/add Pages" %}</a></li>
-				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Administration" %}</a></li>
+				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
 				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
 				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">Icon</span>{% trans "View History" %}</a></li>
 				{% endif %}
-				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">delete</span>{% trans "Delete Page" %}</a></li>{% endif %}			
+				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">delete</span>{% trans "Delete Page" %}</a></li>{% endif %}
+				{% endif %}			
 			</ul>
 		</div>
+		{% if auth %}
 		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>Lock</strong><em>Logout</em></span></a>
+		{% endif %}
 		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>Close</strong></span></a>
 	</div>
+
 </div>
 <div id="cms_toolbar_spacer">&nbsp;</div>
 
