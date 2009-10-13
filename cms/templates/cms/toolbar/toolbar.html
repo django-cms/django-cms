@@ -368,6 +368,12 @@
 		var plugin_id = -1;
 		var placeholder = "";
 		var plugin_type = "";
+		var bodyBackgroundPos;
+		var bodyBackgroundPosXFull;
+		var bodyBackgroundPosYFull;
+		var bodyBackgroundPosY;
+		var bodyBackgroundPosUnit;
+		
 
 		function move(direction){
 			var result = new Array();
@@ -483,7 +489,7 @@
 		function initBodyBackgroundPos(s){
 			if(bodyBackgroundPosUnit=="px"){
 				if(s==undefined){s=400;}
-				bodyBackgroundPosYnew = Number(bodyBackgroundPosY)+41;				
+				var bodyBackgroundPosYnew = Number(bodyBackgroundPosY)+41;				
 				$("body").animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosYnew+"px)"},s);
 			}			
 		}
@@ -594,7 +600,16 @@
 					float:cmsPluginHolderFirstObj.css("float"),
 					clear:cmsPluginHolderFirstObj.css("clear")
 				})
-		      });			
+		      });	
+
+
+		     $('#cms_toolbar_templatebutton li a').click(function(){
+			     template = $(this).attr("href").split("#")[1];
+			     $.post("{% url admin:cms_page_change_template page.pk %}", {template:template}, function(){
+				     window.location.reload();
+				     });
+			     return false;
+		     });		
 			
 			/* PLUGIN */			
 			$("a.cms_toolbar_move_slot").live("click", function(){
@@ -706,19 +721,20 @@
 </script>
 
 <div id="cms_toolbar_mini">
-	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
+	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>{% trans "Open" %}</strong></span></a>
 </div>
 <div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
 	<div id="cms_toolbar_col1">
 		<a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
 		{% if auth %}
 		<div id="cms_toolbar_editmode_toggle">
-			<span>Edit mode</span>
+			<span>{% trans "Edit mode" %}</span>
 			<a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
 		</div>
+		{% if page.last_page_states %}
 		<div id="cms_toolbar_statusbar">
 			<div>
-				<span>Status:</span>
+				<span>{% trans "Status" %}:</span>
 				<em>
 					{% for state in page.last_page_states %}					
 						{{ state.get_action_display }}	
@@ -726,6 +742,7 @@
 				</em>
 			</div>
 		</div>		
+		{% endif %}
 		{% else %}
 		<form method="post">
 			<label for="cms_username">{% trans "Username" %}</label>
@@ -745,23 +762,32 @@
 			<span class="state">{{ page_moderator_state.label }}</span>
 		</a>{% endif %}
 		<!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
+		{% if auth and has_change_permission %}
+		<div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>		
+			<ul id="cms_toolbar_template_menu" class="cms_toolbar_submenu">
+				{% for template in templates %}
+				<li class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">{% ifequal template.0 page.template %}<span class="selected">selected</span>{% endifequal %}<a href="#{{ template.0 }}">{{ template.1 }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
 		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
 			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
-				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">edit</span>{% trans "Site Administration" %}</a></li>
+				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">{% trans "edit" %}</span>{% trans "Site Administration" %}</a></li>
 				{% if auth %}
-				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">Icon</span>{% trans "Move/add Pages" %}</a></li>
+				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
 				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
 				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
-				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">Icon</span>{% trans "View History" %}</a></li>
+				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
 				{% endif %}
-				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">delete</span>{% trans "Delete Page" %}</a></li>{% endif %}
+				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
 				{% endif %}			
 			</ul>
 		</div>
 		{% if auth %}
-		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>Lock</strong><em>Logout</em></span></a>
+		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
 		{% endif %}
-		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>Close</strong></span></a>
+		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
 	</div>
 
 </div>
@@ -770,18 +796,18 @@
 <div id="cms_plugin_overlay">
 	<div class="cms_toolbar_plugintools cms_toolbar">
 		<div class="cms_toolbar_plugintools_holder">
-			<a href="#" class="cms_toolbar_plugin_edit cms_toolbar_button cms_toolbar_iconbutton"><span><strong class="cms_toolbar_icon_edit">edit</strong></span></a>			
+			<a href="#" class="cms_toolbar_plugin_edit cms_toolbar_button cms_toolbar_iconbutton"><span><strong class="cms_toolbar_icon_edit">{% trans "edit" %}</strong></span></a>			
 			
-			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>up</strong></span></a>
-			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>down</strong></span></a>				
+			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "up" %}</strong></span></a>
+			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "down" %}</strong></span></a>				
 			
-			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span class="cms_toolbar_submenubutton_content"><strong>Settings</strong><em>arrow</em></span>		
+			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span class="cms_toolbar_submenubutton_content"><strong>{% trans "Settings" %}</strong><em>arrow</em></span>		
 				<ul class="cms_toolbar_submenu">				
-					<li class="first"><a href="#">Move to Slot1</a></li>
+					<!--  li class="first"><a href="#">Move to Slot1</a></li>
 					<li><a href="#">Move to Slot zwei</a></li>
 					<li><a href="#">Move to Slot drei</a></li>
-					<li><a href="#">Move to Slot 4</a></li>
-					<li class="last"><a href="#"><span class="cms_toolbar_icon_delete">delete</span>Delete Plugin</a></li>			
+					<li><a href="#">Move to Slot 4</a></li-->
+					<li class="last"><a href="#"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Plugin" %}</a></li>			
 				</ul>
 			</div>
 		</div>	

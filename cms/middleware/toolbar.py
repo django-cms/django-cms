@@ -96,6 +96,7 @@ class ToolbarMiddleware(object):
         context.update({
             'auth':auth,
             'page':page,
+            'templates': cms_settings.CMS_TEMPLATES,
             'auth_error':not auth and 'cms_username' in request.POST,
             'placeholder_data':data,
             'edit':edit,
