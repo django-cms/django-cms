@@ -445,7 +445,10 @@ def language_chooser(context, template="cms/language_chooser.html"):
         return ''
     
     request = context['request']
-    languages = settings.LANGUAGES
+    languages = []
+    for lang in settings.CMS_LANGUAGES:
+        if lang[0] in settings.CMS_FRONTEND_LANGUAGES:
+            languages.append(lang)
     lang = get_language_from_request(request, request.current_page)
     context.update(locals())
     return context
@@ -513,8 +516,7 @@ class PlaceholderNode(template.Node):
             name = title(name)
             c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                                     'language':request.LANGUAGE_CODE,
-                                                                                    'placeholder':self.name,
-                                                                                    'placeholder_name':name,
+                                                                                    'placeholder_name':self.name,
                                                                                     'page':page})
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name, edit=edit)                

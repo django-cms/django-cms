@@ -103,6 +103,9 @@ CMS_LANGUAGE_CONF = getattr(settings, 'CMS_LANGUAGE_CONF', {})
 # Defines which languages should be offered.
 CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)
 
+# Languages that are visible in the frontend (Language Chooser)
+CMS_FRONTEND_LANGUAGES = getattr(settings, 'CMS_FRONTEND_LANGUAGES', [x[0] for x in CMS_LANGUAGES])
+
 # Defines how long page content should be cached, including navigation
 CMS_CONTENT_CACHE_DURATION = getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60)
 
