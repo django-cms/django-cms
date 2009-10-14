@@ -515,9 +515,10 @@ class PlaceholderNode(template.Node):
                     name = settings.CMS_PLACEHOLDER_CONF[self.name]['name']
             name = title(name)
             c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
-                                                                                    'language':request.LANGUAGE_CODE,
-                                                                                    'placeholder_name':self.name,
-                                                                                    'page':page})
+                                                                   'language':request.LANGUAGE_CODE,
+                                                                   'placeholder_name':name,
+                                                                   'placeholder':self.name,
+                                                                   'page':page})
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name, edit=edit)                
         return c
