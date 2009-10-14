@@ -49,15 +49,15 @@ class ToolbarMiddleware(object):
         return True
     
     def process_request(self, request):
+        if request.method == "POST" and "edit" in request.GET and "cms_username" in request.POST:
+            user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
+            if user:
+                login(request, user)
         if request.user.is_authenticated() and request.user.is_staff:
             if "edit-off" in request.GET:
                 request.session['cms_edit'] = False
             if "edit" in request.GET:
                 request.session['cms_edit'] = True
-        elif request.method == "POST" and "edit" in request.GET and "cms_username" in request.POST:
-            user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
-            if user:
-                login(request, user)
 
     def process_response(self, request, response):
         if self.show_toolbar(request, response):
@@ -76,8 +76,8 @@ class ToolbarMiddleware(object):
             placeholders = get_placeholders(request)
             for placeholder in placeholders:
                 d = {}
-                if placeholder in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder]:
-                    d['name'] =  title(settings.CMS_PLACEHOLDER_CONF[placeholder]["name"])
+                if placeholder in cms_settings.CMS_PLACEHOLDER_CONF and "name" in cms_settings.CMS_PLACEHOLDER_CONF[placeholder]:
+                    d['name'] =  title(cms_settings.CMS_PLACEHOLDER_CONF[placeholder]["name"])
                 else:
                     d['name'] =  title(placeholder)
                 plugins = plugin_pool.get_all_plugins(placeholder)

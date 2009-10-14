@@ -468,7 +468,7 @@
 		function hide_iframe(){
 			$.nyroModalRemove();
 			$('div.wrappe').html("");
-			window.location.reload();
+			window.location = window.location.href;
 		}
 
 		function edit_plugin(page_id, plugin_id){
@@ -674,7 +674,7 @@
 			     $('#cms_toolbar_templatebutton li a').click(function(){
 				     template = $(this).attr("href").split("#")[1];
 				     $.post("{% url admin:cms_page_change_template page.pk %}", {template:template}, function(){
-					     window.location.reload();
+					     window.location = window.location.href;
 					     });
 				     return false;
 			     });		
@@ -686,7 +686,7 @@
 					"{% url admin:cms_page_move_plugin %}", 
 					{ placeholder: target, plugin_id: plugin_id },
 					function(data){
-				    	window.location.reload();
+				    	window.location = window.location.href;
 					});
 				return false;
 			});
@@ -785,7 +785,7 @@
 		        var answer = confirm(question, true);
 		        if(answer){
 		            $.post("{% url admin:cms_page_remove_plugin %}", { plugin_id:plugin_id }, function(data){
-		                window.location.reload();
+		                window.location = window.location.href;
 		            }, "html");
 		        }
 		        return false;

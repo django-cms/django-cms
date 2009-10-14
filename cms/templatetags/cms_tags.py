@@ -16,6 +16,7 @@ from cms.utils import navigation
 from cms.utils.i18n import get_fallback_languages
 from django.template.loader import render_to_string
 from cms.plugin_pool import plugin_pool
+from django.template.defaultfilters import title
 
 
 register = template.Library()
@@ -505,9 +506,15 @@ class PlaceholderNode(template.Node):
         
         if edit:
             installed_plugins = plugin_pool.get_all_plugins(self.name)
+            name = self.name
+            if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
+                if "name" in settings.CMS_PLACEHOLDER_CONF[self.name]:
+                    name = settings.CMS_PLACEHOLDER_CONF[self.name]['name']
+            name = title(name)
             c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                                     'language':request.LANGUAGE_CODE,
-                                                                                    'placeholder_name':self.name,
+                                                                                    'placeholder':self.name,
+                                                                                    'placeholder_name':name,
                                                                                     'page':page})
         for plugin in plugins:
             c += plugin.render_plugin(context, self.name, edit=edit)                

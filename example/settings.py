@@ -169,7 +169,7 @@ CMS_PLACEHOLDER_CONF = {
     'fancy-content': {
         "plugins": ('TextPlugin', 'LinkPlugin'),
         "extra_context": {"theme":"16_11"},
-        "name":gettext("fancy content"),
+        "name":gettext("fancy content custom name"),
     },
 }
 
