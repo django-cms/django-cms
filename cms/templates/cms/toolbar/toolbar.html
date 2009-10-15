@@ -608,17 +608,17 @@
 					if(wasOpen == false){
 						cmsClicked.addClass("open");
 					}					
-					return false;
+					//return false;
 				}
 				if(cmsSubmenuHit == false){
 					hideCMStoolbarSubmenus();
 				}
     		});
 			
-			$(".cms_toolbar_submenu li a").click(function () { 
+			/*$(".cms_toolbar_submenu li a").click(function () { 
 				window.location = $(this).attr("href");
 				return false;
-			});			
+			});*/			
 
     		$('#cms_toolbar_edit_button_on').click(function(){
         		var url = remove_from_url(window.location.href, "edit");
@@ -676,6 +676,7 @@
 				     $.post("{% url admin:cms_page_change_template page.pk %}", {template:template}, function(){
 					     window.location = window.location.href;
 					     });
+				     hideCMStoolbarSubmenus();
 				     return false;
 			     });		
 		    {% endif %}
@@ -755,15 +756,12 @@
 				hideCMStoolbarSubmenus();
 			});
 			
-			$("div.cms_toolbar_placeholder_plugins .cms_toolbar_submenuselect li a").click(function(){
+			$("div.cms_toolbar_placeholder_plugins li a").click(function(e){
 		        var select = $(this);
 		        var pluginvalue = select.attr('rel');
 		        var div = $(this).parent().parent().parent().parent();
-		       
 		        var placeholder = div.attr("rel")
-		        
 		        var splits = div.attr("id").split("cms_placeholder_")[1].split("_");
-
 		        var page_id = splits[1];
 		        var language = splits[0];
 		        if (!language) {
@@ -776,7 +774,8 @@
 		                    edit_plugin(page_id, data);
 		                }
 		            }, "html" );
-		        }			
+		        }	
+		        hideCMStoolbarSubmenus();
 				return false;
 			});
 			
@@ -788,6 +787,7 @@
 		                window.location = window.location.href;
 		            }, "html");
 		        }
+		        hideCMStoolbarSubmenus();
 		        return false;
 		    });
 			

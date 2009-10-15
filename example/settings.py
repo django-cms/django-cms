@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'cms.plugins.twitter',
     'mptt',
     'reversion',
-    #'example.categories',
+    'example.categories',
     #'debug_toolbar',
     'south',
     # sample application
