@@ -19,7 +19,7 @@ class GoogleMap(CMSPlugin):
         help_text=_('Use latitude & longitude to fine tune the map possiton.'))
     lng = models.DecimalField(_('longitude'), max_digits=10, decimal_places=6, null=True, blank=True)
     
-    route_planer_title = models.CharField(_("rout planer title"), max_length=150, blank=True, null=True, default=_("Calculate your fastest way to here"))
+    route_planer_title = models.CharField(_("route planer title"), max_length=150, blank=True, null=True, default=_("Calculate your fastest way to here"))
     route_planer = models.BooleanField(_("route planer"), default=False)
     
     def __unicode__(self):

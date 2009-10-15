@@ -3,7 +3,7 @@
 	<div class="col1">
 		{% if has_change_permission %}
 			<a href="{{ url }}{{ page.id }}" class="title" title="{% trans "edit this page" %}">{{ page.get_menu_title }}</a>	
-			<a href="{{ url }}{{ page.id }}" class="changelink" title="{% trans "edit this page" %}">edit</a>
+			<a href="{{ url }}{{ page.id }}" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>
 		{% endif %}
