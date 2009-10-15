@@ -193,13 +193,12 @@ class PageAdmin(admin.ModelAdmin):
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
-            
-            pat(r'/add-plugin/$', add_plugin),
-            url(r'/edit-plugin/([0-9]+)/$',
+            pat(r'add-plugin/$', add_plugin),
+            url(r'edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
-            pat(r'^/remove-plugin/$', remove_plugin),
-            pat(r'^/move-plugin/$', move_plugin),
+            pat(r'remove-plugin/$', remove_plugin),
+            pat(r'move-plugin/$', move_plugin),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/change-status/$', change_status),
@@ -214,7 +213,7 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog            
         )
         
-        url_patterns.extend(super(PageAdmin, self).get_urls())
+        url_patterns = url_patterns + super(PageAdmin, self).get_urls()
         return url_patterns
     
     def redirect_jsi18n(self, request):
