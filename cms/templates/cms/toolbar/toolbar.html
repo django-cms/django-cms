@@ -607,18 +607,12 @@
 					hideCMStoolbarSubmenus();					
 					if(wasOpen == false){
 						cmsClicked.addClass("open");
-					}					
-					//return false;
+					}										//return false;
 				}
 				if(cmsSubmenuHit == false){
 					hideCMStoolbarSubmenus();
 				}
-    		});
-			
-			/*$(".cms_toolbar_submenu li a").click(function () { 
-				window.location = $(this).attr("href");
-				return false;
-			});*/			
+    		});	
 
     		$('#cms_toolbar_edit_button_on').click(function(){
         		var url = remove_from_url(window.location.href, "edit");
