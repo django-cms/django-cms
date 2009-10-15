@@ -174,7 +174,8 @@ CMS_PLACEHOLDER_CONF = {
 }
 
 
-CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
+CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),
+                            ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),)
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True
