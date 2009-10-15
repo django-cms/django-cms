@@ -208,8 +208,6 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/change-moderation/$', change_moderation),
-            
-            # NOTE: revert plugin is newly integrated in overriden revision_view
             pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page 
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
