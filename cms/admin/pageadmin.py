@@ -194,12 +194,12 @@ class PageAdmin(admin.ModelAdmin):
         
         url_patterns = patterns('',
             
-            pat(r'^.+/add-plugin/$', add_plugin),
-            url(r'^.+/edit-plugin/([0-9]+)/$',
+            pat(r'/add-plugin/$', add_plugin),
+            url(r'/edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
-            pat(r'^(?:[0-9]+)/remove-plugin/$', remove_plugin),
-            pat(r'^(?:[0-9]+)/move-plugin/$', move_plugin),
+            pat(r'^/remove-plugin/$', remove_plugin),
+            pat(r'^/move-plugin/$', move_plugin),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/change-status/$', change_status),
