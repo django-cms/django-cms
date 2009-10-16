@@ -120,6 +120,8 @@ class Page(MpttPublisher):
                 tree = []
         else:
             tree = []
+        if tree:
+            tree[0].old_pk = tree[0].pk
         first = True
         for page in descendants:
            
