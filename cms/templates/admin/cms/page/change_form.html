@@ -3,7 +3,9 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
+{{ block.super.super }}
+<script type="text/javascript" src="{% url admin:jsi18n %}"></script>
+{{ media }}
 {% if not add %}
 	<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_form.js"></script>
 {% endif %}

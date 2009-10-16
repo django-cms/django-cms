@@ -4,7 +4,10 @@ class NavigationNode(object):
     def __init__(self, title, url):
         self.title = title
         self.url = url
+        self.childrens = []
     def get_title(self):
+        return self.title
+    def get_page_title(self):
         return self.title
     def get_menu_title(self):
         return self.title
