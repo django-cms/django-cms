@@ -167,7 +167,8 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     ids.remove(page.pk)
             if current_page and page.pk == current_page.pk and not getattr(current, 'ancestor', False):
                     page.selected = True
-                    mark_descendants(page.childrens)
+                    if hasattr(page, "childrens"):
+                        mark_descendants(page.childrens)
             if page.pk in ancestors:
                 page.ancestor = True
             if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk and not getattr(current, 'ancestor', False):
