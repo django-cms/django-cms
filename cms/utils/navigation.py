@@ -1,4 +1,4 @@
-from cms import settings 
+from django.conf import settings 
 
 class NavigationNode(object):
     def __init__(self, title, url):

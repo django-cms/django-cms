@@ -1,9 +1,9 @@
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from cms.models import Title, PagePermission, Page, PageModerator
-from cms import settings
 from cms.utils import get_language_from_request, find_children
-from django.contrib.sites.models import Site
 from cms.utils.permissions import get_user_sites_queryset
 from cms.exceptions import NoHomeFound
 from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN,\

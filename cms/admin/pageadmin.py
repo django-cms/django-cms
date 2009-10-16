@@ -1,4 +1,22 @@
-from cms import settings
+import os
+from copy import deepcopy
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import unquote
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.forms import Widget, Textarea, CharField
+from django.http import HttpResponseRedirect, HttpResponse, Http404,\
+    HttpResponseBadRequest, HttpResponseForbidden
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title
+from django.utils.encoding import force_unicode
+from django.utils.functional import curry
+from django.utils.translation import ugettext as _
+
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
@@ -20,23 +38,6 @@ from cms.utils.moderator import update_moderation_message, \
     will_require_moderation
 from cms.utils.permissions import has_page_add_permission, \
     get_user_permission_level, has_global_change_permissions_permission
-from copy import deepcopy
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote
-from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.core.urlresolvers import reverse
-from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404,\
-    HttpResponseBadRequest, HttpResponseForbidden
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import title
-from django.utils.encoding import force_unicode
-from django.utils.functional import curry
-from django.utils.translation import ugettext as _
-from os.path import join
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -122,14 +123,14 @@ class PageAdmin(admin.ModelAdmin):
       
     class Media:
         css = {
-            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
             )]
         }
-        js = [join(settings.CMS_MEDIA_URL, path) for path in (
+        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
             'js/lib/jquery.js',
             'js/lib/jquery.query.js',
             'js/lib/ui.core.js',

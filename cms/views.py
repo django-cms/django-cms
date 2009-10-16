@@ -1,4 +1,4 @@
-from cms import settings
+from django.conf import settings
 from cms.appresolver import applications_page_check
 from cms.utils import auto_render, get_template_from_request, \
     get_language_from_request

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django import template
 from django.core.cache import cache
 from django.core.mail import send_mail, mail_managers
@@ -6,7 +7,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import NoHomeFound
 
-from cms import settings
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
 from cms.utils import get_language_from_request,\

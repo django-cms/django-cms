@@ -1,8 +1,8 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 from posixpath import join, basename, splitext, exists
-from cms import settings as cms_settings
 from django.conf import settings
 
 class File(CMSPlugin):
@@ -27,7 +27,7 @@ class File(CMSPlugin):
     # CMS_ICON_EXTENSIONS and CMS_ICON_PATH are assumed to be plugin-specific, and not included in cms.settings
     # -- they are therefore imported from django.conf.settings
     ICON_EXTENSIONS = getattr(settings, "CMS_FILE_ICON_EXTENSIONS", ('gif', 'png'))
-    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", join(cms_settings.CMS_MEDIA_PATH, "images", "file_icons"))
+    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", join(settings.CMS_MEDIA_PATH, "images", "file_icons"))
     
     def get_icon_url(self):
         base = join(self.ICON_PATH, self.get_ext())

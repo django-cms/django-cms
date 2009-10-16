@@ -2,7 +2,7 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
-from cms import settings
+from django.conf import settings
 
 from cms.utils.i18n import get_default_language
 

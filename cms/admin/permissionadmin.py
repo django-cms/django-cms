@@ -1,4 +1,4 @@
-from cms import settings
+from django.conf import settings
 from cms.admin.forms import GlobalPagePermissionAdminForm, \
     PagePermissionInlineAdminForm
 from cms.admin.models import BaseInlineFormSetWithQuerySet

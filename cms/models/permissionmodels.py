@@ -1,4 +1,3 @@
-from cms import settings
 from cms.models.managers import BasicPagePermissionManager, \
     PagePermissionManager
 from cms.models.moderatormodels import ACCESS_CHOICES, \

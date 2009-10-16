@@ -1,17 +1,18 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpResponseBadRequest
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 from django.template.context import RequestContext
+from django.conf import settings
+from django.template.defaultfilters import escapejs, force_escape
+from django.views.decorators.http import require_POST
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
-from cms import settings
 from cms.models import Page, Title, CMSPlugin, MASK_CHILDREN, MASK_DESCENDANTS,\
     MASK_PAGE
 from cms.plugin_pool import plugin_pool
-from django.template.defaultfilters import escapejs, force_escape
-from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+
 
 @require_POST
 def change_status(request, page_id):
@@ -69,11 +70,11 @@ def add_plugin(request):
             position = None
 
         if not page.has_change_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
+            return HttpResponseForbidden(ugettext("You do not have permission to change this page"))
 
         # Sanity check to make sure we're not getting bogus values from JavaScript:
         if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+            return HttpResponseBadRequest(ugettext("Language must be set to a supported language!"))
         
         plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
 

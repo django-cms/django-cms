@@ -1,9 +1,9 @@
-from cms.models import CMSPlugin
-from cms.exceptions import SubClassNeededError
+from django.conf import settings
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.contrib import admin
-from cms import settings as cms_settings
+from cms.models import CMSPlugin
+from cms.exceptions import SubClassNeededError
  
 class CMSPluginBase(admin.ModelAdmin):
     name = ""
@@ -69,7 +69,7 @@ class CMSPluginBase(admin.ModelAdmin):
         context.update({
             'is_popup': True,
             'plugin': self.cms_plugin_instance,
-            'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
+            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
         })
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)

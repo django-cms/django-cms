@@ -1,4 +1,4 @@
-from cms import settings
+from django.conf import settings
 
 def media(request):
     """

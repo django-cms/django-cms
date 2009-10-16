@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.db.models import signals
 from django.contrib.auth.models import User, Group
-from cms import settings
+
 from cms.models import PagePermission, GlobalPagePermission, Page
 from cms.cache.permissions import clear_user_permission_cache,\
     clear_permission_cache
