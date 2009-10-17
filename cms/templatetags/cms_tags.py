@@ -68,7 +68,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         alist = None
         if current_page:
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
-        if alist == None:# maybe the active node is in an extender?
+        if not alist:  # == None:# maybe the active node is in an extender?
             alist = []
             extenders = page_queryset.published().filter(in_navigation=True, 
                                                         site=site, 
