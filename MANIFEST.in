@@ -1,3 +1,11 @@
 include AUTHORS
 include LICENSE
 include README.md
+recursive-include cms/templates *.html *.css *.js
+recursive-include cms/docs *.html *.css *.js *.png
+recursive-include cms/media *.html *.css *.js *.gif *.jpg *.png
+recursive-include cms/plugins *.html *.css *.js
+recursive-include example *.html *.css *.js *.jpg *.gif *.png
+recursive-include cms/fixtures *.json
+recursive-include mptt/tests/fixtures *.json
+
