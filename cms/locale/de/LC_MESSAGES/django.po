@@ -21,7 +21,7 @@ msgstr ""
 
 #: settings.py:22
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Template von übergeordneter Seite übernehmen"
 
 #: admin/forms.py:23
 msgid "Title"
@@ -83,7 +83,7 @@ msgstr "Url Überschreibung"
 #: admin/forms.py:78
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
-"Lassen Sie dieses Feld leer wenn der standart Pfad verwendet werden soll."
+"Lassen Sie dieses Feld leer wenn der Standard-Pfad verwendet werden soll."
 
 #: admin/forms.py:84
 msgid "Redirect"
@@ -132,7 +132,7 @@ msgstr "Seiten hinzufügen Berechtigung benötigt auch die Editier-Berechtigung"
 #: admin/forms.py:177
 #, fuzzy
 msgid "Please select user or group first."
-msgstr "Bitte wählen Sie ein Plugin Type"
+msgstr "Bitte wählen Sie einen Plugin Typ"
 
 #: admin/forms.py:184 admin/forms.py:191 admin/forms.py:195
 #: templates/admin/cms/page/plugin_change_form.html:69
@@ -181,11 +181,13 @@ msgstr "E-Mail-Benachrichtigung benötigt eine gültige E-Mail-Adresse."
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr ""
+"Die Berechtigung 'Seiten hinzufügen' erfordert zusätzlich die Berechtingung 'Seiten ändern'"
 
 #: admin/forms.py:297
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
+"Die Berechtigung 'Benutzer hinzufügen' erfordert zusätzlich die Berechtingung 'Benutzer ändern'"
 
 #: admin/forms.py:299
 msgid "To add permissions you also need to edit them!"
@@ -739,15 +741,15 @@ msgstr "Hinzufügen"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr ""
+msgstr "PLZ"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr ""
+msgstr "Ort"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr ""
+msgstr "Zusätzlicher Inhalt"
 
 #: plugins/googlemap/models.py:16
 #, fuzzy
@@ -756,7 +758,7 @@ msgstr "Auf Seitenebene"
 
 #: plugins/googlemap/models.py:23
 msgid "Map"
-msgstr ""
+msgstr "Karte"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
@@ -841,7 +843,7 @@ msgstr "Snippet"
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr ""
+msgstr "Fehlendes Template '%(template)s'"
 
 #: plugins/snippet/models.py:15 plugins/snippet/migrations/0001_initial.py:14
 msgid "HTML"
@@ -919,7 +921,7 @@ msgstr "Kein Plugin Objekt"
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: plugins/video/models.py:17
 #, fuzzy
@@ -937,21 +939,21 @@ msgstr "Seite"
 
 #: plugins/video/models.py:23
 msgid "window"
-msgstr ""
+msgstr "Fenster (window)"
 
 #: plugins/video/models.py:24
 #, fuzzy
 msgid "opaque"
-msgstr "Seite"
+msgstr "Undurchsichtig (opaque)"
 
 #: plugins/video/models.py:25
 msgid "transparent"
-msgstr ""
+msgstr "Durchsichtig (transparent)"
 
 #: plugins/video/models.py:28
 #, fuzzy
 msgid "movie"
-msgstr "Anzeigen"
+msgstr "Film"
 
 #: plugins/video/models.py:29 plugins/videoplayer/models.py:11
 #, fuzzy
@@ -960,24 +962,24 @@ msgstr ".swf datei"
 
 #: plugins/video/models.py:34
 msgid "auto load"
-msgstr ""
+msgstr "Automatisch laden"
 
 #: plugins/video/models.py:35
 msgid "auto play"
-msgstr ""
+msgstr "Automatisch starten"
 
 #: plugins/video/models.py:36
 msgid "loop"
-msgstr ""
+msgstr "Wiederholen"
 
 #: plugins/video/models.py:37
 #, fuzzy
 msgid "volume"
-msgstr "Start"
+msgstr "Lautstärke"
 
 #: plugins/video/models.py:37
 msgid "in range <0, 100>"
-msgstr ""
+msgstr "im Bereich 0 .. 100"
 
 #: plugins/video/models.py:39
 msgid "click_url"
@@ -989,24 +991,24 @@ msgstr ""
 
 #: plugins/video/models.py:43
 msgid "bgcolor"
-msgstr ""
+msgstr "Hintergrundfarbe"
 
 #: plugins/video/models.py:43
 msgid "Hexadecimal, eg fff000"
-msgstr ""
+msgstr "Hexadezimal (z.B. fff000)"
 
 #: plugins/video/models.py:44
 msgid "fullscreen"
-msgstr ""
+msgstr "Vollbild"
 
 #: plugins/video/models.py:45
 #, fuzzy
 msgid "wmode"
-msgstr "moderieren"
+msgstr "Flash Hintergrund (wmode)"
 
 #: plugins/video/models.py:46
 msgid "flash menu"
-msgstr ""
+msgstr "Flash Menu"
 
 #: plugins/videoplayer/cms_plugins.py:8
 #, fuzzy
