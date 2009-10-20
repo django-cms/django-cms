@@ -23,8 +23,9 @@ class PluginModelBase(ModelBase):
             if base.__name__ == "CMSPlugin":
                 found = True
         if found:
-            table = "cmsplugin_" + new_class._meta.db_table.split("_")[1]
-            new_class._meta.db_table = table
+            if new_class._meta.db_table.startswith("%s_" % new_class._meta.app_label):
+                table = "cmsplugin_" + new_class._meta.db_table.split("%s_" % new_class._meta.app_label, 1)[1]
+                new_class._meta.db_table = table
         return new_class 
          
     
@@ -85,11 +86,11 @@ class CMSPlugin(MpttPublisher):
             instance = self
         return instance, plugin
     
-    def render_plugin(self, context=None, placeholder=None):
+    def render_plugin(self, context=None, placeholder=None, admin=False):
         instance, plugin = self.get_plugin_instance()
         if context is None:
             context = Context()
-        if instance:
+        if instance and not (admin and not plugin.admin_preview):
             context = plugin.render(context, instance, placeholder)
             template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
             if not template:

@@ -1,6 +1,6 @@
 {% extends "admin/change_list.html" %}
 {% load adminmedia admin_list i18n cms_admin js %}
-{% block title %}List of pages{% endblock %}
+{% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
 {% if not is_popup %}{% block breadcrumbs %}
@@ -56,7 +56,7 @@
 	    msg.fadeOut(3000);
 	}
 	function moveError(node){
-		var msg = $('<span class="success">An error occured. Please reload the page</span>');
+		var msg = $('<span class="success">{% trans "An error occured. Please reload the page" %}</span>');
 		node.append(msg);
 	}
 	// some settings used by javascript functions
@@ -108,7 +108,7 @@
 {% if cl.has_filters %}
 
 
-<a href="javascript:showchangelistfilter();" id="changelist-filter-button">Filter: {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
+<a href="javascript:showchangelistfilter();" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
 <div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>
 {% for spec in cl.filter_specs %}

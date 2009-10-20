@@ -26,10 +26,12 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404,\
+    HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
+from django.template.context import RequestContext, Context
 from django.template.defaultfilters import title
 from django.utils.encoding import force_unicode
 from django.utils.functional import curry
@@ -45,7 +47,7 @@ class PageAdmin(admin.ModelAdmin):
     
     exclude = ['created_by', 'changed_by', 'lft', 'rght', 'tree_id', 'level']
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
-    top_fields = ['language']
+    top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
     advanced_fields = ['reverse_id',  'overwrite_url', 'login_required', 'menu_login_required']
@@ -161,7 +163,7 @@ class PageAdmin(admin.ModelAdmin):
         elif url.endswith('/change-navigation'):
             return change_innavigation(request, unquote(url[:-18]))
         elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
-            return HttpResponseRedirect("../../../jsi18n/")
+            return HttpResponseRedirect(reverse('admin:jsi18n'))
         elif url.endswith('/permissions'):
             return self.get_permissions(request, unquote(url[:-12]))
         elif url.endswith('/moderation-states'):
@@ -191,13 +193,12 @@ class PageAdmin(admin.ModelAdmin):
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
-            
-            pat(r'^.+/add-plugin/$', add_plugin),
-            url(r'^.+/edit-plugin/([0-9]+)/$',
+            pat(r'add-plugin/$', add_plugin),
+            url(r'edit-plugin/([0-9]+)/$',
                 self.admin_site.admin_view(curry(edit_plugin, admin_site=self.admin_site)),
                 name='%s_edit_plugin' % info),
-            pat(r'^(?:[0-9]+)/remove-plugin/$', remove_plugin),
-            pat(r'^(?:[0-9]+)/move-plugin/$', move_plugin),
+            pat(r'remove-plugin/$', remove_plugin),
+            pat(r'move-plugin/$', move_plugin),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/change-status/$', change_status),
@@ -206,19 +207,17 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/change-moderation/$', change_moderation),
-            
-            # NOTE: revert plugin is newly integrated in overriden revision_view
             pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page 
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog            
         )
         
-        url_patterns.extend(super(PageAdmin, self).get_urls())
+        url_patterns = url_patterns + super(PageAdmin, self).get_urls()
         return url_patterns
     
     def redirect_jsi18n(self, request):
-            return HttpResponseRedirect("../../../jsi18n/")
+            return HttpResponseRedirect(reverse('admin:jsi18n'))
     
     def save_model(self, request, obj, form, change):
         """
@@ -310,13 +309,13 @@ class PageAdmin(admin.ModelAdmin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder in get_placeholders(request, template):
-                if placeholder.name not in self.mandatory_placeholders:
-                    if placeholder.name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder.name]:
-                        name = settings.CMS_PLACEHOLDER_CONF[placeholder.name]["name"]
+            for placeholder_name in get_placeholders(request, template):
+                if placeholder_name not in self.mandatory_placeholders:
+                    if placeholder_name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
+                        name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]["name"]
                     else:
-                        name = placeholder.name
-                    given_fieldsets += [(title(name), {'fields':[placeholder.name], 'classes':['plugin-holder']})]
+                        name = placeholder_name
+                    given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
@@ -325,22 +324,17 @@ class PageAdmin(admin.ModelAdmin):
                 given_fieldsets.append(seo) 
         else: # new page
             given_fieldsets = deepcopy(self.add_fieldsets)
-                
+
         return given_fieldsets
-    
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        if not "language" in request.GET and obj:
-            titles = Title.objects.filter(page=obj)
-            try:
-                language = titles[0].language
-            except:
-                language = get_language_from_request(request, obj)
-        else:
-            language = get_language_from_request(request, obj)
+        
+        language = get_language_from_request(request, obj)
+        
         if obj:
             self.inlines = PAGE_ADMIN_INLINES
             if not obj.has_publish_permission(request) and not 'published' in self.exclude:
@@ -350,9 +344,8 @@ class PageAdmin(admin.ModelAdmin):
 
             if not settings.CMS_SOFTROOT and 'soft_root' in self.exclude:
                 self.exclude.remove('soft_root')
-            
+
             form = super(PageAdmin, self).get_form(request, obj, **kwargs)
-            form.base_fields['language'].initial = force_unicode(language)
             version_id = None
             versioned = False
             if "history" in request.path or 'recover' in request.path:
@@ -361,8 +354,7 @@ class PageAdmin(admin.ModelAdmin):
         else:
             self.inlines = []
             form = PageAddForm
-        form.base_fields['language'].initial = force_unicode(language)
-        
+
         if obj:
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
@@ -387,9 +379,9 @@ class PageAdmin(admin.ModelAdmin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(template)
             
-            for placeholder in get_placeholders(request, template):
-                if placeholder.name not in self.mandatory_placeholders:
-                    installed_plugins = plugin_pool.get_all_plugins(placeholder.name)
+            for placeholder_name in get_placeholders(request, template):
+                if placeholder_name not in self.mandatory_placeholders:
+                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name)
                     plugin_list = []
                     if obj:
                         if versioned:
@@ -402,7 +394,7 @@ class PageAdmin(admin.ModelAdmin):
                             for rev in revs:
                                 obj = rev.object
                                 if obj.__class__ == CMSPlugin:
-                                    if obj.language == language and obj.placeholder == placeholder.name and not obj.parent_id:
+                                    if obj.language == language and obj.placeholder == placeholder_name and not obj.parent_id:
                                         if obj.get_plugin_class() == CMSPlugin:
                                             plugin_list.append(obj)
                                         else:
@@ -414,9 +406,9 @@ class PageAdmin(admin.ModelAdmin):
                                     bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
                                     plugin_list.append(plugin)
                         else:
-                            plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder.name, parent=None).order_by('position')
+                            plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
                     widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
-                    form.base_fields[placeholder.name] = CharField(widget=widget, required=False)
+                    form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
@@ -459,24 +451,30 @@ class PageAdmin(admin.ModelAdmin):
         if not isinstance(widget(), Widget):
             widget = Textarea
         return widget
-    
+
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        
+
         if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
             moderation_required = will_require_moderation(request.GET['target'], request.GET['position'])
-            
+
             extra_context.update({
                 'moderation_required': moderation_required,
                 'moderation_level': _('higher'),
                 'show_save_and_continue':True,
             })
+
+        language = get_language_from_request(request)
+        extra_context.update({
+            'language': language,
+        })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
     
     def change_view(self, request, object_id, extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
+
         try:
             obj = self.model.objects.get(pk=object_id)
         except self.model.DoesNotExist:
@@ -489,37 +487,45 @@ class PageAdmin(admin.ModelAdmin):
             moderation_level, moderation_required = get_test_moderation_level(obj, request.user)
             
             # if there is a delete request for this page
-            moderation_delete_request = settings.CMS_MODERATOR and obj.pagemoderatorstate_set.get_delete_actions().count()
+            moderation_delete_request = (settings.CMS_MODERATOR and
+                    obj.pagemoderatorstate_set.get_delete_actions(
+                    ).count())
+
             
+            #activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
-                'language': get_language_from_request(request),
-                'traduction_language': settings.CMS_LANGUAGES,
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
-                
                 'moderation_level': moderation_level,
                 'moderation_required': moderation_required,
                 'moderator_should_approve': moderator_should_approve(request, obj),
-                
                 'moderation_delete_request': moderation_delete_request,
             }
+            extra_context = self.update_language_tab_context(request, obj, extra_context)
+        tab_language = request.GET.get("language", None)
+        response = super(PageAdmin, self).change_view(request, object_id, extra_context)
         
-        return super(PageAdmin, self).change_view(request, object_id, extra_context)
+        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
+            location = response._headers['location']
+            response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+        return response
     
-    # since we have 2 step wizard now, this is not required anymore
-    
-    #def response_add(self, request, obj, post_url_continue='../%s/'):
-    #    """Called always when new object gets created, there may be some new 
-    #    stuff, which should be published after all other objects on page are 
-    #    collected. E.g. title, plugins, etc...
-    #    """
-    #    obj.save(commit=False)
-    #    return super(PageAdmin, self).response_add(request, obj, post_url_continue)
-    
+    def update_language_tab_context(self, request, obj=None, context=None):
+        if not context:
+            context = {}
+        language = get_language_from_request(request, obj)
+        context.update({
+            'language': language,
+            'traduction_language': settings.CMS_LANGUAGES,
+            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
+        })
+        return context
+        
+  
     def response_change(self, request, obj):
         """Called always when page gets changed, call save on page, there may be
         some new stuff, which should be published after all other objects on page 
@@ -607,7 +613,6 @@ class PageAdmin(admin.ModelAdmin):
             'app_label': app_label,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
-            
             'CMS_PERMISSION': settings.CMS_PERMISSION,
             'CMS_MODERATOR': settings.CMS_MODERATOR,
             'has_recover_permission': self.has_recover_permission(request),
@@ -626,21 +631,26 @@ class PageAdmin(admin.ModelAdmin):
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
+        
+        
         return super(PageAdmin, self).recoverlist_view(request, extra_context)
     
     def recover_view(self, request, version_id, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
+        extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).recover_view(request, version_id, extra_context)
     
     def revision_view(self, request, object_id, version_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
+        extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
     
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
+        extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).history_view(request, object_id, extra_context)
     
     def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
@@ -701,15 +711,17 @@ class PageAdmin(admin.ModelAdmin):
             page = self.model.objects.get(pk=page_id)
             target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
-            return HttpResponse("error")
+            return HttpResponseBadRequest("error")
             
         # does he haves permissions to do this...?
         if not page.has_move_page_permission(request) or \
             not target.has_add_permission(request):
-                return HttpResponse("Denied")
+                return HttpResponseForbidden("Denied")
+        
         # move page
         page.move_page(target, position)
-        return HttpResponse("ok")
+        return render_admin_menu_item(request, page)
+        
     
     
     def get_permissions(self, request, page_id):
@@ -856,10 +868,11 @@ class PageAdmin(admin.ModelAdmin):
             attrs += "&draft=1"
         
         url = instance.get_absolute_url() + attrs
+        
         site = Site.objects.get_current()
         
         if not site == instance.site:
-            url = "http://%s%s%s" % (site.domain, url)
+            url = "http://%s%s" % (instance.site.domain, url)
         return HttpResponseRedirect(url)
         
 

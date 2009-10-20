@@ -13,9 +13,10 @@ from cms.utils.urlutils import urljoin
 from cms import settings
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
-from cms.utils.page import get_available_slug
+from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
+from cms.utils.i18n import get_fallback_languages
 
 class Page(MpttPublisher):
     """
@@ -88,11 +89,15 @@ class Page(MpttPublisher):
         to mptt, but after move is done page_moved signal is fired.
         """
         self.move_to(target, position)
+        
         # fire signal
         from cms.models.moderatormodels import PageModeratorState
         self.force_moderation_action = PageModeratorState.ACTION_MOVE
         cms_signals.page_moved.send(sender=Page, instance=self) #titles get saved before moderation
         self.save(change_state=True) # always save the page after move, because of publisher
+        
+        # check the slugs
+        check_title_slugs(self)
         
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
@@ -102,54 +107,58 @@ class Page(MpttPublisher):
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
         from cms.utils.moderator import update_moderation_message
-        # get a flat list of all tree nodes in reverse tree order
+        
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
-        #for d in descendants:
-        #    print u"%s %s (id: %s parent: %s level: %s lft: %s rght: %s)" %("  "*d.level, d, d.id, d.parent_id, d.level, d.lft, d.rght)
-        #print "====="
-        tree = [target]
-        level_dif = self.level - target.level - 1
+        site_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
+        if target:
+            target.old_pk = -1
+            if position == "first_child":
+                tree = [target]
+            elif target.parent_id:
+                tree = [target.parent]
+            else:
+                tree = []
+        else:
+            tree = []
         first = True
-        
-        # list of all reverse_id values in the target site
-        all_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
-        
         for page in descendants:
-            new_level = page.level - level_dif
-            dif = new_level - tree[-1].level 
-            if dif < 0:
-                # hopping back up.. remove the obsolete pages from the stack
-                tree = tree[:dif-1]
-            elif dif==0:
-                # same level as before... remove the item from
-                # the last iteration (it did not have any children)
-                tree = tree[:-1]
-            # assign the parent for this page
-            current_parent = tree[-1]
-            # append the current page to the stack... we don't know if it has children
-            # but if it does they need this to be in the stack the use it as parent
-            tree.append(page)
-            
+           
             titles = list(page.title_set.all())
             plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
-            
             origin_id = page.id
-            # IMPORTANT NOTE: self gets changed in next few lines to page!!
-            
+            page.old_pk = page.pk
             page.pk = None
             page.level = None
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.status = Page.MODERATOR_NEED_APPROVEMENT
-            page.parent = current_parent
+            page.published = False
+            page.publisher_status = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
-            if page.reverse_id in all_reverse_ids:
-                # reverse_id already exists for some page on the target site
+            if page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
+            if first:
+                first = False
+                if tree:
+                    page.parent = tree[0]
+                else:
+                    page.parent = None
+                page.insert_at(target, position)
+            else:
+                count = 1
+                found = False
+                for prnt in tree:
+                    if prnt.old_pk == page.parent_id:
+                        page.parent = prnt
+                        tree = tree[0:count]
+                        found = True
+                        break
+                    count += 1
+                if not found:
+                    page.parent = None
+            tree.append(page)
+            page.site = site
             page.save()
-            #print "%s%s (id: %s new_level: %s dif: %s parent_id: %s)    current stack: %s" % ("   "*new_level,page,page.id,new_level,dif,page.parent_id,[ u"%s"%z for z in tree])
-            update_moderation_message(page, _('Page was copied.'))
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
@@ -157,36 +166,34 @@ class Page(MpttPublisher):
                     permission.pk = None
                     permission.page = page
                     permission.save()
-            
             if settings.CMS_MODERATOR and copy_moderation:
                 from cms.models.moderatormodels import PageModerator
                 for moderator in PageModerator.objects.filter(page__id=origin_id):
                     moderator.pk = None
                     moderator.page = page
                     moderator.save()
-            
-            if first:
-                first = False
-                page.move_to(target, position)
-            page.site = site
-            page.save()
+            update_moderation_message(page, unicode(_('Page was copied.')))
             for title in titles:
                 title.pk = None
                 title.publisher_public_id = None
+                title.published = False
                 title.page = page
                 title.slug = get_available_slug(title)
                 title.save()
             ptree = []
             for p in plugins:
-                plugin, cls = p.get_plugin_instance()
+                try:
+                    plugin, cls = p.get_plugin_instance()
+                except KeyError: #plugin type not found anymore
+                    continue
                 p.page = page
                 p.pk = None
                 p.id = None
                 p.tree_id = None
                 p.lft = None
                 p.rght = None
+                p.inherited_public_id = None
                 p.publisher_public_id = None
-                
                 if p.parent:
                     pdif = p.level - ptree[-1].level
                     if pdif < 0:
@@ -207,10 +214,12 @@ class Page(MpttPublisher):
                     plugin.rght = p.rght
                     plugin.level = p.level
                     plugin.cmsplugin_ptr = p
-                    plugin.publisher_public_id = p.pk
+                    plugin.publisher_public_id = None
+                    plugin.public_id = None
+                    plugin.plubished = False
                     plugin.save()
     
-    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None):
+    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None, **kwargs):
         """
         Args:
             
@@ -275,9 +284,9 @@ class Page(MpttPublisher):
         
         if commit:
             if no_signals:# ugly hack because of mptt
-                super(Page, self).save_base(cls=self.__class__)
+                super(Page, self).save_base(cls=self.__class__, **kwargs)
             else:
-                super(Page, self).save()
+                super(Page, self).save(**kwargs)
         
         #if commit and (publish_directly or created and not under_moderation):
         if self.publisher_is_draft and commit and publish_directly:
@@ -305,14 +314,12 @@ class Page(MpttPublisher):
         get the list of all existing languages for this page
         """
         from cms.models.titlemodels import Title
-        titles = Title.objects.filter(page=self)
-        if not hasattr(self, "languages_cache"):
-            languages = []
-            for t in titles:
-                if t.language not in languages:
-                    languages.append(t.language)
-            self.languages_cache = languages
-        return self.languages_cache
+
+        if not hasattr(self, "all_languages"):
+            self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
+            self.all_languages = list(self.all_languages)
+            self.all_languages.sort()    
+        return self.all_languages
 
     def get_absolute_url(self, language=None, fallback=True):
         try:
@@ -350,9 +357,10 @@ class Page(MpttPublisher):
         """Helper function for accessing wanted / current title. 
         If wanted title doesn't exists, EmptyTitle instance will be returned.
         """
-        self._get_title_cache(language, fallback, version_id, force_reload)
-        if self.title_cache:
-            return self.title_cache
+        
+        language = self._get_title_cache(language, fallback, version_id, force_reload)
+        if language in self.title_cache:
+            return self.title_cache[language]
         from cms.models.titlemodels import EmptyTitle
         return EmptyTitle()
     
@@ -382,7 +390,7 @@ class Page(MpttPublisher):
         """
         return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
     
-    def get_menu_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+    def get_menu_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the menu title of the page depending on the given language
         """
@@ -391,7 +399,7 @@ class Page(MpttPublisher):
             return self.get_title(language, True, version_id, force_reload)
         return menu_title
     
-    def get_page_title(self, language=None, fallback=False, version_id=None, force_reload=False):
+    def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
         """
@@ -425,20 +433,19 @@ class Page(MpttPublisher):
         return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
     
     def _get_title_cache(self, language, fallback, version_id, force_reload):
-        default_lang = False
         if not language:
-            default_lang = True
             language = get_language()
         load = False
-        
-        if not hasattr(self, "title_cache"):
+        if not hasattr(self, "title_cache") or force_reload:
             load = True
-        elif self.title_cache and self.title_cache.language != language and language and not default_lang:
-            load = True
-        elif fallback and not self.title_cache:
+            self.title_cache = {}
+        elif not language in self.title_cache:
+            if fallback:
+                fallback_langs = get_fallback_languages(language)
+                for lang in fallback_langs:
+                    if lang in self.title_cache:
+                        return lang    
             load = True 
-        if force_reload:
-            load = True            
         if load:
             from cms.models.titlemodels import Title
             if version_id:
@@ -448,16 +455,13 @@ class Page(MpttPublisher):
                 for rev in revs:
                     obj = rev.object
                     if obj.__class__ == Title:
-                        if obj.language == language and obj.page_id == self.pk:
-                            self.title_cache = obj
-                if not self.title_cache and fallback:
-                    for rev in revs:
-                        obj = rev.object
-                        if obj.__class__ == Title:
-                            if obj.page_id == self.pk:
-                                self.title_cache = obj
+                        self.title_cache[obj.language] = obj
             else:
-                self.title_cache = Title.objects.get_title(self, language, language_fallback=fallback)
+                title = Title.objects.get_title(self, language, language_fallback=fallback)
+                if title:
+                    self.title_cache[title.language] = title 
+                language = title.language
+        return language
                 
     def get_template(self):
         """
@@ -487,12 +491,6 @@ class Page(MpttPublisher):
             if t[0] == template:
                 return t[1] 
         return _("default")
-
-    #def traductions(self):
-    #    langs = ""
-    #    for lang in self.get_languages():
-    #        langs += '%s, ' % lang
-    #    return langs[0:-2]
 
     def has_change_permission(self, request):
         opts = self._meta
@@ -562,18 +560,6 @@ class Page(MpttPublisher):
             except NoHomeFound:
                 pass
         return False
-    
-    """ - not used.. - kill ?
-    def is_parent_home(self):
-        if not self.parent_id:
-            return False
-        else:
-            try:
-                return self.home_pk_cache == self.parent_id
-            except NoHomeFound:
-                pass
-        return False
-    """ 
     
     def get_home_pk_cache(self):
         attr = "%s_home_pk_cache" % (self.publisher_is_draft and "draft" or "public")

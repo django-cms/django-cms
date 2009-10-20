@@ -6,6 +6,7 @@ from cms.exceptions import NoPermissionsException
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from publisher import PublisherManager
 from cms.models.query import PageQuerySet
+from cms.utils.i18n import get_fallback_languages
 
 try:
     set
@@ -93,11 +94,11 @@ class PageManager(PublisherManager):
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
         
-        NOTE:For future may be better if every plugin defines Q object relative 
-        to page, and search function just takes them. This will give us 
-        posibillity to search over custom plugins. 
+        Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
         """
-        qs = self.public()
+        qs = self.get_query_set()
+        if settings.CMS_MODERATOR:
+            qs = qs.public()
         
         if current_site_only:
             site = Site.objects.get_current()
@@ -105,20 +106,15 @@ class PageManager(PublisherManager):
         
         qt = Q(title_set__title__icontains=q)
         
-        plugins = (
-            ('cms.plugins.text', Q(cmsplugin__text__body__icontains=q)),
-            ('cms.plugins.file', Q(cmsplugin__file__title__icontains=q)),
-            ('cms.plugins.snippet', Q(cmsplugin__snippetptr__snippet__html__icontains=q)),
-            ('cms.plugins.link', Q(cmsplugin__link__name__icontains=q)),
-            ('cms.plugins.teaser', Q(cmsplugin__teaser__description__icontains=q)),
-        )
-        
+        # find 'searchable' plugins and build query
         qp = Q()
-        # build plugin query depending on installed plugins
-        for app_name, q in plugins:
-            if not app_name in settings.INSTALLED_APPS:
-                continue
-            qp |= q
+        # cannot import CMSPlugin due to Manager -> Page -> Plugin circle!
+        CMSPlugin = models.get_model('cms','cmsplugin')
+        for c in CMSPlugin.__subclasses__():
+            if hasattr(c, 'search_fields'):
+                for field in c.search_fields:
+                    qp |= Q(**{'cmsplugin__%s__%s__icontains' % \
+                                   (c.__name__.lower(), field):q})
         
         if language:
             qt &= Q(title_set__language=language)
@@ -129,9 +125,8 @@ class PageManager(PublisherManager):
         return qs.distinct()
         
         
-        
 class TitleManager(PublisherManager):
-    def get_title(self, page, language, language_fallback=False, latest_by='creation_date'):
+    def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back
         to another language if wanted.
@@ -142,15 +137,20 @@ class TitleManager(PublisherManager):
         except self.model.DoesNotExist:
             if language_fallback:
                 try:
-                    title = self.filter(page=page).latest(latest_by)
-                    return title
+                    titles = self.filter(page=page)
+                    fallbacks = get_fallback_languages(language)
+                    for l in fallbacks:
+                        for title in titles:
+                            if l == title.language:
+                                return title
+                    return None
                 except self.model.DoesNotExist:
                     pass
             else:
                 raise
         return None        
     
-    def get_page_slug(self, slug, site=None, latest_by='creation_date'):
+    def get_page_slug(self, slug, site=None):
         """
         Returns the latest slug for the given slug and checks if it's available 
         on the current site.

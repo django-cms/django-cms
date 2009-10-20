@@ -6,7 +6,7 @@ contain the appropriate settings.
 from os.path import join
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy  as _
 
 # Which templates should be used for extracting the placeholders?
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
@@ -69,6 +69,9 @@ CMS_SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False)
 # a tuble with a python path to a function that returns a list of navigation nodes
 CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 
+# a tuple with a python path to a function that receives all navigation nodes and can add or remove them
+CMS_NAVIGATION_MODIFIERS = getattr(settings, 'CMS_NAVIGATION_MODIFIERS', ())
+
 # a tuple of hookable applications, e.g.:
 # CMS_APPLICATIONS_URLS = (
 #    ('sampleapp.urls', 'Sample application'),
@@ -76,10 +79,10 @@ CMS_NAVIGATION_EXTENDERS = getattr(settings, 'CMS_NAVIGATION_EXTENDERS', ())
 CMS_APPLICATIONS_URLS = getattr(settings, 'CMS_APPLICATIONS_URLS', ()) 
 
 # Whether a slug should be unique ... must be unique in all languages.
-i18n_not_installed = not 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
-CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', i18n_not_installed)
+i18n_installed = 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
+CMS_UNIQUE_SLUGS = getattr(settings, 'CMS_UNIQUE_SLUGS', not i18n_installed)
 
-#Should the tree of the pages be also be displayed in the urls? or should a falt slug strucutre be used?
+#Should the tree of the pages be also be displayed in the urls? or should a flat slug structure be used?
 CMS_FLAT_URLS = getattr(settings, 'CMS_FLAT_URLS', False)
 
 # Wheter the cms has a softroot functionionality
@@ -88,14 +91,17 @@ CMS_SOFTROOT = getattr(settings, 'CMS_SOFTROOT', False)
 #Hide untranslated Pages
 CMS_HIDE_UNTRANSLATED = getattr(settings, 'CMS_HIDE_UNTRANSLATED', True)
 
-#Fall back to another language if the requested page isn't available in the prefered language
+#Fall back to another language if the requested page isn't available in the preferred language
 CMS_LANGUAGE_FALLBACK = getattr(settings, 'CMS_LANGUAGE_FALLBACK', True)
+
+#Configuration on how to order the fallbacks for languages.
+# example: {'de': ['en', 'fr'],
+#           'en': ['de'],
+#          }
+CMS_LANGUAGE_CONF = getattr(settings, 'CMS_LANGUAGE_CONF', {})
 
 # Defines which languages should be offered.
 CMS_LANGUAGES = getattr(settings, 'CMS_LANGUAGES', settings.LANGUAGES)
-
-# Defines which language should be used by default and falls back to LANGUAGE_CODE
-CMS_DEFAULT_LANGUAGE = getattr(settings, 'CMS_DEFAULT_LANGUAGE', settings.LANGUAGE_CODE)[:2]
 
 # Defines how long page content should be cached, including navigation
 CMS_CONTENT_CACHE_DURATION = getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60)
@@ -107,6 +113,7 @@ MANAGERS = settings.MANAGERS
 DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 INSTALLED_APPS = settings.INSTALLED_APPS
 LANGUAGES = settings.LANGUAGES
+
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
 CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
@@ -122,4 +129,3 @@ CMS_MODERATOR = getattr(settings, 'CMS_MODERATOR', False)
 
 #if CMS_MODERATOR and not CMS_PERMISSION:
 #    raise ImproperlyConfigured('CMS Moderator requires permissions to be enabled')
-

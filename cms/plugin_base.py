@@ -10,6 +10,7 @@ class CMSPluginBase(admin.ModelAdmin):
     form = None
     
     change_form_template = "admin/cms/page/plugin_change_form.html"
+    admin_preview = True #Should the plugin be rendered in the admin?
     
     render_template = None
     model = CMSPlugin
@@ -28,6 +29,26 @@ class CMSPluginBase(admin.ModelAdmin):
                         exclude = ('page', 'position', 'placeholder', 'language', 'plugin_type')
                 self.form = DefaultModelForm
         
+            # Move 'advanced' fields into separate fieldset.
+            # Currently disabled if fieldsets already set, though
+            # could simply append an additional 'advanced' fieldset -- 
+            # but then the plugin can't customise the advanced fields
+            if not self.__class__.fieldsets:
+                basic_fields = []
+                advanced_fields = []
+                for f in self.model._meta.fields:
+                    if not f.auto_created and f.editable:
+                        if hasattr(f,'advanced'): 
+                            advanced_fields.append(f.name)
+                        else: basic_fields.append(f.name)
+                if advanced_fields: # leave well enough alone otherwise
+                    self.__class__.fieldsets = (
+                        (None, { 'fields' : basic_fields}),
+                        (_('Advanced options'), 
+                         {'fields' : advanced_fields, 
+                          'classes' : ('collapse',)})
+                        )
+
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
         

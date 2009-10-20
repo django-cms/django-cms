@@ -17,7 +17,7 @@ DATABASE_ENGINE = 'mysql'#'postgresql_psycopg2'       # 'postgresql_psycopg2', '
 DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
 DATABASE_USER = 'cms'           # Not used with sqlite3.
 DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
-DATABASE_HOST = '127.0.0.1'     # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_HOST = ''     # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''              # Set to empty string for default. Not used with sqlite3.
 
 # Test database settings
@@ -32,10 +32,6 @@ DATABASE_SUPPORTS_TRANSACTIONS = True
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'America/Chicago'
-
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
@@ -117,23 +113,32 @@ INSTALLED_APPS = (
     'cms.plugins.googlemap',
     'cms.plugins.teaser',
     'cms.plugins.video',
+    'cms.plugins.twitter',
     'mptt',
     'reversion',
-    #'example.categories',
+    'example.categories',
     #'debug_toolbar',
     'south',
     # sample application
-    'sampleapp',
+    'example.sampleapp',
     #'store',
 )
 
+LANGUAGE_CODE = "en"
+
 gettext = lambda s: s
+
 LANGUAGES = (
     ('fr', gettext('French')),
     ('de', gettext('German')),
     ('en', gettext('English')),
     ('pt-br', gettext("Brazil")),
 )
+
+CMS_LANGUAGE_CONF = {
+    'de':['fr'],
+    'en':['fr'],
+}
 
 CMS_TEMPLATES = (
     ('index.html', gettext('default')),
@@ -149,13 +154,13 @@ CMS_APPLICATIONS_URLS = (
 
 CMS_PLACEHOLDER_CONF = {                        
     'right-column': {
-        "plugins": ('FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin', 'SnippetsPlugin'),
+        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
         "extra_context": {"theme":"16_16"},
         "name":gettext("right column")
     },
     
     'body': {
-        "plugins": ("VideoPlugin", ),
+        "plugins": ("VideoPlugin", "TextPlugin", ),
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
@@ -167,7 +172,8 @@ CMS_PLACEHOLDER_CONF = {
 }
 
 
-CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),)
+CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),
+                            ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),)
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True
@@ -175,6 +181,8 @@ CMS_PERMISSION = True
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True
+CMS_HIDE_UNTRANSLATED = False
+
 
 try:
     from local_settings import *

@@ -12,6 +12,9 @@ class Category(models.Model):
     def get_title(self):
         return self.name
     
+    def get_menu_title(self):
+        return self.name
+    
     def get_absolute_url(self):
         return reverse('category_view', args=[self.pk])
     

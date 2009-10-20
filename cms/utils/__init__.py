@@ -1,10 +1,10 @@
 # TODO: this is just stuff from utils.py - should be splitted / moved
-
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from cms import settings
-from cms.models import Page
+
+from cms.utils.i18n import get_default_language
 
 # !IMPORTANT: Page cant be imported here, because we will get cyclic import!!
 
@@ -52,27 +52,39 @@ def get_template_from_request(request, obj=None):
         return obj.get_template()
     return settings.CMS_TEMPLATES[0][0]
 
-def get_language_in_settings(iso):
-    for language in settings.CMS_LANGUAGES:
-        if language[0] == iso:
-            return iso
-    return None
 
 def get_language_from_request(request, current_page=None):
+    from cms.models import Page
     """
     Return the most obvious language according the request
     """
-    language = get_language_in_settings(request.REQUEST.get('language', None))
+    language = request.REQUEST.get('language', None)
+    
+    if language:
+        if not language in dict(settings.CMS_LANGUAGES).keys():
+            language = None
+        
     if language is None:
         language = getattr(request, 'LANGUAGE_CODE', None)
-    if language is None:
+        
+    if language:
+        if not language in dict(settings.CMS_LANGUAGES).keys():
+            language = None
+
+    # TODO: This smells like a refactoring oversight - was current_page ever a page object? It appears to be a string now
+    if language is None and isinstance(current_page, Page):
         # in last resort, get the first language available in the page
-        if current_page:
-            languages = current_page.get_languages()
-            if len(languages) > 0:
-                language = languages[0]
+        languages = current_page.get_languages()
+
+        if len(languages) > 0:
+            language = languages[0]
+
     if language is None:
-        language = settings.CMS_DEFAULT_LANGUAGE
+        # language must be defined in CMS_LANGUAGES, so check first if there
+        # is any language with LANGUAGE_CODE, otherwise try to split it and find
+        # best match
+        language = get_default_language()
+
     return language
 
 
@@ -97,7 +109,13 @@ def get_page_from_request(request):
         return resp['current_page']
 
 
+def mark_descendants(nodes):
+    for node in nodes:
+        node.descendant = True
+        mark_descendants(node.childrens)
+
 def make_tree(request, items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
+    from cms.models import Page
     """
     builds the tree of all the navigation extender nodes and marks them with some metadata
     """
@@ -111,6 +129,7 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
         item.ancestors_ascending = ancestors
         if item.get_absolute_url() == url:
             item.selected = True
+            item.descendant = False
             levels = active_levels
             descendants = True
             found = True
@@ -132,7 +151,7 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
                             child.sibling = True
         elif found:
             item.sibling = True
-        if levels == 0 and not hasattr(item, "ancestor" ) or item.level == to_levels:
+        if levels == 0 and not hasattr(item, "ancestor" ) or item.level == to_levels or not hasattr(item, "childrens"):
             item.childrens = []
         else:
             make_tree(request, item.childrens, levels, url, ancestors+[item], descendants, current_level, to_levels, active_levels) 
@@ -201,7 +220,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                           to_levels)
             if hasattr(page, "selected"):
                 mark_sibling = True
-    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended and target.level < to_levels: 
+    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended and target.level < to_levels:
         target.childrens += get_extended_navigation_nodes(request, 
                                                           levels, 
                                                           list(target.ancestors_ascending) + [target], 

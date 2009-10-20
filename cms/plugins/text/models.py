@@ -24,6 +24,7 @@ class Text(CMSPlugin):
                               admin. Read/write.
                               """)
 
+    search_fields = ('body',)
     
     def __unicode__(self):
         return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")

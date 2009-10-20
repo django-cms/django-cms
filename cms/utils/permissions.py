@@ -179,7 +179,6 @@ def has_add_page_on_same_level_permission(request, page):
             # this page
             for perm in PagePermission.objects.with_user(request.user).filter(page=page, can_add=True):
                 if perm.grant_on & MASK_PAGE:
-                    print PagePermission.objects.with_user(request.user).filter(page=page, can_add=True)
                     return True
         """ 
     return False
@@ -240,6 +239,6 @@ def get_user_sites_queryset(user):
     q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
         Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True))
     
-    return qs.filter(q)
+    return qs.filter(q).distinct()
     
     

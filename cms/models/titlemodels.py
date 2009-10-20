@@ -12,7 +12,7 @@ class Title(Publisher):
     title = models.CharField(_("title"), max_length=255)
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
-    path = models.CharField(_("path"), max_length=255, db_index=True)
+    path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
@@ -31,7 +31,7 @@ class Title(Publisher):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
 
-    def save(self):
+    def save(self, **kwargs):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
@@ -43,7 +43,7 @@ class Title(Publisher):
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
-        super(Title, self).save()
+        super(Title, self).save(**kwargs)
         
         # Update descendants only if path changed
         if current_path != self.path:
@@ -86,4 +86,6 @@ class EmptyTitle(object):
         return None
     
     
-reversion_register(Title)
+if 'reversion' in settings.INSTALLED_APPS: 
+    import reversion       
+    reversion.register(Title)

@@ -3,7 +3,9 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
+{{ block.super.super }}
+<script type="text/javascript" src="{% url admin:jsi18n %}"></script>
+{{ media }}
 {% if not add %}
 	<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_form.js"></script>
 {% endif %}
@@ -28,7 +30,7 @@
 {% block content_title %}
 	{% if moderation_delete_request %}
 	<h1 class="moderation-approve-deletion">{% trans "Approve page deletion" %}</h1>
-		
+
 	{% else %}
 
 	<h1>{{ title }}
@@ -54,7 +56,7 @@
 	{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
@@ -62,7 +64,24 @@
 
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% block form_top %}{% endblock %}
 {{ adminForm.fields.parent }}
-<div>
+
+<input type="hidden" name="language" value="{{ language }}" />
+
+{% if show_language_tabs %}
+<div id="page_form_lang_tabs">
+    {% for lang_code, lang_name in traduction_language %}
+        <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
+            class="language_button {% ifequal lang_code language %}selected{% endifequal %}"
+            id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
+    {% endfor %}
+</div>
+{% endif %}
+
+
+<div id="lang_tab_content">
+{% if show_language_tabs %}
+<h2 class="header"></h2>
+{% endif %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if errors %}
@@ -75,13 +94,14 @@
 {% for fieldset in adminform %}
   {% include "admin/cms/page/includes/fieldset.html" %}
 {% endfor %}
-	
+
+
 {% for inline_admin_formset in inline_admin_formsets %}
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
 
-{% if not add %}
 
+{% if not add %}
 	{% if CMS_PERMISSION and has_change_permissions_permission %}
 		<div class="inline-group">
 			<div class="tabular inline-related">
@@ -93,9 +113,7 @@
 			</div>
 		</div>
 	{% endif %}
-	
-	
-	
+
 	{% if CMS_MODERATOR and has_moderate_permission %}
 		<div class="inline-group">
 			<div class="tabular inline-related">
@@ -107,50 +125,50 @@
 			</div>
 		</div>
 	{% endif %}
-	
+
 	{% if moderation_delete_request %}<script type="text/javascript">
 		$(function(){
 			// disable all fields
-			function lockControls(){ 
+			function lockControls(){
 				$('input,select,textarea').attr("disabled", "disabled");
-				$('a[id^=add_],span[class^=add-plugin],a[class^=selector-],p[class^=selector-]').remove(); 
+				$('a[id^=add_],span[class^=add-plugin],a[class^=selector-],p[class^=selector-]').remove();
 			}
 			$('fieldset[class=collapsed]').remove();
 			lockControls();
-			setTimeout(lockControls,200);	
+			setTimeout(lockControls,200);
 		});
 	</script>{% endif %}
-	
+
 	{% if CMS_MODERATOR and moderation_required %}
 		<div id="dialog" title="Approve dialog">
 			<p>{% blocktrans %}This page must be moderated at level {{ moderation_level }}, post a message for moderator.{% endblocktrans %}</p>
 			<div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
 			<div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label></div>
 		</div>
-		
+
 		<script type="text/javascript">
 			$(function(){
 				// override standard uncolapse_all javascript function, we need to call it
 				// only if there is submit, but submit might be cancelled over dialog.
 				var old_uncollapse_all = CollapsedFieldsets.uncollapse_all;
 				CollapsedFieldsets.uncollapse_all = function() {}
-				
+
 				var submitActor;
 				var forceSubmit = false;
 				var seen = false;
-				
+
 				// change submit states, open dialog
 				$('#page_form').submit(function(event){
 					return showDialog(event);
 				});
-				
+
 				$('#page_form input[name=_continue]').click(function(event){
 					return showDialog(event, this);
 				});
-				
+
 				function showDialog(event, actor) {
 					if (forceSubmit) return true; // escape sequence
-					
+
 					if (!seen) {
 						// show previously posted message if there were an error
 						$('#id_df_moderator_message').val($('#id_moderator_message').val());
@@ -161,21 +179,21 @@
 					$('#dialog').dialog('open');
 					return false;
 				}
-				
+
 				function dialogSave(){
 					// assign values from dialog form to real form
 					$('#id_moderator_message').val($('#id_df_moderator_message').val());
 					$('#id_moderator_state').val(
 						$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
 					);
-					
+
 					old_uncollapse_all(); // uncolapse all fields django way
 					$('#dialog').dialog('close');
 					forceSubmit = true;
 					$(submitActor || '#page_form input[name=_save]').click();
 					return false;
 				}
-				
+
 				$('#dialog').dialog({
 					bgiframe: true,
 					autoOpen: false,
@@ -189,15 +207,15 @@
 						Save: function() {
 							dialogSave();
 						}
-						
-					}, 
+
+					},
 					open: function(){
 						var val = $('#id_moderator_state').val();
 						$('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
 						$('#id_df_moderator_message')
 							.focus()
 							.keydown(function(event) { if (event.keyCode == 13) dialogSave()});
-							
+
 						// add default button class to last rendered button (Save)
 						$(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
 					},

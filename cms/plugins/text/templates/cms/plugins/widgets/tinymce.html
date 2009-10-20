@@ -1,0 +1,139 @@
+{% load i18n %}
+
+// Global var, for storing callbacks, see below.
+var editPluginPopupCallbacks = {};
+
+{% include "cms/plugins/widgets/widget_lib.js" %}
+
+var texteditor = null;
+
+// Creates a new plugin class
+tinymce.create('tinymce.plugins.CMSPluginEditor', {
+	init : function(ed, url) {
+        // Register an example button
+        var tiny = ed;
+        
+    	var c = new TinyMCEPlaceholderBridge(tiny);
+    	PlaceholderEditorRegistry.registerEditor("{{name}}", c);
+    	
+    	ed.onNodeChange.add(function(ed, cm, n, co) {
+    		var is_plugin = n.nodeName == 'IMG' && n.id.split("plugin_obj_").length > 1; 
+			cm.setDisabled('editplugins', !is_plugin);
+			cm.setActive('editplugins', is_plugin);
+		});
+        
+    },
+    createControl: function(n, cm) {
+    	switch (n) {
+            case 'cmsplugins':        
+		        var mlb = cm.createListBox('mylistbox', {
+		             title : '{% filter escapejs %}{% trans "Plugins" %}{% endfilter %}',
+		             onselect : function(v) {
+		             	var pluginvalue = v;
+						var splits = window.location.href.split("?")[0].split("/");
+						var parent_id = Number(splits[splits.length - 2]);
+						var language = $('#id_language').attr('value');
+						
+						if (pluginvalue == "") {
+							alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
+							return;
+						}
+						texteditor = get_editor("{{ name }}");
+						
+						// First create db instance using AJAX post back
+						add_plugin(pluginvalue, parent_id, language)
+		             }
+		        });
+				{% for p in installed_plugins %}
+				mlb.add('{{ p.name }}', '{{ p.value }}');{% endfor %}
+	     		
+		      	// Return the new listbox instance
+                return mlb;
+        	case 'cmspluginsedit':
+        		var bt = cm.createButton('editplugins', {
+            		title : '{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}',
+            		onclick : function() {
+                 		var texteditor = get_editor("{{ name }}");
+						if (texteditor == null || texteditor.selectedObject == null) {
+							alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
+							return;
+						}
+						var imgobj = texteditor.selectedObject();
+						if (imgobj == null) {
+							alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
+							return;
+						}
+						
+						
+						var plugin_id = imgobj.split("plugin_obj_")[1].split('"')[0];
+						edit_plugin(plugin_id);
+            		},
+            		'class' : 'plugin_edit_button' // Use the bold icon from the theme
+        		});
+        		cm.createSeparator(); 
+        		return bt;
+        }
+
+        return null;
+    }
+});
+
+
+
+// Register plugin with a short name
+tinymce.PluginManager.add('cmsplugins', tinymce.plugins.CMSPluginEditor);
+
+function init_plugin_editor(placeholder){
+	var toolbar = get_plugin_html()
+	var html = '<table class="mceToolbar mceToolbarRow3 Enabled"><tbody>'
+	html += '<td class="mceToolbarStart mceToolbarStartListBox mceFirst">'
+	html += '<span></span>'
+	html += '</td><td>' + toolbar + '</td></tbody></table>'
+	$("td.mceToolbar").append(html);
+	init_buttons(placeholder);
+}
+
+
+function init_buttons(placeholder){
+	$('span.insert-object').click(function(){
+		var select = $(this).parent().children("select");
+		var pluginvalue = select.attr('value');
+		var splits = window.location.href.split("?")[0].split("/");
+		var parent_id = Number(splits[splits.length - 2]);
+		var language = $('#id_language').attr('value');
+		
+		if (pluginvalue == "") {
+			alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
+			return;
+		}
+		
+		var texteditor = get_editor(placeholder);
+		if (texteditor == null || texteditor.insertText == null) {
+			alert("{% filter escapejs %}{% trans "Text editor does not support inserting objects." %}{% endfilter %}");
+			return;
+		}
+		// First create db instance using AJAX post back
+		add_plugin(pluginvalue, parent_id, language)
+		
+	}).css("cursor", "pointer").css("margin", "5px");
+	
+	/* onclick for 'Edit selected object' */
+	$('span.edit-object').click(function(){
+		var texteditor = get_editor(placeholder);
+		if (texteditor == null || texteditor.selectedObject == null) {
+			alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
+			return;
+		}
+		var imgobj = texteditor.selectedObject();
+		if (imgobj == null) {
+			alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
+			return;
+		}
+		if (imgobj.id == null || imgobj.id.indexOf("plugin_obj_") != 0) {
+			alert("{% filter escapejs %}{% trans "Not a plugin object" %}{% endfilter %}");
+			return;
+		}
+		var plugin_id = imgobj.id.substr("plugin_obj_".length);
+		edit_plugin(plugin_id);
+	}).css("cursor", "pointer").css("margin","5px");
+}

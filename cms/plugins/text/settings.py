@@ -2,7 +2,11 @@ from django.conf import settings
 
 # Uses TinyMCE as editor (no inline plugins). Requires django-tinymce app. 
 # If false, then WYMEditor is used. 
-USE_TINYMCE = getattr(settings, 'CMS_USE_TINYMCE', False)
+USE_TINYMCE = getattr(settings, 'CMS_USE_TINYMCE', "tinymce" in settings.INSTALLED_APPS)
+
+if USE_TINYMCE:
+    import tinymce.settings
+    TINYMCE_CONFIG = getattr(settings, 'CMS_PLUGIN_TEXT_TINYMCE_CONFIG', tinymce.settings.DEFAULT_CONFIG)
 
 WYM_TOOLS = ",\n".join([
     "{'name': 'Bold', 'title': 'Strong', 'css': 'wym_tools_strong'}",
@@ -53,3 +57,10 @@ WYM_STYLES = ",\n".join([
 
 WYM_CLASSES = getattr(settings, "WYM_CLASSES", WYM_CLASSES)
 WYM_STYLES = getattr(settings, "WYM_STYLES", WYM_STYLES)
+
+#Advantageously replaces WYM_CLASSES and WYM_STYLES
+##Prepare url for wymeditor.css
+CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
+WYM_STYLESHEET_PATH = getattr(settings, 'CMS_MEDIA_URL', ''.join((settings.MEDIA_URL, CMS_MEDIA_PATH)) )
+WYM_STYLESHEET = getattr(settings, "WYM_STYLESHEET",  '"%scss/wymeditor.css"' % WYM_STYLESHEET_PATH  )
+

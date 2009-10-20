@@ -26,6 +26,13 @@ WymPlaceholderBridge.prototype.insertText = function(text) {
     this.wym.insert(text);
 };
 
+WymPlaceholderBridge.prototype.replaceContent = function(old, rep) {
+    /* Replaces occurence of `old` with `new` in the editor. 
+     */
+	var html = this.wym.html()
+	this.wym.html(html.replace(old, rep));
+};
+
 WymPlaceholderBridge.prototype.selectedObject = function() {
     /* If an image/object is selected, returns the HTMLImageObject for that image,
      * otherwise undefined/null.

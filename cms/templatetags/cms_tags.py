@@ -1,6 +1,6 @@
 from django import template
 from django.core.cache import cache
-from django.core.mail import send_mail
+from django.core.mail import send_mail, mail_managers
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -10,7 +10,10 @@ from cms import settings
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
 from cms.utils import get_language_from_request,\
-    get_extended_navigation_nodes, find_children, cut_levels, find_selected
+    get_extended_navigation_nodes, find_children, \
+    cut_levels, find_selected, mark_descendants
+from cms.utils import navigation
+from cms.utils.i18n import get_fallback_languages
 
 
 register = template.Library()
@@ -59,12 +62,13 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         except NoHomeFound:
             home_pk = 0
     if not next_page: #new menu... get all the data so we can save a lot of queries
-        ids = []
+        
         children = []
         ancestors = []
+        alist = None
         if current_page:
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
-        else:# maybe the active node is in an extender?
+        if not alist:  # == None:# maybe the active node is in an extender?
             alist = []
             extenders = page_queryset.published().filter(in_navigation=True, 
                                                         site=site, 
@@ -126,7 +130,11 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             pages = [root_page] + pages
         all_pages = pages[:]
         root_level = getattr(root_page, 'level', None)
+        ids = []
+        current = None
         for page in pages:# build the tree
+            if current_page and current_page.pk == page.pk:
+                current = page
             if page.level >= db_from_level:
                 ids.append(page.pk)
             if page.level == 0 or page.level == root_level:
@@ -140,7 +148,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 children.append(page)
                 if page.pk == soft_root_pk:
                     page.soft_root = False #ugly hack for the recursive function
-                if current_page:
+                if current_page and not current_page.navigation_extenders:
                     pk = current_page.pk
                 else:
                     pk = -1
@@ -153,12 +161,32 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         for page in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == page.pk:
-                    page.title_cache = title
-                    #titles.remove(title)
+                    if not hasattr(page, "title_cache"):
+                        page.title_cache = {}
+                    page.title_cache[title.language] = title
+                    ids.remove(page.pk)
+            if current_page and page.pk == current_page.pk and not getattr(current, 'ancestor', False):
+                    page.selected = True
+                    if hasattr(page, "childrens"):
+                        mark_descendants(page.childrens)
             if page.pk in ancestors:
                 page.ancestor = True
-            if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
+            if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk and not getattr(current, 'ancestor', False):
                 page.sibling = True
+        if ids:
+            fallbacks = get_fallback_languages(lang)
+            for l in fallbacks:
+                titles = list(get_title_queryset(request).filter(page__in=ids, language=l))
+                for page in all_pages:# add the title and slugs and some meta data
+                    for title in titles:
+                        if title.page_id == page.pk:
+                            if not hasattr(page, "title_cache"):
+                                page.title_cache = {}
+                            page.title_cache[title.language] = title
+                            ids.remove(page.pk)
+                if not ids:
+                    break
+        children = navigation.handle_navigation_manipulators(children, request)
     else:
         children = next_page.childrens
     context.update({'children':children,
@@ -235,7 +263,9 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         for p in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == p.pk:
-                    p.title_cache = title
+                    if not hasattr(page, "title_cache"):
+                        page.title_cache = {}
+                    page.title_cache[title.language] = title
         from_level = page.level
         to_level = page.level+levels
         extra_active = extra_inactive = levels
@@ -258,7 +288,7 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
                     from_level = selected.level
                     to_level =  from_level+levels
                     extra_active = extra_inactive = levels
-    
+    children = navigation.handle_navigation_manipulators(children, request)
     context.update({'children':children,
                     'template':template,
                     'from_level':from_level,
@@ -283,24 +313,8 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
         })
         return context
     lang = get_language_from_request(request)
-    if page:
-        ancestors = list(page.get_ancestors())
-        ancestors.append(page)
-        home = page_queryset.get_home()
-        if ancestors and ancestors[0].pk != home.pk: 
-            ancestors = [home] + ancestors
-        ids = [page.pk]
-        for anc in ancestors:
-            ids.append(anc.pk)
-        titles = title_queryset.filter(page__in=ids, language=lang)
-        for anc in ancestors:
-            anc.home_pk_cache = home.pk 
-            for title in titles:
-                if title.page_id == anc.pk:
-                    anc.title_cache = title
-        for title in titles:
-            if title.page_id == page.pk:
-                page.title_cache = title
+    if page and not page.navigation_extenders:
+        ancestors = ancestors_from_page(page, page_queryset, title_queryset, lang)
     else:
         site = Site.objects.get_current()
         ancestors = []
@@ -328,14 +342,42 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                         ancs += [anc]
                         for title in titles:
                             if title.page_id == anc.pk:
-                                anc.title_cache = title
+                                if not hasattr(anc, "title_cache"):
+                                    anc.title_cache = {}
+                                anc.title_cache[title.language] = title
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
+        if not ancestors and page:
+            ancestors = ancestors_from_page(page, page_queryset, title_queryset, lang)
     context.update({'ancestors':ancestors,
                     'template': template})
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
-
+                                         
+def ancestors_from_page(page, page_queryset, title_queryset, lang):
+    ancestors = list(page.get_cached_ancestors())
+    ancestors.append(page)
+    home = page_queryset.get_home()
+    if ancestors and ancestors[0].pk != home.pk: 
+        ancestors = [home] + ancestors
+    ids = [page.pk]
+    for anc in ancestors:
+        ids.append(anc.pk)
+    titles = title_queryset.filter(page__in=ids, language=lang)
+    for anc in ancestors:
+        anc.home_pk_cache = home.pk 
+        for title in titles:
+            if title.page_id == anc.pk:
+                if not hasattr(anc, "title_cache"):
+                    anc.title_cache = {}
+                anc.title_cache[title.language] = title
+    for title in titles:
+        if title.page_id == page.pk:
+            if not hasattr(page, "title_cache"):
+                page.title_cache = {}
+            page.title_cache[title.language] = title
+    return ancestors
+            
 def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
@@ -343,13 +385,11 @@ register.filter(has_permission)
 
 def send_missing_mail(reverse_id, request):
     site = Site.objects.get_current()
-    send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                  _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                    "The url of the page was: http://%(host)s%(path)s")
-                    % {'reverse_id':reverse_id, 'host':site.domain, 'path':request.path},
-                  settings.DEFAULT_FROM_EMAIL,
-                  settings.MANAGERS, 
-                  fail_silently=True)
+    mail_managers(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                   _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                     "The url of the page was: http://%(host)s%(path)s")
+                     % {'reverse_id':reverse_id, 'host':site.domain, 'path':request.path}, 
+                   fail_silently=True)
 
 def page_id_url(context, reverse_id, lang=None, site=None):
     """
@@ -399,7 +439,7 @@ def page_language_url(context, lang):
         url = "/%s" % lang + request._language_changer(lang)
     else:
         try:
-            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=not settings.CMS_HIDE_UNTRANSLATED)
+            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=False)
         except:
             url = "/%s/" % lang 
     if url:
@@ -453,6 +493,8 @@ class PlaceholderNode(template.Node):
         self.theme = theme
 
     def render(self, context):
+        if context.get('display_placeholder_names_only'):
+            return "<!-- PlaceholderNode: %s -->" % self.name
         if not 'request' in context:
             return ''
         l = get_language_from_request(context['request'])

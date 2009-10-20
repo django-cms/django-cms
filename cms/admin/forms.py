@@ -17,13 +17,14 @@ from cms.admin.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
 from django.forms.widgets import HiddenInput
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 
 
 class PageAddForm(forms.ModelForm):
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
-        help_text=_('The part of the title that is used in the url'))
+        help_text=_('The part of the title that is used in the URL'))
     language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
     
@@ -62,7 +63,16 @@ class PageAddForm(forms.ModelForm):
     
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
+        if not slug:
+            raise ValidationError("Slug must not be empty.")
         return slug
+    
+    def clean_language(self):
+        language = self.cleaned_data['language']
+        if not language in dict(cms_settings.CMS_LANGUAGES).keys():
+            raise ValidationError("Given language does not match language settings.")
+        return language
+        
     
 class PageForm(PageAddForm):
     APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
@@ -70,11 +80,11 @@ class PageForm(PageAddForm):
     menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
         help_text=_('Overwrite what is displayed in the menu'), required=False)
     page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
-        help_text=_('Overwrites what is display at the top of your browser or in bookmarks'), required=False)
+        help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'), required=False)
     application_urls = forms.ChoiceField(label=_('Application'), 
         choices=APPLICATION_URLS, required=False,  
         help_text=_('Hook application to this page.'))
-    overwrite_url = forms.CharField(label=_('Overwrite url'), max_length=255, required=False,
+    overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
     # moderation state
     moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
@@ -88,19 +98,20 @@ class PageForm(PageAddForm):
     meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
         help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
         
-    def clean_reverse_id(self):
-        id = self.cleaned_data['reverse_id']
-        site_id = self.cleaned_data['site']
+    def clean(self):
+        cleaned_data = super(PageForm, self).clean()
+        id = cleaned_data['reverse_id']
+        site_id = cleaned_data['site']
         if id:
             if Page.objects.filter(reverse_id=id, site=site_id).exclude(pk=self.instance.pk).count():
-                raise forms.ValidationError(ugettext_lazy('A page with this reverse url id exists already.'))
-        return id
+                raise forms.ValidationError(ugettext_lazy('A page with this reverse URL id exists already.'))
+        return cleaned_data
 
     def clean_overwrite_url(self):
         url = self.cleaned_data['overwrite_url']
         if url:
             if not any_path_re.match(url):
-                raise forms.ValidationError(ugettext_lazy('Invalid url, use /my/url format.'))
+                raise forms.ValidationError(ugettext_lazy('Invalid URL, use /my/url format.'))
         return url
     
 
@@ -144,7 +155,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # this is a missconfiguration - user can add/move page to current
             # page but after he does this, he will not have permissions to 
             # access this page anymore, so avoid this
-            raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by his creator.'))
+            raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by its creator.'))
         
         if can_add and not can_edit:
             raise forms.ValidationError(ugettext_lazy('Add page permission also requires edit page permission.'))

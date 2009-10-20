@@ -74,3 +74,14 @@ def moderator_choices(page, user):
         choices.append((mask_value, title, active, kind))
     
     return choices
+
+@register.filter
+def preview_link(page, language):
+    if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
+        return "/%s%s" % (language, page.get_absolute_url(language))
+    return page.get_absolute_url(language)
+
+def render_plugin(context, plugin):
+    return {'content': plugin.render_plugin(context, admin=True)}
+
+render_plugin = register.inclusion_tag('cms/content.html', takes_context=True)(render_plugin)

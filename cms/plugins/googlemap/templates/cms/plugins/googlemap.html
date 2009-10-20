@@ -4,9 +4,10 @@
 	<div id="google-map" style="height:385px; width:auto; display: block;"></div>
 </div>
 
-<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ lang }}"></script>
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ request.LANGUAGE_CODE }}"></script>
 <script type="text/javascript">
 	//<![CDATA[
+	(function(){
 		var geocoder;
 		var map;
 		
@@ -20,42 +21,60 @@
 		  map = new GMap2(document.getElementById("google-map"));
 		  map.addControl(new GSmallZoomControl());
 		  map.addControl(new GMapTypeControl());
-		
+		 
+		  {% if object.get_lat_lng %}
+		  var latLng=new GLatLng({{ object.get_lat_lng|join:", " }});
+		  addToMap(latLng);
+		  {% else %}
 		  // Create new geocoding object
 		  geocoder = new GClientGeocoder();
-		
 		  // Retrieve location information, pass it to addToMap()
-		  geocoder.getLocations(address, addToMap);
+		  geocoder.getLocations(address, onResponse);
+		  {% endif %}
 		}
 		
 		// This function adds the point to the map
 		
-		function addToMap(response)
-		{
+		function onResponse(response){
 		  // Retrieve the object
 		  place = response.Placemark[0];
 		
 		  // Retrieve the latitude and longitude
-		  point1 = new GLatLng(place.Point.coordinates[1],
-		                      place.Point.coordinates[0]);
-		  
+		  latLng = new GLatLng(place.Point.coordinates[1],
+		                       place.Point.coordinates[0]);
+		  addToMap(latLng);	
+		}
+		
+		function addToMap(latLng)
+		{
 		  // Retrieve the latitude and longitude
-		  point2 = new GLatLng(place.Point.coordinates[1] + 0.01,
-		                      place.Point.coordinates[0]);
+		  center = new GLatLng(latLng.lat() + 0.01, latLng.lng());
 		
 		  // Center the map on this point
-		  map.setCenter(point2, zoom);
+		  map.setCenter(center, zoom);
 		
 		  // Create a marker
-		  marker = new GMarker(point1);
+		  marker = new GMarker(latLng);
 		
 		  // Add the marker to map
 		  map.addOverlay(marker);
 		
 		  // Add address information to marker
-		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + place.address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
+		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
 		}
 		
 		load();
+	})();
 	//]]>
 </script>
+{% if object.route_planer %}
+<form method="get" action="http://maps.google.ch/" class="routeplaner_box">
+	<p>{{ object.route_planer_title }}:</p>
+	<fieldset>
+		<label for="saddr">{% trans "Your address" %}:</label>
+		<input id="saddr" name="saddr" class="textinput" value="" type="text" />
+		<input name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" type="hidden" />
+		<input value="{% trans "Calculate route" %}" class="input_submit" type="submit" />
+	</fieldset>
+</form>
+{% endif %}

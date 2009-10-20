@@ -85,12 +85,6 @@ a.collapsed span.collapsed{
     display: inline;
 }
 
-.sidebar {
-    width: 30em;
-    float: left;
-    margin-right: 1em;
-}
-
 .clear {
     clear: both;
 }
