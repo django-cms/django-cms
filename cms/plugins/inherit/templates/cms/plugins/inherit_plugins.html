@@ -1,7 +1,3 @@
-{# for plugin in parent_plugins #}
-{# {plugin}}:{{plugin.plugin_type}}:{{plugin.get_plugin_instance} #}
-{# endfor #}
-
-{% for output in parent_output %}
-{{output}}
-{% endfor %}
+{% if parent_output %}
+  {{parent_output|safeseq|join:""}}
+{% endif %}
