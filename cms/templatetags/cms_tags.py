@@ -41,7 +41,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
-        return {'template': 'cms/empty.html'}
+        return {'template': 'cms/content.html'}
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
