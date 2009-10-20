@@ -1,0 +1,7 @@
+{# for plugin in parent_plugins #}
+{# {plugin}}:{{plugin.plugin_type}}:{{plugin.get_plugin_instance} #}
+{# endfor #}
+
+{% for output in parent_output %}
+{{output}}
+{% endfor %}
