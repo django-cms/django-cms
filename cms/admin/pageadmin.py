@@ -871,6 +871,9 @@ class PageAdmin(admin.ModelAdmin):
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
+        if not len(obj.get_languages()) > 1:
+            raise Http404(_('There only exists one translation for this page'))
+
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(page__id=object_id, language=language)
 
