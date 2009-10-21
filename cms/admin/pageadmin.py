@@ -6,7 +6,7 @@ from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
 from cms.admin.utils import get_placeholders
 from cms.admin.views import change_status, change_innavigation, add_plugin, \
-    edit_plugin, remove_plugin, move_plugin, revert_plugins, change_moderation
+    edit_plugin, remove_plugin, move_plugin, save_all_plugins, revert_plugins, change_moderation
 from cms.admin.widgets import PluginEditor
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title, CMSPlugin, PagePermission, \
@@ -883,12 +883,17 @@ class PageAdmin(admin.ModelAdmin):
             if perms_needed:
                 raise PermissionDenied
 
-            message = _('Title and plugins with language %(language)s was deleted')
+            message = _('Title and plugins with language %(language)s was deleted') % {
+                'language': language}
             self.log_change(request, titleobj, message)
 
             titleobj.delete()
             for p in plugins:
                 p.delete()
+
+            if 'reversion' in settings.INSTALLED_APPS:
+                obj.save()
+                save_all_plugins(request, obj)
 
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
@@ -948,9 +953,11 @@ class PageAdminMixins(admin.ModelAdmin):
     pass
 
 if 'reversion' in settings.INSTALLED_APPS:
+    from reversion import revision
     from reversion.admin import VersionAdmin
     # change the inheritance chain to include VersionAdmin
     PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__
+    PageAdminMixins.delete_translation = revision.create_on_success(PageAdminMixins.delete_translation)
     admin.site.register(Page, PageAdminMixins)
 else:
     admin.site.register(Page, PageAdmin)
