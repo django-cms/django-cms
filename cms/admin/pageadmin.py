@@ -40,7 +40,6 @@ from django.utils.translation import ugettext as _
 from django.utils.text import capfirst
 from os.path import join
 
-
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
     list_filter = ['published', 'in_navigation', 'template', 'changed_by']
@@ -852,23 +851,53 @@ class PageAdmin(admin.ModelAdmin):
 
         language = get_language_from_request(request)
 
+        opts = Page._meta
         titleopts = Title._meta
         app_label = titleopts.app_label
         pluginopts = CMSPlugin._meta
 
-        title = get_object_or_404(Title, page__id=object_id, language=language)
+        try:
+            obj = self.queryset(request).get(pk=unquote(object_id))
+        except self.model.DoesNotExist:
+            # Don't raise Http404 just yet, because we haven't checked
+            # permissions yet. We don't want an unauthenticated user to be able
+            # to determine whether a given object exists.
+            obj = None
+
+        if not self.has_delete_permission(request, obj):
+            raise PermissionDenied
+
+        if obj is None:
+            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
+
+        titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(page__id=object_id, language=language)
 
-        deleted_objects = [u'%s: %s' % (capfirst(titleopts.verbose_name), force_unicode(title)), []]
+        deleted_objects = [u'%s: %s' % (capfirst(titleopts.verbose_name), force_unicode(titleobj)), []]
         perms_needed = set()
-        get_deleted_objects(deleted_objects, perms_needed, request.user, title, titleopts, 1, self.admin_site)
+        get_deleted_objects(deleted_objects, perms_needed, request.user, titleobj, titleopts, 1, self.admin_site)
         for p in plugins:
             get_deleted_objects(deleted_objects, perms_needed, request.user, p, pluginopts, 1, self.admin_site)
 
+        if request.method == 'POST':
+            if perms_needed:
+                raise PermissionDenied
+
+            message = _('Title and plugins with language %(language)s was deleted')
+            self.log_change(request, titleobj, message)
+
+            titleobj.delete()
+            for p in plugins:
+                p.delete()
+
+            if not self.has_change_permission(request, None):
+                return HttpResponseRedirect("../../../../")
+            return HttpResponseRedirect("../../")
+ 
         context = {
             "title": _("Are you sure?"),
             "object_name": force_unicode(titleopts.verbose_name),
-            "object": title,
+            "object": titleobj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
             "opts": titleopts,
@@ -882,7 +911,7 @@ class PageAdmin(admin.ModelAdmin):
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context, context_instance=context_instance)
-             
+
     def remove_delete_state(self, request, object_id):
         """Remove all delete action from page states, requires change permission
         """
@@ -921,7 +950,7 @@ class PageAdminMixins(admin.ModelAdmin):
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.admin import VersionAdmin
     # change the inheritance chain to include VersionAdmin
-    PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__    
+    PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__
     admin.site.register(Page, PageAdminMixins)
 else:
     admin.site.register(Page, PageAdmin)
