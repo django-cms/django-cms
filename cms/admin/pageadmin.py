@@ -23,7 +23,7 @@ from cms.utils.permissions import has_page_add_permission, \
 from copy import deepcopy
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote
+from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -31,12 +31,15 @@ from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
+from django import template
 from django.template.context import RequestContext, Context
 from django.template.defaultfilters import title
 from django.utils.encoding import force_unicode
 from django.utils.functional import curry
 from django.utils.translation import ugettext as _
+from django.utils.text import capfirst
 from os.path import join
+
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -199,6 +202,7 @@ class PageAdmin(admin.ModelAdmin):
                 name='%s_edit_plugin' % info),
             pat(r'remove-plugin/$', remove_plugin),
             pat(r'move-plugin/$', move_plugin),
+            pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/change-status/$', change_status),
@@ -843,6 +847,41 @@ class PageAdmin(admin.ModelAdmin):
         if request.method == 'POST' and response.status_code == 302 and public:
             public.delete()
         return response
+
+    def delete_translation(self, request, object_id, extra_context=None):
+
+        language = get_language_from_request(request)
+
+        titleopts = Title._meta
+        app_label = titleopts.app_label
+        pluginopts = CMSPlugin._meta
+
+        title = get_object_or_404(Title, page__id=object_id, language=language)
+        plugins = CMSPlugin.objects.filter(page__id=object_id, language=language)
+
+        deleted_objects = [u'%s: %s' % (capfirst(titleopts.verbose_name), force_unicode(title)), []]
+        perms_needed = set()
+        get_deleted_objects(deleted_objects, perms_needed, request.user, title, titleopts, 1, self.admin_site)
+        for p in plugins:
+            get_deleted_objects(deleted_objects, perms_needed, request.user, p, pluginopts, 1, self.admin_site)
+
+        context = {
+            "title": _("Are you sure?"),
+            "object_name": force_unicode(titleopts.verbose_name),
+            "object": title,
+            "deleted_objects": deleted_objects,
+            "perms_lacking": perms_needed,
+            "opts": titleopts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+        }
+        context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
+        return render_to_response(self.delete_confirmation_template or [
+            "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
+            "admin/%s/delete_confirmation.html" % app_label,
+            "admin/delete_confirmation.html"
+        ], context, context_instance=context_instance)
              
     def remove_delete_state(self, request, object_id):
         """Remove all delete action from page states, requires change permission
