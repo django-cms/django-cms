@@ -258,3 +258,14 @@ class PagesTestCase(PageBaseTestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
         self.assertEqual(response.status_code, 200)
+
+    def test_11_language_delete(self):
+        self.client.login(username= 'test', password='test')
+        setattr(settings, "SITE_ID", 1)
+        page_data = self.get_new_page_data()
+        self.client.post('/admin/cms/page/add/', page_data)
+        pk = Page.objects.all()[0].pk
+        response = self.client.get("/admin/cms/page/%s/delete-translation" % pk, {"language":"en" })
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post("/admin/cms/page/%s/delete-translation" % pk, {"language":"en" })
+        self.assertEqual(response.status_code, 200)
