@@ -91,7 +91,7 @@ def page_submit_row(context):
     change = context['change']
     is_popup = context['is_popup']
     save_as = context['save_as']
-    show_language_tabs = context['show_language_tabs']
+    show_delete_translation = context['show_delete_translation']  
     language = context['language']
     return {
         'onclick_attrib': (opts.get_ordered_objects() and change
@@ -105,6 +105,6 @@ def page_submit_row(context):
         'is_popup': is_popup,
         'show_save': True,
         'language': language,
-        'show_language_tabs': show_language_tabs
+        'show_delete_translation': show_delete_translation
     }
 page_submit_row = register.inclusion_tag('admin/page_submit_line.html', takes_context=True)(page_submit_row)
