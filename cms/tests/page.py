@@ -268,4 +268,4 @@ class PagesTestCase(PageBaseTestCase):
         response = self.client.get("/admin/cms/page/%s/delete-translation" % pk, {"language":"en" })
         self.assertEqual(response.status_code, 200)
         response = self.client.post("/admin/cms/page/%s/delete-translation" % pk, {"language":"en" })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
