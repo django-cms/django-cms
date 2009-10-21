@@ -888,8 +888,9 @@ class PageAdmin(admin.ModelAdmin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': language}
+                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0].lower()}
             self.log_change(request, titleobj, message)
+            self.message_user(request, message)
 
             titleobj.delete()
             for p in plugins:
