@@ -265,7 +265,7 @@ class PagesTestCase(PageBaseTestCase):
         page_data = self.get_new_page_data()
         self.client.post('/admin/cms/page/add/', page_data)
         pk = Page.objects.all()[0].pk
-        response = self.client.get("/admin/cms/page/%s/delete-translation" % pk, {"language":"en" })
+        response = self.client.get("/admin/cms/page/%s/delete-translation/" % pk, {"language":"en" })
         self.assertEqual(response.status_code, 200)
-        response = self.client.post("/admin/cms/page/%s/delete-translation" % pk, {"language":"en" })
+        response = self.client.post("/admin/cms/page/%s/delete-translation/" % pk, {"language":"en" })
         self.assertEqual(response.status_code, 302)
