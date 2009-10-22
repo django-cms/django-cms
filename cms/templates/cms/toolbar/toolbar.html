@@ -102,15 +102,18 @@
 		display:block;float:left;color:#5b81b3;padding-right:10px;margin-left:10px;cursor:pointer;text-decoration:none;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat right -41px;
 	}
+	.cms_toolbar .cms_toolbar_button{color:#5b81b3;}
 	* html .cms_toolbar_button{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif); height:27px; }
 		
-	.cms_toolbar_button:hover{color:#264064;}
+	.cms_toolbar .cms_toolbar_button:hover{color:#264064;}
 	.cms_toolbar_button span{
 		display:block;float:left;height:27px;padding-left:10px;line-height:26px;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat left -41px;
 	}
 	* html .cms_toolbar_button span{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	
+	.cms_toolbar_button span em{color:#5B81B3;}	
+	.cms_toolbar_button:hover span em{color:#264064;}
 	
 	.cms_toolbar_iconbutton strong{
 		margin-top:6px;text-indent:-7777px;display:block;float:left;width:11px;height:14px;line-height:14px;
@@ -119,7 +122,6 @@
 	* html .cms_toolbar_iconbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	
 	/* SETTINGS BUTTON */
-	/*.cms_toolbar .cms_toolbar_settingsbutton{height:27px; overflow:hidden;}*/
 	.cms_toolbar .cms_toolbar_settingsbutton strong{
 		margin-top:6px;text-indent:-7777px;width:15px;height:14px;line-height:14px;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -170px -158px;		
@@ -147,19 +149,14 @@
 	.cms_toolbar .cms_toolbar_submenubutton:hover em{background-position:-190px -188px;}
 	.cms_toolbar_submenu li{
 		clear:both;zoom:1;height:27px;overflow:hidden;
-		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -790px -125px;
-	}
-	* html .cms_toolbar_submenu li{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
-	.cms_toolbar_submenu li.first{background-position:-790px -122px;}
-	.cms_toolbar_submenu li.last{background-position:-790px -248px;}
+		white-space:nowrap;		
+	}		
 	
-	.cms_toolbar_submenuselect .cms_toolbar_submenu{
-		height:200px;
-		overflow:auto;
-	}	
-	
-	.cms_toolbar_submenu a{float:none;display:block;padding-left:10px;padding-top:2px;height:27px;line-height:23px;}
+	.cms_toolbar_submenu a{float:none;display:block;padding:2px 10px 0 10px;height:27px;line-height:23px;}
 	.cms_toolbar_submenu a:hover, .cms_toolbar_submenu li.selected a{color:#264064;}
+	
+	.cms_toolbar_submenuselect .cms_toolbar_submenu{max-height:200px;overflow:auto;}
+	.cms_toolbar_submenuselect .cms_toolbar_submenu a{padding-right:20px;}
 	
 	.cms_toolbar_submenu a span{text-indent:-7777px;width:9px;height:17px;margin-right:4px;}	
 	
@@ -181,8 +178,12 @@
 	.cms_toolbar_submenu a .cms_toolbar_icon_delete{background-position:-108px -155px;}
 	.cms_toolbar_submenu a:hover .cms_toolbar_icon_delete{background-position:-108px -185px;}
 	
-	.cms_toolbar_submenu{z-index:70012;display:none;position:absolute;width:170px;top:29px;right:0px;}
-	.open .cms_toolbar_submenu{display:block;}
+	.cms_toolbar_submenu{z-index:70012;display:none;position:absolute;width:auto;min-width:130px;top:29px;right:0px;}
+	.open .cms_toolbar_submenu{display:block; border:1px solid #E8E8E8;
+		-moz-border-radius:5px;
+		-webkit-border-radius:5px;
+		background:#fff;
+	}
 	
 	/* SETTINGS MENU */
 	#cms_toolbar_settings_menu{z-index:70012;top:29px;left:-124px;}
@@ -674,6 +675,7 @@
 				     return false;
 			     });		
 		    {% endif %}
+			
 			/* PLUGIN */			
 			$("a.cms_toolbar_move_slot").live("click", function(){
 				var target = $(this).attr("rel")
