@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from cms import settings as cms_settings
 
 register = template.Library()
 
@@ -91,7 +92,7 @@ def page_submit_row(context):
     change = context['change']
     is_popup = context['is_popup']
     save_as = context['save_as']
-    show_delete_translation = context['show_delete_translation']  
+    show_delete_translation = context.get('show_delete_translation')  
     language = context['language']
     return {
         'onclick_attrib': (opts.get_ordered_objects() and change
@@ -105,6 +106,7 @@ def page_submit_row(context):
         'is_popup': is_popup,
         'show_save': True,
         'language': language,
+        'language_name': [name for langcode, name in cms_settings.CMS_LANGUAGES if langcode == language][0],
         'show_delete_translation': show_delete_translation
     }
 page_submit_row = register.inclusion_tag('admin/page_submit_line.html', takes_context=True)(page_submit_row)
