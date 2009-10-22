@@ -109,6 +109,11 @@ def get_page_from_request(request):
         return resp['current_page']
 
 
+def mark_descendants(nodes):
+    for node in nodes:
+        node.descendant = True
+        mark_descendants(node.childrens)
+
 def make_tree(request, items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
     from cms.models import Page
     """
@@ -124,6 +129,7 @@ def make_tree(request, items, levels, url, ancestors, descendants=False, current
         item.ancestors_ascending = ancestors
         if item.get_absolute_url() == url:
             item.selected = True
+            item.descendant = False
             levels = active_levels
             descendants = True
             found = True
@@ -214,7 +220,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                           to_levels)
             if hasattr(page, "selected"):
                 mark_sibling = True
-    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended and target.level < to_levels: 
+    if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended and target.level < to_levels:
         target.childrens += get_extended_navigation_nodes(request, 
                                                           levels, 
                                                           list(target.ancestors_ascending) + [target], 

@@ -11,7 +11,7 @@ from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, \
-    cut_levels, find_selected
+    cut_levels, find_selected, mark_descendants
 from cms.utils import navigation
 from cms.utils.i18n import get_fallback_languages
 
@@ -41,7 +41,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
-        return {'template': 'cms/empty.html'}
+        return {'template': 'cms/content.html'}
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
@@ -65,9 +65,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         
         children = []
         ancestors = []
+        alist = None
         if current_page:
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
-        else:# maybe the active node is in an extender?
+        if not alist:  # == None:# maybe the active node is in an extender?
             alist = []
             extenders = page_queryset.published().filter(in_navigation=True, 
                                                         site=site, 
@@ -130,7 +131,10 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         all_pages = pages[:]
         root_level = getattr(root_page, 'level', None)
         ids = []
+        current = None
         for page in pages:# build the tree
+            if current_page and current_page.pk == page.pk:
+                current = page
             if page.level >= db_from_level:
                 ids.append(page.pk)
             if page.level == 0 or page.level == root_level:
@@ -144,7 +148,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 children.append(page)
                 if page.pk == soft_root_pk:
                     page.soft_root = False #ugly hack for the recursive function
-                if current_page:
+                if current_page and not current_page.navigation_extenders:
                     pk = current_page.pk
                 else:
                     pk = -1
@@ -161,9 +165,13 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                         page.title_cache = {}
                     page.title_cache[title.language] = title
                     ids.remove(page.pk)
+            if current_page and page.pk == current_page.pk and not getattr(current, 'ancestor', False):
+                    page.selected = True
+                    if hasattr(page, "childrens"):
+                        mark_descendants(page.childrens)
             if page.pk in ancestors:
                 page.ancestor = True
-            if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk:
+            if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk and not getattr(current, 'ancestor', False):
                 page.sibling = True
         if ids:
             fallbacks = get_fallback_languages(lang)
@@ -305,28 +313,8 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
         })
         return context
     lang = get_language_from_request(request)
-    if page:
-        ancestors = list(page.get_ancestors())
-        ancestors.append(page)
-        home = page_queryset.get_home()
-        if ancestors and ancestors[0].pk != home.pk: 
-            ancestors = [home] + ancestors
-        ids = [page.pk]
-        for anc in ancestors:
-            ids.append(anc.pk)
-        titles = title_queryset.filter(page__in=ids, language=lang)
-        for anc in ancestors:
-            anc.home_pk_cache = home.pk 
-            for title in titles:
-                if title.page_id == anc.pk:
-                    if not hasattr(anc, "title_cache"):
-                        anc.title_cache = {}
-                    anc.title_cache[title.language] = title
-        for title in titles:
-            if title.page_id == page.pk:
-                if not hasattr(page, "title_cache"):
-                    page.title_cache = {}
-                page.title_cache[title.language] = title
+    if page and not page.navigation_extenders:
+        ancestors = ancestors_from_page(page, page_queryset, title_queryset, lang)
     else:
         site = Site.objects.get_current()
         ancestors = []
@@ -358,12 +346,38 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                                     anc.title_cache = {}
                                 anc.title_cache[title.language] = title
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
+        if not ancestors and page:
+            ancestors = ancestors_from_page(page, page_queryset, title_queryset, lang)
     context.update({'ancestors':ancestors,
                     'template': template})
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
-
+                                         
+def ancestors_from_page(page, page_queryset, title_queryset, lang):
+    ancestors = list(page.get_cached_ancestors())
+    ancestors.append(page)
+    home = page_queryset.get_home()
+    if ancestors and ancestors[0].pk != home.pk: 
+        ancestors = [home] + ancestors
+    ids = [page.pk]
+    for anc in ancestors:
+        ids.append(anc.pk)
+    titles = title_queryset.filter(page__in=ids, language=lang)
+    for anc in ancestors:
+        anc.home_pk_cache = home.pk 
+        for title in titles:
+            if title.page_id == anc.pk:
+                if not hasattr(anc, "title_cache"):
+                    anc.title_cache = {}
+                anc.title_cache[title.language] = title
+    for title in titles:
+        if title.page_id == page.pk:
+            if not hasattr(page, "title_cache"):
+                page.title_cache = {}
+            page.title_cache[title.language] = title
+    return ancestors
+            
 def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
