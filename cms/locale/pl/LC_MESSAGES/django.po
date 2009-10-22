@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-10 20:44+0200\n"
+"POT-Creation-Date: 2009-10-22 13:55+0200\n"
 "PO-Revision-Date: 2009-10-10 00:57+0100\n"
 "Last-Translator: Maciej Wiśniowski <pigletto@gmail.com>\n"
 "Language-Team: Gerard\n"
@@ -189,37 +189,37 @@ msgstr ""
 msgid "To add permissions you also need to edit them!"
 msgstr "Aby dodać uprawnienia musisz także móc je edytować!"
 
-#: admin/pageadmin.py:87 admin/pageadmin.py:103
+#: admin/pageadmin.py:90 admin/pageadmin.py:106
 msgid "Hidden"
 msgstr "Ukryte"
 
-#: admin/pageadmin.py:98
+#: admin/pageadmin.py:101
 msgid "Basic Settings"
 msgstr "Ustawienia podstawowe"
 
-#: admin/pageadmin.py:101
+#: admin/pageadmin.py:104
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "Uwaga: gdy zmienione zostanie zaznaczenie wybranego elementu strona zostanie "
 "przeładowana automatycznie, aby nie utracić danych najpierw zapisz."
 
-#: admin/pageadmin.py:107
+#: admin/pageadmin.py:110
 msgid "Advanced Settings"
 msgstr "Ustawienia zaawansowane"
 
-#: admin/pageadmin.py:116
+#: admin/pageadmin.py:119
 msgid "SEO Settings"
 msgstr "Ustawienia SEO"
 
-#: admin/pageadmin.py:466
+#: admin/pageadmin.py:484
 msgid "higher"
 msgstr "wyższy"
 
-#: admin/pageadmin.py:598
+#: admin/pageadmin.py:616
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: admin/pageadmin.py:683 migrations/0001_initial.py:13
+#: admin/pageadmin.py:701 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
 #: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
 #: models/pagemodel.py:70 models/permissionmodels.py:69
@@ -230,7 +230,7 @@ msgstr "Błąd bazy danych"
 msgid "page"
 msgstr "stronę"
 
-#: admin/pageadmin.py:805
+#: admin/pageadmin.py:823
 msgid "Page was successfully approved."
 msgstr "Strona została pomyślnie zatwierdzona."
 
@@ -254,32 +254,32 @@ msgstr "Szczegóły użytkownika"
 msgid "Groups"
 msgstr "Grupy"
 
-#: admin/useradmin.py:30
+#: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:828
 msgid "Password"
 msgstr "Hasło"
 
-#: admin/views.py:27
+#: admin/views.py:28
 msgid "You do not have permission to publish this page"
 msgstr ""
 
-#: admin/views.py:45
+#: admin/views.py:46
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/views.py:72
+#: admin/views.py:73
 msgid "You do not have permission to change this page"
 msgstr ""
 
-#: admin/views.py:76
+#: admin/views.py:77
 msgid "Language must be set to a supported language!"
 msgstr "Język musi być ustawiony na jeden z obsługiwanych języków!"
 
-#: admin/views.py:88
+#: admin/views.py:89
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "Plugin %(plugin_name)s został dodany do %(placeholder)s"
 
-#: admin/views.py:162
+#: admin/views.py:163
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
@@ -287,11 +287,11 @@ msgstr ""
 "Plugin %(plugin_name)s został zmieniony na pozycji %(position)s w %"
 "(placeholder)s"
 
-#: admin/views.py:204
+#: admin/views.py:222
 msgid "Plugins where moved"
 msgstr "Plugin'y zostały przeniesione"
 
-#: admin/views.py:227
+#: admin/views.py:245
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -682,7 +682,8 @@ msgid "req. app."
 msgstr ""
 
 #: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
-#: utils/moderator.py:91
+#: templates/cms/toolbar/toolbar.html:859
+#: templates/cms/toolbar/toolbar.html:886 utils/moderator.py:91
 msgid "delete"
 msgstr "usuń"
 
@@ -1104,7 +1105,7 @@ msgid "Not a plugin object"
 msgstr "Obiekt nie jest pluginem."
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
-#: templates/admin/cms/page/widgets/plugin_editor.html:8
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
 msgstr "Dostępne Plugin'y"
 
@@ -1349,41 +1350,41 @@ msgstr "Lista stron"
 msgid "Home"
 msgstr "Start"
 
-#: templates/admin/cms/page/change_list.html:54
+#: templates/admin/cms/page/change_list.html:55
 msgid "Successfully moved"
 msgstr "Przeniesiono."
 
-#: templates/admin/cms/page/change_list.html:59
+#: templates/admin/cms/page/change_list.html:60
 msgid "An error occured. Please reload the page"
 msgstr "Wystąpił błąd. Proszę przeładować stronę"
 
-#: templates/admin/cms/page/change_list.html:79
+#: templates/admin/cms/page/change_list.html:80
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "Napraw usunięty %(name)s"
 
-#: templates/admin/cms/page/change_list.html:82
+#: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Add %(name)s"
 msgstr "Dodaj %(name)s"
 
-#: templates/admin/cms/page/change_list.html:94
+#: templates/admin/cms/page/change_list.html:95
 msgid "Pages on:"
 msgstr "Strony na"
 
-#: templates/admin/cms/page/change_list.html:111
+#: templates/admin/cms/page/change_list.html:112
 msgid "Filter:"
 msgstr "Filtr:"
 
-#: templates/admin/cms/page/change_list.html:111
+#: templates/admin/cms/page/change_list.html:112
 msgid "on"
 msgstr "aktywny"
 
-#: templates/admin/cms/page/change_list.html:111
+#: templates/admin/cms/page/change_list.html:112
 msgid "off"
 msgstr "nieaktywny"
 
-#: templates/admin/cms/page/change_list.html:113
+#: templates/admin/cms/page/change_list.html:114
 msgid "Filter"
 msgstr "Filtr"
 
@@ -1409,6 +1410,8 @@ msgid "edit this page"
 msgstr "edytuj tą stronę"
 
 #: templates/admin/cms/page/menu_item.html:6
+#: templates/cms/toolbar/toolbar.html:852
+#: templates/cms/toolbar/toolbar.html:875
 msgid "edit"
 msgstr "edytuj"
 
@@ -1460,6 +1463,7 @@ msgid "add"
 msgstr "dodaj"
 
 #: templates/admin/cms/page/menu_item.html:65
+#: templates/cms/toolbar/toolbar.html:837
 msgid "Approve directly"
 msgstr "Zatwierdź bezpośrednio"
 
@@ -1572,29 +1576,119 @@ msgstr "Opcje kopiowania"
 msgid "Choose copy options"
 msgstr "Wybierz opcje kopiowania"
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:11
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
+#: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
 msgstr "Dodaj Plugin"
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:16
+#: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
 msgstr "Musisz zapisać stronę przed dodaniem pluginów."
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:19
+#: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
 msgstr "Nie wybrano żadnego Plugin'a. Wybierz jeden z menu po lewej stronie"
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:21
+#: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr "Nie dodano jeszcze pluginów. Dodaj plugin dla tego slotu."
 
-#: templates/cms/revisions.html:3
-msgid "Revisions"
-msgstr "Wersje"
+#: templates/cms/toolbar/toolbar.html:733
+#, fuzzy, python-format
+msgid "Move to %(name)s"
+msgstr "Napraw usunięty %(name)s"
 
-#: templates/cms/traduction_helper.html:4
-msgid "Wanted language has not been translated yet."
-msgstr "Brak tłumaczenia na ten język."
+#: templates/cms/toolbar/toolbar.html:779
+msgid "Are you sure you want to delete this plugin?"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:808
+msgid "Edit mode"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:815
+#, fuzzy
+msgid "Status"
+msgstr "status"
+
+#: templates/cms/toolbar/toolbar.html:826
+#, fuzzy
+msgid "Username"
+msgstr "Użytkownik:"
+
+#: templates/cms/toolbar/toolbar.html:830
+#: templates/cms/toolbar/toolbar.html:831
+#, fuzzy
+msgid "login"
+msgstr "odnośnik"
+
+#: templates/cms/toolbar/toolbar.html:842
+msgid "Template"
+msgstr "Szablon"
+
+#: templates/cms/toolbar/toolbar.html:852
+msgid "Site Administration"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:854
+#, fuzzy
+msgid "move"
+msgstr "film"
+
+#: templates/cms/toolbar/toolbar.html:854
+msgid "Move/add Pages"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:855
+#, fuzzy
+msgid "Page Settings"
+msgstr "Ustawienia podstawowe"
+
+#: templates/cms/toolbar/toolbar.html:857
+#, fuzzy
+msgid "history"
+msgstr "Historia"
+
+#: templates/cms/toolbar/toolbar.html:857
+#, fuzzy
+msgid "View History"
+msgstr "Historia"
+
+#: templates/cms/toolbar/toolbar.html:859
+#, fuzzy
+msgid "Delete Page"
+msgstr "Usuń"
+
+#: templates/cms/toolbar/toolbar.html:864
+msgid "Lock"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:864
+msgid "Logout"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:866
+msgid "Close"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:877
+msgid "up"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:878
+#, fuzzy
+msgid "down"
+msgstr "aktywny"
+
+#: templates/cms/toolbar/toolbar.html:880
+#, fuzzy
+msgid "Settings"
+msgstr "Ustawienia SEO"
+
+#: templates/cms/toolbar/toolbar.html:886
+#, fuzzy
+msgid "Delete Plugin"
+msgstr "Zmień wybrany plugin"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
@@ -1608,12 +1702,12 @@ msgstr ""
 msgid "Unbind descendants moderation"
 msgstr ""
 
-#: templatetags/cms_tags.py:374 templatetags/cms_tags.py:593
+#: templatetags/cms_tags.py:391 templatetags/cms_tags.py:627
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr "Odwrotny ID nie znaleziony w domenie %(domain)s"
 
-#: templatetags/cms_tags.py:375
+#: templatetags/cms_tags.py:392
 #, python-format
 msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %"
@@ -1621,7 +1715,7 @@ msgid ""
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:594
+#: templatetags/cms_tags.py:628
 #, python-format
 msgid ""
 "A show_placeholder_by_id template tag didn't found a page with the "
@@ -1652,6 +1746,12 @@ msgstr "CMS - Twoje konto użytkownika zostało utworzone"
 #: utils/permissions.py:195
 msgid "CMS - your user account was changed."
 msgstr "CMS - Twoje konto użytkownika zostało zmodyfikowane"
+
+#~ msgid "Revisions"
+#~ msgstr "Wersje"
+
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Brak tłumaczenia na ten język."
 
 #~ msgid "Site"
 #~ msgstr "Witryna"
@@ -1700,9 +1800,6 @@ msgstr "CMS - Twoje konto użytkownika zostało zmodyfikowane"
 
 #~ msgid "The url that this page has instead. Starts with a \"/\""
 #~ msgstr "Zamienny adres url dla tej strony. Zaczyna się od \"/\""
-
-#~ msgid "Template"
-#~ msgstr "Szablon"
 
 #~ msgid "Default template"
 #~ msgstr "Domyślny szablon"
