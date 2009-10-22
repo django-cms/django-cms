@@ -2,7 +2,7 @@
 <div class="cont{% if CMS_MODERATOR %} moderatorstate{{ page_moderator_state.state }}{% endif %}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="{{ url }}{{ page.id }}" class="title" title="{% trans "edit this page" %}">{{ page.get_menu_title }}</a>	
+			<a href="{{ url }}{{ page.id }}" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>	
 			<a href="{{ url }}{{ page.id }}" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>

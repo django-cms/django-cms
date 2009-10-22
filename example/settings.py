@@ -121,7 +121,7 @@ INSTALLED_APPS = (
     'south',
     # sample application
     'example.sampleapp',
-    'test_utils',
+    #'test_utils',
     #'store',
 )
 
