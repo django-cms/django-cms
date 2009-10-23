@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'cms.plugins.teaser',
     'cms.plugins.video',
     'cms.plugins.twitter',
+    'cms.plugins.inherit',
     'mptt',
     'reversion',
     'example.categories',
