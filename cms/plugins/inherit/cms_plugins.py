@@ -14,6 +14,7 @@ from cms.models import CMSPlugin
 from models import InheritPagePlaceholder
 from django.template.context import Context
 from django.conf import settings
+from cms.plugins.inherit.forms import InheritForm
 import copy
 
 class InheritPagePlaceholderPlugin(CMSPluginBase):
@@ -22,45 +23,66 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
     and renders those plugins sequentially
     """
     model = InheritPagePlaceholder
-    name = _("Inherit Plugins from Parent Page")
+    name = _("Inherit Plugins from Page")
     render_template = "cms/plugins/inherit_plugins.html"
-
+    form = InheritForm
+    admin_preview = False
+    
     def render(self, context, instance, placeholder):
-        #print 'rendering inherited plugins!'
         template_vars = {
             'placeholder': placeholder,
         }
         template_vars['object'] = instance
-        # locate the plugins assigned to the given page for the indicated placeholder
-        lang = None
+        lang = instance.from_language
         request = None
-        if context.has_key('request'):
-            request = context['request']
-            lang = get_language_from_request(request)
+        if not lang:
+            if context.has_key('request'):
+                request = context['request']
+                lang = get_language_from_request(request)
+            else:
+                lang = settings.LANGUAGE_CODE
+        if instance.from_page:
+            page = instance.from_page
         else:
-            lang = settings.LANGUAGE_CODE
-        #print 'language CONTEXT FOR PLUGIN:', lang
-        plugins = get_cmsplugin_queryset(request).filter(page=instance.parent_page, language=lang, placeholder__iexact=placeholder, parent__isnull=True).order_by('position').select_related()
-        #plugins = CMSPlugin.objects.filter(page=instance.parent_page, placeholder=placeholder, language=lang)
+            page = instance.page
+        if not instance.page.publisher_is_draft and page.publisher_is_draft:
+            page = page.publisher_public
+            
+        plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder, parent__isnull=True).order_by('position').select_related()
         plugin_output = []
         template_vars['parent_plugins'] = plugins 
         for plg in plugins:
-            #print 'added a parent plugin:', plg, plg.__class__
-            # use a temporary context to prevent plugins from overwriting context
             tmpctx = copy.copy(context)
             tmpctx.update(template_vars)
             inst, name = plg.get_plugin_instance()
-            #print 'got a plugin instance:', inst
             outstr = inst.render_plugin(tmpctx, placeholder)
             plugin_output.append(outstr)
-            #print 'render result:', outstr
         template_vars['parent_output'] = plugin_output
         context.update(template_vars)
-#        plugin_output = render_plugins_for_context(placeholder, instance.parent_page, context)
-#        print 'PLUGIN OUTPUT:', plugin_output
-#        template_vars['parent_output'] = plugin_output
-#        context.update(template_vars)
-#        print 'inherit returning output:', context['parent_output']
         return context
+    
+    def get_form(self, request, obj=None, **kwargs):
+        Form = super(InheritPagePlaceholderPlugin, self).get_form(request, obj, **kwargs)
+        
+        # this is bit tricky, since i don't wont override add_view and 
+        # change_view 
+        class FakeForm(object):
+            def __init__(self, Form, site):
+                self.Form = Form
+                self.site = site
+                
+                # base fields are required to be in this fake class, this may
+                # do some troubles, with new versions of django, if there will
+                # be something more required
+                self.base_fields = Form.base_fields
+            
+            def __call__(self, *args, **kwargs):
+                # instanciate the form on call
+                form = self.Form(*args, **kwargs)
+                # tell form we are on this site
+                form.for_site(self.site)
+                return form
+            
+        return FakeForm(Form, self.cms_plugin_instance.page.site) 
 
 plugin_pool.register_plugin(InheritPagePlaceholderPlugin)

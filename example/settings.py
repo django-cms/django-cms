@@ -139,8 +139,8 @@ LANGUAGES = (
 )
 
 CMS_LANGUAGE_CONF = {
-    'de':['fr'],
-    'en':['fr'],
+    'de':['fr', 'en'],
+    'en':['fr', 'de'],
 }
 
 CMS_TEMPLATES = (
@@ -163,7 +163,6 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
-        "plugins": ("VideoPlugin", "TextPlugin", ),
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
