@@ -9,15 +9,19 @@
 		autoplay: {{ object.auto_play|bool }},
 		autoload: {{ object.auto_load|bool }},
 		loop: {{ object.loop|bool }},
-		fullscreen: {{ object.fullscreen|bool }}
+		fullscreen: {{ object.fullscreen|bool }},
+		fgcolor: "{{ object.fgcolor }}",
+		mute: "{{ object.mute }}",
+		muteonly: "{{ object.mute_only }}",
+		controller_style: "{{ object.controller_style }}"
 	};
 	
 	{% if object.image %}
 		flashvars.image = "{{ MEDIA_URL }}{{ object.image}}";
 	{% endif %}
 	{% if object.click_url %}
-		flashvars.clickurl = {{ object.click_url }}
-		flashvars.clicktarget = {{ object.click_target }};
+		flashvars.clickurl = "{{ object.click_url }}";
+		flashvars.clicktarget = "{{ object.click_target }}";
 	{% endif %}
 				
 	var params = {

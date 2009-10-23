@@ -34,22 +34,3 @@ def get_placeholders(request, template=None):
 
 def get_placeholder_plugins(placeholder):
     pass
-
-
-"""
-        edit = False
-        if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
-            edit = True
-        
-        if edit:
-            installed_plugins = plugin_pool.get_all_plugins(self.name)
-            name = self.name
-            if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
-                if "name" in settings.CMS_PLACEHOLDER_CONF[self.name]:
-                    name = settings.CMS_PLACEHOLDER_CONF[self.name]['name']
-            name = title(name)
-            c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
-                                                                   'language':request.LANGUAGE_CODE,
-                                                                   'placeholder_name':name,
-                             
-"""

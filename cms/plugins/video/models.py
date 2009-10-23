@@ -5,6 +5,9 @@ from cms.models import CMSPlugin
 from os.path import basename
 
 class Video(CMSPlugin):
+    CONTROLLER_OVERLAY = 'overlay'
+    CONTROLLER_DOCK = 'dock'
+    
     CLICK_TARGET_BLANK = '_blank'
     CLICK_TARGET_SELF = '_self'
     CLICK_TARGET_PARENT = '_parent'
@@ -12,6 +15,11 @@ class Video(CMSPlugin):
     WMODE_WINDOW = 'window'
     WMODE_OPAQUE = 'opaque'
     WMODE_TRANSPARENT = 'transparent'
+    
+    controller_style_choices = (
+        (CONTROLLER_DOCK, _('dock')),
+        (CONTROLLER_OVERLAY, _('overlay')),
+    )
     
     click_target_choices = (
         (CLICK_TARGET_BLANK, _('blank')),
@@ -34,12 +42,18 @@ class Video(CMSPlugin):
     auto_load = models.BooleanField(_('auto load'), default=True)
     auto_play = models.BooleanField(_('auto play'), default=False)
     loop = models.BooleanField(_('loop'), default=False)
-    volume = models.SmallIntegerField(_('volume'), default=50, help_text=_('in range <0, 100>'))
+    
+    controller_style = models.CharField(_('controller style'), max_length=7, choices=controller_style_choices, default=CONTROLLER_DOCK)
     
     click_url = models.URLField(_('click_url'), blank=True, null=True)
     click_target = models.CharField(_('click target'), max_length=7, choices=click_target_choices, default=CLICK_TARGET_BLANK)
     
+    mute = models.BooleanField(_('mute'), default=False)
+    mute_only = models.BooleanField(_('mute only'), default=False)
+    volume = models.SmallIntegerField(_('volume'), default=50, help_text=_('in range <0, 100>'))
+    
     # plugin settings
+    fgcolor = models.CharField(_('fgcolor'), max_length=6, default="13abec", help_text=_('Hexadecimal, eg 13abec'))
     bgcolor = models.CharField(_('bgcolor'), max_length=6, default="000000", help_text=_('Hexadecimal, eg fff000'))
     fullscreen = models.BooleanField(_('fullscreen'), default=False)
     wmode = models.CharField(_('wmode'), max_length=10, choices=wmode_choices, default=WMODE_OPAQUE)
