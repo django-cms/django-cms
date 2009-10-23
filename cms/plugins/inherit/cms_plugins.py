@@ -19,7 +19,7 @@ import copy
 
 class InheritPagePlaceholderPlugin(CMSPluginBase):
     """
-    Locates the plugins associated with the "parent_page" of an InheritPagePlaceholder instance
+    Locates the plugins associated with the "from_page" of an InheritPagePlaceholder instance
     and renders those plugins sequentially
     """
     model = InheritPagePlaceholder
