@@ -30,7 +30,7 @@ from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
+from django.template.context import RequestContext, Context
 from django.template.defaultfilters import title
 from django.utils.encoding import force_unicode
 from django.utils.functional import curry
@@ -512,25 +512,21 @@ class PageAdmin(admin.ModelAdmin):
                     obj.pagemoderatorstate_set.get_delete_actions(
                     ).count())
 
-            language = get_language_from_request(request, obj)
+            
             #activate(user_lang_set)
             extra_context = {
                 'placeholders': get_placeholders(request, template),
-                'language': language,
-                'traduction_language': settings.CMS_LANGUAGES,
-                'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
-                
                 'moderation_level': moderation_level,
                 'moderation_required': moderation_required,
                 'moderator_should_approve': moderator_should_approve(request, obj),
-                
                 'moderation_delete_request': moderation_delete_request,
             }
+            extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
         response = super(PageAdmin, self).change_view(request, object_id, extra_context)
         
@@ -538,6 +534,18 @@ class PageAdmin(admin.ModelAdmin):
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
+    
+    def update_language_tab_context(self, request, obj=None, context=None):
+        if not context:
+            context = {}
+        language = get_language_from_request(request, obj)
+        context.update({
+            'language': language,
+            'traduction_language': settings.CMS_LANGUAGES,
+            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
+        })
+        return context
+        
   
     def response_change(self, request, obj):
         """Called always when page gets changed, call save on page, there may be
@@ -626,7 +634,6 @@ class PageAdmin(admin.ModelAdmin):
             'app_label': app_label,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
-            
             'CMS_PERMISSION': settings.CMS_PERMISSION,
             'CMS_MODERATOR': settings.CMS_MODERATOR,
             'has_recover_permission': self.has_recover_permission(request),
@@ -645,21 +652,26 @@ class PageAdmin(admin.ModelAdmin):
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
+        
+        
         return super(PageAdmin, self).recoverlist_view(request, extra_context)
     
     def recover_view(self, request, version_id, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
+        extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).recover_view(request, version_id, extra_context)
     
     def revision_view(self, request, object_id, version_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
+        extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
     
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
+        extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).history_view(request, object_id, extra_context)
     
     def render_revision_form(self, request, obj, version, context, revert=False, recover=False):

@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from cms.utils.admin import render_admin_menu_item
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from cms.utils.plugins import get_placeholders
+from cms.utils import get_language_from_request
 
 @require_POST
 def change_status(request, page_id):
@@ -277,6 +278,7 @@ def revert_plugins(request, version_id, obj):
     titles = []
     others = []
     page = obj
+    lang = get_language_from_request(request)
     for rev in revs:
         obj = rev.object
         
@@ -288,7 +290,8 @@ def revert_plugins(request, version_id, obj):
             pass
             #page = obj #Page.objects.get(pk=obj.pk)
         elif obj.__class__ == Title:
-            titles.append(obj)
+            if not obj.language == lang: 
+                titles.append(obj) 
         else:
             others.append(rev)
     if not page.has_change_permission(request):
@@ -317,7 +320,6 @@ def revert_plugins(request, version_id, obj):
         other.object.save()
     for plugin in current_plugins:
         plugin.delete()
-        
 
 @require_POST
 def change_moderation(request, page_id):

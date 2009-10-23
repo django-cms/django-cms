@@ -9,6 +9,7 @@ from cms.exceptions import NoHomeFound
 from cms import settings
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
+from cms.utils.plugin import render_plugins_for_context
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, \
     cut_levels, find_selected, mark_descendants
@@ -44,7 +45,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
-        return {'template': 'cms/empty.html'}
+        return {'template': 'cms/content.html'}
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
@@ -71,7 +72,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         alist = None
         if current_page:
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
-        if alist == None:# maybe the active node is in an extender?
+        if not alist:  # == None:# maybe the active node is in an extender?
             alist = []
             extenders = page_queryset.published().filter(in_navigation=True, 
                                                         site=site, 
@@ -509,33 +510,19 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         if page == "dummy":
             return ""
-        plugins = get_cmsplugin_queryset(request).filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
-        if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
-            if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
-                context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
-        if self.theme:
-            # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
-            context.update({'theme': self.theme,})
-        c = ""
-        edit = False
-        if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
-            edit = True
-        
-        if edit:
-            installed_plugins = plugin_pool.get_all_plugins(self.name)
-            name = self.name
-            if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
-                if "name" in settings.CMS_PLACEHOLDER_CONF[self.name]:
-                    name = settings.CMS_PLACEHOLDER_CONF[self.name]['name']
-            name = title(name)
-            c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
-                                                                   'language':request.LANGUAGE_CODE,
-                                                                   'placeholder_name':name,
-                                                                   'placeholder':self.name,
-                                                                   'page':page})
-        for plugin in plugins:
-            c += plugin.render_plugin(context, self.name, edit=edit)                
-        return c
+        return render_plugins_for_context(self.name, page, context, self.theme)
+# NOTE: refactored to use a common utility function
+#        plugins = get_cmsplugin_queryset(request).filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+#        if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
+#            if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
+#                context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
+#        if self.theme:
+#            # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
+#            context.update({'theme': self.theme,})
+#        c = ""
+#        for plugin in plugins:
+#            c += plugin.render_plugin(context, self.name)
+#        return c
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
