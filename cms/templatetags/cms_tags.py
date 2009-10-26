@@ -510,10 +510,7 @@ class PlaceholderNode(template.Node):
         if self.theme:
             # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
             context.update({'theme': self.theme,})
-        c = ""
-        for plugin in plugins:
-            c += plugin.render_plugin(context, self.name)
-        return c
+        return "".join([plugin.render_plugin(context, self.name) for plugin in plugins])
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
