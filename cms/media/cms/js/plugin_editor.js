@@ -20,13 +20,20 @@ $(document).ready(function() {
         if (pluginvalue) {
             var pluginname = select.children('[selected]').text();
             var ul_list = $(this).parent().parent().children("ul.plugin-list");
-            $.post("add-plugin/", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
-                if ('error' != data) {
-                    loadPluginForm(target_div, data);
-                    ul_list.append('<li id="plugin_' + data + '" class="' + pluginvalue + ' active"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>');
-                    setclickfunctions();
-                }
-            }, "html" );
+            $.ajax({
+            	url: "add-plugin/", dataType: "html", type: "POST",
+            	data: { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language },
+            	success: function(data) {
+                   loadPluginForm(target_div, data);
+                   ul_list.append('<li id="plugin_' + data + '" class="' + pluginvalue + ' active"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>');
+                   setclickfunctions();
+            	},
+            	error: function(xhr) {
+            		if (xhr.status < 500) {
+            			alert(xhr.responseText);
+            		}
+            	}
+            });
         }
     });
 
