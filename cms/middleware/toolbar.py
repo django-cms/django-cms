@@ -19,7 +19,7 @@ _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 def inster_after_tag(string, tag, insertion):
     no_case = string.lower()
     index = no_case.find("<%s" % tag.lower())
-    if index:
+    if index > -1:
         start_tag = index
         end_tag = start_tag + no_case[start_tag:].find(">") + 1
         return string[:end_tag] + insertion + string[end_tag:]

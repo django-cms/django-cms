@@ -461,9 +461,10 @@ def language_chooser(context, template="cms/language_chooser.html"):
     
     request = context['request']
     languages = []
-    for lang in settings.CMS_LANGUAGES:
-        if lang[0] in settings.CMS_FRONTEND_LANGUAGES:
-            languages.append(lang)
+    cms_languages = dict(settings.CMS_LANGUAGES)
+    for lang in settings.CMS_FRONTEND_LANGUAGES:
+        if lang in cms_languages:
+            languages.append((lang, cms_languages[lang]))
     lang = get_language_from_request(request, request.current_page)
     context.update(locals())
     return context

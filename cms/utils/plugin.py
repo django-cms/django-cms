@@ -39,7 +39,7 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
                                                                })
 
     for plugin in plugins:
-        c += plugin.render_plugin(copy.copy(context), placeholder_name)
+        c += plugin.render_plugin(copy.copy(context), placeholder_name, edit=edit)
     return c
 
 
