@@ -46,7 +46,7 @@ class PluginPool(object):
                     allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get("plugins")
                 if not allowed_plugins:
                     allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("plugins")
-                if plugin.__name__ in allowed_plugins or not allowed_plugins:
+                if not allowed_plugins or plugin.__name__ in allowed_plugins:
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins
