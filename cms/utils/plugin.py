@@ -37,10 +37,11 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
                                                                'language':request.LANGUAGE_CODE,
                                                                'placeholder_name':name,
                                                                })
-
-    for plugin in plugins:
-        c += plugin.render_plugin(copy.copy(context), placeholder_name, edit=edit)
-    return c
+    c = []
+    for index, plugin in enumerate(plugins):
+        context['plugin_index'] = index
+        c.append(plugin.render_plugin(copy.copy(context), placeholder_name, edit=edit))
+    return "".join(c)
 
 
                              
