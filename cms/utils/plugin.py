@@ -22,7 +22,7 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
     if theme:
         # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
         context.update({'theme': theme,})
-    c = ""
+    c = []
     edit = False
     if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
         edit = True
@@ -33,11 +33,12 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
             if "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
                 name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]['name']
         name = title(name)
-        c += render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
+        c.append(render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                'language':request.LANGUAGE_CODE,
-                                                               'placeholder_name':name,
-                                                               })
-    c = []
+                                                               'placeholder_label':name,
+                                                               'placeholder_name':placeholder_name,
+                                                               'page':page,
+                                                               }))
     for index, plugin in enumerate(plugins):
         context['plugin_index'] = index
         c.append(plugin.render_plugin(copy.copy(context), placeholder_name, edit=edit))
