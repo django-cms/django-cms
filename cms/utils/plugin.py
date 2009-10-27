@@ -27,7 +27,7 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
     if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
         edit = True
     if edit:
-        installed_plugins = plugin_pool.get_all_plugins(placeholder_name)
+        installed_plugins = plugin_pool.get_all_plugins(placeholder_name, page)
         name = placeholder_name
         if settings.CMS_PLACEHOLDER_CONF and placeholder_name in settings.CMS_PLACEHOLDER_CONF:
             if "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:

@@ -406,7 +406,7 @@ class PageAdmin(admin.ModelAdmin):
             
             for placeholder_name in get_placeholders(request, template):
                 if placeholder_name not in self.mandatory_placeholders:
-                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name)
+                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                     plugin_list = []
                     if obj:
                         if versioned:
@@ -471,7 +471,7 @@ class PageAdmin(admin.ModelAdmin):
         """
         Given the request and name of a placeholder return a PluginEditor Widget
         """
-        installed_plugins = plugin_pool.get_all_plugins(name)
+        installed_plugins = plugin_pool.get_all_plugins(name, page)
         widget = PluginEditor(installed=installed_plugins)
         if not isinstance(widget(), Widget):
             widget = Textarea

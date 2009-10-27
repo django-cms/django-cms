@@ -82,7 +82,7 @@ class ToolbarMiddleware(object):
                 if not name:
                     name = placeholder
                 d['name'] = title(name)
-                plugins = plugin_pool.get_all_plugins(placeholder)
+                plugins = plugin_pool.get_all_plugins(placeholder, page)
                 d['plugins'] = [] 
                 for p in plugins:
                     d['plugins'].append(p.value)

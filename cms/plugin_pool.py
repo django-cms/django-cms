@@ -51,8 +51,8 @@ class PluginPool(object):
             plugins = final_plugins
         return plugins
     
-    def get_text_enabled_plugins(self, placeholder):
-        plugins = self.get_all_plugins(placeholder)
+    def get_text_enabled_plugins(self, placeholder, page):
+        plugins = self.get_all_plugins(placeholder, page)
         final = []
         for plugin in plugins:
             if plugin.text_enabled:
