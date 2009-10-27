@@ -51,8 +51,13 @@ Example::
 			"plugins": ('TeaserPlugin', 'LinkPlugin'),
 			"extra_context": {"theme":"small"},
 			'name':gettext("Right Column")
-		},
+    	},
+    	'base.html content': {
+    		"plugins": {'TextPlugin', 'PicturePlugin', 'TeasePlugin'}
+    	},
 	}
+
+You can combine template names and placeholder names to granually define the plugins like done with ''base.html content''.
 	
 **plugins**
 
