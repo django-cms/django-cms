@@ -35,7 +35,8 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
         name = title(name)
         c.append(render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                'language':request.LANGUAGE_CODE,
-                                                               'placeholder_name':name,
+                                                               'placeholder_label':name,
+                                                               'placeholder_name':placeholder_name,
                                                                'page':page,
                                                                }))
     for index, plugin in enumerate(plugins):
