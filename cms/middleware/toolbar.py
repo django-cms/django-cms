@@ -76,10 +76,12 @@ class ToolbarMiddleware(object):
             placeholders = get_placeholders(request)
             for placeholder in placeholders:
                 d = {}
-                if placeholder in cms_settings.CMS_PLACEHOLDER_CONF and "name" in cms_settings.CMS_PLACEHOLDER_CONF[placeholder]:
-                    d['name'] =  title(cms_settings.CMS_PLACEHOLDER_CONF[placeholder]["name"])
-                else:
-                    d['name'] =  title(placeholder)
+                name = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get("name", None)
+                if not name:
+                    name = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("name", None)
+                if not name:
+                    name = placeholder
+                d['name'] = title(name)
                 plugins = plugin_pool.get_all_plugins(placeholder)
                 d['plugins'] = [] 
                 for p in plugins:

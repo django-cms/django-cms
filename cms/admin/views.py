@@ -62,8 +62,9 @@ def add_plugin(request):
             placeholder = request.POST['placeholder'].lower()
             language = request.POST['language']
             position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
-            
-            limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get('limits')
+            limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get('limits', None)
+            if not limits:
+                limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get('limits', None)
             if limits:
                 global_limit = limits.get("global")
                 type_limit = limits.get(plugin_type)

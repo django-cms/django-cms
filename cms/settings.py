@@ -27,6 +27,8 @@ if CMS_TEMPLATE_INHERITANCE:
 #    'placeholder1': {
 #        "plugins": ('plugin1', 'plugin2'),
 #        "extra_context": {},
+#        "name": gettext("name"),
+#        "limit": 3,
 #    },
 #    'placeholder2': {
 #        "plugins": ('plugin1', 'plugin3'),

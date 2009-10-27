@@ -335,9 +335,10 @@ class PageAdmin(admin.ModelAdmin):
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
             for placeholder_name in get_placeholders(request, template):
                 if placeholder_name not in self.mandatory_placeholders:
-                    if placeholder_name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
-                        name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]["name"]
-                    else:
+                    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template placeholder_name), {}).get("name", None)
+                    if not name:
+                        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
+                    if not name:
                         name = placeholder_name
                     given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)

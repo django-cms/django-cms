@@ -46,12 +46,12 @@ Example::
 			'plugins': ('TextPlugin', 'PicturePlugin'),
 			'extra_context': {"theme":"wide"},
 			'name':gettext("Content")
-    	},
-    	'right-column': {
-        	"plugins": ('TeaserPlugin', 'LinkPlugin'),
-        	"extra_context": {"theme":"small"},
+		},
+		'right-column': {
+			"plugins": ('TeaserPlugin', 'LinkPlugin'),
+			"extra_context": {"theme":"small"},
 			'name':gettext("Right Column")
-    	},
+		},
 	}
 	
 **plugins**
