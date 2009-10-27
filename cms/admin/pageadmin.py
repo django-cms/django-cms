@@ -890,8 +890,9 @@ class PageAdmin(admin.ModelAdmin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': language}
+                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0].lower()}
             self.log_change(request, titleobj, message)
+            self.message_user(request, message)
 
             titleobj.delete()
             for p in plugins:
@@ -900,6 +901,10 @@ class PageAdmin(admin.ModelAdmin):
             if 'reversion' in settings.INSTALLED_APPS:
                 obj.save()
                 save_all_plugins(request, obj)
+
+            public = obj.publisher_public
+            if public:
+                public.save()
 
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
