@@ -62,6 +62,18 @@ def add_plugin(request):
             placeholder = request.POST['placeholder'].lower()
             language = request.POST['language']
             position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
+            
+            limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get('limits')
+            if limits:
+                global_limit = limits.get("global")
+                type_limit = limits.get(plugin_type)
+                if type_limit:
+                    type_count = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder, plugin_type=plugin_type).count()
+                    if type_count >= type_limit:
+                        return HttpResponseBadRequest("Dieser Platzhalter enthaelt bereits die maximal moegliche anzahl Plugins vom Typ '%s'" % plugin_type)
+                elif global_limit and global_limit >= position:
+                    return HttpResponseBadRequest("Dieser Platzhalter enthaelt bereits die maximale Pluginanzahl.")
+            
         else:
             parent_id = request.POST['parent_id']
             parent = get_object_or_404(CMSPlugin, pk=parent_id)

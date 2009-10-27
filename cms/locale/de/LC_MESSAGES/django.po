@@ -87,7 +87,7 @@ msgstr "URL Überschreibung"
 #: admin/forms.py:88
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
-"Lassen Sie dieses Feld leer wenn der standart Pfad verwendet werden soll."
+"Lassen Sie dieses Feld leer wenn der Standard-Pfad verwendet werden soll."
 
 #: admin/forms.py:94
 msgid "Redirect"
@@ -179,19 +179,17 @@ msgstr "Bestätigung neues Passwort"
 msgid "Email notification requires valid email address."
 msgstr "E-Mail-Benachrichtigung benötigt eine gültige E-Mail-Adresse."
 
-#: admin/forms.py:306
+#: admin/forms.py:295
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr ""
-"Die Erlaubniss um neue Seiten hinzufügen zu können benötigt die Erlaubnis "
-"Seiten ändern zu können!"
+"Die Berechtigung 'Seiten hinzufügen' erfordert zusätzlich die Berechtingung 'Seiten ändern'"
 
-#: admin/forms.py:308
+#: admin/forms.py:297
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
-"Die Erlaubnis um neue Benutzer hinzufügen zu können benötigt die Erlaubniss "
-"Benutzer zu ändern!"
+"Die Berechtigung 'Benutzer hinzufügen' erfordert zusätzlich die Berechtingung 'Benutzer ändern'"
 
 #: admin/forms.py:310
 msgid "To add permissions you also need to edit them!"
@@ -902,15 +900,15 @@ msgstr "adresse"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr "Postleitzahl"
+msgstr "PLZ"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr "stadt"
+msgstr "Ort"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr "zusätzlicher Inhalt"
+msgstr "Zusätzlicher Inhalt"
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
@@ -1029,7 +1027,7 @@ msgstr "Snippet"
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr "Das Template %(template)s  existiert nicht."
+msgstr "Fehlendes Template '%(template)s'"
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:14
 msgid "HTML"
@@ -1155,19 +1153,19 @@ msgstr "übergeordnet"
 
 #: plugins/video/models.py:23
 msgid "window"
-msgstr "fenster"
+msgstr "Fenster (window)"
 
 #: plugins/video/models.py:24
 msgid "opaque"
-msgstr "opaque"
+msgstr "Undurchsichtig (opaque)"
 
 #: plugins/video/models.py:25
 msgid "transparent"
-msgstr "transparent"
+msgstr "Durchsichtig (transparent)"
 
 #: plugins/video/models.py:28
 msgid "movie"
-msgstr "film"
+msgstr "Film"
 
 #: plugins/video/models.py:29
 msgid "use image file"
@@ -1175,23 +1173,23 @@ msgstr "bild verwenden"
 
 #: plugins/video/models.py:34
 msgid "auto load"
-msgstr "automatisch laden"
+msgstr "Automatisch laden"
 
 #: plugins/video/models.py:35
 msgid "auto play"
-msgstr "automatisch starten"
+msgstr "Automatisch starten"
 
 #: plugins/video/models.py:36
 msgid "loop"
-msgstr "wiederholen"
+msgstr "Wiederholen"
 
 #: plugins/video/models.py:37
 msgid "volume"
-msgstr "lautstärke"
+msgstr "Lautstärke"
 
 #: plugins/video/models.py:37
 msgid "in range <0, 100>"
-msgstr "im Bereich 0-100"
+msgstr "im Bereich 0 .. 100"
 
 #: plugins/video/models.py:39
 msgid "click_url"
@@ -1203,23 +1201,46 @@ msgstr "click target"
 
 #: plugins/video/models.py:43
 msgid "bgcolor"
-msgstr "hintegrund farbe"
+msgstr "Hintergrundfarbe"
 
 #: plugins/video/models.py:43
 msgid "Hexadecimal, eg fff000"
-msgstr "Hexadecimal, z.B fff000"
+msgstr "Hexadezimal (z.B. fff000)"
 
 #: plugins/video/models.py:44
 msgid "fullscreen"
-msgstr "vollbildschirm"
+msgstr "Vollbild"
 
 #: plugins/video/models.py:45
 msgid "wmode"
-msgstr "wmode"
+msgstr "Flash Hintergrund (wmode)"
 
 #: plugins/video/models.py:46
 msgid "flash menu"
-msgstr "flash menu"
+msgstr "Flash Menu"
+
+#: plugins/videoplayer/cms_plugins.py:8
+#, fuzzy
+msgid "Videoplayer"
+msgstr "Im Web anzeigen"
+
+#: plugins/videoplayer/models.py:10
+msgid "video file"
+msgstr ""
+
+#: plugins/videoplayer/models.py:10
+#, fuzzy
+msgid "use video file"
+msgstr ".swf datei"
+
+#: plugins/videoplayer/models.py:11
+#, fuzzy
+msgid "splash image"
+msgstr "Letzte Änderung"
+
+#: plugins/videoplayer/models.py:12
+msgid "autoplay"
+msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
