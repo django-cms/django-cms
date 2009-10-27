@@ -921,6 +921,10 @@ class PageAdmin(admin.ModelAdmin):
                 obj.save()
                 save_all_plugins(request, obj)
 
+            public = obj.publisher_public
+            if public:
+                public.save()
+
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
