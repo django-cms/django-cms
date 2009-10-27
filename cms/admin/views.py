@@ -70,9 +70,9 @@ def add_plugin(request):
                 if type_limit:
                     type_count = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder, plugin_type=plugin_type).count()
                     if type_count >= type_limit:
-                        return HttpResponseBadRequest("Dieser Platzhalter enthaelt bereits die maximal moegliche anzahl Plugins vom Typ '%s'" % plugin_type)
+                        return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
                 elif global_limit and global_limit >= position:
-                    return HttpResponseBadRequest("Dieser Platzhalter enthaelt bereits die maximale Pluginanzahl.")
+                    return HttpResponseBadRequest("This placeholder already has the maximum number of plugins")
             
         else:
             parent_id = request.POST['parent_id']
