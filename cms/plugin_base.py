@@ -124,7 +124,15 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         self.object_successfully_changed = True
         return super(CMSPluginBase, self).response_add(request, obj)
-    
+
+    def log_addition(self, request, object):
+        pass
+
+    def log_change(self, request, object, message):
+        pass
+
+    def log_deletion(self, request, object, object_repr):
+        pass
                 
     def icon_src(self, instance):
         """
