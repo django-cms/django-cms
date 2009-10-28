@@ -68,13 +68,12 @@ def add_plugin(request):
             if limits:
                 global_limit = limits.get("global")
                 type_limit = limits.get(plugin_type)
-                if type_limit:
+                if global_limit and global_limit >= position:
+                    return HttpResponseBadRequest("This placeholder already has the maximum number of plugins")
+                elif type_limit:
                     type_count = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder, plugin_type=plugin_type).count()
                     if type_count >= type_limit:
                         return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
-                elif global_limit and global_limit >= position:
-                    return HttpResponseBadRequest("This placeholder already has the maximum number of plugins")
-            
         else:
             parent_id = request.POST['parent_id']
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
