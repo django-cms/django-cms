@@ -2,8 +2,6 @@
 Edit Toolbar middleware
 """
 from cms import settings as cms_settings
-from cms.plugin_pool import plugin_pool
-from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -65,6 +63,8 @@ class ToolbarMiddleware(object):
         return response
 
     def render_toolbar(self, request):
+        from cms.plugin_pool import plugin_pool
+        from cms.utils.admin import get_admin_menu_item_context
         """
         Renders the Toolbar.
         """
