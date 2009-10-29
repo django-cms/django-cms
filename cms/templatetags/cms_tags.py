@@ -13,6 +13,7 @@ from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, \
     cut_levels, find_selected, mark_descendants
 from cms.utils import navigation
+from cms.plugins.utils import get_plugins
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -503,7 +504,7 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         if page == "dummy":
             return ""
-        plugins = get_cmsplugin_queryset(request).filter(page=page, language=l, placeholder__iexact=self.name, parent__isnull=True).order_by('position').select_related()
+        plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == self.name]
         if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
             if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
                 context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
@@ -622,3 +623,31 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
         return {'content':mark_safe(content)}
     return {'content':''}
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
+
+def do_plugins_media(parser, token):
+    return PluginsMediaNode()
+
+class PluginsMediaNode(template.Node):
+    """This template node is used to output media for plugins.
+
+    eg: {% plugins_media %}
+    """
+    def render(self, context):
+        if not 'request' in context:
+            return ''
+        request = context['request']
+        page = request.current_page
+        if page == "dummy":
+            return ''
+        from cms.plugins.utils import get_plugins_media
+        plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        if plugins_media:
+            return plugins_media.render()
+        else:
+            return u''
+        
+    def __repr__(self):
+        return "<PluginsMediaNode Node: %s>" % self.name
+        
+register.tag('plugins_media', do_plugins_media)
+
