@@ -1,0 +1,570 @@
+- fields: {codename: add_logentry, content_type: 7, name: Can add log entry}
+  model: auth.permission
+  pk: 19
+- fields: {codename: change_logentry, content_type: 7, name: Can change log entry}
+  model: auth.permission
+  pk: 20
+- fields: {codename: delete_logentry, content_type: 7, name: Can delete log entry}
+  model: auth.permission
+  pk: 21
+- fields: {codename: add_group, content_type: 2, name: Can add group}
+  model: auth.permission
+  pk: 4
+- fields: {codename: add_message, content_type: 4, name: Can add message}
+  model: auth.permission
+  pk: 10
+- fields: {codename: add_permission, content_type: 1, name: Can add permission}
+  model: auth.permission
+  pk: 1
+- fields: {codename: add_user, content_type: 3, name: Can add user}
+  model: auth.permission
+  pk: 7
+- fields: {codename: change_group, content_type: 2, name: Can change group}
+  model: auth.permission
+  pk: 5
+- fields: {codename: change_message, content_type: 4, name: Can change message}
+  model: auth.permission
+  pk: 11
+- fields: {codename: change_permission, content_type: 1, name: Can change permission}
+  model: auth.permission
+  pk: 2
+- fields: {codename: change_user, content_type: 3, name: Can change user}
+  model: auth.permission
+  pk: 8
+- fields: {codename: delete_group, content_type: 2, name: Can delete group}
+  model: auth.permission
+  pk: 6
+- fields: {codename: delete_message, content_type: 4, name: Can delete message}
+  model: auth.permission
+  pk: 12
+- fields: {codename: delete_permission, content_type: 1, name: Can delete permission}
+  model: auth.permission
+  pk: 3
+- fields: {codename: delete_user, content_type: 3, name: Can delete user}
+  model: auth.permission
+  pk: 9
+- fields: {codename: add_cmsplugin, content_type: 19, name: Can add cms plugin}
+  model: auth.permission
+  pk: 55
+- fields: {codename: add_globalpagepermission, content_type: 15, name: Can add Page
+      global permission}
+  model: auth.permission
+  pk: 43
+- fields: {codename: add_page, content_type: 12, name: Can add page}
+  model: auth.permission
+  pk: 34
+- fields: {codename: add_pagemoderator, content_type: 13, name: Can add PageModerator}
+  model: auth.permission
+  pk: 37
+- fields: {codename: add_pagemoderatorstate, content_type: 14, name: Can add Page
+      moderator state}
+  model: auth.permission
+  pk: 40
+- fields: {codename: add_pagepermission, content_type: 16, name: Can add Page permission}
+  model: auth.permission
+  pk: 46
+- fields: {codename: add_pageuser, content_type: 17, name: Can add User (page)}
+  model: auth.permission
+  pk: 49
+- fields: {codename: add_pageusergroup, content_type: 18, name: Can add User group
+      (page)}
+  model: auth.permission
+  pk: 52
+- fields: {codename: add_title, content_type: 20, name: Can add title}
+  model: auth.permission
+  pk: 58
+- fields: {codename: change_cmsplugin, content_type: 19, name: Can change cms plugin}
+  model: auth.permission
+  pk: 56
+- fields: {codename: change_globalpagepermission, content_type: 15, name: Can change
+      Page global permission}
+  model: auth.permission
+  pk: 44
+- fields: {codename: change_page, content_type: 12, name: Can change page}
+  model: auth.permission
+  pk: 35
+- fields: {codename: change_pagemoderator, content_type: 13, name: Can change PageModerator}
+  model: auth.permission
+  pk: 38
+- fields: {codename: change_pagemoderatorstate, content_type: 14, name: Can change
+      Page moderator state}
+  model: auth.permission
+  pk: 41
+- fields: {codename: change_pagepermission, content_type: 16, name: Can change Page
+      permission}
+  model: auth.permission
+  pk: 47
+- fields: {codename: change_pageuser, content_type: 17, name: Can change User (page)}
+  model: auth.permission
+  pk: 50
+- fields: {codename: change_pageusergroup, content_type: 18, name: Can change User
+      group (page)}
+  model: auth.permission
+  pk: 53
+- fields: {codename: change_title, content_type: 20, name: Can change title}
+  model: auth.permission
+  pk: 59
+- fields: {codename: delete_cmsplugin, content_type: 19, name: Can delete cms plugin}
+  model: auth.permission
+  pk: 57
+- fields: {codename: delete_globalpagepermission, content_type: 15, name: Can delete
+      Page global permission}
+  model: auth.permission
+  pk: 45
+- fields: {codename: delete_page, content_type: 12, name: Can delete page}
+  model: auth.permission
+  pk: 36
+- fields: {codename: delete_pagemoderator, content_type: 13, name: Can delete PageModerator}
+  model: auth.permission
+  pk: 39
+- fields: {codename: delete_pagemoderatorstate, content_type: 14, name: Can delete
+      Page moderator state}
+  model: auth.permission
+  pk: 42
+- fields: {codename: delete_pagepermission, content_type: 16, name: Can delete Page
+      permission}
+  model: auth.permission
+  pk: 48
+- fields: {codename: delete_pageuser, content_type: 17, name: Can delete User (page)}
+  model: auth.permission
+  pk: 51
+- fields: {codename: delete_pageusergroup, content_type: 18, name: Can delete User
+      group (page)}
+  model: auth.permission
+  pk: 54
+- fields: {codename: delete_title, content_type: 20, name: Can delete title}
+  model: auth.permission
+  pk: 60
+- fields: {codename: add_contenttype, content_type: 5, name: Can add content type}
+  model: auth.permission
+  pk: 13
+- fields: {codename: change_contenttype, content_type: 5, name: Can change content
+      type}
+  model: auth.permission
+  pk: 14
+- fields: {codename: delete_contenttype, content_type: 5, name: Can delete content
+      type}
+  model: auth.permission
+  pk: 15
+- fields: {codename: add_file, content_type: 27, name: Can add file}
+  model: auth.permission
+  pk: 79
+- fields: {codename: change_file, content_type: 27, name: Can change file}
+  model: auth.permission
+  pk: 80
+- fields: {codename: delete_file, content_type: 27, name: Can delete file}
+  model: auth.permission
+  pk: 81
+- fields: {codename: add_flash, content_type: 25, name: Can add flash}
+  model: auth.permission
+  pk: 73
+- fields: {codename: change_flash, content_type: 25, name: Can change flash}
+  model: auth.permission
+  pk: 74
+- fields: {codename: delete_flash, content_type: 25, name: Can delete flash}
+  model: auth.permission
+  pk: 75
+- fields: {codename: add_googlemap, content_type: 26, name: Can add google map}
+  model: auth.permission
+  pk: 76
+- fields: {codename: change_googlemap, content_type: 26, name: Can change google map}
+  model: auth.permission
+  pk: 77
+- fields: {codename: delete_googlemap, content_type: 26, name: Can delete google map}
+  model: auth.permission
+  pk: 78
+- fields: {codename: add_link, content_type: 28, name: Can add link}
+  model: auth.permission
+  pk: 82
+- fields: {codename: change_link, content_type: 28, name: Can change link}
+  model: auth.permission
+  pk: 83
+- fields: {codename: delete_link, content_type: 28, name: Can delete link}
+  model: auth.permission
+  pk: 84
+- fields: {codename: add_picture, content_type: 22, name: Can add picture}
+  model: auth.permission
+  pk: 64
+- fields: {codename: change_picture, content_type: 22, name: Can change picture}
+  model: auth.permission
+  pk: 65
+- fields: {codename: delete_picture, content_type: 22, name: Can delete picture}
+  model: auth.permission
+  pk: 66
+- fields: {codename: add_revision, content_type: 9, name: Can add revision}
+  model: auth.permission
+  pk: 25
+- fields: {codename: add_version, content_type: 10, name: Can add version}
+  model: auth.permission
+  pk: 28
+- fields: {codename: change_revision, content_type: 9, name: Can change revision}
+  model: auth.permission
+  pk: 26
+- fields: {codename: change_version, content_type: 10, name: Can change version}
+  model: auth.permission
+  pk: 29
+- fields: {codename: delete_revision, content_type: 9, name: Can delete revision}
+  model: auth.permission
+  pk: 27
+- fields: {codename: delete_version, content_type: 10, name: Can delete version}
+  model: auth.permission
+  pk: 30
+- fields: {codename: add_session, content_type: 6, name: Can add session}
+  model: auth.permission
+  pk: 16
+- fields: {codename: change_session, content_type: 6, name: Can change session}
+  model: auth.permission
+  pk: 17
+- fields: {codename: delete_session, content_type: 6, name: Can delete session}
+  model: auth.permission
+  pk: 18
+- fields: {codename: add_site, content_type: 8, name: Can add site}
+  model: auth.permission
+  pk: 22
+- fields: {codename: change_site, content_type: 8, name: Can change site}
+  model: auth.permission
+  pk: 23
+- fields: {codename: delete_site, content_type: 8, name: Can delete site}
+  model: auth.permission
+  pk: 24
+- fields: {codename: add_snippet, content_type: 23, name: Can add snippet}
+  model: auth.permission
+  pk: 67
+- fields: {codename: add_snippetptr, content_type: 24, name: Can add Snippet}
+  model: auth.permission
+  pk: 70
+- fields: {codename: change_snippet, content_type: 23, name: Can change snippet}
+  model: auth.permission
+  pk: 68
+- fields: {codename: change_snippetptr, content_type: 24, name: Can change Snippet}
+  model: auth.permission
+  pk: 71
+- fields: {codename: delete_snippet, content_type: 23, name: Can delete snippet}
+  model: auth.permission
+  pk: 69
+- fields: {codename: delete_snippetptr, content_type: 24, name: Can delete Snippet}
+  model: auth.permission
+  pk: 72
+- fields: {codename: add_migrationhistory, content_type: 11, name: Can add migration
+      history}
+  model: auth.permission
+  pk: 31
+- fields: {codename: change_migrationhistory, content_type: 11, name: Can change migration
+      history}
+  model: auth.permission
+  pk: 32
+- fields: {codename: delete_migrationhistory, content_type: 11, name: Can delete migration
+      history}
+  model: auth.permission
+  pk: 33
+- fields: {codename: add_teaser, content_type: 29, name: Can add teaser}
+  model: auth.permission
+  pk: 85
+- fields: {codename: change_teaser, content_type: 29, name: Can change teaser}
+  model: auth.permission
+  pk: 86
+- fields: {codename: delete_teaser, content_type: 29, name: Can delete teaser}
+  model: auth.permission
+  pk: 87
+- fields: {codename: add_text, content_type: 21, name: Can add text}
+  model: auth.permission
+  pk: 61
+- fields: {codename: change_text, content_type: 21, name: Can change text}
+  model: auth.permission
+  pk: 62
+- fields: {codename: delete_text, content_type: 21, name: Can delete text}
+  model: auth.permission
+  pk: 63
+- fields: {codename: add_twitterrecententries, content_type: 31, name: Can add twitter
+      recent entries}
+  model: auth.permission
+  pk: 91
+- fields: {codename: change_twitterrecententries, content_type: 31, name: Can change
+      twitter recent entries}
+  model: auth.permission
+  pk: 92
+- fields: {codename: delete_twitterrecententries, content_type: 31, name: Can delete
+      twitter recent entries}
+  model: auth.permission
+  pk: 93
+- fields: {codename: add_video, content_type: 30, name: Can add video}
+  model: auth.permission
+  pk: 88
+- fields: {codename: change_video, content_type: 30, name: Can change video}
+  model: auth.permission
+  pk: 89
+- fields: {codename: delete_video, content_type: 30, name: Can delete video}
+  model: auth.permission
+  pk: 90
+- fields:
+    date_joined: 2009-10-16 06:48:32
+    email: pcicman@gmail.com
+    first_name: ''
+    groups: []
+    is_active: 1
+    is_staff: 1
+    is_superuser: 1
+    last_login: 2009-10-16 06:59:25
+    last_name: ''
+    password: sha1$d8ab0$18628768a9b97e94a44b6f1ccac0f9e895be0f38
+    user_permissions: []
+    username: super
+  model: auth.user
+  pk: 1
+- fields:
+    date_joined: 2009-10-16 06:51:25
+    email: ''
+    first_name: ''
+    groups: []
+    is_active: 1
+    is_staff: 1
+    is_superuser: 0
+    last_login: 2009-10-16 07:00:06
+    last_name: ''
+    password: sha1$b3321$e718966f940e99534bdc8e6139f306268ee45d4f
+    user_permissions: [19, 20, 21, 4, 10, 1, 7, 5, 11, 2, 8, 6, 12, 3, 9, 55, 43,
+      34, 37, 40, 46, 49, 52, 58, 56, 44, 35, 38, 41, 47, 50, 53, 59, 57, 45, 36,
+      39, 42, 48, 51, 54, 60, 13, 14, 15, 79, 80, 81, 73, 74, 75, 76, 77, 78, 82,
+      83, 84, 64, 65, 66, 25, 28, 26, 29, 27, 30, 16, 17, 18, 22, 23, 24, 67, 70,
+      68, 71, 69, 72, 31, 32, 33, 85, 86, 87, 61, 62, 63, 91, 92, 93, 88, 89, 90]
+    username: master
+  model: auth.user
+  pk: 2
+- fields:
+    date_joined: 2009-10-16 06:58:10
+    email: ''
+    first_name: ''
+    groups: []
+    is_active: 1
+    is_staff: 1
+    is_superuser: 0
+    last_login: 2009-10-16 06:58:34
+    last_name: ''
+    password: sha1$721b2$51f7543bd7421430e157712f87080e0febcd6a63
+    user_permissions: [34, 35, 36]
+    username: slave
+  model: auth.user
+  pk: 3
+- fields: {expire_date: !!timestamp '2009-10-30 07:02:39', session_data: 'gAJ9cQEoVQ5jbXNfYWRtaW5fc2l0ZXECigEBVRJfYXV0aF91c2VyX2JhY2tlbmRxA1UpZGphbmdv
+
+      LmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmRxBFUPZGphbmdvX2xhbmd1YWdlcQVY
+
+      AgAAAGVucQZVDV9hdXRoX3VzZXJfaWRxB4oBAnUuOTA0NGZhNDgyMzllZWM4ZjUzZDNmMTkzYWU4
+
+      YTg0Njg=
+
+      '}
+  model: sessions.session
+  pk: ef0853c7112d126e3660825ffb353797
+- fields: {action_flag: 3, action_time: !!timestamp '2009-10-16 06:59:48', change_message: '',
+    content_type: 15, object_id: '1', object_repr: 'master :: GLOBAL', user: 1}
+  model: admin.logentry
+  pk: 14
+- fields: {action_flag: 2, action_time: !!timestamp '2009-10-16 06:58:25', change_message: 'Changed
+      language. Added Page permission "slave-home :: slave has: a".', content_type: 12,
+    object_id: '6', object_repr: slave-home, user: 1}
+  model: admin.logentry
+  pk: 13
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:58:10', change_message: '',
+    content_type: 17, object_id: '3', object_repr: slave, user: 1}
+  model: admin.logentry
+  pk: 12
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:57:30', change_message: '',
+    content_type: 12, object_id: '6', object_repr: slave-home, user: 1}
+  model: admin.logentry
+  pk: 11
+- fields: {action_flag: 2, action_time: !!timestamp '2009-10-16 06:55:37', change_message: Changed
+      user_permissions., content_type: 3, object_id: '2', object_repr: master, user: 1}
+  model: admin.logentry
+  pk: 10
+- fields: {action_flag: 2, action_time: !!timestamp '2009-10-16 06:54:41', change_message: Changed
+      is_staff., content_type: 3, object_id: '2', object_repr: master, user: 1}
+  model: admin.logentry
+  pk: 9
+- fields: {action_flag: 2, action_time: !!timestamp '2009-10-16 06:53:56', change_message: 'Changed
+      language. Added Page permission "pagea :: master has: a".', content_type: 12,
+    object_id: '5', object_repr: pagea, user: 1}
+  model: admin.logentry
+  pk: 8
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:53:34', change_message: '',
+    content_type: 12, object_id: '5', object_repr: pagea, user: 1}
+  model: admin.logentry
+  pk: 7
+- fields: {action_flag: 2, action_time: !!timestamp '2009-10-16 06:52:55', change_message: 'Changed
+      language. Added Page permission "mas :: master has: a".', content_type: 12,
+    object_id: '3', object_repr: mas, user: 1}
+  model: admin.logentry
+  pk: 6
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:52:25', change_message: '',
+    content_type: 12, object_id: '3', object_repr: mas, user: 1}
+  model: admin.logentry
+  pk: 5
+- fields: {action_flag: 2, action_time: !!timestamp '2009-10-16 06:51:56', change_message: 'Changed
+      language. Added Page permission "home :: master has: a".', content_type: 12,
+    object_id: '1', object_repr: home, user: 1}
+  model: admin.logentry
+  pk: 4
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:51:34', change_message: '',
+    content_type: 15, object_id: '1', object_repr: 'master :: GLOBAL', user: 1}
+  model: admin.logentry
+  pk: 3
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:51:25', change_message: '',
+    content_type: 3, object_id: '2', object_repr: master, user: 1}
+  model: admin.logentry
+  pk: 2
+- fields: {action_flag: 1, action_time: !!timestamp '2009-10-16 06:50:41', change_message: '',
+    content_type: 12, object_id: '1', object_repr: home, user: 1}
+  model: admin.logentry
+  pk: 1
+- fields: {domain: example.com, name: example.com}
+  model: sites.site
+  pk: 1
+- fields: {changed_by: super, created_by: super, creation_date: !!timestamp '2009-10-16
+      06:50:41', in_navigation: 0, level: 0, lft: 1, login_required: 0, menu_login_required: 0,
+    moderator_state: 10, navigation_extenders: null, parent: null, publication_date: null,
+    publication_end_date: null, published: 1, publisher_is_draft: 1, publisher_public: 2,
+    publisher_state: 1, reverse_id: null, rght: 2, site: 1, soft_root: 0, template: index.html,
+    tree_id: 1}
+  model: cms.page
+  pk: 1
+- fields: {changed_by: super, created_by: super, creation_date: !!timestamp '2009-10-16
+      06:50:41', in_navigation: 0, level: 0, lft: 1, login_required: 0, menu_login_required: 0,
+    moderator_state: 1, navigation_extenders: null, parent: null, publication_date: null,
+    publication_end_date: null, published: 1, publisher_is_draft: 0, publisher_public: null,
+    publisher_state: 0, reverse_id: null, rght: 2, site: 1, soft_root: 0, template: index.html,
+    tree_id: 2}
+  model: cms.page
+  pk: 2
+- fields: {changed_by: super, created_by: super, creation_date: !!timestamp '2009-10-16
+      06:52:25', in_navigation: 0, level: 0, lft: 1, login_required: 0, menu_login_required: 0,
+    moderator_state: 1, navigation_extenders: null, parent: null, publication_date: null,
+    publication_end_date: null, published: 1, publisher_is_draft: 0, publisher_public: null,
+    publisher_state: 0, reverse_id: null, rght: 2, site: 1, soft_root: 0, template: index.html,
+    tree_id: 3}
+  model: cms.page
+  pk: 4
+- fields: {changed_by: super, created_by: super, creation_date: !!timestamp '2009-10-16
+      06:52:25', in_navigation: 0, level: 0, lft: 1, login_required: 0, menu_login_required: 0,
+    moderator_state: 10, navigation_extenders: null, parent: null, publication_date: null,
+    publication_end_date: null, published: 1, publisher_is_draft: 1, publisher_public: 4,
+    publisher_state: 1, reverse_id: null, rght: 4, site: 1, soft_root: 0, template: index.html,
+    tree_id: 4}
+  model: cms.page
+  pk: 3
+- fields: {changed_by: super, created_by: super, creation_date: !!timestamp '2009-10-16
+      06:57:30', in_navigation: 0, level: 1, lft: 2, login_required: 0, menu_login_required: 0,
+    moderator_state: 1, navigation_extenders: null, parent: 3, publication_date: null,
+    publication_end_date: null, published: 0, publisher_is_draft: 1, publisher_public: null,
+    publisher_state: 1, reverse_id: null, rght: 3, site: 1, soft_root: 0, template: INHERIT,
+    tree_id: 4}
+  model: cms.page
+  pk: 6
+- fields: {changed_by: super, created_by: super, creation_date: !!timestamp '2009-10-16
+      06:53:34', in_navigation: 0, level: 0, lft: 1, login_required: 0, menu_login_required: 0,
+    moderator_state: 1, navigation_extenders: null, parent: null, publication_date: null,
+    publication_end_date: null, published: 0, publisher_is_draft: 1, publisher_public: null,
+    publisher_state: 1, reverse_id: null, rght: 2, site: 1, soft_root: 0, template: index.html,
+    tree_id: 5}
+  model: cms.page
+  pk: 5
+- fields: {moderate_children: 1, moderate_descendants: 1, moderate_page: 1, page: 3,
+    user: 2}
+  model: cms.pagemoderator
+  pk: 1
+- fields: {action: ADD, created: !!timestamp '2009-10-16 06:52:01', message: '', page: 2,
+    user: 1}
+  model: cms.pagemoderatorstate
+  pk: 3
+- fields: {action: PUB, created: !!timestamp '2009-10-16 06:52:01', message: '', page: 2,
+    user: 1}
+  model: cms.pagemoderatorstate
+  pk: 4
+- fields: {action: ADD, created: !!timestamp '2009-10-16 06:52:42', message: '', page: 4,
+    user: 1}
+  model: cms.pagemoderatorstate
+  pk: 7
+- fields: {action: PUB, created: !!timestamp '2009-10-16 06:52:42', message: '', page: 4,
+    user: 1}
+  model: cms.pagemoderatorstate
+  pk: 8
+- fields: {action: ADD, created: !!timestamp '2009-10-16 06:57:30', message: '', page: 6,
+    user: 1}
+  model: cms.pagemoderatorstate
+  pk: 10
+- fields: {action: ADD, created: !!timestamp '2009-10-16 06:53:34', message: '', page: 5,
+    user: 1}
+  model: cms.pagemoderatorstate
+  pk: 9
+- fields: {can_add: 1, can_change: 1, can_change_advanced_settings: 1, can_change_permissions: 1,
+    can_delete: 1, can_moderate: 1, can_move_page: 1, can_publish: 1, grant_on: 4,
+    group: null, page: 1, user: 2}
+  model: cms.pagepermission
+  pk: 1
+- fields: {can_add: 1, can_change: 1, can_change_advanced_settings: 1, can_change_permissions: 1,
+    can_delete: 1, can_moderate: 1, can_move_page: 1, can_publish: 1, grant_on: 5,
+    group: null, page: 3, user: 2}
+  model: cms.pagepermission
+  pk: 2
+- fields: {can_add: 1, can_change: 1, can_change_advanced_settings: 0, can_change_permissions: 0,
+    can_delete: 1, can_moderate: 0, can_move_page: 0, can_publish: 0, grant_on: 4,
+    group: null, page: 5, user: 2}
+  model: cms.pagepermission
+  pk: 3
+- fields: {can_add: 1, can_change: 1, can_change_advanced_settings: 0, can_change_permissions: 0,
+    can_delete: 1, can_moderate: 0, can_move_page: 0, can_publish: 0, grant_on: 5,
+    group: null, page: 6, user: 3}
+  model: cms.pagepermission
+  pk: 4
+- fields:
+    created_by: 1
+    groups: []
+    user_permissions: [19, 20, 21, 4, 10, 1, 7, 5, 11, 2, 8, 6, 12, 3, 9, 55, 43,
+      34, 37, 40, 46, 49, 52, 58, 56, 44, 35, 38, 41, 47, 50, 53, 59, 57, 45, 36,
+      39, 42, 48, 51, 54, 60, 13, 14, 15, 79, 80, 81, 73, 74, 75, 76, 77, 78, 82,
+      83, 84, 64, 65, 66, 25, 28, 26, 29, 27, 30, 16, 17, 18, 22, 23, 24, 67, 70,
+      68, 71, 69, 72, 31, 32, 33, 85, 86, 87, 61, 62, 63, 91, 92, 93, 88, 89, 90]
+  model: cms.pageuser
+  pk: 2
+- fields:
+    created_by: 1
+    groups: []
+    user_permissions: [34, 35, 36]
+  model: cms.pageuser
+  pk: 3
+- fields: {application_urls: '', creation_date: !!timestamp '2009-10-16 06:50:41',
+    has_url_overwrite: 0, language: en, menu_title: '', meta_description: '', meta_keywords: '',
+    page: 1, page_title: '', path: home, publisher_is_draft: 1, publisher_public: 2,
+    publisher_state: 0, redirect: '', slug: home, title: home}
+  model: cms.title
+  pk: 1
+- fields: {application_urls: '', creation_date: !!timestamp '2009-10-16 06:50:41',
+    has_url_overwrite: 0, language: en, menu_title: '', meta_description: '', meta_keywords: '',
+    page: 2, page_title: '', path: home, publisher_is_draft: 0, publisher_public: null,
+    publisher_state: 0, redirect: '', slug: home, title: home}
+  model: cms.title
+  pk: 2
+- fields: {application_urls: '', creation_date: !!timestamp '2009-10-16 06:52:25',
+    has_url_overwrite: 0, language: en, menu_title: '', meta_description: '', meta_keywords: '',
+    page: 3, page_title: '', path: mas, publisher_is_draft: 1, publisher_public: 4,
+    publisher_state: 0, redirect: '', slug: mas, title: master}
+  model: cms.title
+  pk: 3
+- fields: {application_urls: '', creation_date: !!timestamp '2009-10-16 06:52:25',
+    has_url_overwrite: 0, language: en, menu_title: '', meta_description: '', meta_keywords: '',
+    page: 4, page_title: '', path: mas, publisher_is_draft: 0, publisher_public: null,
+    publisher_state: 0, redirect: '', slug: mas, title: master}
+  model: cms.title
+  pk: 4
+- fields: {application_urls: '', creation_date: !!timestamp '2009-10-16 06:53:34',
+    has_url_overwrite: 0, language: en, menu_title: '', meta_description: '', meta_keywords: '',
+    page: 5, page_title: '', path: pagea, publisher_is_draft: 1, publisher_public: null,
+    publisher_state: 1, redirect: '', slug: pagea, title: pageA}
+  model: cms.title
+  pk: 5
+- fields: {application_urls: '', creation_date: !!timestamp '2009-10-16 06:57:30',
+    has_url_overwrite: 0, language: en, menu_title: '', meta_description: '', meta_keywords: '',
+    page: 6, page_title: '', path: mas/slave-home, publisher_is_draft: 1, publisher_public: null,
+    publisher_state: 1, redirect: '', slug: slave-home, title: slave-home}
+  model: cms.title
+  pk: 6
+

@@ -53,7 +53,7 @@ def has_page_add_permission(request):
             page = Page.objects.get(pk=target)
         except:
             return False
-        if position == "first-child":
+        if position in ("first-child", "last-child"):
             return page.has_add_permission(request)
         elif position in ("left", "right"):
             return has_add_page_on_same_level_permission(request, page)

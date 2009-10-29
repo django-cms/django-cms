@@ -31,10 +31,10 @@ class CMSTestCase(TestCase):
         assert logged_in
     
     
-    def get_new_page_data(self):
+    def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
             'slug':'test-page-%d' % self.counter, 'language':'en',
-            'site':1, 'template':'index.html'}
+            'site':1, 'template':'index.html', 'parent': parent_id}
         
         # required only if user haves can_change_permission
         #page_data['pagepermission_set-TOTAL_FORMS'] = 0
@@ -57,14 +57,18 @@ class CMSTestCase(TestCase):
             return
         raise self.failureException, "ObjectDoesNotExist not raised"
     
-    def create_page(self, parent_page=None, user=None, position="first-child", title=None, site=1):
+    def create_page(self, parent_page=None, user=None, position="last-child", title=None, site=1):
         """Common way for page creation with some checks
         """
         if user:
             # change logged in user
             self.login_user(user)
         
-        page_data = self.get_new_page_data()
+        parent_id = ''
+        if parent_page:
+            parent_id=parent_page.id
+            
+        page_data = self.get_new_page_data(parent_id)
         page_data['site'] = site
         
         page_data.update({
