@@ -1,4 +1,5 @@
 import operator
+from django.forms.widgets import Media
 
 def get_plugins(request, obj):
     if not hasattr(obj, '_plugins_cache'):
@@ -15,5 +16,9 @@ def get_plugin_media(request, plugin):
 def get_plugins_media(request, obj):
     if not hasattr(obj, '_plugins_media_cache'):
         plugins = get_plugins(request, obj)
-        obj._plugins_media_cache = reduce(operator.add, [get_plugin_media(request, plugin) for plugin in plugins])
+        media_classes = [get_plugin_media(request, plugin) for plugin in plugins]
+        if media_classes:
+        	obj._plugins_media_cache = reduce(operator.add, media_classes)
+        else:
+        	obj._plugins_media_cache = Media()
     return obj._plugins_media_cache

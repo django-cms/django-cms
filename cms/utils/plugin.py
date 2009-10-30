@@ -16,7 +16,7 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
     context = copy.copy(context_to_copy) 
     l = get_language_from_request(context['request'])
     request = context['request']
-    plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == self.name]
+    plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == placeholder_name]
     if settings.CMS_PLACEHOLDER_CONF and placeholder_name in settings.CMS_PLACEHOLDER_CONF:
         if "extra_context" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
             context.update(settings.CMS_PLACEHOLDER_CONF[placeholder_name]["extra_context"])
