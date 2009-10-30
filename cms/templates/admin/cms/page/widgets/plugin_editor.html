@@ -3,13 +3,7 @@
 	<ul class="plugin-list">{% for plugin in plugin_list %}
 		<li id="plugin_{{ plugin.pk }}" class="{{ plugin.plugin_type }}"><span class="drag"></span><span class="text"><b>{{ plugin.get_plugin_name }}</b>{% if plugin.get_short_description %} [ {{ plugin.get_short_description }} ]{% endif %}</span><span class="delete"></span></li>{% endfor %}
 	</ul>
-	<div class="plugin-select-holder">
-		<select name="plugins">
-			<option value="" selected="selected">{% trans "Available Plugins" %}</option>{% for p in installed_plugins %}
-			<option value="{{ p.value }}">{{ p.name }}</option>{% endfor %}
-		</select>{% if not add %}
-		<span class="add-plugin addlink">{% trans "Add Plugin" %}</span>{% endif %}
-	</div>
+	{% include "admin/cms/page/widgets/installed_plugins_inc.html" %}
 </div>
 <div class="plugin-editor">
 	{% if add %}

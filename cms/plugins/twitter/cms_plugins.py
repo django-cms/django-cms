@@ -5,7 +5,7 @@ from cms.plugin_pool import plugin_pool
 
 class TwitterRecentEntriesPlugin(CMSPluginBase):
     model = TwitterRecentEntries
-    name = _("Twitter recent entries plugin")
+    name = _("Twitter")
     render_template = "cms/plugins/twitter_recent_entries.html"
     
     def render(self, context, instance, placeholder):

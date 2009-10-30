@@ -121,10 +121,15 @@ Example::
 			"plugins": ('ContactFormPlugin','TextPlugin', 'SimpleGalleryPublicationPlugin'),
 	        "extra_context": {"theme":"16_5"},
 			"name": gettext("right column")
+			"limits": {
+				"global": 2,
+				"TeaserPlugin": 1,
+				"LinkPlugin": 1,
+			},
 		},
 	
 "**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so plugin-templates can react to them. In this example we give them some parameters that are used in a CSS Grid Framework.
-You can change the displayed name in the admin with the **name** parameter. In combination with gettext you can translate this names according to the language of the user.
+You can change the displayed name in the admin with the **name** parameter. In combination with gettext you can translate this names according to the language of the user. Additionally you can limit the number of plugins (either total or by type) for each placeholder with the **limits** parameter (see ``Configuration`` for details). 
 
 
 Advanced

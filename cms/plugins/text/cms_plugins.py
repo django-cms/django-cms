@@ -41,7 +41,10 @@ class TextPlugin(CMSPluginBase):
         return TextPluginForm
 
     def get_form(self, request, obj=None, **kwargs):
-        plugins = plugin_pool.get_text_enabled_plugins(self.placeholder)
+        page = None
+        if obj:
+            page = obj.page
+        plugins = plugin_pool.get_text_enabled_plugins(self.placeholder, page)
         form = self.get_form_class(request, plugins)
         kwargs['form'] = form # override standard form
         return super(TextPlugin, self).get_form(request, obj, **kwargs)

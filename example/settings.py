@@ -80,11 +80,13 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     
 )
 
 ROOT_URLCONF = 'example.urls'
+
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -114,6 +116,7 @@ INSTALLED_APPS = (
     'cms.plugins.teaser',
     'cms.plugins.video',
     'cms.plugins.twitter',
+    'cms.plugins.inherit',
     'mptt',
     'reversion',
     'example.categories',
@@ -136,8 +139,8 @@ LANGUAGES = (
 )
 
 CMS_LANGUAGE_CONF = {
-    'de':['fr'],
-    'en':['fr'],
+    'de':['fr', 'en'],
+    'en':['fr', 'de'],
 }
 
 CMS_TEMPLATES = (
@@ -160,14 +163,17 @@ CMS_PLACEHOLDER_CONF = {
     },
     
     'body': {
-        "plugins": ("VideoPlugin", "TextPlugin", ),
         "extra_context": {"theme":"16_5"},
         "name":gettext("body"),
     },
     'fancy-content': {
         "plugins": ('TextPlugin', 'LinkPlugin'),
         "extra_context": {"theme":"16_11"},
-        "name":gettext("fancy content"),
+        "name":gettext("fancy content custom name"),
+        "limits": {
+            "global": 3,
+            "TextPlugin": 1,
+        },
     },
 }
 

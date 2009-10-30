@@ -1,0 +1,908 @@
+{% load i18n %}
+<style type="text/css">
+	#cms_toolbar_spacer{height:41px;}
+	* html #cms_toolbar_spacer{display:none;}
+	
+	#cms_toolbar_mini{z-index:70010;position:fixed;right:0;top:0;height:41px;padding-top:6px;padding-right:10px;}
+		
+	#cms_toolbar{
+		z-index:70011;position:fixed;left:0;top:0;height:41px;width:100%;min-width: 960px;color:#656565;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;
+		border-bottom: 2px solid #ddd;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x 0 0;
+	}
+	* html #cms_toolbar{
+		position: absolute; left: 0px; top: 0px;
+		background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);
+		left: expression( ( 0 + ( ignoreMe2 = document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft ) ) + 'px' );
+		top: expression( ( 0 + ( ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop ) ) + 'px' );		
+	}
+	
+	.cms_toolbar a{text-decoration:none;color:#656565; outline:none;}
+	.cms_toolbar a:hover{text-decoration:none;color:#656565;}
+	
+	#cms_toolbar_col1{float:left;padding-top:6px;zoom:1;overflow:hidden;height:35px;}
+	
+	#cms_toolbar_col2{float:right;height:100%;padding-top:6px;padding-right:10px;height:35px;}
+	
+	/* RESET */	
+	.cms_toolbar strong, .cms_toolbar em{font-style:normal;font-weight:normal;margin:0;padding:0;}
+	.cms_toolbar ul, .cms_toolbar li{margin:0;list-style:none;}
+	.cms_toolbar form, .cms_toolbar input, .cms_toolbar label{
+		color:#656565;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;margin:0;padding:0;
+	}
+	
+	/* LOGO */
+	#cms_toolbar_logo{}
+	#cms_toolbar_logo span{
+		display:block;float:left;margin-top:3px;width:110px;height:22px;text-indent:-7777px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat 0px -122px;
+	}
+	* html #cms_toolbar_logo span{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	/* EDIT MODE */
+	#cms_toolbar_editmode_toggle{display:block;float:left;line-height:27px;margin-left:15px;}
+	#cms_toolbar_editmode_toggle a{
+		display:inline-block;width:63px;height:27px;text-indent:-7777px;margin-left:5px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat;
+	}
+	* html #cms_toolbar_editmode_toggle a{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	.cms_toolbar_editmode_toggle_on #cms_toolbar_editmode_toggle a{background-position:-110px -122px;}
+	.cms_toolbar_editmode_toggle_off #cms_toolbar_editmode_toggle a{background-position:-180px -122px;}
+	
+	/* STATUSBAR */
+	#cms_toolbar_statusbar{
+		display:block;float:left;margin-left:10px;line-height:26px;padding-right:10px;font-size:11px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat right -95px;
+	}
+	* html #cms_toolbar_statusbar{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	
+	ul.cms_toolbar_status {
+		display:inline;
+		
+	}
+	ul.cms_toolbar_status li {display:inline;}
+	
+	#cms_toolbar_statusbar div{
+		padding-left:10px;width:400px;color:#656565;overflow:hidden;height:27px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat left -95px;
+	}	
+	* html #cms_toolbar_statusbar div{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	#cms_toolbar_statusbar span{color:#5b81b3;}
+	#cms_toolbar_statusbar em{font-style:normal;}
+	
+	ul.cms_toolbar_status span.cms_toolbar_icon {
+		width: 18px;
+		height: 18px;
+		display: inline-block;
+		background: url({{ CMS_MEDIA_URL }}/images/icons.png) 0px 0px no-repeat;
+		margin-top: 5px;
+	}
+	
+	span.cms_toolbar_icon.cms_toolbar_state-icon.cha {
+		background-position:-40px -20px;
+	}
+	
+	span.cms_toolbar_icon.cms_toolbar_state-icon.add {
+		background-position:-40px 0;
+	}
+	span.cms_toolbar_icon.cms_toolbar_state-icon.mov {
+		background-position:-60px 0;
+	}
+	
+	span.cms_toolbar_icon.cms_toolbar_state-icon.del {
+		background-position:-40px -40px;
+	}
+
+	
+	/* BUTTON */
+	.cms_toolbar_button{
+		display:block;float:left;color:#5b81b3;padding-right:10px;margin-left:10px;cursor:pointer;text-decoration:none;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat right -41px;
+	}
+	.cms_toolbar .cms_toolbar_button{color:#5b81b3;}
+	* html .cms_toolbar_button{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif); height:27px; }
+		
+	.cms_toolbar .cms_toolbar_button:hover{color:#264064;}
+	.cms_toolbar_button span{
+		display:block;float:left;height:27px;padding-left:10px;line-height:26px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat left -41px;
+	}
+	* html .cms_toolbar_button span{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	.cms_toolbar_button span em{color:#5B81B3;}	
+	.cms_toolbar_button:hover span em{color:#264064;}
+	
+	.cms_toolbar_iconbutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:11px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -260px -158px;	
+	}
+	* html .cms_toolbar_iconbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	
+	/* SETTINGS BUTTON */
+	.cms_toolbar .cms_toolbar_settingsbutton strong{
+		margin-top:6px;text-indent:-7777px;width:15px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -170px -158px;		
+	}	
+	* html .cms_toolbar .cms_toolbar_settingsbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar .cms_toolbar_settingsbutton:hover strong{background-position:-170px -188px;} 
+	
+	/* ADD BUTTON */
+	.cms_toolbar .cms_toolbar_addbutton strong{
+		margin-top:6px;text-indent:-7777px;width:9px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -225px -158px;	
+	}	
+	* html .cms_toolbar .cms_toolbar_addbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar .cms_toolbar_addbutton:hover strong{background-position:-225px -188px;} 
+	
+	
+	/* SUBMENU / SUBMENUBUTTON */	
+	.cms_toolbar .cms_toolbar_submenubutton{position:relative;}
+	.cms_toolbar .cms_toolbar_submenubutton strong{display:block;float:left;}
+	.cms_toolbar .cms_toolbar_submenubutton em{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:7px;height:10px;margin-left:5px;line-height:10px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -190px -158px;	
+	}
+	* html .cms_toolbar .cms_toolbar_submenubutton em{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	.cms_toolbar .cms_toolbar_submenubutton:hover em{background-position:-190px -188px;}
+
+	.cms_toolbar_submenu{z-index:70012;display:none;position:absolute;width:auto;min-width:130px;top:29px;right:0px;}
+	.open .cms_toolbar_submenu{display:block; border:1px solid #E8E8E8;
+		-moz-border-radius:5px;
+		-webkit-border-radius:5px;
+		background:#fff;white-space:nowrap;	
+	}	
+	.cms_toolbar_submenu li{
+		clear:both;zoom:1;height:27px;overflow:hidden;width:100%;
+		white-space:nowrap;
+	}		
+	
+	.cms_toolbar_submenu a{float:left;clear:all;display:block;padding:2px 10px 0 10px;height:27px;line-height:23px;}
+	.cms_toolbar_submenu a:hover, .cms_toolbar_submenu li.selected a{color:#264064;}
+	
+	.cms_toolbar_submenuselect .cms_toolbar_submenu{overflow:auto;overflow-x:hidden;}
+	
+	.cms_toolbar_submenu a span{text-indent:-7777px;width:9px;height:17px;margin-right:4px;}	
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_edit{background-position:-9px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_edit{background-position:-9px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_move{background-position:-30px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_move{background-position:-30px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_padeadmin{background-position:-47px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_padeadmin{background-position:-47px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_pageunpublish{background-position:-67px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_pageunpublish{background-position:-67px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_history{background-position:-88px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_history{background-position:-88px -185px;}
+	
+	.cms_toolbar_submenu a .cms_toolbar_icon_delete{background-position:-108px -155px;}
+	.cms_toolbar_submenu a:hover .cms_toolbar_icon_delete{background-position:-108px -185px;}
+	
+	
+	/* SETTINGS MENU */
+	#cms_toolbar_settings_menu{z-index:70012;top:29px;left:-124px;}
+	
+	/* LOGOUT BUTTON */
+	#cms_toolbar #cms_toolbar_logoutbutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:15px;height:14px;line-height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -150px -158px;
+	}
+	* html #cms_toolbar #cms_toolbar_logoutbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	#cms_toolbar #cms_toolbar_logoutbutton:hover strong{background-position:-150px -188px;}
+	#cms_toolbar #cms_toolbar_logoutbutton em{margin-left:5px;}
+	
+	/* CLOSE BUTTON */
+	#cms_toolbar #cms_toolbar_closebutton strong{
+		width:7px;
+		background-position:-210px -158px;
+	}
+	#cms_toolbar #cms_toolbar_closebutton:hover strong{background-position:-210px -188px;}
+	
+	/* OPEN BUTTON */
+	#cms_toolbar_mini #cms_toolbar_openbutton strong{
+		margin-top:6px;text-indent:-7777px;display:block;float:left;width:8px;height:14px;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -225px -158px;
+	}
+	* html #cms_toolbar_mini #cms_toolbar_openbutton strong{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
+	#cms_toolbar_mini #cms_toolbar_openbutton:hover strong{background-position:-225px -188px;}
+	
+	
+	/* TOOLBAR PLUGINTOOLS */
+	#cms_plugin_overlay, #cms_plugin_overlay2{
+		position:absolute;
+		z-index:70000;
+		display:none;
+		border:1px solid #5b80b2;
+	}
+	#cms_plugin_overlay .cms_toolbar_button{
+		margin-left:0;
+		padding-right:0;
+		border-right:1px solid #DDDDDD;
+	}
+	#cms_plugin_overlay a.cms_toolbar_button span, 
+	#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content{
+		padding-left:5px;
+		padding-right:5px;
+		background-position:-5px -41px;
+	}
+	#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content{
+		padding-right:0;
+	}
+	#cms_plugin_overlay .cms_plugin_overlay_bg, #cms_plugin_overlay2 .cms_plugin_overlay_bg{
+		z-index:70001;
+		height:100%;			
+	}
+	#cms_plugin_overlay .cms_plugin_overlay_bg{
+		background:#5b80b2;
+		opacity: .50;
+		-ms-filter: “alpha(opacity=50)”;
+		filter: alpha(opacity=50);
+		-khtml-opacity: .50;
+		-moz-opacity: .50;	
+	}
+	#cms_plugin_overlay2 .cms_plugin_overlay_bg{
+		background:#59E140;
+		opacity: .50;
+		-ms-filter: “alpha(opacity=50)”;
+		filter: alpha(opacity=50);
+		-khtml-opacity: .50;
+		-moz-opacity: .50;	
+	}
+	
+	#cms_plugin_overlay2{border:1px solid #59E140;}
+	
+	.cms_toolbar_plugintools{position:relative;z-index:70002;}
+	.cms_toolbar_plugintools_holder{position:absolute; right:1px; top:1px;width:106px;height:30px;}
+	
+	#cms_plugin_overlay a.cms_toolbar_plugin_edit span{
+		background-position:0px -41px;
+		padding-left:7px;
+	}	
+	#cms_plugin_overlay a.cms_toolbar_plugin_edit strong{
+		width:12px;height:14px;
+		background-position:-11px -159px;
+	}
+	#cms_plugin_overlay a.cms_toolbar_plugin_edit:hover strong{
+		background-position:-11px -189px;
+	}
+	
+	#cms_plugin_overlay .cms_toolbar_upbutton strong{
+		width:11px;height:14px;
+		background-position:-240px -158px;		
+	}
+	#cms_plugin_overlay .cms_toolbar_upbutton:hover strong{
+		background-position:-240px -188px;
+	}
+	
+	#cms_plugin_overlay .cms_toolbar_downbutton strong{		
+		width:11px;height:14px;
+		background-position:-260px -158px;	
+	}
+	#cms_plugin_overlay .cms_toolbar_downbutton:hover strong{
+		background-position:-260px -188px;
+	}
+	
+	#cms_plugin_overlay .cms_toolbar_settingsbutton{
+		padding-right:5px;
+		border:none;
+	}
+	
+	.cms_toolbar_placeholder_plugins{
+		height:40px;
+		border:1px solid #ddd;
+		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x 0 0;
+		padding-left:10px;
+		padding-right:10px;
+		position:relative;
+	}
+	.cms_toolbar_placeholder_plugins_title{
+		float:left;
+		color:#5b80b2;
+		font-size:12px;
+		margin-top:10px;
+	}
+		
+	.cms_toolbar_placeholder_plugins .cms_toolbar_submenubutton{
+		float:right;
+		position:relative;
+		margin-top:6px;
+	}
+	
+	/* LOGINFORM */
+	#cms_toolbar_loginform,#cms_toolbar_loginform label, #cms_toolbar_loginform input{float:left;}
+	#cms_toolbar_loginform{}
+	#cms_toolbar_loginform .cms_submit{display:none;}
+	#cms_toolbar_loginform .cms_toolbar_button{margin-left:0;}
+	#cms_toolbar_loginform label{line-height:20px;padding:3px 5px 0px 5px;}
+	.cms_toolbar input.cms_textinput{
+		border:1px solid #ccc;
+		padding:3px;
+		margin-top:2px;margin-right:5px;
+	}
+	.cms_toolbar .cms_toolbar_error input.cms_textinput{
+		border-color:#990000;
+	}
+	
+	/* OVERLAY */
+	#nyroModalContent{
+		background:#fff;
+	}
+	.wrapperIframe{
+		position:relative;
+	}
+	h1#nyroModalTitle{
+		font-size:12px;
+		margin:0;
+		padding:0 10px 0 10px;
+		background:transparent url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x scroll 0 0;
+		border:1px solid #DDDDDD;
+		height:40px;
+		position:relative;
+		color:#5B80B2;
+		line-height:40px;
+		font-weight:normal;
+		overflow:hidden;	
+	}
+	a#closeBut{
+		margin:0;
+		position:absolute;
+		right:10px;
+		top:-36px;
+	}
+	a#closeBut strong{
+		width:7px;
+		background-position:-210px -158px;
+	}
+	a#closeBut:hover strong{background-position:-210px -188px;}	
+</style>
+
+<script type="text/javascript" charset="utf-8">
+	//<![CDATA[
+	// When jQuery is sourced, it's going to overwrite whatever might be in the
+	// '$' variable, so store a reference of it in a temporary variable...
+	var _$ = window.$;
+	if (typeof jQuery == 'undefined') {
+		var jquery_url = 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js';
+		document.write(unescape('%3Cscript src="' + jquery_url + '" type="text/javascript"%3E%3C/script%3E'));
+	}
+	//]]>
+</script>
+
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.cookie.js"></script> 
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.backgroundposition.js"></script> 
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/tools.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL}}js/lib/jquery.nyroModal-1.5.2.min.js"></script>
+
+<script type="text/javascript">
+	//<![CDATA[
+	
+		var placeholder_data = {{ placeholder_data }};
+		
+		jQuery.fn.swapWith = function(to) {
+		    return this.each(function() {
+		        var copy_to = $(to).clone(true);
+		        var copy_from = $(this).clone(true);
+		        $(to).replaceWith(copy_from);
+		        $(this).replaceWith(copy_to);
+		    });
+		};
+				
+		
+		var page_id = -1;
+		var plugin_id = -1;
+		var placeholder = "";
+		var plugin_type = "";
+		var bodyBackgroundPos;
+		var bodyBackgroundPosXFull;
+		var bodyBackgroundPosYFull;
+		var bodyBackgroundPosY;
+		var bodyBackgroundPosUnit;
+		
+
+		function move(direction){
+			var result = new Array();
+			var index = -1;
+			var plugins = $("div.cms_plugin_holder[rel='" + placeholder+"']");
+			var before = new Array();
+			var after = new Array();
+			for(var i=0; i<plugins.length; i++){
+				var plugin = $(plugins[i]);
+				var id = plugin.attr("id").split("cms_plugin_")[1].split("_")[1]
+				if (id == plugin_id){
+					index = i;
+				}else{
+					if(index == -1){
+						before.push(id);
+					}else{
+						after.push(id);
+					}
+				}
+			}
+			if(direction == 1){
+				if(after.length){
+					result = result.concat(before, [after.shift(), plugin_id], after);
+				}else{
+					direction = 2;
+					result = result.concat([plugin_id], before);
+				}
+			}
+			if(direction == -1){
+				if(before.length){
+					var mover = before.pop();
+					result = result.concat(before, [plugin_id, mover], after);
+				}else{
+					direction = -2;
+					result = result.concat([plugin_id], after);
+				}
+			}
+
+
+			$.post("{% url admin:cms_page_move_plugin %}", { ids:result.join("_") }, function(data){
+				
+			});
+
+			var current = $("#cms_plugin_"+page_id+"_"+plugin_id)
+			
+			if(direction == 1){
+				current.swapWith(current.next());
+			}else if(direction == -1){
+				current.swapWith(current.prev());
+			}else if(direction == 2){
+				$(plugins[0]).before(current.clone());
+				current.remove();
+			}else if(direction == -2){
+				$(plugins[plugins.length-1]).after(current.clone());
+				current.remove();
+			}
+			$("#cms_plugin_overlay").hide();
+			hideCMStoolbarSubmenus();
+			$("#cms_plugin_"+page_id+"_"+plugin_id).makeoverlay("#cms_plugin_overlay2");
+		}
+		
+		function hide_iframe(){
+			$.nyroModalRemove();
+			$("#nyroModalWrapper .wrapperIframe").html("");
+			window.location = window.location.href;
+		}
+
+		function edit_plugin(page_id, plugin_id){	
+			$.nyroModalManual({
+				zIndexStart: 80000,
+			    type: 'iframe',
+				modal: false,
+				forceType: 'iframe',
+				url: '{% url admin:cms_page_changelist %}'+page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true&no_preview',
+				padding: 0,
+				minWidth: 800,
+				minHeight: 300,
+				height: 400,
+				closeButton: '<a class="cms_toolbar_button cms_toolbar_iconbutton nyroModalClose" href="#" id="closeBut"><span><strong>Close</strong></span></a>',
+				css: {
+					content: {
+						overflow: 'hidden'
+					}
+				}
+			});
+		}		
+		
+		function closeCMStoolbar(){
+			$("#cms_toolbar").slideUp();				
+			$("#cms_toolbar_mini").show();
+			$("#cms_toolbar_spacer").slideUp();
+			$.cookie("CMStoolbarColsed", "true", {path:'/', expires:7 });
+			hideCMStoolbarSubmenus();
+			resetBodyBackgroundPos();
+		}
+		
+		function openCMStoolbar(){
+			$("#cms_toolbar").slideDown();				
+			$("#cms_toolbar_mini").hide();
+			$("#cms_toolbar_spacer").slideDown();
+			$.cookie("CMStoolbarColsed", "false", {path:'/', expires:7 });
+			initBodyBackgroundPos();
+		}
+		
+		function hideCMSToolbar(){
+			$("#cms_toolbar").hide();
+			$("#cms_toolbar_mini").show();
+			$("#cms_toolbar_spacer").hide();
+			resetBodyBackgroundPos(0);
+		}
+		function showCMSToolbar(){
+			$("#cms_toolbar").show();
+			$("#cms_toolbar_mini").hide();
+			$("#cms_toolbar_spacer").show();		
+			initBodyBackgroundPos(0);						
+		}
+		
+		function initBodyBackgroundPos(s){
+			if(bodyBackgroundPosUnit=="px"){
+				if(s==undefined){s=400;}
+				var bodyBackgroundPosYnew = Number(bodyBackgroundPosY)+41;
+				var bodyBackgroundPosYnew = ""+bodyBackgroundPosYnew;
+				if ($.browser.msie) {//for IE
+					$("body").css("background-position-x",bodyBackgroundPosXFull);
+					$("body").css("background-position-y",bodyBackgroundPosYnew+"px");
+				}else {
+					$("body").stop().animate({backgroundPosition: "(" + bodyBackgroundPosXFull + " " + bodyBackgroundPosYnew + "px)"}, s);
+				}			
+			}			
+		}
+		function resetBodyBackgroundPos(s){
+			if(bodyBackgroundPosUnit=="px") {
+				if(s==undefined){s=400;}
+				if ($.browser.msie){//for IE
+					$("body").css("background-position-x",bodyBackgroundPosXFull);
+					$("body").css("background-position-y",bodyBackgroundPosYFull);
+				}else{
+					$("body").stop().animate({backgroundPosition: "("+bodyBackgroundPosXFull+" "+bodyBackgroundPosY+"px)"},s);
+				}			
+			}else{
+				if ($.browser.msie){//for IE
+					$("body").css("background-position-x",bodyBackgroundPosXFull);
+					$("body").css("background-position-y",bodyBackgroundPosYFull);
+				}else{
+					$("body").css("background-position",bodyBackgroundPos)
+				}								
+			}
+		}
+		
+		function hideCMStoolbarSubmenus(){			
+			$(".cms_toolbar_submenubutton").removeClass("open");
+		}
+		
+		$(document).ready(function () {
+			bodyBackgroundPos = $("body").css("background-position");			
+			if (bodyBackgroundPos == 'undefined' || bodyBackgroundPos == null) {
+				//for IE
+				bodyBackgroundPosXFull = $("body").css("background-position-x");
+				bodyBackgroundPosYFull = $("body").css("background-position-y");				
+				bodyBackgroundPos = bodyBackgroundPosXFull+" "+bodyBackgroundPosYFull;
+			} else {
+				bodyBackgroundPosXFull = bodyBackgroundPos.split(" ")[0];
+				bodyBackgroundPosYFull = bodyBackgroundPos.split(" ")[1];
+			}			
+
+			bodyBackgroundPosUnit = bodyBackgroundPosYFull.substr(bodyBackgroundPosYFull.length-1, bodyBackgroundPosYFull.length);
+			
+			if(bodyBackgroundPosUnit=="%"){
+				bodyBackgroundPosY = bodyBackgroundPosYFull.substr(0, bodyBackgroundPosYFull.length-1);
+			}else{
+				bodyBackgroundPosUnit = "px";
+				bodyBackgroundPosY = bodyBackgroundPosYFull.substr(0, bodyBackgroundPosYFull.length-2);				
+			}
+			if(bodyBackgroundPosYFull == "0%" || bodyBackgroundPosYFull == "top"){
+				bodyBackgroundPosUnit = "px";
+				bodyBackgroundPosY = 0;
+			}
+			
+			if ($.cookie("CMStoolbarColsed") == "true") {
+				hideCMSToolbar();
+			}else{
+				showCMSToolbar();
+			}			
+			
+      		$(document).bind('click', function(e){ 	
+				var cmsClicked = $(e.target);
+				var cmsSubmenuHit = false;
+				if(cmsClicked.parent().is('.cms_toolbar_submenubutton')){
+					cmsClicked = $(cmsClicked.parent())
+				}
+				if(cmsClicked.parent().parent().is('.cms_toolbar_submenubutton')){
+					cmsClicked = $(cmsClicked.parent().parent())
+				}				
+				if(cmsClicked.is('.cms_toolbar_submenubutton')) {
+					cmsSubmenuHit = true;
+					wasOpen = false;					
+					if(cmsClicked.hasClass("open")){wasOpen = true;}										
+					hideCMStoolbarSubmenus();					
+					if(wasOpen == false){
+						cmsClicked.addClass("open");												
+						
+						cmsClicked.find("ul").width("auto")
+						cmsClicked.find("li a").width("auto")
+						var maxW = 0;
+						cmsClicked.find("li a").each(function(){
+							if ($(this).width() > maxW)
+             					maxW = $(this).width();
+						});	
+						cmsClicked.find("li a").width((maxW)+"px")						
+						cmsClicked.find("ul").width((maxW+20)+"px")
+							
+						if(cmsClicked.hasClass("cms_toolbar_submenuselect")){
+							if(cmsClicked.find("ul").height()>=200){
+								cmsClicked.find("ul").css({height:"200px",width:(maxW+35)+"px"})
+							}
+						}
+						
+					}
+				}
+				if(cmsSubmenuHit == false){
+					hideCMStoolbarSubmenus();
+				}
+    		});	
+
+    		$("#cms_toolbar_edit_button_on").click(function(){
+        		var url = remove_from_url(window.location.href, "edit");
+        		url = insert_into_url(url, "edit-off", "");
+        		window.location = url;
+        		return false;
+    		});
+
+    		$("#cms_toolbar_edit_button_off").click(function(){
+        		window.location = insert_into_url(window.location.href, "edit", "");
+        		return false;
+    		});
+			
+			$("#cms_toolbar_closebutton").click(function () {
+				closeCMStoolbar();		
+				return false; 
+			});
+			
+			$("#cms_toolbar_openbutton").click(function () {
+				openCMStoolbar();			
+				return false; 
+			});			
+			
+			$("a.cms_toolbar_plugin_edit").click(function () {
+				edit_plugin(page_id, plugin_id);
+				return false;
+			});
+
+			$("a.cms_toolbar_downbutton").click(function () {
+				move(1);
+				return false;
+			});
+
+			$("a.cms_toolbar_upbutton").click(function () {
+				move(-1);
+				return false;
+			});		
+			$("#cms_toolbar_loginform a.cms_toolbar_button").click(function () {				
+				$("#cms_toolbar_loginform .cms_submit").trigger("click");
+				return false;
+			});		
+			
+			
+			$(".cms_plugin_holder").each(function (i) {				
+				var cmsPluginHolderFirstObj = $(this).children().eq(0)				
+				$(this).css({
+					float:cmsPluginHolderFirstObj.css("float"),
+					clear:cmsPluginHolderFirstObj.css("clear")
+				})
+		      });	
+
+			{% if page %}
+			     $("#cms_toolbar_templatebutton li a").click(function(){
+				     template = $(this).attr("href").split("#")[1];
+				     $.post("{% url admin:cms_page_change_template page.pk %}", {template:template}, function(){
+					     window.location = window.location.href;
+					     });
+				     hideCMStoolbarSubmenus();
+				     return false;
+			     });		
+		    {% endif %}
+			
+			/* PLUGIN */			
+			$("a.cms_toolbar_move_slot").live("click", function(){
+				var target = $(this).attr("rel")
+				$.post(
+					"{% url admin:cms_page_move_plugin %}", 
+					{ placeholder: target, plugin_id: plugin_id },
+					function(data){
+				    	window.location = window.location.href;
+					});
+				return false;
+			});
+			
+			$.fn.makeoverlay = function(options){
+				var pluginH = $(this).height();
+				var pluginHmin = 10;				
+				if(pluginH<pluginHmin){pluginH=pluginHmin}				
+				$(options).show();
+				$(options).css({
+					'width'		: $(this).width()+'px',
+					'height'	: pluginH+'px',
+					'left'		: $(this).offset().left+'px',
+					'top'		: $(this).offset().top+'px'
+				})
+				if(options == "#cms_plugin_overlay2"){
+					$(options).fadeIn(0);
+					$(options).fadeOut(800, function () {
+						$(options).hide();
+					})
+				}
+			}
+					
+			$(".cms_plugin_holder").live("mouseover", function(){	
+				var splits = $(this).attr("id").split("_");
+				page_id = splits[2];
+				plugin_id = splits[3];
+				placeholder = $(this).attr("rel");
+				plugin_type = $(this).attr("type");	
+				
+				$(this).makeoverlay("#cms_plugin_overlay");
+				
+				$("div.cms_toolbar_plugintools_holder ul.cms_toolbar_submenu li:not(:last)").remove();
+				var last = $("div.cms_toolbar_plugintools_holder ul.cms_toolbar_submenu li.last")
+				var first = true;
+				for(var i = 0; i < placeholder_data.length; i++){
+					var data = placeholder_data[i];
+					var found = false;
+					if(data.type != placeholder){
+						for(j = 0; j < data.plugins.length; j++){
+							if(data.plugins[j] == plugin_type){
+								found = true;
+							}
+						}
+					}
+					if(found){
+						var html = '<li class="%(extra_class)s"><a class="cms_toolbar_move_slot" href="#" rel="%(type)s">{% trans 'Move to %(name)s' %}</a></li>'
+						if (first){
+							first = false;
+							html = html.split("%(extra_class)s").join("first")
+						}else{
+							html = html.split("%(extra_class)s").join("")
+						}
+						html = html.split("%(name)s").join(data.name)
+						html = html.split("%(type)s").join(data.type)
+						last.before(html)
+					}
+				}
+				
+			});			
+			
+			$("#cms_plugin_overlay").mouseenter(function(){
+				$("#cms_plugin_overlay").show();
+			}).mouseleave(function(){
+				$("#cms_plugin_overlay").hide();
+				hideCMStoolbarSubmenus();
+			});
+			
+			$("div.cms_toolbar_placeholder_plugins li a").click(function(e){
+		        var select = $(this);
+		        var pluginvalue = select.attr('rel');
+		        var div = $(this).parent().parent().parent().parent();
+		        var placeholder = div.attr("rel")
+		        var splits = div.attr("id").split("cms_placeholder_")[1].split("_");
+		        var page_id = splits[1];
+		        var language = splits[0];
+		        if (!language) {
+		            alert("Unable to determine the correct language for this plugin! Please report the bug!");
+		        }
+		        if (pluginvalue) {
+		            var pluginname = select.children('[selected]').text();
+		            $.post("{% url admin:cms_page_add_plugin %}", { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language }, function(data){
+		                if ('error' != data) {
+		                    edit_plugin(page_id, data);
+		                }
+		            }, "html" );
+		        }	
+		        hideCMStoolbarSubmenus();
+				return false;
+			});
+			
+			$("a.cms_toolbar_plugin_delete").click(function(){
+		        var question = "{% trans "Are you sure you want to delete this plugin?" %}"
+		        var answer = confirm(question, true);
+		        if(answer){
+		            $.post("{% url admin:cms_page_remove_plugin %}", { plugin_id:plugin_id }, function(data){
+		                window.location = window.location.href;
+		            }, "html");
+		        }
+		        hideCMStoolbarSubmenus();
+		        return false;
+		    });
+			
+		});
+	//]]>
+</script>
+
+<script type="text/javascript" charset="utf-8">
+	// Now that jQuery is done loading, put the '$' variable back to what it was...
+	//var $ = _$;
+</script>
+
+<div id="cms_toolbar_mini">
+	<a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
+</div>
+<div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
+	<div id="cms_toolbar_col1">
+		<a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
+		{% if auth %}
+			{% if page %}
+			<div id="cms_toolbar_editmode_toggle">
+				<span>{% trans "Edit mode" %}</span>
+				<a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
+			</div>
+			{% endif %}
+			{% if page.last_page_states %}
+			<div id="cms_toolbar_statusbar">
+				<div>
+					<span>{% trans "Status" %}:</span>
+					<em>
+						{% for state in page.last_page_states %}					
+							{{ state.get_action_display }}	
+						{% endfor %}				
+					</em>
+				</div>
+			</div>		
+			{% endif %}
+		{% else %}
+		<form method="post" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>
+			<label for="cms_username">{% trans "Username" %}</label>
+			<input type="text" name="cms_username" class="cms_textinput"></input>
+			<label for="cms_password">{% trans "Password" %}</label>
+			<input type="password" name="cms_password" class="cms_textinput"></input>
+			<input type="submit" name="submit" value="{% trans "login" %}" class="cms_submit"></input>
+			<a href="#" class="cms_toolbar_button"><span>{% trans "login" %}</span></a>		
+		</form>
+		{% endif %}	
+	</div>
+	
+	<div id="cms_toolbar_col2">
+		{% if moderator_should_approve and has_moderate_permission and auth %}<a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="icon approve cms_toolbar_button" title="{% trans 'Approve directly' %}">
+			<span class="state">{{ page_moderator_state.label }}</span>
+		</a>{% endif %}
+		<!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
+		{% if auth and has_change_permission %}
+		<div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>		
+			<ul id="cms_toolbar_template_menu" class="cms_toolbar_submenu">
+				{% for template in templates %}
+				<li class="{% ifequal template.0 page.template %}selected {% endifequal %}{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}"><a href="#{{ template.0 }}">{{ template.1 }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
+			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
+				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">{% trans "edit" %}</span>{% trans "Site Administration" %}</a></li>
+				{% if auth %}
+				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
+				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
+				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
+				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
+				{% endif %}
+				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
+				{% endif %}			
+			</ul>
+		</div>
+		{% if auth %}
+		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
+		{% endif %}
+		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
+	</div>
+
+</div>
+<div id="cms_toolbar_spacer">&nbsp;</div>
+
+<div id="cms_plugin_overlay">
+	<div class="cms_toolbar_plugintools cms_toolbar">
+		<div class="cms_toolbar_plugintools_holder">
+			<a href="#" class="cms_toolbar_plugin_edit cms_toolbar_button cms_toolbar_iconbutton"><span><strong class="cms_toolbar_icon_edit">{% trans "edit" %}</strong></span></a>			
+			
+			<a href="#" class="cms_toolbar_upbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "up" %}</strong></span></a>
+			<a href="#" class="cms_toolbar_downbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "down" %}</strong></span></a>				
+			
+			<div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span class="cms_toolbar_submenubutton_content"><strong>{% trans "Settings" %}</strong><em>arrow</em></span>		
+				<ul class="cms_toolbar_submenu">				
+					<!--  li class="first"><a href="#">Move to Slot1</a></li>
+					<li><a href="#">Move to Slot zwei</a></li>
+					<li><a href="#">Move to Slot drei</a></li>
+					<li><a href="#">Move to Slot 4</a></li-->
+					<li class="last"><a href="#" class="cms_toolbar_plugin_delete"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Plugin" %}</a></li>			
+				</ul>
+			</div>
+		</div>	
+	</div>
+	<div class="cms_plugin_overlay_bg">&nbsp;</div>
+</div>
+<div id="cms_plugin_overlay2">
+	<div class="cms_plugin_overlay_bg">&nbsp;</div>
+</div>

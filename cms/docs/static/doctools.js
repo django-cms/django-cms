@@ -183,7 +183,6 @@ var Documentation = {
     var togglers = $('img.toggler').click(function() {
       var src = $(this).attr('src');
       var idnum = $(this).attr('id').substr(7);
-      console.log($('tr.cg-' + idnum).toggle());
       if (src.substr(-9) == 'minus.png')
         $(this).attr('src', src.substr(0, src.length-9) + 'plus.png');
       else

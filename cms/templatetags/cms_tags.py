@@ -4,17 +4,20 @@ from django.core.mail import send_mail, mail_managers
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings as django_settings
 from cms.exceptions import NoHomeFound
-
 from cms import settings
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
+from cms.utils.plugin import render_plugins_for_context
 from cms.utils import get_language_from_request,\
     get_extended_navigation_nodes, find_children, \
     cut_levels, find_selected, mark_descendants
 from cms.utils import navigation
-from cms.plugins.utils import get_plugins
 from cms.utils.i18n import get_fallback_languages
+from django.template.loader import render_to_string
+from cms.plugin_pool import plugin_pool
+from django.template.defaultfilters import title
 
 
 register = template.Library()
@@ -457,7 +460,11 @@ def language_chooser(context, template="cms/language_chooser.html"):
         return ''
     
     request = context['request']
-    languages = settings.LANGUAGES
+    languages = []
+    cms_languages = dict(settings.CMS_LANGUAGES)
+    for lang in settings.CMS_FRONTEND_LANGUAGES:
+        if lang in cms_languages:
+            languages.append((lang, cms_languages[lang]))
     lang = get_language_from_request(request, request.current_page)
     context.update(locals())
     return context
@@ -496,27 +503,16 @@ class PlaceholderNode(template.Node):
     def render(self, context):
         if context.get('display_placeholder_names_only'):
             return "<!-- PlaceholderNode: %s -->" % self.name
+            
         if not 'request' in context:
             return ''
-        l = get_language_from_request(context['request'])
         request = context['request']
         
         page = request.current_page
         if page == "dummy":
             return ""
-        plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == self.name]
-        if settings.CMS_PLACEHOLDER_CONF and self.name in settings.CMS_PLACEHOLDER_CONF:
-            if "extra_context" in settings.CMS_PLACEHOLDER_CONF[self.name]:
-                context.update(settings.CMS_PLACEHOLDER_CONF[self.name]["extra_context"])
-        if self.theme:
-            # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
-            context.update({'theme': self.theme,})
-        c = []
-        for index, plugin in enumerate(plugins):
-            context['plugin_index'] = index
-            c.append(plugin.render_plugin(context, self.name))
-        return "".join(c)
-        
+        return render_plugins_for_context(self.name, page, context, self.theme)
+ 
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
 

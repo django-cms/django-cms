@@ -34,26 +34,25 @@ class PluginPool(object):
             except RegistrationError:
                 pass
     
-    def get_all_plugins(self, placeholder=None):
+    def get_all_plugins(self, placeholder=None, page=None):
         self.discover_plugins()
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
         if placeholder:
             final_plugins = []
             for plugin in plugins:
-                found = True
-                if cms_settings.CMS_PLACEHOLDER_CONF:
-                    if placeholder in cms_settings.CMS_PLACEHOLDER_CONF:
-                        if "plugins" in cms_settings.CMS_PLACEHOLDER_CONF[placeholder] \
-                        and not plugin.__name__ in cms_settings.CMS_PLACEHOLDER_CONF[placeholder]["plugins"]:
-                            found = False
-                if found:
+                allowed_plugins = []
+                if page:
+                    allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get("plugins")
+                if not allowed_plugins:
+                    allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("plugins")
+                if not allowed_plugins or plugin.__name__ in allowed_plugins:
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins
     
-    def get_text_enabled_plugins(self, placeholder):
-        plugins = self.get_all_plugins(placeholder)
+    def get_text_enabled_plugins(self, placeholder, page):
+        plugins = self.get_all_plugins(placeholder, page)
         final = []
         for plugin in plugins:
             if plugin.text_enabled:

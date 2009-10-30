@@ -4,7 +4,6 @@ from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
-from cms.admin.utils import get_placeholders
 from cms.admin.views import change_status, change_innavigation, add_plugin, \
     edit_plugin, remove_plugin, move_plugin, save_all_plugins, revert_plugins, change_moderation
 from cms.admin.widgets import PluginEditor
@@ -39,6 +38,10 @@ from django.utils.functional import curry
 from django.utils.translation import ugettext as _
 from django.utils.text import capfirst
 from os.path import join
+from cms.utils.plugins import get_placeholders
+
+if 'reversion' in settings.INSTALLED_APPS:
+    from reversion import revision 
 
 class PageAdmin(admin.ModelAdmin):
     form = PageForm
@@ -180,6 +183,8 @@ class PageAdmin(admin.ModelAdmin):
             return get_copy_dialog(request, unquote(url[:-12]))
         elif url.endswith('/preview'):
             return self.preview_page(request, unquote(url[:-8]))
+        elif url.endswith('/change_temlate'):
+            return self.change_template(request, unquote(url[:-15]))
         # NOTE: revert plugin is newly integrated in overriden revision_view
         if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
             url = url.split("/?")[0]
@@ -189,9 +194,7 @@ class PageAdmin(admin.ModelAdmin):
         """New way of urls handling.
         """
         from django.conf.urls.defaults import patterns, url
-        info = "%sadmin_%s_%s" % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
-
-        # helper for url pattern generation
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
@@ -213,7 +216,8 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page 
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog            
+            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog     
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog            
         )
         
         url_patterns = url_patterns + super(PageAdmin, self).get_urls()
@@ -288,6 +292,23 @@ class PageAdmin(admin.ModelAdmin):
             form.cleaned_data['moderator_message']:
             update_moderation_message(obj, form.cleaned_data['moderator_message'])
     
+    
+           
+    def change_template(self, request, object_id):
+        page = get_object_or_404(Page, pk=object_id)
+        if page.has_change_permission(request):
+            template = request.POST.get("template", None)
+            if template in dict(settings.CMS_TEMPLATES):
+                page.template = template
+                page.save()
+                return HttpResponse(str("ok"))
+            else:
+                return HttpResponseBadRequest("template not valid")
+        else:
+            return HttpResponseForbidden()
+    if 'reversion' in settings.INSTALLED_APPS:
+        change_template = revision.create_on_success(change_template)    
+    
     def get_parent(self, request):    
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
@@ -314,9 +335,10 @@ class PageAdmin(admin.ModelAdmin):
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
             for placeholder_name in get_placeholders(request, template):
                 if placeholder_name not in self.mandatory_placeholders:
-                    if placeholder_name in settings.CMS_PLACEHOLDER_CONF and "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
-                        name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]["name"]
-                    else:
+                    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
+                    if not name:
+                        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
+                    if not name:
                         name = placeholder_name
                     given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
@@ -384,7 +406,7 @@ class PageAdmin(admin.ModelAdmin):
             
             for placeholder_name in get_placeholders(request, template):
                 if placeholder_name not in self.mandatory_placeholders:
-                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name)
+                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                     plugin_list = []
                     if obj:
                         if versioned:
@@ -449,7 +471,7 @@ class PageAdmin(admin.ModelAdmin):
         """
         Given the request and name of a placeholder return a PluginEditor Widget
         """
-        installed_plugins = plugin_pool.get_all_plugins(name)
+        installed_plugins = plugin_pool.get_all_plugins(name, page)
         widget = PluginEditor(installed=installed_plugins)
         if not isinstance(widget(), Widget):
             widget = Textarea

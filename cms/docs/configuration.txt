@@ -46,13 +46,23 @@ Example::
 			'plugins': ('TextPlugin', 'PicturePlugin'),
 			'extra_context': {"theme":"wide"},
 			'name':gettext("Content")
-    	},
-    	'right-column': {
-        	"plugins": ('TeaserPlugin', 'LinkPlugin'),
-        	"extra_context": {"theme":"small"},
+		},
+		'right-column': {
+			"plugins": ('TeaserPlugin', 'LinkPlugin'),
+			"extra_context": {"theme":"small"},
 			'name':gettext("Right Column")
+			'limits': {
+				'global': 2,
+				'TeaserPlugin': 1,
+				'LinkPlugin': 1,
+			},
+    	},
+    	'base.html content': {
+    		"plugins": {'TextPlugin', 'PicturePlugin', 'TeasePlugin'}
     	},
 	}
+
+You can combine template names and placeholder names to granually define the plugins like done with ''base.html content''.
 	
 **plugins**
 
@@ -65,6 +75,14 @@ Extra context that plugins in this placeholder receive.
 **name**
 
 The name displayed in admin. With the gettext stub it can be internationalized.
+
+**limits**
+
+Limit the number of plugins that can be placed inside this placeholder. 
+Dictionary keys are plugin names; values their respective limits. 
+Special case: "global" - Limit the absolute number of plugins in this 
+placeholder regardless of their type (takes precedence over the type-specific
+limits).
 
 
 CMS_PERMISSION
