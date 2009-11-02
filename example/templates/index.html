@@ -46,7 +46,6 @@
         margin:0 auto;
         border:1px #999 solid;
         margin-bottom:40px;
-        overflow:hidden;
         height:1%;
         background:#fffdca;
     }
@@ -146,14 +145,14 @@
 
 <h2>Content</h2>
 {% block content %}
-    <div style="width:70%">
-		<h3>title placeholder {% page_attribute title %}</h3>
-		<div style="float:right;width:25%">
+    <div>
+		<h3>Title placeholder {% page_attribute title %}</h3>
+		<div style="float:right;width:30%;">
     		<h3>Right column placeholder</h3>
     		{% placeholder right-column %}
     	 </div>
-        <div>
-        	<h3>body placeholder</h3>
+        <div style="float:left;width:65%;">
+        	<h3>Body placeholder</h3>
          	{% placeholder "body" %}
          </div>
     </div>
