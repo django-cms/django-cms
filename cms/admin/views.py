@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from cms.utils import get_language_from_request
+from cms.models import Page, Title, CMSPlugin
 
 def save_all_plugins(request, page, excludes=None):
     if not page.has_change_permission(request):

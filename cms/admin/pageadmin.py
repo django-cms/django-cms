@@ -31,10 +31,9 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render_to_response, get_object_or_404
 from django import template
-from django.template.context import RequestContext, Context
-from django.template.defaultfilters import title, escapejs, force_escape
+from django.template.context import RequestContext
+from django.template.defaultfilters import title, escapejs, force_escape, escape
 from django.utils.encoding import force_unicode
-from django.utils.functional import curry
 from django.utils.translation import ugettext as _
 from django.utils.text import capfirst
 from os.path import join
@@ -298,9 +297,9 @@ class PageAdmin(model_admin):
     def change_template(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
         if page.has_change_permission(request):
-            template = request.POST.get("template", None)
+            to_template = request.POST.get("template", None)
             if template in dict(settings.CMS_TEMPLATES):
-                page.template = template
+                page.template = to_template
                 page.save()
                 return HttpResponse(str("ok"))
             else:
@@ -326,7 +325,7 @@ class PageAdmin(model_admin):
         Add fieldsets of placeholders to the list of already existing
         fieldsets.
         """
-        template = get_template_from_request(request, obj)
+        placeholders_template = get_template_from_request(request, obj)
         
         if obj: # edit
             given_fieldsets = deepcopy(self.fieldsets)
@@ -334,7 +333,7 @@ class PageAdmin(model_admin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder_name in get_placeholders(request, template):
+            for placeholder_name in get_placeholders(request, placeholders_template):
                 if placeholder_name not in self.mandatory_placeholders:
                     name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
                     if not name:
@@ -400,12 +399,12 @@ class PageAdmin(model_admin):
             else:
                 form.base_fields['overwrite_url'].initial = ""
             if settings.CMS_TEMPLATES:
-                template = get_template_from_request(request, obj)
+                selected_template = get_template_from_request(request, obj)
                 template_choices = list(settings.CMS_TEMPLATES)
                 form.base_fields['template'].choices = template_choices
-                form.base_fields['template'].initial = force_unicode(template)
+                form.base_fields['template'].initial = force_unicode(selected_template)
             
-            for placeholder_name in get_placeholders(request, template):
+            for placeholder_name in get_placeholders(request, selected_template):
                 if placeholder_name not in self.mandatory_placeholders:
                     installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                     plugin_list = []
@@ -642,7 +641,7 @@ class PageAdmin(model_admin):
             'softroot': settings.CMS_SOFTROOT,
             'CMS_PERMISSION': settings.CMS_PERMISSION,
             'CMS_MODERATOR': settings.CMS_MODERATOR,
-            'has_recover_permission': self.has_recover_permission(request),
+            'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
         }
         if 'reversion' in settings.INSTALLED_APPS:
@@ -658,8 +657,6 @@ class PageAdmin(model_admin):
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
-        
-        
         return super(PageAdmin, self).recoverlist_view(request, extra_context)
     
     def recover_view(self, request, version_id, extra_context=None):
@@ -1059,9 +1056,9 @@ class PageAdmin(model_admin):
             if 'reversion' in settings.INSTALLED_APPS:
                 page.save()
                 save_all_plugins(request, page)
-                revision.user = request.user
+                reversion.revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-                revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
+                reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
             return HttpResponse(str(plugin.pk))
         raise Http404
 
