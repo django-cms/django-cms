@@ -27,6 +27,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
+from django.views.decorators.http import require_POST
 from django.http import HttpResponseRedirect, HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render_to_response, get_object_or_404
@@ -298,7 +299,7 @@ class PageAdmin(model_admin):
         page = get_object_or_404(Page, pk=object_id)
         if page.has_change_permission(request):
             to_template = request.POST.get("template", None)
-            if template in dict(settings.CMS_TEMPLATES):
+            if to_template in dict(settings.CMS_TEMPLATES):
                 page.template = to_template
                 page.save()
                 return HttpResponse(str("ok"))
@@ -508,7 +509,7 @@ class PageAdmin(model_admin):
             # to determine whether a given object exists.
             obj = None
         else:
-            template = get_template_from_request(request, obj)
+            selected_template = get_template_from_request(request, obj)
             moderation_level, moderation_required = get_test_moderation_level(obj, request.user)
             
             # if there is a delete request for this page
@@ -519,7 +520,7 @@ class PageAdmin(model_admin):
             
             #activate(user_lang_set)
             extra_context = {
-                'placeholders': get_placeholders(request, template),
+                'placeholders': get_placeholders(request, selected_template),
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
