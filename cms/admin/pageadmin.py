@@ -40,10 +40,17 @@ from django.utils.text import capfirst
 from os.path import join
 from cms.utils.plugins import get_placeholders
 
+model_admin = admin.ModelAdmin
+create_on_success = lambda x: x
+    
 if 'reversion' in settings.INSTALLED_APPS:
-    from reversion import revision 
+    import reversion
+    from reversion.admin import VersionAdmin
+    model_admin = VersionAdmin
+    
+    create_on_success = reversion.revision.create_on_success
 
-class PageAdmin(admin.ModelAdmin):
+class PageAdmin(model_admin):
     form = PageForm
     list_filter = ['published', 'in_navigation', 'template', 'changed_by']
     search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
@@ -306,8 +313,8 @@ class PageAdmin(admin.ModelAdmin):
                 return HttpResponseBadRequest("template not valid")
         else:
             return HttpResponseForbidden()
-    if 'reversion' in settings.INSTALLED_APPS:
-        change_template = revision.create_on_success(change_template)    
+            
+    create_on_success(change_template)    
     
     def get_parent(self, request):    
         target = request.GET.get('target', None)
@@ -417,15 +424,15 @@ class PageAdmin(admin.ModelAdmin):
                             plugins = []
                             bases = {}
                             for rev in revs:
-                                obj = rev.object
-                                if obj.__class__ == CMSPlugin:
-                                    if obj.language == language and obj.placeholder == placeholder_name and not obj.parent_id:
-                                        if obj.get_plugin_class() == CMSPlugin:
-                                            plugin_list.append(obj)
+                                pobj = rev.object
+                                if pobj.__class__ == CMSPlugin:
+                                    if pobj.language == language and pobj.placeholder == placeholder_name and not pobj.parent_id:
+                                        if pobj.get_plugin_class() == CMSPlugin:
+                                            plugin_list.append(pobj)
                                         else:
-                                            bases[int(obj.pk)] = obj
-                                if hasattr(obj, "cmsplugin_ptr_id"): 
-                                    plugins.append(obj)
+                                            bases[int(pobj.pk)] = pobj
+                                if hasattr(pobj, "cmsplugin_ptr_id"): 
+                                    plugins.append(pobj)
                             for plugin in plugins:
                                 if int(plugin.cmsplugin_ptr_id) in bases:
                                     bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
@@ -947,6 +954,9 @@ class PageAdmin(admin.ModelAdmin):
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context, context_instance=context_instance)
+        
+    
+    delete_translation = create_on_success(delete_translation)
 
     def remove_delete_state(self, request, object_id):
         """Remove all delete action from page states, requires change permission
@@ -980,15 +990,4 @@ class PageAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(url)
         
 
-class PageAdminMixins(admin.ModelAdmin):
-    pass
-
-if 'reversion' in settings.INSTALLED_APPS:
-    from reversion import revision
-    from reversion.admin import VersionAdmin
-    # change the inheritance chain to include VersionAdmin
-    PageAdminMixins.__bases__ = (PageAdmin, VersionAdmin) + PageAdmin.__bases__
-    PageAdminMixins.delete_translation = revision.create_on_success(PageAdminMixins.delete_translation)
-    admin.site.register(Page, PageAdminMixins)
-else:
-    admin.site.register(Page, PageAdmin)
+admin.site.register(Page, PageAdmin)
