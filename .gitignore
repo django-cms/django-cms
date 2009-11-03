@@ -17,4 +17,9 @@ dist
 .ropeproject
 .project
 .pydevproject
-django_cms.egg-info
+*.egg-info
+develop-eggs
+downloads
+eggs
+parts
+bin
