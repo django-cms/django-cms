@@ -124,9 +124,9 @@ INSTALLED_APPS = (
     #'store',
 )
 
-LANGUAGE_CODE = "en"
-
 gettext = lambda s: s
+
+LANGUAGE_CODE = "en"
 
 LANGUAGES = (
     ('fr', gettext('French')),
@@ -176,8 +176,8 @@ CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categor
                             ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),)
 
 CMS_SOFTROOT = True
-CMS_MODERATOR = True
-CMS_PERMISSION = True
+CMS_MODERATOR = False
+CMS_PERMISSION = False
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_MENU_TITLE_OVERWRITE = True
