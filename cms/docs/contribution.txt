@@ -72,7 +72,7 @@ After this you can do a fetch from upstream:
 ::
 
 	$ git fetch upstream 	# only download
-	$ git pull upstream 	# download and merge
+	$ git pull upstream master	# download and merge master branch
 	
 or::
 	
@@ -80,6 +80,11 @@ or::
 	$ hg update 		# merge
 
 Now your repository is up-to-date again.
+
+It is also good practice to use a branch for every bug / feature you commit if you have more than one.
+So we can merge the whole branch and don't have to cherry-pick the single commits that make up the fix / feature.
+Also it allows us to give you instructions as if something is missing (tests, docs) and you don't have to interfere 
+with other things you might be working on. 
 
 If you have questions you may wish to read some tutorials about git or Mercurial
 or ask on IRC or the mailing list.
