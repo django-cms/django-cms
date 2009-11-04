@@ -18,6 +18,8 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
     returns: (Page, None) or (None, path_to_alternative language)
     """
     try:
+        if settings.CMS_FLAT_URLS:
+            return queryset.filter(Q(title_set__slug=path) & Q(title_set__language=lang)).distinct().select_related()[0], None
         if home_slug:
             queryset = queryset.exclude(Q(title_set__path=home_slug)&Q(tree_id=home_tree_id))
             home_slug += "/"
@@ -25,21 +27,18 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
             
         else:
             title_q = Q(title_set__slug=path)
-        if settings.CMS_FLAT_URLS:
-            return queryset.filter(title_q & Q(title_set__language=lang)).distinct().select_related()[0], None
-        else:
-            page = queryset.filter(title_q).distinct().select_related()[0]
-            if page:
-                langs = page.get_languages() 
-                if lang in langs:
-                    return page, None
-                else:
-                    path = None
-                    for alt_lang in get_fallback_languages(lang):
-                        if alt_lang in langs:
-                            path = '/%s%s' % (alt_lang, page.get_absolute_url(language=lang, fallback=True))
-                            return None, path
-                    return None, path
+        page = queryset.filter(title_q).distinct().select_related()[0]
+        if page:
+            langs = page.get_languages() 
+            if lang in langs:
+                return page, None
+            else:
+                path = None
+                for alt_lang in get_fallback_languages(lang):
+                    if alt_lang in langs:
+                        path = '/%s%s' % (alt_lang, page.get_absolute_url(language=lang, fallback=True))
+                        return None, path
+                return None, path
     except IndexError:
         return None, None
 
