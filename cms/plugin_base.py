@@ -4,8 +4,48 @@ from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.contrib import admin
 from cms import settings as cms_settings
- 
+from django.forms.widgets import Media, MediaDefiningClass
+
+def pluginmedia_property(cls):
+    def _media(self):
+        # Get the plugin media property of the superclass, if it exists
+        if hasattr(super(cls, self), 'pluginmedia'):
+            base = super(cls, self).pluginmedia
+        else:
+            base = Media()
+
+        # Get the media definition for this class
+        definition = getattr(cls, 'PluginMedia', None)
+        if definition:
+            extend = getattr(definition, 'extend', True)
+            if extend:
+                if extend == True:
+                    m = base
+                else:
+                    m = Media()
+                    for medium in extend:
+                        m = m + base[medium]
+                return m + Media(definition)
+            else:
+                return Media(definition)
+        else:
+            return base
+    return property(_media)
+
+class PluginMediaDefiningClass(MediaDefiningClass):
+    def __new__(cls, name, bases, attrs):
+        new_class = super(PluginMediaDefiningClass, cls).__new__(cls, name, bases,
+                                                           attrs)
+        if 'pluginmedia' not in attrs:
+            new_class.pluginmedia = pluginmedia_property(new_class)
+        return new_class
+
+
+
 class CMSPluginBase(admin.ModelAdmin):
+    
+    __metaclass__ = PluginMediaDefiningClass # just define a PluginMedia class to add media
+    
     name = ""
     form = None
     
@@ -57,8 +97,7 @@ class CMSPluginBase(admin.ModelAdmin):
         # variables will be overriden in edit_view, so we got requred
         self.cms_plugin_instance = None
         self.placeholder = None
-    
-    
+
     def render(self, context, placeholder):
         raise NotImplementedError, "render needs to be implemented"
     
@@ -75,6 +114,9 @@ class CMSPluginBase(admin.ModelAdmin):
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
     
+    def get_plugin_media(self, request, plugin):
+        return self.pluginmedia
+        
     def has_add_permission(self, request, *args, **kwargs):
         """Permission handling change - if user is allowed to change the page
         he must be also allowed to add/change/delete plugins..
@@ -125,7 +167,15 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         self.object_successfully_changed = True
         return super(CMSPluginBase, self).response_add(request, obj)
-    
+
+    def log_addition(self, request, object):
+        pass
+
+    def log_change(self, request, object, message):
+        pass
+
+    def log_deletion(self, request, object, object_repr):
+        pass
                 
     def icon_src(self, instance):
         """

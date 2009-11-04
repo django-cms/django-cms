@@ -503,9 +503,9 @@ class PlaceholderNode(template.Node):
     def render(self, context):
         if context.get('display_placeholder_names_only'):
             return "<!-- PlaceholderNode: %s -->" % self.name
+            
         if not 'request' in context:
             return ''
-        l = get_language_from_request(context['request'])
         request = context['request']
         
         page = request.current_page
@@ -619,3 +619,31 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
         return {'content':mark_safe(content)}
     return {'content':''}
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
+
+def do_plugins_media(parser, token):
+    return PluginsMediaNode()
+
+class PluginsMediaNode(template.Node):
+    """This template node is used to output media for plugins.
+
+    eg: {% plugins_media %}
+    """
+    def render(self, context):
+        if not 'request' in context:
+            return ''
+        request = context['request']
+        page = request.current_page
+        if page == "dummy":
+            return ''
+        from cms.plugins.utils import get_plugins_media
+        plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        if plugins_media:
+            return plugins_media.render()
+        else:
+            return u''
+        
+    def __repr__(self):
+        return "<PluginsMediaNode Node: %s>" % self.name
+        
+register.tag('plugins_media', do_plugins_media)
+
