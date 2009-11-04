@@ -4,7 +4,7 @@ from cms.utils.moderator import get_page_queryset
 from cms.models import Title
 from cms.models.pagemodel import Page
 from cms.exceptions import NoHomeFound
-
+from django.contrib.sites.models import Site
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application. 
@@ -148,7 +148,8 @@ class DynamicURLConfModule(object):
             home_slugs = {}
             for title in home_titles:
                 home_slugs[title.language] = title.slug
-            title_qs = Title.objects.filter(page__publisher_is_draft=is_draft)
+            current_site = Site.objects.get_current()
+            title_qs = Title.objects.filter(page__publisher_is_draft=is_draft, page__site=current_site)
             
             urls = []
             for title in title_qs.filter(application_urls__gt="").select_related():

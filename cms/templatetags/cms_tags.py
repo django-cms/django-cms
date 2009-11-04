@@ -41,7 +41,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
-        return {'template': 'cms/empty.html'}
+        return {'template': 'cms/content.html'}
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
@@ -68,7 +68,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         alist = None
         if current_page:
             alist = current_page.get_ancestors().values_list('id', 'soft_root')
-        if alist == None:# maybe the active node is in an extender?
+        if not alist:  # == None:# maybe the active node is in an extender?
             alist = []
             extenders = page_queryset.published().filter(in_navigation=True, 
                                                         site=site, 
@@ -510,10 +510,11 @@ class PlaceholderNode(template.Node):
         if self.theme:
             # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
             context.update({'theme': self.theme,})
-        c = ""
-        for plugin in plugins:
-            c += plugin.render_plugin(context, self.name)
-        return c
+        c = []
+        for index, plugin in enumerate(plugins):
+            context['plugin_index'] = index
+            c.append(plugin.render_plugin(context, self.name))
+        return "".join(c)
         
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name

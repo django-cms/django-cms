@@ -21,6 +21,7 @@ def get_placeholders(request, template_name):
     context.update({'template':template,
                     'request':request,
                     'display_placeholder_names_only': True,
+                    'current_page': "dummy",
                     })
     output = temp.render(context)
     request.user = user
