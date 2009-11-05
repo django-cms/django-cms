@@ -1,5 +1,5 @@
 import re
-from cms import settings as cms_settings
+from django.conf import settings
 
 APPEND_TO_SLUG = "-copy"
 copy_slug_re = re.compile(r'^.*-copy(?:-(\d)*)?$')
@@ -10,10 +10,10 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     from cms.models import Title
     qs = Title.objects.filter(page__site=site, slug=slug, publisher_is_draft=True).exclude(page=page)
     
-    if not cms_settings.CMS_UNIQUE_SLUGS:
+    if settings.i18n_installed:
         qs = qs.filter(language=lang)
     
-    if not cms_settings.CMS_FLAT_URLS:
+    if not settings.CMS_FLAT_URLS:
         if parent and not parent.is_home(): 
             qs = qs.filter(page__parent=parent)
         else:

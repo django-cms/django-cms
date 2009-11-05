@@ -1,9 +1,8 @@
 from datetime import datetime
 from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.contrib.sites.models import Site
 from publisher.query import PublisherQuerySet
-from cms import settings
+from django.conf import settings
 from cms.exceptions import NoHomeFound
 
 #from cms.utils.urlutils import levelize_path

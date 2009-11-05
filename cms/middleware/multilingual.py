@@ -1,25 +1,24 @@
+import re
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 from django.conf import settings
 from cms.utils.i18n import get_default_language
-import re    
-from cms import settings as cms_settings
 
 SUB = re.compile(ur'<a([^>]+)href="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % (
-    "|".join(map(lambda l: l[0] + "/" , cms_settings.CMS_LANGUAGES)), 
+    "|".join(map(lambda l: l[0] + "/" , settings.CMS_LANGUAGES)), 
     settings.MEDIA_URL[1:], 
     settings.ADMIN_MEDIA_PREFIX[1:]
 ))
 
 SUB2 = re.compile(ur'<form([^>]+)action="/(?!(%s|%s|%s))([^"]*)"([^>]*)>' % (
-    "|".join(map(lambda l: l[0] + "/" , cms_settings.CMS_LANGUAGES)),
+    "|".join(map(lambda l: l[0] + "/" , settings.CMS_LANGUAGES)),
      settings.MEDIA_URL[1:],
      settings.ADMIN_MEDIA_PREFIX[1:]
 ))
 
-SUPPORTED = dict(cms_settings.CMS_LANGUAGES)
+SUPPORTED = dict(settings.CMS_LANGUAGES)
 
-START_SUB = re.compile(r"^/(%s)/.*" % "|".join(map(lambda l: l[0], cms_settings.CMS_LANGUAGES)))
+START_SUB = re.compile(r"^/(%s)/.*" % "|".join(map(lambda l: l[0], settings.CMS_LANGUAGES)))
 
 def has_lang_prefix(path):
     check = START_SUB.match(path)

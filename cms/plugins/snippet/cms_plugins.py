@@ -1,6 +1,6 @@
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.settings import CMS_MEDIA_URL
+from django.conf import settings
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -34,6 +34,6 @@ class SnippetPlugin(CMSPluginBase):
         return context
 
     def icon_src(self, instance):
-        return CMS_MEDIA_URL + u"images/plugins/snippet.png"
+        return settings.CMS_MEDIA_URL + u"images/plugins/snippet.png"
 
 plugin_pool.register_plugin(SnippetPlugin)

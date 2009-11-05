@@ -1,13 +1,13 @@
+from django.conf import settings
 from django.core.management.base import NoArgsCommand, CommandError
 from django.db.models import Q
-from cms import settings as cms_settings
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         """Create published public version of all published drafts. Useful, 
         when CMS_MODERATOR gets turned on after some time. 
         """
-        if not cms_settings.CMS_MODERATOR:
+        if not settings.CMS_MODERATOR:
             raise CommandError("This command may be used only with settings.CMS_MODERATOR") 
         
         self.publish_pages()

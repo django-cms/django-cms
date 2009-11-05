@@ -1,5 +1,5 @@
 from django.db import models
-from cms import settings
+from django.conf import settings
 
 class ContentManager(models.Manager):
 

@@ -2,12 +2,12 @@ from cms.admin.dialog.forms import get_copy_dialog_form
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404, HttpResponse
+from django.conf import settings
 from cms.models import Page
-from cms import settings as cms_settings
 
 @staff_member_required
 def get_copy_dialog(request, page_id):
-    if not cms_settings.CMS_PERMISSION or not cms_settings.CMS_MODERATOR:
+    if not settings.CMS_PERMISSION or not settings.CMS_MODERATOR:
         return HttpResponse('')
      
     page = get_object_or_404(Page, pk=page_id)

@@ -1,5 +1,6 @@
 from os.path import join
 from datetime import datetime
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _, get_language
@@ -10,7 +11,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
-from cms import settings
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug, check_title_slugs
@@ -120,6 +120,8 @@ class Page(MpttPublisher):
                 tree = []
         else:
             tree = []
+        if tree:
+            tree[0].old_pk = tree[0].pk
         first = True
         for page in descendants:
            

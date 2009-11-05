@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import MpttPublisher
 from django.template.context import Context
-from cms import settings
+from django.conf import settings
 from cms.utils.helpers import reversion_register
 
 class PluginModelBase(ModelBase):

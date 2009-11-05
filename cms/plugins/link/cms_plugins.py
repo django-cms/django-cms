@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from models import Link
-from cms.settings import CMS_MEDIA_URL
+from django.conf import settings
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugins.link.forms import LinkForm
@@ -55,6 +55,6 @@ class LinkPlugin(CMSPluginBase):
         return FakeForm(Form, self.cms_plugin_instance.page.site) 
         
     def icon_src(self, instance):
-        return CMS_MEDIA_URL + u"images/plugins/link.png"
+        return settings.CMS_MEDIA_URL + u"images/plugins/link.png"
     
 plugin_pool.register_plugin(LinkPlugin)
