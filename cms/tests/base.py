@@ -24,7 +24,7 @@ class CMSTestCase(TestCase):
         # restore original settings after each test
         settings._wrapped = self._original_settings_wrapped
         super(CMSTestCase, self)._post_teardown()
-        
+    
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
@@ -42,6 +42,14 @@ class CMSTestCase(TestCase):
         
         self.counter = self.counter + 1
         return page_data
+    
+    def print_page_structure(self, title=None):
+        """Just a helper to see the page struct.
+        """
+        print "-------------------------- %s --------------------------------" % (title or "page structure")
+        for page in Page.objects.drafts().order_by('tree_id', 'parent', 'lft'):
+            print "%s%s #%d" % ("    " * (page.level), page, page.id)
+    
     
     def assertObjectExist(self, qs, **filter):
         try:
@@ -103,7 +111,7 @@ class CMSTestCase(TestCase):
         from cms.utils.page import get_available_slug
         
         data = {
-            'position': 'first-child',
+            'position': 'last-child',
             'target': target_page.pk,
             'site': 1,
             'copy_permissions': 'on',
@@ -111,11 +119,12 @@ class CMSTestCase(TestCase):
         }
         
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
-        assert(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.content, "ok")
         
-        title = page.title_set.all()[0]
-        
+        title = page.title_set.all()[0] 
         copied_slug = get_available_slug(title)
+        
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
         return copied_page
     
@@ -127,7 +136,7 @@ class CMSTestCase(TestCase):
         }
         response = self.client.post(URL_CMS_PAGE + "%d/move-page/" % page.pk, data)
         assert(response.status_code, 200)        
-        return self._reload(page)
+        return self.reload_page(page)
         
         
     def reload_page(self, page):

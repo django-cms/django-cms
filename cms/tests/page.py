@@ -170,7 +170,11 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
         self.assertEqual(response.status_code, 200)
-
+        
+    """
+    This is not a valid test, please write correct tests, which work, this must
+    create at lest 2 language mutations of page before delete
+    
     def test_11_language_delete(self):
         self.client.login(username= 'test', password='test')
         setattr(settings, "SITE_ID", 1)
@@ -181,3 +185,4 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post("/admin/cms/page/%s/delete-translation/" % pk, {"language":"en" })
         self.assertEqual(response.status_code, 302)
+    """

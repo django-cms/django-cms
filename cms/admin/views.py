@@ -6,7 +6,6 @@ from django.template.context import RequestContext
 from django.conf import settings
 from django.template.defaultfilters import escapejs, force_escape
 from django.views.decorators.http import require_POST
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from cms.models import Page, Title, CMSPlugin, MASK_CHILDREN, MASK_DESCENDANTS,\
     MASK_PAGE
@@ -27,7 +26,7 @@ def change_status(request, page_id):
         page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)    
         return render_admin_menu_item(request, page)
     else:
-        return HttpResponseForbidden(_("You do not have permission to publish this page"))
+        return HttpResponseForbidden(ugettext("You do not have permission to publish this page"))
 change_status = staff_member_required(change_status)
 
 @require_POST
@@ -45,7 +44,7 @@ def change_innavigation(request, page_id):
             val = 1
         page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
         return render_admin_menu_item(request, page)
-    return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
+    return HttpResponseForbidden(ugettext("You do not have permission to change this page's in_navigation status"))
 change_innavigation = staff_member_required(change_innavigation)
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -205,7 +204,7 @@ def move_plugin(request):
             save_all_plugins(request, page)
             revision.user = request.user
             revision.comment = unicode(_(u"Plugins where moved")) 
-        return HttpResponse(str("ok"))
+        return HttpResponse("ok")
     else:
         raise Http404
     

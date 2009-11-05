@@ -3,8 +3,9 @@ from django.conf import settings
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE,\
     URL_CMS_PAGE_CHANGE
 from cms.models import Title, Page
-
-
+from cms.models.permissionmodels import PagePermission
+from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS,\
+    ACCESS_CHOICES, ACCESS_DESCENDANTS, ACCESS_CHILDREN
 
 class PermissionModeratorTestCase(CMSTestCase):
     """Permissions and moderator together
@@ -14,7 +15,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     Users:
         1. `super`: superuser
         2. `master`: user with permissions to all applications
-        3. `slave`: user assigned to page `slave-home` can add/change/delete page
+        3. `slave`: user assigned to page `slave-home`
     
     Pages:
         1. `home`:
@@ -29,7 +30,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         3.       `slave-home`:
                     - not published
-                    - assigned slave user which can add/change/delete this page and its descendants
+                    - assigned slave user which can add/change/delete/
+                      move/publish/moderate this page and its descendants
                     - `master` user want to moderate this page and all descendants
                     
         4. `pageA`:
@@ -41,31 +43,31 @@ class PermissionModeratorTestCase(CMSTestCase):
     #./manage.sh dumpdata -e south -e reversion > ../cms/tests/fixtures/permission.json
     #fixtures = ['../cms/tests/fixtures/permission.yaml']
     
+    ############################################################################
+    # set of heler functions
     
-    def create_page_user(self, page, username, password=None, 
-        can_add_page=True, can_change_page=True, can_delete_page=False, 
-        can_recover_page=False, can_add_pageuser=False, can_change_pageuser=False, 
-        can_delete_pageuser=False, can_add_pagepermission=False, 
-        can_change_pagepermission=False, can_delete_pagepermission=False,
+    def create_page_user(self, username, password=None, 
+        can_add_page=True, can_change_page=True, can_delete_page=True, 
+        can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, 
+        can_delete_pageuser=True, can_add_pagepermission=True, 
+        can_change_pagepermission=True, can_delete_pagepermission=True,
         grant_all=False):
         """Helper function for creating page user, through form on:
             /admin/cms/pageuser/add/
             
-        Special argument grant_all just sets all permission related arguments to 
-        True.
-        
         Returns created user.
         """
+        
         if grant_all:
-            return self.create_page_user(page, username, password, 
-                True, True, True, True, True, True, True, True, True, True, False)
+            return self.create_page_user(username, password, 
+                True, True, True, True, True, True, True, True, True, True)
             
         if password is None:
             password=username
             
         data = {
             'username': username, 
-            'password': password,
+            'password1': password,
             'password2': password, 
             'can_add_page': can_add_page, 
             'can_change_page': can_change_page, 
@@ -84,36 +86,43 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         return User.objects.get(username=username)
         
+    def assign_user_to_page(self, page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+        can_add=False, can_change=False, can_delete=False, 
+        can_change_advanced_settings=False, can_publish=False, 
+        can_change_permissions=False, can_move_page=False, can_moderate=False, 
+        grant_all=False):
+        """Assigns given user to page, and gives him requested permissions. 
+        
+        Note: this is not happening over frontend, maybe a test for this in 
+        future will be nice.
+        """
+        if grant_all:
+            return self.assign_user_to_page(page, user, grant_on, 
+                True, True, True, True, True, True, True, True)
+        
+        # just check if the current logged in user even can change the page and 
+        # see the permission inline
+        response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
+        self.assertEqual(response.status_code, 200)
+        
+        #print "TODO:", response.content
+        
+        data = {
+            'can_add': can_add,
+            'can_change': can_change,
+            'can_delete': can_delete, 
+            'can_change_advanced_settings': can_change_advanced_settings,
+            'can_publish': can_publish, 
+            'can_change_permissions': can_change_permissions, 
+            'can_move_page': can_move_page, 
+            'can_moderate': can_moderate,  
+        }
+        
+        page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
+        page_permission.save()
+        return page_permission
     
-    def setUp(self):
-        # create super user
-        self.user_super = User(username="super", is_staff = True, is_active = True, is_superuser = True)
-        self.user_super.set_password("super")
-        self.user_super.save()
-        
-        # create basic structure
-        self.login_user(self.user_super)
-        
-        home = self.create_page(title="home")
-        self.publish_page(home)
-        
-        master = self.create_page(title="master")
-        self.publish_page(master)
-        # create master user
-        
-        
-          
-        
-        page_a = self.create_page(title="pageA")
-        
-        
-        self.user_master = User.objects.get(username="master")
-        self.user_slave = User.objects.get(username="slave")
-    
-    
-    # helpers
-    
-    def _add_plugin(self, user):
+    def add_plugin(self, user):
         slave_page = self.slave_page
         
         post_data = {
@@ -126,8 +135,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
         response = self.client.post(url, post_data)
         self.assertEqual(response.content, "1")
-        
-    
     
     def publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
@@ -141,7 +148,7 @@ class PermissionModeratorTestCase(CMSTestCase):
             return self.reload_page(page)
         
         # approve
-        page = self._approve_page(page)
+        page = self.approve_page(page)
         
         if published_check:
             # must have public object now
@@ -151,13 +158,13 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         return page
     
-    def _approve_page(self, page):
+    def approve_page(self, page):
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
         self.assertRedirects(response, URL_CMS_PAGE)
         # reload page
         return self.reload_page(page)
     
-    def _check_published_page_attributes(self, page):
+    def check_published_page_attributes(self, page):
         public_page = page.publisher_public
         
         if page.parent:
@@ -179,6 +186,24 @@ class PermissionModeratorTestCase(CMSTestCase):
                 continue
             self.assertEqual(sibling.id, public_siblings[i - skip].publisher_draft.id) 
     
+    def request_moderation(self, page, level):
+        """Assign current logged in user to the moderators / change moderation
+        
+        Args:
+            page: Page on which moderation should be changed
+        
+            level <0, 7>: Level of moderation, 
+                1 - moderate page
+                2 - moderate children
+                4 - moderate descendants
+                + conbinations
+        """
+        response = self.client.post("/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
+        self.assertEquals(response.status_code, 200)
+
+    
+    ############################################################################
+    # page acessors
     
     @property
     def home_page(self):
@@ -192,9 +217,61 @@ class PermissionModeratorTestCase(CMSTestCase):
     def master_page(self):
         return Page.objects.drafts().get(title_set__slug="master")
     
-    
+    ############################################################################
     # tests
-            
+    
+    def setUp(self):
+        # create super user
+        self.user_super = User(username="super", is_staff=True, is_active=True, 
+            is_superuser=True)
+        self.user_super.set_password("super")
+        self.user_super.save()
+        
+        # create basic structure ... 
+        
+        self.login_user(self.user_super)
+        
+        home = self.create_page(title="home")
+        self.publish_page(home)
+        
+        # master page & master user
+        
+        master = self.create_page(title="master")
+        self.publish_page(master)
+        # create master user
+        self.user_master = self.create_page_user("master", grant_all=True)
+        
+        # assign master user under home page
+        self.assign_user_to_page(home, self.user_master, grant_on=ACCESS_DESCENDANTS,
+            grant_all=True)
+        
+        # and to master page
+        self.assign_user_to_page(master, self.user_master, grant_all=True)
+        
+        # slave page & slave user
+        
+        slave = self.create_page(title="slave-home", parent_page=master)  
+        self.user_slave = self.create_page_user("slave", 
+            can_add_page=True, can_change_page=True, can_delete_page=True)
+        
+        self.assign_user_to_page(slave, self.user_slave, grant_all=True)
+        
+        # create page_a - sample page from master
+        
+        page_a = self.create_page(title="pageA")
+        self.assign_user_to_page(page_a, self.user_master, 
+            can_add=True, can_change=True, can_delete=True, can_publish=True, 
+            can_move_page=True, can_moderate=True)
+        
+        # logg in as master, and request moderation for slave page and descendants
+        self.login_user(self.user_master)
+        self.request_moderation(slave, 7)
+        
+        self.client.logout()
+        # login super again
+        self.login_user(self.user_super)
+         
+    
     def test_00_test_configuration(self):
         """Just check if we have right configuration for this test. Problem lies
         in cms_settings!! something like cms_settings.CMS_MODERATOR = True just
@@ -239,7 +316,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         
         page_data = self.get_new_page_data(slave_page.pk)
-        # reuest moderation
+        
+        # request moderation
         page_data.update({
             #'moderator_state': Page.MODERATOR_NEED_APPROVEMENT,
             #'moderator_message': "Approve me!",
@@ -247,7 +325,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         })
         
         # add page
-        
         self.login_user(self.user_slave)
         response = self.client.post(url, page_data)
         
@@ -259,7 +336,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # page created?
         page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=page_data['slug'])
-        # moderators and approvemnt right?
+        # moderators and approvement ok?
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         #assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
@@ -273,19 +350,20 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         
         # approve / publish
-        page = self._approve_page(page)
-        
+        page = self.approve_page(page)
     
+        
     def test_06_super_can_add_plugin(self):
-        self._add_plugin(self.user_super)
+        self.add_plugin(self.user_super)
     
     
     def test_07_master_can_add_plugin(self):
-        self._add_plugin(self.user_master)
+        self.add_plugin(self.user_master)
     
-        
+    
     def test_08_slave_can_add_plugin(self):
-        self._add_plugin(self.user_slave)
+        self.add_plugin(self.user_slave)
+    
     
     def test_09_same_order(self):
         self.login_user(self.user_master)
@@ -301,8 +379,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         for slug in reversed(slugs[2:]):
             page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)
             page = self.publish_page(page, True)
-            self._check_published_page_attributes(page)
-    
+            self.check_published_page_attributes(page)
     
     def test_10_create_copy_publish(self):
         # create new page to copy
@@ -313,7 +390,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         copied_page = self.copy_page(page, self.home_page)
         
         page = self.publish_page(copied_page, True)
-        self._check_published_page_attributes(page)
+        self.check_published_page_attributes(page)
     
     
     def test_11_create_publish_copy(self):
@@ -326,8 +403,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         # copy it under master page...
         copied_page = self.copy_page(page, self.master_page)
         
-        self._check_published_page_attributes(page)
-        self._check_published_page_attributes(copied_page)
+        self.check_published_page_attributes(page)
+        copied_page = self.publish_page(copied_page, True)
+        self.check_published_page_attributes(copied_page)
         
         
     def test_12_subtree_needs_approvement(self):
@@ -361,8 +439,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         assert(subpage.publisher_public) 
         
         #check attributes
-        self._check_published_page_attributes(page)
-        self._check_published_page_attributes(subpage)
+        self.check_published_page_attributes(page)
+        self.check_published_page_attributes(subpage)
 
 
     def test_13_subtree_with_super(self):
@@ -392,8 +470,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(page.publisher_public.tree_id, subpage.publisher_public.tree_id)
         
         #check attributes
-        self._check_published_page_attributes(page) 
-        self._check_published_page_attributes(subpage)
+        self.check_published_page_attributes(page) 
+        self.check_published_page_attributes(subpage)
+        
         
     def test_14_super_add_page_to_root(self):
         """Create page which is not under moderation in root, and check if 
@@ -408,6 +487,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # moderator_state must be changed
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
+    
     
     def test_15_moderator_flags(self):
         """Add page under slave_home and check its flag
@@ -429,7 +509,7 @@ class PermissionModeratorTestCase(CMSTestCase):
 
         # approve this page - but it doesn't get published yet, because 
         # slave home is not published
-        page = self._approve_page(page)
+        page = self.approve_page(page)
         
         # public page must not exist because of parent
         assert(not page.publisher_public)
@@ -444,7 +524,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         assert(not slave_page.publisher_public)
         
         # they must be approved first
-        slave_page = self._approve_page(slave_page)
+        slave_page = self.approve_page(slave_page)
         
         # master is approved
         self.assertEqual(slave_page.moderator_state, Page.MODERATOR_APPROVED)
@@ -561,10 +641,10 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # login as master, and approve moves
         self.login_user(self.user_master)
-        pg = self._approve_page(pg)
-        pe = self._approve_page(pe)
-        ph = self._approve_page(ph)
-        pf = self._approve_page(pf)
+        pg = self.approve_page(pg)
+        pe = self.approve_page(pe)
+        ph = self.approve_page(ph)
+        pf = self.approve_page(pf)
         
         # public parent check after move
         self.assertEqual(pg.publisher_public.parent.pk, pc.publisher_public_id)
@@ -574,6 +654,3 @@ class PermissionModeratorTestCase(CMSTestCase):
         # check if urls are correct after move
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')        
-        
-        
-        
