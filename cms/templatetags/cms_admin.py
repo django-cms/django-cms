@@ -5,7 +5,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
-from cms import settings as cms_settings
 
 register = template.Library()
 
