@@ -105,7 +105,7 @@ def page_submit_row(context):
         'is_popup': is_popup,
         'show_save': True,
         'language': language,
-        'language_name': [name for langcode, name in cms_settings.CMS_LANGUAGES if langcode == language][0],
+        'language_name': [name for langcode, name in settings.CMS_LANGUAGES if langcode == language][0],
         'show_delete_translation': show_delete_translation
     }
 page_submit_row = register.inclusion_tag('admin/page_submit_line.html', takes_context=True)(page_submit_row)

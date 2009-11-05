@@ -37,8 +37,8 @@ class CMSTestCase(TestCase):
             'site':1, 'template':'index.html', 'parent': parent_id}
         
         # required only if user haves can_change_permission
-        #page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        #page_data['pagepermission_set-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-INITIAL_FORMS'] = 0
         
         self.counter = self.counter + 1
         return page_data
