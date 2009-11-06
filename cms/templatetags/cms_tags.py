@@ -355,7 +355,7 @@ show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
                                          
 def ancestors_from_page(page, page_queryset, title_queryset, lang):
-    ancestors = list(page.get_cached_ancestors())
+    ancestors = list(page.get_cached_ancestors(False))
     ancestors.append(page)
     home = page_queryset.get_home()
     if ancestors and ancestors[0].pk != home.pk: 
