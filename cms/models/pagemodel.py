@@ -339,7 +339,7 @@ class Page(MpttPublisher):
                 pass
             ancestors = self.get_cached_ancestors()
             
-            if self.parent_id and ancestors[0].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback):
+            if self.parent_id and ancestors[0].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
                 path = "/".join(path.split("/")[1:])
             
         return urljoin(reverse('pages-root'), path)
