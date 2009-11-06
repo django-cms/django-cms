@@ -78,7 +78,7 @@ def moderator_choices(page, user):
 @register.filter
 def preview_link(page, language):
     if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
-        return "/%s%s" % (language, page.get_absolute_url(language))
+        return "/%s%s" % (language, page.get_absolute_url(language, fallback=True))
     return page.get_absolute_url(language)
 
 def render_plugin(context, plugin):
