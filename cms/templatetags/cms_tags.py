@@ -599,18 +599,8 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
         try:
             page = get_page_queryset(request).get(reverse_id=reverse_id, site=site_id)
         except:
-            if settings.DEBUG:
-                raise
-            else:
-                site = Site.objects.get_current()
-                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                          _("A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                            "The url of the page was: http://%(host)s%(path)s") %
-                            {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
-                          settings.DEFAULT_FROM_EMAIL,
-                          settings.MANAGERS,
-                          fail_silently=True)
-                return {'content':''}
+            send_missing_mail(reverse_id, request)
+            return {'content':''}
         plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:
