@@ -7,21 +7,23 @@ class Migration:
  
     def forwards(self, orm):
         db.rename_table("cms_publicpage", "cms_pagepublic")
+#        db.delete_unique('cms_publictitle', ['language', 'page_id'])
         db.rename_table("cms_publictitle", "cms_titlepublic")
         db.rename_table("cms_publiccmsplugin", "cms_cmspluginpublic")
         db.alter_column('cms_cmsplugin', 'inherited_public_id', orm['cms.cmsplugin:inherited_public'])
         db.alter_column('cms_title', 'public_id', orm['cms.title:public'])
         db.alter_column('cms_page', 'public_id', orm['cms.page:public'])
-        db.create_unique('cms_titlepublic', ['language', 'page_id'])
+#        db.create_unique('cms_titlepublic', ['language', 'page_id'])
     
     def backwards(self, orm):
-        db.rename_table("cms_public_page", "cms_publicpage")
-        db.rename_table("cms_public_title", "cms_publictitle")
-        db.rename_table("cms_public_cmsplugin", "cms_publiccmsplugin")
+        db.rename_table("cms_pagepublic", "cms_publicpage")
+#        db.delete_unique('cms_titlepublic', ['language', 'page_id'])
+        db.rename_table("cms_titlepublic", "cms_publictitle")
+        db.rename_table("cms_cmspluginpublic", "cms_publiccmsplugin")
         db.alter_column('cms_cmsplugin', 'inherited_public_id', orm['cms.cmsplugin:inherited_public'])
         db.alter_column('cms_title', 'public_id', orm['cms.title:public'])
         db.alter_column('cms_page', 'public_id', orm['cms.page:public'])
-        db.delete_unique('cms_titlepublic', ['language', 'page_id'])
+#        db.create_unique('cms_publictitle', ['language', 'page_id'])
     
    
     

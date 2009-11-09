@@ -5,7 +5,7 @@ from cms.plugins.flash.models import *
 
 class Migration:
     depends_on = (
-        ("cms", "0018_site_permissions"),
+        ("cms", "0019_public_table_renames"),
     )
     def forwards(self, orm):
         
@@ -22,13 +22,16 @@ class Migration:
         db.foreign_key_sql('cmsplugin_flash' ,'public_id', 'cmsplugin_flashpublic', 'cmspluginpublic_ptr_id')
     
     def backwards(self, orm):
-        db.delete_foreign_key('cmsplugin_flash' ,'public_id')
+        try:
+            db.delete_foreign_key('cmsplugin_flash' ,'public_id')
+        except:
+            pass
         db.drop_primary_key("cmsplugin_flashpublic")
         db.rename_column("cmsplugin_flashpublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
         db.create_primary_key("cmsplugin_flashpublic", ("publiccmsplugin_ptr_id",))
         db.rename_table("cmsplugin_flash", "flash_flash")
         db.rename_table("cmsplugin_flashpublic", "flash_publicflash")
-        db.alter_column('cmsplugin_flash', 'public_id', orm['flash.flash:public'])
+        db.alter_column('flash_flash', 'public_id', orm['flash.flash:public'])
     
     
     models = {

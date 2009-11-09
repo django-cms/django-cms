@@ -5,7 +5,7 @@ from cms.plugins.snippet.models import *
 
 class Migration:
     depends_on = (
-        ("cms", "0018_site_permissions"),
+        ("cms", "0019_public_table_renames"),
     )
     def forwards(self, orm):
         
@@ -29,7 +29,7 @@ class Migration:
         db.create_primary_key("cmsplugin_snippetptrpublic", ("publiccmsplugin_ptr_id",))
         db.rename_table("cmsplugin_snippetptr", "snippet_snippetptr")
         db.rename_table("cmsplugin_snippetptrpublic", "snippet_publicsnippetptr")
-        db.alter_column('cmsplugin_snippetptr', 'public_id', orm['snippet.snippetptr:public'])
+        db.alter_column('snippet_snippetptr', 'public_id', orm['snippet.snippetptr:public'])
         
     
     

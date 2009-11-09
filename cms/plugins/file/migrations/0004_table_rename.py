@@ -5,7 +5,7 @@ from cms.plugins.file.models import *
 
 class Migration:
     depends_on = (
-        ("cms", "0018_site_permissions"),
+        ("cms", "0019_public_table_renames"),
     )
     def forwards(self, orm):
         
@@ -22,13 +22,16 @@ class Migration:
         db.foreign_key_sql('cmsplugin_file' ,'public_id', 'cmsplugin_filepublic', 'cmspluginpublic_ptr_id')
     
     def backwards(self, orm):
-        db.delete_foreign_key('cmsplugin_file' ,'public_id')
+        try:
+            db.delete_foreign_key('cmsplugin_file' ,'public_id')
+        except:
+            pass
         db.drop_primary_key("cmsplugin_filepublic")
         db.rename_column("cmsplugin_filepublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
         db.create_primary_key("cmsplugin_filepublic", ("publiccmsplugin_ptr_id",))
         db.rename_table("cmsplugin_file", "file_file")
         db.rename_table("cmsplugin_filepublic", "file_publicfile")
-        db.alter_column('cmsplugin_file', 'public_id', orm['file.file:public'])
+        db.alter_column('file_file', 'public_id', orm['file.file:public'])
     
     
     models = {

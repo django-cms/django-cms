@@ -22,10 +22,10 @@ class Migration:
         
         # Adding model 'filepublic'
         db.create_table('cmsplugin_filepublic', (
-            ('cmspluginpublic_ptr', orm['file.file:cmspluginpublic_ptr']),
-            ('mark_delete', orm['file.file:mark_delete']),
-            ('file', orm['file.file:file']),
-            ('title', orm['file.file:title']),
+            ('cmspluginpublic_ptr', orm['file.filepublic:cmspluginpublic_ptr']),
+            ('mark_delete', orm['file.filepublic:mark_delete']),
+            ('file', orm['file.filepublic:file']),
+            ('title', orm['file.filepublic:title']),
         ))
         db.send_create_signal('file', ['filepublic'])
         

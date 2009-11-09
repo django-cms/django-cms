@@ -22,13 +22,13 @@ class Migration:
         
         # Adding model 'picturepublic'
         db.create_table('cmsplugin_picturepublic', (
-            ('url', orm['picture.picture:url']),
-            ('image', orm['picture.picture:image']),
-            ('float', orm['picture.picture:float']),
-            ('mark_delete', orm['picture.picture:mark_delete']),
-            ('page_link', orm['picture.picture:page_link']),
-            ('cmspluginpublic_ptr', orm['picture.picture:cmspluginpublic_ptr']),
-            ('alt', orm['picture.picture:alt']),
+            ('url', orm['picture.picturepublic:url']),
+            ('image', orm['picture.picturepublic:image']),
+            ('float', orm['picture.picturepublic:float']),
+            ('mark_delete', orm['picture.picturepublic:mark_delete']),
+            ('page_link', orm['picture.picturepublic:page_link']),
+            ('cmspluginpublic_ptr', orm['picture.picturepublic:cmspluginpublic_ptr']),
+            ('alt', orm['picture.picturepublic:alt']),
         ))
         db.send_create_signal('picture', ['picturepublic'])
         

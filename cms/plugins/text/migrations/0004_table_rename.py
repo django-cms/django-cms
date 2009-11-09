@@ -6,7 +6,7 @@ from cms.plugins.text.models import *
 class Migration:
     
     depends_on = (
-        ("cms", "0018_site_permissions"),
+        ("cms", "0019_public_table_renames"),
     )
     
     def forwards(self, orm):    
@@ -23,15 +23,11 @@ class Migration:
         db.foreign_key_sql('cmsplugin_text' ,'public_id', 'cmsplugin_textpublic', 'cmspluginpublic_ptr_id')
         
     def backwards(self, orm): 
-        db.delete_foreign_key('cmsplugin_text' ,'public_id')
-        db.drop_primary_key("cmsplugin_textpublic")
-        
         db.rename_column("cmsplugin_textpublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
-        db.create_primary_key("cmsplugin_textpublic", ("publiccmsplugin_ptr_id",))      
         db.foreign_key_sql('cmsplugin_text' ,'public_id', 'cmsplugin_textpublic', "publiccmsplugin_ptr_id")
         db.rename_table("cmsplugin_text", "text_text")
         db.rename_table("cmsplugin_textpublic", "text_publictext")
-        db.alter_column('cmsplugin_text', 'public_id', orm['text.text:public'])
+        db.alter_column('text_text', 'public_id', orm['text.text:public'])
     
     models = {
         'cms.publiccmsplugin': {

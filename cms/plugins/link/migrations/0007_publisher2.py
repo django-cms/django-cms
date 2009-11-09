@@ -22,11 +22,11 @@ class Migration:
         
         # Adding model 'linkpublic'
         db.create_table('cmsplugin_linkpublic', (
-            ('name', orm['link.link:name']),
-            ('url', orm['link.link:url']),
-            ('mark_delete', orm['link.link:mark_delete']),
-            ('page_link', orm['link.link:page_link']),
-            ('cmspluginpublic_ptr', orm['link.link:cmspluginpublic_ptr']),
+            ('name', orm['link.linkpublic:name']),
+            ('url', orm['link.linkpublic:url']),
+            ('mark_delete', orm['link.linkpublic:mark_delete']),
+            ('page_link', orm['link.linkpublic:page_link']),
+            ('cmspluginpublic_ptr', orm['link.linkpublic:cmspluginpublic_ptr']),
         ))
         db.send_create_signal('link', ['linkpublic'])
         

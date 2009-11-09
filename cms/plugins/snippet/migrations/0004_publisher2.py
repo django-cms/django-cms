@@ -22,9 +22,9 @@ class Migration:
         
         # Adding model 'snippetptrpublic'
         db.create_table('cmsplugin_snippetptrpublic', (
-            ('snippet', orm['snippet.snippetptr:snippet']),
-            ('cmspluginpublic_ptr', orm['snippet.snippetptr:cmspluginpublic_ptr']),
-            ('mark_delete', orm['snippet.snippetptr:mark_delete']),
+            ('snippet', orm['snippet.snippetptrpublic:snippet']),
+            ('cmspluginpublic_ptr', orm['snippet.snippetptrpublic:cmspluginpublic_ptr']),
+            ('mark_delete', orm['snippet.snippetptrpublic:mark_delete']),
         ))
         db.send_create_signal('snippet', ['snippetptrpublic'])
         
