@@ -104,7 +104,7 @@ class PageForm(PageAddForm):
         id = cleaned_data['reverse_id']
         site_id = cleaned_data['site']
         if id:
-            if Page.objects.filter(reverse_id=id, site=site_id).exclude(pk=self.instance.pk).count():
+            if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
                 raise forms.ValidationError(ugettext_lazy('A page with this reverse URL id exists already.'))
         return cleaned_data
 
