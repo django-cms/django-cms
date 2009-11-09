@@ -1,4 +1,4 @@
-VERSION = (2, 0, 0, 'RC2')
+VERSION = (2, 0, 0, 'RC3')
 __version__ = '.'.join(map(str, VERSION))
 
 # patch settings 
