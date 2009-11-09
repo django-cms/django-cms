@@ -278,8 +278,11 @@ class Page(MpttPublisher):
             self.reverse_id = None
         
         from cms.utils.permissions import _thread_locals
-        
-        self.changed_by = _thread_locals.user.username
+        user = getattr(_thread_locals, "user", None)
+        if user:
+            self.changed_by = user.username
+        else:
+            self.changed_by = "script"
         if not self.pk:
             self.created_by = self.changed_by 
         
