@@ -29,4 +29,4 @@ msgstr "Êtes-vous sûr de vouloir supprimer ce bloc ?"
 
 #: media/cms/js/change_form.js:122
 msgid "Are you sure you want to change tabs without saving the page first?"
-msgstr "Êtes-vous sûr de vouloir changer d'onglet sans enregistrer la page ?"
+msgstr "Êtes-vous sûr de vouloir changer d'onglet sans enregistrer la page?"
