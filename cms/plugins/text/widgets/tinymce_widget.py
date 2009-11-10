@@ -62,14 +62,10 @@ class TinyMCEEditor(TinyMCE):
             plugins += ","
         plugins += "-cmsplugins"
         mce_config['plugins'] = plugins
-        adv2 = mce_config.get('theme_advanced_buttons1', None)
-        if adv2 is not None:
-            if len(adv2):
-                adv2 = "," + adv2
-            adv2 = "cmsplugins,cmspluginsedit" + adv2
-            mce_config['theme_advanced_buttons1'] = adv2
+        if mce_config['theme'] == "simple":
+            mce_config['theme'] = "advanced"
+        mce_config['theme_advanced_buttons1_add_before'] = "cmsplugins,cmspluginsedit"
         json = simplejson.dumps(mce_config)
-        
         html = [u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))]
         if tinymce.settings.USE_COMPRESSOR:
             compressor_config = {
