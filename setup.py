@@ -41,6 +41,7 @@ setup(
     data_files = media_files,
     package_data = {
         'cms': [
+            'templates/admin/*.html',
             'templates/admin/cms/mail/*.html',
             'templates/admin/cms/mail/*.txt',
             'templates/admin/cms/page/*.html',
