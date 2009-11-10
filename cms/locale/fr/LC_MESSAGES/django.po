@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-05 17:04+0100\n"
-"PO-Revision-Date: 2009-11-10 17:44+0100\n"
+"PO-Revision-Date: 2009-11-10 19:58+0100\n"
 "Last-Translator: Yohan Boniface <yohanboniface@gmail.com>\n"
 "Language-Team: French <http://www.django-cms.org>\n"
 "MIME-Version: 1.0\n"
@@ -240,7 +240,7 @@ msgstr "La page a été approuvée avec succès."
 #: admin/pageadmin.py:879
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "L'objet %(name)s de clé primaire %(key)r n'existe pas."
 
 #: admin/pageadmin.py:882
 msgid "There only exists one translation for this page"
@@ -249,7 +249,7 @@ msgstr ""
 #: admin/pageadmin.py:897
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "Les titres et les blocs en %(language)s ont été supprimés"
 
 #: admin/pageadmin.py:919
 msgid "Are you sure?"
@@ -294,7 +294,7 @@ msgstr "Vous n'avez pas la permission de modifier cette page"
 
 #: admin/views.py:78
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Une langue disponible doit être sélectionnée!"
 
 #: admin/views.py:90
 #, python-format
@@ -346,15 +346,15 @@ msgstr ""
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "Liste toutes les rubriques et sous-rubriques"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "Page de recherche"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "Chercher dans cette documentation"
 
 #: docs/templates/defindex.html:19
 #: docs/templates/modindex.html:2
@@ -364,7 +364,7 @@ msgstr ""
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "Accès rapide aux modules"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
@@ -372,7 +372,7 @@ msgstr "Index général"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr ""
+msgstr "Fonctions, classes, termes"
 
 #: docs/templates/genindex-single.html:2
 #: docs/templates/genindex-split.html:2
@@ -389,7 +389,7 @@ msgstr "Index"
 #: docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr ""
+msgstr "Index complet sur une page"
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
@@ -441,7 +441,7 @@ msgstr "Aller"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr ""
+msgstr "Entrez un terme de recherche, ou le nom d'un module, d'une classe ou d'une fonction"
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
@@ -510,7 +510,7 @@ msgstr "emplacement"
 #: migrations/0001_initial.py:18
 #: models/pluginmodel.py:40
 msgid "plugin_name"
-msgstr ""
+msgstr "Nom du bloc"
 
 #: migrations/0001_initial.py:25
 #: migrations/0011_title_overwrites.py:12
@@ -868,9 +868,8 @@ msgid "If none selected, user haves granted permissions to all sites."
 msgstr "Si aucun n'est selectionné, les permissions de l'utilisateur sont valables sur tous les sites"
 
 #: models/permissionmodels.py:52
-#, fuzzy
 msgid "sites"
-msgstr "site"
+msgstr "sites"
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
@@ -910,7 +909,6 @@ msgid "overwrite the title in the menu"
 msgstr "remplace le titre du menu"
 
 #: models/titlemodels.py:15
-#, fuzzy
 msgid "Path"
 msgstr "chemin"
 
@@ -953,7 +951,7 @@ msgstr "hauteur"
 #: plugins/flash/templates/cms/plugins/flash.html:3
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin."
-msgstr "Greffon flash manquant."
+msgstr "Il manque le bloc Flash."
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
@@ -1195,14 +1193,12 @@ msgid "Twitter recent entries plugin"
 msgstr "Bloc des tweets récents"
 
 #: plugins/twitter/models.py:7
-#, fuzzy
 msgid "twitter user"
-msgstr "Notifier l'utilisateur"
+msgstr "Utilisateur Twitter"
 
 #: plugins/twitter/models.py:8
-#, fuzzy
 msgid "count"
-msgstr "couper"
+msgstr "compte"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
@@ -1309,9 +1305,8 @@ msgid "fgcolor"
 msgstr "couleur d'arrière plan"
 
 #: plugins/video/models.py:56
-#, fuzzy
 msgid "Hexadecimal, eg 13abec"
-msgstr "Héxadécimal, par ex: fff000 "
+msgstr "Hexadécimal, par ex. : fff000 "
 
 #: plugins/video/models.py:57
 msgid "bgcolor"
@@ -1342,16 +1337,15 @@ msgstr "Sauvegarder"
 #: templates/admin/page_submit_line.html:5
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Supprimer la traduction en %(language)s"
 
 #: templates/admin/page_submit_line.html:7
 msgid "Save as new"
 msgstr "Enregistrer comme nouveau"
 
 #: templates/admin/page_submit_line.html:8
-#, fuzzy
 msgid "Save and add another"
-msgstr "Page et descendants de la page"
+msgstr "Enregistrer et créer nouveau"
 
 #: templates/admin/page_submit_line.html:9
 #: templates/admin/cms/page/change_form.html:237
@@ -1361,7 +1355,7 @@ msgstr "Sauvegarder et continuer les modifications"
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
+msgstr "Vous devez valider la page <a href=\"%(admin_url)s\">%(page)s</a>."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
@@ -1393,11 +1387,11 @@ msgstr "Approuver la suppression de page"
 #: templates/admin/cms/page/change_form.html:38
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
-msgstr ""
+msgstr "Nécessite une validation au niveau %(moderation_level)s"
 
 #: templates/admin/cms/page/change_form.html:39
 msgid "(you can perform actions on this page directly)"
-msgstr ""
+msgstr "Vous pouvez exécuter des actions directement dans cette page"
 
 #: templates/admin/cms/page/change_form.html:52
 msgid "Remove delete request"
@@ -1434,7 +1428,7 @@ msgstr "Voir sur le site"
 #: templates/admin/cms/page/plugin_change_form.html:83
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Veuillez corriger l'erreurs suivante."
+msgstr[0] "Veuillez corriger l'erreur suivante."
 msgstr[1] "Veuillez corriger les erreurs suivantes."
 
 #: templates/admin/cms/page/change_form.html:109
@@ -1454,16 +1448,15 @@ msgstr "États des pages"
 #: templates/admin/cms/page/change_form.html:144
 #, python-format
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-msgstr ""
+msgstr "Cette page doit être validée au niveau %(moderation_level)s, contactez les personnes concernées."
 
 #: templates/admin/cms/page/change_form.html:146
 msgid "Request approvemet"
-msgstr "Demander approbation"
+msgstr "Demander l'approbation"
 
 #: templates/admin/cms/page/change_list.html:3
-#, fuzzy
 msgid "List of pages"
-msgstr "Modifications récentes"
+msgstr "Liste de pages"
 
 #: templates/admin/cms/page/change_list.html:8
 #: templates/admin/cms/page/plugin_change_form.html:66
@@ -1495,9 +1488,8 @@ msgid "Pages on:"
 msgstr "Pages sur:"
 
 #: templates/admin/cms/page/change_list.html:111
-#, fuzzy
 msgid "Filter:"
-msgstr "Filtre"
+msgstr "Filtre:"
 
 #: templates/admin/cms/page/change_list.html:111
 msgid "on"
@@ -1528,9 +1520,8 @@ msgid "last changes"
 msgstr "modifications récentes"
 
 #: templates/admin/cms/page/menu_item.html:5
-#, fuzzy
 msgid "select this page"
-msgstr "modifier cette page"
+msgstr "sélectionner cette page"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
@@ -1538,9 +1529,8 @@ msgid "edit this page"
 msgstr "modifier cette page"
 
 #: templates/admin/cms/page/menu_item.html:6
-#, fuzzy
 msgid "edit"
-msgstr "Redirection"
+msgstr "Éditer"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
@@ -1665,9 +1655,8 @@ msgid "All"
 msgstr "Tout"
 
 #: templates/admin/cms/page/permissions.html:49
-#, fuzzy
 msgid "Page doesn't inherit any permissions."
-msgstr "Permissions globales des pages"
+msgstr "La page n'hérite d'aucune permission"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
@@ -1680,7 +1669,7 @@ msgstr "Le bloc a été correctement sauvegardé."
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "Recouvrer des %(verbose_name)s supprimés"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
@@ -1697,11 +1686,11 @@ msgstr "Cliquer sur le bouton \"Sauvegarder\" ci-dessous pour revenir à cette v
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "Options de copie"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Choisissez les options de copie"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:11
 msgid "Add Plugin"
@@ -1725,7 +1714,7 @@ msgstr "Versions"
 
 #: templates/cms/traduction_helper.html:4
 msgid "Wanted language has not been translated yet."
-msgstr "Le langage demandé n'a pas encore été traduit"
+msgstr "La traduction pour la langue demandée n'est pas encore disponible."
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
