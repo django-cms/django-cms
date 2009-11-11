@@ -65,7 +65,7 @@ msgstr "Seitentitel"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Überschreiben, was im Titel des Browsers oder in den Lesezeichen erscheint"
+msgstr "Überschreiben, was im Titel des Browsers oder in den Favoriten erscheint"
 
 #: admin/forms.py:85
 msgid "Application"
@@ -77,11 +77,11 @@ msgstr "Schliessen Sie Applikationen an diese Seite an."
 
 #: admin/forms.py:88
 msgid "Overwrite URL"
-msgstr "URL-Überschreibung"
+msgstr "URL Überschreibung"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
-msgstr "Lassen Sie dieses Feld leer, wenn der Standardpfad verwendet werden soll."
+msgstr "Lassen Sie dieses Feld leer wenn der Standardpfad verwendet werden soll."
 
 #: admin/forms.py:95
 msgid "Redirect"
@@ -97,7 +97,7 @@ msgstr "Eine Beschreibung der Seite (wird teilweise von Suchmaschinen genutzt)"
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Eine Liste von mit Kommas getrennten Schlüsselwörtern (wird teilweise von Suchmaschinen genutzt)"
+msgstr "Eine Liste von mit Kommas getrennter Schlüsselwörter (wird teilweise von Suchmaschinen genutzt)"
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
@@ -105,7 +105,7 @@ msgstr "Eine andere Seite mit dieser Reverse-URL-ID ist bereits vorhanden."
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr "Keine korrekte URL. Bitte verwenden sie das Format: /meine/url/"
+msgstr "Keine korrekte URL. Bitte verwenden sie das Format: /meine/url/ !"
 
 #: admin/forms.py:126
 #: admin/forms.py:127
@@ -116,11 +116,11 @@ msgstr "Benutzer"
 
 #: admin/forms.py:159
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr "Zum Hinzufügen von Seiten muss der Zugriff auf Unterseiten ebenfalls ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten Speichervorgang nicht mehr editiert werden."
+msgstr "Zum Hinzufügen von Seiten muss der Zugriff auf Unterseiten auch ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten Speichervorgang nicht mehr editiert werden."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr "Die \"Seiten hinzufügen\"-Berechtigung benötigt auch die \"Bearbeiten\"-Berechtigung"
+msgstr "Die \"Seiten hinzufügen\"-Berechtigung benötigt auch die \"Editieren\"-Berechtigung"
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
@@ -157,7 +157,7 @@ msgstr "Benutzer benachrichtigen"
 
 #: admin/forms.py:263
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr "Benachrichtigung über Änderungen von Benutzername oder Passwort per E-Mail an den Benutzer senden. Benötigt die E-Mail-Adresse des Benutzers."
+msgstr "Benachrichtigung der Änderungen des Benutzernamens oder Passworts per E-Mail an den Benutzer senden. Benötigt die E-Mail-Adresse des Benutzers."
 
 #: admin/forms.py:283
 msgid "New password"
@@ -165,7 +165,7 @@ msgstr "Neues Passwort"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr "Bestätigung des neuen Passworts"
+msgstr "Bestätigung neues Passwort"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
@@ -173,15 +173,15 @@ msgstr "E-Mail-Benachrichtigung benötigt eine gültige E-Mail-Adresse."
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr "Die Berechtigung neue Seiten hinzuzufügen benötigt die Berechtigung Seiten zu ändern."
+msgstr "Die Erlaubnis um neue Seiten hinzufügen zu können benötigt die Erlaubnis Seiten ändern zu können."
 
 #: admin/forms.py:309
 msgid "The permission to add new users requires the permission to change users!"
-msgstr "Die Berechtigung neue Benutzer hinzufügen benötigt die Berechtigung Benutzer zu ändern."
+msgstr "Die Erlaubnis um neue Benutzer hinzufügen zu können benötigt die Erlaubnis Benutzer zu ändern."
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr "Um Berechtigungen hinzuzufügen, müssen Sie sie auch ändern können."
+msgstr "Um Rechte hinzuzufügen müssen Sie sie auch ändern können."
 
 #: admin/pageadmin.py:96
 #: admin/pageadmin.py:112
@@ -194,7 +194,7 @@ msgstr "Grundeinstellungen"
 
 #: admin/pageadmin.py:110
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Hinweis: Diese Seite wird neu geladen, wenn Sie die Auswahl ändern. Speichern Sie sie zuerst."
+msgstr "Achtung: Diese Seite wird neu geladen wenn Sie die Auswahl ändern. Sichern Sie vorher!"
 
 #: admin/pageadmin.py:116
 msgid "Advanced Settings"
@@ -256,7 +256,7 @@ msgstr "Sind Sie sicher?"
 #: admin/permissionadmin.py:112
 #: models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr "Seiten-Berechtigungen"
+msgstr "Seitenberechtigungen"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
@@ -280,15 +280,15 @@ msgstr "Passwort"
 
 #: admin/views.py:29
 msgid "You do not have permission to publish this page"
-msgstr "Sie haben nicht die Berechtigung, um diese Seite zu veröffentlichen."
+msgstr "Sie haben nicht die benötigten Rechte um diese Seite zu veröffentlichen."
 
 #: admin/views.py:47
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Sie haben nicht Berechtigung, um den \"im Menü\"-Status dieser Seite zu ändern."
+msgstr "Sie haben nicht die erforderlichen Rechte um den \"In der Navigation\"-Status dieser Seite zu ändern."
 
 #: admin/views.py:74
 msgid "You do not have permission to change this page"
-msgstr "Sie haben nicht die Berechtigung, um diese Seite zu ändern."
+msgstr "Sie haben nicht genügend Rechte um diese Seite zu ändern."
 
 #: admin/views.py:78
 msgid "Language must be set to a supported language!"
@@ -369,7 +369,7 @@ msgstr "Allgemeiner Index"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr "Alle Funktionen, Klassen, Begriffe"
+msgstr "Alle Funktionen, Klassen, Terme"
 
 #: docs/templates/genindex-single.html:2
 #: docs/templates/genindex-split.html:2
@@ -386,7 +386,7 @@ msgstr "Index"
 #: docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr "Ganzer Index auf einer Seite"
+msgstr "Ganzer Index für eine Seite"
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
@@ -414,7 +414,7 @@ msgstr "vorheriges Kapitel"
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr "Nächstes Thema"
+msgstr "nächstes Thema"
 
 #: docs/templates/layout.html:55
 msgid "next chapter"
@@ -539,7 +539,7 @@ msgstr "alle"
 #: migrations/0001_initial.py:37
 #: models/permissionmodels.py:20
 msgid "can edit"
-msgstr "kann bearbeiten"
+msgstr "kann editieren"
 
 #: migrations/0001_initial.py:38
 #: models/permissionmodels.py:17
@@ -770,15 +770,15 @@ msgstr "Ab wann soll die Seite veröffentlicht werden? Der Status der Seite muss
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr "Ablaufdatum der Seite. Leer lassen, um sie nie ablaufen zu lassen."
+msgstr "Ablaufdatum der Seite. Leer lassen um nie abzulaufen."
 
 #: models/pagemodel.py:47
 msgid "All ancestors will not be displayed in the navigation"
-msgstr "Alle übergeordneten Seiten werden nicht im Menü dargestellt."
+msgstr "Alle Überseiten werden nicht im Menü dargestellt."
 
 #: models/pagemodel.py:48
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr "Ein einzigartiger Identifikator, der benutzt wird, um mit dem page_url templatetag auf diese Seite zu verlinken."
+msgstr "Ein einzigartiger Identifikator der benutzt wird um mit dem page_url templatetag auf diese Seite zu verlinken."
 
 #: models/pagemodel.py:50
 msgid "is published"
@@ -790,7 +790,7 @@ msgstr "Die benutzte Vorlage um die Seite darzustellen."
 
 #: models/pagemodel.py:53
 msgid "The site the page is accessible at."
-msgstr "Die Webseite (Domain), wo die Seite verfügbar ist."
+msgstr "Die Webseite (Domain) wo die Seite verfügbar ist."
 
 #: models/pagemodel.py:53
 msgid "site"
@@ -802,11 +802,11 @@ msgstr "Status der Moderierung"
 
 #: models/pagemodel.py:63
 msgid "menu login required"
-msgstr "Menü-Login erforderlich"
+msgstr "Menü Login erforderlich"
 
 #: models/pagemodel.py:63
 msgid "only show this page in the menu if the user is logged in"
-msgstr "Diese Seite nur im Menü darstellen, wenn der Benutzer eingeloggt ist."
+msgstr "Diese Seite nur im Menü darstellen wenn der Benutzer eingeloggt ist."
 
 #: models/pagemodel.py:71
 msgid "pages"
@@ -858,7 +858,7 @@ msgstr "Kann alle gelöschten Seiten wiederherstellen"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr "Falls keine Auswahl erfolgt, hat der Benutzer Berechtigungen auf alle Seiten."
+msgstr "Keine Auswahl: der Benutzer hat Rechte auf allen Seiten."
 
 #: models/permissionmodels.py:52
 msgid "sites"
@@ -1105,7 +1105,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr "Fügen sie eine Vorlage ein, welche dargestellt werden soll (z.B. \"snippets/plugin_xy.html\")."
+msgstr "Fügen sie eine Vorlage ein welche dargestellt werden soll (z.B. \"snippets/plugin_xy.html\")."
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
@@ -1145,13 +1145,13 @@ msgstr "Bitte wählen Sie einen Plugin-Typ"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
 msgid "Edit selected plugin"
-msgstr "Ausgewähltes Plugin bearbeiten"
+msgstr "Ausgewähltes Plugin editieren"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr "Dieser Texteditor unterstützt das Bearbeiten von Plugins nicht."
+msgstr "Dieser Texteditor unterstützt das Editieren von Plugins nicht."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
@@ -1296,7 +1296,7 @@ msgstr "Hexadezimal, z.B. 13abec"
 
 #: plugins/video/models.py:57
 msgid "bgcolor"
-msgstr "Hintergrundfarbe"
+msgstr "Hintegrundfarbe"
 
 #: plugins/video/models.py:57
 msgid "Hexadecimal, eg fff000"
@@ -1318,7 +1318,7 @@ msgstr "Flash-Menü"
 #: templates/admin/cms/page/change_form.html:236
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr "Speichern"
+msgstr "Sichern"
 
 #: templates/admin/page_submit_line.html:5
 #, python-format
@@ -1336,7 +1336,7 @@ msgstr "Speichern und neu hinzufügen"
 #: templates/admin/page_submit_line.html:9
 #: templates/admin/cms/page/change_form.html:237
 msgid "Save and continue editing"
-msgstr "Speichern und weiter bearbeiten"
+msgstr "Speichern und weiter editieren"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
@@ -1404,7 +1404,7 @@ msgstr "Vorschau"
 #: templates/admin/cms/page/change_form.html:58
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr "Verlauf"
+msgstr "Geschichte"
 
 #: templates/admin/cms/page/change_form.html:59
 msgid "View on site"
@@ -1425,7 +1425,7 @@ msgstr "Alle Berechtigungen"
 #: templates/admin/cms/page/change_form.html:122
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr "Wird geladen…"
+msgstr "Lade..."
 
 #: templates/admin/cms/page/change_form.html:121
 msgid "Page states"
@@ -1512,11 +1512,11 @@ msgstr "Diese Seite auswählen"
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr "Diese Seite bearbeiten"
+msgstr "Diese Seite editieren"
 
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit"
-msgstr "bearbeiten"
+msgstr "editieren"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
@@ -1537,7 +1537,7 @@ msgstr "Softroot"
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr "Bearbeiten Sie diese Seite in %(language)s "
+msgstr "Editieren Sie diese Seite in %(language)s "
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
@@ -1605,7 +1605,7 @@ msgstr "Gruppe"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr "Kann bearbeiten"
+msgstr "Kann editieren"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
@@ -1659,7 +1659,7 @@ msgstr "Gelöschte %(verbose_name)s wiederherstellen"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr "Drücken Sie auf Speichern, um diese Version wiederherzustellen."
+msgstr "Drücken Sie auf speichern um diese Version wiederherzustellen."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1668,7 +1668,7 @@ msgstr "%(verbose_name)s wiederherstellen"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr "Drücken sie auf Speichern, um diese Version wiederherzustellen."
+msgstr "Drücken sie auf speichern um diese Version wiederherzustellen."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1684,7 +1684,7 @@ msgstr "Plugin hinzufügen"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:16
 msgid "You must save the page first to add plugins."
-msgstr "Sie müssen die Seite zuerst speichern, um Plugins hinzufügen zu können."
+msgstr "Sie müssen die Seite zuerst speichern um Plugins hinzufügen zu können."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:19
 msgid "No Plugin selected. Selected one on the left side"
@@ -1761,7 +1761,7 @@ msgstr "CMS - Ihr Benutzerkonto wurde verändert."
 
 #~ msgid "A programming error occurred - cannot find text editor widgets."
 #~ msgstr ""
-#~ "Ein Fehler ist aufgetreten: Kann das Text-Editor-Widget nicht finden."
+#~ "Ein Fehler ist aufgetreten: Kann das Text-Editor Widget nicht finden."
 
 #, fuzzy
 #~ msgid "Videoplayer"
