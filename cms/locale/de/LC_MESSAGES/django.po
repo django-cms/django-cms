@@ -116,7 +116,7 @@ msgstr "Benutzer"
 
 #: admin/forms.py:159
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr "Zum Hinzufügen von Seiten muss der Zugriff auf Unterseiten ebenfalls ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten Speichervorgang nicht mehr editiert werden."
+msgstr "Zum Hinzufügen von Seiten muss der Zugriff auf Unterseiten ebenfalls ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten Speichervorgang nicht mehr bearbeitet werden."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
@@ -302,7 +302,7 @@ msgstr "%(plugin_name)s-Plugin wurde in %(placeholder)s eingefügt."
 #: admin/views.py:164
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "%(plugin_name)s-Plugin auf der %(position)s Position in %(placeholder)s wurde editiert."
+msgstr "%(plugin_name)s-Plugin auf der %(position)s Position in %(placeholder)s wurde geändert."
 
 #: admin/views.py:206
 msgid "Plugins where moved"
