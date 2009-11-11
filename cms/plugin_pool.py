@@ -43,7 +43,7 @@ class PluginPool(object):
             for plugin in plugins:
                 allowed_plugins = []
                 if page:
-                    allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get("plugins")
+                    allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("plugins")
                 if not allowed_plugins:
                     allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("plugins")
                 if not allowed_plugins or plugin.__name__ in allowed_plugins:
