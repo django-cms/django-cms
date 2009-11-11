@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-05 17:04+0100\n"
-"PO-Revision-Date: 2009-11-10 19:58+0100\n"
+"PO-Revision-Date: 2009-11-11 13:24+0100\n"
 "Last-Translator: Yohan Boniface <yohanboniface@gmail.com>\n"
 "Language-Team: French <http://www.django-cms.org>\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr "Slug"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr "Partie du titre utilisée dans l'URL"
+msgstr "Mots-clés pour construire l'URL"
 
 #: admin/forms.py:29
 msgid "Language"
@@ -72,7 +72,7 @@ msgstr "Application"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Associer une application à cette page."
 
 #: admin/forms.py:88
 #, fuzzy
@@ -175,11 +175,11 @@ msgstr "La notification par e-mail nécessite une adresse e-mail valide"
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "La permission d'ajouter des pages nécessite la permission de modifier des pages!"
 
 #: admin/forms.py:309
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "La permission d'ajouter des utilisateurs nécessite la permission de modifier des utilisateurs!"
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
@@ -244,7 +244,7 @@ msgstr "L'objet %(name)s de clé primaire %(key)r n'existe pas."
 
 #: admin/pageadmin.py:882
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Il existe une seule traduction pour cette page."
 
 #: admin/pageadmin.py:897
 #, python-format
@@ -284,9 +284,10 @@ msgstr "Mot de passe"
 msgid "You do not have permission to publish this page"
 msgstr "Vous n'avez pas la permission d'ajouter cette page"
 
+# Pas sûr de ce in_navigation
 #: admin/views.py:47
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "Vous n'avez pas la permission de changer le statut \"Apparaître dans le menu\""
 
 #: admin/views.py:74
 msgid "You do not have permission to change this page"
@@ -337,8 +338,9 @@ msgid "Overview"
 msgstr "Vue d'ensemble"
 
 #: docs/templates/defindex.html:11
+#, fuzzy
 msgid "Indices and tables:"
-msgstr ""
+msgstr "Index et tableaux"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
@@ -606,7 +608,7 @@ msgstr "identification requise"
 #: migrations/0001_initial.py:60
 #: models/pagemodel.py:47
 msgid "soft root"
-msgstr ""
+msgstr "racine"
 
 #: migrations/0001_initial.py:63
 #: models/pagemodel.py:44
@@ -720,7 +722,7 @@ msgstr "Modifiée"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
-msgstr ""
+msgstr "Dem. de suppression"
 
 #: models/moderatormodels.py:100
 msgid "move req."
@@ -772,19 +774,20 @@ msgstr "modifiée par"
 
 #: models/pagemodel.py:43
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr ""
+msgstr "Date de publication de la page. Son statut doit être à \"Publié\" pour une publication automatique."
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "Pour dépublier automatiquement la page. Laisser vide pour ne pas prévoir de dépublication."
 
 #: models/pagemodel.py:47
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "Les parents n'appaîtront par dans le menu"
 
 #: models/pagemodel.py:48
+#, fuzzy
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr ""
+msgstr "Identifiant unique utilisé par le modèle page_url pour créer un lien vers cette page"
 
 #: models/pagemodel.py:50
 msgid "is published"
@@ -807,9 +810,8 @@ msgid "moderator state"
 msgstr "état du modérateur"
 
 #: models/pagemodel.py:63
-#, fuzzy
 msgid "menu login required"
-msgstr "identification requise"
+msgstr "Dans le menu seulement pour les membres identifiés"
 
 #: models/pagemodel.py:63
 msgid "only show this page in the menu if the user is logged in"
@@ -1000,7 +1002,7 @@ msgstr ""
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "Calculer la route la plus rapide vers ce lieu"
 
 #: plugins/googlemap/models.py:23
 #, fuzzy
@@ -1018,7 +1020,7 @@ msgstr "adresse"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:77
 msgid "Calculate route"
-msgstr ""
+msgstr "Calculer la route"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
@@ -1202,7 +1204,7 @@ msgstr "compte"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr ""
+msgstr "Nombre d'éléments à afficher"
 
 #: plugins/twitter/models.py:9
 #, fuzzy
@@ -1322,7 +1324,7 @@ msgstr "plein écran"
 
 #: plugins/video/models.py:59
 msgid "wmode"
-msgstr ""
+msgstr "wmode"
 
 #: plugins/video/models.py:60
 msgid "flash menu"
@@ -1395,7 +1397,7 @@ msgstr "Vous pouvez exécuter des actions directement dans cette page"
 
 #: templates/admin/cms/page/change_form.html:52
 msgid "Remove delete request"
-msgstr ""
+msgstr "Annuler la demande de suppression"
 
 #: templates/admin/cms/page/change_form.html:54
 msgid "Approve delete"
@@ -1546,7 +1548,7 @@ msgstr "insérer"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
-msgstr ""
+msgstr "Racine"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
@@ -1678,7 +1680,7 @@ msgstr "Cliquer sur le bouton \"Sauvegarder\" ci-dessous pour recouvrer cette ve
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "Annuler %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
@@ -1718,21 +1720,21 @@ msgstr "La traduction pour la langue demandée n'est pas encore disponible."
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
-msgstr ""
+msgstr "Annuler la modération de la page"
 
 #: templatetags/cms_admin.py:66
 msgid "Unbind children moderation"
-msgstr ""
+msgstr "Annuler la modération des fils"
 
 #: templatetags/cms_admin.py:67
 msgid "Unbind descendants moderation"
-msgstr ""
+msgstr "Annuler la modération des descendants"
 
 #: templatetags/cms_tags.py:388
 #: templatetags/cms_tags.py:606
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr ""
+msgstr "Identifiant non trouvé sur %(domain)s"
 
 #: templatetags/cms_tags.py:389
 #, python-format
