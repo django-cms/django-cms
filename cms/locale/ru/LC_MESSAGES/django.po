@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DJANGO-CMS\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-08 20:55+0100\n"
-"PO-Revision-Date: 2009-11-11 12:36+0500\n"
+"PO-Revision-Date: 2009-11-12 14:23+0500\n"
 "Last-Translator: Lapuhov Alex <lapuhov.alex@gmail.com>\n"
 "Language-Team: DJANGO-CMS-russian <lapuhov.alex@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -711,19 +711,19 @@ msgstr "изменён"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
-msgstr ""
+msgstr "удаляется"
 
 #: models/moderatormodels.py:100
 msgid "move req."
-msgstr ""
+msgstr "перемещается"
 
 #: models/moderatormodels.py:101
 msgid "publish req."
-msgstr ""
+msgstr "публикуется"
 
 #: models/moderatormodels.py:102
 msgid "unpublish req."
-msgstr ""
+msgstr "отменяется публикация"
 
 #: models/moderatormodels.py:103
 #: models/pagemodel.py:36
@@ -740,7 +740,7 @@ msgstr "Статусы модератора страницы"
 
 #: models/pagemodel.py:34
 msgid "req. app."
-msgstr ""
+msgstr "требуется приложение"
 
 #: models/pagemodel.py:35
 #: templates/admin/cms/page/menu_item.html:44
@@ -750,7 +750,7 @@ msgstr "удалить"
 
 #: models/pagemodel.py:37
 msgid "app. par."
-msgstr ""
+msgstr "часть приложения"
 
 #: models/pagemodel.py:39
 msgid "created by"
@@ -787,7 +787,7 @@ msgstr "Шаблон, используемый для отображения."
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "The site the page is accessible at."
 
 #: models/pagemodel.py:52
 msgid "site"
@@ -985,7 +985,7 @@ msgstr "долгота"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr ""
+msgstr "заголовок планировщика пути"
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
@@ -993,7 +993,7 @@ msgstr "Вычислить кратчайший путь до сюда"
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
-msgstr ""
+msgstr "планировщик пути"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
@@ -1088,7 +1088,7 @@ msgstr "сторона"
 #: plugins/snippet/cms_plugins.py:12
 #: plugins/snippet/models.py:30
 msgid "Snippet"
-msgstr ""
+msgstr "Snippet"
 
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
@@ -1106,7 +1106,7 @@ msgstr "Введите имя шаблона (например \"snippets/plugin
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
-msgstr ""
+msgstr "Teaser"
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
@@ -1205,11 +1205,11 @@ msgstr "Видео"
 
 #: plugins/video/models.py:20
 msgid "dock"
-msgstr ""
+msgstr "док"
 
 #: plugins/video/models.py:21
 msgid "overlay"
-msgstr ""
+msgstr "оверлей"
 
 #: plugins/video/models.py:25
 msgid "blank"
@@ -1261,7 +1261,7 @@ msgstr "стиль контроллера"
 
 #: plugins/video/models.py:48
 msgid "click_url"
-msgstr ""
+msgstr "click_url"
 
 #: plugins/video/models.py:49
 msgid "click target"
@@ -1305,7 +1305,7 @@ msgstr "полный экран"
 
 #: plugins/video/models.py:59
 msgid "wmode"
-msgstr ""
+msgstr "wmode"
 
 #: plugins/video/models.py:60
 msgid "flash menu"
@@ -1392,7 +1392,7 @@ msgstr "Утвердить"
 #: templates/admin/cms/page/change_form.html:55
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "draft"
 
 #: templates/admin/cms/page/change_form.html:55
 msgid "Preview"
@@ -1524,7 +1524,7 @@ msgstr "вставить внутрь"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
-msgstr ""
+msgstr "softroot"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
@@ -1565,7 +1565,7 @@ msgstr "Утвердить напрямую"
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
 msgid "view"
-msgstr ""
+msgstr "вид"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
@@ -1688,7 +1688,7 @@ msgstr "Не указан плагин. Добавьте плагин в это�
 
 #: templates/cms/revisions.html:3
 msgid "Revisions"
-msgstr ""
+msgstr "Revisions"
 
 #: templates/cms/traduction_helper.html:4
 msgid "Wanted language has not been translated yet."
@@ -1710,7 +1710,7 @@ msgstr "Убрать модерацию потомков"
 #: templatetags/cms_tags.py:606
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr ""
+msgstr "Обратный ID не найден для %(domain)s"
 
 #: templatetags/cms_tags.py:389
 #, python-format
