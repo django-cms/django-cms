@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import MpttPublisher
 from django.template.context import Context
-from cms import settings
+from django.conf import settings
 from cms.utils.helpers import reversion_register
 
 class PluginModelBase(ModelBase):
@@ -89,8 +89,10 @@ class CMSPlugin(MpttPublisher):
     def render_plugin(self, context=None, placeholder=None, admin=False, edit=False):
         instance, plugin = self.get_plugin_instance()
         if context is None:
-            context = Context()
-        
+            c = Context()
+        else:
+            c = Context(context)
+            
         if instance and not (admin and not plugin.admin_preview):
             if edit:
                 content = '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s" type="%s">' % (instance.page_id, instance.pk, instance.placeholder, instance.plugin_type)

@@ -1,5 +1,5 @@
 from django.contrib.sites.models import Site
-from cms import settings as cms_settings
+from django.conf import settings
 from cms.utils.moderator import page_moderator_state, I_APPROVE
 from cms.utils import get_language_from_request
 from django.shortcuts import render_to_response
@@ -20,7 +20,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     lang = get_language_from_request(request)
     #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
-    if cms_settings.CMS_PERMISSION:
+    if settings.CMS_PERMISSION:
         # jstree metadata generator 
         md = []
         
@@ -56,8 +56,8 @@ def get_admin_menu_item_context(request, page, filtered=False):
         
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         
-        'CMS_PERMISSION': cms_settings.CMS_PERMISSION,
-        'CMS_MODERATOR': cms_settings.CMS_MODERATOR,
+        'CMS_PERMISSION': settings.CMS_PERMISSION,
+        'CMS_MODERATOR': settings.CMS_MODERATOR,
     }
     return context
 

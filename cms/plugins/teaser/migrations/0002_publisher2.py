@@ -22,13 +22,13 @@ class Migration:
         
         # Adding model 'teaserpublic'
         db.create_table('cmsplugin_teaserpublic', (
-            ('description', orm['teaser.teaser:description']),
-            ('title', orm['teaser.teaser:title']),
-            ('url', orm['teaser.teaser:url']),
-            ('image', orm['teaser.teaser:image']),
-            ('mark_delete', orm['teaser.teaser:mark_delete']),
-            ('page_link', orm['teaser.teaser:page_link']),
-            ('cmspluginpublic_ptr', orm['teaser.teaser:cmspluginpublic_ptr']),
+            ('description', orm['teaser.TeaserPublic:description']),
+            ('title', orm['teaser.TeaserPublic:title']),
+            ('url', orm['teaser.TeaserPublic:url']),
+            ('image', orm['teaser.TeaserPublic:image']),
+            ('mark_delete', orm['teaser.TeaserPublic:mark_delete']),
+            ('page_link', orm['teaser.TeaserPublic:page_link']),
+            ('cmspluginpublic_ptr', orm['teaser.TeaserPublic:cmspluginpublic_ptr']),
         ))
         db.send_create_signal('teaser', ['teaserpublic'])
         

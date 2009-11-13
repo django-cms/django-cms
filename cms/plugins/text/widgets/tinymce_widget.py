@@ -1,5 +1,5 @@
 from tinymce.widgets import TinyMCE, get_language_config
-from cms.settings import CMS_MEDIA_URL
+from django.conf import settings
 from django.utils.translation import get_language
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -22,7 +22,7 @@ class TinyMCEEditor(TinyMCE):
         context = {
             'name': name,
             'language': language,
-            'CMS_MEDIA_URL': CMS_MEDIA_URL,
+            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'installed_plugins': self.installed_plugins,
         }
         return mark_safe(render_to_string(
@@ -30,12 +30,12 @@ class TinyMCEEditor(TinyMCE):
         
     def _media(self):
         media = super(TinyMCEEditor, self)._media()
-        media.add_js([join(CMS_MEDIA_URL, path) for path in (
+        media.add_js([join(settings.CMS_MEDIA_URL, path) for path in (
                       'js/tinymce.placeholdereditor.js',
                       'js/lib/ui.core.js',
                       'js/placeholder_editor_registry.js',
                       )])
-        media.add_css({"all":[join(CMS_MEDIA_URL, path) for path in ('css/jquery/cupertino/jquery-ui.css',
+        media.add_css({"all":[join(settings.CMS_MEDIA_URL, path) for path in ('css/jquery/cupertino/jquery-ui.css',
                                                                      'css/tinymce_toolbar.css')]})
         
         return media
@@ -62,13 +62,10 @@ class TinyMCEEditor(TinyMCE):
             plugins += ","
         plugins += "-cmsplugins"
         mce_config['plugins'] = plugins
-        adv2 = mce_config.get('theme_advanced_buttons1', "")
-        if len(adv2):
-            adv2 = "," + adv2
-        adv2 = "cmsplugins,cmspluginsedit" + adv2
-        mce_config['theme_advanced_buttons1'] = adv2
+        if mce_config['theme'] == "simple":
+            mce_config['theme'] = "advanced"
+        mce_config['theme_advanced_buttons1_add_before'] = "cmsplugins,cmspluginsedit"
         json = simplejson.dumps(mce_config)
-        
         html = [u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))]
         if tinymce.settings.USE_COMPRESSOR:
             compressor_config = {

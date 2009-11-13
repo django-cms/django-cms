@@ -1,9 +1,8 @@
 from datetime import datetime
 from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.contrib.sites.models import Site
 from publisher.query import PublisherQuerySet
-from cms import settings
+from django.conf import settings
 from cms.exceptions import NoHomeFound
 
 #from cms.utils.urlutils import levelize_path
@@ -50,15 +49,16 @@ class PageQuerySet(PublisherQuerySet):
 
         if settings.CMS_SHOW_START_DATE:
             pub = pub.filter(
-                Q(publication_date__gt=datetime.now()) |
+                Q(publication_date__lt=datetime.now()) |
                 Q(publication_date__isnull=True)
             )
-
+        
         if settings.CMS_SHOW_END_DATE:
             pub = pub.filter(
-                Q(publication_end_date__lte=datetime.now()) |
+                Q(publication_end_date__gte=datetime.now()) |
                 Q(publication_end_date__isnull=True)
             )
+
         return pub
 
     def expired(self):

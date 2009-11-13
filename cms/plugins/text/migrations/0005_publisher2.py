@@ -22,9 +22,9 @@ class Migration:
         
         # Adding model 'textpublic'
         db.create_table('cmsplugin_textpublic', (
-            ('body', orm['text.text:body']),
-            ('cmspluginpublic_ptr', orm['text.text:cmspluginpublic_ptr']),
-            ('mark_delete', orm['text.text:mark_delete']),
+            ('body', orm['text.textpublic:body']),
+            ('cmspluginpublic_ptr', orm['text.textpublic:cmspluginpublic_ptr']),
+            ('mark_delete', orm['text.textpublic:mark_delete']),
         ))
         db.send_create_signal('text', ['textpublic'])
         

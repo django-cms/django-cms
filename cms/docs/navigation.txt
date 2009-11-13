@@ -97,9 +97,9 @@ The template for the HTML can be found at ``cms/breadcrumb.html``.::
 
 	{% show_breadcrumb %}
 
-Or with a custom template::
+Or with a custom template and only display level 2 or higher::
 
-	{% show_breadcrumb "myapp/breadcrumb.html" %}
+	{% show_breadcrumb 2 "myapp/breadcrumb.html" %}
 
 If the current URL is not handled by the CMS or you are working in a navigation extender,
 you may need to provide your own breadcrumb via the template.

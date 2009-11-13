@@ -1,3 +1,4 @@
+from django.conf import settings
 from django import forms
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _, ugettext_lazy
@@ -7,7 +8,7 @@ from django.contrib.auth.models import User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import BooleanField
 
-from cms import settings as cms_settings
+
 from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE,\
     PageUserGroup
 from cms.utils.urlutils import any_path_re
@@ -25,7 +26,7 @@ class PageAddForm(forms.ModelForm):
         help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the URL'))
-    language = forms.ChoiceField(label=_("Language"), choices=cms_settings.CMS_LANGUAGES,
+    language = forms.ChoiceField(label=_("Language"), choices=settings.CMS_LANGUAGES,
         help_text=_('The current language of the content fields.'))
     
     class Meta:
@@ -39,10 +40,10 @@ class PageAddForm(forms.ModelForm):
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
         if self.fields['parent'].initial and \
-            cms_settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
-            [name for name, value in cms_settings.CMS_TEMPLATES]:
+            settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
+            [name for name, value in settings.CMS_TEMPLATES]:
             # non-root pages default to inheriting their template
-            self.fields['template'].initial = cms_settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+            self.fields['template'].initial = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -69,13 +70,13 @@ class PageAddForm(forms.ModelForm):
     
     def clean_language(self):
         language = self.cleaned_data['language']
-        if not language in dict(cms_settings.CMS_LANGUAGES).keys():
+        if not language in dict(settings.CMS_LANGUAGES).keys():
             raise ValidationError("Given language does not match language settings.")
         return language
         
     
 class PageForm(PageAddForm):
-    APPLICATION_URLS = (('', '----------'), ) + cms_settings.CMS_APPLICATIONS_URLS
+    APPLICATION_URLS = (('', '----------'), ) + settings.CMS_APPLICATIONS_URLS
     
     menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
         help_text=_('Overwrite what is displayed in the menu'), required=False)
@@ -103,7 +104,7 @@ class PageForm(PageAddForm):
         id = cleaned_data['reverse_id']
         site_id = cleaned_data['site']
         if id:
-            if Page.objects.filter(reverse_id=id, site=site_id).exclude(pk=self.instance.pk).count():
+            if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
                 raise forms.ValidationError(ugettext_lazy('A page with this reverse URL id exists already.'))
         return cleaned_data
 

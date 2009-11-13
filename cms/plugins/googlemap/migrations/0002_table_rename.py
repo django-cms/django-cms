@@ -5,7 +5,7 @@ from cms.plugins.googlemap.models import *
 
 class Migration:
     depends_on = (
-        ("cms", "0018_site_permissions"),
+        ("cms", "0019_public_table_renames"),
     )
     def forwards(self, orm):
         
@@ -28,7 +28,7 @@ class Migration:
         db.create_primary_key("cmsplugin_googlemappublic", ("publiccmsplugin_ptr_id",))
         db.rename_table("cmsplugin_googlemap", "googlemap_googlemap")
         db.rename_table("cmsplugin_googlemappublic", "googlemap_publicgooglemap")
-        db.alter_column('cmsplugin_googlemap', 'public_id', orm['googlemap.googlemap:public'])
+        db.alter_column('googlemap_googlemap', 'public_id', orm['googlemap.googlemap:public'])
         
         
     

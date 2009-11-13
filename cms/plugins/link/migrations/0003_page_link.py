@@ -6,11 +6,11 @@ from cms.plugins.link.models import *
 class Migration:
     
     def forwards(self, orm):
-        db.add_column("link_link", "page_link", models.ForeignKey(orm['cms.page'], verbose_name=_("page"), blank=True, null=True))
+        db.rename_column("link_link", "page_id", "page_link_id")
     
     
     def backwards(self, orm):
-        db.delete_column("link_link", "page_link")
+        db.rename_column("link_link", "page_link_id", "page_id")
     
     
     models = {

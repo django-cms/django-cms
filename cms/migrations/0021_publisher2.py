@@ -69,6 +69,9 @@ class Migration:
         # Deleting field 'Page.publisher_state'
         db.delete_column('cms_page', 'publisher_state')
         
+        # Deleting unique_together for [publisher_is_draft, language, page] on Title.
+        db.delete_unique('cms_title', ['publisher_is_draft', 'language', 'page_id'])
+        
         # Deleting field 'Title.publisher_public'
         db.delete_column('cms_title', 'publisher_public_id')
         
@@ -100,73 +103,67 @@ class Migration:
         
         # Adding model 'titlepublic'
         db.create_table('cms_titlepublic', (
-            ('menu_title', orm['cms.cmsplugin:menu_title']),
-            ('meta_description', orm['cms.cmsplugin:meta_description']),
-            ('slug', orm['cms.cmsplugin:slug']),
-            ('meta_keywords', orm['cms.cmsplugin:meta_keywords']),
-            ('page_title', orm['cms.cmsplugin:page_title']),
-            ('language', orm['cms.cmsplugin:language']),
-            ('application_urls', orm['cms.cmsplugin:application_urls']),
-            ('has_url_overwrite', orm['cms.cmsplugin:has_url_overwrite']),
-            ('redirect', orm['cms.cmsplugin:redirect']),
-            ('mark_delete', orm['cms.cmsplugin:mark_delete']),
-            ('creation_date', orm['cms.cmsplugin:creation_date']),
-            ('title', orm['cms.cmsplugin:title']),
-            ('path', orm['cms.cmsplugin:path']),
-            ('id', orm['cms.cmsplugin:id']),
-            ('page', orm['cms.cmsplugin:page']),
+            ('menu_title', orm['cms.titlepublic:menu_title']),
+            ('meta_description', orm['cms.titlepublic:meta_description']),
+            ('slug', orm['cms.titlepublic:slug']),
+            ('meta_keywords', orm['cms.titlepublic:meta_keywords']),
+            ('page_title', orm['cms.titlepublic:page_title']),
+            ('language', orm['cms.titlepublic:language']),
+            ('application_urls', orm['cms.titlepublic:application_urls']),
+            ('has_url_overwrite', orm['cms.titlepublic:has_url_overwrite']),
+            ('redirect', orm['cms.titlepublic:redirect']),
+            ('mark_delete', orm['cms.titlepublic:mark_delete']),
+            ('creation_date', orm['cms.titlepublic:creation_date']),
+            ('title', orm['cms.titlepublic:title']),
+            ('path', orm['cms.titlepublic:path']),
+            ('id', orm['cms.titlepublic:id']),
+            ('page', orm['cms.titlepublic:page']),
         ))
         db.send_create_signal('cms', ['titlepublic'])
         
         # Adding model 'cmspluginpublic'
         db.create_table('cms_cmspluginpublic', (
-            ('rght', orm['cms.cmsplugin:rght']),
-            ('parent', orm['cms.cmsplugin:parent']),
-            ('language', orm['cms.cmsplugin:language']),
-            ('level', orm['cms.cmsplugin:level']),
-            ('mark_delete', orm['cms.cmsplugin:mark_delete']),
-            ('creation_date', orm['cms.cmsplugin:creation_date']),
-            ('lft', orm['cms.cmsplugin:lft']),
-            ('tree_id', orm['cms.cmsplugin:tree_id']),
-            ('position', orm['cms.cmsplugin:position']),
-            ('plugin_type', orm['cms.cmsplugin:plugin_type']),
-            ('placeholder', orm['cms.cmsplugin:placeholder']),
-            ('id', orm['cms.cmsplugin:id']),
-            ('page', orm['cms.cmsplugin:page']),
+            ('rght', orm['cms.cmspluginpublic:rght']),
+            ('parent', orm['cms.cmspluginpublic:parent']),
+            ('language', orm['cms.cmspluginpublic:language']),
+            ('level', orm['cms.cmspluginpublic:level']),
+            ('mark_delete', orm['cms.cmspluginpublic:mark_delete']),
+            ('creation_date', orm['cms.cmspluginpublic:creation_date']),
+            ('lft', orm['cms.cmspluginpublic:lft']),
+            ('tree_id', orm['cms.cmspluginpublic:tree_id']),
+            ('position', orm['cms.cmspluginpublic:position']),
+            ('plugin_type', orm['cms.cmspluginpublic:plugin_type']),
+            ('placeholder', orm['cms.cmspluginpublic:placeholder']),
+            ('id', orm['cms.cmspluginpublic:id']),
+            ('page', orm['cms.cmspluginpublic:page']),
         ))
         db.send_create_signal('cms', ['cmspluginpublic'])
         
         # Adding model 'pagepublic'
         db.create_table('cms_pagepublic', (
-            ('rght', orm['cms.cmsplugin:rght']),
-            ('navigation_extenders', orm['cms.cmsplugin:navigation_extenders']),
-            ('site', orm['cms.cmsplugin:site']),
-            ('creation_date', orm['cms.cmsplugin:creation_date']),
-            ('lft', orm['cms.cmsplugin:lft']),
-            ('in_navigation', orm['cms.cmsplugin:in_navigation']),
-            ('id', orm['cms.cmsplugin:id']),
-            ('reverse_id', orm['cms.cmsplugin:reverse_id']),
-            ('login_required', orm['cms.cmsplugin:login_required']),
-            ('created_by', orm['cms.cmsplugin:created_by']),
-            ('publication_end_date', orm['cms.cmsplugin:publication_end_date']),
-            ('moderator_state', orm['cms.cmsplugin:moderator_state']),
-            ('template', orm['cms.cmsplugin:template']),
-            ('tree_id', orm['cms.cmsplugin:tree_id']),
-            ('parent', orm['cms.cmsplugin:parent']),
-            ('soft_root', orm['cms.cmsplugin:soft_root']),
-            ('publication_date', orm['cms.cmsplugin:publication_date']),
-            ('level', orm['cms.cmsplugin:level']),
-            ('changed_by', orm['cms.cmsplugin:changed_by']),
-            ('mark_delete', orm['cms.cmsplugin:mark_delete']),
-            ('published', orm['cms.cmsplugin:published']),
+            ('rght', orm['cms.pagepublic:rght']),
+            ('navigation_extenders', orm['cms.pagepublic:navigation_extenders']),
+            ('site', orm['cms.pagepublic:site']),
+            ('creation_date', orm['cms.pagepublic:creation_date']),
+            ('lft', orm['cms.pagepublic:lft']),
+            ('in_navigation', orm['cms.pagepublic:in_navigation']),
+            ('id', orm['cms.pagepublic:id']),
+            ('reverse_id', orm['cms.pagepublic:reverse_id']),
+            ('login_required', orm['cms.pagepublic:login_required']),
+            ('created_by', orm['cms.pagepublic:created_by']),
+            ('publication_end_date', orm['cms.pagepublic:publication_end_date']),
+            ('moderator_state', orm['cms.pagepublic:moderator_state']),
+            ('template', orm['cms.pagepublic:template']),
+            ('tree_id', orm['cms.pagepublic:tree_id']),
+            ('parent', orm['cms.pagepublic:parent']),
+            ('soft_root', orm['cms.pagepublic:soft_root']),
+            ('publication_date', orm['cms.pagepublic:publication_date']),
+            ('level', orm['cms.pagepublic:level']),
+            ('changed_by', orm['cms.pagepublic:changed_by']),
+            ('mark_delete', orm['cms.pagepublic:mark_delete']),
+            ('published', orm['cms.pagepublic:published']),
         ))
         db.send_create_signal('cms', ['pagepublic'])
-        
-        # Deleting unique_together for [publisher_is_draft, language, page] on Title.
-        db.delete_unique('cms_title', ['publisher_is_draft', 'language', 'page_id'])
-        
-        # Creating unique_together for [language, page] on title.
-        db.create_unique('cms_title', ['language', 'page_id'])
         
     
     

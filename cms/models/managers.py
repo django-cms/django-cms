@@ -1,7 +1,7 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models import Q
-from cms import settings
 from cms.exceptions import NoPermissionsException
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from publisher import PublisherManager

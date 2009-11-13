@@ -93,6 +93,9 @@ class Migration:
             'cmspluginpublic_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPluginPublic']", 'unique': 'True', 'primary_key': 'True'}),
             'content': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'postcode': ('models.IntegerField', [], {}),
+            'street': ('models.CharField', [], {'max_length': '100'}),
+            'streetnr': ('models.IntegerField', [], {}),
             'title': ('models.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'zipcode': ('models.CharField', [], {'max_length': '30'}),
             'zoom': ('models.IntegerField', [], {'null': 'True', 'blank': 'True'})
@@ -118,7 +121,10 @@ class Migration:
             'city': ('models.CharField', [], {'max_length': '100'}),
             'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'content': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'postcode': ('models.IntegerField', [], {}),
             'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['googlemap.GoogleMapPublic']"}),
+            'street': ('models.CharField', [], {'max_length': '100'}),
+            'streetnr': ('models.IntegerField', [], {}),
             'title': ('models.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'zipcode': ('models.CharField', [], {'max_length': '30'}),
             'zoom': ('models.IntegerField', [], {'null': 'True', 'blank': 'True'})

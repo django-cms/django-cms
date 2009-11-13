@@ -1,6 +1,6 @@
 import datetime
 from django.utils.translation import ugettext as _
-from cms import settings as cms_settings
+from django.conf import settings
 from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title,\
     PagePermission
 
@@ -79,7 +79,7 @@ def page_moderator_state(request, page):
     
     # TODO: OPTIMIZE!! calls 1 or 2 q per list item (page)
     
-    if cms_settings.CMS_MODERATOR:
+    if settings.CMS_MODERATOR:
         if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
             label = _('parent first')
         elif page.requires_approvement() and page.has_moderate_permission(request) \
@@ -114,7 +114,7 @@ def requires_moderation(page):
 def will_require_moderation(target_id, position):
     """Check if newly added page will require moderation
     """
-    if not cms_settings.CMS_MODERATOR:
+    if not settings.CMS_MODERATOR:
         return False
     target = Page.objects.get(pk=target_id)
     if position == 'first-child':
@@ -140,7 +140,7 @@ def get_test_moderation_level(page, user=None, include_user=True):
     
     qs = page.get_moderator_queryset()
     
-    if not cms_settings.CMS_MODERATOR or (user and user.is_superuser):
+    if not settings.CMS_MODERATOR or (user and user.is_superuser):
         if include_user and qs.filter(user__id=user.id, moderate_page=True).count():
             return 0, True
         return 0, False
@@ -198,7 +198,7 @@ def get_model_queryset(model, request=None):
     """Decision function used in frontend - says which model should be used. 
     Public models are used only if CMS_MODERATOR.
     """
-    if not cms_settings.CMS_MODERATOR or \
+    if not settings.CMS_MODERATOR or \
         (request and (('preview' in request.GET and 
             'draft' in request.GET) or ('edit' in request.GET or request.session.get("cms_edit", False))) and request.user.is_staff):
         return model.objects.drafts()
@@ -215,10 +215,10 @@ def mail_approvement_request(page, user=None):
     """Sends approvement request over email to all users which should approve 
     this page if they have an email entered.
     
-    Don't send it to current user - he should now about it, because he made the 
+    Don't send it to current user - he should know about it, because he made the 
     change.
     """
-    if not cms_settings.CMS_MODERATOR or not page.requires_approvement():
+    if not settings.CMS_MODERATOR or not page.requires_approvement():
         return
     
     recipient_list = []

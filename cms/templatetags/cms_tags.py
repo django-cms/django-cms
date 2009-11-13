@@ -1,3 +1,4 @@
+from django.conf import settings
 from django import template
 from django.core.cache import cache
 from django.core.mail import send_mail, mail_managers
@@ -6,7 +7,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings as django_settings
 from cms.exceptions import NoHomeFound
-from cms import settings
+
 from cms.models import Page
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
 from cms.utils.plugin import render_plugins_for_context
@@ -322,7 +323,7 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
     else:
         site = Site.objects.get_current()
         ancestors = []
-        extenders = page_queryset.published().filter(in_navigation=True, site=site)
+        extenders = page_queryset.published().filter(site=site)
         extenders = extenders.exclude(navigation_extenders__isnull=True).exclude(navigation_extenders__exact="")
         for ext in extenders:
             ext.childrens = []
@@ -359,7 +360,7 @@ show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
                                          
 def ancestors_from_page(page, page_queryset, title_queryset, lang):
-    ancestors = list(page.get_cached_ancestors())
+    ancestors = list(page.get_cached_ancestors(False))
     ancestors.append(page)
     home = page_queryset.get_home()
     if ancestors and ancestors[0].pk != home.pk: 
@@ -596,18 +597,8 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
         try:
             page = get_page_queryset(request).get(reverse_id=reverse_id, site=site_id)
         except:
-            if settings.DEBUG:
-                raise
-            else:
-                site = Site.objects.get_current()
-                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                          _("A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                            "The url of the page was: http://%(host)s%(path)s") %
-                            {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
-                          settings.DEFAULT_FROM_EMAIL,
-                          settings.MANAGERS,
-                          fail_silently=True)
-                return {'content':''}
+            send_missing_mail(reverse_id, request)
+            return {'content':''}
         plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:

@@ -22,14 +22,14 @@ class Migration:
         
         # Adding model 'googlemappublic'
         db.create_table('cmsplugin_googlemappublic', (
-            ('city', orm['googlemap.googlemap:city']),
-            ('title', orm['googlemap.googlemap:title']),
-            ('mark_delete', orm['googlemap.googlemap:mark_delete']),
-            ('zipcode', orm['googlemap.googlemap:zipcode']),
-            ('zoom', orm['googlemap.googlemap:zoom']),
-            ('content', orm['googlemap.googlemap:content']),
-            ('cmspluginpublic_ptr', orm['googlemap.googlemap:cmspluginpublic_ptr']),
-            ('address', orm['googlemap.googlemap:address']),
+            ('city', orm['googlemap.googlemappublic:city']),
+            ('title', orm['googlemap.googlemappublic:title']),
+            ('mark_delete', orm['googlemap.googlemappublic:mark_delete']),
+            ('zipcode', orm['googlemap.googlemappublic:zipcode']),
+            ('zoom', orm['googlemap.googlemappublic:zoom']),
+            ('content', orm['googlemap.googlemappublic:content']),
+            ('cmspluginpublic_ptr', orm['googlemap.googlemappublic:cmspluginpublic_ptr']),
+            ('address', orm['googlemap.googlemappublic:address']),
         ))
         db.send_create_signal('googlemap', ['googlemappublic'])
         

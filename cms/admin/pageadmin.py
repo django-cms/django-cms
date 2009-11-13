@@ -1,16 +1,17 @@
-from cms import settings
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
+from cms.admin.utils import get_placeholders
 from cms.admin.views import save_all_plugins, revert_plugins
 from cms.admin.widgets import PluginEditor
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title, CMSPlugin, PagePermission, \
-    PageModeratorState, EmptyTitle, GlobalPagePermission, \
-    MASK_CHILDREN, MASK_DESCENDANTS, MASK_PAGE
+    PageModeratorState, EmptyTitle, GlobalPagePermission
 from cms.models.managers import PagePermissionsPermissionManager
+from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
+    MASK_DESCENDANTS
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.admin import render_admin_menu_item
@@ -20,6 +21,8 @@ from cms.utils.moderator import update_moderation_message, \
 from cms.utils.permissions import has_page_add_permission, \
     get_user_permission_level, has_global_change_permissions_permission
 from copy import deepcopy
+from django import template
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote, get_deleted_objects
@@ -27,18 +30,18 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.forms import Widget, Textarea, CharField
-from django.views.decorators.http import require_POST
-from django.http import HttpResponseRedirect, HttpResponse, Http404,\
+from django.http import HttpResponseRedirect, HttpResponse, Http404, \
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render_to_response, get_object_or_404
-from django import template
 from django.template.context import RequestContext
-from django.template.defaultfilters import title, escapejs, force_escape, escape
+from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext as _
+from django.utils.functional import curry
 from django.utils.text import capfirst
-from os.path import join
-from cms.utils.plugins import get_placeholders
+from django.utils.translation import ugettext as _
+import os
+
+
 
 model_admin = admin.ModelAdmin
 create_on_success = lambda x: x
@@ -134,14 +137,14 @@ class PageAdmin(model_admin):
       
     class Media:
         css = {
-            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
             )]
         }
-        js = [join(settings.CMS_MEDIA_URL, path) for path in (
+        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
             'js/lib/jquery.js',
             'js/lib/jquery.query.js',
             'js/lib/ui.core.js',
@@ -275,6 +278,8 @@ class PageAdmin(model_admin):
                 pass
             else:
                 obj.move_to(target, position)
+                
+        
         
         Title.objects.set_or_create(
             obj, 

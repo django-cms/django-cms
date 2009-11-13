@@ -12,7 +12,7 @@ class Migration:
     needed_by = (
         ("cms", "0019_public_table_renames"),
     )
-    
+
     def forwards(self, orm):
         
         # Adding model 'PublicLink'

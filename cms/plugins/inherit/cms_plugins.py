@@ -1,18 +1,9 @@
 from cms.plugin_base import CMSPluginBase
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils import get_language_from_request
-from cms.utils.plugin import render_plugins_for_context
 from cms.plugin_pool import plugin_pool
-from cms.settings import CMS_MEDIA_URL
-from django import template
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.template.context import Context
-from django.conf import settings
-from cms.settings import CMS_MEDIA_URL
-from cms.models import CMSPlugin
 from models import InheritPagePlaceholder
-from django.template.context import Context
 from django.conf import settings
 from cms.plugins.inherit.forms import InheritForm
 import copy

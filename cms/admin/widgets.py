@@ -3,7 +3,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
-from cms.settings import CMS_MEDIA_URL
 from django.forms.widgets import Widget, Select
 from cms.models import PageUser
 
@@ -16,14 +15,14 @@ class PluginEditor(Widget):
             self.attrs = {}
         
     class Media:
-        js = [join(CMS_MEDIA_URL, path) for path in (
+        js = [join(settings.CMS_MEDIA_URL, path) for path in (
             'js/lib/jquery.js',
             'js/lib/ui.core.js',
             'js/lib/ui.sortable.js',
             'js/plugin_editor.js',
         )]
         css = {
-            'all': [join(CMS_MEDIA_URL, path) for path in (
+            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
                 'css/plugin_editor.css',
             )]
         }

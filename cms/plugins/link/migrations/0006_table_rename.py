@@ -5,7 +5,7 @@ from cms.plugins.link.models import *
 
 class Migration:
     depends_on = (
-        ("cms", "0018_site_permissions"),
+        ("cms", "0019_public_table_renames"),
     )
     def forwards(self, orm):
         
@@ -28,7 +28,7 @@ class Migration:
         db.create_primary_key("cmsplugin_linkpublic", ("publiccmsplugin_ptr_id",))
         db.rename_table("cmsplugin_link", "link_link")
         db.rename_table("cmsplugin_linkpublic", "link_publiclink")
-        db.alter_column('cmsplugin_link', 'public_id', orm['link.link:public'])
+        db.alter_column('link_link', 'public_id', orm['link.link:public'])
     
     
     models = {

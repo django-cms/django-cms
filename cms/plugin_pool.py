@@ -1,6 +1,5 @@
 from cms.exceptions import PluginAllreadyRegistered
 from django.conf import settings
-from cms import settings as cms_settings
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import reversion_register
 
@@ -41,12 +40,13 @@ class PluginPool(object):
         if placeholder:
             final_plugins = []
             for plugin in plugins:
-                allowed_plugins = []
-                if page:
-                    allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get("plugins")
-                if not allowed_plugins:
-                    allowed_plugins = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("plugins")
-                if not allowed_plugins or plugin.__name__ in allowed_plugins:
+                found = True
+                if settings.CMS_PLACEHOLDER_CONF:
+                    if placeholder in settings.CMS_PLACEHOLDER_CONF:
+                        if "plugins" in settings.CMS_PLACEHOLDER_CONF[placeholder] \
+                        and not plugin.__name__ in settings.CMS_PLACEHOLDER_CONF[placeholder]["plugins"]:
+                            found = False
+                if found:
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins

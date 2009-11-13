@@ -258,9 +258,6 @@ class Migration:
         # Adding field 'PagePermission.can_edit'
         db.add_column('cms_pagepermission', 'can_edit', orm['cms.pagepermission:can_edit'])
         
-        # Deleting unique_together for [language, page] on PublicTitle.
-        db.delete_unique('cms_publictitle', ['language', 'page_id'])
-        
     
     
     models = {

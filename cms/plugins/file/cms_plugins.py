@@ -3,7 +3,6 @@ from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
 from models import File
 from django.conf import settings
-from cms.settings import CMS_MEDIA_URL
 
 class FilePlugin(CMSPluginBase):
     model = File
@@ -21,6 +20,6 @@ class FilePlugin(CMSPluginBase):
     def icon_src(self, instance):
         file_icon = instance.get_icon_url()
         if file_icon: return file_icon
-        return CMS_MEDIA_URL + u"images/plugins/file.png"
+        return settings.CMS_MEDIA_URL + u"images/plugins/file.png"
     
 plugin_pool.register_plugin(FilePlugin)

@@ -1,5 +1,6 @@
 from os.path import join
 from datetime import datetime
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _, get_language
@@ -10,7 +11,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
-from cms import settings
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models import signals as cms_signals
 from cms.utils.page import get_available_slug, check_title_slugs
@@ -42,7 +42,6 @@ class Page(MpttPublisher):
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
-    login_required = models.BooleanField(_('login required'), default=False)
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
@@ -120,6 +119,8 @@ class Page(MpttPublisher):
                 tree = []
         else:
             tree = []
+        if tree:
+            tree[0].old_pk = tree[0].pk
         first = True
         for page in descendants:
            
@@ -277,8 +278,11 @@ class Page(MpttPublisher):
             self.reverse_id = None
         
         from cms.utils.permissions import _thread_locals
-        
-        self.changed_by = _thread_locals.user.username
+        user = getattr(_thread_locals, "user", None)
+        if user:
+            self.changed_by = user.username
+        else:
+            self.changed_by = "script"
         if not self.pk:
             self.created_by = self.changed_by 
         

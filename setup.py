@@ -46,6 +46,7 @@ setup(
             'templates/admin/cms/page/*.html',
             'templates/admin/cms/page/*/*.html',
             'templates/cms/*.html',
+            'templates/admin/*.html',
             'plugins/*/templates/cms/plugins/*.html',
             'plugins/*/templates/cms/plugins/*/*.html',
             'plugins/*/templates/cms/plugins/*/*.js',

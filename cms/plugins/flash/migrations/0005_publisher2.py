@@ -22,11 +22,11 @@ class Migration:
         
         # Adding model 'flashpublic'
         db.create_table('cmsplugin_flashpublic', (
-            ('width', orm['flash.flash:width']),
-            ('mark_delete', orm['flash.flash:mark_delete']),
-            ('height', orm['flash.flash:height']),
-            ('cmspluginpublic_ptr', orm['flash.flash:cmspluginpublic_ptr']),
-            ('file', orm['flash.flash:file']),
+            ('width', orm['flash.flashpublic:width']),
+            ('mark_delete', orm['flash.flashpublic:mark_delete']),
+            ('height', orm['flash.flashpublic:height']),
+            ('cmspluginpublic_ptr', orm['flash.flashpublic:cmspluginpublic_ptr']),
+            ('file', orm['flash.flashpublic:file']),
         ))
         db.send_create_signal('flash', ['flashpublic'])
         

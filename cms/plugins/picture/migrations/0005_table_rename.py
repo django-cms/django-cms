@@ -20,13 +20,10 @@ class Migration:
         db.foreign_key_sql('cmsplugin_picture' ,'public_id', 'cmsplugin_picturepublic', 'cmspluginpublic_ptr_id')
         
     def backwards(self, orm):
-        db.delete_foreign_key('cmsplugin_picture' ,'public_id')
-        db.drop_primary_key("cmsplugin_picturepublic")
         db.rename_column("cmsplugin_picturepublic", "cmspluginpublic_ptr_id", "publiccmsplugin_ptr_id")
-        db.create_primary_key("cmsplugin_picturepublic", ("publiccmsplugin_ptr_id",))
         db.rename_table("cmsplugin_picture", "picture_picture")
         db.rename_table("cmsplugin_picturepublic", "picture_publicpicture")
-        db.alter_column('cmsplugin_picture', 'public_id', orm['picture.picture:public'])
+        db.alter_column('picture_picture', 'public_id', orm['picture.picture:public'])
     
     
     models = {

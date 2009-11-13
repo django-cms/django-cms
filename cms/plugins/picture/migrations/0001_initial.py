@@ -5,6 +5,10 @@ from cms.plugins.picture.models import *
 
 class Migration:
     
+    depends_on = (
+        ("cms", "0001_initial"),
+    )
+
     def forwards(self, orm):
         
         # Adding model 'Picture'
