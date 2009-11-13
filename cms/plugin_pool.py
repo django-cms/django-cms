@@ -40,13 +40,12 @@ class PluginPool(object):
         if placeholder:
             final_plugins = []
             for plugin in plugins:
-                found = True
-                if settings.CMS_PLACEHOLDER_CONF:
-                    if placeholder in settings.CMS_PLACEHOLDER_CONF:
-                        if "plugins" in settings.CMS_PLACEHOLDER_CONF[placeholder] \
-                        and not plugin.__name__ in settings.CMS_PLACEHOLDER_CONF[placeholder]["plugins"]:
-                            found = False
-                if found:
+                allowed_plugins = []
+                if page:
+                    allowed_plugins = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("plugins")
+                if not allowed_plugins:
+                    allowed_plugins = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("plugins")
+                if not allowed_plugins or plugin.__name__ in allowed_plugins:
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins

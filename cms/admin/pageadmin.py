@@ -1027,7 +1027,7 @@ class PageAdmin(model_admin):
                 placeholder = request.POST['placeholder'].lower()
                 language = request.POST['language']
                 position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
-                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.template, placeholder), {}).get('limits', None)
+                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get('limits', None)
                 if not limits:
                     limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get('limits', None)
                 if limits:
