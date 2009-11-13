@@ -215,7 +215,7 @@ def mail_approvement_request(page, user=None):
     """Sends approvement request over email to all users which should approve 
     this page if they have an email entered.
     
-    Don't send it to current user - he should now about it, because he made the 
+    Don't send it to current user - he should know about it, because he made the 
     change.
     """
     if not settings.CMS_MODERATOR or not page.requires_approvement():
