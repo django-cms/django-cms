@@ -3,7 +3,7 @@ from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
-from cms.admin.utils import get_placeholders
+from cms.utils.plugins import get_placeholders
 from cms.admin.views import save_all_plugins, revert_plugins
 from cms.admin.widgets import PluginEditor
 from cms.exceptions import NoPermissionsException
