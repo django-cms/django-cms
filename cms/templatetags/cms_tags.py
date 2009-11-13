@@ -578,8 +578,7 @@ def clean_admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : unique_choices}
 clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
 
-
-def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
+def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None, cache=True):
     """
     Show the content of a page with a placeholder name and a reverse id in the right language
     This is mostly used if you want to have static content in a template of a page (like a footer)
@@ -591,25 +590,50 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
         return {'content':''}
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'show_placeholder_by_id_pid:'+reverse_id+'_placeholder:'+placeholder_name+'_site:'+str(site_id)+'_l:'+str(lang)
-    content = cache.get(key)
+        
+    content = None
+    
+    if cache:
+        key = 'show_placeholder_by_id_pid:'+reverse_id+'_placeholder:'+placeholder_name+'_site:'+str(site_id)+'_l:'+str(lang)
+        content = cache.get(key)
+        
     if not content:
         try:
             page = get_page_queryset(request).get(reverse_id=reverse_id, site=site_id)
         except:
-            send_missing_mail(reverse_id, request)
-            return {'content':''}
+            if settings.DEBUG:
+                raise
+            else:
+                site = Site.objects.get_current()
+                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
+                          _("A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+                            "The url of the page was: http://%(host)s%(path)s") %
+                            {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
+                          settings.DEFAULT_FROM_EMAIL,
+                          settings.MANAGERS,
+                          fail_silently=True)
+                return {'content':''}
         plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:
             content += plugin.render_plugin(context, placeholder_name)
-
-    cache.set(key, content, settings.CMS_CONTENT_CACHE_DURATION)
+            
+    if cache:
+        cache.set(key, content, settings.CMS_CONTENT_CACHE_DURATION)
 
     if content:
         return {'content':mark_safe(content)}
     return {'content':''}
+
+def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
+    return _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=lang, site=site)
+
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
+
+def show_uncached_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
+    return _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=lang, site=site, cache=False)
+
+show_uncached_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_uncached_placeholder_by_id)
 
 def do_plugins_media(parser, token):
     return PluginsMediaNode()
