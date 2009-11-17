@@ -51,6 +51,13 @@ setup(
             'plugins/*/templates/cms/plugins/*/*.html',
             'plugins/*/templates/cms/plugins/*/*.js',
             'locale/*/LC_MESSAGES/*'
+        ],
+        'example': [
+            'templates/*.html',
+            'store/templates/store/plugins/*.html',
+            'sampleapp/media/sampleapp/img/gift.jpg',
+            'sampleapp/templates/sampleapp/*.html',
+            'categories/templates/categories/*.html',
         ]
     },
     zip_safe = False
