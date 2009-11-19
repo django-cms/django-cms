@@ -41,10 +41,10 @@
 
 
 	$(document).ready(function(){
-		$("a.add-another").each(function(i, sign){
+		$("a.add-another,a.related-lookup").each(function(i, sign){
 			var href = $(sign).attr("href")
 			if (href.substr(0,2) == ".."){
-				href += "../../"
+				href = "../../"+href
 				$(sign).attr("href", href); 
 			}
 			
