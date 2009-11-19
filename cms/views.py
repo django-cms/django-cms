@@ -104,7 +104,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         
         redirect_url = current_page.get_redirect(language=lang)
         if redirect_url:
-            if settings.i18n_installed:
+            if settings.i18n_installed and redirect_url[0] == "/":
                 redirect_url = "/%s/%s" % (lang, redirect_url.lstrip("/"))
             # add language prefix to url
             return HttpResponseRedirect(redirect_url)
