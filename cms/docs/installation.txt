@@ -49,6 +49,7 @@ Add the following middleware classes::
 	MIDDLEWARE_CLASSES = (
 		# needed for add/edit page
 		'django.middleware.locale.LocaleMiddleware',
+		'django.contrib.sessions.middleware.SessionMiddleware',
 		'django.contrib.auth.middleware.AuthenticationMiddleware',
 		...
 		'cms.middleware.page.CurrentPageMiddleware',
