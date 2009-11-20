@@ -41,6 +41,7 @@ setup(
     data_files = media_files,
     package_data = {
         'cms': [
+            'templates/admin/*.html',
             'templates/admin/cms/mail/*.html',
             'templates/admin/cms/mail/*.txt',
             'templates/admin/cms/page/*.html',
@@ -51,6 +52,13 @@ setup(
             'plugins/*/templates/cms/plugins/*/*.html',
             'plugins/*/templates/cms/plugins/*/*.js',
             'locale/*/LC_MESSAGES/*'
+        ],
+        'example': [
+            'templates/*.html',
+            'store/templates/store/plugins/*.html',
+            'sampleapp/media/sampleapp/img/gift.jpg',
+            'sampleapp/templates/sampleapp/*.html',
+            'categories/templates/categories/*.html',
         ]
     },
     zip_safe = False

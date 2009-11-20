@@ -21,6 +21,8 @@ class Snippet(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("Snippet")
+        verbose_name_plural = _("Snippets")
 
 # Plugin model - just a pointer to Snippet
 class SnippetPtr(CMSPlugin):

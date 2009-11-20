@@ -600,6 +600,8 @@ class PageAdmin(model_admin):
         """
         Returns True if the use has the right to recover pages
         """
+        if not "reversion" in settings.INSTALLED_APPS:
+            return False
         user = request.user
         if user.is_superuser:
             return True

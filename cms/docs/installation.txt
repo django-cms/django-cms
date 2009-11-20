@@ -2,13 +2,23 @@ Installation
 ============
 
 Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
+They all should come with the distribution.
+
+python 2.4 - 2.6 should be supported
+
+django 1.1 is required at this moment.
 
 Apps
 ----
 
-Add the following to your project's ``INSTALLED_APPS`` setting::
+Add the following to your project's ``INSTALLED_APPS`` setting if not already present::
 
 	INSTALLED_APPS = (
+		'django.contrib.auth',
+		'django.contrib.contenttypes',
+		'django.contrib.sessions',
+		'django.contrib.admin',
+		'django.contrib.sites',
 		...
 		'cms',
 		'cms.plugins.text',
@@ -22,9 +32,14 @@ Add the following to your project's ``INSTALLED_APPS`` setting::
 		...
 	)
 
-Django-cms 2.0 is compatible with `django-reversion <http://code.google.com/p/django-reversion/>`_ for versioning all the page content and its plugins. Put ``reversion`` in your ``INSTALLED_APPS`` if you have it installed.
+Django-cms is compatible with `django-reversion <http://code.google.com/p/django-reversion/>`_ for versioning all the page content and its plugins. Put ``reversion`` in your ``INSTALLED_APPS`` if you have it installed.
 
 If you don't need all the plugins you can comment them out here. For a complete list of all the plugins have a look inside ``cms/plugins/``.
+
+The following apps are also required by the cms:
+
+	'django.contrib.admin'
+	'django.contrib.sites',
 
 Middleware
 ----------
@@ -34,6 +49,7 @@ Add the following middleware classes::
 	MIDDLEWARE_CLASSES = (
 		# needed for add/edit page
 		'django.middleware.locale.LocaleMiddleware',
+		'django.contrib.sessions.middleware.SessionMiddleware',
 		'django.contrib.auth.middleware.AuthenticationMiddleware',
 		...
 		'cms.middleware.page.CurrentPageMiddleware',
@@ -147,7 +163,7 @@ You can use something like `django-appmedia <http://code.google.com/p/django-app
 South
 -----
 
-Django-cms 2.0 has support for `django-south <http://south.aeracode.org/>`_. South is a database migration tool.
+Django-cms has support for `django-south <http://south.aeracode.org/>`_. South is a database migration tool.
 So if you get a new version of django-cms you also get the db-migrations automatically. Please read the documentation of south
 first before you use it the first time. 
 
@@ -171,3 +187,7 @@ Troubleshooting
 If you create a page and you don't see a page in the list view:
 
 - Be sure you copied all the media files. Check with firebug and its "net" panel if you have any 404s
+
+If you edit a Page but don't see a "Add Plugin" button and a dropdown-list with plugins:
+
+- Be sure your CMS_TEMPLATES setting is correct and that the templates specifiet actually exsist. Maybe check that you are not missing a {% placeholder %} templatetag in the template. 

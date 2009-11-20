@@ -362,15 +362,19 @@ show_breadcrumb = register.inclusion_tag('cms/dummy.html',
 def ancestors_from_page(page, page_queryset, title_queryset, lang):
     ancestors = list(page.get_cached_ancestors(False))
     ancestors.append(page)
-    home = page_queryset.get_home()
-    if ancestors and ancestors[0].pk != home.pk: 
+    try:
+        home = page_queryset.get_home()
+    except NoHomeFound:
+        home = None
+    if ancestors and home and ancestors[0].pk != home.pk: 
         ancestors = [home] + ancestors
     ids = [page.pk]
     for anc in ancestors:
         ids.append(anc.pk)
     titles = title_queryset.filter(page__in=ids, language=lang)
     for anc in ancestors:
-        anc.home_pk_cache = home.pk 
+        if home:
+            anc.home_pk_cache = home.pk 
         for title in titles:
             if title.page_id == anc.pk:
                 if not hasattr(anc, "title_cache"):
