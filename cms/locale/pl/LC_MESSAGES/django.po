@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-13 10:54+0100\n"
+"POT-Creation-Date: 2009-11-21 23:30+0100\n"
 "PO-Revision-Date: 2009-11-05 18:00+0100\n"
 "Last-Translator: Robert <rtpm@gazeta.pl>\n"
 "Language-Team: Gerard Swiderski - gerard5, Maciej Wiśniowski - pigletto\n"
@@ -189,29 +189,29 @@ msgstr ""
 msgid "To add permissions you also need to edit them!"
 msgstr "Aby dodać uprawnienia musisz także móc je edytować!"
 
-#: admin/pageadmin.py:104 admin/pageadmin.py:120
+#: admin/pageadmin.py:102 admin/pageadmin.py:118
 msgid "Hidden"
 msgstr "Ukryte"
 
-#: admin/pageadmin.py:115
+#: admin/pageadmin.py:113
 msgid "Basic Settings"
 msgstr "Ustawienia podstawowe"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "Uwaga: gdy zmienione zostanie zaznaczenie wybranego elementu strona zostanie "
 "przeładowana automatycznie, aby nie utracić danych najpierw zapisz."
 
-#: admin/pageadmin.py:124
+#: admin/pageadmin.py:122
 msgid "Advanced Settings"
 msgstr "Ustawienia zaawansowane"
 
-#: admin/pageadmin.py:133
+#: admin/pageadmin.py:131
 msgid "SEO Settings"
 msgstr "Ustawienia SEO"
 
-#: admin/pageadmin.py:496
+#: admin/pageadmin.py:494
 msgid "higher"
 msgstr "wyższy"
 
@@ -971,7 +971,7 @@ msgstr "Twój adres"
 msgid "Calculate route"
 msgstr "Oblicz trasę"
 
-#: plugins/inherit/cms_plugins.py:26
+#: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
 msgstr ""
 
@@ -1059,7 +1059,8 @@ msgstr "dodatkowy opis obrazka"
 msgid "side"
 msgstr "strona"
 
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:30
+#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
+#: plugins/snippet/models.py:32
 msgid "Snippet"
 msgstr "Fragment"
 
@@ -1077,6 +1078,11 @@ msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 "Podaj szablon (np. \"snippets/plugin_xy.html\"), który będzie renderowany. "
+
+#: plugins/snippet/models.py:25
+#, fuzzy
+msgid "Snippets"
+msgstr "Fragment"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
@@ -1791,16 +1797,26 @@ msgstr ""
 msgid "Unbind descendants moderation"
 msgstr ""
 
-#: templatetags/cms_tags.py:393
+#: templatetags/cms_tags.py:397 templatetags/cms_tags.py:612
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr "Odwrotny ID nie znaleziony w domenie %(domain)s"
 
-#: templatetags/cms_tags.py:394
+#: templatetags/cms_tags.py:398
 #, python-format
 msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %"
 "(reverse_id)s\n"
+"The url of the page was: http://%(host)s%(path)s"
+msgstr ""
+"Template tag page_id_url nie odnalazł strony o reverse_id: %(reverse_id)s\n"
+"Url strony: http://%(host)s%(path)s"
+
+#: templatetags/cms_tags.py:613
+#, fuzzy, python-format
+msgid ""
+"A show_placeholder_by_id template tag didn't found a page with the "
+"reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 "Template tag page_id_url nie odnalazł strony o reverse_id: %(reverse_id)s\n"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-13 10:54+0100\n"
+"POT-Creation-Date: 2009-11-21 23:30+0100\n"
 "PO-Revision-Date: 2009-11-11 18:39+0100\n"
 "Last-Translator: Yohan Boniface <yohanboniface@gmail.com>\n"
 "Language-Team: French <http://www.django-cms.org>\n"
@@ -190,29 +190,29 @@ msgstr ""
 msgid "To add permissions you also need to edit them!"
 msgstr "Pour ajouter des permissions, il faut aussi les éditer !"
 
-#: admin/pageadmin.py:104 admin/pageadmin.py:120
+#: admin/pageadmin.py:102 admin/pageadmin.py:118
 msgid "Hidden"
 msgstr "Caché"
 
-#: admin/pageadmin.py:115
+#: admin/pageadmin.py:113
 msgid "Basic Settings"
 msgstr "Propriétés"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "Note : cette page sera rechargée si vous changez la selection. Pensez à la "
 "sauver au préalable."
 
-#: admin/pageadmin.py:124
+#: admin/pageadmin.py:122
 msgid "Advanced Settings"
 msgstr "Paramètres avancés"
 
-#: admin/pageadmin.py:133
+#: admin/pageadmin.py:131
 msgid "SEO Settings"
 msgstr "Paramètres SEO (Optimisation pour les moteurs de recherche)"
 
-#: admin/pageadmin.py:496
+#: admin/pageadmin.py:494
 msgid "higher"
 msgstr "plus haut"
 
@@ -986,7 +986,7 @@ msgstr "Votre adresse"
 msgid "Calculate route"
 msgstr "Calculer la route"
 
-#: plugins/inherit/cms_plugins.py:26
+#: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
 msgstr ""
 
@@ -1074,7 +1074,8 @@ msgstr "description additionnelle de l'image"
 msgid "side"
 msgstr "côté"
 
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:30
+#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
+#: plugins/snippet/models.py:32
 msgid "Snippet"
 msgstr "Fragment"
 
@@ -1093,6 +1094,11 @@ msgid ""
 msgstr ""
 "Veuillez fournir le nom du modèle (par ex.: \"snippets/plugin_xy.html\") qui "
 "sera affiché."
+
+#: plugins/snippet/models.py:25
+#, fuzzy
+msgid "Snippets"
+msgstr "Fragment"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
@@ -1803,12 +1809,12 @@ msgstr "Annuler la modération des descendants immédiats"
 msgid "Unbind descendants moderation"
 msgstr "Annuler la modération des descendants"
 
-#: templatetags/cms_tags.py:393
+#: templatetags/cms_tags.py:397 templatetags/cms_tags.py:612
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr "Identifiant non trouvé sur %(domain)s"
 
-#: templatetags/cms_tags.py:394
+#: templatetags/cms_tags.py:398
 #, fuzzy, python-format
 msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %"
@@ -1817,6 +1823,17 @@ msgid ""
 msgstr ""
 "Un templatetag page_id_url n'a pas trouvé de page avec l'identifiant %"
 "(reverse_id)s\n"
+"L'URL de la page était : http://%(host)s%(path)s"
+
+#: templatetags/cms_tags.py:613
+#, fuzzy, python-format
+msgid ""
+"A show_placeholder_by_id template tag didn't found a page with the "
+"reverse_id %(reverse_id)s\n"
+"The url of the page was: http://%(host)s%(path)s"
+msgstr ""
+"Un templatetag show_placeholder_by_id n'a pas pu trouver une page avec "
+"l'identifiant %(reverse_id)s\n"
 "L'URL de la page était : http://%(host)s%(path)s"
 
 #: utils/moderator.py:84
@@ -1848,16 +1865,6 @@ msgstr "CMS - votre compte utilisateur a été modifié"
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "La traduction pour la langue demandée n'est pas encore disponible."
-
-#, fuzzy
-#~ msgid ""
-#~ "A show_placeholder_by_id template tag didn't found a page with the "
-#~ "reverse_id %(reverse_id)s\n"
-#~ "The url of the page was: http://%(host)s%(path)s"
-#~ msgstr ""
-#~ "Un templatetag show_placeholder_by_id n'a pas pu trouver une page avec "
-#~ "l'identifiant %(reverse_id)s\n"
-#~ "L'URL de la page était : http://%(host)s%(path)s"
 
 #, fuzzy
 #~ msgid "A programming error occurred - cannot find text editor widgets."
