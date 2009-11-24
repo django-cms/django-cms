@@ -237,7 +237,9 @@ class Publisher(models.Model):
         if 'reversion' in settings.INSTALLED_APPS:
             import reversion
             self.old_reversion_state_depth = reversion.revision._state.depth
-            reversion.revision._state.depth = - 10000
+            # commented out because of bugs
+            # see http://github.com/digi604/django-cms-2.0/issues/#issue/264
+            #reversion.revision._state.depth = - 10000
             
     
     def _publisher_save_public(self, obj):
