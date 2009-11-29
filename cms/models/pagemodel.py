@@ -75,12 +75,11 @@ class Page(MpttPublisher):
         exclude_fields_append = ['moderator_state']
     
     def __unicode__(self):
-        slug = self.get_slug(fallback=True)
-        if slug is None:
-            return u'' # otherwise we get unicode decode errors
-        else:
-            return slug
-        
+        title = self.get_menu_title(fallback=True)
+        if title is None:
+            title = u""
+        pre_title = settings.CMS_TITLE_CHARACTER * self.level
+        return u'%s%s' % (pre_title, title)
     
     def move_page(self, target, position='first-child'):
         """Called from admin interface when page is moved. Should be used on
