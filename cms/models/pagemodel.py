@@ -263,17 +263,10 @@ class Page(MpttPublisher):
             if force_state is not None:
                 self.moderator_state = force_state
             
-        
+        # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
         
-        # Drafts should not, unless they have been set to the future
-        if self.published:
-            if settings.CMS_SHOW_START_DATE:
-                if self.publication_date and self.publication_date <= datetime.now():
-                    self.publication_date = None
-            else:
-                self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
         
