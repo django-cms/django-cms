@@ -9,8 +9,8 @@ from django.conf import settings
 register = template.Library()
 
 def mlurl(parser, token):
-    """ Based on django url tag. Just adds language postfix to view name for
-    multilinagual stuff.
+    """ Based on django url tag. Just adds language namespace to view name for
+    multilinagual urls.
     """
     bits = token.contents.split(' ')
     if len(bits) < 2:
@@ -61,7 +61,7 @@ class MLURLNode(Node):
         # {% url ... as var %} construct in which cause return nothing.
         url = ''
         try:
-            ml_viewname = "%s_%s" % (self.view_name, get_language())
+            ml_viewname = "%s:%s" % ( get_language(), self.view_name)
             url = reverse(ml_viewname, args=args, kwargs=kwargs, current_app=context.current_app)
         except NoReverseMatch, e:
             try:

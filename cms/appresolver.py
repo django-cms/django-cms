@@ -83,7 +83,7 @@ class DynamicAppRegexURLResolver(PageRegexURLResolver):
     
 
 class ApplicationRegexUrlResolver(PageRegexURLResolver):
-    def __init__(self, path, title, default_kwargs={}):
+    def __init__(self, path, title, default_kwargs={}, app_name=None, namespace=None):
         """Creates standard variant of RegexUrlResolver, but adds some usefull
         functionality to it.
         
@@ -104,7 +104,11 @@ class ApplicationRegexUrlResolver(PageRegexURLResolver):
         
         # assign page_id to resolver, so he knows on which page he was assigned
         self.page_id = title.page_id
-        super(ApplicationRegexUrlResolver, self).__init__(regex, urlconf_name, default_kwargs)
+        
+        if not namespace and 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
+            language = title.language
+            namespace = language
+        super(ApplicationRegexUrlResolver, self).__init__(regex, urlconf_name, default_kwargs, app_name, namespace)
     
                 
 class DynamicURLConfModule(object):

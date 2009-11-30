@@ -4,10 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 
 def get_nodes(request):
     res = [] # result list
-    n = NavigationNode(_('Sublevel'), reverse('sample-app-sublevel'))
-    n2 = NavigationNode(_('Sublevel3'), reverse('sample-app-sublevel3'))
+    lang = request.LANGUAGE_CODE
+    n = NavigationNode(_('Sublevel'), reverse('%s:sample-app-sublevel' % lang))
+    n2 = NavigationNode(_('Sublevel3'), reverse('%s:sample-app-sublevel3' % lang))
     n.childrens = [n2]
     res.append(n)
-    n = NavigationNode(_('Sublevel 2'), reverse('sample-app-sublevel2'))
+    n = NavigationNode(_('Sublevel 2'), reverse('%s:sample-app-sublevel2' % lang))
     res.append(n)
     return res

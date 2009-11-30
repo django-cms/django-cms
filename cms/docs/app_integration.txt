@@ -1,0 +1,16 @@
+App Integration
+===============
+
+Here we will cover how 3th party django apps can be integrated into the cms.
+
+CMS_APPLICATION_URLS
+--------------------
+
+Put this in your settings.py.
+Example:
+
+	CMS_APPLICATION_URLS = (
+		("myapp.urls", gettext("My Application")),
+		("myotherapp.urls", gettext("My other Application")),
+	)
+
