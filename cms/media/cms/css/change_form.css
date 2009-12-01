@@ -44,30 +44,11 @@ ul#page_form_lang_tabs a:hover {
 }
 
 
-.language_button { 
-    font-weight:bold;
-    margin-bottom:-1px; 
-    border-color:#DDDDDD #AAAAAA #CCCCCC #DDDDDD !important; 
-    border:1px;  
-    background:white url(/media/admin/img/admin/nav-bg.gif) repeat-x scroll center bottom !important;
-    }
-
 .language_button.selected { 
     margin-bottom:-2px;
     border-bottom:0px !important;
     color:#fff;
     background:#bcd2e9 !important;
-    }
-
-
-#lang_tab_content h2.header {
-    margin: 0;
-    padding: 2px 5px 3px 5px;
-    font-size: 11px;
-    text-align: left;
-    font-weight: bold;
-    background: #7CA0C7 url(/media/admin/img/admin/default-bg.gif) top left repeat-x;
-    color: white;
 }
 
 .deletetranslation { margin-left: 30px; }

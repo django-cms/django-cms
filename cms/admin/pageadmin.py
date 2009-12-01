@@ -508,6 +508,7 @@ class PageAdmin(admin.ModelAdmin):
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
+                'ADMIN_MEDIA_URL': settings.ADMIN_MEDIA_PREFIX,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
                 'moderation_level': moderation_level,
