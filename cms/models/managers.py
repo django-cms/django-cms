@@ -454,7 +454,7 @@ class PagePermissionsPermissionManager(models.Manager):
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
                     page_id_allow_list.append(permission.page.id)
-                if permission.grant_on & MASK_CHILDREN:
+                if permission.grant_on & MASK_CHILDREN and not attr is "can_add":
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
