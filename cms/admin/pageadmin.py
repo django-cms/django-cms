@@ -36,9 +36,9 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
-from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
+from django.db import transaction
 import os
 
 
@@ -529,6 +529,7 @@ class PageAdmin(model_admin):
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
+                'ADMIN_MEDIA_URL': settings.ADMIN_MEDIA_PREFIX,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
                 'moderation_level': moderation_level,
@@ -728,7 +729,8 @@ class PageAdmin(model_admin):
         change_list = self.changelist_view(request, context)
         self.change_list_template = None
         return change_list
-
+    
+    @transaction.commit_on_success
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
@@ -785,6 +787,7 @@ class PageAdmin(model_admin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
     
+    @transaction.commit_on_success
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
@@ -829,6 +832,7 @@ class PageAdmin(model_admin):
         }
         return render_to_response('admin/cms/page/moderation_messages.html', context)
     
+    @transaction.commit_on_success
     def approve_page(self, request, page_id):
         """Approve changes on current page by user from request.
         """        

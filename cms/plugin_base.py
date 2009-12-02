@@ -99,7 +99,7 @@ class CMSPluginBase(admin.ModelAdmin):
         self.cms_plugin_instance = None
         self.placeholder = None
 
-    def render(self, context, placeholder):
+    def render(self, context, instance, placeholder):
         raise NotImplementedError, "render needs to be implemented"
     
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):

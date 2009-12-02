@@ -161,6 +161,7 @@ $(document).ready(function() {
         var jtarget = $(target);
         
         if(jtarget.hasClass("move")) {
+        	// prepare tree for move / cut paste
 			var id = e.target.id.split("move-link-")[1];
 			if(id==null){
 				id = e.target.parentNode.id.split("move-link-")[1];
@@ -176,6 +177,7 @@ $(document).ready(function() {
         }
         
         if(jtarget.hasClass("copy")) {
+        	// prepare tree for copy
 			var id = e.target.id.split("copy-link-")[1];
 			if(id==null){
 				id = e.target.parentNode.id.split("copy-link-")[1];
@@ -275,7 +277,7 @@ $(document).ready(function() {
             var target_id = target.parentNode.id.split("move-target-")[1];
             
 			if(action=="move") {
-				moveTreeItem(jtarget, selected_page, target_id, position, tree);
+				moveTreeItem(null, selected_page, target_id, position, tree);
                 $('.move-target-container').hide();
             }else if(action=="copy") {
             	site = $('#site-select')[0].value;

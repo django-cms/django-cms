@@ -225,14 +225,12 @@ class Publisher(models.Model):
             # existing instances
             public_copy._publisher_delete_marked()
         return public_copy
-                    
     
     def _publisher_save_public(self, obj):
         """Save method for object which should be published. obj is a instance 
         of the same class as self. 
         """
         return obj.save() 
-
             
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
         if excluded_models is None:
