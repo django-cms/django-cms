@@ -1,5 +1,6 @@
 # PLEASE, I HAD SORTED THIS IMPORTS ALREADY MILTIPLE TIMES, ALWAYS SOMEBODY
 # BREAKS THEM! JUST KEEP THEM AS THEY ARE, THX PETER.
+from django.db import transaction
 
 import os
 from copy import deepcopy
@@ -711,7 +712,8 @@ class PageAdmin(admin.ModelAdmin):
         change_list = self.changelist_view(request, context)
         self.change_list_template = None
         return change_list
-
+    
+    @transaction.commit_on_success
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
@@ -770,6 +772,7 @@ class PageAdmin(admin.ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
     
+    @transaction.commit_on_success
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
@@ -814,6 +817,7 @@ class PageAdmin(admin.ModelAdmin):
         }
         return render_to_response('admin/cms/page/moderation_messages.html', context)
     
+    @transaction.commit_on_success
     def approve_page(self, request, page_id):
         """Approve changes on current page by user from request.
         """        
