@@ -582,7 +582,8 @@ def clean_admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : unique_choices}
 clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
 
-def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None, cache=True):
+def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None,
+        site=None, cache_result=True):
     """
     Show the content of a page with a placeholder name and a reverse id in the right language
     This is mostly used if you want to have static content in a template of a page (like a footer)
@@ -597,7 +598,7 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, si
         
     content = None
     
-    if cache:
+    if cache_result:
         key = 'show_placeholder_by_id_pid:'+reverse_id+'_placeholder:'+placeholder_name+'_site:'+str(site_id)+'_l:'+str(lang)
         content = cache.get(key)
         
@@ -622,7 +623,7 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, si
         for plugin in plugins:
             content += plugin.render_plugin(context, placeholder_name)
             
-    if cache:
+    if cache_result:
         cache.set(key, content, settings.CMS_CONTENT_CACHE_DURATION)
 
     if content:
@@ -635,7 +636,8 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
 
 def show_uncached_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
-    return _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=lang, site=site, cache=False)
+    return _show_placeholder_by_id(context, placeholder_name, reverse_id,
+            lang=lang, site=site, cache_result=False)
 
 show_uncached_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_uncached_placeholder_by_id)
 
