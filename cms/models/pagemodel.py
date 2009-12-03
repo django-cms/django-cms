@@ -12,7 +12,7 @@ from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models import signals as cms_signals
+
 from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
@@ -91,6 +91,7 @@ class Page(MpttPublisher):
         # fire signal
         from cms.models.moderatormodels import PageModeratorState
         self.force_moderation_action = PageModeratorState.ACTION_MOVE
+        import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self) #titles get saved before moderation
         self.save(change_state=True) # always save the page after move, because of publisher
         
@@ -663,6 +664,7 @@ class Page(MpttPublisher):
             page.publish()
         
         # fire signal after publishing is done
+        import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
         return published
     

@@ -1,11 +1,21 @@
 from django.db.models import signals
 from django.conf import settings
 from cms import appresolver
-from cms.models import signals as cms_signals, Page, Title
+from cms.models import Page, Title
 from cms.models import CMSPlugin        
 from cms.utils.moderator import page_changed
 from django.core.exceptions import ObjectDoesNotExist
+from django.dispatch import Signal
 
+# fired after page location is changed - is moved from one node to other
+page_moved = Signal(providing_args=["instance"])
+
+# fired when some of nodes (Title) with applications gets saved
+application_post_changed = Signal(providing_args=["instance"])
+
+# fired after page gets published - copied to public model - there may be more
+# than one instances published before this signal gets called
+post_publish = Signal(providing_args=["instance"])
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
@@ -26,7 +36,7 @@ def update_title_paths(instance, **kwargs):
     for title in instance.title_set.all():
         title.save()
         
-cms_signals.page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
+page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
 
 
 def pre_save_title(instance, raw, **kwargs):
@@ -81,7 +91,7 @@ def post_save_title(instance, raw, created, **kwargs):
     if not hasattr(instance, 'tmp_prevent_descendant_update') and \
         (instance.application_urls != getattr(instance, 'tmp_application_urls', None) or application_changed):
         # fire it if we have some application linked to this page or some descendant
-        cms_signals.application_post_changed.send(sender=Title, instance=instance)
+        application_post_changed.send(sender=Title, instance=instance)
     
     # remove temporary attributes
     if getattr( instance, 'tmp_path', None):
@@ -104,7 +114,7 @@ def clear_appresolver_cache(instance, **kwargs):
 
 if settings.CMS_APPLICATIONS_URLS:
     # register this signal only if we have some hookable applications
-    cms_signals.application_post_changed.connect(clear_appresolver_cache, sender=Title, dispatch_uid="cms.title.appchanged")        
+    application_post_changed.connect(clear_appresolver_cache, sender=Title, dispatch_uid="cms.title.appchanged")        
 
 
 def post_save_user(instance, raw, created, **kwargs):
@@ -201,5 +211,62 @@ if settings.CMS_MODERATOR:
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
     signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
     
-        
-from cache import signals
+ 
+from cms.models import PagePermission, GlobalPagePermission
+from cms.cache.permissions import clear_user_permission_cache,\
+    clear_permission_cache
+
+
+def pre_save_user(instance, raw, **kwargs):
+    clear_user_permission_cache(instance)
+
+def pre_delete_user(instance, **kwargs):
+    clear_user_permission_cache(instance)
+
+def pre_save_group(instance, raw, **kwargs):
+    if instance.pk:
+        for user in instance.user_set.filter(is_staff=True):
+            clear_user_permission_cache(user)
+
+def pre_delete_group(instance, **kwargs):
+    for user in instance.user_set.filter(is_staff=True):
+        clear_user_permission_cache(user)
+    
+def pre_save_pagepermission(instance, raw, **kwargs):
+    if instance.user:
+        clear_user_permission_cache(instance.user)
+
+def pre_delete_pagepermission(instance, **kwargs):
+    if instance.user:
+        clear_user_permission_cache(instance.user)
+
+def pre_save_globalpagepermission(instance, raw, **kwargs):
+    if instance.user:
+        clear_user_permission_cache(instance.user)
+
+def pre_delete_globalpagepermission(instance, **kwargs):
+    if instance.user:
+        clear_user_permission_cache(instance.user)
+
+def pre_save_delete_page(instance, **kwargs):
+    clear_permission_cache()
+
+
+if settings.CMS_PERMISSION:
+    # TODO: will this work also with PageUser and PageGroup??
+    signals.pre_save.connect(pre_save_user, sender=User)
+    signals.pre_delete.connect(pre_delete_user, sender=User)
+    
+    signals.pre_save.connect(pre_save_group, sender=Group)
+    signals.pre_delete.connect(pre_delete_group, sender=Group)
+    
+    signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission)
+    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission)
+    
+    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission)
+    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission)
+    
+    signals.pre_save.connect(pre_save_delete_page, sender=Page)
+    signals.pre_delete.connect(pre_save_delete_page, sender=Page)
+
+
