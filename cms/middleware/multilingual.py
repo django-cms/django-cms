@@ -72,8 +72,12 @@ class MultilingualURLMiddleware:
                 not path.startswith(settings.ADMIN_MEDIA_PREFIX) and \
                 response.status_code == 200 and \
                 response._headers['content-type'][1].split(';')[0] == "text/html":
-            response.content = SUB.sub(ur'<a\1href="/%s/\3"\4>' % request.LANGUAGE_CODE, response.content.decode('utf-8'))
-            response.content = SUB2.sub(ur'<form\1action="/%s/\3"\4>' % request.LANGUAGE_CODE, response.content.decode('utf-8'))
+            try:
+                decoded_response = response.content.decode('utf-8')
+            except UnicodeDecodeError:
+                decoded_response = response.content
+            response.content = SUB.sub(ur'<a\1href="/%s/\3"\4>' % request.LANGUAGE_CODE, decoded_response)
+            response.content = SUB2.sub(ur'<form\1action="/%s/\3"\4>' % request.LANGUAGE_CODE, decoded_response)
         if (response.status_code == 301 or response.status_code == 302 ):
             location = response._headers['location']
             prefix = has_lang_prefix(location[1])

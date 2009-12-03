@@ -5,7 +5,6 @@ from pluginmodel import *
 from titlemodels import *
 
 from django.core.exceptions import ImproperlyConfigured
-from cms.models import signals
 from cms import signals as s_import
 from cms import plugin_pool
 
