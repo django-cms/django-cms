@@ -35,7 +35,6 @@ class PageRegexURLResolver(RegexURLResolver):
         assigned.
         """
         tried = []
-        print path
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
@@ -54,8 +53,6 @@ class PageRegexURLResolver(RegexURLResolver):
                         else:
                             return self.page_id
                     tried.append(pattern.regex.pattern)
-            print tried
-            print new_path
             raise Resolver404, {'tried': tried, 'path': new_path}
 
 
@@ -104,7 +101,6 @@ class ApplicationRegexUrlResolver(PageRegexURLResolver):
         if settings.APPEND_SLASH:
             regex += r'/'  
         urlconf_name = title.application_urls
-        print regex
         # assign page_id to resolver, so he knows on which page he was assigned
         self.page_id = title.page_id
         super(ApplicationRegexUrlResolver, self).__init__(regex, urlconf_name, default_kwargs)
@@ -169,8 +165,6 @@ class DynamicURLConfModule(object):
                     else:
                         path = title.path
                     mixid = "%s:%s" % (path + "/", title.application_urls)
-                print path
-                print mixid
                 if mixid in included:
                     # don't add the same thing twice
                     continue  
@@ -178,7 +172,6 @@ class DynamicURLConfModule(object):
                     path += '/'  
                 urls.append(ApplicationRegexUrlResolver(path, title))
                 included.append(mixid)
-            print urls
             self._urlpatterns = urls
         return self._urlpatterns
         

@@ -141,6 +141,8 @@ CMS_LANGUAGE_CONF = {
     'en':['fr'],
 }
 
+APPEND_SLASH = True
+
 CMS_TEMPLATES = (
     ('index.html', gettext('default')),
     ('nice.html', gettext('nice one')),
@@ -184,6 +186,7 @@ CMS_SEO_FIELDS = True
 CMS_FLAT_URLS = False
 CMS_MENU_TITLE_OVERWRITE = True
 CMS_HIDE_UNTRANSLATED = False
+CMS_URL_OVERWRITE = True
 
 
 try:

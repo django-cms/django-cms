@@ -60,7 +60,7 @@ class PageAdmin(admin.ModelAdmin):
     top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
-    advanced_fields = ['reverse_id',  'overwrite_url', 'login_required', 'menu_login_required']
+    advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'menu_login_required']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
@@ -80,12 +80,15 @@ class PageAdmin(admin.ModelAdmin):
         additional_hidden_fields.extend(('moderator_state', 'moderator_message'))
     if settings.CMS_APPLICATIONS_URLS:
         advanced_fields.append('application_urls')
-    if settings.CMS_REDIRECTS:
-        advanced_fields.append('redirect')
     if settings.CMS_SEO_FIELDS:
         seo_fields = ('page_title', 'meta_description', 'meta_keywords')
     if settings.CMS_MENU_TITLE_OVERWRITE:
         general_fields[0] = ('title', 'menu_title')
+    if not settings.CMS_URL_OVERWRITE:
+        advanced_fields.remove("overwrite_url")
+    if not settings.CMS_REDIRECTS:
+        advanced_fields.remove('redirect')
+        
     
     # take care with changing fieldsets, get_fieldsets() method removes some
     # fields depending on permissions, but its very static!!
