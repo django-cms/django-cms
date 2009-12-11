@@ -70,7 +70,13 @@ def has_page_add_permission(request):
             return True
     return False
 
-
+def has_any_page_change_permissions(request):
+    from cms.admin.utils import current_site  
+    permissions = PagePermission.objects.filter(page__site=current_site(request)).filter(Q(user=request.user)|Q(group__in=request.user.groups.all()))
+    if permissions.count()>0:
+        return True
+    return False
+ 
 def has_page_change_permission(request):
     """Return true if the current user has permission to change any page. This is
     just used for building the tree - only superuser, or user with can_change in
@@ -80,11 +86,12 @@ def has_page_change_permission(request):
     opts = Page._meta
     if request.user.is_superuser or \
         (request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_change=True, sites__in=[current_site(request)]).count()>0):
+            (GlobalPagePermission.objects.with_user(request.user).filter(can_change=True, sites__in=[current_site(request)]).count()>0) or 
+            has_any_page_change_permissions(request)):
         return True
     return False
 
-    
+
 def get_user_permission_level(user):
     """Returns highest user level from the page/permission hierarchy on which
     user haves can_change_permission. Also takes look into user groups. Higher 

@@ -446,7 +446,6 @@ class PagePermissionsPermissionManager(models.Manager):
         # his group/s
         qs = PagePermission.objects.with_user(user)
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
-        
         # default is denny...
         page_id_allow_list = []
         for permission in qs:
