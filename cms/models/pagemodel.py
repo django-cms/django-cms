@@ -550,7 +550,7 @@ class Page(MpttPublisher):
             
             from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            setattr(self, att_name, has_generic_permission(self.id, request.user, type))
+            setattr(self, att_name, has_generic_permission(self.id, request.user, type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)

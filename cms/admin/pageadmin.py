@@ -44,7 +44,8 @@ from cms.utils.moderator import update_moderation_message, \
     get_test_moderation_level, moderator_should_approve, approve_page, \
     will_require_moderation
 from cms.utils.permissions import has_page_add_permission, \
-    get_user_permission_level, has_global_change_permissions_permission
+    get_user_permission_level, has_global_change_permissions_permission,\
+    has_page_change_permission
 
 
 
@@ -566,8 +567,11 @@ class PageAdmin(admin.ModelAdmin):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        if settings.CMS_PERMISSION and obj is not None:
-            return obj.has_change_permission(request)
+        if settings.CMS_PERMISSION:
+            if obj:
+                return obj.has_change_permission(request)
+            else:
+                return has_page_change_permission(request)
         return super(PageAdmin, self).has_change_permission(request, obj)
     
     def has_delete_permission(self, request, obj=None):
@@ -746,9 +750,9 @@ class PageAdmin(admin.ModelAdmin):
     def get_permissions(self, request, page_id):
         page = get_object_or_404(Page, id=page_id)
         
-        can_change_list = Page.permissions.get_change_id_list(request.user)
+        can_change_list = Page.permissions.get_change_id_list(request.user, page.site_id)
         
-        global_page_permissions = GlobalPagePermission.objects.all()
+        global_page_permissions = GlobalPagePermission.objects.filter(sites__in=[page.site_id])
         page_permissions = PagePermission.objects.for_page(page)
         permissions = list(global_page_permissions) + list(page_permissions)
         

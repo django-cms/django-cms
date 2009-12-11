@@ -314,7 +314,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # can he even access it over get?
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        
+        print response
         page_data = self.get_new_page_data(slave_page.pk)
         
         # request moderation
@@ -326,8 +326,10 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # add page
         self.login_user(self.user_slave)
+        print url
+        print page_data
         response = self.client.post(url, page_data)
-        
+        print response
         self.assertRedirects(response, URL_CMS_PAGE)
         
         # public model shouldn't be available yet, because of the moderation
