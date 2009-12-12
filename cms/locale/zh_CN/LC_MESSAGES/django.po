@@ -3,14 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-26 14:32+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2009-12-12 15:56+0800\n"
+"Last-Translator: 张昆 <zhangkun@web916.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,15 +17,15 @@ msgstr ""
 
 #: plugin_base.py:88
 msgid "Advanced options"
-msgstr ""
+msgstr "高级选项"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "标题"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "默认标题"
 
 #: admin/forms.py:27
 msgid "Slug"
@@ -38,7 +37,7 @@ msgstr ""
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "语言"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
@@ -50,7 +49,7 @@ msgstr ""
 
 #: admin/forms.py:81
 msgid "Menu Title"
-msgstr ""
+msgstr "菜单标题"
 
 #: admin/forms.py:82
 msgid "Overwrite what is displayed in the menu"
@@ -58,7 +57,7 @@ msgstr ""
 
 #: admin/forms.py:83
 msgid "Page Title"
-msgstr ""
+msgstr "页标题"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
@@ -66,7 +65,7 @@ msgstr ""
 
 #: admin/forms.py:85
 msgid "Application"
-msgstr ""
+msgstr "应用"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
@@ -74,7 +73,7 @@ msgstr ""
 
 #: admin/forms.py:88
 msgid "Overwrite URL"
-msgstr ""
+msgstr "URL重写"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
@@ -82,11 +81,11 @@ msgstr ""
 
 #: admin/forms.py:95
 msgid "Redirect"
-msgstr ""
+msgstr "转向"
 
 #: admin/forms.py:96
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "转到这个链接"
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
@@ -104,15 +103,15 @@ msgstr ""
 msgid "Invalid URL, use /my/url format."
 msgstr ""
 
-#: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
+#: admin/forms.py:126
+#: admin/forms.py:127
+#: migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "用户"
 
 #: admin/forms.py:159
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr ""
 
 #: admin/forms.py:162
@@ -121,22 +120,28 @@ msgstr ""
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "请首先选择用户或组。"
 
-#: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
+#: admin/forms.py:196
+#: admin/forms.py:203
+#: admin/forms.py:207
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "新建"
 
-#: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
+#: admin/forms.py:197
+#: admin/forms.py:204
+#: admin/forms.py:208
 msgid "Change"
-msgstr ""
+msgstr "修改"
 
-#: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
+#: admin/forms.py:198
+#: admin/forms.py:205
+#: admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
@@ -147,38 +152,35 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:263
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
+msgid "Send email notification to user about username or password change. Requires user email."
 msgstr ""
 
 #: admin/forms.py:283
 msgid "New password"
-msgstr ""
+msgstr "新的密码"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr ""
+msgstr "再输一次新密码"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:307
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:309
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
 msgstr ""
 
-#: admin/pageadmin.py:102 admin/pageadmin.py:118
+#: admin/pageadmin.py:102
+#: admin/pageadmin.py:118
 msgid "Hidden"
 msgstr ""
 
@@ -200,26 +202,34 @@ msgstr ""
 
 #: admin/pageadmin.py:494
 msgid "higher"
-msgstr ""
+msgstr "更高"
 
 #: admin/pageadmin.py:637
 msgid "Database error"
 msgstr ""
 
-#: admin/pageadmin.py:723 migrations/0001_initial.py:13
-#: migrations/0001_initial.py:26 migrations/0001_initial.py:40
-#: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
-#: models/pagemodel.py:69 models/permissionmodels.py:68
-#: models/pluginmodel.py:35 models/titlemodels.py:22
-#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22 plugins/teaser/models.py:13
+#: admin/pageadmin.py:723
+#: migrations/0001_initial.py:13
+#: migrations/0001_initial.py:26
+#: migrations/0001_initial.py:40
+#: migrations/0001_initial.py:78
+#: migrations/0003_remove_placeholder.py:21
+#: models/pagemodel.py:69
+#: models/permissionmodels.py:68
+#: models/pluginmodel.py:35
+#: models/titlemodels.py:22
+#: plugins/inherit/forms.py:9
+#: plugins/link/forms.py:9
+#: plugins/link/models.py:13
+#: plugins/link/migrations/0001_initial.py:19
+#: plugins/picture/models.py:22
+#: plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "页"
 
 #: admin/pageadmin.py:843
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "本页已获批准。"
 
 #: admin/pageadmin.py:897
 #, python-format
@@ -237,11 +247,11 @@ msgstr ""
 
 #: admin/pageadmin.py:937
 msgid "Are you sure?"
-msgstr ""
+msgstr "您确认码？"
 
 #: admin/pageadmin.py:1000
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "你没有权限发布此页"
 
 #: admin/pageadmin.py:1018
 msgid "You do not have permission to change this page's in_navigation status"
@@ -262,8 +272,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1142
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1200
@@ -272,12 +281,11 @@ msgstr ""
 
 #: admin/pageadmin.py:1222
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
-#: admin/permissionadmin.py:112 models/permissionmodels.py:74
+#: admin/permissionadmin.py:112
+#: models/permissionmodels.py:74
 msgid "Page permissions"
 msgstr ""
 
@@ -297,9 +305,10 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
-#: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:841
+#: admin/useradmin.py:30
+#: templates/cms/toolbar/toolbar.html:841
 msgid "Password"
-msgstr ""
+msgstr "密码"
 
 #: admin/widgets.py:56
 msgid "Add Another"
@@ -319,7 +328,7 @@ msgstr ""
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "覆盖"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
@@ -341,7 +350,8 @@ msgstr ""
 msgid "search this documentation"
 msgstr ""
 
-#: docs/templates/defindex.html:19 docs/templates/modindex.html:2
+#: docs/templates/defindex.html:19
+#: docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
 msgstr ""
@@ -358,15 +368,19 @@ msgstr ""
 msgid "all functions, classes, terms"
 msgstr ""
 
-#: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
-#: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
-#: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
+#: docs/templates/genindex-single.html:2
+#: docs/templates/genindex-split.html:2
+#: docs/templates/genindex-split.html:5
+#: docs/templates/genindex.html:2
+#: docs/templates/genindex.html.py:5
+#: docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
-msgstr ""
+msgstr "索引"
 
 #: docs/templates/genindex-single.html:44
-#: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
+#: docs/templates/genindex-split.html:14
+#: docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
 msgstr ""
@@ -381,11 +395,11 @@ msgstr ""
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
-msgstr ""
+msgstr "导航"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
-msgstr ""
+msgstr "目录"
 
 #: docs/templates/layout.html:48
 msgid "Previous topic"
@@ -397,7 +411,7 @@ msgstr ""
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr ""
+msgstr "下一主题"
 
 #: docs/templates/layout.html:55
 msgid "next chapter"
@@ -425,9 +439,10 @@ msgstr ""
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
-msgstr ""
+msgstr "关于这些文档"
 
-#: docs/templates/layout.html:134 docs/templates/search.html:2
+#: docs/templates/layout.html:134
+#: docs/templates/search.html:2
 #: docs/templates/search.html.py:5
 msgid "Search"
 msgstr ""
@@ -442,58 +457,76 @@ msgstr ""
 
 #: docs/templates/search.html:21
 msgid "search"
-msgstr ""
+msgstr "检索"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
-msgstr ""
+msgstr "检索结果"
 
 #: docs/templates/search.html:27
 msgid "Your search did not match any results."
 msgstr ""
 
-#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
-#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
-#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
-#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:39 models/titlemodels.py:11
+#: migrations/0001_initial.py:12
+#: migrations/0001_initial.py:24
+#: migrations/0001_initial.py:75
+#: migrations/0003_remove_placeholder.py:18
+#: migrations/0010_5char_language.py:12
+#: migrations/0010_5char_language.py:15
+#: migrations/0010_5char_language.py:22
+#: migrations/0010_5char_language.py:25
+#: models/pluginmodel.py:39
+#: models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr ""
+msgstr "语言"
 
-#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:37
+#: migrations/0001_initial.py:14
+#: migrations/0004_textobjects.py:12
+#: migrations/0004_textobjects.py:22
+#: models/pluginmodel.py:37
 msgid "position"
 msgstr ""
 
-#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:41 models/titlemodels.py:23
+#: migrations/0001_initial.py:15
+#: migrations/0001_initial.py:29
+#: models/pluginmodel.py:41
+#: models/titlemodels.py:23
 msgid "creation date"
 msgstr ""
 
-#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:38
+#: migrations/0001_initial.py:16
+#: migrations/0001_initial.py:77
+#: migrations/0003_remove_placeholder.py:20
+#: models/pluginmodel.py:38
 msgid "slot"
 msgstr ""
 
-#: migrations/0001_initial.py:18 models/pluginmodel.py:40
+#: migrations/0001_initial.py:18
+#: models/pluginmodel.py:40
 msgid "plugin_name"
 msgstr ""
 
-#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
-#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:26
-#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:11
+#: migrations/0001_initial.py:25
+#: migrations/0011_title_overwrites.py:12
+#: migrations/0011_title_overwrites.py:15
+#: models/titlemodels.py:12
+#: models/titlemodels.py:13
+#: models/titlemodels.py:21
+#: plugins/file/models.py:26
+#: plugins/file/migrations/0001_initial.py:18
+#: plugins/teaser/models.py:11
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr ""
+msgstr "标题"
 
 #: migrations/0001_initial.py:28
 msgid "path"
 msgstr ""
 
-#: migrations/0001_initial.py:30 models/titlemodels.py:14
+#: migrations/0001_initial.py:30
+#: models/titlemodels.py:14
 msgid "slug"
 msgstr ""
 
@@ -501,41 +534,49 @@ msgstr ""
 msgid "everybody"
 msgstr ""
 
-#: migrations/0001_initial.py:37 models/permissionmodels.py:20
+#: migrations/0001_initial.py:37
+#: models/permissionmodels.py:20
 msgid "can edit"
-msgstr ""
+msgstr "可以修改"
 
-#: migrations/0001_initial.py:38 models/permissionmodels.py:17
+#: migrations/0001_initial.py:38
+#: models/permissionmodels.py:17
 msgid "group"
-msgstr ""
+msgstr "组"
 
-#: migrations/0001_initial.py:39 models/permissionmodels.py:24
+#: migrations/0001_initial.py:39
+#: models/permissionmodels.py:24
 msgid "can publish"
-msgstr ""
+msgstr "可以发布"
 
 #: migrations/0001_initial.py:42
 msgid "type"
-msgstr ""
+msgstr "类型"
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
 msgstr ""
 
-#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
+#: migrations/0001_initial.py:50
+#: migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "状态"
 
-#: migrations/0001_initial.py:53 models/pagemodel.py:48
+#: migrations/0001_initial.py:53
+#: models/pagemodel.py:48
 msgid "navigation extenders"
 msgstr ""
 
-#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46 models/titlemodels.py:16
+#: migrations/0001_initial.py:54
+#: migrations/0006_apphook.py:12
+#: migrations/0006_apphook.py:46
+#: models/titlemodels.py:16
 msgid "has url overwrite"
 msgstr ""
 
-#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
+#: migrations/0001_initial.py:55
+#: migrations/0006_apphook.py:49
 msgid "url overwrite"
 msgstr ""
 
@@ -543,61 +584,74 @@ msgstr ""
 msgid "author"
 msgstr ""
 
-#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
+#: migrations/0001_initial.py:58
+#: migrations/0006_apphook.py:37
 msgid "reverse url id"
 msgstr ""
 
-#: migrations/0001_initial.py:59 models/pagemodel.py:61
+#: migrations/0001_initial.py:59
+#: models/pagemodel.py:61
 msgid "login required"
 msgstr ""
 
-#: migrations/0001_initial.py:60 models/pagemodel.py:46
+#: migrations/0001_initial.py:60
+#: models/pagemodel.py:46
 msgid "soft root"
 msgstr ""
 
-#: migrations/0001_initial.py:63 models/pagemodel.py:44
+#: migrations/0001_initial.py:63
+#: models/pagemodel.py:44
 msgid "publication end date"
 msgstr ""
 
-#: migrations/0001_initial.py:64 models/pagemodel.py:51
+#: migrations/0001_initial.py:64
+#: models/pagemodel.py:51
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr ""
+msgstr "模板"
 
-#: migrations/0001_initial.py:66 models/pagemodel.py:43
+#: migrations/0001_initial.py:66
+#: models/pagemodel.py:43
 msgid "publication date"
 msgstr ""
 
-#: migrations/0001_initial.py:67 models/pagemodel.py:45
+#: migrations/0001_initial.py:67
+#: models/pagemodel.py:45
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
 msgstr ""
 
-#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
+#: migrations/0006_apphook.py:15
+#: migrations/0007_apphook_longer.py:11
+#: migrations/0007_apphook_longer.py:17
+#: models/titlemodels.py:17
 msgid "application"
 msgstr ""
 
-#: migrations/0006_apphook.py:65 models/pagemodel.py:47
+#: migrations/0006_apphook.py:65
+#: models/pagemodel.py:47
 msgid "id"
 msgstr ""
 
-#: migrations/0008_redirects.py:11 models/titlemodels.py:18
+#: migrations/0008_redirects.py:11
+#: models/titlemodels.py:18
 msgid "redirect"
-msgstr ""
+msgstr "转向"
 
-#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
+#: migrations/0009_added_meta_fields.py:12
+#: models/titlemodels.py:20
 msgid "keywords"
-msgstr ""
+msgstr "关键字"
 
-#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
+#: migrations/0009_added_meta_fields.py:15
+#: models/titlemodels.py:19
 #: plugins/teaser/models.py:15
 msgid "description"
-msgstr ""
+msgstr "详细描述"
 
 #: models/moderatormodels.py:24
 msgid "Current page"
-msgstr ""
+msgstr "当前页"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
@@ -615,29 +669,34 @@ msgstr ""
 msgid "Page and descendants"
 msgstr ""
 
-#: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
+#: models/moderatormodels.py:44
+#: templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr ""
+msgstr "页"
 
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "用户"
 
-#: models/moderatormodels.py:49 templatetags/cms_admin.py:65
+#: models/moderatormodels.py:49
+#: templatetags/cms_admin.py:65
 msgid "Moderate page"
 msgstr ""
 
-#: models/moderatormodels.py:50 templatetags/cms_admin.py:66
+#: models/moderatormodels.py:50
+#: templatetags/cms_admin.py:66
 msgid "Moderate children"
 msgstr ""
 
-#: models/moderatormodels.py:51 templatetags/cms_admin.py:67
+#: models/moderatormodels.py:51
+#: templatetags/cms_admin.py:67
 msgid "Moderate descendants"
 msgstr ""
 
-#: models/moderatormodels.py:54 models/moderatormodels.py:55
+#: models/moderatormodels.py:54
+#: models/moderatormodels.py:55
 msgid "PageModerator"
 msgstr ""
 
@@ -645,7 +704,8 @@ msgstr ""
 msgid "created"
 msgstr ""
 
-#: models/moderatormodels.py:98 models/pagemodel.py:33
+#: models/moderatormodels.py:98
+#: models/pagemodel.py:33
 msgid "changed"
 msgstr ""
 
@@ -665,7 +725,8 @@ msgstr ""
 msgid "unpublish req."
 msgstr ""
 
-#: models/moderatormodels.py:103 models/pagemodel.py:36
+#: models/moderatormodels.py:103
+#: models/pagemodel.py:36
 msgid "approved"
 msgstr ""
 
@@ -681,11 +742,13 @@ msgstr ""
 msgid "req. app."
 msgstr ""
 
-#: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
+#: models/pagemodel.py:35
+#: templates/admin/cms/page/menu_item.html:44
 #: templates/cms/toolbar/toolbar.html:872
-#: templates/cms/toolbar/toolbar.html:899 utils/moderator.py:91
+#: templates/cms/toolbar/toolbar.html:899
+#: utils/moderator.py:91
 msgid "delete"
-msgstr ""
+msgstr "删除"
 
 #: models/pagemodel.py:37
 msgid "app. par."
@@ -695,14 +758,13 @@ msgstr ""
 msgid "created by"
 msgstr ""
 
-#: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
+#: models/pagemodel.py:40
+#: templates/admin/cms/page/change_list_tree.html:16
 msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:43
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:44
@@ -714,9 +776,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:47
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:49
@@ -733,7 +793,7 @@ msgstr ""
 
 #: models/pagemodel.py:52
 msgid "site"
-msgstr ""
+msgstr "站点"
 
 #: models/pagemodel.py:54
 msgid "moderator state"
@@ -781,7 +841,7 @@ msgstr ""
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "可以移动"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
@@ -801,7 +861,7 @@ msgstr ""
 
 #: models/permissionmodels.py:52
 msgid "sites"
-msgstr ""
+msgstr "站点"
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
@@ -811,7 +871,8 @@ msgstr ""
 msgid "Pages global permissions"
 msgstr ""
 
-#: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
+#: models/permissionmodels.py:67
+#: templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
 msgstr ""
 
@@ -849,30 +910,35 @@ msgstr ""
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
-msgstr ""
+msgstr "文件"
 
-#: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:25
+#: plugins/file/migrations/0001_initial.py:17
+#: plugins/flash/models.py:9
+#: plugins/flash/migrations/0001_initial.py:18
 msgid "file"
-msgstr ""
+msgstr "文件"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
 msgstr ""
 
-#: plugins/flash/models.py:9 plugins/video/models.py:36
+#: plugins/flash/models.py:9
+#: plugins/video/models.py:36
 msgid "use swf file"
 msgstr ""
 
-#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
+#: plugins/flash/models.py:10
+#: plugins/flash/migrations/0001_initial.py:16
 #: plugins/video/models.py:39
 msgid "width"
-msgstr ""
+msgstr "宽"
 
-#: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
+#: plugins/flash/models.py:11
+#: plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:40
 msgid "height"
-msgstr ""
+msgstr "高"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
 #: plugins/video/templates/cms/plugins/video.html:3
@@ -889,27 +955,27 @@ msgstr ""
 
 #: plugins/googlemap/models.py:11
 msgid "address"
-msgstr ""
+msgstr "地址"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr ""
+msgstr "邮编"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr ""
+msgstr "城市"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr ""
+msgstr "附加内容"
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
-msgstr ""
+msgstr "缩放级别"
 
 #: plugins/googlemap/models.py:18
 msgid "latitude"
-msgstr ""
+msgstr "纬度"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
@@ -917,7 +983,7 @@ msgstr ""
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
-msgstr ""
+msgstr "经度"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
@@ -933,11 +999,11 @@ msgstr ""
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
-msgstr ""
+msgstr "地图"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:74
 msgid "Your address"
-msgstr ""
+msgstr "你的地址"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:77
 msgid "Calculate route"
@@ -952,9 +1018,7 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -963,17 +1027,21 @@ msgstr ""
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
-msgstr ""
+msgstr "链接"
 
-#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
+#: plugins/link/models.py:11
+#: plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
-#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
+#: plugins/snippet/models.py:12
+#: plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
 msgstr ""
 
-#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
-#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
+#: plugins/link/models.py:12
+#: plugins/link/migrations/0001_initial.py:16
+#: plugins/picture/models.py:21
+#: plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:14
 msgid "link"
 msgstr ""
@@ -984,7 +1052,7 @@ msgstr ""
 
 #: plugins/link/models.py:14
 msgid "mailto"
-msgstr ""
+msgstr "电子邮件地址"
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
@@ -996,22 +1064,26 @@ msgstr ""
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr ""
+msgstr "左"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr ""
+msgstr "右"
 
-#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:12 plugins/video/models.py:37
+#: plugins/picture/models.py:20
+#: plugins/picture/migrations/0001_initial.py:17
+#: plugins/teaser/models.py:12
+#: plugins/video/models.py:37
 msgid "image"
-msgstr ""
+msgstr "图像"
 
-#: plugins/picture/models.py:21 plugins/picture/models.py:22
+#: plugins/picture/models.py:21
+#: plugins/picture/models.py:22
 msgid "if present image will be clickable"
 msgstr ""
 
-#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
+#: plugins/picture/models.py:23
+#: plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
 msgstr ""
 
@@ -1031,7 +1103,8 @@ msgstr ""
 msgid "side"
 msgstr ""
 
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
+#: plugins/snippet/cms_plugins.py:12
+#: plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
 msgstr ""
@@ -1041,13 +1114,13 @@ msgstr ""
 msgid "Template %(template)s does not exist."
 msgstr ""
 
-#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
+#: plugins/snippet/models.py:13
+#: plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1068,13 +1141,14 @@ msgstr ""
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
-msgstr ""
+msgstr "更多"
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr ""
+msgstr "文本"
 
-#: plugins/text/models.py:12 plugins/text/migrations/0001_initial.py:16
+#: plugins/text/models.py:12
+#: plugins/text/migrations/0001_initial.py:16
 msgid "body"
 msgstr ""
 
@@ -1286,8 +1360,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1380,9 +1453,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:144
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:146
@@ -1666,16 +1737,16 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:839
 msgid "Username"
-msgstr ""
+msgstr "用户名"
 
 #: templates/cms/toolbar/toolbar.html:843
 #: templates/cms/toolbar/toolbar.html:844
 msgid "login"
-msgstr ""
+msgstr "登录"
 
 #: templates/cms/toolbar/toolbar.html:855
 msgid "Template"
-msgstr ""
+msgstr "模板"
 
 #: templates/cms/toolbar/toolbar.html:865
 msgid "Site Administration"
@@ -1683,7 +1754,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "move"
-msgstr ""
+msgstr "移动"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "Move/add Pages"
@@ -1695,7 +1766,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "history"
-msgstr ""
+msgstr "历史"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "View History"
@@ -1703,7 +1774,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:872
 msgid "Delete Page"
-msgstr ""
+msgstr "删除页"
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Lock"
@@ -1719,19 +1790,19 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:890
 msgid "up"
-msgstr ""
+msgstr "上"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "down"
-msgstr ""
+msgstr "下"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #: templates/cms/toolbar/toolbar.html:899
 msgid "Delete Plugin"
-msgstr ""
+msgstr "删除插件"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
@@ -1745,7 +1816,8 @@ msgstr ""
 msgid "Unbind descendants moderation"
 msgstr ""
 
-#: templatetags/cms_tags.py:397 templatetags/cms_tags.py:612
+#: templatetags/cms_tags.py:397
+#: templatetags/cms_tags.py:612
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr ""
@@ -1753,16 +1825,14 @@ msgstr ""
 #: templatetags/cms_tags.py:398
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:613
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1772,7 +1842,7 @@ msgstr ""
 
 #: utils/moderator.py:91
 msgid "approve"
-msgstr ""
+msgstr "批准"
 
 #: utils/moderator.py:243
 #, python-format
@@ -1786,3 +1856,4 @@ msgstr ""
 #: utils/permissions.py:195
 msgid "CMS - your user account was changed."
 msgstr ""
+
