@@ -21,7 +21,7 @@ class PagesTestCase(CMSTestCase):
         Test that the add admin page could be displayed via the admin
         """
         response = self.client.get(URL_CMS_PAGE_ADD)
-        assert(response.status_code == 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_02_create_page(self):
         """
@@ -32,12 +32,12 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         title = Title.objects.get(slug=page_data['slug'])
-        assert(title is not None)
+        self.assertEqual(title is not None, True)
         page = title.page
         page.published = True
         page.save()
-        assert(page.get_title() == page_data['title'])
-        assert(page.get_slug() == page_data['slug'])
+        self.assertEqual(page.get_title(), page_data['title'])
+        self.assertEqual(page.get_slug(), page_data['slug'])
         
         # were public instanes created?
         title = Title.objects.drafts().get(slug=page_data['slug'])
@@ -60,10 +60,10 @@ class PagesTestCase(CMSTestCase):
         if settings.i18n_installed:
             self.assertEqual(response.status_code, 302)
             # did we got right redirect?
-            assert(response['Location'].endswith(URL_CMS_PAGE))
+            self.assertEqual(response['Location'].endswith(URL_CMS_PAGE), True)
         else:
             self.assertEqual(response.status_code, 200)
-            assert(response['Location'].endswith(URL_CMS_PAGE_ADD))
+            self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
         # TODO: check for slug collisions after move
         # TODO: check for slug collisions with different settings         
   
@@ -107,7 +107,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post('/admin/cms/page/1/', page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         page = Page.objects.get(id=1)
-        assert(page.get_title() == 'changed title')
+        self.assertEqual(page.get_title(), 'changed title')
     
     def test_06_meta_description_and_keywords_fields_from_admin(self):
         """
@@ -123,8 +123,8 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post('/admin/cms/page/1/', page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         page = Page.objects.get(id=1)
-        assert(page.get_meta_description() == 'I am a duck')
-        assert(page.get_meta_keywords() == 'page,cms,stuff')
+        self.assertEqual(page.get_meta_description(), 'I am a duck')
+        self.assertEqual(page.get_meta_keywords(), 'page,cms,stuff')
 
     def test_07_meta_description_and_keywords_from_template_tags(self):
         from django import template
