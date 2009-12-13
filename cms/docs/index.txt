@@ -20,7 +20,9 @@ Contents:
 	plugins
 	custom_plugins
 	i18n
+	sitemap
 	contribution
+	
 	
 
 Indices and tables
