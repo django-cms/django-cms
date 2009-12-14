@@ -10,10 +10,11 @@
 		autoload: {{ object.auto_load|bool }},
 		loop: {{ object.loop|bool }},
 		fullscreen: {{ object.fullscreen|bool }},
-		fgcolor: "{{ object.fgcolor }}",
+		fgcolor: "0x{{ object.fgcolor }}",
+		bgcolor: "0x{{ object.bgcolor }}",
 		mute: "{{ object.mute }}",
 		muteonly: "{{ object.mute_only }}",
-		controller_style: "{{ object.controller_style }}"
+		controllerstyle: "{{ object.controller_style }}"
 	};
 	
 	{% if object.image %}
@@ -27,11 +28,11 @@
 	var params = {
 		allowscriptaccess: "always",
 		allowfullscreen: {{ object.fullscreen|bool }},
-		bgcolor: "#{{ object.bgcolor }}",
+		bgcolor: "#000000",
 		wmode: "{{ object.wmode }}",
 		menu: {{ object.flash_menu|bool }}
 	};
 		
 	var attributes = {};
-	swfobject.embedSWF("{{ MEDIA_URL }}cms/swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.0", "expressInstall.swf", flashvars, params, attributes);
+	swfobject.embedSWF("{{ MEDIA_URL }}cms/swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.0", "{{ MEDIA_URL }}cms/swf/expressInstall.swf", flashvars, params, attributes);
 //]]></script>
