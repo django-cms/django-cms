@@ -48,16 +48,16 @@ class CMSPluginBase(admin.ModelAdmin):
     __metaclass__ = PluginMediaDefiningClass # just define a PluginMedia class to add media
     
     name = ""
-    form = None
     
+    form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
     admin_preview = True #Should the plugin be rendered in the admin?
     
     render_template = None
     model = CMSPlugin
-    opts = {}
-    placeholders = None # a tupple with placeholder names this plugin can be placed. All if empty
     text_enabled = False
+    
+    opts = {}
     
     def __init__(self, model=None,  admin_site=None):
         if self.model:
