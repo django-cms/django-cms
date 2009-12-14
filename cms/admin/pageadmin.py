@@ -3,7 +3,6 @@ from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
-from cms.utils.plugins import get_placeholders
 from cms.admin.views import save_all_plugins, revert_plugins
 from cms.admin.widgets import PluginEditor
 from cms.exceptions import NoPermissionsException
@@ -19,7 +18,9 @@ from cms.utils.moderator import update_moderation_message, \
     get_test_moderation_level, moderator_should_approve, approve_page, \
     will_require_moderation
 from cms.utils.permissions import has_page_add_permission, \
-    get_user_permission_level, has_global_change_permissions_permission
+    has_page_change_permission, get_user_permission_level, \
+    has_global_change_permissions_permission
+from cms.utils.plugins import get_placeholders
 from copy import deepcopy
 from django import template
 from django.conf import settings
@@ -29,6 +30,7 @@ from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404, \
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
@@ -38,7 +40,6 @@ from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.db import transaction
 import os
 
 
@@ -65,7 +66,7 @@ class PageAdmin(model_admin):
     top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
-    advanced_fields = ['reverse_id',  'overwrite_url', 'login_required', 'menu_login_required']
+    advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'menu_login_required']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
@@ -85,12 +86,15 @@ class PageAdmin(model_admin):
         additional_hidden_fields.extend(('moderator_state', 'moderator_message'))
     if settings.CMS_APPLICATIONS_URLS:
         advanced_fields.append('application_urls')
-    if settings.CMS_REDIRECTS:
-        advanced_fields.append('redirect')
     if settings.CMS_SEO_FIELDS:
         seo_fields = ('page_title', 'meta_description', 'meta_keywords')
     if settings.CMS_MENU_TITLE_OVERWRITE:
         general_fields[0] = ('title', 'menu_title')
+    if not settings.CMS_URL_OVERWRITE:
+        advanced_fields.remove("overwrite_url")
+    if not settings.CMS_REDIRECTS:
+        advanced_fields.remove('redirect')
+        
     
     # take care with changing fieldsets, get_fieldsets() method removes some
     # fields depending on permissions, but its very static!!
@@ -583,8 +587,11 @@ class PageAdmin(model_admin):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        if settings.CMS_PERMISSION and obj is not None:
-            return obj.has_change_permission(request)
+        if settings.CMS_PERMISSION:
+            if obj:
+                return obj.has_change_permission(request)
+            else:
+                return has_page_change_permission(request)
         return super(PageAdmin, self).has_change_permission(request, obj)
     
     def has_delete_permission(self, request, obj=None):
@@ -758,9 +765,9 @@ class PageAdmin(model_admin):
     def get_permissions(self, request, page_id):
         page = get_object_or_404(Page, id=page_id)
         
-        can_change_list = Page.permissions.get_change_id_list(request.user)
+        can_change_list = Page.permissions.get_change_id_list(request.user, page.site_id)
         
-        global_page_permissions = GlobalPagePermission.objects.all()
+        global_page_permissions = GlobalPagePermission.objects.filter(sites__in=[page.site_id])
         page_permissions = PagePermission.objects.for_page(page)
         permissions = list(global_page_permissions) + list(page_permissions)
         

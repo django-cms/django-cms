@@ -71,15 +71,15 @@ Will be rendered with the context returned by the render function
 
 The render function takes 3 arguments:
 
-**context**:
+***context***:
 
 The context of the template placeholder was placed.
 
-**instance**:
+***instance***:
 
 The instance of the GalleryPlugin model
 
-**placeholder**:
+***placeholder***:
 
 The name of the placeholder this plugin appears.
 It is normally a good idea to give the placeholder to the template so you can style

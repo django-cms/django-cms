@@ -1,0 +1,13 @@
+==== 2.0.0 (2009-11-12) ====
+
+==== 2.0.1 (2009-12-13) ====
+
+- mostly bugfixes (18 tickets closed)
+- docs updated
+- permissions now working in multisite environment
+- home is now graphically designated in tree-view
+
+==== 2.0.2 (2009-12-14) ====
+
+- testsuite working again
+- changelog file added

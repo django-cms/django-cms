@@ -268,9 +268,9 @@ def show_sub_menu(context, levels=100, template="cms/sub_menu.html"):
         for p in all_pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == p.pk:
-                    if not hasattr(page, "title_cache"):
-                        page.title_cache = {}
-                    page.title_cache[title.language] = title
+                    if not hasattr(p, "title_cache"):
+                        p.title_cache = {}
+                    p.title_cache[title.language] = title
         from_level = page.level
         to_level = page.level+levels
         extra_active = extra_inactive = levels

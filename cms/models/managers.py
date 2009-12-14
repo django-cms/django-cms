@@ -337,64 +337,64 @@ class PagePermissionsPermissionManager(models.Manager):
     # enabled/configured in settings
     GRANT_ALL = 'All'
     
-    def get_publish_id_list(self, user):
+    def get_publish_id_list(self, user, site):
         """
         Give a list of page where the user has publish rights or the string "All" if
         the user has all rights.
         """
-        return self.__get_id_list(user, "can_publish")
+        return self.__get_id_list(user, site, "can_publish")
     
     
-    def get_change_id_list(self, user):
+    def get_change_id_list(self, user, site):
         """
         Give a list of page where the user has edit rights or the string "All" if
         the user has all rights.
         """
-        return self.__get_id_list(user, "can_change")
+        return self.__get_id_list(user, site, "can_change")
     
     
-    def get_add_id_list(self, user):
+    def get_add_id_list(self, user, site):
         """
         Give a list of page where the user has add page rights or the string 
         "All" if the user has all rights.
         """
-        return self.__get_id_list(user, "can_add")
+        return self.__get_id_list(user, site, "can_add")
     
-    def get_delete_id_list(self, user):
+    def get_delete_id_list(self, user, site):
         """
         Give a list of page where the user has delete rights or the string "All" if
         the user has all rights.
         """
-        return self.__get_id_list(user, "can_delete")
+        return self.__get_id_list(user, site, "can_delete")
     
-    def get_advanced_settings_id_list(self, user):
+    def get_advanced_settings_id_list(self, user, site):
         """
         Give a list of page where the user can change advanced settings or the 
         string "All" if the user has all rights.
         """
-        return self.__get_id_list(user, "can_change_advanced_settings")
+        return self.__get_id_list(user, site, "can_change_advanced_settings")
     
-    def get_change_permissions_id_list(self, user):
+    def get_change_permissions_id_list(self, user, site):
         """Give a list of page where the user can change permissions.
         """
-        return self.__get_id_list(user, "can_change_permissions")
+        return self.__get_id_list(user, site, "can_change_permissions")
     
-    def get_move_page_id_list(self, user):
+    def get_move_page_id_list(self, user, site):
         """Give a list of pages which user can move.
         """
-        return self.__get_id_list(user, "can_move_page")
+        return self.__get_id_list(user, site, "can_move_page")
     
     
-    def get_moderate_id_list(self, user):
+    def get_moderate_id_list(self, user, site):
         """Give a list of pages which user can moderate. If moderation isn't 
         installed, nobody can moderate. 
         """        
         if not settings.CMS_MODERATOR:
             return []
-        return self.__get_id_list(user, "can_moderate")
+        return self.__get_id_list(user, site, "can_moderate")
     
-    
-    def get_change_list_id_list(self, user):
+    '''
+    def get_change_list_id_list(self, user, site):
         """This is used just in admin now. Gives all ids where user haves can_edit
         and can_add merged together.
         
@@ -413,9 +413,9 @@ class PagePermissionsPermissionManager(models.Manager):
             else:
                 page_id_list = list(set(can_change).union(set(can_add)))
         return page_id_list
-        
+    '''    
     
-    def __get_id_list(self, user, attr):
+    def __get_id_list(self, user, site, attr):
         # TODO: result of this method should be cached per user, and cache should
         # be cleaned after some change in permissions / globalpermission
         
@@ -428,24 +428,24 @@ class PagePermissionsPermissionManager(models.Manager):
             return PagePermissionsPermissionManager.GRANT_ALL
         
         # read from cache if posssible
-        cached = get_permission_cache(user, attr)
-        if cached is not None:
-            return cached
+        #cached = get_permission_cache(user, attr)
+        #if cached is not None:
+        #    print "retunr cache"
+        #    print cached
+        #    return cached
         
         from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
             MASK_CHILDREN, MASK_DESCENDANTS
         # check global permissions
-        in_global_permissions = GlobalPagePermission.objects.with_user(user).filter(**{attr: True})
+        in_global_permissions = GlobalPagePermission.objects.with_user(user).filter(**{attr: True, 'sites__in':[site]}).count()
         if in_global_permissions:
             # user or his group are allowed to do `attr` action
             # !IMPORTANT: page permissions must not override global permissions 
             return PagePermissionsPermissionManager.GRANT_ALL
-        
         # for standard users without global permissions, get all pages for him or
         # his group/s
         qs = PagePermission.objects.with_user(user)
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
-        
         # default is denny...
         page_id_allow_list = []
         for permission in qs:
@@ -459,7 +459,7 @@ class PagePermissionsPermissionManager(models.Manager):
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
         # store value in cache
-        set_permission_cache(user, attr, page_id_allow_list)
+        #set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list
 
 

@@ -540,12 +540,12 @@ class Page(MpttPublisher):
         att_name = "permission_%s_cache" % type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
             or request.user.pk != self.permission_user_cache.pk:
-            
             from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            setattr(self, att_name, has_generic_permission(self.id, request.user, type))
+            setattr(self, att_name, has_generic_permission(self.id, request.user, type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
+                
         return getattr(self, att_name)
     
     def is_home(self):

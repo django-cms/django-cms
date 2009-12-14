@@ -4,9 +4,10 @@ from cms.utils.moderator import page_moderator_state, I_APPROVE
 from cms.utils import get_language_from_request
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from cms.utils.permissions import has_add_page_on_same_level_permission,\
-    has_page_add_permission
+from cms.utils.permissions import has_page_add_permission, has_generic_permission
 from django.http import HttpResponse, Http404
+from cms.models.permissionmodels import GlobalPagePermission
+from cms.models.pagemodel import Page
 
 
 def get_admin_menu_item_context(request, page, filtered=False):
@@ -36,7 +37,15 @@ def get_admin_menu_item_context(request, page, filtered=False):
                 isinstance(e[1], bool) and str(e[1]) or e[1].lower() ), md)) + "}"
         
     moderator_state = page_moderator_state(request, page)
-    has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
+    has_add_on_same_level_permission = False
+    opts = Page._meta
+    if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
+            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id])):
+            has_add_on_same_level_permission = True
+        
+    if not has_add_on_same_level_permission and page.parent_id:
+        has_add_on_same_level_permission = has_generic_permission(page.parent_id, request.user, "add", page.site)
+    #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
 
     context = {
         'page': page,

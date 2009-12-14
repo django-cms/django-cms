@@ -28,7 +28,7 @@ class CMSTestCase(TestCase):
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
-        assert logged_in
+        self.assertEqual(logged_in, True)
     
     
     def get_new_page_data(self, parent_id=''):
@@ -135,7 +135,7 @@ class CMSTestCase(TestCase):
             'target': target_page.pk,
         }
         response = self.client.post(URL_CMS_PAGE + "%d/move-page/" % page.pk, data)
-        assert(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)        
         return self.reload_page(page)
         
         

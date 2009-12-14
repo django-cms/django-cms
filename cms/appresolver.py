@@ -101,7 +101,6 @@ class ApplicationRegexUrlResolver(PageRegexURLResolver):
         if settings.APPEND_SLASH:
             regex += r'/'  
         urlconf_name = title.application_urls
-        
         # assign page_id to resolver, so he knows on which page he was assigned
         self.page_id = title.page_id
         super(ApplicationRegexUrlResolver, self).__init__(regex, urlconf_name, default_kwargs)
@@ -169,6 +168,8 @@ class DynamicURLConfModule(object):
                 if mixid in included:
                     # don't add the same thing twice
                     continue  
+                if not settings.APPEND_SLASH:
+                    path += '/'  
                 urls.append(ApplicationRegexUrlResolver(path, title))
                 included.append(mixid)
             self._urlpatterns = urls
