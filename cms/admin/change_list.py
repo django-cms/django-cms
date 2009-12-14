@@ -18,7 +18,7 @@ class CMSChangeList(ChangeList):
     
     def __init__(self, request, *args, **kwargs):
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
-        from cms.admin.utils import current_site
+        from cms.utils.plugins import current_site
         self._current_site = current_site(request)
         try:
             self.query_set = self.get_query_set(request)
