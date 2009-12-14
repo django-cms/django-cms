@@ -47,7 +47,7 @@ class CMSChangeList(ChangeList):
         return qs
     
     def is_filtered(self):
-        from cms.admin.utils import SITE_VAR
+        from cms.utils.plugins import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR):
             if i in lookup_params:
