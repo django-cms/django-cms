@@ -426,13 +426,13 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # publish page (parent of subage), so subpage must be published also
         page = self.publish_page(page, True)
-        self.assertEqual(page.publisher_public, True)
+        self.assertEqual(page.publisher_public != None, True)
         
         # reload subpage, it was probably changed
         subpage = self.reload_page(subpage)
         
         # parent was published, so subpage must be also published..
-        self.assertEqual(subpage.publisher_public, True) 
+        self.assertEqual(subpage.publisher_public != None, True) 
         
         #check attributes
         self.check_published_page_attributes(page)
@@ -604,7 +604,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(ph.parent, pe)
         
         # not published yet, cant exist
-        self.assertEqual(pg.publisher_public, True)
+        self.assertEqual(pg.publisher_public != None, True)
         
         # check urls
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
