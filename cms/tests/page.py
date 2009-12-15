@@ -117,10 +117,11 @@ class PagesTestCase(CMSTestCase):
         page_data["meta_description"] = "I am a page"
         page_data["meta_keywords"] = "page,cms,stuff"
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        response = self.client.get('/admin/cms/page/1/')
+        page =  Page.objects.get(title_set__slug=page_data['slug'])
+        response = self.client.get('/admin/cms/page/%s/' %page.id)
         self.assertEqual(response.status_code, 200)
         page_data['meta_description'] = 'I am a duck'
-        response = self.client.post('/admin/cms/page/1/', page_data)
+        response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         page = Page.objects.get(title_set__slug=page_data["slug"])
         self.assertEqual(page.get_meta_description(), 'I am a duck')
@@ -133,10 +134,10 @@ class PagesTestCase(CMSTestCase):
         page_data["meta_description"] = "I am a page"
         page_data["meta_keywords"] = "page,cms,stuff"
         self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.client.post('/admin/cms/page/1/', page_data)
+        page =  Page.objects.get(title_set__slug=page_data['slug'])
+        self.client.post('/admin/cms/page/%s/' %page.id, page_data)
         t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
         req = HttpRequest()
-        page = Page.objects.get(title_set__slug=page_data["slug"])
         page.published = True
         page.save()
         req.current_page = page 
