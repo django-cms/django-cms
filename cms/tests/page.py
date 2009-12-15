@@ -101,12 +101,12 @@ class PagesTestCase(CMSTestCase):
         """
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        response = self.client.get('/admin/cms/page/1/')
+        page =  Page.objects.get(title_set__slug=page_data['slug'])
+        response = self.client.get('/admin/cms/page/%s/' %page.id)
         self.assertEqual(response.status_code, 200)
         page_data['title'] = 'changed title'
-        response = self.client.post('/admin/cms/page/1/', page_data)
+        response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
-        page = Page.objects.get(id=1)
         self.assertEqual(page.get_title(), 'changed title')
     
     def test_06_meta_description_and_keywords_fields_from_admin(self):
