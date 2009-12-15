@@ -2,6 +2,7 @@ import copy
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.core.exceptions import ObjectDoesNotExist
+from django.template.defaultfilters import slugify
 from cms.models import Title, Page
 
 URL_CMS_PAGE = "/admin/cms/page/"
@@ -84,7 +85,8 @@ class CMSTestCase(TestCase):
         })
         
         if title is not None:
-            page_data['title'] = page_data['slug'] = title
+            page_data['title'] = title
+            page_data['slug'] = slugify(title)
         
         # add page
         if parent_page:
