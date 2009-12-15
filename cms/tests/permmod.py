@@ -132,7 +132,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(user)
         url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
         response = self.client.post(url, post_data)
-        self.assertEqual(response.content, "1")
+        self.assertEqual(slave_page.cmsplugin_set.count(), 1)
+        plugin_id = slave_page.cmsplugin_set.all()[0].id
+        self.assertEqual(response.content, str(plugin_id))
     
     def publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
