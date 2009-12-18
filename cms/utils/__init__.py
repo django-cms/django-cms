@@ -210,7 +210,7 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
                 page.descendant = True
             if len(target.childrens):
                 target.childrens[-1].last = False
-            page.ancestors_ascending = list(target.ancestors_ascending) + [target]
+            page.ancestors_ascending = [target] + list(target.ancestors_ascending)
             page.home_pk_cache = target.home_pk_cache
             page.last = True
             target.childrens.append(page)    
