@@ -6,10 +6,8 @@ from titlemodels import *
 
 from django.core.exceptions import ImproperlyConfigured
 from cms import signals as s_import
-from cms import plugin_pool
 
 from django.conf import settings as d_settings
-plugin_pool.plugin_pool.discover_plugins()
 
 def validate_settings():
     if not "django.core.context_processors.request" in d_settings.TEMPLATE_CONTEXT_PROCESSORS:
