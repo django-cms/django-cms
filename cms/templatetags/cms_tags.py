@@ -353,6 +353,10 @@ def show_breadcrumb(context, start_level=0, template="cms/breadcrumb.html"):
                     ancestors = ancestors + selected.ancestors_ascending[1:] + [selected]
         if not ancestors and page:
             ancestors = ancestors_from_page(page, page_queryset, title_queryset, lang)
+    if len(ancestors) > start_level:
+        ancestors = ancestors[start_level:]
+    else:
+        ancestors = []
     context.update({'ancestors':ancestors,
                     'template': template})
     return context
