@@ -12,7 +12,7 @@ from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models import signals as cms_signals
+
 from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
@@ -75,12 +75,11 @@ class Page(MpttPublisher):
         exclude_fields_append = ['moderator_state']
     
     def __unicode__(self):
-        slug = self.get_slug(fallback=True)
-        if slug is None:
-            return u'' # otherwise we get unicode decode errors
-        else:
-            return slug
-        
+        title = self.get_menu_title(fallback=True)
+        if title is None:
+            title = u""
+        pre_title = settings.CMS_TITLE_CHARACTER * self.level
+        return u'%s%s' % (pre_title, title)
     
     def move_page(self, target, position='first-child'):
         """Called from admin interface when page is moved. Should be used on
@@ -92,6 +91,7 @@ class Page(MpttPublisher):
         # fire signal
         from cms.models.moderatormodels import PageModeratorState
         self.force_moderation_action = PageModeratorState.ACTION_MOVE
+        import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self) #titles get saved before moderation
         self.save(change_state=True) # always save the page after move, because of publisher
         
@@ -263,17 +263,10 @@ class Page(MpttPublisher):
             if force_state is not None:
                 self.moderator_state = force_state
             
-        
+        # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
         
-        # Drafts should not, unless they have been set to the future
-        if self.published:
-            if settings.CMS_SHOW_START_DATE:
-                if self.publication_date and self.publication_date <= datetime.now():
-                    self.publication_date = None
-            else:
-                self.publication_date = None
         if self.reverse_id == "":
             self.reverse_id = None
         
@@ -547,12 +540,12 @@ class Page(MpttPublisher):
         att_name = "permission_%s_cache" % type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
             or request.user.pk != self.permission_user_cache.pk:
-            
             from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            setattr(self, att_name, has_generic_permission(self.id, request.user, type))
+            setattr(self, att_name, has_generic_permission(self.id, request.user, type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
+                
         return getattr(self, att_name)
     
     def is_home(self):
@@ -664,6 +657,7 @@ class Page(MpttPublisher):
             page.publish()
         
         # fire signal after publishing is done
+        import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
         return published
     

@@ -5,7 +5,7 @@ Translators
 -----------
 
 For translators we have a `transifex account <http://www.transifex.net/projects/p/django-cms/>`_ 
-where you can translate the .po files and don't need install git or mercurial to be able to contribute.
+where you can translate the .po files and don't need to install git or mercurial to be able to contribute.
 All changes there will be automatically sent to the project.
 
 Developers
@@ -81,9 +81,9 @@ or::
 
 Now your repository is up-to-date again.
 
-It is also good practice to use a branch for every bug / feature you commit if you have more than one.
-So we can merge the whole branch and don't have to cherry-pick the single commits that make up the fix / feature.
-Also it allows us to give you instructions as if something is missing (tests, docs) and you don't have to interfere 
+It is also good practice to use a branch for every bug / feature you commit if you have more than one or you need more then one commit.
+This helps that we can merge the whole branch and don't have to cherry-pick the single commits that make up the fix / feature.
+Also it allows us to give you instructions if something is missing (tests, docs) and you don't have to interfere 
 with other things you might be working on. 
 
 If you have questions you may wish to read some tutorials about git or Mercurial

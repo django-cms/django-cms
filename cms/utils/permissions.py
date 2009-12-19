@@ -7,6 +7,8 @@ from cms.exceptions import NoPermissionsException
 from django.contrib.sites.models import Site
 
 
+
+
 try:
     from threading import local
 except ImportError:
@@ -39,9 +41,7 @@ def has_page_add_permission(request):
     add page under target page will occur. 
     """        
     opts = Page._meta
-    if request.user.is_superuser or \
-        (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True)):
+    if request.user.is_superuser:
         return True
     
     # if add under page
@@ -53,13 +53,45 @@ def has_page_add_permission(request):
             page = Page.objects.get(pk=target)
         except:
             return False
+        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
+            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id])):
+            return True
         if position in ("first-child", "last-child"):
             return page.has_add_permission(request)
         elif position in ("left", "right"):
-            return has_add_page_on_same_level_permission(request, page)
+            if page.parent_id:
+                return has_generic_permission(page.parent_id, request.user, "add", page.site)
+                #return page.parent.has_add_permission(request)
+    else:
+        from cms.utils.plugins import current_site
+        site = current_site(request)
+        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
+            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[site])):
+            return True
     return False
 
-    
+def has_any_page_change_permissions(request):
+    from cms.utils.plugins import current_site  
+    permissions = PagePermission.objects.filter(page__site=current_site(request)).filter(Q(user=request.user)|Q(group__in=request.user.groups.all()))
+    if permissions.count()>0:
+        return True
+    return False
+ 
+def has_page_change_permission(request):
+    """Return true if the current user has permission to change any page. This is
+    just used for building the tree - only superuser, or user with can_change in
+    globalpagepermission can change a page.
+    """    
+    from cms.utils.plugins import current_site    
+    opts = Page._meta
+    if request.user.is_superuser or \
+        (request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
+            (GlobalPagePermission.objects.with_user(request.user).filter(can_change=True, sites__in=[current_site(request)]).count()>0) or 
+            has_any_page_change_permissions(request)):
+        return True
+    return False
+
+
 def get_user_permission_level(user):
     """Returns highest user level from the page/permission hierarchy on which
     user haves can_change_permission. Also takes look into user groups. Higher 
@@ -162,26 +194,7 @@ def has_global_change_permissions_permission(user):
         return True
     return False
 
-def has_add_page_on_same_level_permission(request, page):
-    """Checks if there can be page added under page parent.
-    """
-    if not settings.CMS_PERMISSION or request.user.is_superuser \
-        or GlobalPagePermission.objects.with_user(request.user).filter(can_add=True).count():
-        return True
-    try:
-        return has_generic_permission(page.parent_id, request.user, "add")
-    except AttributeError:
-        # if page doesnt have parent...
-        pass
-        """
-        if page.level == 0:
-            # we are in the root, check if user haves add PAGE paermisson for
-            # this page
-            for perm in PagePermission.objects.with_user(request.user).filter(page=page, can_add=True):
-                if perm.grant_on & MASK_PAGE:
-                    return True
-        """ 
-    return False
+
 
 def mail_page_user_change(user, created=False, password=""):
     """Send email notification to given user. Used it PageUser profile creation/
@@ -202,11 +215,11 @@ def mail_page_user_change(user, created=False, password=""):
     send_mail(subject, 'admin/cms/mail/page_user_change.txt', [user.email], context, 'admin/cms/mail/page_user_change.html')
 
 
-def has_generic_permission(page_id, user, attr):
+def has_generic_permission(page_id, user, attr, site):
     """Permission getter for single page with given id.
     """    
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
-    permission = func(user)
+    permission = func(user, site)
     return permission == Page.permissions.GRANT_ALL or page_id in permission
 
 
@@ -237,8 +250,7 @@ def get_user_sites_queryset(user):
     
     # add some pages if he haves permission to add / change her    
     q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
-        Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True))
-    
+        (Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True)))
     return qs.filter(q).distinct()
     
     

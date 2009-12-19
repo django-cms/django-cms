@@ -58,8 +58,8 @@ def revert_plugins(request, version_id, obj):
     current_plugins = list(CMSPlugin.objects.filter(page=page))
     for plugin in cms_plugin_list:
         plugin.page = page
-        
         plugin.save(no_signals=True)
+    for plugin in cms_plugin_list:
         plugin.save()
         for p in plugin_list:
             if int(p.cmsplugin_ptr_id) == int(plugin.pk):

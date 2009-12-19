@@ -32,8 +32,7 @@ def reversion_register(model_class, fields=None, follow=(), format="xml", exclud
             # auto exclude publisher fields
             exclude_fields += ['publisher_is_draft', 'publisher_public', 'publisher_state']
     
-    import reversion
-    #if exclude_fields:
     fields = filter(lambda name: not name in exclude_fields, fields)        
-     
-    reversion.register(model_class, fields, follow, format)
+
+    from cms.utils import reversion_hacks
+    reversion_hacks.register_draft_only(model_class, fields, follow, format)

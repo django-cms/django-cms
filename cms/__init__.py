@@ -1,5 +1,9 @@
 VERSION = (2, 1, 0, 'alpha')
-__version__ = '.'.join(map(str, VERSION))
+if VERSION[-1] != "final":
+    __version__ = '.'.join(map(str, VERSION))
+else:
+    __version__ = '.'.join(map(str, VERSION[:-1]))
+
 
 # patch settings 
 try:

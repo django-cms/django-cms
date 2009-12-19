@@ -1,0 +1,49 @@
+Templatetags
+============
+
+placeholder
+-----------
+
+page_attribute
+--------------
+
+show_menu
+---------
+
+show_menu_below_id
+------------------
+
+show_sub_menu
+-------------
+
+show_breadcrumb
+---------------
+
+page_language_url
+-----------------
+
+language_chooser
+----------------
+
+page_id_url
+-----------
+
+show_placeholder_by_id
+----------------------
+
+show_uncached_placeholder_by_id
+-------------------------------
+
+plugins_media
+-------------
+
+Returns all media that is used by plugins and is defined with a Media class
+You normally want to place this in your <head> tag.
+
+example::
+
+	{% plugins_media %}
+	
+For a reference on what plugin media is used look in the plugin reference.
+
+	

@@ -105,8 +105,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
         self.assertEqual(response.status_code, 200)
         
-        #print "TODO:", response.content
-        
         data = {
             'can_add': can_add,
             'can_change': can_change,
@@ -134,7 +132,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(user)
         url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
         response = self.client.post(url, post_data)
-        self.assertEqual(response.content, "1")
+        self.assertEqual(slave_page.cmsplugin_set.count(), 1)
+        plugin_id = slave_page.cmsplugin_set.all()[0].id
+        self.assertEqual(response.content, str(plugin_id))
     
     def publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
@@ -279,8 +279,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         TODO: settings must be changed to be configurable / overridable
         """
-        assert(settings.CMS_PERMISSION)
-        assert(settings.CMS_MODERATOR)
+        self.assertEqual(settings.CMS_PERMISSION, True)
+        self.assertEqual(settings.CMS_MODERATOR, True)
     
     
     def test_01_super_can_add_page_to_root(self, status_code=200):
@@ -314,7 +314,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # can he even access it over get?
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        
+        #print response
         page_data = self.get_new_page_data(slave_page.pk)
         
         # request moderation
@@ -327,9 +327,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # add page
         self.login_user(self.user_slave)
         response = self.client.post(url, page_data)
-        
         self.assertRedirects(response, URL_CMS_PAGE)
-        
         # public model shouldn't be available yet, because of the moderation
         self.assertObjectExist(Title.objects, slug=page_data['slug'])
         self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
@@ -341,7 +339,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         #assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
-        assert(not page.publisher_public)
+        self.assertEqual(not page.publisher_public, True)
         
         # publish / approve page by master
         self.login_user(self.user_master)
@@ -412,31 +410,31 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(self.user_master)
         # create page under slave_page
         page = self.create_page(self.home_page)
-        assert(not page.publisher_public)
+        self.assertEqual(not page.publisher_public, True)
         
         # create subpage uner page
         subpage = self.create_page(page)
-        assert(not subpage.publisher_public)
+        self.assertEqual(not subpage.publisher_public, True)
         
         # publish both of them in reverse order 
         subpage = self.publish_page(subpage, True, published_check=False) 
         
         # subpage should not be published, because parent is not published 
         # yet, should be marked as `publish when parent`
-        assert(not subpage.publisher_public) 
+        self.assertEqual(not subpage.publisher_public, True) 
         
         # pagemoderator state must be set
         self.assertEqual(subpage.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         
         # publish page (parent of subage), so subpage must be published also
         page = self.publish_page(page, True)
-        assert(page.publisher_public)
+        self.assertEqual(page.publisher_public != None, True)
         
         # reload subpage, it was probably changed
         subpage = self.reload_page(subpage)
         
         # parent was published, so subpage must be also published..
-        assert(subpage.publisher_public) 
+        self.assertEqual(subpage.publisher_public != None, True) 
         
         #check attributes
         self.check_published_page_attributes(page)
@@ -447,11 +445,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(self.user_super)
         # create page under root
         page = self.create_page()
-        assert(not page.publisher_public)
+        self.assertEqual(not page.publisher_public, True)
         
         # create subpage under page
         subpage = self.create_page(page)
-        assert(not subpage.publisher_public)
+        self.assertEqual(not subpage.publisher_public, True)
         
         # tree id must be the same
         self.assertEqual(page.tree_id, subpage.tree_id)
@@ -483,7 +481,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.create_page()
         
         # public must not exist
-        assert(not page.publisher_public)
+        self.assertEqual(not page.publisher_public, True)
         
         # moderator_state must be changed
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
@@ -512,7 +510,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.approve_page(page)
         
         # public page must not exist because of parent
-        assert(not page.publisher_public)
+        self.assertEqual(not page.publisher_public, True)
         
         # waiting for parents
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
@@ -520,8 +518,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         # publish slave page
         slave_page = self.publish_page(self.slave_page)
         
-        assert(not page.publisher_public)
-        assert(not slave_page.publisher_public)
+        self.assertEqual(not page.publisher_public, True)
+        self.assertEqual(not slave_page.publisher_public, True)
         
         # they must be approved first
         slave_page = self.approve_page(slave_page)
@@ -584,7 +582,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         ph = self.create_page(pf, position="right", title="ph")
         
         
-        assert(not pg.publisher_public)
+        self.assertEqual(not pg.publisher_public, True)
         
         # login as master for approvement
         self.login_user(self.user_master)
@@ -608,7 +606,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(ph.parent, pe)
         
         # not published yet, cant exist
-        assert(pg.publisher_public)
+        self.assertEqual(pg.publisher_public != None, True)
         
         # check urls
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')

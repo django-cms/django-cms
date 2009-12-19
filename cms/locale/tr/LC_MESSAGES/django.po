@@ -2,12 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-26 14:30+0100\n"
+"POT-Creation-Date: 2009-12-15 14:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,9 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: plugin_base.py:88
-#, fuzzy
 msgid "Advanced options"
-msgstr "Opcions avançades"
+msgstr ""
 
 #: admin/forms.py:25
 msgid "Title"
@@ -38,7 +38,7 @@ msgstr ""
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr "fehefiu"
+msgstr ""
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
@@ -89,9 +89,8 @@ msgid "Redirects to this URL."
 msgstr ""
 
 #: admin/forms.py:98
-#, fuzzy
 msgid "A description of the page sometimes used by search engines."
-msgstr "Una descripció de la pàgina a vegades utilitzat pels motors de cerca."
+msgstr ""
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
@@ -111,7 +110,9 @@ msgid "user"
 msgstr ""
 
 #: admin/forms.py:159
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
 msgstr ""
 
 #: admin/forms.py:162
@@ -123,6 +124,7 @@ msgid "Please select user or group first."
 msgstr ""
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
+#: templates/admin/cms/page/change_form.html:58
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
 msgstr ""
@@ -146,7 +148,9 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:263
-msgid "Send email notification to user about username or password change. Requires user email."
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 
 #: admin/forms.py:283
@@ -162,46 +166,48 @@ msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:307
-msgid "The permission to add new pages requires the permission to change pages!"
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:309
-msgid "The permission to add new users requires the permission to change users!"
+msgid ""
+"The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
 msgstr ""
 
-#: admin/pageadmin.py:102 admin/pageadmin.py:118
+#: admin/pageadmin.py:106 admin/pageadmin.py:122
 msgid "Hidden"
 msgstr ""
 
-#: admin/pageadmin.py:113
+#: admin/pageadmin.py:117
 msgid "Basic Settings"
 msgstr ""
 
-#: admin/pageadmin.py:116
+#: admin/pageadmin.py:120
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 
-#: admin/pageadmin.py:122
+#: admin/pageadmin.py:126
 msgid "Advanced Settings"
 msgstr ""
 
-#: admin/pageadmin.py:131
+#: admin/pageadmin.py:135
 msgid "SEO Settings"
 msgstr ""
 
-#: admin/pageadmin.py:494
+#: admin/pageadmin.py:498
 msgid "higher"
 msgstr ""
 
-#: admin/pageadmin.py:637
+#: admin/pageadmin.py:645
 msgid "Database error"
 msgstr ""
 
-#: admin/pageadmin.py:723 migrations/0001_initial.py:13
+#: admin/pageadmin.py:731 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
 #: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
 #: models/pagemodel.py:69 models/permissionmodels.py:68
@@ -212,61 +218,64 @@ msgstr ""
 msgid "page"
 msgstr ""
 
-#: admin/pageadmin.py:843
+#: admin/pageadmin.py:854
 msgid "Page was successfully approved."
 msgstr ""
 
-#: admin/pageadmin.py:897
+#: admin/pageadmin.py:908
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: admin/pageadmin.py:900
+#: admin/pageadmin.py:911
 msgid "There only exists one translation for this page"
 msgstr ""
 
-#: admin/pageadmin.py:915
+#: admin/pageadmin.py:926
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
 
-#: admin/pageadmin.py:937
+#: admin/pageadmin.py:948
 msgid "Are you sure?"
 msgstr ""
 
-#: admin/pageadmin.py:1000
+#: admin/pageadmin.py:1011
 msgid "You do not have permission to publish this page"
 msgstr ""
 
-#: admin/pageadmin.py:1018
+#: admin/pageadmin.py:1029
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/pageadmin.py:1053
+#: admin/pageadmin.py:1064
 msgid "You do not have permission to change this page"
 msgstr ""
 
-#: admin/pageadmin.py:1057
+#: admin/pageadmin.py:1068
 msgid "Language must be set to a supported language!"
 msgstr ""
 
-#: admin/pageadmin.py:1069
+#: admin/pageadmin.py:1080
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1142
+#: admin/pageadmin.py:1153
 #, python-format
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1211
 msgid "Plugins where moved"
 msgstr ""
 
-#: admin/pageadmin.py:1222
+#: admin/pageadmin.py:1233
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -692,7 +701,9 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:43
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:44
@@ -704,7 +715,9 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:47
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:49
@@ -743,7 +756,7 @@ msgstr ""
 msgid "Page was copied."
 msgstr ""
 
-#: models/pagemodel.py:497
+#: models/pagemodel.py:490
 msgid "default"
 msgstr ""
 
@@ -940,7 +953,9 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1032,7 +1047,8 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1246,7 +1262,7 @@ msgid "flash menu"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:236
+#: templates/admin/cms/page/change_form.html:268
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
 msgstr ""
@@ -1265,13 +1281,14 @@ msgid "Save and add another"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:237
+#: templates/admin/cms/page/change_form.html:269
 msgid "Save and continue editing"
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1297,89 +1314,92 @@ msgstr ""
 msgid "Change a page"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:32
+#: templates/admin/cms/page/change_form.html:55
+#: templates/admin/cms/page/change_list.html:8
+#: templates/admin/cms/page/plugin_change_form.html:66
+#: templates/admin/cms/page/recover_form.html:14
+#: templates/admin/cms/page/revision_form.html:6
+msgid "Home"
+msgstr ""
+
+#: templates/admin/cms/page/change_form.html:64
 msgid "Approve page deletion"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:38
+#: templates/admin/cms/page/change_form.html:70
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:39
+#: templates/admin/cms/page/change_form.html:71
 msgid "(you can perform actions on this page directly)"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:52
+#: templates/admin/cms/page/change_form.html:84
 msgid "Remove delete request"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:54
+#: templates/admin/cms/page/change_form.html:86
 msgid "Approve delete"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:54
+#: templates/admin/cms/page/change_form.html:86
 msgid "Approve"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:54
-#: templates/admin/cms/page/change_form.html:55
+#: templates/admin/cms/page/change_form.html:86
+#: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:55
+#: templates/admin/cms/page/change_form.html:87
 msgid "Preview"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:58
+#: templates/admin/cms/page/change_form.html:90
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:59
+#: templates/admin/cms/page/change_form.html:91
 msgid "View on site"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:89
+#: templates/admin/cms/page/change_form.html:121
 #: templates/admin/cms/page/plugin_change_form.html:83
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/cms/page/change_form.html:109
+#: templates/admin/cms/page/change_form.html:141
 msgid "All permissions"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:110
-#: templates/admin/cms/page/change_form.html:122
+#: templates/admin/cms/page/change_form.html:142
+#: templates/admin/cms/page/change_form.html:154
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:121
+#: templates/admin/cms/page/change_form.html:153
 msgid "Page states"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:144
+#: templates/admin/cms/page/change_form.html:176
 #, python-format
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:146
+#: templates/admin/cms/page/change_form.html:178
 msgid "Request approvemet"
 msgstr ""
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:8
-#: templates/admin/cms/page/plugin_change_form.html:66
-#: templates/admin/cms/page/recover_form.html:14
-#: templates/admin/cms/page/revision_form.html:6
-msgid "Home"
 msgstr ""
 
 #: templates/admin/cms/page/change_list.html:55
@@ -1465,6 +1485,10 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
+msgstr ""
+
+#: templates/admin/cms/page/menu_item.html:23
+msgid "home"
 msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:26
@@ -1727,7 +1751,7 @@ msgstr ""
 msgid "Unbind descendants moderation"
 msgstr ""
 
-#: templatetags/cms_tags.py:397 templatetags/cms_tags.py:612
+#: templatetags/cms_tags.py:397 templatetags/cms_tags.py:613
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr ""
@@ -1735,14 +1759,16 @@ msgstr ""
 #: templatetags/cms_tags.py:398
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %"
+"(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:613
+#: templatetags/cms_tags.py:614
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the "
+"reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1759,10 +1785,10 @@ msgstr ""
 msgid "CMS - Page %s requires approvement."
 msgstr ""
 
-#: utils/permissions.py:193
+#: utils/permissions.py:206
 msgid "CMS - your user account was created."
 msgstr ""
 
-#: utils/permissions.py:195
+#: utils/permissions.py:208
 msgid "CMS - your user account was changed."
 msgstr ""

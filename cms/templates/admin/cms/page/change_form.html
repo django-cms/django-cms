@@ -24,8 +24,40 @@
 	</script>
 {% endif %}
 
+<style type="text/css">
+
+.language_button { 
+    font-weight:bold;
+    margin-bottom:-1px; 
+    border-color:#DDDDDD #AAAAAA #CCCCCC #DDDDDD !important; 
+    border:1px;  
+    background:white url({{ ADMIN_MEDIA_URL }}img/admin/nav-bg.gif) repeat-x scroll center bottom !important;
+    }
+
+#lang_tab_content h2.header {
+    margin: 0;
+    padding: 2px 5px 3px 5px;
+    font-size: 11px;
+    text-align: left;
+    font-weight: bold;
+    background: #7CA0C7 url({{ ADMIN_MEDIA_URL }}img/admin/default-bg.gif) top left repeat-x;
+    color: white;
+}
+
+</style>
+
 
 {% endblock %}
+
+
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
+     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
+     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original.get_title|truncatewords:"18" }}{% endif %}
+</div>
+{% endif %}{% endblock %}
 
 {% block content_title %}
 	{% if moderation_delete_request %}

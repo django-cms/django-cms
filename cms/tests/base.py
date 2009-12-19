@@ -2,6 +2,7 @@ import copy
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.core.exceptions import ObjectDoesNotExist
+from django.template.defaultfilters import slugify
 from cms.models import Title, Page
 
 URL_CMS_PAGE = "/admin/cms/page/"
@@ -28,7 +29,7 @@ class CMSTestCase(TestCase):
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
-        assert logged_in
+        self.assertEqual(logged_in, True)
     
     
     def get_new_page_data(self, parent_id=''):
@@ -84,7 +85,8 @@ class CMSTestCase(TestCase):
         })
         
         if title is not None:
-            page_data['title'] = page_data['slug'] = title
+            page_data['title'] = title
+            page_data['slug'] = slugify(title)
         
         # add page
         if parent_page:
@@ -135,7 +137,7 @@ class CMSTestCase(TestCase):
             'target': target_page.pk,
         }
         response = self.client.post(URL_CMS_PAGE + "%d/move-page/" % page.pk, data)
-        assert(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)        
         return self.reload_page(page)
         
         

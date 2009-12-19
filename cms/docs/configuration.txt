@@ -306,19 +306,8 @@ Example::
 	
 Normally the cms takes the LANGUAGES from the settings.py. With this you can overwrite this. Be sure that you don't have more language in here than in the LANGUAGES setting.
 
-
-CMS_DEFAULT_LANGUAGE
-----------------------
-
-Example::
-
-	CMS_DEFAULT_LANGUAGE = "de"
-	
-The default language is used if no other language could be found in the browser. Normally it will take the first of the LANGUAGES setting.
-
-
 CMS_CONTENT_CACHE_DURATION
------------------------------
+--------------------------
 
 Example::
 
@@ -329,7 +318,7 @@ Defines how long page content should be cached, including navigation and admin m
 Default is 60
 
 CMS_MEDIA_PATH
-----------------
+--------------
 
 Example::
 	
@@ -340,7 +329,7 @@ The path from MEDIA_ROOT to the media files located in ``cms/media/``
 default: ``cms/``
 
 CMS_MEDIA_ROOT
-----------------
+--------------
 
 Example::
 
@@ -351,7 +340,7 @@ The path to the media root of the cms media files.
 Default: ``settings.MEDIA_ROOT + CMS_MEDIA_PATH``
 
 CMS_MEDIA_URL
----------------
+-------------
 
 Example::
 
@@ -362,7 +351,7 @@ The location of the media files that are located in cms/media/cms/
 default: ``MEDIA_URL + CMS_MEDIA_PATH``
 
 CMS_PAGE_MEDIA_PATH
-----------------------
+-------------------
 
 By default the cms creates a folder in called 'cms_page_media' in your static files folder where all uploaded media files are stored.
 The media files are stored in subfolders numbered with the id of the page.

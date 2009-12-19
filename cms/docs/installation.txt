@@ -1,6 +1,10 @@
 Installation
 ============
 
+This document assumes that you are familiar with python and django.
+
+A more beginner friendly tutorial should be written shortly.
+
 Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
 They all should come with the distribution.
 
@@ -89,7 +93,8 @@ near the beginning of the file but after any import statements that it may have:
 	
 This allows you to use ``gettext`` in ``settings.py``.
 
-Add some templates you want to use within Django-cms 2.0 that contain at least one
+Add some templates you want to use within django-cms that contain at least one
+
 ``{% placeholder %}`` template tag to your ``settings.py``::
 	
 	CMS_TEMPLATES = (
@@ -157,6 +162,8 @@ Media Files
 Be sure to copy the ``cms/media/cms/`` folder into your media directory or make a symbolic
 link as appropriate.
 
+If installed with pip in a virtualenv the media files may be located in the root folder of the the virtualenv.
+
 You can use something like `django-appmedia <http://code.google.com/p/django-appmedia/>`_ that handles this for you.
 
 
@@ -170,6 +177,7 @@ first before you use it the first time.
 If there is a problem with python manage.py migrate:
 
 Create a new ticket on github with your database engine (mysql, postgres), database type (MyIsam, InnoDB), south version
+There are known problems with SQLite and MySQL InnoDB but the Quickfix below should help.
 
 Quick fix:
 
@@ -190,4 +198,4 @@ If you create a page and you don't see a page in the list view:
 
 If you edit a Page but don't see a "Add Plugin" button and a dropdown-list with plugins:
 
-- Be sure your CMS_TEMPLATES setting is correct and that the templates specifiet actually exsist. Maybe check that you are not missing a {% placeholder %} templatetag in the template. 
+- Be sure your CMS_TEMPLATES setting is correct and that the templates specified actually exist. Maybe check that you are not missing a '{% placeholder %}' templatetag in the template. 

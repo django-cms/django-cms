@@ -9,7 +9,8 @@ from cms.exceptions import NoHomeFound
 from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN,\
     MASK_DESCENDANTS, PageModeratorState
 
-SITE_VAR = "site__exact"
+
+
 COPY_VAR = "copy"
 
 class CMSChangeList(ChangeList):
@@ -17,20 +18,14 @@ class CMSChangeList(ChangeList):
     
     def __init__(self, request, *args, **kwargs):
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
+        from cms.utils.plugins import current_site
+        self._current_site = current_site(request)
         try:
             self.query_set = self.get_query_set(request)
         except:
             raise
         self.get_results(request)
         
-        if SITE_VAR in self.params:
-            self._current_site = Site.objects.get(pk=self.params[SITE_VAR])
-        else:
-            site_pk = request.session.get('cms_admin_site', None)
-            if site_pk:
-                self._current_site = Site.objects.get(pk=site_pk)
-            else:
-                self._current_site = Site.objects.get_current()
         
         request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
@@ -38,21 +33,21 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
-        
-            
         qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
-            permissions = Page.permissions.get_change_list_id_list(request.user)
+            site = self._current_site
+            permissions = Page.permissions.get_change_id_list(request.user, site)
+            
             if permissions != Page.permissions.GRANT_ALL:
                 qs = qs.filter(pk__in=permissions)
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
-            if not SITE_VAR in self.params:
-                qs = qs.filter(site=request.session.get('cms_admin_site', None))
+            qs = qs.filter(site=self._current_site)
         qs = qs.order_by('tree_id', 'parent', 'lft')
         return qs
     
     def is_filtered(self):
+        from cms.utils.plugins import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR):
             if i in lookup_params:
@@ -71,16 +66,17 @@ class CMSChangeList(ChangeList):
     
     def set_items(self, request):
         lang = get_language_from_request(request)
+        site = self._current_site
         pages = self.get_query_set(request).drafts().order_by('tree_id', 'parent', 'lft').select_related()
         
-        perm_edit_ids = Page.permissions.get_change_id_list(request.user)
-        perm_publish_ids = Page.permissions.get_publish_id_list(request.user)
-        perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user)
-        perm_change_list_ids = Page.permissions.get_change_list_id_list(request.user)
-        
+        perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)
+        perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
+        perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
+        perm_change_list_ids = Page.permissions.get_change_id_list(request.user, site)
+
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
-            #pages = pages.filter(pk__in=perm_edit_ids)
-            pages = pages.filter(pk__in=perm_change_list_ids)   
+            pages = pages.filter(pk__in=perm_edit_ids)
+            #pages = pages.filter(pk__in=perm_change_list_ids)   
         
         if settings.CMS_MODERATOR:
             # get all ids of public instances, so we can cache them
@@ -109,8 +105,7 @@ class CMSChangeList(ChangeList):
         try:
             home_pk = Page.objects.drafts().get_home(self.current_site()).pk
         except NoHomeFound:
-            home_pk = 0
-            
+            home_pk = 0    
         for page in pages:
             children = []
 

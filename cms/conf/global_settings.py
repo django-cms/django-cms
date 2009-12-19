@@ -99,3 +99,6 @@ CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
 # moderator mode - if True, approve path can be setup for every page, so there
 # will be some control over the published stuff
 CMS_MODERATOR = False 
+
+# Defines what character will be used for the __unicode__ handling of cms pages
+CMS_TITLE_CHARACTER = '+'

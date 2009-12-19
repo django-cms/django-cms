@@ -7,7 +7,7 @@ class Command(NoArgsCommand):
         """Create published public version of all published drafts. Useful, 
         when CMS_MODERATOR gets turned on after some time. 
         """
-        if not settings.CMS_MODERATOR:
+        if not getattr(settings, 'CMS_MODERATOR', False):
             raise CommandError("This command may be used only with settings.CMS_MODERATOR") 
         
         self.publish_pages()
