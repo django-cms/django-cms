@@ -153,7 +153,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                 children.append(page)
                 if page.pk == soft_root_pk:
                     page.soft_root = False #ugly hack for the recursive function
-                if current_page and not current_page.navigation_extenders:
+                if current_page:
                     pk = current_page.pk
                 else:
                     pk = -1
