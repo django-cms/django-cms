@@ -76,8 +76,8 @@ class MultilingualURLMiddleware:
                 decoded_response = response.content.decode('utf-8')
             except UnicodeDecodeError:
                 decoded_response = response.content
-            response.content = SUB.sub(ur'<a\1href="/%s/\3"\4>' % request.LANGUAGE_CODE, decoded_response)
-            response.content = SUB2.sub(ur'<form\1action="/%s/\3"\4>' % request.LANGUAGE_CODE, decoded_response)
+            decoded_response = SUB.sub(ur'<a\1href="/%s/\3"\4>' % request.LANGUAGE_CODE, decoded_response)
+            response.content = SUB2.sub(ur'<form\1action="/%s/\3"\4>' % request.LANGUAGE_CODE, decoded_response).encode("utf8")
         if (response.status_code == 301 or response.status_code == 302 ):
             location = response._headers['location']
             prefix = has_lang_prefix(location[1])
