@@ -1,10 +1,29 @@
 App Integration
 ===============
 
-Here we will cover how 3th party django apps can be integrated into the cms.
+It is pretty easy to integrate your own django applications with django-cms.
+You have 4 ways of integrating your app:
+
+1. App-Hooks
+	
+	Attach an apps urls.py to a page
+	
+2. Navigation Extenders
+
+	Extend the menu with your own entries
+	
+3. Navigation Modifiers
+
+	Modify the whole menu tree 
+	
+4. Custom Plugin
+
+	Display your models / content in cms pages
+
+App-Hooks
+---------
 
 CMS_APPLICATION_URLS
---------------------
 
 Put this in your settings.py.
 Example:
