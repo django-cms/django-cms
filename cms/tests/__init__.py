@@ -9,6 +9,7 @@ from cms.utils import urlutils
 from cms.tests.page import PagesTestCase
 from cms.tests.permmod import PermissionModeratorTestCase
 from cms.tests.site import SiteTestCase
+from cms.tests.navextender import NavExtenderTestCase
 
 def suite():
     # this must be changed!! and tests must happen for multiple configurations!
@@ -17,6 +18,7 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PagesTestCase))
     
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(SiteTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(NavExtenderTestCase))
     
     if settings.CMS_PERMISSION and settings.CMS_MODERATOR:
         # this test is settings dependant, and these settings can not be
