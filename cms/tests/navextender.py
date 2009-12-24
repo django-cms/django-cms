@@ -11,20 +11,13 @@ from cms.tests.base import CMSTestCase
 class NavExtenderTestCase(CMSTestCase):
 
     fixtures = ['test_navextender', ]
+    #urls = 'example.sampleapp.urlstwo'
     
     PK_ROOT = 8
     PK_NORMAL = 15
     PK_EXTENDED = 10
     
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
-        
-        self.login_user(u)
-        self.user = u
-        
-                # call tag
         context = {}
         environ = {
             'HTTP_COOKIE':      self.client.cookies,
