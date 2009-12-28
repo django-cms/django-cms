@@ -4,13 +4,17 @@ from django.db import models
 from cms.plugins.teaser.models import *
 
 class Migration:
-    
+
     depends_on = (
         ("cms", "0019_public_table_renames"),
     )
-    
+
+    needed_by = (
+        ("cms", "0021_publisher2"),
+    )
+
     def forwards(self, orm):
-        
+
         # Adding model 'TeaserPublic'
         db.create_table('cmsplugin_teaserpublic', (
             ('description', orm['teaser.TeaserPublic:description']),
@@ -22,7 +26,7 @@ class Migration:
             ('cmspluginpublic_ptr', orm['teaser.TeaserPublic:cmspluginpublic_ptr']),
         ))
         db.send_create_signal('teaser', ['TeaserPublic'])
-        
+
         # Adding model 'Teaser'
         db.create_table('cmsplugin_teaser', (
             ('description', orm['teaser.Teaser:description']),
@@ -34,19 +38,19 @@ class Migration:
             ('public', orm['teaser.Teaser:public']),
         ))
         db.send_create_signal('teaser', ['Teaser'])
-        
-    
-    
+
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'TeaserPublic'
         db.delete_table('cmsplugin_teaserpublic')
-        
+
         # Deleting model 'Teaser'
         db.delete_table('cmsplugin_teaser')
-        
-    
-    
+
+
+
     models = {
         'sites.site': {
             'Meta': {'db_table': "'django_site'"},
@@ -151,5 +155,5 @@ class Migration:
             'tree_id': ('models.PositiveIntegerField', [], {'db_index': 'True'})
         }
     }
-    
+
     complete_apps = ['teaser']
