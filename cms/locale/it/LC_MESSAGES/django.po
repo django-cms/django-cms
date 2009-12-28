@@ -16,22 +16,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: plugin_base.py:88
-#, fuzzy
 msgid "Advanced options"
 msgstr "Opzioni avanzate"
 
 #: admin/forms.py:25
-#, fuzzy
 msgid "Title"
 msgstr "Titolo"
 
 #: admin/forms.py:26
-#, fuzzy
 msgid "The default title"
 msgstr "Il titolo predefinito"
 
 #: admin/forms.py:27
-#, fuzzy
 msgid "Slug"
 msgstr "Slug"
 
@@ -40,42 +36,34 @@ msgid "The part of the title that is used in the URL"
 msgstr "La parte del titolo che viene utilizzato nell' URL"
 
 #: admin/forms.py:29
-#, fuzzy
 msgid "Language"
 msgstr "Lingua"
 
 #: admin/forms.py:30
-#, fuzzy
 msgid "The current language of the content fields."
 msgstr "La lingua corrente dei campi contenuti."
 
 #: admin/forms.py:61
-#, fuzzy
 msgid "Another page with this slug already exists"
 msgstr "Un'altra pagina con questo slug esiste già"
 
 #: admin/forms.py:81
-#, fuzzy
 msgid "Menu Title"
 msgstr "Menu titolo"
 
 #: admin/forms.py:82
-#, fuzzy
 msgid "Overwrite what is displayed in the menu"
 msgstr "Sovrascrivere ciò che viene visualizzato nel menu"
 
 #: admin/forms.py:83
-#, fuzzy
 msgid "Page Title"
 msgstr "Titolo pagina"
 
 #: admin/forms.py:84
-#, fuzzy
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Sovrascrive quello che viene visualizzata nella parte superiore del browser o in segnalibri"
 
 #: admin/forms.py:85
-#, fuzzy
 msgid "Application"
 msgstr "Applicazione"
 
@@ -84,32 +72,26 @@ msgid "Hook application to this page."
 msgstr "Aggancia applicazione a questa pagina."
 
 #: admin/forms.py:88
-#, fuzzy
 msgid "Overwrite URL"
 msgstr "Sovrascrivere URL"
 
 #: admin/forms.py:89
-#, fuzzy
 msgid "Keep this field empty if standard path should be used."
 msgstr "Mantenere questo campo vuoto se il percorso standard dovrebbe essere usato."
 
 #: admin/forms.py:95
-#, fuzzy
 msgid "Redirect"
 msgstr "Redirect"
 
 #: admin/forms.py:96
-#, fuzzy
 msgid "Redirects to this URL."
 msgstr "Reindirizza a questo URL."
 
 #: admin/forms.py:98
-#, fuzzy
 msgid "A description of the page sometimes used by search engines."
 msgstr "Una descrizione della pagina talvolta usato dai motori di ricerca."
 
 #: admin/forms.py:100
-#, fuzzy
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "Una lista di parole chiave separate da virgola talvolta usato dai motori di ricerca."
 
@@ -123,7 +105,6 @@ msgstr "URL non valido, utilizza il formato /mia/url."
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
-#, fuzzy
 msgid "user"
 msgstr "utente"
 
@@ -141,19 +122,16 @@ msgstr "Si prega di selezionare un utente o un gruppo."
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/plugin_change_form.html:69
-#, fuzzy
 msgid "Add"
 msgstr "Aggiungere"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
-#, fuzzy
 msgid "Change"
 msgstr "Cambiare"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
-#, fuzzy
 msgid "Delete"
 msgstr "Eliminare"
 
@@ -166,32 +144,26 @@ msgid "Notify user"
 msgstr "Notifica l'utente"
 
 #: admin/forms.py:263
-#, fuzzy
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "Inviare email di notifica per l'utente su un nome utente o modificare la password. Richiede email dell'utente."
 
 #: admin/forms.py:283
-#, fuzzy
 msgid "New password"
 msgstr "Nuova password"
 
 #: admin/forms.py:285
-#, fuzzy
 msgid "New password confirmation"
 msgstr "Conferma Nuova password"
 
 #: admin/forms.py:304
-#, fuzzy
 msgid "Email notification requires valid email address."
 msgstr "E-mail di notifica richiede indirizzo e-mail valido."
 
 #: admin/forms.py:307
-#, fuzzy
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "Il permesso di aggiungere nuove pagine richiede l'autorizzazione a modificare le pagine!"
 
 #: admin/forms.py:309
-#, fuzzy
 msgid "The permission to add new users requires the permission to change users!"
 msgstr "Il permesso di aggiungere nuovi utenti richiede l'autorizzazione a modificare gli utenti!"
 
@@ -204,7 +176,6 @@ msgid "Hidden"
 msgstr "Nascosto"
 
 #: admin/pageadmin.py:113
-#, fuzzy
 msgid "Basic Settings"
 msgstr "Impostazioni di base"
 
