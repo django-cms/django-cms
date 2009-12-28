@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -17,64 +16,77 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: plugin_base.py:88
+#, fuzzy
 msgid "Advanced options"
-msgstr ""
+msgstr "Opzioni avanzate"
 
 #: admin/forms.py:25
+#, fuzzy
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: admin/forms.py:26
+#, fuzzy
 msgid "The default title"
-msgstr ""
+msgstr "Il titolo predefinito"
 
 #: admin/forms.py:27
+#, fuzzy
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "La parte del titolo che viene utilizzato nell' URL"
 
 #: admin/forms.py:29
+#, fuzzy
 msgid "Language"
-msgstr ""
+msgstr "Lingua"
 
 #: admin/forms.py:30
+#, fuzzy
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "La lingua corrente dei campi contenuti."
 
 #: admin/forms.py:61
+#, fuzzy
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Un'altra pagina con questo slug esiste già"
 
 #: admin/forms.py:81
+#, fuzzy
 msgid "Menu Title"
-msgstr ""
+msgstr "Menu titolo"
 
 #: admin/forms.py:82
+#, fuzzy
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Sovrascrivere ciò che viene visualizzato nel menu"
 
 #: admin/forms.py:83
+#, fuzzy
 msgid "Page Title"
-msgstr ""
+msgstr "Titolo pagina"
 
 #: admin/forms.py:84
+#, fuzzy
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Sovrascrive quello che viene visualizzata nella parte superiore del browser o in segnalibri"
 
 #: admin/forms.py:85
+#, fuzzy
 msgid "Application"
-msgstr ""
+msgstr "Applicazione"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Aggancia applicazione a questa pagina."
 
 #: admin/forms.py:88
+#, fuzzy
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Sovrascrivere URL"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
@@ -110,9 +122,7 @@ msgid "user"
 msgstr ""
 
 #: admin/forms.py:159
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr ""
 
 #: admin/forms.py:162
@@ -147,9 +157,7 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:263
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
+msgid "Send email notification to user about username or password change. Requires user email."
 msgstr ""
 
 #: admin/forms.py:283
@@ -165,13 +173,11 @@ msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:307
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:309
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:311
@@ -262,8 +268,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1142
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1200
@@ -272,9 +277,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1222
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -700,9 +703,7 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:43
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:44
@@ -714,9 +715,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:47
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:49
@@ -952,9 +951,7 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1046,8 +1043,7 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1286,8 +1282,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1380,9 +1375,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:144
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:146
@@ -1753,16 +1746,14 @@ msgstr ""
 #: templatetags/cms_tags.py:398
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:613
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
