@@ -5,7 +5,6 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugins.link.forms import LinkForm
 
-
 class LinkPlugin(CMSPluginBase):
     model = Link
     form = LinkForm
@@ -15,15 +14,15 @@ class LinkPlugin(CMSPluginBase):
     
     def render(self, context, instance, placeholder):
         if instance.mailto:
-            link = "mailto:%s" % instance.mailto
+            link = u"mailto:%s" % settings.dbgettext(instance.mailto)
         elif instance.url:
-            link = instance.url
+            link = settings.dbgettext(instance.url)
         elif instance.page_link:
             link = instance.page_link.get_absolute_url()
         else:
             link = ""
         context.update({
-            'name':instance.name,
+            'name':settings.dbgettext(instance.name),
             'link':link, 
             'placeholder':placeholder,
             'object':instance

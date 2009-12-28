@@ -66,6 +66,9 @@ class PageAdmin(model_admin):
     top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
+    if settings.CMS_DBGETTEXT:
+        # no need to select language for page
+        add_general_fields.remove('language')
     advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'menu_login_required']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -558,7 +561,8 @@ class PageAdmin(model_admin):
         context.update({
             'language': language,
             'traduction_language': settings.CMS_LANGUAGES,
-            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1,
+            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1 and \
+                not settings.CMS_DBGETTEXT,
         })
         return context
         

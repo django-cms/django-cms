@@ -26,6 +26,14 @@ def post_patch():
             (settings.CMS_TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')),
         ) 
 
+    if settings.CMS_DBGETTEXT:
+        # untranslated titles are translated using gettext anyway
+        settings.CMS_HIDE_UNTRANSLATED = False
+        settings.dbgettext = _
+    else:
+        # dummy translation
+        settings.dbgettext = lambda x: x
+
 
 def post_patch_check():
     """Post patch check, just make sure there isn't any misconfiguration. All

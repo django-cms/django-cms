@@ -2,7 +2,8 @@ from cms.models import CMSPlugin
 import re
 
 OBJ_TAG_RE = re.compile(u"\{\{ plugin_object (\d+) \}\}")
-OBJ_ADMIN_RE = re.compile(ur'<img [^>]*\bid="plugin_obj_(\d+)"[^>]*/?>')
+OBJ_ADMIN_RE_PATTERN = ur'<img [^>]*\bid="plugin_obj_(\d+)"[^>]*/?>'
+OBJ_ADMIN_RE = re.compile(OBJ_ADMIN_RE_PATTERN)
 
 def plugin_tags_to_admin_html(text):
     """
@@ -51,4 +52,3 @@ def plugin_admin_html_to_tags(text):
     into the 'tag' form used in the database
     """
     return OBJ_ADMIN_RE.sub(lambda m: u"{{ plugin_object %s }}"  % m.groups()[0], text)
-

@@ -28,10 +28,19 @@ def get_current_page(path, lang, queryset, home_slug, home_tree_id):
                 title_q = Q(title_set__path=path)|(Q(title_set__path=home_slug + path)&Q(tree_id=home_tree_id))
             else:
                 title_q = Q(title_set__slug=path)
+            if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
+                # ugly hack -- brute force search for reverse path translation:
+                from django.utils.translation import ugettext
+                from cms.models import Title
+                for t in Title.objects.all():
+                    tpath = '/'.join([ugettext(x) for x in t.path.split('/')])
+                    if path == tpath:
+                        title_q = Q(title_set__path=t.path)
+                        break
             page = queryset.filter(title_q).distinct().select_related()[0]
             if page:
                 langs = page.get_languages() 
-                if lang in langs:
+                if lang in langs or settings.CMS_DBGETTEXT:
                     return page, None
                 else:
                     path = None
