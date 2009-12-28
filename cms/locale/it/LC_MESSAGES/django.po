@@ -89,108 +89,124 @@ msgid "Overwrite URL"
 msgstr "Sovrascrivere URL"
 
 #: admin/forms.py:89
+#, fuzzy
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Mantenere questo campo vuoto se il percorso standard dovrebbe essere usato."
 
 #: admin/forms.py:95
+#, fuzzy
 msgid "Redirect"
-msgstr ""
+msgstr "Redirect"
 
 #: admin/forms.py:96
+#, fuzzy
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Reindirizza a questo URL."
 
 #: admin/forms.py:98
+#, fuzzy
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "Una descrizione della pagina talvolta usato dai motori di ricerca."
 
 #: admin/forms.py:100
+#, fuzzy
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
+msgstr "Una lista di parole chiave separate da virgola talvolta usato dai motori di ricerca."
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Una pagina con questo id URL inverso esiste già."
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "URL non valido, utilizza il formato /mia/url."
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
+#, fuzzy
 msgid "user"
-msgstr ""
+msgstr "utente"
 
 #: admin/forms.py:159
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr "Il permesso \"Aggiungi pagina\" richiede anche l'accesso ai figli o discendenti, altrimenti la pagina aggiunta non può essere cambiata dal suo creatore."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "Il permesso \"Aggiungere pagina\" richiede anche il permesso \"Modificare pagina\"."
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Si prega di selezionare un utente o un gruppo."
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/plugin_change_form.html:69
+#, fuzzy
 msgid "Add"
-msgstr ""
+msgstr "Aggiungere"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
+#, fuzzy
 msgid "Change"
-msgstr ""
+msgstr "Cambiare"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
+#, fuzzy
 msgid "Delete"
-msgstr ""
+msgstr "Eliminare"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Recuperare (qualsiasi) pagina"
 
 #: admin/forms.py:262
 msgid "Notify user"
-msgstr ""
+msgstr "Notifica l'utente"
 
 #: admin/forms.py:263
+#, fuzzy
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr ""
+msgstr "Inviare email di notifica per l'utente su un nome utente o modificare la password. Richiede email dell'utente."
 
 #: admin/forms.py:283
+#, fuzzy
 msgid "New password"
-msgstr ""
+msgstr "Nuova password"
 
 #: admin/forms.py:285
+#, fuzzy
 msgid "New password confirmation"
-msgstr ""
+msgstr "Conferma Nuova password"
 
 #: admin/forms.py:304
+#, fuzzy
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "E-mail di notifica richiede indirizzo e-mail valido."
 
 #: admin/forms.py:307
+#, fuzzy
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "Il permesso di aggiungere nuove pagine richiede l'autorizzazione a modificare le pagine!"
 
 #: admin/forms.py:309
+#, fuzzy
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "Il permesso di aggiungere nuovi utenti richiede l'autorizzazione a modificare gli utenti!"
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Per aggiungere le autorizzazioni è necessario anche poterle modificare!"
 
 #: admin/pageadmin.py:102 admin/pageadmin.py:118
 msgid "Hidden"
-msgstr ""
+msgstr "Nascosto"
 
 #: admin/pageadmin.py:113
+#, fuzzy
 msgid "Basic Settings"
-msgstr ""
+msgstr "Impostazioni di base"
 
 #: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
