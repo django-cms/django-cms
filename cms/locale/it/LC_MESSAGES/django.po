@@ -210,23 +210,23 @@ msgstr "Impostazioni di base"
 
 #: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "Nota: Questa pagina viene ricaricata se si cambia la selezione. Salvare la pagina prima."
 
 #: admin/pageadmin.py:122
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Impostazioni avanzate"
 
 #: admin/pageadmin.py:131
 msgid "SEO Settings"
-msgstr ""
+msgstr "Impostazioni SEO"
 
 #: admin/pageadmin.py:494
 msgid "higher"
-msgstr ""
+msgstr "superiore"
 
 #: admin/pageadmin.py:637
 msgid "Database error"
-msgstr ""
+msgstr "Errore del database"
 
 #: admin/pageadmin.py:723 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -237,59 +237,59 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "pagina"
 
 #: admin/pageadmin.py:843
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "La pagina è stata approvata con successo."
 
 #: admin/pageadmin.py:897
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s  oggetto con chiave primaria %(key)r non esiste."
 
 #: admin/pageadmin.py:900
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Esiste solo una traduzione per questa pagina"
 
 #: admin/pageadmin.py:915
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "Titolo e plugins con lingua %(language)s sono stati eliminati"
 
 #: admin/pageadmin.py:937
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sei sicuro?"
 
 #: admin/pageadmin.py:1000
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "Non hai il permesso di pubblicare questa pagina"
 
 #: admin/pageadmin.py:1018
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "Non si dispone dell'autorizzazione per modificare lo status di in_navigation per questa pagina"
 
 #: admin/pageadmin.py:1053
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "Non si dispone dell'autorizzazione per modificare questa pagina"
 
 #: admin/pageadmin.py:1057
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Lingua deve essere impostato su una delle lingue supportate!"
 
 #: admin/pageadmin.py:1069
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr " %(plugin_name)s plugin aggiunto a %(placeholder)s "
 
 #: admin/pageadmin.py:1142
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr " %(plugin_name)s plugin modificato alla posizione %(position)s in %(placeholder)s "
 
 #: admin/pageadmin.py:1200
 msgid "Plugins where moved"
-msgstr ""
+msgstr "I plugins sono stati spostati"
 
 #: admin/pageadmin.py:1222
 #, python-format
@@ -298,7 +298,7 @@ msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "Pagina autorizzazioni"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
