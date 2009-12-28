@@ -612,7 +612,6 @@ msgstr "Pagina"
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
-#, fuzzy
 msgid "User"
 msgstr "Utente"
 
@@ -622,329 +621,329 @@ msgstr "Modera pagina"
 
 #: models/moderatormodels.py:50 templatetags/cms_admin.py:66
 msgid "Moderate children"
-msgstr ""
+msgstr "Modera figli"
 
 #: models/moderatormodels.py:51 templatetags/cms_admin.py:67
 msgid "Moderate descendants"
-msgstr ""
+msgstr "Modera discendenti"
 
 #: models/moderatormodels.py:54 models/moderatormodels.py:55
 msgid "PageModerator"
-msgstr ""
+msgstr "Moderatore"
 
 #: models/moderatormodels.py:97
 msgid "created"
-msgstr ""
+msgstr "creato"
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr ""
+msgstr "cambiato"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
-msgstr ""
+msgstr "rich. eliminazione"
 
 #: models/moderatormodels.py:100
 msgid "move req."
-msgstr ""
+msgstr "rich. spostamento"
 
 #: models/moderatormodels.py:101
 msgid "publish req."
-msgstr ""
+msgstr "rich. pubblicazione"
 
 #: models/moderatormodels.py:102
 msgid "unpublish req."
-msgstr ""
+msgstr "rich. sospensione"
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr ""
+msgstr "approvato"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
-msgstr ""
+msgstr "stato del moderatore"
 
 #: models/moderatormodels.py:116
 msgid "Page moderator states"
-msgstr ""
+msgstr "stati del moderatore"
 
 #: models/pagemodel.py:34
 msgid "req. app."
-msgstr ""
+msgstr "rich. app."
 
 #: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
 #: templates/cms/toolbar/toolbar.html:872
 #: templates/cms/toolbar/toolbar.html:899 utils/moderator.py:91
 msgid "delete"
-msgstr ""
+msgstr "eliminare"
 
 #: models/pagemodel.py:37
 msgid "app. par."
-msgstr ""
+msgstr "app. par."
 
 #: models/pagemodel.py:39
 msgid "created by"
-msgstr ""
+msgstr "creato da"
 
 #: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
 msgid "changed by"
-msgstr ""
+msgstr "cambiato da"
 
 #: models/pagemodel.py:43
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr ""
+msgstr "Quando la pagina dovrebbe andare online. Lo stato deve essere \\ \"Pubblicato \" per la pagina per essere online."
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "Quando scade la pagina. Lasciare vuoto per non farla mai scadere."
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "Tutti gli antenati non verranno visualizzati nella barra di navigazione"
 
 #: models/pagemodel.py:47
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr ""
+msgstr "Un identificativo univoco, che viene utilizzato con il templatetag page_url per riferirsi a questa pagina"
 
 #: models/pagemodel.py:49
 msgid "is published"
-msgstr ""
+msgstr "è pubblicato"
 
 #: models/pagemodel.py:51
 msgid "The template used to render the content."
-msgstr ""
+msgstr "Il modello utilizzato per il rendering del contenuto."
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "Il sito a cui la pagina è accessibile."
 
 #: models/pagemodel.py:52
 msgid "site"
-msgstr ""
+msgstr "sito"
 
 #: models/pagemodel.py:54
 msgid "moderator state"
-msgstr ""
+msgstr "stato del moderatore"
 
 #: models/pagemodel.py:62
 msgid "menu login required"
-msgstr ""
+msgstr "login menu richiesto"
 
 #: models/pagemodel.py:62
 msgid "only show this page in the menu if the user is logged in"
-msgstr ""
+msgstr "mostra solo questa pagina nel menù, se l'utente è connesso"
 
 #: models/pagemodel.py:70
 msgid "pages"
-msgstr ""
+msgstr "pagine"
 
 #: models/pagemodel.py:176
 msgid "Page was copied."
-msgstr ""
+msgstr "La pagina è stata copiata."
 
 #: models/pagemodel.py:497
 msgid "default"
-msgstr ""
+msgstr "predefinito"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr ""
+msgstr "può aggiungere"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr ""
+msgstr "può eliminare"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr ""
+msgstr "può modificare le impostazioni avanzate"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr ""
+msgstr "può cambiare i permessi"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr ""
+msgstr "il livello di pagina"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "può muovere"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
-msgstr ""
+msgstr "può moderare"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
-msgstr ""
+msgstr "può recuperare le pagine"
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "può recuperare qualsiasi pagina cancellata"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "Se nessuno selezionato, l'utente ha concesse le autorizzazioni per tutti i siti."
 
 #: models/permissionmodels.py:52
 msgid "sites"
-msgstr ""
+msgstr "siti"
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
-msgstr ""
+msgstr "Permesso globale per la pagina"
 
 #: models/permissionmodels.py:58
 msgid "Pages global permissions"
-msgstr ""
+msgstr "Permessi globali per le pagine"
 
 #: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
-msgstr ""
+msgstr "Grant su"
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
-msgstr ""
+msgstr "Permesso della pagina"
 
 #: models/permissionmodels.py:87
 msgid "User (page)"
-msgstr ""
+msgstr "Utente (pagina)"
 
 #: models/permissionmodels.py:88
 msgid "Users (page)"
-msgstr ""
+msgstr "Utenti (pagina)"
 
 #: models/permissionmodels.py:100
 msgid "User group (page)"
-msgstr ""
+msgstr "Gruppo di Utenti (pagina)"
 
 #: models/permissionmodels.py:101
 msgid "User groups (page)"
-msgstr ""
+msgstr "Gruppi di Utenti (pagina)"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "sovrascrivere il titolo nel menu"
 
 #: models/titlemodels.py:15
 msgid "Path"
-msgstr ""
+msgstr "Percorso"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
-msgstr ""
+msgstr "sovrascrivere il titolo (tag title)"
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
-msgstr ""
+msgstr "File"
 
 #: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
 #: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
-msgstr ""
+msgstr "file"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
-msgstr ""
+msgstr "Flash"
 
 #: plugins/flash/models.py:9 plugins/video/models.py:36
 msgid "use swf file"
-msgstr ""
+msgstr "l'uso del file swf"
 
 #: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
 #: plugins/video/models.py:39
 msgid "width"
-msgstr ""
+msgstr "ampiezza"
 
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:40
 msgid "height"
-msgstr ""
+msgstr "altezza"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin."
-msgstr ""
+msgstr "Il plugin Flash non è installato."
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
-msgstr ""
+msgstr "Google Map"
 
 #: plugins/googlemap/models.py:9
 msgid "map title"
-msgstr ""
+msgstr "titolo mappa"
 
 #: plugins/googlemap/models.py:11
 msgid "address"
-msgstr ""
+msgstr "indirizzo"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr ""
+msgstr "codice postale"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr ""
+msgstr "città"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr ""
+msgstr "contenuti aggiuntivi"
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
-msgstr ""
+msgstr "livello di zoom"
 
 #: plugins/googlemap/models.py:18
 msgid "latitude"
-msgstr ""
+msgstr "latitudine"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr ""
+msgstr "Usa latitudine e longitudine per perfezionare la posizione della mappa."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
-msgstr ""
+msgstr "longitudine"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr ""
+msgstr "titolo del route planer"
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "Calcola il tuo percorso più veloce fino a qui"
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
-msgstr ""
+msgstr "route planer"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
-msgstr ""
+msgstr "Mappa"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:74
 msgid "Your address"
-msgstr ""
+msgstr "Il tuo indirizzo"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:77
 msgid "Calculate route"
-msgstr ""
+msgstr "Calcolare il percorso"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "Eredita Plugins dalla Pagina"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "La Lingua o la Pagina deve essere compilata"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "Scegli una pagina da cui includere i plugin in questo segnaposto, vuota sceglierà la pagina corrente"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr ""
+msgstr "Opzionale: il linguaggio dei plugins che si desidera"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
