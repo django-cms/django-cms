@@ -361,3 +361,18 @@ Example::
 	CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
 
 
+CMS_DBGETTEXT
+-------------
+
+Enable gettext-based translation of CMS content rather than using the standard administration interface. Requires `django-dbgettext <http://http://bitbucket.org/drmeers/django-dbgettext>`_.
+
+Default: ``False`` (unless ``dbgettext`` is in ``settings.INSTALLED_APPS``)
+
+CMS_DBGETTEXT_SLUGS
+-------------------
+
+Enable gettext-based translation of page paths/slugs. Experimental at this stage as resulting translations cannot be guaranteed to be unique.
+
+Default: ``False``
+
+For general dbgettext settings, see the `dbgettext documentation <http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
