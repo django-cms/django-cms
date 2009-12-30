@@ -1,5 +1,6 @@
-#Fri Oct 16 16:31:13 CEST 2009
+#Wed Dec 23 22:05:30 CET 2009
 eclipse.preferences.version=1
 encoding//cms/docs/conf.py=utf-8
 encoding//cms/tests/__init__.py=utf-8
+encoding//cms/tests/navextender.py=utf-8
 encoding//cms/tests/page.py=utf-8

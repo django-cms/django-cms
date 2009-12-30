@@ -199,7 +199,6 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
     if target.pk in ancestors:
         target.ancestor = True
     if target.pk == selected_pk:
-        target.selected = True
         levels = active_levels
     if (levels <= 0 or (target.soft_root and soft_roots)) and not target.pk in ancestors:
         return

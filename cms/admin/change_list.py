@@ -149,7 +149,7 @@ class CMSChangeList(ChangeList):
                 page.menu_level = 0
                 root_pages.append(page)
                 if page.parent_id:
-                    page.get_cached_ancestors()
+                    page.get_cached_ancestors(ascending=True)
                 else:
                     page.ancestors_ascending = []
                 page.home_pk_cache = home_pk
