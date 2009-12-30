@@ -5,11 +5,17 @@
 	<h2>Sample application home page</h2>
 	<h3>{{ message }}</h3>
 	{{ block.super }}
-	<a href="{% mlurl sample-app-sublevel %}">Sample app sublevel reverse test</a>
-	
-	<a href="/de{% url de:sample-app-sublevel %}">Sample app sublevel reverse test de</a>
-	<a href="/en{% url en:sample-app-sublevel %}">Sample app sublevel reverse test en</a>
-	
+	<ul>
+		<li>
+			<a href="{% url sample-app-sublevel %}">Sample app sublevel reverse test</a>
+		</li>
+		<li>
+			<a href="{% url de:sample-app-sublevel %}">Sample app sublevel reverse test de</a>
+		</li>
+		<li>
+			<a href="{% url en:sample-app-sublevel %}">Sample app sublevel reverse test en</a>
+		</li>
+	</ul>
 	<h4>Sample image  - appmedia works?</h4>
 	<img src="{{ MEDIA_URL }}sampleapp/img/gift.jpg" alt="gift">
 {% endblock content %}

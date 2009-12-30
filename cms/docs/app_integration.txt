@@ -23,9 +23,13 @@ You have 4 ways of integrating your app:
 App-Hooks
 ---------
 
-CMS_APPLICATION_URLS
+**`CMS_APPLICATION_URLS`**
+
+With this settings you can add urls.py of your applications to a list
+that will show up in the advanced settings tab of a page.
 
 Put this in your settings.py.
+
 Example:
 
 	CMS_APPLICATION_URLS = (
@@ -33,3 +37,22 @@ Example:
 		("myotherapp.urls", gettext("My other Application")),
 	)
 
+Now edit a page and select an entry in the advanced settings tab. Save the page.
+After this you need to restart the server because the urls are cached by django and 
+in a multi-threaded environment we don't know which caches are cleared yet.
+
+If you attached the app to a page with the url `/hello/world/` and the app has a urls.py 
+that looks like this:
+
+from django.conf.urls.defaults import *
+
+	urlpatterns = patterns('sampleapp.views',
+	    url(r'^$', 'main_view', name='app_main'),
+	    url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
+	)
+	
+The 'main_view' should now be available at `/hello/world/` and the 'sample_view' has the url
+'/hello/world/sublevel/'.
+
+
+ 
