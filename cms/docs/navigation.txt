@@ -108,91 +108,6 @@ This is mostly needed for pages like login, logout and third-party apps.
 
 .. _extending_the_menu:
 
-Extending the menu
-------------------
-
-The menu can be extended with static or dynamic content.
-For example, you may have a shop with categories and want these categories to be displayed in the navigation.
-
-Add the following to your ``settings.py`` file::
-
-	CMS_NAVIGATION_EXTENDERS = (('shop.utils.get_nodes', gettext('Shop Categories')),)
-
-Now you can link a navigation extender to a page in the 'Advanced' tab of the page settings.
-
-An example of an extender function is in ``utils.py`` in ``myapp`` in the example project included in the source::
-
-    from categories.models import Category
-    
-    def get_nodes(request):
-        categories = list(Category.objects.all())
-        res = [] # result list
-        all_categories = categories[:]
-        child_categories = [] # all categories with a parent
-
-        # put all of the child categories in a list of their
-        # own (children) and add all of the parent categories
-        # (that is, categories with no parent) to the result list
-        for category in categories:
-            if category.parent_id:
-                # this is a child category
-                child_categories.append(category)
-            else:
-                # this is a parent category
-                res.append(category)
-
-        # now go through each parent category, putting its children
-        # in a list called 'childrens' (because 'children' has already
-        # been taken by mptt)
-        for category in all_categories:
-            category.childrens = []
-            for child in children_categories:
-                if child.parent_id == category.pk:
-                    category.childrens.append(child)
-        return res
-    
-The model would look something like this::
-
-    from django.db import models
-    from django.core.urlresolvers import reverse
-    import mptt
-    
-    class Category(models.Model):
-        parent = models.ForeignKey('self', blank=True, null=True)
-        name = models.CharField(max_length=20)
-     
-        def __unicode__(self):
-            return self.name
-        
-        def get_menu_title(self):
-            return self.name
-        
-        def get_absolute_url(self):
-            return reverse('category_view', args=[self.pk])
-        
-        try:
-            mptt.register(Category)
-        except mptt.AlreadyRegistered:
-            pass
-
-It is encouraged to use `django-mptt <http://code.google.com/p/django-mptt/>`_ (a
-suitable version is included in the `mptt` directory) for the tree
-structure because of performance considerations.
-The objects provided must adhere to the following structure:
-
-Each must have a ``get_menu_title`` function, a ``get_absolute_url`` function, and a
-``childrens`` array with all of its children inside (the 's' at the end of ``childrens`` is done on purpose
-because ``children`` is already taken by mptt).
-
-Be sure that ``get_menu_title`` and ``get_absolute_url`` don't trigger any queries when called in a template or you 
-may have some serious performance and DB problems with a lot of queries.
-
-It may be wise to cache the output of ``get_nodes``. For this you may need to write a wrapper class because of
-dynamic content that the pickle module can't handle. 
-
-If you want to display some static pages in the navigation ("login", for example) you can write your own "dummy" class that adheres to the conventions described above.
-
-A base class for this purpose can be found in ``cms/utils/navigation.py``
 
 Properties of Navigation Nodes in templates
 -------------------------------------------
@@ -274,3 +189,10 @@ enter a id (such as "help") in the 'Advanced' tab of the page's settings.
 You could then obtain a URL for the help page in a template like this::
 
 	<a href="{% page_id_url "help" %}">help</a>
+
+
+Modifing & Extending the menu
+-----------------------------
+
+Please refer to the app integration documentation
+	
