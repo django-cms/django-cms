@@ -334,7 +334,6 @@ class Page(MpttPublisher):
             except NoHomeFound:
                 pass
             ancestors = self.get_cached_ancestors()
-            
             if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
                 path = "/".join(path.split("/")[1:])
             
