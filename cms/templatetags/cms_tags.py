@@ -534,39 +534,67 @@ def do_page_attribute(parser, token):
         bits = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(error_string)
-    if len(bits) == 2:
-        #tag_name, name
-        return PageAttributeNode(bits[1])
+    if len(bits) >= 2:
+        # tag_name, name
+        # tag_name, name, reverse_id
+        reverse_id = bits[2] if len(bits) == 3 else None 
+        return PageAttributeNode(bits[1], reverse_id)
     else:
         raise template.TemplateSyntaxError(error_string)
 
 class PageAttributeNode(template.Node):
-    """This template node is used to output attribute from page such
+    """This template node is used to output attribute from a page such
     as its title and slug.
 
-    eg: {% page_attribute field-name %}
+    Synopsis
+         {% page_attribute field-name %}        
+         {% page_attribute field-name reverse-id %}
+     
+    Example
+         {# Output current page's page_title attribute #}
+         {% page_attribute page_title %}        
+         {# Output page_title attribute of the page with reverse_id 'the_page' #}
+         {% page_attribute page_title 'the_page' %}
+
 
     Keyword arguments:
-    field-name -- the name of the field to output. One of "title",
-    "slug", "meta_description" or "meta_keywords" -- Use without qoutes!
+    field-name -- the name of the field to output. Use one of:
+    - title
+    - menu_title
+    - page_title
+    - slug
+    - meta_description
+    - meta_keywords
+    
+    reverse-id -- The page's reverse_id property, if omitted field-name of 
+    current page is returned.
     """
-    def __init__(self, name):
+    def __init__(self, name, reverse_id=None):
         self.name = name.lower()
+        self.reverse_id = reverse_id
+
 
     def render(self, context):
         if not 'request' in context:
             return ''
         lang = get_language_from_request(context['request'])
-        request = context['request']
-        page = request.current_page
+        page = self._get_page(context['request'])
         if page == "dummy":
             return ''
         if page and self.name in ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]:
             f = getattr(page, "get_"+self.name)
             return f(language=lang, fallback=True)
-        else:
-            return ''
-        
+        return ''
+
+    def _get_page(self, request):
+        if self.reverse_id == None:
+            return request.current_page
+        site = Site.objects.get_current()    
+        try:
+            return get_page_queryset(request).get(reverse_id=self.reverse_id, site=site)
+        except:
+            send_missing_mail(self.reverse_id, request)
+
     def __repr__(self):
         return "<PageAttribute Node: %s>" % self.name
 
