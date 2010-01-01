@@ -1,38 +1,254 @@
 Templatetags
 ============
 
+To use any of the following templatetags you need to load them first at the top of your template::
+
+	{% load cms_tags %}
+
 placeholder
 -----------
+
+The placeholder templatetag will be filled with plugins. The cms auto-detects all placeholders
+used in the template.
+
+Example::
+
+	{% placeholder "content" %}
+	
+You can additionally give the placeholder a theme attribute::
+
+	{% placeholder "content" "fancy_theme" %}
+	
+If a theme is provided every plugin recieves a "theme" context variable when the plugin is rendered.
+
+Also be sure to check out the ``PLACEHOLDER_CONF`` setting where you can change some of the behavior
+of the placeholders. 
+ 
 
 page_attribute
 --------------
 
+This templatetag is used to display an attribute of the current page in the current language.
+
+Example::
+
+	{% page_attribute page_title %}
+	
+Possible attributes:
+
+- title
+- menu_title
+- page_title
+- slug
+- meta_description
+- meta_keywords
+
+As an optional second argument you can provide a page id. Page ids can be set in the advanced
+settings tab of a page.
+
+Example::
+
+	{% page_attribute page_title my_page_id %}	
+
 show_menu
 ---------
+
+``{& show_menu %}`` renders the navigation of the current page.
+You can overwrite the appearance and the HTML if you add a ``cms/menu.html``
+template to your project or edit the one provided with django-cms.
+``show_menu`` takes four optional parameters: ``start_level``, ``end_level``,
+``extra_inactive``, and ``extra_active``.
+
+The first two parameters, ``start_level`` (default=0) and ``end_level`` (default=100) specify from what level to which level
+should the navigation be rendered.
+If you have a home as a root node and don't want to display home you can render the navigation only after level 1.
+
+The third parameter, ``extra_inactive`` (default=0), specifies how many levels of navigation should be displayed
+if a node is not a direct ancestor or descendant of the current active node.
+
+Finally, the fourth parameter, ``extra_active`` (default=100), specifies how many levels of
+descendants of the currently active node should be displayed.
+
+Some Examples:
+^^^^^^^^^^^^^^
+
+Complete navigation (as a nested list)::
+
+	{% load cache cms_tags %}
+	<ul>
+		{% show_menu 0 100 100 100 %}
+	</ul>
+
+Navigation with active tree (as a nested list)::
+
+	<ul>
+		{% show_menu 0 100 0 100 %}
+	</ul>
+
+Navigation with only one active extra level::
+
+	<ul>
+		{% show_menu 0 100 0 1 %}
+	</ul>
+
+Level 1 navigation (as a nested list)::
+
+	<ul>
+		{% show_menu 1 %}
+	</ul>
+
+Navigation with a custom template::
+
+	{% show_menu 0 100 100 100 "myapp/menu.html" %}
 
 show_menu_below_id
 ------------------
 
+If you have set an id in the advanced settings of a page, you can display the submenu of this page with
+a template tag.  For example, we have a page called meta that is not displayed in the navigation and that
+has the id "meta"::
+
+	<ul>
+		{% show_menu_below_id "meta" %}
+	</ul>
+
+You can give it the same optional parameters as ``show_menu``::
+
+	<ul>
+		{% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
+	</ul>
+
 show_sub_menu
 -------------
+
+Display the sub menu of the current page (as a nested list).
+Takes one argument that specifies how many levels deep should the submenu be displayed.
+The template can be found at ``cms/sub_menu.html``::
+
+	<ul>
+    	{% show_sub_menu 1 %}
+	</ul>
+
+Or with a custom template::
+
+	<ul>
+		{% show_sub_menu 1 "myapp/submenu.html" %}
+	</ul>
 
 show_breadcrumb
 ---------------
 
+Show the breadcrumb navigation of the current page.
+The template for the HTML can be found at ``cms/breadcrumb.html``.::
+
+	{% show_breadcrumb %}
+
+Or with a custom template and only display level 2 or higher::
+
+	{% show_breadcrumb 2 "myapp/breadcrumb.html" %}
+
+If the current URL is not handled by the CMS or by a navigation extender,
+the current menu node can not be determined.
+In this case you may need to provide your own breadcrumb via the template.
+This is mostly needed for pages like login, logout and third-party apps.
+This can easily be accomplished by a block you overwrite in your templates.
+
+For example in your base.html:
+
+	<ul>
+		{% block breadcrumb %}
+		{% show_breadcrumb %}
+		{% endblock %}
+	<ul>
+	
+And then in your app template:
+
+	{% block breadcrumb %}
+	<li><a href="/">home</a></li>
+	<li>My current page</li>
+	{% endblock %} 
+	
+	
 page_language_url
 -----------------
+
+Returns the url of the current page in an other language::
+
+	{% page_language_url de %}
+	{% page_language_url fr %}
+	{% page_language_url en %}
+
+If the current url has no cms-page and is handled by a navigation extender and the url changes based on the language:
+You will need to set a language_changer function with the set_language_changer function in cms.utils.
+
+For more information have a look in the i18n docs.
+
+#TODO: link to i18n
 
 language_chooser
 ----------------
 
+The ``language_chooser`` template tag will display a language chooser for the current page.
+You can modify the template in ``cms/language_chooser.html`` or provide your own template if necessary.
+
+Example::
+
+	{% language_chooser %}
+	
+or with custom template::
+
+	{% language_chooser "myapp/language_chooser.html" %}
+
+
+If the current url has no cms-page and is handled by a navigation extender and the url changes based on the language:
+You will need to set a language_changer function with the set_language_changer function in cms.utils.
+
+For more information have a look in the i18n docs.
+
+#TODO: link to i18n
+
 page_id_url
 -----------
+
+This template tag returns the URL of a page that has a symbolic name, known as
+``id`` or  ``reverse_id``.  For example, you could have a help page that you want to display a link to 
+on every page.  To do this, you would go to the help page in the admin interface and
+enter a id (such as "help") in the 'Advanced' tab of the page's settings.
+You could then obtain a URL for the help page in a template like this::
+
+	<a href="{% page_id_url "help" %}">help</a>
 
 show_placeholder_by_id
 ----------------------
 
+Displays the placeholder of a page with an id.
+
+Attributes:
+
+- placeholder_name
+- reverse_id
+- language (optional)
+- site (optional)
+
+Example::
+
+	{% show_placeholder_by_id "content" "footer_page" %}
+
 show_uncached_placeholder_by_id
 -------------------------------
+
+The same as ``show_placeholder_by_id`` but is not cached.
+
+Attributes:
+
+- placeholder_name
+- reverse_id
+- language (optional)
+- site (optional)
+
+Example::
+
+	{% show_uncached_placeholder_by_id "content" "footer_page" %}
 
 plugins_media
 -------------

@@ -499,7 +499,7 @@ class PlaceholderNode(template.Node):
     """This template node is used to output page content and
     is also used in the admin to dynamicaly generate input fields.
     
-    eg: {% placeholder content-type-name page-object widget-name %}
+    eg: {% placeholder content-type-name theme-name %}
     
     Keyword arguments:
     name -- the name of the placeholder
@@ -544,7 +544,7 @@ def do_page_attribute(parser, token):
 
 class PageAttributeNode(template.Node):
     """This template node is used to output attribute from a page such
-    as its title and slug.
+    as its title or slug.
 
     Synopsis
          {% page_attribute field-name %}        

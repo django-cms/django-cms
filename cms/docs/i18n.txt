@@ -32,7 +32,11 @@ the ``set_language_changer`` function in the view that handles the current URL.
 
 In the models of the current object add an optional language parameter to the ``get_absolute_url`` function::
 
+	from django.utils.translation import get_language
+	
 	def get_absolute_url(self, language=None):
+		if not language:
+			language = get_language()
 		reverse("product_view", args=[self.get_slug(language=language)])
 
 

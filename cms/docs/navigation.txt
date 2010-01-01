@@ -55,22 +55,7 @@ Navigation with a custom template::
 
 	{% show_menu 0 100 100 100 "myapp/menu.html" %}
 
-show_menu_below_id
-------------------
 
-If you have set an id in the advanced settings of a page, you can display the submenu of this page with
-a template tag.  For example, we have a page called meta that is not displayed in the navigation and that
-has the id "meta"::
-
-	<ul>
-		{% show_menu_below_id "meta" %}
-	</ul>
-
-You can give it the same optional parameters as ``show_menu``::
-
-	<ul>
-		{% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
-	</ul>
 
 show_sub_menu
 -------------
@@ -179,19 +164,8 @@ To enable it put the following in your ``settings.py`` file::
 
 Now you can mark a page as "soft root" in the 'Advanced' tab of the page's settings in the admin interface.
 
-page_id_url
------------
 
-This template tag returns the URL of a page that has a symbolic name, known as
-``id`` or  ``reverse_id``.  For example, you could have a help page that you want to display a link to 
-on every page.  To do this, you would go to the help page in the admin interface and
-enter a id (such as "help") in the 'Advanced' tab of the page's settings.
-You could then obtain a URL for the help page in a template like this::
-
-	<a href="{% page_id_url "help" %}">help</a>
-
-
-Modifing & Extending the menu
+Modifying & Extending the menu
 -----------------------------
 
 Please refer to the app integration documentation
