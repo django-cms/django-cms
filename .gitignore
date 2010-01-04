@@ -9,7 +9,6 @@ cms/django
 cms/media/cms_page_media/
 cms/docs/build
 example/run
-
 example/local_settings.py
 reversion/
 build
@@ -23,3 +22,4 @@ downloads
 eggs
 parts
 bin
+/dist
