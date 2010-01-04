@@ -38,6 +38,8 @@ class ToolbarMiddleware(object):
             return False
         if request.path_info.startswith(reverse("admin:index")):
             return False
+        if request.path_info.startswith(settings.MEDIA_URL):
+            return False
         if "edit" in request.GET:
             return True
         if not hasattr(request, "user"):
