@@ -249,7 +249,11 @@ For example you have a page named blog and a blog application. You can attach th
 
 At the moment if you change this settings you should restart the server as there is a cache invalidation bug.
 
-An simpler way is to have a page with the same url as the app. This will give you also the plugin and menu abilities but has some limitations when it comes to i18n and urls. 
+An simpler way is to have a page with the same url as the app. This will give you also the plugin and menu abilities but has some limitations when it comes to i18n and urls.
+
+**ATTENTION**
+
+All views must return RequestContext beside the normal Context 
 
 CMS_UNIQUE_SLUGS
 ------------------

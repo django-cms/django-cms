@@ -54,6 +54,11 @@ from django.conf.urls.defaults import *
 The 'main_view' should now be available at `/hello/world/` and the 'sample_view' has the url
 '/hello/world/sublevel/'.
 
+
+**ATTENTION**
+
+All views that are attached like this must return the RequestContext besides the normal Context.
+
 **Language Namespaces**
 
 An additional feature of apphooks is that if you use the MultilingualURLMiddleware all apphook urls
