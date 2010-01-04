@@ -159,54 +159,6 @@ class PageAdmin(model_admin):
             
         )]
         
-    def __call__(self, request, url):
-        """Delegate to the appropriate method, based on the URL.
-        
-        Old way of url handling, so we are compatible with older django 
-        versions.
-        """
-        if url is None:
-            return self.list_pages(request)
-        elif url.endswith('add-plugin'):
-            return self.add_plugin(request)
-        elif 'edit-plugin' in url:
-            plugin_id = url.split("/")[-1]
-            return self.edit_plugin(request, plugin_id)
-        elif 'remove-plugin' in url:
-            return self.remove_plugin(request)
-        elif 'move-plugin' in url:
-            return self.move_plugin(request)
-        elif url.endswith('/move-page'):
-            return self.move_page(request, unquote(url[:-10]))
-        elif url.endswith('/copy-page'):
-            return self.copy_page(request, unquote(url[:-10]))
-        elif url.endswith('/change-status'):
-            return self.change_status(request, unquote(url[:-14]))
-        elif url.endswith('/change-navigation'):
-            return self.change_innavigation(request, unquote(url[:-18]))
-        elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
-            return HttpResponseRedirect(reverse('admin:jsi18n'))
-        elif url.endswith('/permissions'):
-            return self.get_permissions(request, unquote(url[:-12]))
-        elif url.endswith('/moderation-states'):
-            return self.get_moderation_states(request, unquote(url[:-18]))
-        elif url.endswith('/change-moderation'):
-            return self.change_moderation(request, unquote(url[:-18]))
-        elif url.endswith('/approve'):
-            return self.approve_page(request, unquote(url[:-8]))
-        elif url.endswith('/remove-delete-state'):
-            return self.remove_delete_state(request, unquote(url[:-20]))
-        elif url.endswith('/dialog/copy'):
-            return get_copy_dialog(request, unquote(url[:-12]))
-        elif url.endswith('/preview'):
-            return self.preview_page(request, unquote(url[:-8]))
-        elif url.endswith('/change_temlate'):
-            return self.change_template(request, unquote(url[:-15]))
-        # NOTE: revert plugin is newly integrated in overriden revision_view
-        if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
-            url = url.split("/?")[0]
-        return super(PageAdmin, self).__call__(request, url)
-
     def get_urls(self):
         """New way of urls handling.
         """

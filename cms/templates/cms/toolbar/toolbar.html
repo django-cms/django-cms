@@ -148,7 +148,7 @@
 	* html .cms_toolbar .cms_toolbar_submenubutton em{background-image:url({{ CMS_MEDIA_URL }}images/cms_toolbar.gif);}
 	.cms_toolbar .cms_toolbar_submenubutton:hover em{background-position:-190px -188px;}
 
-	.cms_toolbar_submenu{z-index:70012;display:none;position:absolute;width:auto;min-width:130px;top:29px;right:0px;}
+	.cms_toolbar_submenu{padding:0;z-index:70012;display:none;position:absolute;width:auto;min-width:130px;top:29px;right:0px;}
 	.open .cms_toolbar_submenu{display:block; border:1px solid #E8E8E8;
 		-moz-border-radius:5px;
 		-webkit-border-radius:5px;
@@ -860,16 +860,26 @@
 			</ul>
 		</div>
 		{% endif %}
+		{% if auth %}
+		<div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Page</strong><em>arrow</em></span>		
+			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
+				<li class="first"><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
+				{% if has_add_page_permission %}
+				<li><a href="{% url admin:cms_page_add %}?target={{ page.pk }}&position=last-child"><span class="cms_toolbar_icon_add_child">{% trans "add child" %}</span>{% trans "Add child page" %}</a></li>
+				<li><a href="{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&position=last-child{% endif %}"><span class="cms_toolbar_icon_add_sibling">{% trans "add sibling" %}</span>{% trans "Add sibling page" %}</a></li>
+				{% endif %}
+				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
+			</ul>
+		</div>
+		{% endif %}
 		<div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>		
 			<ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">				
 				<li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">{% trans "edit" %}</span>{% trans "Site Administration" %}</a></li>
 				{% if auth %}
-				<li><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
 				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
 				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
 				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
 				{% endif %}
-				{% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
 				{% endif %}			
 			</ul>
 		</div>
