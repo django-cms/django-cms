@@ -163,7 +163,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.drafts().count() - count, 3)
         
         
-    def test_9_language_change(self):
+    def test_09_language_change(self):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         pk = Page.objects.all()[0].pk
@@ -172,18 +172,43 @@ class PagesTestCase(CMSTestCase):
         response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
         self.assertEqual(response.status_code, 200)
         
-    """
-    This is not a valid test, please write correct tests, which work, this must
-    create at lest 2 language mutations of page before delete
-    
-    def test_11_language_delete(self):
-        self.client.login(username= 'test', password='test')
-        setattr(settings, "SITE_ID", 1)
-        page_data = self.get_new_page_data()
-        self.client.post('/admin/cms/page/add/', page_data)
-        pk = Page.objects.all()[0].pk
-        response = self.client.get("/admin/cms/page/%s/delete-translation/" % pk, {"language":"en" })
+    def test_10_move_page(self):
+        page_data1 = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data1)
+        page_data2 = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data2)
+        page_data3 = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data3)
+        page1 = Page.objects.all()[0]
+        page2 = Page.objects.all()[1]
+        page3 = Page.objects.all()[2]
+        # move pages
+        response = self.client.post("/admin/cms/page/%s/move-page/" % page3.pk, {"target":page2.pk, "position":"last-child" })
         self.assertEqual(response.status_code, 200)
-        response = self.client.post("/admin/cms/page/%s/delete-translation/" % pk, {"language":"en" })
-        self.assertEqual(response.status_code, 302)
-    """
+        response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"last-child" })
+        self.assertEqual(response.status_code, 200)
+        # check page2 path and url
+        page2 = Page.objects.get(pk=page2.pk)
+        self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
+        self.assertEqual(page2.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/")
+        # check page3 path and url
+        page3 = Page.objects.get(pk=page3.pk)
+        self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
+        self.assertEqual(page3.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        # publish page 1 (becomes home)
+        page1 = Page.objects.all()[0]
+        page1.published = True
+        page1.save()
+        # check that page2 and page3 url have changed
+        page2 = Page.objects.get(pk=page2.pk)
+        self.assertEqual(page2.get_absolute_url(), "/"+page_data2['slug']+"/")
+        page3 = Page.objects.get(pk=page3.pk)
+        self.assertEqual(page3.get_absolute_url(), "/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        # move page2 back to root and check path of 2 and 3
+        response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"left" })
+        self.assertEqual(response.status_code, 200)
+        page2 = Page.objects.get(pk=page2.pk)
+        self.assertEqual(page2.get_path(), page_data2['slug'])
+        page3 = Page.objects.get(pk=page3.pk)
+        self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
+        
