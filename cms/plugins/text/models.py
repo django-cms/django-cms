@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.html import strip_tags
 from django.utils.text import truncate_words
 from cms.plugins.text.utils import plugin_admin_html_to_tags,\
-    plugin_tags_to_admin_html
+    plugin_tags_to_admin_html, plugin_tags_to_id_list
 
 class Text(CMSPlugin):
     """A block of content, tied to a page, for a particular language"""
@@ -28,3 +28,12 @@ class Text(CMSPlugin):
     
     def __unicode__(self):
         return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")
+    
+    def clean_plugins(self):
+        ids = plugin_tags_to_id_list(self.body)
+        plugins = CMSPlugin.objects.filter(parent=self)
+        for plugin in plugins:
+            if not str(plugin.pk) in ids:
+                plugin.delete() #delete plugins that are not referenced in the text anymore
+        
+        

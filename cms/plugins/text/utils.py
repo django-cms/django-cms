@@ -1,4 +1,5 @@
 from cms.models import CMSPlugin
+from django.template.defaultfilters import force_escape
 import re
 
 OBJ_TAG_RE = re.compile(u"\{\{ plugin_object (\d+) \}\}")
@@ -24,8 +25,12 @@ def plugin_tags_to_admin_html(text):
                     icon_src=force_escape(obj.get_instance_icon_src()),
                     icon_alt=force_escape(obj.get_instance_icon_alt()),
                     )
-
     return OBJ_TAG_RE.sub(_tag_to_admin, text)
+
+
+def plugin_tags_to_id_list(text):
+    ls = OBJ_ADMIN_RE.findall(text)    
+    return ls
 
 def plugin_tags_to_user_html(text, context, placeholder):
     """

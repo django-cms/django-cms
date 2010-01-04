@@ -132,7 +132,7 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         Override original method, and add some attributes to obj
         This have to be made, because if object is newly created, he must know
-        where he belives.
+        where he lives.
         Attributes from cms_plugin_instance have to be assigned to object, if
         is cms_plugin_instance attribute available.
         """
