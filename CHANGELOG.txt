@@ -11,3 +11,12 @@
 
 - testsuite working again
 - changelog file added
+
+==== 2.1.0 (2010-XX-XX) ====
+
+- language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
+- video plugin switch to http://github.com/FlashJunior/OSFlashVideoPlayer
+- frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
+- testsuite works now under sqlite and postgres
+- orphaned text embed plugins get now deleted if not referenced in the text anymore
+- a lot of bugfixes

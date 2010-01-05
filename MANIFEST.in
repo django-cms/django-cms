@@ -2,11 +2,11 @@ include AUTHORS
 include LICENSE
 include README.md
 include CHANGELOG.txt
+recursive-include cms/locale *
 recursive-include cms/templates *
 recursive-include cms/media *
-recursive-include cms/docs *.html *.css *.js *.png
-recursive-include cms/plugins/*/templates *
-recursive-include example/templates *
-recursive-include cms/fixtures *.json
+recursive-include cms/docs *.txt *.png
+recursive-include cms/plugins/ *
+recursive-include cms/models/fixtures *.json
 recursive-include mptt/tests/fixtures *.json
 
