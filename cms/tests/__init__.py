@@ -11,6 +11,18 @@ from cms.tests.permmod import PermissionModeratorTestCase
 from cms.tests.site import SiteTestCase
 from cms.tests.navextender import NavExtenderTestCase
 
+settings.CMS_PERMISSION = True
+settings.CMS_MODERATOR = True
+settings.CMS_NAVIGATION_EXTENDERS = (
+    ('example.categories.navigation.get_nodes', 'Categories'),
+    ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+)
+
+settings.CMS_FLAT_URLS = False
+settings.CMS_MENU_TITLE_OVERWRITE = True
+settings.CMS_HIDE_UNTRANSLATED = False
+settings.CMS_URL_OVERWRITE = True
+
 def suite():
     # this must be changed!! and tests must happen for multiple configurations!
     s = unittest.TestSuite()
