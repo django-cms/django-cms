@@ -20,12 +20,16 @@ Plugins included at the moment include the following:
 * Video
 * Twitter
 
+
 Many more are in the works.  Plugins are very easy to write and integrate with your own models.  
+For a list of 3rd party plugins have a look [here](http://www.django-cms.org/en/extensions/).
 
 Tour & Screenshots
 ------------------
 
-can be found [here](http://www.django-cms.org/en/tour/)
+Can be found [here](http://www.django-cms.org/en/tour/).
+Some Sites done with django-cms can be found [here](http://www.django-cms.org/en/sites/)
+
 
 
 Documentation
@@ -51,5 +55,12 @@ or #django-cms on freenet IRC for more info.
 For a feature comparison of all the CMS apps available for django see
 [CMSComparison](http://code.djangoproject.com/wiki/CMSAppsComparison).
 
-This is a fork of django-page-cms.
-Some icons are from [http://www.famfamfam.com](http://www.famfamfam.com/)
+Kudos
+-----
+
+- This is a fork of django-page-cms.
+- Some icons are from [http://www.famfamfam.com](http://www.famfamfam.com/)
+- Video plugin uses [OSFlashVideoPlayer](http://github.com/FlashJunior/OSFlashVideoPlayer)
+- Includes [Wymeditor](http://www.wymeditor.org/)
+- Tree Component from [jstree.com](http://www.jstree.com/)
+
