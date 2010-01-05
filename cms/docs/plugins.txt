@@ -151,3 +151,46 @@ For installation be sure you have the following in your project's ``INSTALLED_AP
 		'cms.plugins.text',
 		# ...
 	)
+	
+Video
+-----
+
+Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer <http://github.com/FlashJunior/OSFlashVideoPlayer>`_.
+If you upload a file use .flv files or h264 encoded video files. 
+ 
+For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
+
+	INSTALLED_APPS = (
+		# ...
+		'cms.plugins.video',
+		# ...
+	)
+	
+Twitter
+-------
+
+Displays the last number of post of a twitter user.
+
+For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
+
+	INSTALLED_APPS = (
+		# ...
+		'cms.plugins.twitter',
+		# ...
+	)
+	
+Inherit
+-------
+
+Displays all plugins of an other page or an other language. Great if you need always the same 
+plugins on a lot of pages.
+
+For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
+
+	INSTALLED_APPS = (
+		# ...
+		'cms.plugins.inherit',
+		# ...
+	)
+
+ 
