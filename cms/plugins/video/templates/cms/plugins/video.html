@@ -10,9 +10,9 @@
 	flashvars.image = "{{ object.image.url }}";
 	{% endif %}
 	
-	flashvars.autoplay = "{{ object.autoplay|bool }}";			
+	flashvars.autoplay = "{{ object.auto_play|bool }}";			
 	flashvars.loop = "{{ object.loop|bool }}";
-	flashvars.autohide = "{{ object.autohide|bool }}";
+	flashvars.autohide = "{{ object.auto_hide|bool }}";
 	flashvars.fullscreen = "{{ object.fullscreen|bool }}";
 	
 	flashvars.color_text = "0x{{ object.textcolor }}";
