@@ -11,6 +11,37 @@ class VideoPlugin(CMSPluginBase):
     
     render_template = "cms/plugins/video.html"
     
+    general_fields = [
+        ('movie', 'movie_url'),
+        'image',
+        ('width', 'height'),
+        'auto_play',
+        'auto_hide',
+        'fullscreen',
+        'loop',
+    ]
+    color_fields = [
+        'bgcolor',
+        'textcolor',
+        'seekbarcolor',
+        'seekbarbgcolor',
+        'loadingbarcolor',
+        'buttonoutcolor',
+        'buttonovercolor',
+        'buttonhighlightcolor',
+    ]
+    
+    fieldsets = [
+        (None, {
+            'fields': general_fields,
+        }),
+        (_('Color Settings'), {
+            'fields': color_fields,
+            'classes': ('collapse',),
+        }),
+    ]
+    
+    
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,

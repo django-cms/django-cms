@@ -2,76 +2,50 @@ import re
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
+from cms.plugins.video import settings
 from os.path import basename
 
 class Video(CMSPlugin):
-    CONTROLLER_OVERLAY = 'overlay'
-    CONTROLLER_DOCK = 'dock'
-    
-    CLICK_TARGET_BLANK = '_blank'
-    CLICK_TARGET_SELF = '_self'
-    CLICK_TARGET_PARENT = '_parent'
-    
-    WMODE_WINDOW = 'window'
-    WMODE_OPAQUE = 'opaque'
-    WMODE_TRANSPARENT = 'transparent'
-    
-    controller_style_choices = (
-        (CONTROLLER_DOCK, _('dock')),
-        (CONTROLLER_OVERLAY, _('overlay')),
-    )
-    
-    click_target_choices = (
-        (CLICK_TARGET_BLANK, _('blank')),
-        (CLICK_TARGET_SELF, _('self')),
-        (CLICK_TARGET_PARENT, _('parent')),
-    )
-    
-    wmode_choices = (
-        (WMODE_WINDOW, _('window')),
-        (WMODE_OPAQUE, _('opaque')),
-        (WMODE_TRANSPARENT, _('transparent')),
-    )
     # player settings
-    movie = models.FileField(_('movie'), upload_to=CMSPlugin.get_media_path, help_text=_('use swf file'))
-    image = models.ImageField(_('image'), upload_to=CMSPlugin.get_media_path, help_text=_('use image file'), null=True, blank=True)
+    movie = models.FileField(_('movie file'), upload_to=CMSPlugin.get_media_path, help_text=_('use .flv file or h264 encoded video file'), blank=True, null=True)
+    movie_url = models.CharField(_('movie url'), max_length=255, help_text=_('vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo'), blank=True, null=True)
+    image = models.ImageField(_('image'), upload_to=CMSPlugin.get_media_path, help_text=_('preview image file'), null=True, blank=True)
     
-    width = models.CharField(_('width'), max_length=6)
-    height = models.CharField(_('height'), max_length=6)
+    width = models.PositiveSmallIntegerField(_('width'))
+    height = models.PositiveSmallIntegerField(_('height'))
     
-    auto_load = models.BooleanField(_('auto load'), default=True)
-    auto_play = models.BooleanField(_('auto play'), default=False)
-    loop = models.BooleanField(_('loop'), default=False)
-    
-    controller_style = models.CharField(_('controller style'), max_length=7, choices=controller_style_choices, default=CONTROLLER_DOCK)
-    
-    click_url = models.URLField(_('click_url'), blank=True, null=True)
-    click_target = models.CharField(_('click target'), max_length=7, choices=click_target_choices, default=CLICK_TARGET_BLANK)
-    
-    mute = models.BooleanField(_('mute'), default=False)
-    mute_only = models.BooleanField(_('mute only'), default=False)
-    volume = models.SmallIntegerField(_('volume'), default=50, help_text=_('in range <0, 100>'))
+    auto_play = models.BooleanField(_('auto play'), default=settings.VIDEO_AUTOPLAY)
+    auto_hide = models.BooleanField(_('auto hide'), default=settings.VIDEO_AUTOHIDE)
+    fullscreen = models.BooleanField(_('fullscreen'), default=settings.VIDEO_FULLSCREEN)
+    loop = models.BooleanField(_('loop'), default=settings.VIDEO_LOOP)
     
     # plugin settings
-    fgcolor = models.CharField(_('fgcolor'), max_length=6, default="13abec", help_text=_('Hexadecimal, eg 13abec'))
-    bgcolor = models.CharField(_('bgcolor'), max_length=6, default="000000", help_text=_('Hexadecimal, eg fff000'))
-    fullscreen = models.BooleanField(_('fullscreen'), default=False)
-    wmode = models.CharField(_('wmode'), max_length=10, choices=wmode_choices, default=WMODE_OPAQUE)
-    flash_menu = models.BooleanField(_('flash menu'), default=False)
+    bgcolor = models.CharField(_('background color'), max_length=6, default=settings.VIDEO_BG_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
+    textcolor = models.CharField(_('text color'), max_length=6, default=settings.VIDEO_TEXT_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
+    seekbarcolor = models.CharField(_('seekbar color'), max_length=6, default=settings.VIDEO_SEEKBAR_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
+    seekbarbgcolor = models.CharField(_('seekbar bg color'), max_length=6, default=settings.VIDEO_SEEKBARBG_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
+    loadingbarcolor = models.CharField(_('loadingbar color'), max_length=6, default=settings.VIDEO_LOADINGBAR_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
+    buttonoutcolor = models.CharField(_('button out color'), max_length=6, default=settings.VIDEO_BUTTON_OUT_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
+    buttonovercolor = models.CharField(_('button over color'), max_length=6, default=settings.VIDEO_BUTTON_OVER_COLOR, help_text=_('Hexadecimal, eg ff00cc'))        
+    buttonhighlightcolor = models.CharField(_('button highlight color'), max_length=6, default=settings.VIDEO_BUTTON_HIGHLIGHT_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
     
-    
-    def get_height(self):
-        return fix_unit(self.height)
-    
-    def get_width(self):
-        return fix_unit(self.width)    
         
     def __unicode__(self):
-        return u"%s" % basename(self.movie.path)
+        if self.movie:
+            name = self.movie.path
+        else:
+            name = self.movie_url
+        return u"%s" % basename(name)
 
+    def get_height(self):
+        return "%spx" % (self.height)
+    
+    def get_width(self):
+        return "%spx" % (self.width)    
+    
+    def get_movie(self):
+        if self.movie:
+            return self.movie.url
+        else:
+            return self.movie_url
 
-def fix_unit(value):
-    if not re.match(r'.*[0-9]$', value):
-        # no unit, add px
-        return value + "px"
-    return value 

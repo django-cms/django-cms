@@ -1,38 +1,36 @@
 {% load i18n js %}
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js"></script>
-<div id="flash-plugin-{{ object.id }}">{% trans 'Missing flash plugin.' %}</div>
+<div id="flash-plugin-{{ object.id }}">{% trans 'Missing flash plugin. Download <a href="http://adobe.com/flashplayer">here</a>' %}</div>
 
-<script type="text/javascript" defer="defer">//<![CDATA[
-	var flashvars = {
-		movie: "{{ MEDIA_URL }}{{ object.movie }}",
-		volume: {{ object.volume }},
-		autoplay: {{ object.auto_play|bool }},
-		autoload: {{ object.auto_load|bool }},
-		loop: {{ object.loop|bool }},
-		fullscreen: {{ object.fullscreen|bool }},
-		fgcolor: "0x{{ object.fgcolor }}",
-		bgcolor: "0x{{ object.bgcolor }}",
-		mute: "{{ object.mute }}",
-		muteonly: "{{ object.mute_only }}",
-		controllerstyle: "{{ object.controller_style }}"
-	};
-	
+<script type="text/javascript" defer="defer">
+//<![CDATA[
+	var flashvars = {};
+	flashvars.movie = "{{ object.get_movie }}";
 	{% if object.image %}
-		flashvars.image = "{{ MEDIA_URL }}{{ object.image}}";
+	flashvars.image = "{{ object.image.url }}";
 	{% endif %}
-	{% if object.click_url %}
-		flashvars.clickurl = "{{ object.click_url }}";
-		flashvars.clicktarget = "{{ object.click_target }}";
-	{% endif %}
-				
-	var params = {
-		allowscriptaccess: "always",
-		allowfullscreen: {{ object.fullscreen|bool }},
-		bgcolor: "#000000",
-		wmode: "{{ object.wmode }}",
-		menu: {{ object.flash_menu|bool }}
-	};
-		
+	
+	flashvars.autoplay = "{{ object.autoplay|bool }}";			
+	flashvars.loop = "{{ object.loop|bool }}";
+	flashvars.autohide = "{{ object.autohide|bool }}";
+	flashvars.fullscreen = "{{ object.fullscreen|bool }}";
+	
+	flashvars.color_text = "0x{{ object.textcolor }}";
+	flashvars.color_seekbar = "0x{{ object.seekbarcolor }}";
+	flashvars.color_loadingbar = "0x{{ object.loadingbarcolor }}";
+	flashvars.color_seekbarbg = "0x{{ object.seekbarbgcolor }}";
+	
+	flashvars.color_button_out = "0x{{ object.buttonoutcolor }}";
+	flashvars.color_button_over = "0x{{ object.buttonovercolor }}";
+	flashvars.color_button_highlight = "0x{{ object.buttonhighlightcolor }}";
+	
+	var params = {};
+	params.allowfullscreen = "true";
+	params.allowscriptaccess = "always";
+	params.bgcolor = "#{{ object.bgcolor }}";
+	
 	var attributes = {};
-	swfobject.embedSWF("{{ MEDIA_URL }}cms/swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.0", "{{ MEDIA_URL }}cms/swf/expressInstall.swf", flashvars, params, attributes);
+	attributes.align = "middle";
+	
+	swfobject.embedSWF("{{ MEDIA_URL }}cms/swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.45", "{{ MEDIA_URL }}cms/swf/expressInstall.swf", flashvars, params, attributes);
 //]]></script>
