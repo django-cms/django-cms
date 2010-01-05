@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-26 14:32+0100\n"
-"PO-Revision-Date: 2010-01-02 11:22+0800\n"
+"PO-Revision-Date: 2010-01-05 23:40+0800\n"
 "Last-Translator: 张昆 <zhangkun@web916.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -29,11 +29,11 @@ msgstr "默认标题"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "缩略名"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "部分标题被用在了URL中"
 
 #: admin/forms.py:29
 msgid "Language"
@@ -41,11 +41,11 @@ msgstr "语言"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "本内容当前使用的语言。"
 
 #: admin/forms.py:61
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "其他页面已经使用了该缩略名"
 
 #: admin/forms.py:81
 msgid "Menu Title"
@@ -69,7 +69,7 @@ msgstr "应用"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr "附件第三方应用到本页面。"
+msgstr "附加第三方应用到本页面。"
 
 #: admin/forms.py:88
 msgid "Overwrite URL"
@@ -89,7 +89,7 @@ msgstr "转到这个链接"
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "页面的描述，有时被搜索引擎使用。"
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
@@ -153,7 +153,7 @@ msgstr "通知用户"
 
 #: admin/forms.py:263
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr ""
+msgstr "发送电子邮件通知用户关于用户名或密码变更的消息。需要用户的邮件地址。"
 
 #: admin/forms.py:283
 msgid "New password"
@@ -165,7 +165,7 @@ msgstr "再输一次新密码"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "需要有效的电子邮件地址来发送邮件通知。"
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
@@ -234,7 +234,7 @@ msgstr "本页已获批准。"
 #: admin/pageadmin.py:897
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "拥有 %(key)r 主键的 %(name)s 对象不存在。"
 
 #: admin/pageadmin.py:900
 msgid "There only exists one translation for this page"
@@ -243,7 +243,7 @@ msgstr "当前页面仅有一种译文"
 #: admin/pageadmin.py:915
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "使用 %(language)s 译文的标题和插件被删除"
 
 #: admin/pageadmin.py:937
 msgid "Are you sure?"
@@ -263,17 +263,17 @@ msgstr "您没有权限修改本页面"
 
 #: admin/pageadmin.py:1057
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "语言项目必须被设置为支持的语言！"
 
 #: admin/pageadmin.py:1069
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "%(plugin_name)s 插件被加载到 %(placeholder)s"
 
 #: admin/pageadmin.py:1142
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被修改"
 
 #: admin/pageadmin.py:1200
 msgid "Plugins where moved"
@@ -332,7 +332,7 @@ msgstr "覆盖"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "索引表："
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
@@ -340,7 +340,7 @@ msgstr "复杂目录"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "列出所有的章节"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
@@ -348,7 +348,7 @@ msgstr "搜索页面"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "检索本文档"
 
 #: docs/templates/defindex.html:19
 #: docs/templates/modindex.html:2
@@ -435,7 +435,7 @@ msgstr "开始"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr ""
+msgstr "输入关键词或模块，类以及函数名称。"
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
@@ -528,7 +528,7 @@ msgstr "路径"
 #: migrations/0001_initial.py:30
 #: models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "缩略名"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
@@ -619,7 +619,7 @@ msgstr "发表日期"
 #: models/pagemodel.py:45
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
-msgstr ""
+msgstr "导航中"
 
 #: migrations/0006_apphook.py:15
 #: migrations/0007_apphook_longer.py:11
@@ -655,11 +655,11 @@ msgstr "当前页"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "最接近的子页面"
 
 #: models/moderatormodels.py:26
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "页面以及最接近的子页面"
 
 #: models/moderatormodels.py:27
 msgid "Page descendants"
@@ -667,7 +667,7 @@ msgstr "子页面"
 
 #: models/moderatormodels.py:28
 msgid "Page and descendants"
-msgstr ""
+msgstr "页面及所有下级页面"
 
 #: models/moderatormodels.py:44
 #: templates/admin/cms/page/permissions.html:5
@@ -773,7 +773,7 @@ msgstr ""
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "所有的上级页面将不会在导航中显示"
 
 #: models/pagemodel.py:47
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
@@ -785,7 +785,7 @@ msgstr "已被发表"
 
 #: models/pagemodel.py:51
 msgid "The template used to render the content."
-msgstr ""
+msgstr "该模板用来生成页面内容。"
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
@@ -797,15 +797,15 @@ msgstr "站点"
 
 #: models/pagemodel.py:54
 msgid "moderator state"
-msgstr ""
+msgstr "核对状态"
 
 #: models/pagemodel.py:62
 msgid "menu login required"
-msgstr ""
+msgstr "需要菜单登录"
 
 #: models/pagemodel.py:62
 msgid "only show this page in the menu if the user is logged in"
-msgstr ""
+msgstr "仅当用户已经登录后才在菜单中展示此页面"
 
 #: models/pagemodel.py:70
 msgid "pages"
@@ -853,7 +853,7 @@ msgstr "允许恢复页面"
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "能恢复任何已删除的页面"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
@@ -921,7 +921,7 @@ msgstr "文件"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
-msgstr ""
+msgstr "Flash"
 
 #: plugins/flash/models.py:9
 #: plugins/video/models.py:36
@@ -979,7 +979,7 @@ msgstr "纬度"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr ""
+msgstr "利用经度和纬度来很好的调整地图位置。"
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -991,7 +991,7 @@ msgstr ""
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "算出您到这里的最快方式"
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
@@ -1015,7 +1015,7 @@ msgstr "从页面继承插件"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "语言或页面必须被填写"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
@@ -1080,7 +1080,7 @@ msgstr "图像"
 #: plugins/picture/models.py:21
 #: plugins/picture/models.py:22
 msgid "if present image will be clickable"
-msgstr ""
+msgstr "如果提供的话，该图片将可被点击"
 
 #: plugins/picture/models.py:23
 #: plugins/picture/migrations/0001_initial.py:19
@@ -1089,7 +1089,7 @@ msgstr "可选文本"
 
 #: plugins/picture/models.py:23
 msgid "textual description of the image"
-msgstr ""
+msgstr "图片的文本描述"
 
 #: plugins/picture/models.py:24
 msgid "long description"
@@ -1101,7 +1101,7 @@ msgstr "图像的附加描述"
 
 #: plugins/picture/models.py:25
 msgid "side"
-msgstr ""
+msgstr "位置"
 
 #: plugins/snippet/cms_plugins.py:12
 #: plugins/snippet/models.py:24
@@ -1112,7 +1112,7 @@ msgstr "代码片段"
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr ""
+msgstr "模板 %(template)s 不存在。"
 
 #: plugins/snippet/models.py:13
 #: plugins/snippet/migrations/0001_initial.py:18
@@ -1121,7 +1121,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
+msgstr "输入用来生成页面的模板(例如 \"snippets/plugin_xy.html\")"
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1133,11 +1133,11 @@ msgstr ""
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
-msgstr ""
+msgstr "如果提供，该图片将可以被点击"
 
 #: plugins/teaser/models.py:14
 msgid "If present image will be clickable."
-msgstr ""
+msgstr "如果提供，该图片将可以被点击。"
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
@@ -1150,7 +1150,7 @@ msgstr "文本"
 #: plugins/text/models.py:12
 #: plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "内容"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
@@ -1171,7 +1171,7 @@ msgstr "编辑选定的插件"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
+msgstr "文本编辑器不支持编辑此对象。"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
@@ -1182,7 +1182,7 @@ msgstr "没有对象被选中"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "文本编辑器不支持插入此对象。"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
@@ -1200,7 +1200,7 @@ msgstr "插入插件"
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
-msgstr ""
+msgstr "推特"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1240,7 +1240,7 @@ msgstr "空白"
 
 #: plugins/video/models.py:26
 msgid "self"
-msgstr ""
+msgstr "自身"
 
 #: plugins/video/models.py:27
 msgid "parent"
@@ -1264,7 +1264,7 @@ msgstr "电影"
 
 #: plugins/video/models.py:37
 msgid "use image file"
-msgstr ""
+msgstr "使用图片文件"
 
 #: plugins/video/models.py:42
 msgid "auto load"
@@ -1370,7 +1370,7 @@ msgstr "最新的变更"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "登录到管理界面 <a href=\"%(login_url)s\">请点这里</a>。"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
@@ -1397,7 +1397,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:39
 msgid "(you can perform actions on this page directly)"
-msgstr ""
+msgstr "(您可以直接在此页面执行操作)"
 
 #: templates/admin/cms/page/change_form.html:52
 msgid "Remove delete request"
@@ -1489,11 +1489,11 @@ msgstr "添加%(name)s"
 
 #: templates/admin/cms/page/change_list.html:95
 msgid "Pages on:"
-msgstr ""
+msgstr "页面在："
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "Filter:"
-msgstr ""
+msgstr "过滤器："
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "on"
@@ -1548,7 +1548,7 @@ msgstr "下边插入"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr "中间插入"
+msgstr "内部插入"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
@@ -1667,7 +1667,7 @@ msgstr "页面不继承任何权限。"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "不能保存该插件的历史版本！"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
@@ -1680,7 +1680,7 @@ msgstr "恢复已删除的%(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "点击下面的保存按钮将会恢复对象到当前版本。"
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1689,7 +1689,7 @@ msgstr "反转%(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
+msgstr "点击下面的保存按钮将会退回对象到前一版本。"
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1706,15 +1706,15 @@ msgstr "添加插件"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "您必须首先保存页面以添加插件。"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "没有插件被选中。请从左边选择一个"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
+msgstr "当前没有插件。请添加插件到这个预留的位置。"
 
 #: templates/cms/toolbar/toolbar.html:746
 #, python-format
