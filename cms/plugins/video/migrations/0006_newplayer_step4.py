@@ -79,7 +79,7 @@ class Migration:
             'buttonovercolor': ('django.db.models.fields.CharField', [], {'default': "'000000'", 'max_length': '6'}),
             'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'fullscreen': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'height': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
+            'height': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'}),
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'loadingbarcolor': ('django.db.models.fields.CharField', [], {'default': "'828282'", 'max_length': '6'}),
             'loop': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -88,7 +88,7 @@ class Migration:
             'seekbarbgcolor': ('django.db.models.fields.CharField', [], {'default': "'333333'", 'max_length': '6'}),
             'seekbarcolor': ('django.db.models.fields.CharField', [], {'default': "'13ABEC'", 'max_length': '6'}),
             'textcolor': ('django.db.models.fields.CharField', [], {'default': "'FFFFFF'", 'max_length': '6'}),
-            'width': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
+            'width': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'})
         }
     }
 

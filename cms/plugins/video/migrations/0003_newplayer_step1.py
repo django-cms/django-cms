@@ -198,8 +198,8 @@ class Migration:
         },
         'video.video': {
             'Meta': {'db_table': "'cmsplugin_video'"},
-            '_i_height': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            '_i_width': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
+            '_i_height': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'}),
+            '_i_width': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'}),
             'auto_hide': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'auto_play': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'bgcolor': ('django.db.models.fields.CharField', [], {'default': "'000000'", 'max_length': '6'}),
