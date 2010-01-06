@@ -10,6 +10,8 @@ from cms.tests.page import PagesTestCase
 from cms.tests.permmod import PermissionModeratorTestCase
 from cms.tests.site import SiteTestCase
 from cms.tests.navextender import NavExtenderTestCase
+from cms.tests.plugins import PluginsTestCase
+from cms.tests.reversion_tests import ReversionTestCase
 
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
@@ -31,11 +33,13 @@ def suite():
     
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(SiteTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(NavExtenderTestCase))
-    
-    if settings.CMS_PERMISSION and settings.CMS_MODERATOR:
-        # this test is settings dependant, and these settings can not be
-        # changed on the fly.
-        s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
+    if "cms.plugins.text" in settings.INSTALLED_APPS:
+        print "run text case"
+        s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginsTestCase))
+        s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
+    else:
+        print settings.INSTALLED_APPS
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
     return s
  
 def test_runner_with_coverage(test_labels, verbosity=1, interactive=True, extra_tests=[]):
