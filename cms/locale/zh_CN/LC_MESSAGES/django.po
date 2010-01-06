@@ -114,7 +114,7 @@ msgstr ""
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "添加页面的权限同时需要有编辑页面的权限"
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
@@ -161,15 +161,15 @@ msgstr "需要有效的电子邮件地址来发送邮件通知。"
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "添加一个新页面要求有修改页面的权限"
 
 #: admin/forms.py:309
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "添加一个新用户要求有修改用户的权限"
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "修改权限要求你有权限编辑他们"
 
 #: admin/pageadmin.py:102 admin/pageadmin.py:118
 msgid "Hidden"
