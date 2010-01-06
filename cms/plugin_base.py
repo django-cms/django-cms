@@ -62,7 +62,17 @@ class CMSPluginBase(admin.ModelAdmin):
     def __init__(self, model=None,  admin_site=None):
         if self.model:
             if not CMSPlugin in self.model._meta.parents and self.model != CMSPlugin:
-                raise SubClassNeededError, "plugin model needs to subclass CMSPlugin"
+                found = False
+                bases = self.model.__bases__
+                while bases:
+                    cls = bases[0]
+                    if cls.__name__ == "CMSPlugin":
+                        found = True
+                        bases = False
+                    else:
+                        bases = cls.__bases__  
+                if not found:
+                    raise SubClassNeededError, "plugin model needs to subclass CMSPlugin"
             if not self.form:
                 class DefaultModelForm(ModelForm):
                     class Meta:

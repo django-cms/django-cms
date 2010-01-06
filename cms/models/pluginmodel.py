@@ -19,9 +19,14 @@ class PluginModelBase(ModelBase):
     def __new__(cls, name, bases, attrs):
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
         found = False
-        for base in bases:
-            if base.__name__ == "CMSPlugin":
+        bbases = bases
+        while bbases:
+            bcls = bbases[0]
+            if bcls.__name__ == "CMSPlugin":
                 found = True
+                bbases = False
+            else:
+                bbases = bcls.__bases__  
         if found:
             if new_class._meta.db_table.startswith("%s_" % new_class._meta.app_label):
                 table = "cmsplugin_" + new_class._meta.db_table.split("%s_" % new_class._meta.app_label, 1)[1]
