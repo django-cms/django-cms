@@ -181,7 +181,7 @@ msgstr "基本设置"
 
 #: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "注意：如果你修改了选项，页面将会重新载入。请先保存"
 
 #: admin/pageadmin.py:122
 msgid "Advanced Settings"
@@ -238,7 +238,7 @@ msgstr "你没有权限发布此页"
 
 #: admin/pageadmin.py:1018
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "你没有权限修改这个页面的浏览模式"
 
 #: admin/pageadmin.py:1053
 msgid "You do not have permission to change this page"
@@ -265,7 +265,7 @@ msgstr "已移动的插件"
 #: admin/pageadmin.py:1222
 #, python-format
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr ""
+msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被删除"
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
@@ -359,7 +359,7 @@ msgstr "索引"
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr ""
+msgstr "在一个页面完全索引"
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
@@ -509,7 +509,7 @@ msgstr "类型"
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
-msgstr ""
+msgstr "可以修改伪路径"
 
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
@@ -523,7 +523,7 @@ msgstr "导航扩展"
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr ""
+msgstr "有URL覆盖"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
@@ -535,7 +535,7 @@ msgstr "作者"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
-msgstr ""
+msgstr "URL id 倒序"
 
 #: migrations/0001_initial.py:59 models/pagemodel.py:61
 msgid "login required"
@@ -783,7 +783,7 @@ msgstr "能恢复任何已删除的页面"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "如果没有选择，所有用户将授予整个网站的权限"
 
 #: models/permissionmodels.py:52
 msgid "sites"
@@ -907,7 +907,7 @@ msgstr "经度"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr ""
+msgstr "路由计划标题"
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
@@ -964,7 +964,7 @@ msgstr "链接"
 
 #: plugins/link/models.py:13
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "链接到一个页面的地址优先文字链接"
 
 #: plugins/link/models.py:14
 msgid "mailto"
@@ -972,7 +972,7 @@ msgstr "电子邮件地址"
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
-msgstr ""
+msgstr "E-mail邮箱地址优先文字链接"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
@@ -1039,7 +1039,7 @@ msgstr "代码片段"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
-msgstr ""
+msgstr "前言"
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
@@ -1129,7 +1129,7 @@ msgstr "链接提示"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "如果填写了Twitter账号，这个提示将链接到他的Twitter页面"
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
@@ -1270,7 +1270,7 @@ msgstr "保存并继续编辑"
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
+msgstr "页面 <a href=\"%(admin_url)s\">%(page)s</a> 需要你的授权"
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
@@ -1744,7 +1744,7 @@ msgstr ""
 
 #: utils/moderator.py:84
 msgid "parent first"
-msgstr ""
+msgstr "父级优先"
 
 #: utils/moderator.py:91
 msgid "approve"
