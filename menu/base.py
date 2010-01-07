@@ -1,4 +1,20 @@
 
+
+class Menu(object):
+    nodes = []
+    
+    def add_nodes(self, nodes):
+        self.nodes.append(nodes)
+
+    def get_nodes(self, request):
+        raise NotImplementedError
+    
+class Modifier(object):
+    
+    def modify(self, request, nodes, namespace):
+        raise NotImplementedError
+    
+    
 class NavigationNode(object):
     title = None
     url = None

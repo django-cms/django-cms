@@ -1,0 +1,2 @@
+class NamespaceAllreadyRegistered(Exception):
+    pass
