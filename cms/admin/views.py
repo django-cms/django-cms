@@ -67,6 +67,8 @@ def revert_plugins(request, version_id, obj):
                 p.save()
         for old in current_plugins:
             if old.pk == plugin.pk:
+                plugin.publisher_public = old.publisher_public
+                plugin.save()
                 current_plugins.remove(old)
     for title in titles:
         title.page = page

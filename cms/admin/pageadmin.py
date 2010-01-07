@@ -641,7 +641,8 @@ class PageAdmin(model_admin):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
         extra_context = self.update_language_tab_context(request, None, extra_context)
-        return super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
+        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
+        return response
     
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
@@ -670,8 +671,6 @@ class PageAdmin(model_admin):
             if settings.CMS_MODERATOR:
                 from cms.utils.moderator import page_changed
                 page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
-                
-            # revert plugins
             revert_plugins(request, version.pk, obj)
         return response
         

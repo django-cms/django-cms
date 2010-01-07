@@ -34,11 +34,9 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(SiteTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(NavExtenderTestCase))
     if "cms.plugins.text" in settings.INSTALLED_APPS:
-        print "run text case"
         s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginsTestCase))
-        s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
-    else:
-        print settings.INSTALLED_APPS
+        if "reversion" in settings.INSTALLED_APPS:
+            s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
     return s
  
