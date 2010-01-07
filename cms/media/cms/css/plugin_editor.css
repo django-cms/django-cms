@@ -1,3 +1,7 @@
+select[name="plugins"] {
+	width: 150px;
+}
+
 .plugin-holder .form-row{
 	padding:0;
 }
@@ -32,7 +36,7 @@
 .plugin-list-holder .plugin-select-holder{
 	padding:10px;
 }
-.plugin-list-holder .add-plugin{
+.plugin-list-holder .add-plugin, .plugin-list-holder .copy-plugins {
 	margin-left:10px;
 	cursor:pointer;
 }

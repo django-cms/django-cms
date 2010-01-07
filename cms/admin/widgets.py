@@ -31,7 +31,9 @@ class PluginEditor(Widget):
         
         context = {
             'plugin_list': self.attrs['list'],
-            'installed_plugins': self.attrs['installed']
+            'installed_plugins': self.attrs['installed'],
+            'traduction_language': self.attrs['traduction_language'],
+            'language': self.attrs['language']
         }
         return mark_safe(render_to_string(
             'admin/cms/page/widgets/plugin_editor.html', context))
