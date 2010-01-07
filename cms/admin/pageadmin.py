@@ -1171,9 +1171,7 @@ class PageAdmin(model_admin):
                 page.save()
                 save_all_plugins(request, page)
                 reversion.revision.user = request.user
-                plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-                reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
-            # return HttpResponse(str(plugin.pk))
+                reversion.revision.comment = _(u"Copied %(language)s plugins to %(placeholder)s") % {'language':dict(settings.LANGUAGES)[language], 'placeholder':placeholder}
             return HttpResponse(str("nekaj"))
         raise Http404
 
