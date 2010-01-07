@@ -159,6 +159,56 @@ class PageAdmin(model_admin):
             
         )]
         
+    def __call__(self, request, url):
+        """Delegate to the appropriate method, based on the URL.
+        
+        Old way of url handling, so we are compatible with older django 
+        versions.
+        """
+        if url is None:
+            return self.list_pages(request)
+        elif url.endswith('add-plugin'):
+            return self.add_plugin(request)
+        elif url.endswith('copy-plugins'):
+            return self.copy_plugins(request)        
+        elif 'edit-plugin' in url:
+            plugin_id = url.split("/")[-1]
+            return self.edit_plugin(request, plugin_id)
+        elif 'remove-plugin' in url:
+            return self.remove_plugin(request)
+        elif 'move-plugin' in url:
+            return self.move_plugin(request)
+        elif url.endswith('/move-page'):
+            return self.move_page(request, unquote(url[:-10]))
+        elif url.endswith('/copy-page'):
+            return self.copy_page(request, unquote(url[:-10]))
+        elif url.endswith('/change-status'):
+            return self.change_status(request, unquote(url[:-14]))
+        elif url.endswith('/change-navigation'):
+            return self.change_innavigation(request, unquote(url[:-18]))
+        elif url.endswith('jsi18n') or url.endswith('jsi18n/'):
+            return HttpResponseRedirect(reverse('admin:jsi18n'))
+        elif url.endswith('/permissions'):
+            return self.get_permissions(request, unquote(url[:-12]))
+        elif url.endswith('/moderation-states'):
+            return self.get_moderation_states(request, unquote(url[:-18]))
+        elif url.endswith('/change-moderation'):
+            return self.change_moderation(request, unquote(url[:-18]))
+        elif url.endswith('/approve'):
+            return self.approve_page(request, unquote(url[:-8]))
+        elif url.endswith('/remove-delete-state'):
+            return self.remove_delete_state(request, unquote(url[:-20]))
+        elif url.endswith('/dialog/copy'):
+            return get_copy_dialog(request, unquote(url[:-12]))
+        elif url.endswith('/preview'):
+            return self.preview_page(request, unquote(url[:-8]))
+        elif url.endswith('/change_temlate'):
+            return self.change_template(request, unquote(url[:-15]))
+        # NOTE: revert plugin is newly integrated in overriden revision_view
+        if len(url.split("/?")):# strange bug in 1.0.2 if post and get variables in the same request
+            url = url.split("/?")[0]
+        return super(PageAdmin, self).__call__(request, url)
+
     def get_urls(self):
         """New way of urls handling.
         """
@@ -167,6 +217,7 @@ class PageAdmin(model_admin):
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
+            pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
             pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
             pat(r'remove-plugin/$', self.remove_plugin),
@@ -397,7 +448,8 @@ class PageAdmin(model_admin):
                                     plugin_list.append(plugin)
                         else:
                             plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
-                    widget = PluginEditor(attrs={'installed':installed_plugins, 'list':plugin_list})
+                    language = get_language_from_request(request, obj)
+                    widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'traduction_language': settings.CMS_LANGUAGES, 'language': language } )
                     form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
@@ -1037,6 +1089,95 @@ class PageAdmin(model_admin):
         raise Http404
 
     add_plugin = create_on_success(add_plugin)
+    
+    @transaction.commit_on_success
+    def copy_plugins(self, request):
+        if 'history' in request.path or 'recover' in request.path:
+            return HttpResponse(str("error"))
+        if request.method == "POST":
+            copy_from = request.POST['copy_from']
+            page_id = request.POST.get('page_id', None)
+            parent = None
+            if page_id:
+                page = get_object_or_404(Page, pk = page_id)
+                language = request.POST['language']
+                placeholder = request.POST['placeholder'].lower()
+                
+                if not page.has_change_permission(request):
+                    return HttpResponseForbidden(_("You do not have permission to change this page"))
+                if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
+                    return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+                
+                position = CMSPlugin.objects.filter(page = page, language = language, placeholder = placeholder).count()
+                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get('limits', None)
+                if not limits:
+                    limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get('limits', None)
+                if limits:
+                    global_limit = limits.get("global")
+                    type_limit = limits.get(plugin_type)
+                    if global_limit and position >= global_limit:
+                        return HttpResponseBadRequest("This placeholder already has the maximum number of plugins")
+                    elif type_limit:
+                        type_count = CMSPlugin.objects.filter(page = page, language = language, placeholder = placeholder, plugin_type = plugin_type).count()
+                        if type_count >= type_limit:
+                            return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
+            
+            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from).order_by('tree_id', '-rght'))
+            ptree = []
+            for p in plugins:
+                try:
+                    plugin, cls = p.get_plugin_instance()
+                except KeyError: #plugin type not found anymore
+                    continue
+                try:
+                    plugin, cls = p.get_plugin_instance()
+                except KeyError: #plugin type not found anymore
+                    continue
+                p.page = page
+                p.pk = None
+                p.id = None
+                p.tree_id = None
+                p.lft = None
+                p.rght = None
+                p.inherited_public_id = None
+                p.publisher_public_id = None
+                if p.parent:
+                    pdif = p.level - ptree[-1].level
+                    if pdif < 0:
+                        ptree = ptree[:pdif-1]
+                    p.parent = ptree[-1]
+                    if pdif != 0:
+                        ptree.append(p)
+                else:
+                    ptree = [p]
+                p.level = None
+                p.language = language
+                p.save()
+                if plugin:
+                    plugin.pk = p.pk
+                    plugin.id = p.pk
+                    plugin.page = page
+                    plugin.tree_id = p.tree_id
+                    plugin.lft = p.lft
+                    plugin.rght = p.rght
+                    plugin.level = p.level
+                    plugin.cmsplugin_ptr = p
+                    plugin.publisher_public_id = None
+                    plugin.public_id = None
+                    plugin.plubished = False
+                    plugin.save()
+                    
+            if 'reversion' in settings.INSTALLED_APPS:
+                page.save()
+                save_all_plugins(request, page)
+                reversion.revision.user = request.user
+                plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+                reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
+            # return HttpResponse(str(plugin.pk))
+            return HttpResponse(str("nekaj"))
+        raise Http404
+
+    copy_plugins = create_on_success(copy_plugins)    
     
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
