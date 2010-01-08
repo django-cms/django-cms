@@ -1,0 +1,137 @@
+Django CMS installation instructions and setup (done on OS X Snow
+Leopard)
+
+I assume you have Python and Django installed.
+
+- 	check python location python: which python
+- 	Go to your Python site-packages directory (<your python path>/site-
+packages)
+- 	Download Django CMS:
+	sudo curl -O http://download.github.com/digi604-django-cms-2.0-c0288a1.tar.gz
+(Django-cms version 2.0.2)
+	(Another version: http://download.github.com/<your-django-cms-version-file>.tar.gz)
+	Check latest version on: http://github.com/digi604/django-cms-2.0/downloads
+- 	Unpack the downloaded file:
+	sudo tar -zxvf digi604-django-cms-2.0-c0288a1.tar.gz
+	(Another version: <your django-cms-version-file>.tar.gz)
+- 	Copy the directories and files you are going to use:
+	sudo cp -R digi604-django-cms-2.0-c0288a1/cms/ cms
+	sudo cp -R digi604-django-cms-2.0-c0288a1/mptt/ mptt
+	sudo cp -R digi604-django-cms-2.0-c0288a1/publisher/ publisher
+- 	Clean up your Python site-packages directory if you want:
+	sudo rm -rf digi604-django-cms-2.0-c0288a1.tar.gz
+	sudo rm -rf digi604-django-cms-2.0-c0288a1/
+- 	Start a new Django project on your prefered location (example: /
+Users/lars/Sites/python/):
+	django-admin.py startproject django_cms
+- 	Start you prefered editor and edit settings.py:
+
+	Add this at the beginning of the settings.py file:
+
+	import os
+	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+
+	Insert the following line near the beginning of the file but after
+any import statements that it may have:
+	gettext = lambda s: s
+
+	Set:
+	DATABASE_ENGINE = 'sqlite3'
+	DATABASE_NAME = '/Users/lars/Sites/python/django_cms/db/
+development.db' (Edit your prefered path)
+	MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
+	MEDIA_URL = '/media/'
+	ADMIN_MEDIA_PREFIX = '/media/admin/'
+
+	Add this to your apps:
+
+	INSTALLED_APPS = (
+	        'django.contrib.auth',
+	        'django.contrib.contenttypes',
+	        'django.contrib.sessions',
+	        'django.contrib.admin',
+	        'django.contrib.sites',
+	        ...
+	        'cms',
+	        'mptt',
+	        'publisher'
+	        ...
+	)
+
+	Add the following middleware classes:
+
+	MIDDLEWARE_CLASSES = (
+	        # needed for add/edit page
+	        'django.middleware.locale.LocaleMiddleware',
+	        'django.contrib.sessions.middleware.SessionMiddleware',
+	        'django.contrib.auth.middleware.AuthenticationMiddleware',
+	        ...
+	        'cms.middleware.page.CurrentPageMiddleware',
+	        'cms.middleware.user.CurrentUserMiddleware',
+	        ...
+	)
+
+	Add the following template context processors:
+
+	TEMPLATE_CONTEXT_PROCESSORS = (
+	        "django.core.context_processors.auth",
+	        "django.core.context_processors.i18n",
+	        "django.core.context_processors.request",
+	        "django.core.context_processors.media",
+	        "cms.context_processors.media",
+	)
+
+	CMS_TEMPLATES = (
+	        ('base.html', gettext('default')),
+	        ('2col.html', gettext('2 Column')),
+	        ('3col.html', gettext('3 Column')),
+	        ('extra.html', gettext('Some extra fancy template')),
+	)
+
+- 	Then edit your urls.py file:
+
+	Uncomment the following lines:
+	from django.contrib import admin
+	admin.autodiscover()
+
+	Uncomment the line:
+
+	(r'^admin/', include(admin.site.urls)),
+
+	and add:
+
+	(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+{'document_root': settings.MEDIA_ROOT } ),
+	(r'^', include('cms.urls')),
+
+	It must be like:
+
+	urlpatterns = patterns('',
+		(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+{'document_root': settings.MEDIA_ROOT } ),
+	    (r'^admin/', include(admin.site.urls)),
+		(r'^', include('cms.urls')),
+	)
+
+- 	Make an directory 'media' in your project root:
+
+	mkdir media
+
+	and go into that directory
+
+- 	Now make an symbolic link:
+
+	ln -s /usr/local/lib/python2.6/site-packages/cms/media/cms cms
+
+-	Do in your project root:
+
+	python manage.py syncdb
+
+	and follow the instructions (setup and admin user)
+
+- 	Then start the development server:
+
+	pyton manage.py runserver
+
+	and go to http://127.0.0.1:8000/admin and login with your just added logindata
+
