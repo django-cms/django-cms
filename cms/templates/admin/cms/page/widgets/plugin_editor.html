@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="plugin-list-holder">
-	<ul class="plugin-list">{% for plugin in plugin_list %}
-		<li id="plugin_{{ plugin.pk }}" class="{{ plugin.plugin_type }}"><span class="drag"></span><span class="text"><b>{{ plugin.get_plugin_name }}</b>{% if plugin.get_short_description %} [ {{ plugin.get_short_description }} ]{% endif %}</span><span class="delete"></span></li>{% endfor %}
+	<ul class="plugin-list">
+		{% include "admin/cms/page/widgets/plugin_item.html" %}
 	</ul>
 	{% include "admin/cms/page/widgets/installed_plugins_inc.html" %}
 </div>

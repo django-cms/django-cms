@@ -1,8 +1,23 @@
 {% load i18n %}
-	<div class="plugin-select-holder">
-		<select name="plugins">
-			<option value="" selected="selected">{% trans "Available Plugins" %}</option>{% for p in installed_plugins %}
-			<option value="{{ p.value }}">{{ p.name }}</option>{% endfor %}
-		</select>{% if not add %}
-		<span class="add-plugin addlink">{% trans "Add Plugin" %}</span>{% endif %}
-	</div>
+<div class="plugin-select-holder">
+    <select name="plugins">
+        <option value="" selected="selected">{% trans "Available Plugins" %}</option>
+        {% for p in installed_plugins %}
+        <option value="{{ p.value }}">{{ p.name }}</option>
+        {% endfor %}
+    </select>
+    {% if not add %}
+    <span class="add-plugin addlink">{% trans "Add Plugin" %}</span>
+
+    <select name="copy-plugins">
+        <option value="" selected="selected">{% trans "From Language" %}</option>
+        {% for lang_code, lang_name in traduction_language %}
+	        {% ifnotequal language lang_code %}
+	        <option value="{{ lang_code }}">{{ lang_name }}</option>
+	        {% endifnotequal %}
+        {% endfor %}
+    </select>
+    
+        <span class="copy-plugins addlink">{% trans "Copy Plugins" %}</span>
+    {% endif %}
+</div>

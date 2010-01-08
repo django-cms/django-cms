@@ -55,19 +55,19 @@ $(document).ready(function() {
         
         var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
         if ((copy_from_language) && (copy_from_language != "")) {
+        	var ul_list = $(this).parent().parent().children("ul.plugin-list");
             $.ajax({
             	url: "copy-plugins/", dataType: "html", type: "POST",
             	data: { page_id: page_id, placeholder: placeholder, copy_from: copy_from_language, language: to_language },
             	success: function(data) {
-                   // loadPluginForm(target_div, data);
-                   // ul_list.append('<li id="plugin_' + data + '" class="' + pluginvalue + ' active"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>');
-                   // setclickfunctions();
-            	},
-            	error: function(xhr) {
-            		if (xhr.status < 500) {
-            			alert(xhr.responseText);
-            		}
-            	}
+                    ul_list.append(data);
+                    setclickfunctions();
+             	},
+             	error: function(xhr) {
+             		if (xhr.status < 500) {
+             			alert(xhr.responseText);
+             		}
+             	}
             });
         }
     });    
