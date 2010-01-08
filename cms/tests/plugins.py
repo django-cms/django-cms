@@ -90,7 +90,7 @@ class PluginsTestCase(CMSTestCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[0][0]).cont(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[0][0]).count(), 1)
         self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[1][0]).count(), 1)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
         for text in Text.objects.all():
