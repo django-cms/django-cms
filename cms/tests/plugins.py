@@ -90,10 +90,10 @@ class PluginsTestCase(CMSTestCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(CMSPlugin.objects.all()[0].language, settings.LANGUAGES[0][0])
-        self.assertEquals(CMSPlugin.objects.all()[1].language, settings.LANGUAGES[1][0])
-        self.assertEquals(CMSPlugin.objects.all()[1].page_id, page.pk)
+        self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[0][0]).cont(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[1][0]).count(), 1)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
-        self.assertEquals(Text.objects.all()[1].body, "Hello World")
+        for text in Text.objects.all():
+            self.assertEquals(text.body, "Hello World")
         
         
