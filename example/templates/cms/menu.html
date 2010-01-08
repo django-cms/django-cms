@@ -1,4 +1,4 @@
-{% load cms_tags cache %}
+{% load menu_tags cache %}
 {% for child in children %}
 <li>
 	{% if not child.is_leaf_node %}+{% endif %}{{ child.menu_level }}

@@ -1,161 +1,29 @@
 
+from menus.menu_pool import menu_pool
+from django import template
+
+
+def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
+    return nodes
+
+register = template.Library()
+
 def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="cms/menu.html", next_page=None, root_id=None):
     """
     render a nested list of all children of the pages
     from_level: is the start level
     to_level: is the max level rendered
-    render_children: if set to True will render all not direct ascendants too
+
     """
     try:
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
         return {'template': 'cms/content.html'}
-    page_queryset = get_page_queryset(request)
-    site = Site.objects.get_current()
-    lang = get_language_from_request(request)
-    current_page = request.current_page
-    if current_page == "dummy":
-        context.update({'children':[],
-                    'template':template,
-                    'from_level':from_level,
-                    'to_level':to_level,
-                    'extra_inactive':extra_inactive,
-                    'extra_active':extra_active})
-        return context
-    if hasattr(current_page, "home_pk_cache"):
-        home_pk = current_page.home_pk_cache
-    else:
-        try:
-            home_pk = page_queryset.get_home(site).pk
-        except NoHomeFound:
-            home_pk = 0
+    
     if not next_page: #new menu... get all the data so we can save a lot of queries
-        
-        children = []
-        ancestors = []
-        alist = None
-        if current_page:
-            alist = current_page.get_ancestors().values_list('id', 'soft_root')
-        if not alist:  # == None:# maybe the active node is in an extender?
-            alist = []
-            extenders = page_queryset.published().filter(in_navigation=True, 
-                                                        site=site, 
-                                                        level__lte=to_level)
-            extenders = extenders.exclude(navigation_extenders__isnull=True).exclude( navigation_extenders__exact="")
-            for ext in extenders:
-                ext.childrens = []
-                ext.ancestors_ascending = []
-                get_extended_navigation_nodes(request, 100, [ext], ext.level, 100, 100, False, ext.navigation_extenders)
-                if hasattr(ext, "ancestor"):
-                    alist = list(ext.get_ancestors().values_list('id', 'soft_root'))
-                    alist = [(ext.pk, ext.soft_root)] + alist
-                    break
-        filters = {'in_navigation' : True, 
-                   'site' : site,
-                   'level__lte' : to_level}
-        #check the ancestors for softroots
-        soft_root_pk = None
-        for p in alist:
-            ancestors.append(p[0])
-            if p[1]:
-                soft_root_pk = p[0]
-        #modify filters if we don't start from the root
-        root_page = None
-        if root_id:
-            try:
-                root_page = page_queryset.get(reverse_id=root_id, site=site)
-            except:
-                send_missing_mail(root_id, request)
-        else:
-            if current_page and current_page.soft_root:
-                root_page = current_page
-                soft_root_pk = current_page.pk
-            elif soft_root_pk:
-                root_page = page_queryset.get(pk=soft_root_pk)
-        if root_page:
-            if isinstance(root_page, int):
-                root_page = page_queryset.get(pk=root_page)
-            if isinstance(root_page, Page):
-                root_page = page_queryset.get(pk=root_page.id)
-            elif isinstance(root_page, unicode):
-                root_page = page_queryset.get(reverse_id=root_page, site=site)
-            filters['tree_id'] = root_page.tree_id
-            filters['lft__gt'] = root_page.lft
-            filters['rght__lt'] = root_page.rght
-            filters['level__lte'] = root_page.level + to_level
-            db_from_level = root_page.level + from_level
-        else:
-            db_from_level = from_level
-        if settings.CMS_HIDE_UNTRANSLATED:
-            filters['title_set__language'] = lang
-        if not request.user.is_authenticated():
-            filters['menu_login_required'] = False
-        pages = page_queryset.published().filter(**filters).order_by('tree_id', 
-                                                                    'parent', 
-                                                                    'lft')
-        pages = list(pages)
-        if root_page:
-            pages = [root_page] + pages
-        all_pages = pages[:]
-        root_level = getattr(root_page, 'level', None)
-        ids = []
-        current = None
-        for page in pages:# build the tree
-            if current_page and current_page.pk == page.pk:
-                current = page
-            if page.level >= db_from_level:
-                ids.append(page.pk)
-            if page.level == 0 or page.level == root_level:
-                if page.parent_id:
-                    page.get_cached_ancestors()
-                else:
-                    page.ancestors_ascending = []
-                page.home_pk_cache = home_pk
-                page.menu_level = 0 - from_level
-                page.childrens = []
-                children.append(page)
-                if page.pk == soft_root_pk:
-                    page.soft_root = False #ugly hack for the recursive function
-                if current_page:
-                    pk = current_page.pk
-                else:
-                    pk = -1
-                find_children(page, pages, extra_inactive, extra_active, ancestors, pk, request=request, to_levels=to_level)
-                if page.pk == soft_root_pk:
-                    page.soft_root = True
-        if db_from_level > 0:
-            children = cut_levels(children, db_from_level)
-        titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
-        for page in all_pages:# add the title and slugs and some meta data
-            for title in titles:
-                if title.page_id == page.pk:
-                    if not hasattr(page, "title_cache"):
-                        page.title_cache = {}
-                    page.title_cache[title.language] = title
-                    ids.remove(page.pk)
-            if current_page and page.pk == current_page.pk and not getattr(current, 'ancestor', False):
-                    page.selected = True
-                    if hasattr(page, "childrens"):
-                        mark_descendants(page.childrens)
-            if page.pk in ancestors:
-                page.ancestor = True
-            if current_page and page.parent_id == current_page.parent_id and not page.pk == current_page.pk and not getattr(current, 'ancestor', False):
-                page.sibling = True
-        if ids:
-            fallbacks = get_fallback_languages(lang)
-            for l in fallbacks:
-                titles = list(get_title_queryset(request).filter(page__in=ids, language=l))
-                for page in all_pages:# add the title and slugs and some meta data
-                    for title in titles:
-                        if title.page_id == page.pk:
-                            if not hasattr(page, "title_cache"):
-                                page.title_cache = {}
-                            page.title_cache[title.language] = title
-                            ids.remove(page.pk)
-                if not ids:
-                    break
-        children = navigation.handle_navigation_manipulators(children, request)
+        nodes = menu_pool.get_nodes(request, root_id)
+        children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
     else:
         children = next_page.childrens
     context.update({'children':children,
@@ -167,7 +35,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     return context
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
-
+'''
 def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=100, extra_active=100, template_file="cms/menu.html", next_page=None):
     return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_id=root_id)
 register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
@@ -372,3 +240,4 @@ def language_chooser(context, template="cms/language_chooser.html"):
     context.update(locals())
     return context
 language_chooser = register.inclusion_tag('cms/dummy.html', takes_context=True)(language_chooser)
+'''

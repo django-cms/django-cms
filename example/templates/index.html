@@ -1,4 +1,4 @@
-{% load cache cms_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% load cache cms_tags menu_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
 <title>{% page_attribute page_title %}</title>
@@ -89,7 +89,7 @@
     {% endif %}
 </p>
 <p class="chooser">
-	See this page in: {% language_chooser %}
+	See this page in: {#% language_chooser %#}
 </p>
 <h1>{% block title %}{% page_attribute title %}{% endblock %}</h1>
 
@@ -134,7 +134,7 @@
 <h2>Display the sub menu (2 level deep) of the current page</h2>
 
 <ul>
-    {% show_sub_menu 1 %}
+    {#% show_sub_menu 1 %#}
 </ul>
 
 

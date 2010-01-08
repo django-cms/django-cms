@@ -105,7 +105,7 @@ INSTALLED_APPS = (
     
     'cms',
     'publisher',
-    'menu',
+    'menus',
     'cms.plugins.text',
     'cms.plugins.picture',
     'cms.plugins.file',

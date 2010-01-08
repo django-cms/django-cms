@@ -1,4 +1,4 @@
-from menu.base import Modifier
+from menus.base import Modifier
 
 class Marker(Modifier):
     """
@@ -8,7 +8,7 @@ class Marker(Modifier):
     descendants: descendant = True
     ancestors: ancestor = True
     """
-    def modify(self, request, node):    
+    def modify(self, request, node, root_id):    
         if node.get_absolute_url() == request.path:
             node.selected = True
             n = node
@@ -31,7 +31,7 @@ class LoginRequired(Modifier):
     """
     Remove nodes that are login required or require a group
     """
-    def modify(self, request, node):
+    def modify(self, request, node, root_id):
         good = False
         if node.auth_required and request.user.is_authenticated():
             good = True

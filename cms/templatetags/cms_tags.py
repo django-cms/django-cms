@@ -1,23 +1,15 @@
-from django.conf import settings
+from cms.exceptions import NoHomeFound
+from cms.utils import get_language_from_request
+from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.plugin import render_plugins_for_context
 from django import template
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import send_mail, mail_managers
-from django.contrib.sites.models import Site
+from django.template.defaultfilters import title
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from cms.exceptions import NoHomeFound
-from cms.models import Page
-from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset, get_title_queryset
-from cms.utils.plugin import render_plugins_for_context
-from cms.utils import get_language_from_request,\
-    get_extended_navigation_nodes, find_children, \
-    cut_levels, find_selected, mark_descendants
-from cms.utils import navigation
-from cms.utils.i18n import get_fallback_languages
-from django.template.defaultfilters import title
-from django.template import TemplateSyntaxError, Node
-from django.utils.translation import get_language
-from django.utils.encoding import smart_str
 
 
 

@@ -1,5 +1,5 @@
-from menu.menu_pool import menu_pool
-from menu.base import Menu
+from menus.menu_pool import menu_pool
+from menus.base import Menu
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_page_queryset, get_title_queryset
 from django.conf import settings
@@ -18,9 +18,7 @@ class CMSMenu(Menu):
         }
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
-        if not request.user.is_authenticated():
-            filters['menu_login_required'] = False
-        pages = page_queryset.published().filter(filters)
+        pages = page_queryset.published().filter(filters).order_by("tree_id", "lft")
         ids = []
         for page in pages:
             ids.append(page.id)
@@ -46,5 +44,6 @@ class CMSMenu(Menu):
                             break
                 if not ids:
                     break
+        return pages
                 
 menu_pool.register_menu(CMSMenu, "main")

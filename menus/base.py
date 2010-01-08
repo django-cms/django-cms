@@ -6,6 +6,11 @@ class Menu(object):
     def get_nodes(self, request):
         raise NotImplementedError
     
+    def get_node_by_id(self, id):
+        for node in self.nodes:
+            if node.id == id:
+                return node
+    
 class Modifier(object):
     
     def modify(self, request, nodes, namespace):
