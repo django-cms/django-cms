@@ -77,13 +77,13 @@ Example::
 	CMS_PLACEHOLDER_CONF = {                        
 		'content': {
 			"plugins": ('ContactFormPlugin','FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin'),
-			"extra_context": {"theme":"16_16"},
+			"extra_context": {"width":940},
 			"name": gettext("content")
 		},
 
 		'right-column': {
 			"plugins": ('ContactFormPlugin','TextPlugin', 'SimpleGalleryPublicationPlugin'),
-	        "extra_context": {"theme":"16_5"},
+	        "extra_context": {"width":280},
 			"name": gettext("right column")
 			"limits": {
 				"global": 2,

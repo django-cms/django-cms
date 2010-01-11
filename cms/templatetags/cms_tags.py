@@ -490,7 +490,7 @@ def do_placeholder(parser, token):
         #tag_name, name
         return PlaceholderNode(bits[1])
     elif len(bits) == 3:
-        #tag_name, name, theme
+        #tag_name, name, width
         return PlaceholderNode(bits[1], bits[2])
     else:
         raise template.TemplateSyntaxError(error_string)
@@ -499,15 +499,15 @@ class PlaceholderNode(template.Node):
     """This template node is used to output page content and
     is also used in the admin to dynamicaly generate input fields.
     
-    eg: {% placeholder content-type-name theme-name %}
+    eg: {% placeholder content-type-name width %}
     
     Keyword arguments:
     name -- the name of the placeholder
-    theme -- additional theme attribute string which gets added to the context
+    width -- additional width attribute (integer) which gets added to the plugin context
     """
-    def __init__(self, name, theme=None):
+    def __init__(self, name, width=None):
         self.name = "".join(name.lower().split('"'))
-        self.theme = theme
+        self.width = width
 
     def render(self, context):
         if context.get('display_placeholder_names_only'):
@@ -520,7 +520,7 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         if page == "dummy":
             return ""
-        return render_plugins_for_context(self.name, page, context, self.theme)
+        return render_plugins_for_context(self.name, page, context, self.width)
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name

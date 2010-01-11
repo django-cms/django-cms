@@ -161,17 +161,17 @@ CMS_APPLICATIONS_URLS = (
 CMS_PLACEHOLDER_CONF = {                        
     'right-column': {
         "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
-        "extra_context": {"theme":"16_16"},
+        "extra_context": {"width":940},
         "name":gettext("right column")
     },
     
     'body': {
-        "extra_context": {"theme":"16_5"},
+        "extra_context": {"width":280},
         "name":gettext("body"),
     },
     'fancy-content': {
         "plugins": ('TextPlugin', 'LinkPlugin'),
-        "extra_context": {"theme":"16_11"},
+        "extra_context": {"width":"640"},
         "name":gettext("fancy content custom name"),
         "limits": {
             "global": 3,
