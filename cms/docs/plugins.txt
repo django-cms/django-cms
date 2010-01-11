@@ -166,6 +166,25 @@ For installation be sure you have the following in your project's ``INSTALLED_AP
 		# ...
 	)
 	
+There are some settings you can set in your settings.py to overwrite some default behavior:
+
+- VIDEO_AUTOPLAY default=False
+- VIDEO_AUTOHIDE default=False
+- VIDEO_FULLSCREEN default=True
+- VIDEO_LOOP default=False
+- VIDEO_AUTOPLAY default=False
+- VIDEO_AUTOPLAY default=False
+
+- VIDEO_BG_COLOR default="000000"
+- VIDEO_TEXT_COLOR default="FFFFFF"
+- VIDEO_SEEKBAR_COLOR default="13ABEC"
+- VIDEO_SEEKBARBG_COLOR default="333333"
+- VIDEO_LOADINGBAR_COLOR default="828282"
+- VIDEO_BUTTON_OUT_COLOR default="333333"
+- VIDEO_BUTTON_OVER_COLOR default="000000"
+- VIDEO_BUTTON_HIGHLIGHT_COLOR default="FFFFFF"
+	
+
 Twitter
 -------
 
