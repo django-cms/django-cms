@@ -25,7 +25,7 @@ msgstr "Titolo"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr "Il titolo predefinito"
+msgstr "Titolo predefinito"
 
 #: admin/forms.py:27
 msgid "Slug"
