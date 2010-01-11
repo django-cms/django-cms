@@ -2,13 +2,29 @@
 from menus.menu_pool import menu_pool
 from django import template
 
+def cut_after(node, levels):
+    if levels == 0:
+        node.children = []
+    else:
+        for n in node.children:
+            cut_after(n, levels - 1)
 
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     print "cut levels"
     final = []
+    selected = None
     for node in nodes:
-        if not node.parent:
+        if node.level == from_level:
             final.append(node)
+            if not node.ancestor and not node.selected and not node.descendant:
+                cut_after(node, extra_inactive)
+        if node.level > to_level and node.parent:
+            if node in node.parent.children:
+                node.parent.children.remove(node)
+        if node.selected:
+            selected = node
+    cut_after(selected, extra_active)
+        
     return final
 
 register = template.Library()
@@ -20,7 +36,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     to_level: is the max level rendered
 
     """
-    print "show menu"
     try:
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
@@ -28,9 +43,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         return {'template': 'cms/content.html'}
     
     if next_page:
-        print next_page
-        print next_page.children
-        print next_page.parent
         children = next_page.children
     else: 
         #new menu... get all the data so we can save a lot of queries

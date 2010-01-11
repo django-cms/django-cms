@@ -12,6 +12,10 @@ class Marker(Modifier):
         selected = None
         root_nodes = []
         for node in nodes:
+            if not hasattr(node, "descendant"):
+                node.descendant = False
+            if not hasattr(node, "ancestor"):
+                node.ancestor = False
             if not node.parent:
                 if selected and not selected.parent:
                     node.sibling = True
@@ -23,7 +27,6 @@ class Marker(Modifier):
                     while n.parent:
                         n = n.parent
                         n.ancestor = True
-                        print n
                     for sibling in node.parent.children:
                         if not sibling.selected:
                             sibling.sibling = True
