@@ -12,10 +12,22 @@ class Menu(object):
                 return node
     
 class Modifier(object):
+    pre_cut = True
+    post_cut = False
     
-    def modify(self, request, nodes, namespace):
-        raise NotImplementedError
+    def set_nodes(self, nodes):
+        self.nodes = nodes
     
+    def modify(self, request, nodes, namespace, post_cut):
+        pass
+    
+    def modify_all(self, request, nodes, namespace, post_cut):
+        pass
+    
+    def remove_node(self, node):
+        self.nodes.remove(node)
+        if node.parent:
+            node.parent.children.remove(node)
     
 class NavigationNode(object):
     title = None
@@ -29,9 +41,11 @@ class NavigationNode(object):
     parent_id = None
     parent_namespace = None
     parent = None # do not touch
-    childrens = [] # do not touch
+   
+    selected = False
     
     def __init__(self, title, url, namespace, id, parent_id=None, parent_namespace=None, attr=None, softroot=False, auth_required=False, required_group_id=None):
+        self.children = [] # do not touch
         self.title = title
         self.url = url
         self.id = id
@@ -43,6 +57,9 @@ class NavigationNode(object):
         self.required_group_id = required_group_id 
         if attr:
             self.attr = attr
+            
+    def __repr__(self):
+        return "<Navigation Node: %s>" % self.title
     
     def get_menu_title(self):
         return self.title

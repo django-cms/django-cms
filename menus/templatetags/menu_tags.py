@@ -4,7 +4,12 @@ from django import template
 
 
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
-    return nodes
+    print "cut levels"
+    final = []
+    for node in nodes:
+        if not node.parent:
+            final.append(node)
+    return final
 
 register = template.Library()
 
@@ -15,17 +20,24 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     to_level: is the max level rendered
 
     """
+    print "show menu"
     try:
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
         return {'template': 'cms/content.html'}
     
-    if not next_page: #new menu... get all the data so we can save a lot of queries
+    if next_page:
+        print next_page
+        print next_page.children
+        print next_page.parent
+        children = next_page.children
+    else: 
+        #new menu... get all the data so we can save a lot of queries
         nodes = menu_pool.get_nodes(request, root_id)
         children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
-    else:
-        children = next_page.childrens
+    print children
+        
     context.update({'children':children,
                     'template':template,
                     'from_level':from_level,

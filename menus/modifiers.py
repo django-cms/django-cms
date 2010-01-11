@@ -8,30 +8,69 @@ class Marker(Modifier):
     descendants: descendant = True
     ancestors: ancestor = True
     """
-    def modify(self, request, node, root_id):    
-        if node.get_absolute_url() == request.path:
-            node.selected = True
-            n = node
-            while n.parent:
-                n = n.parent
-                n.ancestor = True
-            if n.parent:
-                for n in n.parent.childrens:
-                    if not n.selected:
-                        n.sibling = True
-            self.mark_descendants(node.childrens)
-        return node
-            
+    def modify_all(self, request, nodes, root_id, post_cut):
+        selected = None
+        root_nodes = []
+        for node in nodes:
+            if not node.parent:
+                if selected and not selected.parent:
+                    node.sibling = True
+                else:
+                    root_nodes.append(node)
+            if node.selected: 
+                if node.parent:
+                    n = node
+                    while n.parent:
+                        n = n.parent
+                        n.ancestor = True
+                        print n
+                    for sibling in node.parent.children:
+                        if not sibling.selected:
+                            sibling.sibling = True
+                else:
+                    for n in root_nodes:
+                        if not n.selected:
+                            n.sibling = True
+                if node.children:                    
+                    self.mark_descendants(node.children)
+                selected = node
+            if node.children:
+                node.is_leaf_node = False
+            else:
+                node.is_leaf_node = True
+                
     def mark_descendants(self, nodes):
         for node in nodes:
             node.descendant = True
-            self.mark_descendants(node.childrens)
+            self.mark_descendants(node.children)
+            
+  
+
+
+class Level(Modifier):
+    """
+    marks all node levels
+    """
+    def modify(self, request, node, root_id, post_cut):
+        print "level"
+        if not node.parent:
+            node.level = 0
+            self.mark_levels(node)
+    
+                    
+    def mark_levels(self, node):
+        for child in node.children:
+            child.level = node.level + 1
+            self.mark_levels(child)
+
 
 class LoginRequired(Modifier):
     """
     Remove nodes that are login required or require a group
     """
-    def modify(self, request, node, root_id):
+    def modify(self, request, node, root_id, post_cut):
+        print "login required"
+        
         good = False
         if node.auth_required and request.user.is_authenticated():
             good = True
@@ -43,7 +82,7 @@ class LoginRequired(Modifier):
                 if group.pk == node.required_group_id:
                     good = True
                     break
-        if good:
+        if good or (not node.auth_required and not node.required_group_id):
             return node
-        return False
+        self.remove_node(node)
         

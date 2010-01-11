@@ -2,6 +2,7 @@ from django.conf import settings
 
 default_modifiers = [
     'menus.modifiers.Marker',
+    'menus.modifiers.Level',
     'menus.modifiers.LoginRequired',
 ]
 

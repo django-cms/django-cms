@@ -1,5 +1,5 @@
 from menus.menu_pool import menu_pool
-from menus.base import Menu
+from menus.base import Menu, NavigationNode
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_page_queryset, get_title_queryset
 from django.conf import settings
@@ -20,6 +20,7 @@ class CMSMenu(Menu):
             filters['title_set__language'] = lang
         pages = page_queryset.published().filter(filters).order_by("tree_id", "lft")
         ids = []
+        nodes = []
         for page in pages:
             ids.append(page.id)
         titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
@@ -29,6 +30,7 @@ class CMSMenu(Menu):
                     if not hasattr(page, "title_cache"):
                         page.title_cache = {}
                     page.title_cache[title.language] = title
+                    nodes.append(self.page_to_node(page))
                     ids.remove(page.pk)
         if ids: # get fallback languages
             fallbacks = get_fallback_languages(lang)
@@ -40,10 +42,16 @@ class CMSMenu(Menu):
                             if not hasattr(page, "title_cache"):
                                 page.title_cache = {}
                             page.title_cache[title.language] = title
+                            nodes.append(self.page_to_node(page))
                             ids.remove(page.pk)
                             break
                 if not ids:
                     break
-        return pages
-                
+        return nodes
+    
+    def page_to_node(self, page):
+        attr = {}
+        n = NavigationNode(page.get_menu_title(), page.get_absolute_url(), "cms", page.pk, page.parent_id, "cms", attr, page.soft_root, page.login_required)
+        return n
+            
 menu_pool.register_menu(CMSMenu, "main")

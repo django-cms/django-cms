@@ -1,7 +1,7 @@
 {% load menu_tags cache %}
 {% for child in children %}
 <li>
-	{% if not child.is_leaf_node %}+{% endif %}{{ child.menu_level }}
+	{% if not child.is_leaf_node %}+{% endif %}{{ child.level }}
 	<a href="{{ child.get_absolute_url }}">{{ child.get_menu_title }}</a> <span style="color:#999">
 	{% if child.selected %}selected{% endif %}
 	{% if child.ancestor %}ancestor{% endif %}
@@ -9,7 +9,7 @@
 	{% if child.descendant %}descendant{% endif %}
 	{% if child.soft_root %}(softroot){% endif %}
 	(Level: {{ child.level }})</span>
-    {% if child.childrens %}
+    {% if child.children %}
     <ul>
         {% show_menu from_level to_level extra_inactive extra_active template child %}
     </ul>
