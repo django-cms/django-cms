@@ -15,11 +15,12 @@ Example::
 
 	{% placeholder "content" %}
 	
-You can additionally give the placeholder a theme attribute::
+You can additionally give the placeholder a width attribute::
 
-	{% placeholder "content" "fancy_theme" %}
+	{% placeholder "content" "230" %}
 	
-If a theme is provided every plugin recieves a "theme" context variable when the plugin is rendered.
+If a width is provided every plugin recieves a "width" context variable when the plugin is rendered.
+The main use case of the width attribute is for automatically resizing images correctly.
 
 Also be sure to check out the ``PLACEHOLDER_CONF`` setting where you can change some of the behavior
 of the placeholders. 

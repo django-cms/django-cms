@@ -19,4 +19,5 @@
 - frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
+- placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)
 - a lot of bugfixes
