@@ -507,13 +507,17 @@ class PlaceholderNode(template.Node):
     """
     def __init__(self, name, width=None):
         self.name = "".join(name.lower().split('"'))
-        self.width_variable = template.Variable(width)
+        if width: self.width = template.Variable(width)
 
     def render(self, context):
-        try:
-            width = self.width_variable.resolve(context)
-        except template.VariableDoesNotExist:
-            # should we raise an error here?
+        width_var = getattr(self, 'width', None)
+        if width_var:
+            try:
+                width = width_var.resolve(context)
+            except template.VariableDoesNotExist:
+                # should we raise an error here?
+                width = None
+        else:
             width = None
             
         if context.get('display_placeholder_names_only'):
