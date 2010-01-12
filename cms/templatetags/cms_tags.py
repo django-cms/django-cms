@@ -507,9 +507,15 @@ class PlaceholderNode(template.Node):
     """
     def __init__(self, name, width=None):
         self.name = "".join(name.lower().split('"'))
-        self.width = width
+        self.width_variable = template.Variable(width)
 
     def render(self, context):
+        try:
+            width = self.width_variable.resolve(context)
+        except template.VariableDoesNotExist:
+            # should we raise an error here?
+            width = None
+            
         if context.get('display_placeholder_names_only'):
             return "<!-- PlaceholderNode: %s -->" % self.name
             
@@ -520,7 +526,7 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         if page == "dummy":
             return ""
-        return render_plugins_for_context(self.name, page, context, self.width)
+        return render_plugins_for_context(self.name, page, context, width)
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
