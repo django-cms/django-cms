@@ -55,7 +55,6 @@ class Level(Modifier):
     marks all node levels
     """
     def modify(self, request, node, root_id, post_cut):
-        print "level"
         if not node.parent:
             node.level = 0
             self.mark_levels(node)
@@ -72,8 +71,6 @@ class LoginRequired(Modifier):
     Remove nodes that are login required or require a group
     """
     def modify(self, request, node, root_id, post_cut):
-        print "login required"
-        
         good = False
         if node.auth_required and request.user.is_authenticated():
             good = True

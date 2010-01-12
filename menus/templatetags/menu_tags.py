@@ -2,29 +2,34 @@
 from menus.menu_pool import menu_pool
 from django import template
 
-def cut_after(node, levels):
+def cut_after(node, levels, removed):
     if levels == 0:
+        removed.extend(node.children)
         node.children = []
     else:
         for n in node.children:
-            cut_after(n, levels - 1)
+            cut_after(n, levels - 1, removed)
 
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
-    print "cut levels"
     final = []
+    removed = []
     selected = None
-    for node in nodes:
+    for node in nodes: 
+        if not node.parent and not node.ancestor and not node.selected:
+            cut_after(node, extra_inactive, removed)
         if node.level == from_level:
             final.append(node)
-            if not node.ancestor and not node.selected and not node.descendant:
-                cut_after(node, extra_inactive)
         if node.level > to_level and node.parent:
             if node in node.parent.children:
                 node.parent.children.remove(node)
         if node.selected:
             selected = node
-    cut_after(selected, extra_active)
-        
+    if selected:
+        cut_after(selected, extra_active, removed)
+    if removed:
+        for node in final:
+            if node in removed:
+                final.remove(node)
     return final
 
 register = template.Library()
