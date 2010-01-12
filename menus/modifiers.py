@@ -54,16 +54,24 @@ class Level(Modifier):
     """
     marks all node levels
     """
+    post_cut = True
+    
     def modify(self, request, node, root_id, post_cut):
         if not node.parent:
-            node.level = 0
-            self.mark_levels(node)
+            if post_cut:
+                node.menu_level = 0
+            else:
+                node.level = 0
+            self.mark_levels(node, post_cut)
     
                     
-    def mark_levels(self, node):
+    def mark_levels(self, node, post_cut):
         for child in node.children:
-            child.level = node.level + 1
-            self.mark_levels(child)
+            if post_cut:
+                child.menu_level = node.menu_level + 1
+            else:
+                child.level = node.level + 1
+            self.mark_levels(child, post_cut)
 
 
 class LoginRequired(Modifier):

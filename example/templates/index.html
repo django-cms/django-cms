@@ -89,7 +89,7 @@
     {% endif %}
 </p>
 <p class="chooser">
-	See this page in: {#% language_chooser %#}
+	See this page in: {% language_chooser %}
 </p>
 <h1>{% block title %}{% page_attribute title %}{% endblock %}</h1>
 
@@ -134,14 +134,13 @@
 <h2>Display the sub menu (2 level deep) of the current page</h2>
 
 <ul>
-    {#% show_sub_menu 1 %#}
+    {% show_sub_menu 2 %}
 </ul>
 
 
 <h2>Show the breadcrumb navigation of the current page</h2>
 <ul class="breadcrumb">
-{% page_attribute title %}
-	{#% show_breadcrumb %#}
+	{% show_breadcrumb %}
 </ul>
 
 <h2>Content</h2>

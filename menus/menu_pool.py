@@ -8,7 +8,7 @@ class MenuPool(object):
         self.menus = {}
         self.modifiers = []
         self.discovered = False
-        self.nodes = []
+        self.nodes = {}
         
         
     def discover_menus(self):
@@ -34,9 +34,11 @@ class MenuPool(object):
         self.menus[namespace] = menu()
     
     def build_nodes(self, request):
-        if self.nodes:
-            return self.nodes
-        self.nodes = []
+        lang = request.LANGUAGE_CODE
+        if lang in self.nodes:
+            return self.nodes[lang]
+        else:
+            self.nodes[lang] = []
         for ns in self.menus:
             nodes = self.menus[ns].get_nodes(request)
             last = None
@@ -62,9 +64,9 @@ class MenuPool(object):
                     if not found:
                         raise NoParentFound, "No parent found for %s" % node.get_menu_title()
                     node.parent.children.append(node)
-                self.nodes.append(node)
+                self.nodes[lang].append(node)
                 last = node
-        return self.nodes
+        return self.nodes[lang]
     
     def apply_modifiers(self, nodes, request, root_id):
         self.mark_selected(request, nodes)
