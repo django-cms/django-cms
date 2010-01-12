@@ -3,10 +3,10 @@ from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from cms.exceptions import NoPermissionsException
-from cms.cache.permissions import get_permission_cache, set_permission_cache
 from publisher import PublisherManager
 from cms.models.query import PageQuerySet
 from cms.utils.i18n import get_fallback_languages
+
 
 try:
     set
@@ -96,6 +96,7 @@ class PageManager(PublisherManager):
         
         Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
         """
+        from cms.plugin_pool import plugin_pool
         qs = self.get_query_set()
         if settings.CMS_MODERATOR:
             qs = qs.public()
@@ -108,14 +109,13 @@ class PageManager(PublisherManager):
         
         # find 'searchable' plugins and build query
         qp = Q()
-        # cannot import CMSPlugin due to Manager -> Page -> Plugin circle!
-        CMSPlugin = models.get_model('cms','cmsplugin')
-        for c in CMSPlugin.__subclasses__():
+        plugins = plugin_pool.get_all_plugins()
+        for plugin in plugins:
+            c = plugin.model
             if hasattr(c, 'search_fields'):
                 for field in c.search_fields:
                     qp |= Q(**{'cmsplugin__%s__%s__icontains' % \
                                    (c.__name__.lower(), field):q})
-        
         if language:
             qt &= Q(title_set__language=language)
             qp &= Q(cmsplugin__language=language)

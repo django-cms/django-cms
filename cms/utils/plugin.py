@@ -8,7 +8,7 @@ from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 import copy
 
-def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=None):
+def render_plugins_for_context(placeholder_name, page, context_to_copy, width=None):
     """
     renders plugins for the given named placedholder and page using shallow copies of the 
     given context
@@ -20,9 +20,13 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, theme=No
     if settings.CMS_PLACEHOLDER_CONF and placeholder_name in settings.CMS_PLACEHOLDER_CONF:
         if "extra_context" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
             context.update(settings.CMS_PLACEHOLDER_CONF[placeholder_name]["extra_context"])
-    if theme:
-        # this may overwrite previously defined key [theme] from settings.CMS_PLACEHOLDER_CONF
-        context.update({'theme': theme,})
+    if width:
+        # this may overwrite previously defined key [width] from settings.CMS_PLACEHOLDER_CONF
+        try:
+            width = int(width)
+            context.update({'width': width,})
+        except ValueError:
+            pass
     c = []
     edit = False
     if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
