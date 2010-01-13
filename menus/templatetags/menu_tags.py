@@ -103,7 +103,7 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
     for node in nodes:
         if node.selected:
             selected = node
-        print node.get_absolute_url()
+        # find home TODO: maybe home is not in the navigation
         if node.get_absolute_url() == "/":
             home = node
     if selected and selected != home:
