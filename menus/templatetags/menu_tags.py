@@ -113,6 +113,10 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
             n = n.parent
     ancestors.append(home)
     ancestors.reverse()
+    if len(ancestors) >= start_level:
+        ancestors = ancestors[start_level:]
+    else:
+        ancestors = []
     context.update({'ancestors':ancestors,
                     'template': template})
     return context
