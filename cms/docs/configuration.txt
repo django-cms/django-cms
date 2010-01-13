@@ -37,13 +37,14 @@ CMS_PLACEHOLDER_CONF
 ----------------------
 
 Is used to configure the placeholders. 
-This is optional
+This is optional.
 
 Example::
 
 	CMS_PLACEHOLDER_CONF = {
 		'content': {
 			'plugins': ('TextPlugin', 'PicturePlugin'),
+			'text_only_plugins': ('LinkPlugin',)
 			'extra_context': {"width":640},
 			'name':gettext("Content")
 		},
@@ -67,6 +68,10 @@ You can combine template names and placeholder names to granually define the plu
 **plugins**
 
 A list of plugins that can be added to this placeholder. If not supplied all plugins can be selected.
+
+**text_only_plugins**
+
+A list of additional plugins that should only be available to the TextPlugin and can't be added directly to this placeholder.
 
 **extra_context**
 
