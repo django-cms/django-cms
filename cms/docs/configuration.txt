@@ -71,7 +71,7 @@ A list of plugins that can be added to this placeholder. If not supplied all plu
 
 **text_only_plugins**
 
-A list of additional plugins that should only be available to the TextPlugin and can't be added directly to this placeholder.
+A list of additional plugins that should only be available to the TextPlugin, but can't be added directly to this placeholder.
 
 **extra_context**
 
