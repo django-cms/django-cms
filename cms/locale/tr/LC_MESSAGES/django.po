@@ -950,24 +950,24 @@ msgstr ""
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
-msgstr ""
+msgstr "Bağlantı"
 
 #: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
 #: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
-msgstr ""
+msgstr "isim"
 
 #: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
 #: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:14
 msgid "link"
-msgstr ""
+msgstr "bağlantı"
 
 #: plugins/link/models.py:13
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "Bir sayfaya bağlantı, bir yazı bağlantısından önceliklidir."
 
 #: plugins/link/models.py:14
 msgid "mailto"
@@ -975,48 +975,48 @@ msgstr ""
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
-msgstr ""
+msgstr "Bir eposta adresi, bir yazı bağlantısından önceliklidir."
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
-msgstr ""
+msgstr "Resim"
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr ""
+msgstr "sol"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr ""
+msgstr "sağ"
 
 #: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
 #: plugins/teaser/models.py:12 plugins/video/models.py:37
 msgid "image"
-msgstr ""
+msgstr "resim"
 
 #: plugins/picture/models.py:21 plugins/picture/models.py:22
 msgid "if present image will be clickable"
-msgstr ""
+msgstr "şu anki resim tıklanabilir olacak mı "
 
 #: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
-msgstr ""
+msgstr "alternatif metin"
 
 #: plugins/picture/models.py:23
 msgid "textual description of the image"
-msgstr ""
+msgstr "Resmin açıklaması"
 
 #: plugins/picture/models.py:24
 msgid "long description"
-msgstr ""
+msgstr "Uzun açıklama"
 
 #: plugins/picture/models.py:24
 msgid "additional description of the image"
-msgstr ""
+msgstr "Resmin ek açıklamaları"
 
 #: plugins/picture/models.py:25
 msgid "side"
-msgstr ""
+msgstr "yan"
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
@@ -1026,15 +1026,15 @@ msgstr ""
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr ""
+msgstr "%(template)s şablonu mevcut değil."
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
+msgstr "Kullanılacak şablonu (ör. \"snippets/plugin_xy.html\") girin."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
