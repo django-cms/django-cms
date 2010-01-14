@@ -830,20 +830,20 @@ msgstr ""
 
 #: models/titlemodels.py:15
 msgid "Path"
-msgstr ""
+msgstr "Yol"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
-msgstr ""
+msgstr "başlık etiketini belirle (html title etiketi)"
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
-msgstr ""
+msgstr "Dosya"
 
 #: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
 #: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
-msgstr ""
+msgstr "dosya"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
@@ -851,22 +851,22 @@ msgstr ""
 
 #: plugins/flash/models.py:9 plugins/video/models.py:36
 msgid "use swf file"
-msgstr ""
+msgstr "swf dosyası kullan"
 
 #: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
 #: plugins/video/models.py:39
 msgid "width"
-msgstr ""
+msgstr "genişlik"
 
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:40
 msgid "height"
-msgstr ""
+msgstr "yükseklik"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin."
-msgstr ""
+msgstr "Flash eklentisi yok."
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
