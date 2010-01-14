@@ -276,87 +276,87 @@ msgstr ""
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "Kullanıcı & Grup yetkileri"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "Sayfa yetki yönetimi"
 
 #: admin/useradmin.py:21
 msgid "User details"
-msgstr ""
+msgstr "Kullanıcı detayları"
 
 #: admin/useradmin.py:22
 msgid "Groups"
-msgstr ""
+msgstr "Gruplar"
 
 #: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:841
 msgid "Password"
-msgstr ""
+msgstr "Parola"
 
 #: admin/widgets.py:56
 msgid "Add Another"
-msgstr ""
+msgstr "Bir tane daha ekle"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "Kopyalama yetkileri"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr ""
+msgstr "Kopyalama moderasyonu"
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "En yakın üst sayfanın şablonunu kullan"
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "Genel Bakış"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "İndisler ve tablolar"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr ""
+msgstr "Eksiksiz İçindekiler Sayfası"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "tüm kısımları ve alt kısımları listele"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "Sayfa Ara"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "bu belgeleri ara"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "Küresel Modül İndeksi"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "tüm modüllere hızlı erişim"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr ""
+msgstr "Genel İndeks"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr ""
+msgstr "tüm fonksiyonlar, sınıflar, terimler"
 
 #: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
 #: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
 #: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
-msgstr ""
+msgstr "İndeks"
 
 #: docs/templates/genindex-single.html:44
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
