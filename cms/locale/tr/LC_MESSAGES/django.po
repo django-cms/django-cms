@@ -1208,15 +1208,15 @@ msgstr ""
 
 #: plugins/video/models.py:52
 msgid "mute only"
-msgstr ""
+msgstr "sadece sessiz"
 
 #: plugins/video/models.py:53
 msgid "volume"
-msgstr ""
+msgstr "ses"
 
 #: plugins/video/models.py:53
 msgid "in range <0, 100>"
-msgstr ""
+msgstr "<0, 100> arasında"
 
 #: plugins/video/models.py:56
 msgid "fgcolor"
@@ -1236,7 +1236,7 @@ msgstr ""
 
 #: plugins/video/models.py:58
 msgid "fullscreen"
-msgstr ""
+msgstr "tam ekran"
 
 #: plugins/video/models.py:59
 msgid "wmode"
@@ -1250,7 +1250,7 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:268
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "Kaydet"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
@@ -1259,16 +1259,16 @@ msgstr ""
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "Yeni olarak kaydet"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr ""
+msgstr "Kaydet ve yeni bir tane ekle"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:269
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Kaydet ve düzenlemeye devam et"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
@@ -1277,7 +1277,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr ""
+msgstr "Son değişiklikler"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
@@ -1286,11 +1286,11 @@ msgstr ""
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
-msgstr ""
+msgstr "Kullanıcı adı:"
 
 #: templates/admin/cms/mail/page_user_change.html:11
 msgid "Password:"
-msgstr ""
+msgstr "Parola:"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
