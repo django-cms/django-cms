@@ -538,11 +538,11 @@ msgstr ""
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
-msgstr ""
+msgstr "ters url id'si"
 
 #: migrations/0001_initial.py:59 models/pagemodel.py:61
 msgid "login required"
-msgstr ""
+msgstr "giriş yapılmış olması gerekiyor"
 
 #: migrations/0001_initial.py:60 models/pagemodel.py:46
 msgid "soft root"
@@ -550,16 +550,16 @@ msgstr ""
 
 #: migrations/0001_initial.py:63 models/pagemodel.py:44
 msgid "publication end date"
-msgstr ""
+msgstr "yayınlama bitiş tarihi"
 
 #: migrations/0001_initial.py:64 models/pagemodel.py:51
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr ""
+msgstr "şablon"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:43
 msgid "publication date"
-msgstr ""
+msgstr "yayınlanma tarihi"
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:45
 #: templates/admin/cms/page/change_list_tree.html:9
@@ -569,7 +569,7 @@ msgstr ""
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
 #: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
 msgid "application"
-msgstr ""
+msgstr "uygulama"
 
 #: migrations/0006_apphook.py:65 models/pagemodel.py:47
 msgid "id"
@@ -577,28 +577,28 @@ msgstr ""
 
 #: migrations/0008_redirects.py:11 models/titlemodels.py:18
 msgid "redirect"
-msgstr ""
+msgstr "yönlendirme"
 
 #: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
 msgid "keywords"
-msgstr ""
+msgstr "anahtar kelimeler"
 
 #: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:15
 msgid "description"
-msgstr ""
+msgstr "açıklama"
 
 #: models/moderatormodels.py:24
 msgid "Current page"
-msgstr ""
+msgstr "Geçerli sayfa"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "Alt sayfa (hemen)"
 
 #: models/moderatormodels.py:26
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "Sayfa ve Alt sayfa (hemen)"
 
 #: models/moderatormodels.py:27
 msgid "Page descendants"
@@ -610,13 +610,13 @@ msgstr ""
 
 #: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr ""
+msgstr "Sayfa"
 
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "Kullanıcı"
 
 #: models/moderatormodels.py:49 templatetags/cms_admin.py:65
 msgid "Moderate page"
