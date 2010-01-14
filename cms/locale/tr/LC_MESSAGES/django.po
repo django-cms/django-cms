@@ -1128,11 +1128,11 @@ msgstr ""
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr ""
+msgstr "bağlantı ipucu"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "Eğer verilirse ipucu, Twitter hesabınıza bir bağlantı şeklinde gösterilecek. "
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
@@ -1148,7 +1148,7 @@ msgstr ""
 
 #: plugins/video/models.py:25
 msgid "blank"
-msgstr ""
+msgstr "boşluk"
 
 #: plugins/video/models.py:26
 msgid "self"
@@ -1160,51 +1160,51 @@ msgstr ""
 
 #: plugins/video/models.py:31
 msgid "window"
-msgstr ""
+msgstr "pencere"
 
 #: plugins/video/models.py:32
 msgid "opaque"
-msgstr ""
+msgstr "ışık geçirmez"
 
 #: plugins/video/models.py:33
 msgid "transparent"
-msgstr ""
+msgstr "saydam"
 
 #: plugins/video/models.py:36
 msgid "movie"
-msgstr ""
+msgstr "görüntü"
 
 #: plugins/video/models.py:37
 msgid "use image file"
-msgstr ""
+msgstr "resim dosyası kullan"
 
 #: plugins/video/models.py:42
 msgid "auto load"
-msgstr ""
+msgstr "otomatik yükle"
 
 #: plugins/video/models.py:43
 msgid "auto play"
-msgstr ""
+msgstr "otomatik oynat"
 
 #: plugins/video/models.py:44
 msgid "loop"
-msgstr ""
+msgstr "sürekli oynat"
 
 #: plugins/video/models.py:46
 msgid "controller style"
-msgstr ""
+msgstr "kontrol tarzı"
 
 #: plugins/video/models.py:48
 msgid "click_url"
-msgstr ""
+msgstr "tıklama_bağlantısı"
 
 #: plugins/video/models.py:49
 msgid "click target"
-msgstr ""
+msgstr "tıklama hedefi"
 
 #: plugins/video/models.py:51
 msgid "mute"
-msgstr ""
+msgstr "sessiz"
 
 #: plugins/video/models.py:52
 msgid "mute only"
