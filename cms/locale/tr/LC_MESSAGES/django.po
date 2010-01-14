@@ -1046,69 +1046,69 @@ msgstr ""
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
-msgstr ""
+msgstr "şu anki resim tıklanabilir olacak mı"
 
 #: plugins/teaser/models.py:14
 msgid "If present image will be clickable."
-msgstr ""
+msgstr "şu anki resim tıklanabilir olacak mı."
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
-msgstr ""
+msgstr "daha fazla"
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr ""
+msgstr "Metin"
 
 #: plugins/text/models.py:12 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "gövde"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
-msgstr ""
+msgstr "Eklentiler"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "Lütfen bir eklenti türü seçin."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
 msgid "Edit selected plugin"
-msgstr ""
+msgstr "Seçilmiş eklentiyi düzenle"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
+msgstr "Metin editörü nesnelerin düzenlenmesini desteklemiyor."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
 msgid "No object selected."
-msgstr ""
+msgstr "Hiç nesne seçilmedi."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "Metin editörü nesne yerleştirmesini desteklemiyor."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "Bir eklenti nesnesi değil"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr ""
+msgstr "Mevcut Eklentiler"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
 msgid "Insert plugin"
-msgstr ""
+msgstr "Eklenti Ekle"
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
@@ -1116,7 +1116,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr ""
+msgstr "twitter kullanıcısı"
 
 #: plugins/twitter/models.py:8
 msgid "count"
@@ -1124,7 +1124,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr ""
+msgstr "Gösterilecek girdiler"
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
