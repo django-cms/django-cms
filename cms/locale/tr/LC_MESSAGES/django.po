@@ -710,15 +710,15 @@ msgstr ""
 
 #: models/pagemodel.py:49
 msgid "is published"
-msgstr ""
+msgstr "yayınlanmış"
 
 #: models/pagemodel.py:51
 msgid "The template used to render the content."
-msgstr ""
+msgstr "İçeriği göstermek için kullanılan şablon"
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "Sayfanın erişilebileceği site."
 
 #: models/pagemodel.py:52
 msgid "site"
@@ -738,35 +738,35 @@ msgstr ""
 
 #: models/pagemodel.py:70
 msgid "pages"
-msgstr ""
+msgstr "sayfalar"
 
 #: models/pagemodel.py:176
 msgid "Page was copied."
-msgstr ""
+msgstr "Sayfa kopyalanmıştı."
 
 #: models/pagemodel.py:490
 msgid "default"
-msgstr ""
+msgstr "öntanımlı"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr ""
+msgstr "ekleyebilir"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr ""
+msgstr "silebilir"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr ""
+msgstr "gelişmiş seçenekleri değiştirebilir"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr ""
+msgstr "yetkileri değiştirebilir"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr ""
+msgstr "sayfa seviyesinde"
 
 #: models/permissionmodels.py:26
 msgid "can move"
