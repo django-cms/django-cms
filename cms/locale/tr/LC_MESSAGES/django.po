@@ -636,11 +636,11 @@ msgstr ""
 
 #: models/moderatormodels.py:97
 msgid "created"
-msgstr ""
+msgstr "yaratıldı"
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr ""
+msgstr "değiştirildi"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
@@ -660,7 +660,7 @@ msgstr ""
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr ""
+msgstr "onaylanmış"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
