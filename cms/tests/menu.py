@@ -8,6 +8,7 @@ from cms.models import Page, Title
 from cms.menu import CMSMenu
 from menus.templatetags.menu_tags import show_menu, show_sub_menu,\
     show_breadcrumb, language_chooser, page_language_url, show_menu_below_id
+from menus.menu_pool import menu_pool
 
 
 class MenusTestCase(CMSTestCase):
@@ -152,12 +153,16 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual( url, "/%s%s" % (settings.LANGUAGES[0][0], self.page3.get_absolute_url()))
         
     def test_13_show_menu_below_id(self):
+        menu_pool.clean_nodes()
         self.create_some_nodes()
-        self.page2.reverse_id = "hello"
-        self.page2.save()
+        page2 = Page.objects.get(pk=self.page2.pk)
+        page2.reverse_id = "hello"
+        page2.save()
+        page2 = Page.objects.get(pk=self.page2.pk)
+        self.assertEqual(page2.reverse_id, "hello")
         context = self.get_context(path=self.page5.get_absolute_url())
-        nodes = show_menu_below_id(context, "hello")
+        nodes = show_menu_below_id(context, "hello")['children']
         self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].get_absolute_url(), self.node3.get_absolute_url())
+        self.assertEqual(nodes[0].get_absolute_url(), self.page3.get_absolute_url())
         
         

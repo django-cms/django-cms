@@ -51,7 +51,7 @@ class CMSMenu(Menu):
     
     def page_to_node(self, page):
         attr = {}
-        n = NavigationNode(page.get_menu_title(), page.get_absolute_url(), "cms", page.pk, page.parent_id, "cms", attr, page.soft_root, page.login_required)
+        n = NavigationNode(page.get_menu_title(), page.get_absolute_url(), "cms", page.pk, page.parent_id, "cms", attr, page.soft_root, page.login_required, reverse_id=page.reverse_id)
         return n
             
 menu_pool.register_menu(CMSMenu, "main")

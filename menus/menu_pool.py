@@ -26,6 +26,10 @@ class MenuPool(object):
             inst = klass()
             self.modifiers.append(inst)
         self.discovered = True
+        
+    def clean_nodes(self):
+        self.nodes = {}
+        
     
     def register_menu(self, menu, namespace):
         from menus.base import Menu
@@ -73,7 +77,7 @@ class MenuPool(object):
         return self.nodes[lang][site_id]
     
     def _apply_modifiers(self, nodes, request, namespace, root_id):
-        self._mark_selected(request, nodes)
+        nodes = self._mark_selected(request, nodes)
         for inst in self.modifiers:
             inst.set_nodes(nodes)
             inst.modify_all(request, nodes, namespace, root_id, False)

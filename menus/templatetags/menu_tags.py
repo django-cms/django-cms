@@ -65,6 +65,17 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     else: 
         #new menu... get all the data so we can save a lot of queries
         nodes = menu_pool.get_nodes(request, namespace, root_id)
+        if root_id: # find the root id and cut the nodes
+            new_nodes = []
+            for node in nodes:
+                if node.reverse_id == root_id:
+                    new_nodes = node.children
+                    for n in new_nodes:
+                        n.parent = None
+                    from_level += node.level + 1
+                    to_level += node.level + 1
+                    break
+            nodes = new_nodes
         children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
     context.update({'children':children,
                     'template':template,
