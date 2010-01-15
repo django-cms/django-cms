@@ -1593,21 +1593,21 @@ msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "Eklenti başarı ile kaydedildi."
 
 #: templates/admin/cms/page/recover_form.html:17
-#, python-format
+#, python-format, fuzzy
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "%(verbose_name)s silinmişlerini kurtar"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Sayfanın bu sürümünü geri getirmek için aşağıdaki kaydet tuşuna basın."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "%(verbose_name)s geri al"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
@@ -1615,11 +1615,11 @@ msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "Kopyalama seçenekleri"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Kopyalama seçeneklerin seç"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 #: templates/cms/toolbar/add_plugins.html:6
@@ -1628,24 +1628,24 @@ msgstr "Eklenti Ekle"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "Eklenti eklemek için önce sayfayı kaydetmelisiniz."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "Hiç eklenti seçilmedi. Sol tarafta bir tane seçildi."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
+msgstr "Hiç eklenti yok. Yer tutucuya bir eklenti ekle."
 
 #: templates/cms/toolbar/toolbar.html:746
 #, python-format
 msgid "Move to %(name)s"
-msgstr ""
+msgstr "%(name)s'a taşı"
 
 #: templates/cms/toolbar/toolbar.html:792
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Bu eklentiyi silmek istediğinize emin misiniz?"
 
 #: templates/cms/toolbar/toolbar.html:821
 msgid "Edit mode"
