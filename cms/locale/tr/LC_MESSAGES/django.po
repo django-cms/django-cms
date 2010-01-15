@@ -1476,38 +1476,39 @@ msgstr ""
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "Bu sayfayı %(language)s dilinde düzenle"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
-msgstr ""
+msgstr "Kes"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "cut"
-msgstr ""
+msgstr "kes"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
-msgstr ""
+msgstr "Kopyala"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "copy"
-msgstr ""
+msgstr "kopyala"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "Add Child"
-msgstr ""
+msgstr "Alt Sayfa Ekle"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "add"
-msgstr ""
+msgstr "ekle"
 
 #: templates/admin/cms/page/menu_item.html:65
 #: templates/cms/toolbar/toolbar.html:850
+#, fuzzy
 msgid "Approve directly"
-msgstr ""
+msgstr "Hemen onayla"
 
 #: templates/admin/cms/page/menu_item.html:67
 #: templates/admin/cms/page/menu_item.html:79
@@ -1517,68 +1518,70 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
-msgstr ""
+msgstr "Yayından kaldır"
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
-msgstr ""
+msgstr "Yayınla"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
-msgstr ""
+msgstr "Sayfada gör"
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
 msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:5
+#, fuzzy
 msgid "Created"
-msgstr ""
+msgstr "Oluşturma"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
-msgstr ""
+msgstr "Mesaj"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "Grup"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "Düzenleyebilir"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "Ekleyebilir"
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "Silebilir"
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "Yayınlayabilir"
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "Yetkileri değiştirebilir"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Taşıyabilir"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
+#, fuzzy
 msgid "(global)"
-msgstr ""
+msgstr "(genel)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(geçerli)"
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "Hepsi"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
@@ -1621,7 +1624,7 @@ msgstr ""
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "Eklenti Ekle"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
