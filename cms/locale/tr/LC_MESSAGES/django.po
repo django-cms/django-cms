@@ -148,7 +148,7 @@ msgstr "Kullanıcıyı bilgilendir"
 
 #: admin/forms.py:263
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr ""
+msgstr "Kullanıcıya, kullanıcı adı ve parola değişikliği ile ilgili eposta gönder. Kullanıcının epostası olması gerekir."
 
 #: admin/forms.py:283
 msgid "New password"
@@ -160,19 +160,20 @@ msgstr "Yeni parola onayı"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "Eposta bilgilendirmeleri geçerli bir eposta adresi gerektirir."
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "Sayfa ekleme yetkisi, sayfa düzenleme yetkisi de gerektirir!"
 
 #: admin/forms.py:309
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "Kullanıcı ekleme yetkisi, kullanıcı düzenleme yetkisi de gerektirir!"
 
 #: admin/forms.py:311
+#, fuzzy
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Yetkileri eklemek için aynı zamanda düzenleyebilmelisiniz de!"
 
 #: admin/pageadmin.py:106 admin/pageadmin.py:122
 msgid "Hidden"
