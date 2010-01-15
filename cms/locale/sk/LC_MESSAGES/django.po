@@ -101,83 +101,83 @@ msgstr ""
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "Neplatná URL, použite formát /moja/url/adresa."
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "užívateľ"
 
 #: admin/forms.py:159
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr "Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam (potomkom). Inak nebude môcť takéto stránky editovať ich autor."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "Právo na pridanie stránky vyžaduje taktiež právo na editáciu stránky."
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Prosím, zvoľte najskôr užívateľa alebo skupinu."
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "Pridať"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
 msgid "Change"
-msgstr ""
+msgstr "Zmeniť"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "Vymazať"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Obnoviť stránky"
 
 #: admin/forms.py:262
 msgid "Notify user"
-msgstr ""
+msgstr "Notifikovať užívateľa"
 
 #: admin/forms.py:263
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr ""
+msgstr "Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena alebo hesla. Vyžaduje sa e-mail užívateľa."
 
 #: admin/forms.py:283
 msgid "New password"
-msgstr ""
+msgstr "Nové heslo"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr ""
+msgstr "Potvrdenie nového hesla"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "Notifikácia vyžaduje platnú e-mailovú adresu."
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
 
 #: admin/forms.py:309
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Pridávanie prístupových práv vyžaduje taktiež právo na ich zmenu!"
 
 #: admin/pageadmin.py:102 admin/pageadmin.py:118
 msgid "Hidden"
-msgstr ""
+msgstr "Skrytý"
 
 #: admin/pageadmin.py:113
 msgid "Basic Settings"
-msgstr ""
+msgstr "Základné nastavenia"
 
 #: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
