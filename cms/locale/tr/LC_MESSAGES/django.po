@@ -1646,80 +1646,80 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:821
 msgid "Edit mode"
-msgstr ""
+msgstr "Düzenleme modu"
 
 #: templates/cms/toolbar/toolbar.html:828
 msgid "Status"
-msgstr ""
+msgstr "Durum"
 
 #: templates/cms/toolbar/toolbar.html:839
 msgid "Username"
-msgstr ""
+msgstr "Kullanıcı adı"
 
 #: templates/cms/toolbar/toolbar.html:843
 #: templates/cms/toolbar/toolbar.html:844
 msgid "login"
-msgstr ""
+msgstr "giriş"
 
 #: templates/cms/toolbar/toolbar.html:855
 msgid "Template"
-msgstr ""
+msgstr "Şablon"
 
 #: templates/cms/toolbar/toolbar.html:865
 msgid "Site Administration"
-msgstr ""
+msgstr "Site Yönetimi"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "move"
-msgstr ""
+msgstr "taşı"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "Move/add Pages"
-msgstr ""
+msgstr "Sayfa Taşı/Ekle"
 
 #: templates/cms/toolbar/toolbar.html:868
 msgid "Page Settings"
-msgstr ""
+msgstr "Sayfa Ayarları"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "history"
-msgstr ""
+msgstr "geçmiş"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "View History"
-msgstr ""
+msgstr "Geçmişi Gör"
 
 #: templates/cms/toolbar/toolbar.html:872
 msgid "Delete Page"
-msgstr ""
+msgstr "Sayfayı Sil"
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Lock"
-msgstr ""
+msgstr "Kilitle"
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Logout"
-msgstr ""
+msgstr "Çıkış"
 
 #: templates/cms/toolbar/toolbar.html:879
 msgid "Close"
-msgstr ""
+msgstr "Kapat"
 
 #: templates/cms/toolbar/toolbar.html:890
 msgid "up"
-msgstr ""
+msgstr "yukarı"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "down"
-msgstr ""
+msgstr "aşağı"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Settings"
-msgstr ""
+msgstr "Ayarlar"
 
 #: templates/cms/toolbar/toolbar.html:899
 msgid "Delete Plugin"
-msgstr ""
+msgstr "Eklentiyi Sil"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
