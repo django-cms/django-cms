@@ -181,23 +181,23 @@ msgstr "Základné nastavenia"
 
 #: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte uložiť."
 
 #: admin/pageadmin.py:122
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Pokročilé nastavenia"
 
 #: admin/pageadmin.py:131
 msgid "SEO Settings"
-msgstr ""
+msgstr "Nastavenia SEO"
 
 #: admin/pageadmin.py:494
 msgid "higher"
-msgstr ""
+msgstr "vyššie"
 
 #: admin/pageadmin.py:637
 msgid "Database error"
-msgstr ""
+msgstr "Databázová chyba"
 
 #: admin/pageadmin.py:723 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -208,11 +208,11 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "stránka"
 
 #: admin/pageadmin.py:843
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "Stránka bola úspešne schválená."
 
 #: admin/pageadmin.py:897
 #, python-format
