@@ -1,5 +1,6 @@
 from django.conf import settings
 from menus.exceptions import NamespaceAllreadyRegistered, NoParentFound
+from django.contrib.sites.models import Site
 import copy
 
 
@@ -33,12 +34,15 @@ class MenuPool(object):
             raise NamespaceAllreadyRegistered, "[%s] a menu namespace with this name is already registered" % namespace
         self.menus[namespace] = menu()
     
-    def build_nodes(self, request):
+    def _build_nodes(self, request, site_id):
         lang = request.LANGUAGE_CODE
-        if lang in self.nodes:
-            return self.nodes[lang]
+        
+        if not lang in self.nodes:
+            self.nodes[lang] = {}
+        if not site_id in self.nodes[lang]:
+            self.nodes[lang][site_id] = []
         else:
-            self.nodes[lang] = []
+            return self.nodes[lang][site_id]
         for ns in self.menus:
             nodes = self.menus[ns].get_nodes(request)
             last = None
@@ -64,37 +68,40 @@ class MenuPool(object):
                     if not found:
                         raise NoParentFound, "No parent found for %s" % node.get_menu_title()
                     node.parent.children.append(node)
-                self.nodes[lang].append(node)
+                self.nodes[lang][site_id].append(node)
                 last = node
-        return self.nodes[lang]
+        return self.nodes[lang][site_id]
     
-    def apply_modifiers(self, nodes, request, root_id):
-        self.mark_selected(request, nodes)
+    def _apply_modifiers(self, nodes, request, namespace, root_id):
+        self._mark_selected(request, nodes)
         for inst in self.modifiers:
             inst.set_nodes(nodes)
-            inst.modify_all(request, nodes, root_id, False)
+            inst.modify_all(request, nodes, namespace, root_id, False)
         for node in nodes:
             for inst in self.modifiers:
-                inst.modify(request, node, root_id, False)
+                inst.modify(request, node, namespace, root_id, False)
         return nodes
             
     
-    def get_nodes(self, request, root_id=None):
+    def get_nodes(self, request, namespace=None, root_id=None, site_id=None):
         if not self.discovered:
             self.discover_menus()
-        nodes = self.build_nodes(request)
+        if not site_id:
+            site_id = Site.objects.get_current().pk
+        nodes = self._build_nodes(request, site_id)
         nodes = copy.deepcopy(nodes)
-        nodes = self.apply_modifiers(nodes, request, root_id)
+        nodes = self._apply_modifiers(nodes, request, namespace, root_id)
         return nodes 
     
-    def mark_selected(self, request, nodes):
+    def _mark_selected(self, request, nodes):
         for node in nodes:
+            node.sibling = False
+            node.ancestor = False
+            node.descendant = False
             if node.get_absolute_url() == request.path:
                 node.selected = True
             else:
                 node.selected = False
         return nodes
-    
-    
-    
+     
 menu_pool = MenuPool()

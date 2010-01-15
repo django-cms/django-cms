@@ -5,6 +5,9 @@ from django.conf import settings
 from cms.utils import get_language_from_request
 
 def cut_after(node, levels, removed):
+    """
+    given a tree of nodes cuts after N levels
+    """
     if levels == 0:
         removed.extend(node.children)
         node.children = []
@@ -13,6 +16,9 @@ def cut_after(node, levels, removed):
             cut_after(n, levels - 1, removed)
 
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
+    """
+    cutting nodes away from menus
+    """
     final = []
     removed = []
     selected = None
@@ -36,11 +42,16 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
 
 register = template.Library()
 
-def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="menu/menu.html", next_page=None, root_id=None):
+def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="menu/menu.html", namespace=None, root_id=None, next_page=None, ):
     """
     render a nested list of all children of the pages
-    from_level: is the start level
-    to_level: is the max level rendered
+    - from_level: starting level
+    - to_level: max level
+    - extra_inactive: how many levels should be rendered of the not active tree?
+    - extra_active: how deep should the children of the active node be rendered?
+    - namespace: the namespace of the menu. if empty will use all namespaces
+    - root_id: the id of the root node
+    - template: template used to render the menu
 
     """
     try:
@@ -53,7 +64,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         children = next_page.children
     else: 
         #new menu... get all the data so we can save a lot of queries
-        nodes = menu_pool.get_nodes(request, root_id)
+        nodes = menu_pool.get_nodes(request, namespace, root_id)
         children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
     context.update({'children':children,
                     'template':template,
@@ -64,7 +75,22 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     return context
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
+def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=100, extra_active=100, template_file="cms/menu.html", namespace=None, next_page=None):
+    """
+    displays a menu below a node that has an uid
+    """
+    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, root_id=root_id, namespace=namespace, next_page=next_page)
+register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
+
+
+
 def show_sub_menu(context, levels=100, template="menu/sub_menu.html"):
+    """
+    show the sub menu of the current nav-node.
+    -levels: how many levels deep
+    -temlplate: template used to render the navigation
+    """
+    
     try:
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
@@ -91,6 +117,13 @@ show_sub_menu = register.inclusion_tag('cms/dummy.html',
 
 
 def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
+    """
+    Shows the breadcrumb from the node that has the same url as the current request
+    
+    - start level: after which level should the breadcrumb start? 0=home
+    - template: template used to render the breadcrumb 
+    """
+    
     try:
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
@@ -129,6 +162,7 @@ show_breadcrumb = register.inclusion_tag('cms/dummy.html',
 def language_chooser(context, template="menu/language_chooser.html"):
     """
     Displays a language chooser
+    - template: template used to render the language chooser
     """
     try:
         # If there's an exception (500), default context_processors may not be called.
@@ -176,54 +210,3 @@ page_language_url = register.inclusion_tag('cms/content.html', takes_context=Tru
 
 
 
-'''
-def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=100, extra_active=100, template_file="cms/menu.html", next_page=None):
-    return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, next_page, root_id=root_id)
-register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
-
-
-
-def page_language_url(context, lang):
-    """
-    Displays the url of the current page in the defined language.
-    You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
-    This is needed if you have slugs in more than one language.
-    """
-    if not 'request' in context:
-        return ''
-    
-    request = context['request']
-    page = request.current_page
-    if page == "dummy":
-        return ''
-    if hasattr(request, "_language_changer"):
-        url = "/%s" % lang + request._language_changer(lang)
-    else:
-        try:
-            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=False)
-        except:
-            url = "/%s/" % lang 
-    if url:
-        return {'content':url}
-    return {'content':''}
-page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
-
-
-def language_chooser(context, template="cms/language_chooser.html"):
-    """
-    Displays a language chooser
-    """
-    if not 'request' in context:
-        return ''
-    
-    request = context['request']
-    languages = []
-    cms_languages = dict(settings.CMS_LANGUAGES)
-    for lang in settings.CMS_FRONTEND_LANGUAGES:
-        if lang in cms_languages:
-            languages.append((lang, cms_languages[lang]))
-    lang = get_language_from_request(request, request.current_page)
-    context.update(locals())
-    return context
-language_chooser = register.inclusion_tag('cms/dummy.html', takes_context=True)(language_chooser)
-'''

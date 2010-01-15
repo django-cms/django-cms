@@ -1,0 +1,127 @@
+# -*- coding: utf-8 -*-
+from django.conf import settings
+from django.http import HttpRequest
+from django.template import TemplateDoesNotExist
+from django.contrib.auth.models import User
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
+from cms.models import Page, Title
+from cms.menu import CMSMenu
+from menus.templatetags.menu_tags import show_menu, show_sub_menu
+
+
+class MenusTestCase(CMSTestCase):
+
+    def setUp(self):
+        settings.CMS_MODERATOR = False
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u.set_password("test")
+        u.save()
+        
+        self.login_user(u)
+        
+    def create_some_nodes(self):
+        self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
+        self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
+        self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
+        self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
+        self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
+        
+    def test_01_basic_cms_menu(self):
+        self.create_some_nodes()
+        response = self.client.get("/")
+        self.assertEquals(response.status_code, 200)
+        request = self.get_request()
+        
+        # test the cms menu class
+        menu = CMSMenu()
+        nodes = menu.get_nodes(request)
+        self.assertEqual(len(nodes), 5)
+        
+    def test_02_show_menu(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context)['children']
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0].selected, True)
+        self.assertEqual(nodes[0].sibling, False)
+        self.assertEqual(nodes[0].descendant, False)
+        self.assertEqual(nodes[0].children[0].descendant, True)
+        self.assertEqual(nodes[0].children[0].children[0].descendant, True)
+        self.assertEqual(nodes[0].get_absolute_url(), "/")
+        self.assertEqual(nodes[1].get_absolute_url(), self.page4.get_absolute_url())
+        self.assertEqual(nodes[1].sibling, True)
+        self.assertEqual(nodes[1].selected, False)
+    
+    def test_03_only_active_tree(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context, 0, 100, 0, 100)['children']
+        self.assertEqual(len(nodes[1].children), 0)
+        self.assertEqual(len(nodes[0].children), 1)
+        self.assertEqual(len(nodes[0].children[0].children), 1)
+        context = self.get_context(path=self.page4.get_absolute_url())
+        nodes = show_menu(context, 0, 100, 0, 100)['children']
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertEqual(len(nodes[0].children), 0)
+        
+    def test_04_only_one_active_level(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context, 0, 100, 0, 1)['children']
+        self.assertEqual(len(nodes[1].children), 0)
+        self.assertEqual(len(nodes[0].children), 1)
+        self.assertEqual(len(nodes[0].children[0].children), 0)
+        
+    def test_05_only_level_zero(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context, 0, 0, 0, 0)['children']
+        for node in nodes:
+            self.assertEqual(len(node.children), 0)
+        
+    
+    def test_06_only_level_one(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context, 1, 1, 100, 100)['children']
+        self.assertEqual(len(nodes), 2)
+        for node in nodes:
+            self.assertEqual(len(node.children), 0)
+        
+    
+    def test_07_only_level_one_active(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context, 1, 1, 0, 100)['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].descendant, True)
+        self.assertEqual(len(nodes[0].children), 0)
+        
+    def test_08_level_zero_and_one(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_menu(context, 0, 1, 100, 100)['children']
+        self.assertEqual(len(nodes), 2)
+        for node in nodes:
+            self.assertEqual(len(node.children), 1)
+            
+    def test_09_show_submenu(self):
+        self.create_some_nodes()
+        context = self.get_context()
+        # test standard show_menu 
+        nodes = show_sub_menu(context)['children']
+        self.assertEqual(nodes[0].descendant, True)
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(len(nodes[0].children), 1)
+        
+        nodes = show_sub_menu(context, 1)['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(len(nodes[0].children), 0)
+        

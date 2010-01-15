@@ -18,10 +18,10 @@ class Modifier(object):
     def set_nodes(self, nodes):
         self.nodes = nodes
     
-    def modify(self, request, nodes, namespace, post_cut):
+    def modify(self, request, nodes, namespace, id,  post_cut):
         pass
     
-    def modify_all(self, request, nodes, namespace, post_cut):
+    def modify_all(self, request, nodes, namespace, id, post_cut):
         pass
     
     def remove_node(self, node):

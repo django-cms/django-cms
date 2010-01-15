@@ -11,7 +11,7 @@
 	(Level: {{ child.level }})</span>
     {% if child.children %}
     <ul>
-        {% show_menu from_level to_level extra_inactive extra_active template child %}
+        {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
     </ul>
     {% endif %}
 </li>

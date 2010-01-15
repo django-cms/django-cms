@@ -12,6 +12,7 @@ from cms.tests.site import SiteTestCase
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.plugins import PluginsTestCase
 from cms.tests.reversion_tests import ReversionTestCase
+from cms.tests.menu import MenusTestCase
 
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
@@ -26,7 +27,6 @@ settings.CMS_HIDE_UNTRANSLATED = False
 settings.CMS_URL_OVERWRITE = True
 
 def suite():
-    # this must be changed!! and tests must happen for multiple configurations!
     s = unittest.TestSuite()
     s.addTest(doctest.DocTestSuite(urlutils))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PagesTestCase))
@@ -38,6 +38,8 @@ def suite():
         if "reversion" in settings.INSTALLED_APPS:
             s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(MenusTestCase))
+    
     return s
  
 def test_runner_with_coverage(test_labels, verbosity=1, interactive=True, extra_tests=[]):

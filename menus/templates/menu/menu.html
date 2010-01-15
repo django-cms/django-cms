@@ -4,7 +4,7 @@
 	<a href="{{ child.get_absolute_url }}">{{ child.get_menu_title }}</a>
 	{% if child.childrens %}
     <ul>
-        {% show_menu from_level to_level extra_inactive extra_active template child %}
+        {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
     </ul>
     {% endif %}
 </li>

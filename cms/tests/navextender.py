@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from cms.models import Page
-from cms.templatetags.cms_tags import show_menu
+from menus.templatetags.menu_tags import show_menu
 from django.core.handlers.wsgi import WSGIRequest
 from django.contrib.sites.models import Site
 from django.template.defaultfilters import slugify
@@ -18,30 +18,7 @@ class NavExtenderTestCase(CMSTestCase):
     PK_EXTENDED = 10
     
     def setUp(self):
-        context = {}
-        environ = {
-            'HTTP_COOKIE':      self.client.cookies,
-            'PATH_INFO':         '/',
-            'QUERY_STRING':      '',
-            'REMOTE_ADDR':       '127.0.0.1',
-            'REQUEST_METHOD':    'GET',
-            'SCRIPT_NAME':       '',
-            'SERVER_NAME':       'testserver',
-            'SERVER_PORT':       '80',
-            'SERVER_PROTOCOL':   'HTTP/1.1',
-            'wsgi.version':      (1,0),
-            'wsgi.url_scheme':   'http',
-            'wsgi.errors':       self.client.errors,
-            'wsgi.multiprocess': True,
-            'wsgi.multithread':  False,
-            'wsgi.run_once':     False,
-        }
-        request = WSGIRequest(environ)
-        request.session = self.client.session
-        request.user = User()
-        context['request'] = request
-        
-        self.context = context
+        self.context = self.get_context()
     
     def _prepage_page_pk(self, page_pk):
         self.context['request'].current_page = Page.objects.get(pk = page_pk)
