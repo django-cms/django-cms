@@ -1360,17 +1360,17 @@ msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:141
 msgid "All permissions"
-msgstr ""
+msgstr "Tüm yetkiler"
 
 #: templates/admin/cms/page/change_form.html:142
 #: templates/admin/cms/page/change_form.html:154
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr ""
+msgstr "Yüklüyor..."
 
 #: templates/admin/cms/page/change_form.html:153
 msgid "Page states"
-msgstr ""
+msgstr "Sayfa durumu"
 
 #: templates/admin/cms/page/change_form.html:176
 #, python-format
@@ -1379,15 +1379,15 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:178
 msgid "Request approvemet"
-msgstr ""
+msgstr "Onaylama iste"
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
-msgstr ""
+msgstr "Sayfa listesi"
 
 #: templates/admin/cms/page/change_list.html:55
 msgid "Successfully moved"
-msgstr ""
+msgstr "Başarıyla taşındı"
 
 #: templates/admin/cms/page/change_list.html:60
 msgid "An error occured. Please reload the page"
