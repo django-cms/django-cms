@@ -1391,37 +1391,38 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list.html:60
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "Bir hata oluştu. Lütfen sayfayı tekrar yükleyin."
 
 #: templates/admin/cms/page/change_list.html:80
-#, python-format
+#, python-format, fuzzy
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "Silinmişleri geri getir: %(name)s"
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "%(name)s ekle"
 
 #: templates/admin/cms/page/change_list.html:95
+#, fuzzy
 msgid "Pages on:"
-msgstr ""
+msgstr "Sayfalar:"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "Filter:"
-msgstr ""
+msgstr "Filtre:"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "on"
-msgstr ""
+msgstr "açık"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "off"
-msgstr ""
+msgstr "kapalı"
 
 #: templates/admin/cms/page/change_list.html:114
 msgid "Filter"
-msgstr ""
+msgstr "Filtre"
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
@@ -1433,38 +1434,38 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr ""
+msgstr "yayınlanmış"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "last changes"
-msgstr ""
+msgstr "son değişiklikler"
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr ""
+msgstr "bu sayfayı seç"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr ""
+msgstr "bu sayfayı düzenle"
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:865
 #: templates/cms/toolbar/toolbar.html:888
 msgid "edit"
-msgstr ""
+msgstr "düzenle"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr ""
+msgstr "yukarı ekle"
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr ""
+msgstr "aşağı ekle"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "içine ekle"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
@@ -1472,7 +1473,7 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "home"
-msgstr ""
+msgstr "anasayfa"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
