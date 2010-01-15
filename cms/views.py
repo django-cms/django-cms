@@ -107,7 +107,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
             return "cms/new.html", locals()
         raise Http404("CMS: No page found for site %s" % unicode(site.name))
     
-    if current_page:  
+    if current_page:
         has_change_permissions = current_page.has_change_permission(request)
         request._current_page_cache = current_page
         

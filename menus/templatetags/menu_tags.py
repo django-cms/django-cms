@@ -144,7 +144,8 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
         while n:
             ancestors.append(n)
             n = n.parent
-    ancestors.append(home)
+    if not ancestors or (ancestors and ancestors[-1] != home):
+        ancestors.append(home)
     ancestors.reverse()
     if len(ancestors) >= start_level:
         ancestors = ancestors[start_level:]

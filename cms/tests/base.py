@@ -33,6 +33,7 @@ class CMSTestCase(TestCase):
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
+        self.user = user
         self.assertEqual(logged_in, True)
     
     
@@ -183,6 +184,6 @@ class CMSTestCase(TestCase):
         }
         request = WSGIRequest(environ)
         request.session = self.client.session
-        request.user = User()
+        request.user = self.user
         request.LANGUAGE_CODE = settings.LANGUAGES[0][0]
         return request

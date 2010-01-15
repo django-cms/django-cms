@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.models import Page, Title
 from cms.menu import CMSMenu
-from menus.templatetags.menu_tags import show_menu, show_sub_menu
+from menus.templatetags.menu_tags import show_menu, show_sub_menu,\
+    show_breadcrumb, language_chooser, page_language_url, show_menu_below_id
 
 
 class MenusTestCase(CMSTestCase):
@@ -16,7 +17,6 @@ class MenusTestCase(CMSTestCase):
         u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
         u.set_password("test")
         u.save()
-        
         self.login_user(u)
         
     def create_some_nodes(self):
@@ -124,4 +124,40 @@ class MenusTestCase(CMSTestCase):
         nodes = show_sub_menu(context, 1)['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(len(nodes[0].children), 0)
+        
+    def test_10_show_breadcrumb(self):
+        self.create_some_nodes()
+        context = self.get_context(path=self.page3.get_absolute_url())
+        nodes = show_breadcrumb(context)['ancestors']
+        self.assertEqual(len(nodes), 3)
+        nodes = show_breadcrumb(context, 1)['ancestors']
+        self.assertEqual(len(nodes), 2)
+        context = self.get_context()
+        nodes = show_breadcrumb(context)['ancestors']
+        self.assertEqual(len(nodes), 1)
+        nodes = show_breadcrumb(context, 1)['ancestors']
+        self.assertEqual(len(nodes), 0)
+        
+    def test_11_language_chooser(self):
+        self.create_some_nodes()
+        context = self.get_context(path=self.page3.get_absolute_url())
+        new_context = language_chooser(context)
+        self.assertEqual(len(new_context['languages']), len(settings.LANGUAGES))
+        self.assertEqual(new_context['current_language'], settings.LANGUAGES[0][0])
+        
+    def test_12_page_language_url(self):
+        self.create_some_nodes()
+        context = self.get_context(path=self.page3.get_absolute_url())
+        url = page_language_url(context, settings.LANGUAGES[0][0])['content']
+        self.assertEqual( url, "/%s%s" % (settings.LANGUAGES[0][0], self.page3.get_absolute_url()))
+        
+    def test_13_show_menu_below_id(self):
+        self.create_some_nodes()
+        self.page2.reverse_id = "hello"
+        self.page2.save()
+        context = self.get_context(path=self.page5.get_absolute_url())
+        nodes = show_menu_below_id(context, "hello")
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].get_absolute_url(), self.node3.get_absolute_url())
+        
         
