@@ -1297,7 +1297,7 @@ msgstr "Parola:"
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr ""
+msgstr "Bir sayfa düzenle"
 
 #: templates/admin/cms/page/change_form.html:55
 #: templates/admin/cms/page/change_list.html:8
@@ -1305,11 +1305,11 @@ msgstr ""
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
-msgstr ""
+msgstr "Anasayfa"
 
 #: templates/admin/cms/page/change_form.html:64
 msgid "Approve page deletion"
-msgstr ""
+msgstr "Sayfa silmeyi onayla"
 
 #: templates/admin/cms/page/change_form.html:70
 #, python-format
@@ -1322,15 +1322,15 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Remove delete request"
-msgstr ""
+msgstr "Silme isteğini iptal et"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Approve delete"
-msgstr ""
+msgstr "Silmeyi onayla"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Approve"
-msgstr ""
+msgstr "Onayla"
 
 #: templates/admin/cms/page/change_form.html:86
 #: templates/admin/cms/page/change_form.html:87
