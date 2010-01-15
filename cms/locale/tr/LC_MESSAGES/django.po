@@ -1336,20 +1336,20 @@ msgstr "Onayla"
 #: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "taslak"
 
 #: templates/admin/cms/page/change_form.html:87
 msgid "Preview"
-msgstr ""
+msgstr "Önizleme"
 
 #: templates/admin/cms/page/change_form.html:90
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr ""
+msgstr "Geçmiş"
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "View on site"
-msgstr ""
+msgstr "Sitede gör"
 
 #: templates/admin/cms/page/change_form.html:121
 #: templates/admin/cms/page/plugin_change_form.html:83
