@@ -1,19 +1,19 @@
-# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
+# , 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-12-15 14:52+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2010-01-15 12:29+0200\n"
+"Last-Translator: Ekrem SEREN <ekrem.seren@gmailcom>\n"
+"Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: plugin_base.py:88
 msgid "Advanced options"
@@ -185,23 +185,23 @@ msgstr "Temel Ayarlar"
 
 #: admin/pageadmin.py:120
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "Not: Bu sayfa eğer seçimi değiştirirseniz güncellenir. Önce kaydedin."
 
 #: admin/pageadmin.py:126
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Gelişmiş Ayarlar"
 
 #: admin/pageadmin.py:135
 msgid "SEO Settings"
-msgstr ""
+msgstr "Arama Motoru (SEO) Ayarları"
 
 #: admin/pageadmin.py:498
 msgid "higher"
-msgstr ""
+msgstr "daha yüksek"
 
 #: admin/pageadmin.py:645
 msgid "Database error"
-msgstr ""
+msgstr "Veritabanı hatası"
 
 #: admin/pageadmin.py:731 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -212,33 +212,33 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "sayfa"
 
 #: admin/pageadmin.py:854
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "Sayfa başarı ile onaylandı."
 
 #: admin/pageadmin.py:908
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(key)r birincil anahtarlı %(name)s nesnesi mevcut değil."
 
 #: admin/pageadmin.py:911
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Bu sayfa için sadece bir çeviri mevcut"
 
 #: admin/pageadmin.py:926
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "%(language)s dilindeki başlık ve eklenti silindi"
 
 #: admin/pageadmin.py:948
 msgid "Are you sure?"
-msgstr ""
+msgstr "Emin misiniz?"
 
 #: admin/pageadmin.py:1011
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "Bu sayfayı yayınlamak için yetkiniz yok"
 
 #: admin/pageadmin.py:1029
 msgid "You do not have permission to change this page's in_navigation status"
@@ -246,16 +246,16 @@ msgstr ""
 
 #: admin/pageadmin.py:1064
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "Bu sayfayı değiştirmek için yetkiniz yok"
 
 #: admin/pageadmin.py:1068
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Dil, desteklenen bir dile ayarlanmalı!"
 
 #: admin/pageadmin.py:1080
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "%(placeholder)s yer tutucusuna %(plugin_name)s eklentisi eklendi"
 
 #: admin/pageadmin.py:1153
 #, python-format
@@ -264,7 +264,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1211
 msgid "Plugins where moved"
-msgstr ""
+msgstr "Eklentiler taşındı"
 
 #: admin/pageadmin.py:1233
 #, python-format
@@ -273,7 +273,7 @@ msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "Sayfa yetkileri"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
@@ -679,7 +679,7 @@ msgstr ""
 #: templates/cms/toolbar/toolbar.html:872
 #: templates/cms/toolbar/toolbar.html:899 utils/moderator.py:91
 msgid "delete"
-msgstr ""
+msgstr "sil"
 
 #: models/pagemodel.py:37
 msgid "app. par."
@@ -687,19 +687,19 @@ msgstr ""
 
 #: models/pagemodel.py:39
 msgid "created by"
-msgstr ""
+msgstr "oluşturan"
 
 #: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
 msgid "changed by"
-msgstr ""
+msgstr "değiştiren"
 
 #: models/pagemodel.py:43
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr ""
+msgstr "Sayfa ne zaman yayında olacağı. Sayfanın yayında olması için durumunun \"Yayınlanmış\" olması gerekir."
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "Sayfa ne zaman yayından kaldırılacağı. Hiç bir zaman için boş bırakın."
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
@@ -771,7 +771,7 @@ msgstr "sayfa seviyesinde"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "taşıyabilir"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
@@ -807,27 +807,27 @@ msgstr ""
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
-msgstr ""
+msgstr "Sayfa yetkileri"
 
 #: models/permissionmodels.py:87
 msgid "User (page)"
-msgstr ""
+msgstr "Kullanıcı (sayfa)"
 
 #: models/permissionmodels.py:88
 msgid "Users (page)"
-msgstr ""
+msgstr "Kullanıcılar (sayfa)"
 
 #: models/permissionmodels.py:100
 msgid "User group (page)"
-msgstr ""
+msgstr "Kullanıcı grubu (sayfa)"
 
 #: models/permissionmodels.py:101
 msgid "User groups (page)"
-msgstr ""
+msgstr "Kullanıcı grupları (sayfa)"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "menüdeki başlığın üzerine yaz"
 
 #: models/titlemodels.py:15
 msgid "Path"
@@ -1356,7 +1356,6 @@ msgstr "Sitede gör"
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:141
 msgid "All permissions"
@@ -1777,3 +1776,4 @@ msgstr ""
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
 msgstr ""
+
