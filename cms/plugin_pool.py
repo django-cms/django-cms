@@ -33,7 +33,7 @@ class PluginPool(object):
             except RegistrationError:
                 pass
     
-    def get_all_plugins(self, placeholder=None, page=None):
+    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins"):
         self.discover_plugins()
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
@@ -42,20 +42,21 @@ class PluginPool(object):
             for plugin in plugins:
                 allowed_plugins = []
                 if page:
-                    allowed_plugins = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("plugins")
+                    allowed_plugins = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get(setting_key)
                 if not allowed_plugins:
-                    allowed_plugins = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("plugins")
-                if not allowed_plugins or plugin.__name__ in allowed_plugins:
+                    allowed_plugins = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get(setting_key)
+                if (not allowed_plugins and setting_key == "plugins") or (allowed_plugins and plugin.__name__ in allowed_plugins):
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins
     
     def get_text_enabled_plugins(self, placeholder, page):
-        plugins = self.get_all_plugins(placeholder, page)
+        plugins = self.get_all_plugins(placeholder, page) + self.get_all_plugins(placeholder, page, 'text_only_plugins')
         final = []
         for plugin in plugins:
             if plugin.text_enabled:
                 final.append(plugin)
+        final = list(set(final)) # remove any duplicates
         return final
 
     def get_plugin(self, name):
