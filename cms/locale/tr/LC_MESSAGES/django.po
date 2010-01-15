@@ -156,7 +156,7 @@ msgstr "Yeni parola"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr ""
+msgstr "Yeni parola onayı"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
@@ -176,11 +176,11 @@ msgstr ""
 
 #: admin/pageadmin.py:106 admin/pageadmin.py:122
 msgid "Hidden"
-msgstr ""
+msgstr "Gizli"
 
 #: admin/pageadmin.py:117
 msgid "Basic Settings"
-msgstr ""
+msgstr "Temel Ayarlar"
 
 #: admin/pageadmin.py:120
 msgid "Note: This page reloads if you change the selection. Save it first."
