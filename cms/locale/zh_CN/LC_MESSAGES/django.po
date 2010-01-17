@@ -669,7 +669,7 @@ msgstr "页面核对状态"
 
 #: models/pagemodel.py:34
 msgid "req. app."
-msgstr ""
+msgstr "需要批准"
 
 #: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
 #: templates/cms/toolbar/toolbar.html:872
@@ -679,7 +679,7 @@ msgstr "删除"
 
 #: models/pagemodel.py:37
 msgid "app. par."
-msgstr ""
+msgstr "需上一级权限批准"
 
 #: models/pagemodel.py:39
 msgid "created by"
@@ -715,7 +715,7 @@ msgstr "该模板用来生成页面内容。"
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "页面进入点"
 
 #: models/pagemodel.py:52
 msgid "site"
