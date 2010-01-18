@@ -4,12 +4,12 @@ class Menu(object):
     nodes = []
 
     def get_nodes(self, request):
+        """
+        should return a list of NavigationNode instances
+        """ 
         raise NotImplementedError
     
-    def get_node_by_id(self, id):
-        for node in self.nodes:
-            if node.id == id:
-                return node
+    
     
 class Modifier(object):
     pre_cut = True

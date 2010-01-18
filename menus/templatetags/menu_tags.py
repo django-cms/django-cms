@@ -39,8 +39,8 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             if node in removed:
                 final.remove(node)
     return final
-
 register = template.Library()
+
 
 def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_active=100, template="menu/menu.html", namespace=None, root_id=None, next_page=None, ):
     """
@@ -86,13 +86,13 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     return context
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
+
 def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=100, extra_active=100, template_file="cms/menu.html", namespace=None, next_page=None):
     """
     displays a menu below a node that has an uid
     """
     return show_menu(context, from_level, to_level, extra_inactive, extra_active, template_file, root_id=root_id, namespace=namespace, next_page=next_page)
 register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu_below_id)
-
 
 
 def show_sub_menu(context, levels=100, template="menu/sub_menu.html"):
@@ -167,9 +167,7 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
     return context
 show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
-                                         
-                                         
-                                         
+
 
 def language_chooser(context, template="menu/language_chooser.html"):
     """
@@ -195,6 +193,7 @@ def language_chooser(context, template="menu/language_chooser.html"):
     return context
 language_chooser = register.inclusion_tag('cms/dummy.html', takes_context=True)(language_chooser)
 
+
 def page_language_url(context, lang):
     """
     Displays the url of the current page in the defined language.
@@ -218,7 +217,4 @@ def page_language_url(context, lang):
         return {'content':url}
     return {'content':''}
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
-
-
-
 
