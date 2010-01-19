@@ -547,7 +547,7 @@ def do_page_attribute(parser, token):
     if len(bits) >= 2:
         # tag_name, name
         # tag_name, name, reverse_id
-        reverse_id = bits[2] if len(bits) == 3 else None 
+        reverse_id = len(bits) == 3 and bits[2] or None
         return PageAttributeNode(bits[1], reverse_id)
     else:
         raise template.TemplateSyntaxError(error_string)
