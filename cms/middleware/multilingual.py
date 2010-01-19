@@ -5,20 +5,32 @@ from django.utils import translation
 from django.conf import settings
 from cms.utils.i18n import get_default_language
 
-SUB = re.compile(ur'<a([^>]+)href="/(?=%s)(?!(%s|%s|%s))(%s([^"]*))"([^>]*)>' % (
-    urllib.quote(settings.CMS_ROOT[1:]),
-    "|".join(map(lambda l: urllib.quote(settings.CMS_ROOT[1:]) + "/" + l[0] + "/" , settings.CMS_LANGUAGES)),
-    settings.MEDIA_URL[1:],
-    settings.ADMIN_MEDIA_PREFIX[1:],
-    urllib.quote(settings.CMS_ROOT[1:])
+# This makes setting CMS_ROOT optional the common case where django-cms run from /
+if hasattr(settings, 'CMS_ROOT'):
+    CMS_ROOT = settings.CMS_ROOT
+else:
+    CMS_ROOT = ''
+
+# Customarily user pages are served from http://the.server.com/~username/
+# When a user uses django-cms for his pages, the '~' of the url appears
+# quoted in href links. We have to quote CMS_ROOT for the regular expression
+# to match.
+SUB = re.compile(ur'<a([^>]+)href="(?=%s)(?!(%s|%s|%s))(%s([^"]*))"([^>]*)>' % (
+    urllib.quote(CMS_ROOT),
+    "|".join(map(lambda l: urllib.quote(CMS_ROOT) + "/" + l[0] + "/" , settings.CMS_LANGUAGES)),
+    settings.MEDIA_URL,
+    settings.ADMIN_MEDIA_PREFIX,
+    urllib.quote(CMS_ROOT)
 ))
 
-SUB2 = re.compile(ur'<form([^>]+)action="/(?=%s)(?!(%s|%s|%s))(%s([^"]*))"([^>]*)>' % (
-    settings.CMS_ROOT[1:],
-    "|".join(map(lambda l: settings.CMS_ROOT[1:] + "/" + l[0] + "/" , settings.CMS_LANGUAGES)),
-    settings.MEDIA_URL[1:],
-    settings.ADMIN_MEDIA_PREFIX[1:],
-    settings.CMS_ROOT[1:]
+# Unlike in href links, the '~' (see above) the '~' in form actions appears
+# unquoted.
+SUB2 = re.compile(ur'<form([^>]+)action="(?=%s)(?!(%s|%s|%s))(%s([^"]*))"([^>]*)>' % (
+    CMS_ROOT,
+    "|".join(map(lambda l: CMS_ROOT + "/" + l[0] + "/" , settings.CMS_LANGUAGES)),
+    settings.MEDIA_URL,
+    settings.ADMIN_MEDIA_PREFIX,
+    CMS_ROOT
 ))
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
@@ -38,7 +50,7 @@ class MultilingualURLMiddleware:
         prefix = has_lang_prefix(request.path_info)
         if prefix:
             request.path = request.path.split("/")
-            del request.path[settings.CMS_ROOT.count('/')+1]
+            del request.path[CMS_ROOT.count('/')+1]
             request.path = "/".join(request.path)
             request.path_info = "/" + "/".join(request.path_info.split("/")[2:])
             t = prefix
@@ -83,13 +95,13 @@ class MultilingualURLMiddleware:
                 decoded_response = response.content.decode('utf-8')
             except UnicodeDecodeError:
                 decoded_response = response.content
-            decoded_response = SUB.sub(ur'<a\1href="%s/%s\4"\5>' % (settings.CMS_ROOT, request.LANGUAGE_CODE), decoded_response)
-            response.content = SUB2.sub(ur'<form\1action="%s/%s\4"\5>' % (settings.CMS_ROOT, request.LANGUAGE_CODE), decoded_response).encode("utf8")
+            decoded_response = SUB.sub(ur'<a\1href="%s/%s\4"\5>' % (CMS_ROOT, request.LANGUAGE_CODE), decoded_response)
+            response.content = SUB2.sub(ur'<form\1action="%s/%s\4"\5>' % (CMS_ROOT, request.LANGUAGE_CODE), decoded_response).encode("utf8")
         if (response.status_code == 301 or response.status_code == 302 ):
             location = response._headers['location']
             prefix = has_lang_prefix(location[1])
             if not prefix and location[1].startswith("/") and \
                     not location[1].startswith(settings.MEDIA_URL) and \
                     not location[1].startswith(settings.ADMIN_MEDIA_PREFIX):
-                response._headers['location'] = (location[0], "%s/%s%s" % (settings.CMS_ROOT, request.LANGUAGE_CODE, request.path_info))
+                response._headers['location'] = (location[0], "%s/%s%s" % (CMS_ROOT, request.LANGUAGE_CODE, request.path_info))
         return response
