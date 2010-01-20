@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('span.add-plugin').click(function(){
-    	var select = $(this).parent().children("select");
+    	var select = $(this).parent().children("select[name=plugins]");
         var pluginvalue = select.attr('value');
         var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
         var splits = window.location.href.split("/");
