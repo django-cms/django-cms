@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -18,83 +17,83 @@ msgstr ""
 
 #: plugin_base.py:88
 msgid "Advanced options"
-msgstr ""
+msgstr "Pokročilé nastavenia"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "Názov"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "Predvolený názov"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "Identifikátor"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "Časť názvu, ktorá je použitá v URL"
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "Jazyk"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "Aktuálny jazyk polí s obsahom."
 
 #: admin/forms.py:61
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Už existuje stránka s takýmto identifikátorom"
 
 #: admin/forms.py:81
 msgid "Menu Title"
-msgstr ""
+msgstr "Názov v menu"
 
 #: admin/forms.py:82
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Prepísať to, čo sa zobrazuje v menu"
 
 #: admin/forms.py:83
 msgid "Page Title"
-msgstr ""
+msgstr "Názov stránky"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Prepísať to, čo je zobrazené v hornej časti vášho prehliadača alebo v záložkách."
 
 #: admin/forms.py:85
 msgid "Application"
-msgstr ""
+msgstr "Aplikácia"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Pripojiť aplikáciu na túto stránku."
 
 #: admin/forms.py:88
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Prepísať URL"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná cesta."
 
 #: admin/forms.py:95
 msgid "Redirect"
-msgstr ""
+msgstr "Presmerovanie"
 
 #: admin/forms.py:96
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Presmeruje sa na túto URL."
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "Popis stránky, ktorý môžu indexovať vyhľadávače."
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
+msgstr "Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať vyhľadávače."
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
@@ -102,109 +101,103 @@ msgstr ""
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "Neplatná URL, použite formát /moja/url/adresa."
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "užívateľ"
 
 #: admin/forms.py:159
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr "Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam (potomkom). Inak nebude môcť takéto stránky editovať ich autor."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "Právo na pridanie stránky vyžaduje taktiež právo na editáciu stránky."
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Prosím, zvoľte najskôr užívateľa alebo skupinu."
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "Pridať"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
 msgid "Change"
-msgstr ""
+msgstr "Zmeniť"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "Vymazať"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Obnoviť stránky"
 
 #: admin/forms.py:262
 msgid "Notify user"
-msgstr ""
+msgstr "Notifikovať užívateľa"
 
 #: admin/forms.py:263
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena alebo hesla. Vyžaduje sa e-mail užívateľa."
 
 #: admin/forms.py:283
 msgid "New password"
-msgstr ""
+msgstr "Nové heslo"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr ""
+msgstr "Potvrdenie nového hesla"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "Notifikácia vyžaduje platnú e-mailovú adresu."
 
 #: admin/forms.py:307
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgid "The permission to add new pages requires the permission to change pages!"
+msgstr "Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
 
 #: admin/forms.py:309
-msgid ""
-"The permission to add new users requires the permission to change users!"
-msgstr ""
+msgid "The permission to add new users requires the permission to change users!"
+msgstr "Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Pridávanie prístupových práv vyžaduje taktiež právo na ich zmenu!"
 
 #: admin/pageadmin.py:102 admin/pageadmin.py:118
 msgid "Hidden"
-msgstr ""
+msgstr "Skrytý"
 
 #: admin/pageadmin.py:113
 msgid "Basic Settings"
-msgstr ""
+msgstr "Základné nastavenia"
 
 #: admin/pageadmin.py:116
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte uložiť."
 
 #: admin/pageadmin.py:122
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Pokročilé nastavenia"
 
 #: admin/pageadmin.py:131
 msgid "SEO Settings"
-msgstr ""
+msgstr "Nastavenia SEO"
 
 #: admin/pageadmin.py:494
 msgid "higher"
-msgstr ""
+msgstr "vyššie"
 
 #: admin/pageadmin.py:637
 msgid "Database error"
-msgstr ""
+msgstr "Databázová chyba"
 
 #: admin/pageadmin.py:723 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -215,11 +208,11 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "stránka"
 
 #: admin/pageadmin.py:843
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "Stránka bola úspešne schválená."
 
 #: admin/pageadmin.py:897
 #, python-format
@@ -262,8 +255,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1142
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1200
@@ -272,9 +264,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1222
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -700,9 +690,7 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:43
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:44
@@ -714,9 +702,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:47
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:49
@@ -952,9 +938,7 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1046,8 +1030,7 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1286,8 +1269,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1380,9 +1362,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:144
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:146
@@ -1753,16 +1733,14 @@ msgstr ""
 #: templatetags/cms_tags.py:398
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:613
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 

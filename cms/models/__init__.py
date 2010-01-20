@@ -49,8 +49,10 @@ def monkeypatch_reverse():
                         ml_viewname = "%s:%s" % ( lang, viewname)
                         url = django.core.urlresolvers.old_reverse(ml_viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
                         url = "/%s%s" % (lang, url)
+                        return url
                     except NoReverseMatch, e:
                         pass
+            raise
         return url
     
     django.core.urlresolvers.reverse = new_reverse
