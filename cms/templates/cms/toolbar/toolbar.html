@@ -389,7 +389,15 @@
 	//<![CDATA[
 		
 		jQuery.noConflict();
-
+		
+		function hide_iframe(){
+			// needs to be a global function because it gets called 
+			// from the iframe as `parent.hide_iframe`
+			jQuery.nyroModalRemove();
+			jQuery("#nyroModalWrapper .wrapperIframe").html("");
+			window.location = window.location.href;
+		}
+		
 		jQuery(document).ready(function($) {
 		
 			var placeholder_data = {{ placeholder_data }};
@@ -473,12 +481,6 @@
 				$("#cms_plugin_overlay").hide();
 				hideCMStoolbarSubmenus();
 				$("#cms_plugin_"+page_id+"_"+plugin_id).makeoverlay("#cms_plugin_overlay2");
-			}
-		
-			function hide_iframe(){
-				$.nyroModalRemove();
-				$("#nyroModalWrapper .wrapperIframe").html("");
-				window.location = window.location.href;
 			}
 
 			function edit_plugin(page_id, plugin_id){	
@@ -816,7 +818,7 @@
 
 <script type="text/javascript" charset="utf-8">
 	// Now that jQuery is done loading, put the '$' variable back to what it was...
-	//var $ = _$;
+	var $ = _$;
 </script>
 
 <div id="cms_toolbar_mini">
