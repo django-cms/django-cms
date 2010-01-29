@@ -83,12 +83,12 @@ ul.plugin-list span.delete{
 	_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/media/cms/images/pluginlist-delete.png',sizingMethod='crop');	
 }
 
-ul.plugin-list li:hover{background-position:0px -300px; color:#fff;}
+ul.plugin-list li:hover{background-position:0px -100px; color:#fff;}
 ul.plugin-list li:hover .drag{background-position:0px -40px;}
 ul.plugin-list li:hover span.delete{background-position:0px -40px;}
 
 
-ul.plugin-list li.active:hover{background-position:0px -300px; color:#fff;}
+ul.plugin-list li.active:hover{background-position:0px -100px; color:#fff;}
 ul.plugin-list li.active:hover .drag{background-position:0px -40px;}
 
 
