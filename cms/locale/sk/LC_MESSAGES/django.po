@@ -217,59 +217,59 @@ msgstr "Stránka bola úspešne schválená."
 #: admin/pageadmin.py:897
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Objekt %(name)s s primárnym kľúčom %(key)r neexistuje."
 
 #: admin/pageadmin.py:900
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Existuje len jeden preklad tejto stránky"
 
 #: admin/pageadmin.py:915
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "Názov a zásuvné moduly pre jazyk %(language)s boli vymazané"
 
 #: admin/pageadmin.py:937
 msgid "Are you sure?"
-msgstr ""
+msgstr "Ste si istý?"
 
 #: admin/pageadmin.py:1000
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "Nemáte právo na publikovanie tejto stránky"
 
 #: admin/pageadmin.py:1018
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "Nemáte právo meniť status (zobrazenie v navigácii) tejto stránky"
 
 #: admin/pageadmin.py:1053
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "Nemáte právo meniť túto stránku"
 
 #: admin/pageadmin.py:1057
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Jazyk musí byť medzi podporovanými jazykmi"
 
 #: admin/pageadmin.py:1069
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "Zásuvný modul %(plugin_name)s bol pridaný do %(placeholder)s"
 
 #: admin/pageadmin.py:1142
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v %(placeholder)s"
 
 #: admin/pageadmin.py:1200
 msgid "Plugins where moved"
-msgstr ""
+msgstr "Zásuvné moduly boli presunuté"
 
 #: admin/pageadmin.py:1222
 #, python-format
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr ""
+msgstr "Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder)s bol vymazaný."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "Práva k stránkam"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
