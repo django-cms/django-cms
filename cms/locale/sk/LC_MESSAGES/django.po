@@ -359,88 +359,88 @@ msgstr "Index"
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr ""
+msgstr "Celý index na jednej stránke"
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
-msgstr ""
+msgstr "Indexovanie stránok podľa písmena"
 
 #: docs/templates/genindex-split.html:15
 msgid "can be huge"
-msgstr ""
+msgstr "môže byť veľmi veľké"
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
-msgstr ""
+msgstr "Navigácia"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
-msgstr ""
+msgstr "Tabuľka obsahu"
 
 #: docs/templates/layout.html:48
 msgid "Previous topic"
-msgstr ""
+msgstr "Predchádzajúca téma"
 
 #: docs/templates/layout.html:50
 msgid "previous chapter"
-msgstr ""
+msgstr "predchádzajúca kapitola"
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr ""
+msgstr "Nasledujúca téma"
 
 #: docs/templates/layout.html:55
 msgid "next chapter"
-msgstr ""
+msgstr "nasledujúca kapitola"
 
 #: docs/templates/layout.html:60
 msgid "This Page"
-msgstr ""
+msgstr "Táto stránka"
 
 #: docs/templates/layout.html:63
 msgid "Show Source"
-msgstr ""
+msgstr "Zobraziť zdrojový kód"
 
 #: docs/templates/layout.html:73
 msgid "Quick search"
-msgstr ""
+msgstr "Rýchle vyhľadávanie"
 
 #: docs/templates/layout.html:76
 msgid "Go"
-msgstr ""
+msgstr "Choď"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr ""
+msgstr "Zadajte hľadaný výraz, modul, triedu alebo názov funkcie."
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
-msgstr ""
+msgstr "O týchto dokumentoch"
 
 #: docs/templates/layout.html:134 docs/templates/search.html:2
 #: docs/templates/search.html.py:5
 msgid "Search"
-msgstr ""
+msgstr "Hľadať"
 
 #: docs/templates/layout.html:137
 msgid "Copyright"
-msgstr ""
+msgstr "Copyright"
 
 #: docs/templates/modindex.html:36
 msgid "Deprecated"
-msgstr ""
+msgstr "Zastaralé"
 
 #: docs/templates/search.html:21
 msgid "search"
-msgstr ""
+msgstr "hľadať"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
-msgstr ""
+msgstr "Výsledky vyhľadávania"
 
 #: docs/templates/search.html:27
 msgid "Your search did not match any results."
-msgstr ""
+msgstr "Neboli nájdené žiadne výsledky."
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
@@ -449,26 +449,26 @@ msgstr ""
 #: models/pluginmodel.py:39 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr ""
+msgstr "jazyk"
 
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
 #: migrations/0004_textobjects.py:22 models/pluginmodel.py:37
 msgid "position"
-msgstr ""
+msgstr "pozícia"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
 #: models/pluginmodel.py:41 models/titlemodels.py:23
 msgid "creation date"
-msgstr ""
+msgstr "dátum vytvorenia"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
 #: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:38
 msgid "slot"
-msgstr ""
+msgstr "slot"
 
 #: migrations/0001_initial.py:18 models/pluginmodel.py:40
 msgid "plugin_name"
-msgstr ""
+msgstr "názov zásuvného modulu"
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
@@ -477,61 +477,61 @@ msgstr ""
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr ""
+msgstr "názov"
 
 #: migrations/0001_initial.py:28
 msgid "path"
-msgstr ""
+msgstr "cesta"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
-msgstr ""
+msgstr "každý"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
-msgstr ""
+msgstr "môže editovať"
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
-msgstr ""
+msgstr "skupina"
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
-msgstr ""
+msgstr "môže publikovať"
 
 #: migrations/0001_initial.py:42
 msgid "type"
-msgstr ""
+msgstr "typ"
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
-msgstr ""
+msgstr "môže meniť soft-root"
 
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "stav"
 
 #: migrations/0001_initial.py:53 models/pagemodel.py:48
 msgid "navigation extenders"
-msgstr ""
+msgstr "rozšírenia navigácie"
 
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr ""
+msgstr "má prepísanú url"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
-msgstr ""
+msgstr "prepis url"
 
 #: migrations/0001_initial.py:57
 msgid "author"
-msgstr ""
+msgstr "autor"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
