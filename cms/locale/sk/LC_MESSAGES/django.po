@@ -273,87 +273,87 @@ msgstr "Práva k stránkam"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "Práva užívateľov a skupín"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "Manažment práv k stránkam"
 
 #: admin/useradmin.py:21
 msgid "User details"
-msgstr ""
+msgstr "Detaily užívateľa"
 
 #: admin/useradmin.py:22
 msgid "Groups"
-msgstr ""
+msgstr "Skupiny"
 
 #: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:841
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: admin/widgets.py:56
 msgid "Add Another"
-msgstr ""
+msgstr "Pridať ďalšie"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "Kopírovať práva"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr ""
+msgstr "Kopírovať moderovanie"
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Zdediť šablónu od najbližšieho predchodcu"
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "Prehľad"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "Indexy a tabuľky:"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr ""
+msgstr "Kompletná tabuľka obsahu"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "zobrazuje všetky sekcie a podsekcie"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "Hľadať stránku"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "prehľadávať túto dokumentáciu"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "Globálny index modulu"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "rýchly prístup ku všetkým modulom"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr ""
+msgstr "Všeobecný index"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr ""
+msgstr "všetky funkcie, triedy, pojmy"
 
 #: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
 #: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
 #: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
-msgstr ""
+msgstr "Index"
 
 #: docs/templates/genindex-single.html:44
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
