@@ -621,165 +621,165 @@ msgstr "Moderovať stránku"
 
 #: models/moderatormodels.py:50 templatetags/cms_admin.py:66
 msgid "Moderate children"
-msgstr ""
+msgstr "Moderovať potomkov"
 
 #: models/moderatormodels.py:51 templatetags/cms_admin.py:67
 msgid "Moderate descendants"
-msgstr ""
+msgstr "Moderovať nasledovníkov"
 
 #: models/moderatormodels.py:54 models/moderatormodels.py:55
 msgid "PageModerator"
-msgstr ""
+msgstr "Moderátor stránky"
 
 #: models/moderatormodels.py:97
 msgid "created"
-msgstr ""
+msgstr "vytvorené"
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr ""
+msgstr "zmenené"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
-msgstr ""
+msgstr "zmazané"
 
 #: models/moderatormodels.py:100
 msgid "move req."
-msgstr ""
+msgstr "presunuté"
 
 #: models/moderatormodels.py:101
 msgid "publish req."
-msgstr ""
+msgstr "publikované"
 
 #: models/moderatormodels.py:102
 msgid "unpublish req."
-msgstr ""
+msgstr "odpublikované"
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr ""
+msgstr "schválené"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
-msgstr ""
+msgstr "Stav moderovania stránky"
 
 #: models/moderatormodels.py:116
 msgid "Page moderator states"
-msgstr ""
+msgstr "Stavy moderovania stránky"
 
 #: models/pagemodel.py:34
 msgid "req. app."
-msgstr ""
+msgstr "požadované schválenie"
 
 #: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
 #: templates/cms/toolbar/toolbar.html:872
 #: templates/cms/toolbar/toolbar.html:899 utils/moderator.py:91
 msgid "delete"
-msgstr ""
+msgstr "vymazať"
 
 #: models/pagemodel.py:37
 msgid "app. par."
-msgstr ""
+msgstr "schválené a čaká na predkov"
 
 #: models/pagemodel.py:39
 msgid "created by"
-msgstr ""
+msgstr "vytvoril"
 
 #: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
 msgid "changed by"
-msgstr ""
+msgstr "zmenil"
 
 #: models/pagemodel.py:43
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr ""
+msgstr "Aby bola stránka publikovaná treba zmeniť stav na  \"publikované\"."
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "Kedy má stránka expirovať. Ponechajte prázdne, ak má mať neobmedzenú platnosť."
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "Nie všetci predkovia budú zobrazení v navigácii"
 
 #: models/pagemodel.py:47
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr ""
+msgstr "Unikátny indentifikátor, ktorý použije templatetag page_url na vytvorenie odkazu na stránku"
 
 #: models/pagemodel.py:49
 msgid "is published"
-msgstr ""
+msgstr "publikované"
 
 #: models/pagemodel.py:51
 msgid "The template used to render the content."
-msgstr ""
+msgstr "Šablóna, ktorý sa použije na zobrazenie obsahu."
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "Stránka je dostupná na."
 
 #: models/pagemodel.py:52
 msgid "site"
-msgstr ""
+msgstr "web"
 
 #: models/pagemodel.py:54
 msgid "moderator state"
-msgstr ""
+msgstr "stav moderovania"
 
 #: models/pagemodel.py:62
 msgid "menu login required"
-msgstr ""
+msgstr "menu vyžaduje prihlásenie"
 
 #: models/pagemodel.py:62
 msgid "only show this page in the menu if the user is logged in"
-msgstr ""
+msgstr "zobraziť stránku v menu, iba ak je užívateľ prihlásený"
 
 #: models/pagemodel.py:70
 msgid "pages"
-msgstr ""
+msgstr "stránky"
 
 #: models/pagemodel.py:176
 msgid "Page was copied."
-msgstr ""
+msgstr "Stránka bola skopírovaná."
 
 #: models/pagemodel.py:497
 msgid "default"
-msgstr ""
+msgstr "predvolené"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr ""
+msgstr "môže pridať"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr ""
+msgstr "môže zmazať"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr ""
+msgstr "môže meniť pokročilé nastavenia"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr ""
+msgstr "môže meniť práva"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr ""
+msgstr "na úrovni stránky"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "môže presunúť"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
-msgstr ""
+msgstr "môže moderovať"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
-msgstr ""
+msgstr "môže obnoviť stránky"
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "môže obnoviť akúkoľvek zmazanú stánku"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
