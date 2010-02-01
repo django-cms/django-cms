@@ -939,269 +939,269 @@ msgstr "Jazyk alebo stránka musia byť vyplnené"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto oblasti. Prázdne pole znamená aktuálnu stránku."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr ""
+msgstr "Nepoviné: jazyk zásuvného modulu, ktorý požadujete"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
-msgstr ""
+msgstr "Odkaz"
 
 #: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
 #: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
-msgstr ""
+msgstr "meno"
 
 #: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
 #: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:14
 msgid "link"
-msgstr ""
+msgstr "odkaz"
 
 #: plugins/link/models.py:13
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "Odkaz na stránku má väčšiu prioritu ako textový odkaz."
 
 #: plugins/link/models.py:14
 msgid "mailto"
-msgstr ""
+msgstr "mailto"
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
-msgstr ""
+msgstr "E-mailová adresa má väčšiu prioritu ako textový odkaz."
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
-msgstr ""
+msgstr "Obrázok"
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr ""
+msgstr "vľavo"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr ""
+msgstr "vpravo"
 
 #: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
 #: plugins/teaser/models.py:12 plugins/video/models.py:37
 msgid "image"
-msgstr ""
+msgstr "obrázok"
 
 #: plugins/picture/models.py:21 plugins/picture/models.py:22
 msgid "if present image will be clickable"
-msgstr ""
+msgstr "klikateľný obrázok, ak je vyplnený"
 
 #: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
-msgstr ""
+msgstr "alternatívny text"
 
 #: plugins/picture/models.py:23
 msgid "textual description of the image"
-msgstr ""
+msgstr "textový popis obrázku"
 
 #: plugins/picture/models.py:24
 msgid "long description"
-msgstr ""
+msgstr "dlhý popis"
 
 #: plugins/picture/models.py:24
 msgid "additional description of the image"
-msgstr ""
+msgstr "podrobnejší popis obrázku"
 
 #: plugins/picture/models.py:25
 msgid "side"
-msgstr ""
+msgstr "strana"
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
-msgstr ""
+msgstr "Úryvok textu"
 
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr ""
+msgstr "Šablóna %(template)s neexistuje."
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
-msgstr ""
+msgstr "HTML kód"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
+msgstr "Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má zobraziť. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
-msgstr ""
+msgstr "Úryvky textu"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
-msgstr ""
+msgstr "Upútavka"
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
-msgstr ""
+msgstr "Obrázok bude klikateľný (ak je zadaný)"
 
 #: plugins/teaser/models.py:14
 msgid "If present image will be clickable."
-msgstr ""
+msgstr "Obrázok bude klikateľný (ak je zadaný)."
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
-msgstr ""
+msgstr "viac"
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 #: plugins/text/models.py:12 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "telo"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
-msgstr ""
+msgstr "Zásuvné moduly"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "Prosím, vyberte typ zásuvného modulu."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
 msgid "Edit selected plugin"
-msgstr ""
+msgstr "Zmeniť voliteľný zásuvný modul"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
+msgstr "Textový editor nepodporuje editovanie objektov."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
 msgid "No object selected."
-msgstr ""
+msgstr "Nebol vybraný žiadny objekt."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "Textový editor nepodporuje vkladanie objektov."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "Nie je objekt zásuvného modulu"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr ""
+msgstr "Dostupné zásuvné moduly"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
 msgid "Insert plugin"
-msgstr ""
+msgstr "Vložiť zásuvný modul"
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr ""
+msgstr "twitter užívateľ"
 
 #: plugins/twitter/models.py:8
 msgid "count"
-msgstr ""
+msgstr "počet"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr ""
+msgstr "Počet záznamov, ktoré sa majú zobraziť"
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr ""
+msgstr "nápoveda k odkazu"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "Ak je zadaná, tak sa nápoveda zobrazí ako odkaz na váš Twitter profil."
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: plugins/video/models.py:20
 msgid "dock"
-msgstr ""
+msgstr "dock"
 
 #: plugins/video/models.py:21
 msgid "overlay"
-msgstr ""
+msgstr "overlay"
 
 #: plugins/video/models.py:25
 msgid "blank"
-msgstr ""
+msgstr "blank"
 
 #: plugins/video/models.py:26
 msgid "self"
-msgstr ""
+msgstr "self"
 
 #: plugins/video/models.py:27
 msgid "parent"
-msgstr ""
+msgstr "parent"
 
 #: plugins/video/models.py:31
 msgid "window"
-msgstr ""
+msgstr "window"
 
 #: plugins/video/models.py:32
 msgid "opaque"
-msgstr ""
+msgstr "opaque"
 
 #: plugins/video/models.py:33
 msgid "transparent"
-msgstr ""
+msgstr "transparent"
 
 #: plugins/video/models.py:36
 msgid "movie"
-msgstr ""
+msgstr "video"
 
 #: plugins/video/models.py:37
 msgid "use image file"
-msgstr ""
+msgstr "použiť obrázok"
 
 #: plugins/video/models.py:42
 msgid "auto load"
-msgstr ""
+msgstr "automatické naťahovanie"
 
 #: plugins/video/models.py:43
 msgid "auto play"
-msgstr ""
+msgstr "automatické prehrávanie"
 
 #: plugins/video/models.py:44
 msgid "loop"
-msgstr ""
+msgstr "opakovať"
 
 #: plugins/video/models.py:46
 msgid "controller style"
-msgstr ""
+msgstr "štýl ovládača"
 
 #: plugins/video/models.py:48
 msgid "click_url"
-msgstr ""
+msgstr "url po kliknutí"
 
 #: plugins/video/models.py:49
 msgid "click target"
-msgstr ""
+msgstr "cieľ po kliknutí"
 
 #: plugins/video/models.py:51
 msgid "mute"
-msgstr ""
+msgstr "vypnúť zvuk"
 
 #: plugins/video/models.py:52
 msgid "mute only"
