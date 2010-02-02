@@ -17,8 +17,12 @@ class MenusTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         self.login_user(u)
+        if not menu_pool.discovered:
+            menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu']}
+        menu_pool.clear()
+        self.create_some_nodes()
         
     def tearDown(self):
         menu_pool.menus = self.old_menu
@@ -32,7 +36,6 @@ class MenusTestCase(CMSTestCase):
         
     def test_01_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
-        self.create_some_nodes()
         response = self.client.get("/")
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
@@ -43,7 +46,7 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes), 5)
         
     def test_02_show_menu(self):
-        self.create_some_nodes()
+        
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context)['children']
@@ -59,7 +62,6 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(nodes[1].selected, False)
     
     def test_03_only_active_tree(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 0, 100, 0, 100)['children']
@@ -72,7 +74,6 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children), 0)
         
     def test_04_only_one_active_level(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 0, 100, 0, 1)['children']
@@ -81,7 +82,6 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children[0].children), 0)
         
     def test_05_only_level_zero(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 0, 0, 0, 0)['children']
@@ -90,7 +90,6 @@ class MenusTestCase(CMSTestCase):
         
     
     def test_06_only_level_one(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 1, 1, 100, 100)['children']
@@ -100,7 +99,6 @@ class MenusTestCase(CMSTestCase):
         
     
     def test_07_only_level_one_active(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 1, 1, 0, 100)['children']
@@ -109,7 +107,6 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children), 0)
         
     def test_08_level_zero_and_one(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 0, 1, 100, 100)['children']
@@ -118,7 +115,6 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(node.children), 1)
             
     def test_09_show_submenu(self):
-        self.create_some_nodes()
         context = self.get_context()
         # test standard show_menu 
         nodes = show_sub_menu(context)['children']
@@ -131,7 +127,6 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children), 0)
         
     def test_10_show_breadcrumb(self):
-        self.create_some_nodes()
         context = self.get_context(path=self.page3.get_absolute_url())
         nodes = show_breadcrumb(context)['ancestors']
         self.assertEqual(len(nodes), 3)
@@ -144,21 +139,17 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes), 0)
         
     def test_11_language_chooser(self):
-        self.create_some_nodes()
         context = self.get_context(path=self.page3.get_absolute_url())
         new_context = language_chooser(context)
         self.assertEqual(len(new_context['languages']), len(settings.LANGUAGES))
         self.assertEqual(new_context['current_language'], settings.LANGUAGES[0][0])
         
     def test_12_page_language_url(self):
-        self.create_some_nodes()
         context = self.get_context(path=self.page3.get_absolute_url())
         url = page_language_url(context, settings.LANGUAGES[0][0])['content']
         self.assertEqual( url, "/%s%s" % (settings.LANGUAGES[0][0], self.page3.get_absolute_url()))
         
     def test_13_show_menu_below_id(self):
-        menu_pool.clear()
-        self.create_some_nodes()
         page2 = Page.objects.get(pk=self.page2.pk)
         page2.reverse_id = "hello"
         page2.save()
@@ -171,8 +162,6 @@ class MenusTestCase(CMSTestCase):
         
         
     def test_14_unpublished(self):
-        menu_pool.clear()
-        self.create_some_nodes()
         page2 = Page.objects.get(pk=self.page2.pk)
         page2.published = False
         page2.save()
@@ -182,13 +171,22 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children), 0)
         
     def test_15_home_not_in_menu(self):
-        menu_pool.clear()
-        self.create_some_nodes()
         page1 = Page.objects.get(pk=self.page1.pk)
         page1.in_navigation = False
         page1.save()
+        page4 = Page.objects.get(pk=self.page4.pk)
+        page4.in_navigation = False
+        page4.save()
         context = self.get_context()
-        nodes = show_menu(context)['children']
-        self.assertEqual(len(nodes), 2)
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), "/%s/" % self.page2.get_slug())
+        self.assertEqual(nodes[0].children[0].get_absolute_url(), "/%s/%s/" % (self.page2.get_slug(), self.page3.get_slug()))
+        page4 = Page.objects.get(pk=self.page4.pk)
+        page4.in_navigation = True
+        page4.save()
+        menu_pool.clear()
+        context = self.get_context()
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 2)
         

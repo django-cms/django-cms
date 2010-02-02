@@ -328,14 +328,18 @@ class Page(MpttPublisher):
             path = self.get_slug(language, fallback)
         else:
             path = self.get_path(language, fallback)
-            home_pk = None
-            try:
-                home_pk = self.home_pk_cache
-            except NoHomeFound:
-                pass
-            ancestors = self.get_cached_ancestors(ascending=True)
-            if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
-                path = "/".join(path.split("/")[1:])
+            if hasattr(self, "home_cut_cache") and self.home_cut_cache:
+                if not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
+                    path = "/".join(path.split("/")[1:])
+            else:    
+                home_pk = None
+                try:
+                    home_pk = self.home_pk_cache
+                except NoHomeFound:
+                    pass
+                ancestors = self.get_cached_ancestors(ascending=True)
+                if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
+                    path = "/".join(path.split("/")[1:])
             
         if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
             path = '/'.join([ugettext(p) for p in path.split('/')])

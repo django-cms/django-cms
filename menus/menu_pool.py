@@ -3,7 +3,6 @@ from menus.exceptions import NamespaceAllreadyRegistered, NoParentFound
 from django.contrib.sites.models import Site
 import copy
 
-
 class MenuPool(object):
     def __init__(self):
         self.menus = {}
@@ -11,27 +10,20 @@ class MenuPool(object):
         self.discovered = False
         self.nodes = {}
         
-        
     def discover_menus(self):
         if self.discovered:
             return
+        print "=========discover menus========"
         #import all the modules
+        from menus.modifiers import register
+        register()
         for app in settings.INSTALLED_APPS:
             __import__(app, {}, {}, ['menu'])
-        # get all the modifiers 
-        for path in settings.MENU_MODIFIERS:
-            class_name = path.split(".")[-1]
-            module = __import__(".".join(path.split(".")[:-1]),(),(),(class_name,))
-            klass = getattr(module, class_name)
-            inst = klass()
-            self.modifiers.append(inst)
-        __import__("menus.modifiers",(),(),()) #register the modifiers
+        
         self.discovered = True
         
     def clear(self):
         self.nodes = {}
-        self.discovered = False
-        
     
     def register_menu(self, menu):
         from menus.base import Menu
@@ -43,6 +35,8 @@ class MenuPool(object):
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
+        if not modifier_class in self.modifiers:
+            self.modifiers.append(modifier_class)
         
     
     def _build_nodes(self, request, site_id):
@@ -54,9 +48,11 @@ class MenuPool(object):
             self.nodes[lang][site_id] = []
         else:
             return self.nodes[lang][site_id]
+        print self.menus
         for ns in self.menus:
             nodes = self.menus[ns].get_nodes(request)
             last = None
+            print nodes
             for node in nodes:
                 if not node.namespace:
                     node.namespace = ns
@@ -80,30 +76,33 @@ class MenuPool(object):
                             if n.namespace == node.namespace and n.id == node.parent_id:
                                 node.parent = n
                                 found = True
-                    if not found:
-                        node.parent = None
+                    if found:
+                        node.parent.children.append(node)
+                    else:
+                        print "--------> parent not found", node
                         continue
-                    node.parent.children.append(node)
                 self.nodes[lang][site_id].append(node)
                 last = node
         return self.nodes[lang][site_id]
     
     def _apply_modifiers(self, nodes, request, namespace, root_id):
         nodes = self._mark_selected(request, nodes)
-        for inst in self.modifiers:
+        for cls in self.modifiers:
+            inst = cls()
             inst.set_nodes(nodes)
             nodes = inst.modify(request, nodes, namespace, root_id, False)
         return nodes
             
     
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None):
-        if not self.discovered:
-            self.discover_menus()
+        self.discover_menus()
         if not site_id:
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(request, site_id)
         nodes = copy.deepcopy(nodes)
+        print nodes
         nodes = self._apply_modifiers(nodes, request, namespace, root_id)
+        print nodes
         return nodes 
     
     def _mark_selected(self, request, nodes):

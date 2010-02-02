@@ -20,10 +20,15 @@ class NavExtenderTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         self.login_user(u)
-        menu_pool.menus['TestMenu'] = TestMenu()
+        menu_pool.clear()
         
+        if not menu_pool.discovered:
+            menu_pool.discover_menus()
+        self.old_menu = menu_pool.menus
+        menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu'], 'TestMenu':TestMenu()}
+      
     def tearDown(self):
-        del menu_pool.menus['TestMenu']
+        menu_pool.menus = self.old_menu
         
     def create_some_nodes(self):
         self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
@@ -33,10 +38,10 @@ class NavExtenderTestCase(CMSTestCase):
         self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
         
     def test_01_menu_registration(self):
-        self.assertEqual(len(menu_pool.menus) >= 2, True)
+        self.assertEqual(len(menu_pool.menus), 2)
+        self.assertEqual(len(menu_pool.modifiers) >=4, True)
         
     def test_02_extenders_on_root(self):
-        menu_pool.clear()
         self.create_some_nodes()
         page1 = Page.objects.get(pk=self.page1.pk)
         page1.navigation_extenders = "TestMenu"
@@ -49,10 +54,9 @@ class NavExtenderTestCase(CMSTestCase):
         page1.in_navigation = False
         page1.save()
         nodes = show_menu(context)['children']
-        self.assertEqual(len(nodes), 6)
+        self.assertEqual(len(nodes), 5)
         
     def test_03_extenders_on_root_child(self):
-        menu_pool.clear()
         self.create_some_nodes()
         page4 = Page.objects.get(pk=self.page4.pk)
         page4.navigation_extenders = "TestMenu"
@@ -63,13 +67,16 @@ class NavExtenderTestCase(CMSTestCase):
         self.assertEqual(len(nodes[1].children), 4)
         
     def test_04_extenders_on_child(self):
-        menu_pool.clear()
         self.create_some_nodes()
+        page1 = Page.objects.get(pk=self.page1.pk)
+        page1.in_navigation = False
+        page1.save()
         page2 = Page.objects.get(pk=self.page2.pk)
         page2.navigation_extenders = "TestMenu"
         page2.save()
         context = self.get_context()
         nodes = show_menu(context)['children']
-        self.assertEqual(nodes, 2)
-        self.assertEqual(nodes[0].children, 5)
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(len(nodes[0].children), 4)
+        self.assertEqual(nodes[0].children[1].get_absolute_url(), "/" )
         

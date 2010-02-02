@@ -49,7 +49,7 @@ class Marker(Modifier):
             node.descendant = True
             self.mark_descendants(node.children)
 
-menu_pool.register_modifier(Marker)
+
 
 class Level(Modifier):
     """
@@ -59,20 +59,21 @@ class Level(Modifier):
     
     def modify(self, request, nodes, namespace, root_id, post_cut):
         print nodes
-        print "============="
+        print "====== mark levels ======="
         for node in nodes:
+            
             if not node.parent:
-                print node
                 if post_cut:
                     node.menu_level = 0
                 else:
                     node.level = 0
+                print node, node.level
                 self.mark_levels(node, post_cut)
             else:
-                print node
-                print 'parent', node.parent
+                print "no parent", node
+                
         return nodes
-    
+            
                     
     def mark_levels(self, node, post_cut):
         for child in node.children:
@@ -80,9 +81,10 @@ class Level(Modifier):
                 child.menu_level = node.menu_level + 1
             else:
                 child.level = node.level + 1
+            print child, child.level
             self.mark_levels(child, post_cut)
 
-menu_pool.register_modifier(Level)
+
 
 class LoginRequired(Modifier):
     """
@@ -105,7 +107,10 @@ class LoginRequired(Modifier):
             if good or (not node.auth_required and not node.required_group_id):
                 final.append(node)
         return final
-        
-menu_pool.register_modifier(LoginRequired)
 
-        
+
+def register():
+    menu_pool.register_modifier(Marker)
+    menu_pool.register_modifier(LoginRequired)
+    menu_pool.register_modifier(Level)
+    

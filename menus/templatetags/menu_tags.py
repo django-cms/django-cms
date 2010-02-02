@@ -8,6 +8,8 @@ def cut_after(node, levels, removed):
     """
     given a tree of nodes cuts after N levels
     """
+    print "=====cut after======="
+    print node, levels, removed
     if levels == 0:
         removed.extend(node.children)
         node.children = []
@@ -22,11 +24,14 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     final = []
     removed = []
     selected = None
+    print "====== cut levels ========"
+    
     for node in nodes: 
+        print node
         if not node.parent and not node.ancestor and not node.selected:
             cut_after(node, extra_inactive, removed)
         if not hasattr(node, "level"):
-            print node
+            print "no level",node
         if node.level == from_level:
             final.append(node)
         if node.level > to_level and node.parent:
@@ -67,6 +72,9 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
     else: 
         #new menu... get all the data so we can save a lot of queries
         nodes = menu_pool.get_nodes(request, namespace, root_id)
+        print "debug=============="
+        print nodes
+        print nodes[0].children
         if root_id: # find the root id and cut the nodes
             new_nodes = []
             for node in nodes:
