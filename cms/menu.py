@@ -1,5 +1,5 @@
 from menus.menu_pool import menu_pool
-from menus.base import Menu, NavigationNode
+from menus.base import Menu, NavigationNode, Modifier
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_page_queryset, get_title_queryset
 from django.conf import settings
@@ -50,8 +50,30 @@ class CMSMenu(Menu):
         return nodes
     
     def page_to_node(self, page):
-        attr = {}
-        n = NavigationNode(page.get_menu_title(), page.get_absolute_url(), "cms", page.pk, page.parent_id, "cms", attr, page.soft_root, page.login_required, reverse_id=page.reverse_id)
+        attr = {'navigation_extenders':page.navigation_extenders}
+        n = NavigationNode(page.get_menu_title(), 
+                           page.get_absolute_url(), 
+                           page.pk, page.parent_id, 
+                           attr=attr,
+                           softroot=page.soft_root, 
+                           auth_required=page.login_required, 
+                           reverse_id=page.reverse_id)
         return n
             
-menu_pool.register_menu(CMSMenu, "main")
+menu_pool.register_menu(CMSMenu)
+
+
+class NavExtender(Modifier):
+    def modify(self, request, nodes, namespace, id, post_cut):
+        copy = list(nodes)
+        for node in nodes:
+            ext = node.attr.get("navigation_extenders", None)
+            if ext:
+                for n in copy:
+                    if n.namespace == ext and not n.parent_id:
+                        n.parent_id = node.id
+                        n.parent_namespace = node.namespace
+                        n.parent = node 
+        return nodes
+    
+menu_pool.register_modifier(NavExtender)

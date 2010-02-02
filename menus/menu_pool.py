@@ -25,18 +25,25 @@ class MenuPool(object):
             klass = getattr(module, class_name)
             inst = klass()
             self.modifiers.append(inst)
+        __import__("menus.modifiers",(),(),()) #register the modifiers
         self.discovered = True
         
-    def clean_nodes(self):
+    def clear(self):
         self.nodes = {}
+        self.discovered = False
         
     
-    def register_menu(self, menu, namespace):
+    def register_menu(self, menu):
         from menus.base import Menu
         assert issubclass(menu, Menu)
-        if namespace in self.menus.keys():
-            raise NamespaceAllreadyRegistered, "[%s] a menu namespace with this name is already registered" % namespace
-        self.menus[namespace] = menu()
+        if menu.__name__ in self.menus.keys():
+            raise NamespaceAllreadyRegistered, "[%s] a menu with this name is already registered" % menu.__name__
+        self.menus[menu.__name__] = menu()
+        
+    def register_modifier(self, modifier_class):
+        from menus.base import Modifier
+        assert issubclass(modifier_class, Modifier)
+        
     
     def _build_nodes(self, request, site_id):
         lang = request.LANGUAGE_CODE
@@ -51,7 +58,11 @@ class MenuPool(object):
             nodes = self.menus[ns].get_nodes(request)
             last = None
             for node in nodes:
+                if not node.namespace:
+                    node.namespace = ns
                 if node.parent_id:
+                    if not node.parent_namespace:
+                        node.parent_namespace = ns
                     found = False
                     if last:
                         n = last
@@ -70,7 +81,8 @@ class MenuPool(object):
                                 node.parent = n
                                 found = True
                     if not found:
-                        raise NoParentFound, "No parent found for %s" % node.get_menu_title()
+                        node.parent = None
+                        continue
                     node.parent.children.append(node)
                 self.nodes[lang][site_id].append(node)
                 last = node
@@ -80,10 +92,7 @@ class MenuPool(object):
         nodes = self._mark_selected(request, nodes)
         for inst in self.modifiers:
             inst.set_nodes(nodes)
-            inst.modify_all(request, nodes, namespace, root_id, False)
-        for node in nodes:
-            for inst in self.modifiers:
-                inst.modify(request, node, namespace, root_id, False)
+            nodes = inst.modify(request, nodes, namespace, root_id, False)
         return nodes
             
     

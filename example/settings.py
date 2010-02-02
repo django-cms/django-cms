@@ -119,13 +119,9 @@ INSTALLED_APPS = (
     'cms.plugins.inherit',
     'mptt',
     'reversion',
-    'example.categories',
+    'example.sampleapp',
     #'debug_toolbar',
     'south',
-    # sample application
-    'example.sampleapp',
-    #'test_utils',
-    #'store',
 )
 
 gettext = lambda s: s
@@ -153,10 +149,7 @@ CMS_TEMPLATES = (
     ('long-folder-long/long-template-name.html', gettext('long')),
 )
 
-CMS_APPLICATIONS_URLS = (
-    ('sampleapp.urls', 'Sample application'),
-    ('sampleapp.urlstwo', 'Second sample application'),
-)
+
 
 CMS_PLACEHOLDER_CONF = {                        
     'right-column': {
@@ -179,10 +172,6 @@ CMS_PLACEHOLDER_CONF = {
         },
     },
 }
-
-
-CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),
-                            ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),)
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True

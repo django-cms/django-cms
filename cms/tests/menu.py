@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.models import Page, Title
+from cms.tests.base import CMSTestCase
+from cms.models import Page
 from cms.menu import CMSMenu
 from menus.templatetags.menu_tags import show_menu, show_sub_menu,\
     show_breadcrumb, language_chooser, page_language_url, show_menu_below_id
@@ -19,6 +17,11 @@ class MenusTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         self.login_user(u)
+        self.old_menu = menu_pool.menus
+        menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu']}
+        
+    def tearDown(self):
+        menu_pool.menus = self.old_menu
         
     def create_some_nodes(self):
         self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
@@ -28,6 +31,7 @@ class MenusTestCase(CMSTestCase):
         self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
         
     def test_01_basic_cms_menu(self):
+        self.assertEqual(len(menu_pool.menus), 1)
         self.create_some_nodes()
         response = self.client.get("/")
         self.assertEquals(response.status_code, 200)
@@ -153,7 +157,7 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual( url, "/%s%s" % (settings.LANGUAGES[0][0], self.page3.get_absolute_url()))
         
     def test_13_show_menu_below_id(self):
-        menu_pool.clean_nodes()
+        menu_pool.clear()
         self.create_some_nodes()
         page2 = Page.objects.get(pk=self.page2.pk)
         page2.reverse_id = "hello"
@@ -165,4 +169,26 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), self.page3.get_absolute_url())
         
+        
+    def test_14_unpublished(self):
+        menu_pool.clear()
+        self.create_some_nodes()
+        page2 = Page.objects.get(pk=self.page2.pk)
+        page2.published = False
+        page2.save()
+        context = self.get_context()
+        nodes = show_menu(context)['children']
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(len(nodes[0].children), 0)
+        
+    def test_15_home_not_in_menu(self):
+        menu_pool.clear()
+        self.create_some_nodes()
+        page1 = Page.objects.get(pk=self.page1.pk)
+        page1.in_navigation = False
+        page1.save()
+        context = self.get_context()
+        nodes = show_menu(context)['children']
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0].get_absolute_url(), "/%s/" % self.page2.get_slug())
         
