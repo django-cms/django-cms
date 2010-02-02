@@ -1,74 +1,72 @@
 {% load i18n %}
+<div class="plugin_googlemap">
+	<div id="google-map-{{ object.id }}" class="googlemap-map" style="height:385px; width:auto; display: block;"></div>
 
-<div id="map">
-	<div id="google-map" style="height:385px; width:auto; display: block;"></div>
-</div>
-
-<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ request.LANGUAGE_CODE }}"></script>
-<script type="text/javascript">
-	//<![CDATA[
-	(function(){
-		var geocoder;
-		var map;
-		
-		var title = "{{ object.get_title }}";
-		var address = "{{ object.address }}, {{ object.zipcode }} {{ object.city }}";
-		var zoom = {{ object.get_zoom_level }};
-		
-		function load()
-		{
-		  // Create new map object
-		  map = new GMap2(document.getElementById("google-map"));
-		  map.addControl(new GSmallZoomControl());
-		  map.addControl(new GMapTypeControl());
-		 
-		  {% if object.get_lat_lng %}
-		  var latLng=new GLatLng({{ object.get_lat_lng|join:", " }});
-		  addToMap(latLng);
-		  {% else %}
-		  // Create new geocoding object
-		  geocoder = new GClientGeocoder();
-		  // Retrieve location information, pass it to addToMap()
-		  geocoder.getLocations(address, onResponse);
-		  {% endif %}
-		}
-		
-		// This function adds the point to the map
-		
-		function onResponse(response){
-		  // Retrieve the object
-		  place = response.Placemark[0];
-		
-		  // Retrieve the latitude and longitude
-		  latLng = new GLatLng(place.Point.coordinates[1],
-		                       place.Point.coordinates[0]);
-		  addToMap(latLng);	
-		}
-		
-		function addToMap(latLng)
-		{
-		  // Retrieve the latitude and longitude
-		  center = new GLatLng(latLng.lat() + 0.01, latLng.lng());
-		
-		  // Center the map on this point
-		  map.setCenter(center, zoom);
-		
-		  // Create a marker
-		  marker = new GMarker(latLng);
-		
-		  // Add the marker to map
-		  map.addOverlay(marker);
-		
-		  // Add address information to marker
-		  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
-		}
-		
-		load();
-	})();
-	//]]>
-</script>
+	<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ request.LANGUAGE_CODE }}"></script>
+	<script type="text/javascript">
+		//<![CDATA[
+		(function(){
+			var geocoder;
+			var map;
+			
+			var title = "{{ object.get_title }}";
+			var address = "{{ object.address }}, {{ object.zipcode }} {{ object.city }}";
+			var zoom = {{ object.get_zoom_level }};
+			
+			function load()
+			{
+			  // Create new map object
+			  map = new GMap2(document.getElementById("google-map-{{ object.id }}"));
+			  map.addControl(new GSmallZoomControl());
+			  map.addControl(new GMapTypeControl());
+			 
+			  {% if object.get_lat_lng %}
+			  var latLng=new GLatLng({{ object.get_lat_lng|join:", " }});
+			  addToMap(latLng);
+			  {% else %}
+			  // Create new geocoding object
+			  geocoder = new GClientGeocoder();
+			  // Retrieve location information, pass it to addToMap()
+			  geocoder.getLocations(address, onResponse);
+			  {% endif %}
+			}
+			
+			// This function adds the point to the map
+			
+			function onResponse(response){
+			  // Retrieve the object
+			  place = response.Placemark[0];
+			
+			  // Retrieve the latitude and longitude
+			  latLng = new GLatLng(place.Point.coordinates[1],
+			                       place.Point.coordinates[0]);
+			  addToMap(latLng);	
+			}
+			
+			function addToMap(latLng)
+			{
+			  // Retrieve the latitude and longitude
+			  center = new GLatLng(latLng.lat() + 0.01, latLng.lng());
+			
+			  // Center the map on this point
+			  map.setCenter(center, zoom);
+			
+			  // Create a marker
+			  marker = new GMarker(latLng);
+			
+			  // Add the marker to map
+			  map.addOverlay(marker);
+			
+			  // Add address information to marker
+			  marker.openInfoWindowHtml("<strong>" + title + "</strong><br />" + address {% ifnotequal map.get_content "" %} + "<br/><br/><i>{{ object.get_content }}</i>"{% endifnotequal %});
+			}
+			
+			load();
+		})();
+		//]]>
+	</script>
 {% if object.route_planer %}
-<form method="get" action="http://maps.google.ch/" class="routeplaner_box">
+<form method="get" action="http://maps.google.ch/" class="googlemap-routeplaner">
 	<p>{{ object.route_planer_title }}:</p>
 	<fieldset>
 		<label for="saddr">{% trans "Your address" %}:</label>
@@ -78,3 +76,4 @@
 	</fieldset>
 </form>
 {% endif %}
+</div>
