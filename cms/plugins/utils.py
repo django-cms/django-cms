@@ -19,6 +19,9 @@ def get_plugin_media(request, plugin):
 
 def get_plugins_media(request, obj):
     lang = get_language_from_request(request)
+    if not obj:
+        # current page is unknown
+        return []
     if not hasattr(obj, '_%s_plugins_media_cache' % lang):
         plugins = get_plugins(request, obj, lang=lang)
         media_classes = [get_plugin_media(request, plugin) for plugin in plugins]
