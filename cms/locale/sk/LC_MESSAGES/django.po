@@ -1642,84 +1642,84 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:828
 msgid "Status"
-msgstr ""
+msgstr "Stav"
 
 #: templates/cms/toolbar/toolbar.html:839
 msgid "Username"
-msgstr ""
+msgstr "Užívateľské meno"
 
 #: templates/cms/toolbar/toolbar.html:843
 #: templates/cms/toolbar/toolbar.html:844
 msgid "login"
-msgstr ""
+msgstr "prihlásiť"
 
 #: templates/cms/toolbar/toolbar.html:855
 msgid "Template"
-msgstr ""
+msgstr "Šablóna"
 
 #: templates/cms/toolbar/toolbar.html:865
 msgid "Site Administration"
-msgstr ""
+msgstr "Správa webu"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "move"
-msgstr ""
+msgstr "presunúť"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "Move/add Pages"
-msgstr ""
+msgstr "Presunúť / pridať stránky"
 
 #: templates/cms/toolbar/toolbar.html:868
 msgid "Page Settings"
-msgstr ""
+msgstr "Nastavenia stránky"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "history"
-msgstr ""
+msgstr "história"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "View History"
-msgstr ""
+msgstr "Zobraziť históriu"
 
 #: templates/cms/toolbar/toolbar.html:872
 msgid "Delete Page"
-msgstr ""
+msgstr "Odstrániť stránku"
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Lock"
-msgstr ""
+msgstr "Uzamknúť"
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Logout"
-msgstr ""
+msgstr "Odhlásenie"
 
 #: templates/cms/toolbar/toolbar.html:879
 msgid "Close"
-msgstr ""
+msgstr "Zatvoriť"
 
 #: templates/cms/toolbar/toolbar.html:890
 msgid "up"
-msgstr ""
+msgstr "hore"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "down"
-msgstr ""
+msgstr "dole"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Settings"
-msgstr ""
+msgstr "Nastavenia"
 
 #: templates/cms/toolbar/toolbar.html:899
 msgid "Delete Plugin"
-msgstr ""
+msgstr "Zmazať zásuvný modul"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
-msgstr ""
+msgstr "Odpojiť moderovanie stránky"
 
 #: templatetags/cms_admin.py:66
 msgid "Unbind children moderation"
-msgstr ""
+msgstr "Odpojiť moderovanie potomkov"
 
 #: templatetags/cms_admin.py:67
 msgid "Unbind descendants moderation"
