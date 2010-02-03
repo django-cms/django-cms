@@ -1557,88 +1557,88 @@ msgstr ""
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Môže presunúť"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
 msgid "(global)"
-msgstr ""
+msgstr "(globálne)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(aktuálne)"
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "Všetky"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Stránka nededí žiadne práva."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "Stará revízia zásuvného modulu nemôže byť uložená!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "Zásuvný modul bol úspešne uložený."
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "Obnoviť zmazaný %(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Stlačte tlačidlo uložiť, ak chcete obnoviť túto verziu objektu."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "Vrátiť zmeny v %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
+msgstr "Stlačte tlačidlo uložiť, ak sa chcete vrátiť k tejto verzii objektu."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "Možnosti kopírovania"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Vyberte možnosti kopírovania"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "Pridať zásuvný modul"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "Ak chcete pridať zásuvný modul, musíte najskôr uložiť stránku."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "Nebol vybraný zásuvný modul. Vyberte jeden zo zoznamu naľavo."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
+msgstr "Žiadny zásuvný modul. Pridať zásuvný modul do tejto oblasti."
 
 #: templates/cms/toolbar/toolbar.html:746
 #, python-format
 msgid "Move to %(name)s"
-msgstr ""
+msgstr "Presunúť do %(name)s "
 
 #: templates/cms/toolbar/toolbar.html:792
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Ste si istí, že chcete zmazať tento zásuvný modul?"
 
 #: templates/cms/toolbar/toolbar.html:821
 msgid "Edit mode"
-msgstr ""
+msgstr "Editovací mód"
 
 #: templates/cms/toolbar/toolbar.html:828
 msgid "Status"
