@@ -1723,12 +1723,12 @@ msgstr ""
 
 #: templatetags/cms_admin.py:67
 msgid "Unbind descendants moderation"
-msgstr ""
+msgstr "Odpojiť moderovanie nasledovníkov"
 
 #: templatetags/cms_tags.py:397 templatetags/cms_tags.py:612
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr ""
+msgstr "Reverse ID nebolo nájdené na %(domain)s"
 
 #: templatetags/cms_tags.py:398
 #, python-format
@@ -1736,6 +1736,8 @@ msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
+"page_id_url template tag nenašiel reverse_id %(reverse_id)s\n"
+"Url adresa stránky bola: http://%(host)s%(path)s"
 
 #: templatetags/cms_tags.py:613
 #, python-format
@@ -1743,24 +1745,26 @@ msgid ""
 "A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
+"show_placeholder_by_id template tag nenašiel reverse_id %(reverse_id)s\n"
+"Url adresa stránky bola http://%(host)s%(path)s"
 
 #: utils/moderator.py:84
 msgid "parent first"
-msgstr ""
+msgstr "najskôr rodič"
 
 #: utils/moderator.py:91
 msgid "approve"
-msgstr ""
+msgstr "schváliť"
 
 #: utils/moderator.py:243
 #, python-format
 msgid "CMS - Page %s requires approvement."
-msgstr ""
+msgstr "CMS - Stránka %s vyžaduje schválenie."
 
 #: utils/permissions.py:193
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - Vaše užívateľské konto bolo vytvorené."
 
 #: utils/permissions.py:195
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - Vaše užívateľské konto bolo zmenené."
