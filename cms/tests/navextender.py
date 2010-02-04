@@ -2,12 +2,8 @@
 from django.contrib.auth.models import User
 from cms.models import Page
 from menus.templatetags.menu_tags import show_menu
-from django.core.handlers.wsgi import WSGIRequest
-from django.contrib.sites.models import Site
-from django.template.defaultfilters import slugify
 from django.conf import settings
 from cms.tests.base import CMSTestCase
-from cms.menu import CMSMenu
 from menus.menu_pool import menu_pool
 from cms.tests.util.menu_extender import TestMenu
 
