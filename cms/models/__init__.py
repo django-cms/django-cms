@@ -50,9 +50,9 @@ def monkeypatch_reverse():
                         url = django.core.urlresolvers.old_reverse(ml_viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
                         url = "/%s%s" % (lang, url)
                         return url
-                    except NoReverseMatch, e:
+                    except NoReverseMatch:
                         pass
-            raise
+            raise e
         return url
     
     django.core.urlresolvers.reverse = new_reverse
