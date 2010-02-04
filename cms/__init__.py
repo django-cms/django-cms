@@ -7,9 +7,10 @@ else:
 
 # patch settings 
 try:
-    from conf import patch_settings
     from django.conf import settings
-    patch_settings()
+    if 'cms' in settings.INSTALLED_APPS:
+        from conf import patch_settings
+        patch_settings()
 except ImportError:
     """
     This exception means that either the application is being built, or is

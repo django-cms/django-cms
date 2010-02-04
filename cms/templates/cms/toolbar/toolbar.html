@@ -26,7 +26,7 @@
 	
 	/* RESET */	
 	.cms_toolbar strong, .cms_toolbar em{font-style:normal;font-weight:normal;margin:0;padding:0;}
-	.cms_toolbar ul, .cms_toolbar li{margin:0;list-style:none;}
+	.cms_toolbar ul, .cms_toolbar li{margin:0;padding:0;list-style:none;background:none;}
 	.cms_toolbar form, .cms_toolbar input, .cms_toolbar label{
 		color:#656565;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;margin:0;padding:0;
 	}
@@ -374,7 +374,7 @@
 	// '$' variable, so store a reference of it in a temporary variable...
 	var _$ = window.$;
 	if (typeof jQuery == 'undefined') {
-		var jquery_url = 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js';
+		var jquery_url = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js';
 		document.write(unescape('%3Cscript src="' + jquery_url + '" type="text/javascript"%3E%3C/script%3E'));
 	}
 	//]]>
@@ -389,7 +389,15 @@
 	//<![CDATA[
 		
 		jQuery.noConflict();
-
+		
+		function hide_iframe(){
+			// needs to be a global function because it gets called 
+			// from the iframe as `parent.hide_iframe`
+			jQuery.nyroModalRemove();
+			jQuery("#nyroModalWrapper .wrapperIframe").html("");
+			window.location = window.location.href;
+		}
+		
 		jQuery(document).ready(function($) {
 		
 			var placeholder_data = {{ placeholder_data }};
@@ -473,12 +481,6 @@
 				$("#cms_plugin_overlay").hide();
 				hideCMStoolbarSubmenus();
 				$("#cms_plugin_"+page_id+"_"+plugin_id).makeoverlay("#cms_plugin_overlay2");
-			}
-		
-			function hide_iframe(){
-				$.nyroModalRemove();
-				$("#nyroModalWrapper .wrapperIframe").html("");
-				window.location = window.location.href;
 			}
 
 			function edit_plugin(page_id, plugin_id){	
@@ -816,7 +818,7 @@
 
 <script type="text/javascript" charset="utf-8">
 	// Now that jQuery is done loading, put the '$' variable back to what it was...
-	//var $ = _$;
+	var $ = _$;
 </script>
 
 <div id="cms_toolbar_mini">
