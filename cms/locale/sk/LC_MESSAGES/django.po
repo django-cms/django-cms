@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-04 08:28+0200\n"
-"PO-Revision-Date: 2010-02-04 08:38+0100\n"
+"PO-Revision-Date: 2010-02-04 12:28+0100\n"
 "Last-Translator: Martin Kosír <martin@martinkosir.net>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -1024,7 +1024,7 @@ msgstr "Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto obl
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr "Nepoviné: jazyk zásuvného modulu, ktorý požadujete"
+msgstr "Nepovinné: jazyk zásuvného modulu, ktorý požadujete"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
