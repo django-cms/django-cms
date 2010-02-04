@@ -1386,89 +1386,89 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list.html:60
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "Vyskytla sa chyba. Prosím, obnovte stránku vo Vašom prehliadači."
 
 #: templates/admin/cms/page/change_list.html:80
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "Obnoviť zmazané %(name)s"
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Pridať %(name)s"
 
 #: templates/admin/cms/page/change_list.html:95
 msgid "Pages on:"
-msgstr ""
+msgstr "Stránky:"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "Filter:"
-msgstr ""
+msgstr "Filter:"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "on"
-msgstr ""
+msgstr "zapnuté"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "off"
-msgstr ""
+msgstr "vypnuté"
 
 #: templates/admin/cms/page/change_list.html:114
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
-msgstr ""
+msgstr "akcie"
 
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "moderate"
-msgstr ""
+msgstr "moderovať"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr ""
+msgstr "publikované"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "last changes"
-msgstr ""
+msgstr "posledné zmeny"
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr ""
+msgstr "vybrať túto stránku"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr ""
+msgstr "upraviť túto stránku"
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:865
 #: templates/cms/toolbar/toolbar.html:888
 msgid "edit"
-msgstr ""
+msgstr "upraviť"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr ""
+msgstr "vložiť nad"
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr ""
+msgstr "vložiť pod"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "vložiť do vnútra"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
-msgstr ""
+msgstr "softroot"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "Upraviť túto stránku v jazyku %(language)s "
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
