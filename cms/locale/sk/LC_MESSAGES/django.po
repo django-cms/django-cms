@@ -1205,89 +1205,89 @@ msgstr "vypnúť zvuk"
 
 #: plugins/video/models.py:52
 msgid "mute only"
-msgstr ""
+msgstr "iba stíšiť"
 
 #: plugins/video/models.py:53
 msgid "volume"
-msgstr ""
+msgstr "hlasitosť"
 
 #: plugins/video/models.py:53
 msgid "in range <0, 100>"
-msgstr ""
+msgstr "v rozsahu <0, 100>"
 
 #: plugins/video/models.py:56
 msgid "fgcolor"
-msgstr ""
+msgstr "farba popredia"
 
 #: plugins/video/models.py:56
 msgid "Hexadecimal, eg 13abec"
-msgstr ""
+msgstr "Hexadecimálne, napr. 13abec"
 
 #: plugins/video/models.py:57
 msgid "bgcolor"
-msgstr ""
+msgstr "farba pozadia"
 
 #: plugins/video/models.py:57
 msgid "Hexadecimal, eg fff000"
-msgstr ""
+msgstr "Hexadecimálne, napr. fff000"
 
 #: plugins/video/models.py:58
 msgid "fullscreen"
-msgstr ""
+msgstr "celá obrazovka"
 
 #: plugins/video/models.py:59
 msgid "wmode"
-msgstr ""
+msgstr "wmode"
 
 #: plugins/video/models.py:60
 msgid "flash menu"
-msgstr ""
+msgstr "flash menu"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:236
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "Uložiť"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Zmazať %(language)s preklad"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "Uložiť ako novú"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr ""
+msgstr "Uložiť a pridať ďalšiu"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:237
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Uložiť a pokračovať v úpravách"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
+msgstr "Stránka <a href=\"%(admin_url)s\">%(page)s</a> môže vyžadovať Vaše schválenie."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr ""
+msgstr "Posledné zmeny"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Prihlásiť sa do <a href=\"%(login_url)s\">administrácie</a>."
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
-msgstr ""
+msgstr "Užívateľské meno:"
 
 #: templates/admin/cms/mail/page_user_change.html:11
 msgid "Password:"
-msgstr ""
+msgstr "Heslo:"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
