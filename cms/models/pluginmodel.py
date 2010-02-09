@@ -5,10 +5,10 @@ from datetime import datetime, date
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
-from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import MpttPublisher
-from django.template.context import Context
+from cms.plugin_context import PluginContext, PluginRenderer
+from cms.middleware.toolbar import toolbar_plugin_processor
 from django.conf import settings
 from cms.utils.helpers import reversion_register
 
@@ -93,24 +93,18 @@ class CMSPlugin(MpttPublisher):
     
     def render_plugin(self, context=None, placeholder=None, admin=False, edit=False):
         instance, plugin = self.get_plugin_instance()
-        if context is None:
-            c = Context()
-        else:
-            c = Context(context)
-            
         if instance and not (admin and not plugin.admin_preview):
-            if edit:
-                content = '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s" type="%s">' % (instance.page_id, instance.pk, instance.placeholder, instance.plugin_type)
+            if context is None:
+                context = PluginContext(instance, placeholder)
             else:
-                content = ""
+                context = PluginContext(instance, placeholder, context)
             context = plugin.render(context, instance, placeholder)
             template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
             if not template:
                 raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
-            content += render_to_string(template, context)
-            if edit:
-                content += "</div>"
-            return mark_safe(content)
+            processors = (toolbar_plugin_processor,) if edit else None
+            renderer = PluginRenderer(instance, placeholder, template, context, processors)
+            return mark_safe(renderer.content)
         else:
             return ""
             

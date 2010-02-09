@@ -24,6 +24,10 @@ def inster_after_tag(string, tag, insertion):
     else:
         return string
 
+def toolbar_plugin_processor(instance, placeholder, rendered_content):
+    return '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s" type="%s">%s</div>' % \
+        (instance.page_id, instance.pk, instance.placeholder, instance.plugin_type, rendered_content)
+
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
