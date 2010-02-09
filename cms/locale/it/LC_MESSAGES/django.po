@@ -1101,15 +1101,15 @@ msgstr ""
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr ""
+msgstr "Plugin disponibili"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
 msgid "Insert plugin"
-msgstr ""
+msgstr "Inserisci plugin"
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1133,7 +1133,7 @@ msgstr ""
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: plugins/video/models.py:20
 msgid "dock"
@@ -1169,11 +1169,11 @@ msgstr ""
 
 #: plugins/video/models.py:36
 msgid "movie"
-msgstr ""
+msgstr "video"
 
 #: plugins/video/models.py:37
 msgid "use image file"
-msgstr ""
+msgstr "usa file immagine"
 
 #: plugins/video/models.py:42
 msgid "auto load"
@@ -1209,7 +1209,7 @@ msgstr ""
 
 #: plugins/video/models.py:53
 msgid "volume"
-msgstr ""
+msgstr "volume"
 
 #: plugins/video/models.py:53
 msgid "in range <0, 100>"
@@ -1247,7 +1247,7 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:236
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
@@ -1256,16 +1256,16 @@ msgstr ""
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "Salva come nuovo"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr ""
+msgstr "Salva e aggiungi un altro"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:237
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Salva e continua le modifiche"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
@@ -1274,7 +1274,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr ""
+msgstr "Ultime modifiche"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
@@ -1283,11 +1283,11 @@ msgstr ""
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
-msgstr ""
+msgstr "Nome utente:"
 
 #: templates/admin/cms/mail/page_user_change.html:11
 msgid "Password:"
-msgstr ""
+msgstr "Password:"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
@@ -1297,7 +1297,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:32
 msgid "Approve page deletion"
-msgstr ""
+msgstr "Approva eliminazione pagina"
 
 #: templates/admin/cms/page/change_form.html:38
 #, python-format
@@ -1310,30 +1310,30 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:52
 msgid "Remove delete request"
-msgstr ""
+msgstr "Rimuovi richiesta di eliminazione"
 
 #: templates/admin/cms/page/change_form.html:54
 msgid "Approve delete"
-msgstr ""
+msgstr "Approva eliminazione"
 
 #: templates/admin/cms/page/change_form.html:54
 msgid "Approve"
-msgstr ""
+msgstr "Approva"
 
 #: templates/admin/cms/page/change_form.html:54
 #: templates/admin/cms/page/change_form.html:55
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "bozza"
 
 #: templates/admin/cms/page/change_form.html:55
 msgid "Preview"
-msgstr ""
+msgstr "Anteprima"
 
 #: templates/admin/cms/page/change_form.html:58
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr ""
+msgstr "Cronologia"
 
 #: templates/admin/cms/page/change_form.html:59
 msgid "View on site"
@@ -1348,7 +1348,7 @@ msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:109
 msgid "All permissions"
-msgstr ""
+msgstr "Tutti i permessi"
 
 #: templates/admin/cms/page/change_form.html:110
 #: templates/admin/cms/page/change_form.html:122
@@ -1367,7 +1367,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:146
 msgid "Request approvemet"
-msgstr ""
+msgstr "Richiedi approvazione"
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
@@ -1378,7 +1378,7 @@ msgstr ""
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: templates/admin/cms/page/change_list.html:55
 msgid "Successfully moved"
@@ -1408,11 +1408,11 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "on"
-msgstr ""
+msgstr "on"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "off"
-msgstr ""
+msgstr "off"
 
 #: templates/admin/cms/page/change_list.html:114
 msgid "Filter"
@@ -1420,7 +1420,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
-msgstr ""
+msgstr "azioni"
 
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "moderate"
@@ -1432,22 +1432,22 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "last changes"
-msgstr ""
+msgstr "ultime modifiche"
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr ""
+msgstr "seleziona questa pagina"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr ""
+msgstr "modifica questa pagina"
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:865
 #: templates/cms/toolbar/toolbar.html:888
 msgid "edit"
-msgstr ""
+msgstr "modifica"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
@@ -1472,19 +1472,19 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
-msgstr ""
+msgstr "Taglia"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "cut"
-msgstr ""
+msgstr "taglia"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
-msgstr ""
+msgstr "Copia"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "copy"
-msgstr ""
+msgstr "copia"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
@@ -1494,18 +1494,18 @@ msgstr ""
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "add"
-msgstr ""
+msgstr "aggiungi"
 
 #: templates/admin/cms/page/menu_item.html:65
 #: templates/cms/toolbar/toolbar.html:850
 msgid "Approve directly"
-msgstr ""
+msgstr "Approva direttamente"
 
 #: templates/admin/cms/page/menu_item.html:67
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
 msgid "view"
-msgstr ""
+msgstr "vedi"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
@@ -1513,7 +1513,7 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
-msgstr ""
+msgstr "Pubblica"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
@@ -1521,48 +1521,48 @@ msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
-msgstr ""
+msgstr "Azione"
 
 #: templates/admin/cms/page/moderation_messages.html:5
 msgid "Created"
-msgstr ""
+msgstr "Creato"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
-msgstr ""
+msgstr "Messaggio"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "Gruppo"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "Può apportare modifiche"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "Può aggiungere"
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "Può eliminare"
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "Può pubblicare"
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "Può cambiare i permessi"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Può spostare"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
 msgid "(global)"
-msgstr ""
+msgstr "(globale)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
@@ -1582,7 +1582,7 @@ msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "Plugin salvato con successo."
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
@@ -1604,7 +1604,7 @@ msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "Copia opzioni"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
@@ -1613,15 +1613,15 @@ msgstr ""
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "Aggiungi plugin"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "Devi salvare la pagina prima di aggiungere plugin"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "Nessun plugin selezionato. Seleziona un plugin sulla sinistra"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
@@ -1634,7 +1634,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:792
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Sei sicuro di voler eliminare questo plugin?"
 
 #: templates/cms/toolbar/toolbar.html:821
 msgid "Edit mode"
@@ -1651,7 +1651,7 @@ msgstr "Nome utente"
 #: templates/cms/toolbar/toolbar.html:843
 #: templates/cms/toolbar/toolbar.html:844
 msgid "login"
-msgstr ""
+msgstr "login"
 
 #: templates/cms/toolbar/toolbar.html:855
 msgid "Template"
@@ -1691,7 +1691,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Logout"
-msgstr ""
+msgstr "Logout"
 
 #: templates/cms/toolbar/toolbar.html:879
 msgid "Close"
