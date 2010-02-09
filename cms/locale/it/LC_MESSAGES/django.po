@@ -1642,11 +1642,11 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:828
 msgid "Status"
-msgstr ""
+msgstr "Stato"
 
 #: templates/cms/toolbar/toolbar.html:839
 msgid "Username"
-msgstr ""
+msgstr "Nome utente"
 
 #: templates/cms/toolbar/toolbar.html:843
 #: templates/cms/toolbar/toolbar.html:844
@@ -1655,35 +1655,35 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:855
 msgid "Template"
-msgstr ""
+msgstr "Modello"
 
 #: templates/cms/toolbar/toolbar.html:865
 msgid "Site Administration"
-msgstr ""
+msgstr "Amministrazione sito"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "move"
-msgstr ""
+msgstr "muovi"
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "Move/add Pages"
-msgstr ""
+msgstr "Muovi/aggiungi pagina"
 
 #: templates/cms/toolbar/toolbar.html:868
 msgid "Page Settings"
-msgstr ""
+msgstr "Impostazioni pagina"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "history"
-msgstr ""
+msgstr "cronologia"
 
 #: templates/cms/toolbar/toolbar.html:870
 msgid "View History"
-msgstr ""
+msgstr "Visualizza cronologia"
 
 #: templates/cms/toolbar/toolbar.html:872
 msgid "Delete Page"
-msgstr ""
+msgstr "Elimina pagina"
 
 #: templates/cms/toolbar/toolbar.html:877
 msgid "Lock"
@@ -1695,23 +1695,23 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:879
 msgid "Close"
-msgstr ""
+msgstr "Chiudi"
 
 #: templates/cms/toolbar/toolbar.html:890
 msgid "up"
-msgstr ""
+msgstr "su"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "down"
-msgstr ""
+msgstr "giù"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Settings"
-msgstr ""
+msgstr "Impostazioni"
 
 #: templates/cms/toolbar/toolbar.html:899
 msgid "Delete Plugin"
-msgstr ""
+msgstr "Elimina plugin"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
