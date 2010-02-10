@@ -219,20 +219,20 @@ msgstr "La página ha sido aprobada."
 #: admin/pageadmin.py:866
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "El objeto %(name)s con la clave primaria %(key)r no existe."
 
 #: admin/pageadmin.py:869
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Sólo existe una traducción para esta página."
 
 #: admin/pageadmin.py:884
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "El título y los \"plugins\" con el lenguaje %(language)s fueron eliminados."
 
 #: admin/pageadmin.py:906
 msgid "Are you sure?"
-msgstr ""
+msgstr "¿Está seguro?"
 
 #: admin/pageadmin.py:969
 msgid "You do not have permission to publish this page"
@@ -256,14 +256,13 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugin añadido a %(placeholder)s"
 
 #: admin/pageadmin.py:1060
-#, fuzzy
 msgid "Language must be different then the copied language!"
-msgstr "¡Idioma debe estar configurado a uno soportado!"
+msgstr "¡El idioma debe ser diferente del de la copia!"
 
 #: admin/pageadmin.py:1106
-#, fuzzy, python-format
+#, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "%(plugin_name)s plugin añadido a %(placeholder)s"
+msgstr "\"plugins\" en %(language)s copiados a %(placeholder)s"
 
 #: admin/pageadmin.py:1179
 #, python-format
@@ -272,7 +271,7 @@ msgstr "%(plugin_name)s plugin editado en la posición %(position)s en %(placeho
 
 #: admin/pageadmin.py:1237
 msgid "Plugins where moved"
-msgstr "Plugins adonde se movieron"
+msgstr "\"Plugins\" movidos"
 
 #: admin/pageadmin.py:1259
 #, python-format
