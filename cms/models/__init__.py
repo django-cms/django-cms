@@ -35,7 +35,7 @@ def monkeypatch_reverse():
         url = ''
         i18n = 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
         lang = None
-        if viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
+        if isinstance(viewname, basestring) and viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
             lang = viewname.split(":")[0]
         try:    
             url = django.core.urlresolvers.old_reverse(viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)

@@ -302,13 +302,12 @@ class PageAdmin(model_admin):
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
             for placeholder_name in get_placeholders(request, placeholders_template):
-                if placeholder_name not in self.mandatory_placeholders:
-                    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
-                    if not name:
-                        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
-                    if not name:
-                        name = placeholder_name
-                    given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
+                name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
+                if not name:
+                    name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
+                if not name:
+                    name = placeholder_name
+                given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
@@ -373,36 +372,35 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
             for placeholder_name in get_placeholders(request, selected_template):
-                if placeholder_name not in self.mandatory_placeholders:
-                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
-                    plugin_list = []
-                    if obj:
-                        if versioned:
-                            from reversion.models import Version
-                            version = get_object_or_404(Version, pk=version_id)
-                            revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-                            plugin_list = []
-                            plugins = []
-                            bases = {}
-                            for rev in revs:
-                                pobj = rev.object
-                                if pobj.__class__ == CMSPlugin:
-                                    if pobj.language == language and pobj.placeholder == placeholder_name and not pobj.parent_id:
-                                        if pobj.get_plugin_class() == CMSPlugin:
-                                            plugin_list.append(pobj)
-                                        else:
-                                            bases[int(pobj.pk)] = pobj
-                                if hasattr(pobj, "cmsplugin_ptr_id"): 
-                                    plugins.append(pobj)
-                            for plugin in plugins:
-                                if int(plugin.cmsplugin_ptr_id) in bases:
-                                    bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
-                                    plugin_list.append(plugin)
-                        else:
-                            plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
-                    language = get_language_from_request(request, obj)
-                    widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'traduction_language': settings.CMS_LANGUAGES, 'language': language } )
-                    form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
+                installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
+                plugin_list = []
+                if obj:
+                    if versioned:
+                        from reversion.models import Version
+                        version = get_object_or_404(Version, pk=version_id)
+                        revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+                        plugin_list = []
+                        plugins = []
+                        bases = {}
+                        for rev in revs:
+                            pobj = rev.object
+                            if pobj.__class__ == CMSPlugin:
+                                if pobj.language == language and pobj.placeholder == placeholder_name and not pobj.parent_id:
+                                    if pobj.get_plugin_class() == CMSPlugin:
+                                        plugin_list.append(pobj)
+                                    else:
+                                        bases[int(pobj.pk)] = pobj
+                            if hasattr(pobj, "cmsplugin_ptr_id"): 
+                                plugins.append(pobj)
+                        for plugin in plugins:
+                            if int(plugin.cmsplugin_ptr_id) in bases:
+                                bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
+                                plugin_list.append(plugin)
+                    else:
+                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
+                language = get_language_from_request(request, obj)
+                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'traduction_language': settings.CMS_LANGUAGES, 'language': language } )
+                form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
