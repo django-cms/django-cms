@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms-2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-26 14:37+0100\n"
+"POT-Creation-Date: 2010-02-10 10:05+0100\n"
 "PO-Revision-Date: 2009-11-03 09:07+0100\n"
 "Last-Translator: Maciej Wiśniowski <pigletto@gmail.com>\n"
 "Language-Team: Gerard Swiderski - gerard5, Maciej Wiśniowski - pigletto\n"
@@ -38,6 +38,6 @@ msgstr ""
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Czy na pewno chcesz zmienić zakładkę nie zapisując wcześniej strony?"
 
-#: media/cms/js/plugin_editor.js:75
+#: media/cms/js/plugin_editor.js:110
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Czy na pewno usunąć ten plugin?"

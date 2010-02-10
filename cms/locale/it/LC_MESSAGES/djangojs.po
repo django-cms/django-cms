@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-26 14:37+0100\n"
+"POT-Creation-Date: 2010-02-10 10:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,17 +16,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: media/cms/js/change_form.js:30
-msgid "Are you sure you want to change the %(field_name)s without saving the page first?"
-msgstr "Sei sicuro di voler modificare il campo %(field_name)s  senza salvare prima la pagina?"
+msgid ""
+"Are you sure you want to change the %(field_name)s without saving the page "
+"first?"
+msgstr ""
+"Sei sicuro di voler modificare il campo %(field_name)s  senza salvare prima "
+"la pagina?"
 
 #: media/cms/js/change_form.js:67
-msgid "Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost."
-msgstr "Non tutti i plugin sono stati salvati. Sei sicuro di voler salvare la pagina? Tutti i contenuti dei plugin non salvati andranno perduti."
+msgid ""
+"Not all plugins are saved. Are you sure you want to save the page? All "
+"unsaved plugin content will be lost."
+msgstr ""
+"Non tutti i plugin sono stati salvati. Sei sicuro di voler salvare la "
+"pagina? Tutti i contenuti dei plugin non salvati andranno perduti."
 
 #: media/cms/js/change_form.js:122
 msgid "Are you sure you want to change tabs without saving the page first?"
-msgstr "Sei sicuro di voler modificare le schede senza salvare prima la pagina?"
+msgstr ""
+"Sei sicuro di voler modificare le schede senza salvare prima la pagina?"
 
-#: media/cms/js/plugin_editor.js:75
+#: media/cms/js/plugin_editor.js:110
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Sei sicuro di voler eliminare questo plugin?"
