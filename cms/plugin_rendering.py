@@ -3,10 +3,39 @@ from django.core.exceptions import ImproperlyConfigured
 from django.template.context import Context
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.utils.safestring import mark_safe
+import copy
+
+def default_plugin_context_processor(instance, placeholder):
+    return {
+        'plugin_index': instance._render_meta.index, # deprecated template variable
+        'plugin': {
+            'counter': instance._render_meta.index + 1,
+            'counter0': instance._render_meta.index,
+            'revcounter': instance._render_meta.total - instance._render_meta.index,
+            'revcounter0': instance._render_meta.total - instance._render_meta.index - 1,
+            'first': instance._render_meta.index == 0,
+            'last': instance._render_meta.index == instance._render_meta.total - 1,
+            'total': instance._render_meta.total,
+            'id_attr': 'plugin_%i_%i' % (instance.page_id, instance.pk),
+            'instance': instance,
+        }
+    }
+
+def mark_safe_plugin_processor(instance, placeholder, rendered_content, original_context):
+    return mark_safe(rendered_content)
+
+DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
+    default_plugin_context_processor,
+)
+
+DEFAULT_PLUGIN_PROCESSORS = (
+    mark_safe_plugin_processor,
+)
 
 _standard_processors = {}
 
-def get_standard_processors(settings_attr='CMS_PLUGIN_CONTEXT_PROCESSORS'):
+def get_standard_processors(settings_attr):
     from django.conf import settings
     global _standard_processors
     if not _standard_processors.has_key(settings_attr):
@@ -34,27 +63,36 @@ class PluginContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, instance, placeholder, dict=None, processors=None, current_app=None):
+    def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
         Context.__init__(self, dict, current_app=current_app)
         if processors is None:
             processors = ()
         else:
             processors = tuple(processors)
-        for processor in get_standard_processors() + processors:
+        for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS + get_standard_processors('CMS_PLUGIN_CONTEXT_PROCESSORS') + processors:
             self.update(processor(instance, placeholder))
 
 class PluginRenderer(object):
     """
-    This class renders the context to a string using the supploied template.
+    This class renders the context to a string using the supplied template.
     It then passes the rendered content to all processors defined in 
     CMS_PLUGIN_PROCESSORS. Additional processors can be specified as a list
     of callables using the "processors" keyword argument.
     """
-    def __init__(self, instance, placeholder, template, context, processors=None, current_app=None):
+    def __init__(self, context, instance, placeholder, template, processors=None, current_app=None):
         self.content = render_to_string(template, context)
         if processors is None:
             processors = ()
         else:
             processors = tuple(processors)
-        for processor in get_standard_processors('CMS_PLUGIN_PROCESSORS') + processors:
-            self.content = processor(instance, placeholder, self.content)
+        for processor in get_standard_processors('CMS_PLUGIN_PROCESSORS') + processors + DEFAULT_PLUGIN_PROCESSORS:
+            self.content = processor(instance, placeholder, self.content, context)
+
+def render_plugins(plugins, context, placeholder_name, processors=None):
+    c = []
+    total = len(plugins)
+    for index, plugin in enumerate(plugins):
+        plugin._render_meta.total = total 
+        plugin._render_meta.index = index
+        c.append(plugin.render_plugin(copy.copy(context), placeholder_name, processors=processors))
+    return c
