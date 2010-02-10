@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
@@ -62,9 +62,7 @@ msgstr "Názov stránky"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Prepísať to, čo je zobrazené v hornej časti vášho prehliadača alebo v "
-"záložkách."
+msgstr "Prepísať to, čo je zobrazené v hornej časti vášho prehliadača alebo v záložkách."
 
 #: admin/forms.py:85
 msgid "Application"
@@ -80,8 +78,7 @@ msgstr "Prepísať URL"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
-"Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná cesta."
+msgstr "Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná cesta."
 
 #: admin/forms.py:95
 msgid "Redirect"
@@ -97,8 +94,7 @@ msgstr "Popis stránky, ktorý môžu indexovať vyhľadávače."
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať vyhľadávače."
+msgstr "Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať vyhľadávače."
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
@@ -114,12 +110,8 @@ msgid "user"
 msgstr "užívateľ"
 
 #: admin/forms.py:159
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
-"Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam "
-"(potomkom). Inak nebude môcť takéto stránky editovať ich autor."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr "Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam (potomkom). Inak nebude môcť takéto stránky editovať ich autor."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
@@ -154,12 +146,8 @@ msgid "Notify user"
 msgstr "Notifikovať užívateľa"
 
 #: admin/forms.py:263
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-"Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena "
-"alebo hesla. Vyžaduje sa e-mail užívateľa."
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena alebo hesla. Vyžaduje sa e-mail užívateľa."
 
 #: admin/forms.py:283
 msgid "New password"
@@ -174,16 +162,12 @@ msgid "Email notification requires valid email address."
 msgstr "Notifikácia vyžaduje platnú e-mailovú adresu."
 
 #: admin/forms.py:307
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
+msgid "The permission to add new pages requires the permission to change pages!"
+msgstr "Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
 
 #: admin/forms.py:309
-msgid ""
-"The permission to add new users requires the permission to change users!"
-msgstr ""
-"Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
+msgid "The permission to add new users requires the permission to change users!"
+msgstr "Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
 
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
@@ -199,9 +183,7 @@ msgstr "Základné nastavenia"
 
 #: admin/pageadmin.py:123
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte "
-"uložiť."
+msgstr "Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte uložiť."
 
 #: admin/pageadmin.py:129
 msgid "Advanced Settings"
@@ -274,22 +256,18 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "Zásuvný modul %(plugin_name)s bol pridaný do %(placeholder)s"
 
 #: admin/pageadmin.py:1060
-#, fuzzy
 msgid "Language must be different then the copied language!"
-msgstr "Jazyk musí byť medzi podporovanými jazykmi"
+msgstr "Jazyk musí byť odlišný od kopírovaného jazyka!"
 
 #: admin/pageadmin.py:1106
-#, fuzzy, python-format
+#, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "Zásuvný modul %(plugin_name)s bol pridaný do %(placeholder)s"
+msgstr "Skopírované %(language)s zásuvné moduly do %(placeholder)s"
 
 #: admin/pageadmin.py:1179
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v %"
-"(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr "Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v %(placeholder)s"
 
 #: admin/pageadmin.py:1237
 msgid "Plugins where moved"
@@ -297,12 +275,8 @@ msgstr "Zásuvné moduly boli presunuté"
 
 #: admin/pageadmin.py:1259
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
-msgstr ""
-"Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder)s bol "
-"vymazaný."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgstr "Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder)s bol vymazaný."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
@@ -727,28 +701,20 @@ msgid "changed by"
 msgstr "zmenil"
 
 #: models/pagemodel.py:43
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Aby bola stránka publikovaná treba zmeniť stav na  \"publikované\"."
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
-"Kedy má stránka expirovať. Ponechajte prázdne, ak má mať neobmedzenú "
-"platnosť."
+msgstr "Kedy má stránka expirovať. Ponechajte prázdne, ak má mať neobmedzenú platnosť."
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Nie všetci predkovia budú zobrazení v navigácii"
 
 #: models/pagemodel.py:47
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
-msgstr ""
-"Unikátny indentifikátor, ktorý použije templatetag page_url na vytvorenie "
-"odkazu na stránku"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgstr "Unikátny indentifikátor, ktorý použije templatetag page_url na vytvorenie odkazu na stránku"
 
 #: models/pagemodel.py:49
 msgid "is published"
@@ -982,12 +948,8 @@ msgid "Language or Page must be filled out"
 msgstr "Jazyk alebo stránka musia byť vyplnené"
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
-msgstr ""
-"Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto oblasti. "
-"Prázdne pole znamená aktuálnu stránku."
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgstr "Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto oblasti. Prázdne pole znamená aktuálnu stránku."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1078,11 +1040,8 @@ msgid "HTML"
 msgstr "HTML kód"
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má "
-"zobraziť. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr "Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má zobraziť. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1187,43 +1146,36 @@ msgid "Video"
 msgstr "Video"
 
 #: plugins/video/cms_plugins.py:38
-#, fuzzy
 msgid "Color Settings"
-msgstr "Nastavenia"
+msgstr "Nastavenia farieb"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid "movie file"
 msgstr "video"
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "použite .flv súbor alebo video kódované v h264"
 
 #: plugins/video/models.py:11
-#, fuzzy
 msgid "movie url"
-msgstr "video"
+msgstr "url videa"
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
-msgstr ""
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgstr "vimeo alebo youtube video url. Napr.: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
-#, fuzzy
 msgid "preview image file"
-msgstr "použiť obrázok"
+msgstr "náhľad obrázku"
 
 #: plugins/video/models.py:17
 msgid "auto play"
 msgstr "automatické prehrávanie"
 
 #: plugins/video/models.py:18
-#, fuzzy
 msgid "auto hide"
-msgstr "automatické naťahovanie"
+msgstr "automatické schovávanie"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
@@ -1234,7 +1186,6 @@ msgid "loop"
 msgstr "opakovať"
 
 #: plugins/video/models.py:23
-#, fuzzy
 msgid "background color"
 msgstr "farba pozadia"
 
@@ -1242,45 +1193,40 @@ msgstr "farba pozadia"
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
-#, fuzzy
 msgid "Hexadecimal, eg ff00cc"
 msgstr "Hexadecimálne, napr. fff000"
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "farba textu"
 
 #: plugins/video/models.py:25
-#, fuzzy
 msgid "seekbar color"
-msgstr "farba pozadia"
+msgstr "farba seekbar"
 
 #: plugins/video/models.py:26
-#, fuzzy
 msgid "seekbar bg color"
-msgstr "farba pozadia"
+msgstr "farba seekbar"
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
-msgstr ""
+msgstr "farba loadingbar"
 
 #: plugins/video/models.py:28
 msgid "button out color"
-msgstr ""
+msgstr "farba pri opustení tlačidla"
 
 #: plugins/video/models.py:29
 msgid "button over color"
-msgstr ""
+msgstr "farba tlačidla pri prejdení ponad"
 
 #: plugins/video/models.py:30
 msgid "button highlight color"
-msgstr ""
+msgstr "farba zvýrazneného tlačidla"
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
-msgstr ""
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr "Chýbajúci flash plugin. Stiahnuť ho môžete <a href=\"http://adobe.com/flashplayer\">tu</a"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:268
@@ -1308,11 +1254,8 @@ msgstr "Uložiť a pokračovať v úpravách"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Stránka <a href=\"%(admin_url)s\">%(page)s</a> môže vyžadovať Vaše "
-"schválenie."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgstr "Stránka <a href=\"%(admin_url)s\">%(page)s</a> môže vyžadovať Vaše schválenie."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
@@ -1413,12 +1356,8 @@ msgstr "Stavy stránky"
 
 #: templates/admin/cms/page/change_form.html:176
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
-msgstr ""
-"Táto stránka musí byť moderovaná na úrovni %(moderation_level)s. Pošlite "
-"správu moderátorovi."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+msgstr "Táto stránka musí byť moderovaná na úrovni %(moderation_level)s. Pošlite správu moderátorovi."
 
 #: templates/admin/cms/page/change_form.html:178
 msgid "Request approvemet"
@@ -1514,9 +1453,8 @@ msgid "softroot"
 msgstr "softroot"
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "home"
-msgstr "Domov"
+msgstr "domov"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
@@ -1729,22 +1667,20 @@ msgid "Move/add Pages"
 msgstr "Presunúť / pridať stránky"
 
 #: templates/cms/toolbar/toolbar.html:880
-#, fuzzy
 msgid "add child"
-msgstr "Pridať potomka"
+msgstr "pridať potomka"
 
 #: templates/cms/toolbar/toolbar.html:880
-#, fuzzy
 msgid "Add child page"
-msgstr "Pridať potomka"
+msgstr "Pridať podstránku"
 
 #: templates/cms/toolbar/toolbar.html:881
 msgid "add sibling"
-msgstr ""
+msgstr "pridať na rovnakej úrovni"
 
 #: templates/cms/toolbar/toolbar.html:881
 msgid "Add sibling page"
-msgstr ""
+msgstr "Pridať stránku na rovnakej úrovni"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "Delete Page"
@@ -1814,8 +1750,7 @@ msgstr "Reverse ID nebolo nájdené na %(domain)s"
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 "page_id_url template tag nenašiel reverse_id %(reverse_id)s\n"
@@ -1824,8 +1759,7 @@ msgstr ""
 #: templatetags/cms_tags.py:656
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 "show_placeholder_by_id template tag nenašiel reverse_id %(reverse_id)s\n"
@@ -1833,15 +1767,15 @@ msgstr ""
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
-msgstr ""
+msgstr "Podúroveň"
 
 #: tests/util/menu_extender.py:8
 msgid "Sublevel3"
-msgstr ""
+msgstr "Podúroveň 3"
 
 #: tests/util/menu_extender.py:11
 msgid "Sublevel 2"
-msgstr ""
+msgstr "Podúroveň 2"
 
 #: utils/moderator.py:84
 msgid "parent first"
