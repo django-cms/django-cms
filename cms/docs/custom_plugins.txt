@@ -1,3 +1,5 @@
+You have three options to extend Django CMS: Custom plugins, plugin context processors, and plugin processors.
+
 Custom Plugins
 ==============
 
@@ -105,3 +107,89 @@ Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use a
 
 Note: If you want to overwrite the form be sure to extend from ``admin/cms/page/plugin_change_form.html`` to have an unified look across the plugins and to have the preview functionality automatically installed.
 
+
+Plugin Context Processors
+=========================
+
+Plugin context processors are callables that modify all plugin's context before rendering. They are enabled using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
+
+A plugin context processor takes 2 arguments:
+
+**instance**:
+
+The instance of the plugin model
+
+**placeholder**:
+
+The name of the placeholder this plugin appears in.
+
+The return value should be a dictionary containing any variables to be added to the context.
+
+Example::
+
+    # settings.py:
+    CMS_PLUGIN_CONTEXT_PROCESSORS = (
+        'yourapp.cms_plugin_context_processors.add_verbose_name',
+    )
+
+    # yourapp.cms_plugin_context_processors.py:
+    def add_verbose_name(instance, placeholder):
+        '''
+        This plugin context processor adds the plugin model's verbose_name to context.
+        '''
+        return {'verbose_name': instance._meta.verbose_name}
+
+Plugin Processors
+=================
+
+Plugin processors are callables that modify all plugin's output after rendering. They are enabled using the ``CMS_PLUGIN_PROCESSORS`` setting.
+A plugin processor takes 4 arguments:
+
+**instance**:
+
+The instance of the plugin model
+
+**placeholder**:
+
+The name of the placeholder this plugin appears in.
+
+**rendered_content**:
+
+A string containing the rendered content of the plugin.
+
+**original_context**:
+
+The original context for the template used to render the plugin.
+
+Example::
+
+Suppose you want to put wrap each plugin in the main placeholder in a colored box, but it would be too complicated to edit each individual plugin's template. 
+    
+    # settings.py:
+    CMS_PLUGIN_PROCESSORS = (
+        'yourapp.cms_plugin_processors.wrap_in_colored_box',
+    )
+    
+    # yourapp.cms_plugin_processors.py:
+    def wrap_in_colored_box(instance, placeholder, rendered_content, original_context):
+        '''
+        This plugin processor wraps each plugin's output in a colored box if it is in the "main" placeholder.
+        '''
+        if placeholder != 'main':
+            # Plugins not in the main placeholder remain unchanged
+            return rendered_content
+        else:
+            from django.template import Context, Template
+            # For simplicity's sake, construct the template from a string: 
+            t = Template('<div style="border: 10px {{ border_color }} solid; background: {{ background_color }};">{{ content|safe }}</div>')
+            # Prepare that template's context:
+            c = Context({
+                'content': rendered_content,
+                # Some plugin models might allow you to customize the colors,
+                # for others, use default colors:
+                'background_color': instance.background_color if hasattr(instance, 'background_color') else 'lightyellow',
+                'border_color': instance.border_color if hasattr(instance, 'border_color') else 'lightblue',
+            })
+            # Finally, render the content through that template, and return the output
+            return t.render(c)
+ 
