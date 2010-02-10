@@ -1582,11 +1582,11 @@ msgstr "La página no hereda ningún permiso."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr "¡Un versión antigüa de un plugin no puede ser guardada!"
+msgstr "¡Una versión antigüa de un \"plugin\" no puede ser guardada!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
-msgstr "Plugin guardado con éxito."
+msgstr "\"Plugin\" guardado con éxito."
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
@@ -1617,17 +1617,15 @@ msgstr "Elija las opciones de copia"
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr "Añadir un Plugin"
+msgstr "Añadir un \"Plugin\""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
-msgstr "Idioma"
+msgstr "Desde el idioma"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
-#, fuzzy
 msgid "Copy Plugins"
-msgstr "Plugins"
+msgstr "Copiar \"Plugins\""
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
@@ -1642,27 +1640,25 @@ msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr "No hay Plugins presentes. Añada un plugin en el slot del placeholder."
 
 #: templates/cms/toolbar/toolbar.html:758
-#, fuzzy, python-format
+#, python-format
 msgid "Move to %(name)s"
-msgstr "Recuperación de la página %(name)s eliminada"
+msgstr "Mover a %(name)s"
 
 #: templates/cms/toolbar/toolbar.html:804
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "¿Seguro que desea eliminar este \"plugin\"?"
 
 #: templates/cms/toolbar/toolbar.html:833
 msgid "Edit mode"
-msgstr ""
+msgstr "Modo edición"
 
 #: templates/cms/toolbar/toolbar.html:840
-#, fuzzy
 msgid "Status"
-msgstr "estado"
+msgstr "Estado"
 
 #: templates/cms/toolbar/toolbar.html:851
-#, fuzzy
 msgid "Username"
-msgstr "Nombre de usuario:"
+msgstr "Nombre de usuario"
 
 #: templates/cms/toolbar/toolbar.html:855
 #: templates/cms/toolbar/toolbar.html:856
@@ -1743,7 +1739,7 @@ msgstr "Configuración"
 
 #: templates/cms/toolbar/toolbar.html:917
 msgid "Delete Plugin"
-msgstr "Eliminar el \"Plugin\""
+msgstr "Eliminar \"Plugin\""
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
