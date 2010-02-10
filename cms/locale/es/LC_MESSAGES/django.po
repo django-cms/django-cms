@@ -942,19 +942,19 @@ msgstr "Calcular la ruta"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "Hereda \"Plugins\" de la Página"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "El Idioma o la Página debe ser rellenado"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "Elija una página para incluir sus \"plugins\" en este \"placeholder\". Si la deja vacía elegirá la página actual"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr ""
+msgstr "Opcional: el idioma de los \"plugins\" que desee"
 
 #: plugins/link/cms_plugins.py:11
 msgid "Link"
@@ -1045,9 +1045,8 @@ msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendere
 msgstr "Introduzca una plantilla (p.ej. \"snippets/plugin_xy.html\") que será utilizada."
 
 #: plugins/snippet/models.py:25
-#, fuzzy
 msgid "Snippets"
-msgstr "Snippet"
+msgstr "Snippets"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
@@ -1120,9 +1119,8 @@ msgid "Insert plugin"
 msgstr "Insertar un plugin"
 
 #: plugins/twitter/cms_plugins.py:8
-#, fuzzy
 msgid "Twitter"
-msgstr "Título"
+msgstr "Twitter"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1149,41 +1147,36 @@ msgid "Video"
 msgstr "Vídeo"
 
 #: plugins/video/cms_plugins.py:38
-#, fuzzy
 msgid "Color Settings"
-msgstr "Configuración de SEO"
+msgstr "Preferencias del color"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid "movie file"
-msgstr "película"
+msgstr "fichero de película"
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "Use un fichero .flv o uno codificado como h265 como fichero de vídeo"
 
 #: plugins/video/models.py:11
-#, fuzzy
 msgid "movie url"
-msgstr "película"
+msgstr "URL de la película"
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
+msgstr "URL del video en vimeo o youtube. Ejemplo: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
-#, fuzzy
 msgid "preview image file"
-msgstr "usar un fichero de imágen"
+msgstr "Fichero de imágen para previsualizar"
 
 #: plugins/video/models.py:17
 msgid "auto play"
 msgstr "auto reproducción"
 
 #: plugins/video/models.py:18
-#, fuzzy
 msgid "auto hide"
-msgstr "auto carga"
+msgstr "auto esconder"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
@@ -1194,7 +1187,6 @@ msgid "loop"
 msgstr "bucle"
 
 #: plugins/video/models.py:23
-#, fuzzy
 msgid "background color"
 msgstr "color de fondo"
 
@@ -1202,43 +1194,40 @@ msgstr "color de fondo"
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
-#, fuzzy
 msgid "Hexadecimal, eg ff00cc"
-msgstr "En hexagesimal, p. ej. fff000"
+msgstr "Hexagesimal, p. ej. ff00cc"
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "Color del texto"
 
 #: plugins/video/models.py:25
-#, fuzzy
 msgid "seekbar color"
-msgstr "color de fondo"
+msgstr "color de la barra de posicionamiento"
 
 #: plugins/video/models.py:26
-#, fuzzy
 msgid "seekbar bg color"
-msgstr "color de fondo"
+msgstr "Color del fondo de la barra de posicionamiento"
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
-msgstr ""
+msgstr "Color barra de actividad"
 
 #: plugins/video/models.py:28
 msgid "button out color"
-msgstr ""
+msgstr "Color de salida del botón"
 
 #: plugins/video/models.py:29
 msgid "button over color"
-msgstr ""
+msgstr "Color de estar sobre el botón"
 
 #: plugins/video/models.py:30
 msgid "button highlight color"
-msgstr ""
+msgstr "Color para iluminar el botón"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr ""
+msgstr "No está el \"plugin\" de flash. Descargelo de <a href=\"http://adobe.com/flashplayer\">here</a>"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:268
@@ -1249,16 +1238,15 @@ msgstr "Guardar"
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Eliminar la traducción de %(language)s"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "Guardar como nuevo"
 
 #: templates/admin/page_submit_line.html:12
-#, fuzzy
 msgid "Save and add another"
-msgstr "Página y descendientes"
+msgstr "Guardar y añadir otro"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:269
@@ -1465,7 +1453,6 @@ msgid "softroot"
 msgstr "softroot"
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "home"
 msgstr "Inicio"
 
