@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-10 09:56+0100\n"
+"POT-Creation-Date: 2010-02-10 10:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,7 +62,8 @@ msgstr "ページタイトル"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
+msgstr ""
+"ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
 
 #: admin/forms.py:85
 msgid "Application"
@@ -152,8 +153,8 @@ msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr ""
-"パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。"
-"ユーザメールが必要です。"
+"パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザ"
+"メールが必要です。"
 
 #: admin/forms.py:283
 msgid "New password"
@@ -227,7 +228,8 @@ msgstr ""
 #: admin/pageadmin.py:866
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
+msgstr ""
+"プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
 
 #: admin/pageadmin.py:869
 msgid "There only exists one translation for this page"
@@ -707,7 +709,7 @@ msgstr ""
 msgid "created by"
 msgstr ""
 
-#: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
+#: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
 msgstr ""
 
@@ -1442,6 +1444,14 @@ msgid "published"
 msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:15
+msgid "start"
+msgstr ""
+
+#: templates/admin/cms/page/change_list_tree.html:16
+msgid "end"
+msgstr ""
+
+#: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
 msgstr ""
 
