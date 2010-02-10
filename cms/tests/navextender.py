@@ -76,3 +76,13 @@ class NavExtenderTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(nodes[0].children[1].get_absolute_url(), "/" )
         
+    def test_05_incorrect_nav_extender_in_db(self):
+        self.create_some_nodes()
+        page2 = Page.objects.get(pk=self.page2.pk)
+        page2.navigation_extenders = "SomethingWrong"
+        page2.save()
+        context = self.get_context()
+        nodes = show_menu(context)['children']
+        self.assertEqual(len(nodes), 2)
+        
+        

@@ -40,6 +40,7 @@ from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
+from menus.menu_pool import menu_pool
 import os
 
 
@@ -83,8 +84,8 @@ class PageAdmin(model_admin):
         advanced_fields.append('publication_date')
     if settings.CMS_SHOW_END_DATE:
         advanced_fields.append( 'publication_end_date')
-    if settings.CMS_NAVIGATION_EXTENDERS:
-        advanced_fields.append('navigation_extenders')
+    #if menu_pool.get_cms_enabled_menus():
+    advanced_fields.append('navigation_extenders')
     if settings.CMS_MODERATOR:
         additional_hidden_fields.extend(('moderator_state', 'moderator_message'))
     if settings.CMS_APPLICATIONS_URLS:

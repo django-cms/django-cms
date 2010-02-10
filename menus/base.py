@@ -2,13 +2,11 @@ from django.core.exceptions import ValidationError
 
 
 class Menu(object):
-    name = None
-    cms_enabled = False
-    namespace = "main"
+    namespace = None
     
     def __init__(self):
-        if self.cms_enabled and not self.name:
-            raise ValidationError("the menu %s is cms_enabled but has no name" % self.__class__.__name__)
+        if not self.namespace:
+            self.namespace = self.__class__.__name__
 
     def get_nodes(self, request):
         """
@@ -17,11 +15,6 @@ class Menu(object):
         raise NotImplementedError
     
 class Modifier(object):
-    pre_cut = True
-    post_cut = False
-    
-    def set_nodes(self, nodes):
-        self.nodes = nodes
     
     def modify(self, request, nodes, namespace, id,  post_cut):
         pass
@@ -39,6 +32,7 @@ class NavigationNode(object):
     parent_namespace = None
     parent = None # do not touch
     reverse_id = None
+    longer_url_match = False
    
     selected = False
     

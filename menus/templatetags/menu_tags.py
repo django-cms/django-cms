@@ -8,8 +8,6 @@ def cut_after(node, levels, removed):
     """
     given a tree of nodes cuts after N levels
     """
-    print "=====cut after======="
-    print node, levels, removed
     if levels == 0:
         removed.extend(node.children)
         node.children = []
@@ -24,16 +22,12 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     final = []
     removed = []
     selected = None
-    print "====== cut levels ========"
-    
     for node in nodes: 
-        print node
         if not node.parent and not node.ancestor and not node.selected:
             cut_after(node, extra_inactive, removed)
-        if not hasattr(node, "level"):
-            print "no level",node
         if node.level == from_level:
             final.append(node)
+            node.parent = None
         if node.level > to_level and node.parent:
             if node in node.parent.children:
                 node.parent.children.remove(node)
@@ -65,16 +59,13 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
-        return {'template': 'cms/content.html'}
+        return {'template': 'menu/empty.html'}
     
     if next_page:
         children = next_page.children
     else: 
         #new menu... get all the data so we can save a lot of queries
         nodes = menu_pool.get_nodes(request, namespace, root_id)
-        print "debug=============="
-        print nodes
-        print nodes[0].children
         if root_id: # find the root id and cut the nodes
             new_nodes = []
             for node in nodes:
@@ -86,13 +77,21 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
                     to_level += node.level + 1
                     break
             nodes = new_nodes
-        children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
-    context.update({'children':children,
-                    'template':template,
-                    'from_level':from_level,
-                    'to_level':to_level,
-                    'extra_inactive':extra_inactive,
-                    'extra_active':extra_active})
+        try:
+            children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
+            children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
+        except:
+            pass
+    try:
+        context.update({'children':children,
+                        'template':template,
+                        'from_level':from_level,
+                        'to_level':to_level,
+                        'extra_inactive':extra_inactive,
+                        'extra_active':extra_active,
+                        'namespace':namespace})
+    except:
+        context = {"template":template}
     return context
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
@@ -116,13 +115,16 @@ def show_sub_menu(context, levels=100, template="menu/sub_menu.html"):
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
-        return {'template': 'cms/content.html'}
+        return {'template': 'menu/empty.html'}
     nodes = menu_pool.get_nodes(request)
     children = []
     for node in nodes:
         if node.selected:
             cut_after(node, levels, [])
             children = node.children
+            for child in children:
+                child.parent = None
+            children = menu_pool.apply_modifiers(children, request, post_cut=True)
     context.update({'children':children,
                     'template':template,
                     'from_level':0,

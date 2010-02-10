@@ -19,6 +19,8 @@ from cms.utils.page import is_valid_page_slug
 from django.forms.widgets import HiddenInput
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
+from menus.menu_pool import menu_pool
+from django.utils.functional import lazy
 
 
 class PageAddForm(forms.ModelForm):
@@ -76,6 +78,7 @@ class PageAddForm(forms.ModelForm):
         
     
 class PageForm(PageAddForm):
+    
     APPLICATION_URLS = (('', '----------'), ) + settings.CMS_APPLICATIONS_URLS
     
     menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
@@ -98,7 +101,14 @@ class PageForm(PageAddForm):
         help_text=_('A description of the page sometimes used by search engines.'))
     meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
         help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
-        
+    
+    navigation_extenders = forms.ChoiceField(choices=(), required=False)
+    
+    def __init__(self, *args, **kwargs):
+        super(PageForm, self).__init__(*args, **kwargs)
+        # set the nav extenders for the form
+        self.fields['navigation_extenders'].choices = [('', "---------")] + menu_pool.get_cms_enabled_menus()
+    
     def clean(self):
         cleaned_data = super(PageForm, self).clean()
         id = cleaned_data['reverse_id']

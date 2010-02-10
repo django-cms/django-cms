@@ -71,7 +71,6 @@ class CMSMenu(Menu):
         parent_id = page.parent_id
         if home and page.parent_id == home.pk and cut:
             parent_id = None
-            print "cut parent",page
         attr = {'navigation_extenders':page.navigation_extenders}
         n = NavigationNode(page.get_menu_title(), 
                            page.get_absolute_url(), 
@@ -87,19 +86,45 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
-    def modify(self, request, nodes, namespace, id, post_cut):
+    def modify(self, request, nodes, namespace, id, post_cut, breadcrumb):
+        if post_cut:
+            return nodes
+        exts = []
+        # rearrange the parent relations
         for node in nodes:
             ext = node.attr.get("navigation_extenders", None)
             if ext:
-                found = False
+                if not ext in exts:
+                    exts.append(ext)
                 for n in nodes:
                     if n.namespace == ext and not n.parent_id:
-                        found = True
                         n.parent_id = node.id
                         n.parent_namespace = node.namespace
                         n.parent = node
                         node.children.append(n)
-                assert found 
+        removed = []
+        # find all not assigned nodes
+        for menu in menu_pool.menus.items():
+            if menu[1].cms_enabled and not menu[0] in exts:
+                for node in nodes:
+                    if node.namespace == menu[0]:
+                        removed.append(node)
+        if removed:
+            # has home a nav extender and is home not in navigation?
+            page_queryset = get_page_queryset(request)
+            try:
+                home = page_queryset.get_home()
+            except NoHomeFound:
+                home = None  
+            if home and not home.in_navigation and home.navigation_extenders:
+                n_removed = removed
+                removed = []
+                for node in n_removed:
+                    if node.namespace != home.navigation_extenders:
+                        removed.append(node)
+        # remove all nodes that are nav_extenders and not assigned 
+        for node in removed:
+            nodes.remove(node)
         return nodes
     
 menu_pool.register_modifier(NavExtender)

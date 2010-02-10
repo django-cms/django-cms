@@ -25,6 +25,8 @@ settings.CMS_FLAT_URLS = False
 settings.CMS_MENU_TITLE_OVERWRITE = True
 settings.CMS_HIDE_UNTRANSLATED = False
 settings.CMS_URL_OVERWRITE = True
+if not "example.sampleapp" in settings.INSTALLED_APPS:
+    settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ["example.sampleapp"]
 
 def suite():
     s = unittest.TestSuite()

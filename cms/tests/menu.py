@@ -138,6 +138,17 @@ class MenusTestCase(CMSTestCase):
         nodes = show_breadcrumb(context, 1)['ancestors']
         self.assertEqual(len(nodes), 0)
         
+        page1 = Page.objects.get(pk=self.page1.pk)
+        page1.in_navigation = False
+        page1.save()
+        page2 = Page.objects.get(pk=self.page2.pk)
+        context = self.get_context(path=self.page2.get_absolute_url())
+        nodes = show_breadcrumb(context)['ancestors']
+        self.assertEqual(len(nodes), 2)
+        print nodes
+        self.assertEqual(nodes[0].get_absolute_url(), "/")
+        self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
+        
     def test_11_language_chooser(self):
         context = self.get_context(path=self.page3.get_absolute_url())
         new_context = language_chooser(context)
@@ -189,4 +200,14 @@ class MenusTestCase(CMSTestCase):
         context = self.get_context()
         nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 2)
+        
+    def test_15_empty_menu(self):
+        Page.objects.all().delete()
+        request = self.get_request()
+        nodes = menu_pool.get_nodes(request)
+        context = self.get_context()
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        
+    def test_16_softroot(self):
+        self.assertEqual(1, 2)
         

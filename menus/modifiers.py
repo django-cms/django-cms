@@ -10,6 +10,8 @@ class Marker(Modifier):
     ancestors: ancestor = True
     """
     def modify(self, request, nodes, namespace, root_id, post_cut):
+        if post_cut:
+            return nodes
         selected = None
         root_nodes = []
         for node in nodes:
@@ -20,8 +22,7 @@ class Marker(Modifier):
             if not node.parent:
                 if selected and not selected.parent:
                     node.sibling = True
-                else:
-                    root_nodes.append(node)
+                root_nodes.append(node)
             if node.selected: 
                 if node.parent:
                     n = node
@@ -58,8 +59,6 @@ class Level(Modifier):
     post_cut = True
     
     def modify(self, request, nodes, namespace, root_id, post_cut):
-        print nodes
-        print "====== mark levels ======="
         for node in nodes:
             
             if not node.parent:
@@ -67,10 +66,7 @@ class Level(Modifier):
                     node.menu_level = 0
                 else:
                     node.level = 0
-                print node, node.level
                 self.mark_levels(node, post_cut)
-            else:
-                print "no parent", node
                 
         return nodes
             
@@ -81,7 +77,6 @@ class Level(Modifier):
                 child.menu_level = node.menu_level + 1
             else:
                 child.level = node.level + 1
-            print child, child.level
             self.mark_levels(child, post_cut)
 
 
@@ -91,6 +86,8 @@ class LoginRequired(Modifier):
     Remove nodes that are login required or require a group
     """
     def modify(self, request, nodes, namespace, root_id, post_cut):
+        if post_cut:
+            return nodes
         final = []
         for node in nodes:
             good = False
