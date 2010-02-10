@@ -35,7 +35,7 @@ def monkeypatch_reverse():
         url = ''
         i18n = 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
         lang = None
-        if viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
+        if isinstance(viewname, basestring) and viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
             lang = viewname.split(":")[0]
         try:    
             url = django.core.urlresolvers.old_reverse(viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
@@ -50,9 +50,9 @@ def monkeypatch_reverse():
                         url = django.core.urlresolvers.old_reverse(ml_viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
                         url = "/%s%s" % (lang, url)
                         return url
-                    except NoReverseMatch, e:
+                    except NoReverseMatch:
                         pass
-            raise
+            raise e
         return url
     
     django.core.urlresolvers.reverse = new_reverse
