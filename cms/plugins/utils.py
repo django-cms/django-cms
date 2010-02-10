@@ -28,5 +28,5 @@ def get_plugins_media(request, obj):
         if media_classes:
             setattr(obj, '_%s_plugins_media_cache' % lang, reduce(operator.add, media_classes))
         else:
-             setattr(obj, '_%s_plugins_media_cache' % lang,  Media())
+            setattr(obj, '_%s_plugins_media_cache' % lang,  Media())
     return getattr(obj, '_%s_plugins_media_cache' % lang)
