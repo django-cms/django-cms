@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 
 class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     form = PageUserForm
+    add_form = PageUserForm
     model = PageUser
     
     list_display = ('username', 'email', 'first_name', 'last_name', 'created_by')

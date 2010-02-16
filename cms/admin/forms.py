@@ -302,7 +302,6 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         notify_user = self.cleaned_data['notify_user']
         if notify_user and not self.cleaned_data.get('email', None):
             raise forms.ValidationError(_("Email notification requires valid email address."))
-        
         if self.cleaned_data['can_add_page'] and not self.cleaned_data['can_change_page']:
             raise forms.ValidationError(_("The permission to add new pages requires the permission to change pages!"))
         if self.cleaned_data['can_add_pageuser'] and not self.cleaned_data['can_change_pageuser']:
@@ -322,8 +321,8 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         created = not bool(user.pk)
         # assign creator to user
         if created:
+            get_current_user()
             user.created_by = get_current_user()
-
         if commit:
             user.save()
 
