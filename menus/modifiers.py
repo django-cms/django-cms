@@ -9,8 +9,8 @@ class Marker(Modifier):
     descendants: descendant = True
     ancestors: ancestor = True
     """
-    def modify(self, request, nodes, namespace, root_id, post_cut):
-        if post_cut:
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        if post_cut or breadcrumb:
             return nodes
         selected = None
         root_nodes = []
@@ -58,7 +58,9 @@ class Level(Modifier):
     """
     post_cut = True
     
-    def modify(self, request, nodes, namespace, root_id, post_cut):
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        if breadcrumb:
+            return nodes
         for node in nodes:
             
             if not node.parent:
@@ -85,15 +87,15 @@ class LoginRequired(Modifier):
     """
     Remove nodes that are login required or require a group
     """
-    def modify(self, request, nodes, namespace, root_id, post_cut):
-        if post_cut:
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        if post_cut or breadcrumb:
             return nodes
         final = []
         for node in nodes:
             good = False
-            if node.auth_required and request.user.is_authenticated():
+            if node.attr.get('auth_required', False) and request.user.is_authenticated():
                 good = True
-            if node.required_group_id and request.user.is_authenticated():
+            if node.attr.get('required_group_id', False) and request.user.is_authenticated():
                 if not hasattr(request.user, "group_cache"):
                     request.user.group_cache = request.user.groups.all()
                 good = False
@@ -101,7 +103,7 @@ class LoginRequired(Modifier):
                     if group.pk == node.required_group_id:
                         good = True
                         break
-            if good or (not node.auth_required and not node.required_group_id):
+            if good or (not node.attr.get('auth_required', False) and not node.attr.get('required_group_id', False)):
                 final.append(node)
         return final
 

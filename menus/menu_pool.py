@@ -49,7 +49,7 @@ class MenuPool(object):
             try:
                 nodes = self.menus[ns].get_nodes(request)
             except:
-                pass
+                raise
             last = None
             for node in nodes:
                 if not node.namespace:
@@ -97,7 +97,7 @@ class MenuPool(object):
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(request, site_id)
         nodes = copy.deepcopy(nodes)
-        nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb)
+        nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb=breadcrumb)
         return nodes 
     
     def _mark_selected(self, request, nodes):
@@ -111,11 +111,18 @@ class MenuPool(object):
                 node.selected = False
         return nodes
     
-    def get_cms_enabled_menus(self):
-        enabled = []
+    def get_menus_by_attribute(self, name, value):
+        found = []
         for menu in self.menus.items():
-            if menu[1].cms_enabled:
-                enabled.append((menu[0], menu[1].name))
-        return enabled
+            if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
+                found.append((menu[0], menu[1].name))
+        return found
+    
+    def get_nodes_by_attribute(self, nodes, name, value):
+        found = []
+        for node in nodes:
+            if node.attr.get(name, None) == value:
+                found.append(node)
+        return found
      
 menu_pool = MenuPool()

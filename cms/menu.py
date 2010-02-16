@@ -7,6 +7,22 @@ from django.contrib.sites.models import Site
 from cms.utils.i18n import get_fallback_languages
 from cms.exceptions import NoHomeFound
 
+def page_to_node(page, home, cut):
+    parent_id = page.parent_id
+    if home and page.parent_id == home.pk and cut:
+        parent_id = None
+    attr = {'navigation_extenders':page.navigation_extenders,
+            'soft_root':page.soft_root,
+            'auth_required':page.login_required,
+            'reverse_id':page.reverse_id,}
+    n = NavigationNode(page.get_menu_title(), 
+                       page.get_absolute_url(), 
+                       page.pk, 
+                       parent_id, 
+                       attr=attr,
+                       )
+    return n
+
 class CMSMenu(Menu):
     
     def get_nodes(self, request):
@@ -48,7 +64,7 @@ class CMSMenu(Menu):
                     if not hasattr(page, "title_cache"):
                         page.title_cache = {}
                     page.title_cache[title.language] = title
-                    nodes.append(self.page_to_node(page, home, home_cut))
+                    nodes.append(page_to_node(page, home, home_cut))
                     ids.remove(page.pk)
         if ids: # get fallback languages
             fallbacks = get_fallback_languages(lang)
@@ -60,30 +76,13 @@ class CMSMenu(Menu):
                             if not hasattr(page, "title_cache"):
                                 page.title_cache = {}
                             page.title_cache[title.language] = title
-                            nodes.append(self.page_to_node(page, home, home_cut))
+                            nodes.append(page_to_node(page, home, home_cut))
                             ids.remove(page.pk)
                             break
                 if not ids:
                     break
-        return nodes
-    
-    def page_to_node(self, page, home, cut):
-        parent_id = page.parent_id
-        if home and page.parent_id == home.pk and cut:
-            parent_id = None
-        attr = {'navigation_extenders':page.navigation_extenders}
-        n = NavigationNode(page.get_menu_title(), 
-                           page.get_absolute_url(), 
-                           page.pk, 
-                           parent_id, 
-                           attr=attr,
-                           softroot=page.soft_root, 
-                           auth_required=page.login_required, 
-                           reverse_id=page.reverse_id)
-        return n
-            
+        return nodes  
 menu_pool.register_menu(CMSMenu)
-
 
 class NavExtender(Modifier):
     def modify(self, request, nodes, namespace, id, post_cut, breadcrumb):
@@ -105,11 +104,11 @@ class NavExtender(Modifier):
         removed = []
         # find all not assigned nodes
         for menu in menu_pool.menus.items():
-            if menu[1].cms_enabled and not menu[0] in exts:
+            if hasattr(menu[1], 'cms_enabled') and menu[1].cms_enabled and not menu[0] in exts:
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)
-        if removed:
+        if removed or breadcrumb:
             # has home a nav extender and is home not in navigation?
             page_queryset = get_page_queryset(request)
             try:
@@ -122,9 +121,73 @@ class NavExtender(Modifier):
                 for node in n_removed:
                     if node.namespace != home.navigation_extenders:
                         removed.append(node)
+            # if breadcrumb and home not in navigation add node
+            if breadcrumb and home and not home.in_navigation:
+                home = page_to_node(home, home, False)
+                nodes.append(home)
+                if request.path == home.get_absolute_url():
+                    home.selected = True
+                else:
+                    home.selected = False
         # remove all nodes that are nav_extenders and not assigned 
         for node in removed:
             nodes.remove(node)
+        return nodes   
+menu_pool.register_modifier(NavExtender)
+
+
+class SoftRootCutter(Modifier):
+    def modify(self, request, nodes, namespace, id, post_cut, breadcrumb):
+        return nodes
+        if post_cut:
+            return nodes
+        selected = None
+        for node in nodes:
+            if node.selected:
+                selected = node
+        nodes = []
+        if selected:
+            if selected.attr.get("soft_root", False):
+                nodes = selected.children
+            else:
+                if selected.parent:
+                    self.find_ancestors(selected.parent, selected, nodes)
+            self.find_children(selected, nodes)
+        return nodes   
+    
+    def find_children(self, node, nodes):
+        for n in node.children:
+            if n.attr.get("soft_root", False):
+                self.remove_children(n, nodes)
         return nodes
     
-menu_pool.register_modifier(NavExtender)
+    def remove_children(self, node, nodes):
+        for n in node.children:
+            nodes.remove(n)
+            self.remove_children(n, nodes)
+        node.children = []
+        return nodes
+    
+    def find_ancestors(self, node, child, nodes):
+        is_root = False
+        if node.parent and node.parent.attr.get("soft_root", False):
+            is_root = True
+            nodes.remove(node)
+            nodes = self.remove_ancestors(node.parent, node, nodes)
+        for n in node.children:
+            if n != child:
+                self.find_children(n, nodes)
+            if is_root:
+                n.parent = None
+        return nodes
+    
+    def remove_ancestors(self, node, child, nodes):
+        if node.parent:
+            self.remove_ancestors(node.parent, node, nodes)
+        nodes.remove(node)
+        for n in node.children:
+            if n != child:
+                nodes = self.remove_children(n, nodes)
+        return nodes
+    
+menu_pool.register_modifier(SoftRootCutter)

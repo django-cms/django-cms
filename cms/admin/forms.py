@@ -107,7 +107,7 @@ class PageForm(PageAddForm):
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
         # set the nav extenders for the form
-        self.fields['navigation_extenders'].choices = [('', "---------")] + menu_pool.get_cms_enabled_menus()
+        self.fields['navigation_extenders'].choices = [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True)
     
     def clean(self):
         cleaned_data = super(PageForm, self).clean()

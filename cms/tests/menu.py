@@ -7,6 +7,7 @@ from cms.menu import CMSMenu
 from menus.templatetags.menu_tags import show_menu, show_sub_menu,\
     show_breadcrumb, language_chooser, page_language_url, show_menu_below_id
 from menus.menu_pool import menu_pool
+from menus.base import NavigationNode
 
 
 class MenusTestCase(CMSTestCase):
@@ -145,8 +146,8 @@ class MenusTestCase(CMSTestCase):
         context = self.get_context(path=self.page2.get_absolute_url())
         nodes = show_breadcrumb(context)['ancestors']
         self.assertEqual(len(nodes), 2)
-        print nodes
         self.assertEqual(nodes[0].get_absolute_url(), "/")
+        self.assertEqual(isinstance(nodes[0], NavigationNode), True)
         self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
         
     def test_11_language_chooser(self):
@@ -210,4 +211,10 @@ class MenusTestCase(CMSTestCase):
         
     def test_16_softroot(self):
         self.assertEqual(1, 2)
+        page2 = Page.objects.get(pk=self.page2.pk)
+        page2.soft_root = True
+        page2.save()
+        context = self.get_context(path=page2.get_absolute_url())
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 1)
         

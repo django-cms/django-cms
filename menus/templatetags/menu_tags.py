@@ -67,21 +67,21 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
         #new menu... get all the data so we can save a lot of queries
         nodes = menu_pool.get_nodes(request, namespace, root_id)
         if root_id: # find the root id and cut the nodes
-            new_nodes = []
-            for node in nodes:
-                if node.reverse_id == root_id:
-                    new_nodes = node.children
-                    for n in new_nodes:
-                        n.parent = None
-                    from_level += node.level + 1
-                    to_level += node.level + 1
-                    break
+            id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
+            if id_nodes:
+                node = id_nodes[0]
+                new_nodes = node.children
+                for n in new_nodes:
+                    n.parent = None
+                from_level += node.level + 1
+                to_level += node.level + 1
+            else:
+                new_nodes = []
             nodes = new_nodes
-        try:
-            children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
-            children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
-        except:
-            pass
+        
+        children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
+        children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
+    
     try:
         context.update({'children':children,
                         'template':template,
@@ -153,13 +153,13 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
     except KeyError:
         return {'template': 'cms/content.html'}
     ancestors = []
-    nodes = menu_pool.get_nodes(request)
+    nodes = menu_pool.get_nodes(request, breadcrumb=True)
     selected = None
     home = None
     for node in nodes:
         if node.selected:
             selected = node
-        # find home TODO: maybe home is not in the navigation
+        # find home: TODO: maybe home is not on "/"?
         if node.get_absolute_url() == "/":
             home = node
     if selected and selected != home:
@@ -167,7 +167,7 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
         while n:
             ancestors.append(n)
             n = n.parent
-    if not ancestors or (ancestors and ancestors[-1] != home):
+    if not ancestors or (ancestors and ancestors[-1] != home) and home:
         ancestors.append(home)
     ancestors.reverse()
     if len(ancestors) >= start_level:
