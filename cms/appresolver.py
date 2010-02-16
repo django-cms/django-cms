@@ -182,7 +182,6 @@ def get_app_patterns():
         for ns, currentpatterns in hooked_applications.items():
             extra_patterns = patterns('', *currentpatterns)
             resolver = AppRegexURLResolver(r'', 'app_resolver', namespace=ns)
-            print 'got app resolver with extra_patterns: ', extra_patterns
             resolver.url_patterns = extra_patterns
             app_patterns.append(resolver)
             APP_RESOLVERS.append(resolver)
