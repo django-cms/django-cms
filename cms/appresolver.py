@@ -31,7 +31,7 @@ def applications_page_check(request, current_page=None, path=None):
             pass
     return None
 
-class PageRegexURLResolver(RegexURLResolver):
+class AppRegexURLResolver(RegexURLResolver):
     page_id = None
     url_patterns = None
     
@@ -54,14 +54,11 @@ class PageRegexURLResolver(RegexURLResolver):
                         tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['path']])
                 else:
                     if sub_match:
-                        if isinstance(pattern, RegexURLResolver):
-                            return pattern.page_id
-                        else:
-                            return self.page_id
+                        return pattern.page_id
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
-def recurse_patterns(path, pattern_list):
+def recurse_patterns(path, pattern_list, page_id):
     """
     Recurse over a list of to-be-hooked patterns for a given path prefix
     """
@@ -77,11 +74,13 @@ def recurse_patterns(path, pattern_list):
                 pattern.default_kwargs, pattern.app_name, pattern.namespace)
             # This is a bit hacky, usually a RegexURLResolver uses the urlconf_name
             # to resolve URLs, but we just override the url_patterns...
-            resolver.url_patterns = recurse_patterns(regex, pattern.url_patterns)
+            resolver.page_id = page_id
+            resolver.url_patterns = recurse_patterns(regex, pattern.url_patterns, page_id)
         else:
             # Re-do the RegexURLPattern with the new regular expression
             resolver = RegexURLPattern(regex, pattern.callback,
                 pattern.default_args, pattern.name)
+            resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns
 
@@ -99,7 +98,8 @@ def get_patterns_for_title(path, title):
     pattern_list = getattr(mod, 'urlpatterns')
     if not path.endswith('/'):
         path += '/'
-    return recurse_patterns(path, pattern_list)
+    page_id = title.page.id
+    return recurse_patterns(path, pattern_list, page_id)
 
 
 def get_app_patterns():
@@ -181,13 +181,14 @@ def get_app_patterns():
     if use_namespaces:
         for ns, currentpatterns in hooked_applications.items():
             extra_patterns = patterns('', *currentpatterns)
-            resolver = PageRegexURLResolver(r'', 'app_resolver', namespace=ns)
+            resolver = AppRegexURLResolver(r'', 'app_resolver', namespace=ns)
+            print 'got app resolver with extra_patterns: ', extra_patterns
             resolver.url_patterns = extra_patterns
             app_patterns.append(resolver)
             APP_RESOLVERS.append(resolver)
     else:
         extra_patterns = patterns('', *hooked_applications)
-        resolver = PageRegexURLResolver(r'', 'app_resolver')
+        resolver = AppRegexURLResolver(r'', 'app_resolver')
         resolver.url_patterns = extra_patterns
         app_patterns.append(resolver)
         APP_RESOLVERS.append(resolver)
