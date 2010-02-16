@@ -27,7 +27,7 @@ def validate_dependencies():
         from reversion.admin import VersionAdmin
         if not hasattr(VersionAdmin, 'get_urls'):
             raise ImproperlyConfigured('django-cms requires never version of reversion (VersionAdmin must contain get_urls method)')
-        
+
 def monkeypatch_reverse():
     django.core.urlresolvers.old_reverse = django.core.urlresolvers.reverse
     
@@ -59,4 +59,8 @@ def monkeypatch_reverse():
         
 validate_dependencies()
 validate_settings()
-monkeypatch_reverse()
+
+monkeypatched = False
+if not monkeypatched: 
+    monkeypatch_reverse()
+    monkeypatched = True

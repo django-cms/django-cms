@@ -277,4 +277,3 @@ def set_language_changer(request, func):
     Use this function in your nav extender views that have i18n slugs.
     """
     request._language_changer = func
-    
