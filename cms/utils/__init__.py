@@ -17,7 +17,7 @@ def auto_render(func):
             # return only context dictionary
             del(kwargs['only_context'])
             response = func(request, *args, **kwargs)
-            if isinstance(response, HttpResponse) or isinstance(response, HttpResponseRedirect):
+            if isinstance(response, HttpResponseRedirect):
                 raise Exception("cannot return context dictionary because a HttpResponseRedirect has been found")
             (template_name, context) = response
             return context
@@ -25,7 +25,7 @@ def auto_render(func):
             t = kwargs['template_name']
             del kwargs['template_name']
         response = func(request, *args, **kwargs)
-        if isinstance(response, HttpResponse) or isinstance(response, HttpResponseRedirect):
+        if isinstance(response, HttpResponse):
             return response
         (template_name, context) = response
         if not t:

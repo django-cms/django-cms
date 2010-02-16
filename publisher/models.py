@@ -187,8 +187,10 @@ class Publisher(models.Model):
             # remove all not updated instances
             # we have to do this, because m2m doesn't have dirty flag, and
             # maybe there was some change in m2m relation
-            public_m2m_manager.exclude(pk__in=updated_obj_ids).remove()
-                
+            related_query_set = public_m2m_manager.exclude(pk__in=updated_obj_ids)
+            if hasattr(related_query_set, 'remove'):
+                related_query_set.remove()
+   
         ########################################################################
         # update related objects (FK) / model inheritance
         for obj in self._meta.get_all_related_objects():

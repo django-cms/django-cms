@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-26 14:37+0100\n"
+"POT-Creation-Date: 2010-02-10 10:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,6 @@ msgstr ""
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr ""
 
-#: media/cms/js/plugin_editor.js:75
+#: media/cms/js/plugin_editor.js:110
 msgid "Are you sure you want to delete this plugin?"
 msgstr ""
