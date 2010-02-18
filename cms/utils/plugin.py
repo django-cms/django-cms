@@ -6,6 +6,7 @@ from cms.plugin_pool import plugin_pool
 from cms.plugins.utils import get_plugins
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
+from cms.plugin_rendering import render_plugins
 import copy
 
 def render_plugins_for_context(placeholder_name, page, context_to_copy, width=None):
@@ -44,10 +45,11 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, width=No
                                                                'placeholder_name':placeholder_name,
                                                                'page':page,
                                                                }))
-    for index, plugin in enumerate(plugins):
-        context['plugin_index'] = index
-        c.append(plugin.render_plugin(copy.copy(context), placeholder_name, edit=edit))
+        from cms.middleware.toolbar import toolbar_plugin_processor
+        processors = (toolbar_plugin_processor,)
+    else:
+        processors = None 
+        
+    c.extend(render_plugins(plugins, context, placeholder_name, processors))
+    
     return "".join(c)
-
-
-                             

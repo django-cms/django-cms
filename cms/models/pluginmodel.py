@@ -4,11 +4,9 @@ from os.path import join
 from datetime import datetime, date
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.safestring import mark_safe
-from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from publisher import MpttPublisher
-from django.template.context import Context
+from cms.plugin_rendering import PluginContext, PluginRenderer
 from django.conf import settings
 from cms.utils.helpers import reversion_register
 
@@ -49,7 +47,11 @@ class CMSPlugin(MpttPublisher):
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
-    
+
+    class _render_meta:
+        index = 0
+        total = 1
+
     def __unicode__(self):
         return str(self.id) #""
         
@@ -85,32 +87,23 @@ class CMSPlugin(MpttPublisher):
                     instance = getattr(self, plugin.model.__name__.lower())
                 # could alternatively be achieved with:
                 # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
+                instance._render_meta = self._render_meta
             except (AttributeError, ObjectDoesNotExist):
                 instance = None
         else:
             instance = self
         return instance, plugin
     
-    def render_plugin(self, context=None, placeholder=None, admin=False, edit=False):
+    def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
-        if context is None:
-            c = Context()
-        else:
-            c = Context(context)
-            
         if instance and not (admin and not plugin.admin_preview):
-            if edit:
-                content = '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s" type="%s">' % (instance.page_id, instance.pk, instance.placeholder, instance.plugin_type)
-            else:
-                content = ""
+            context = PluginContext(context, instance, placeholder)
             context = plugin.render(context, instance, placeholder)
             template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
             if not template:
                 raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
-            content += render_to_string(template, context)
-            if edit:
-                content += "</div>"
-            return mark_safe(content)
+            renderer = PluginRenderer(context, instance, placeholder, template, processors)
+            return renderer.content
         else:
             return ""
             

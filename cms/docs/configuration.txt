@@ -385,3 +385,15 @@ Enable gettext-based translation of page paths/slugs. Experimental at this stage
 Default: ``False``
 
 For general dbgettext settings, see the `dbgettext documentation <http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
+
+
+CMS_PLUGIN_CONTEXT_PROCESSORS
+-----------------------------
+
+A list of plugin context processors. Plugin context processors are callables that modify all plugin's context before rendering. See "Custom Plugins" for more information.
+
+
+CMS_PLUGIN_PROCESSORS
+---------------------
+
+A list of plugin processors. Plugin processors are callables that modify all plugin's output after rendering. See "Custom Plugins" for more information.
