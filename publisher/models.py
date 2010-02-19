@@ -180,7 +180,7 @@ class Publisher(models.Model):
                     if not obj.publisher_public_id:
                         # publish it first...
                         obj = obj.publish(excluded_models=excluded_models, first_instance=False)
-                        remote_pk = remote.pk
+                        remote_pk = obj.pk
 
                 updated_obj_ids.append(remote_pk)
                 public_m2m_manager.add(obj)
