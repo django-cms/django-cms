@@ -21,7 +21,7 @@ msgstr ""
 
 #: plugin_base.py:98
 msgid "Advanced options"
-msgstr ""
+msgstr "Avanserte valg"
 
 #: admin/forms.py:25
 msgid "Title"
