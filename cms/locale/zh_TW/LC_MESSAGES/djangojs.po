@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
+# Traditional Chinese translation for django-cms
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Cheng-Chia Tseng <pswo10680@gmail.com>, 2010
 # 
 msgid ""
 msgstr ""
