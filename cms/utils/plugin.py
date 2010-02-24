@@ -40,7 +40,7 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, width=No
                 name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]['name']
         name = title(name)
         c.append(render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
-                                                               'language':request.LANGUAGE_CODE,
+                                                               'language':l,
                                                                'placeholder_label':name,
                                                                'placeholder_name':placeholder_name,
                                                                'page':page,
