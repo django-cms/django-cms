@@ -1,7 +1,6 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # 
-#, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -29,7 +28,7 @@ msgstr "Öntanımlı başlık"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr "SEO uyumlu bağlantı"
+msgstr ""
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
