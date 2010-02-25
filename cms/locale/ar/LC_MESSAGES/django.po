@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 09:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Beshr Kayali <beshrkayali@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,194 +18,201 @@ msgstr ""
 
 #: plugin_base.py:98
 msgid "Advanced options"
-msgstr ""
+msgstr "خيارات متقدمة"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "العنوان"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "العنوان الإفتراضي"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "العنوان الذي سيستخدم في الرابط"
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "اللغة"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "اللغة الحالية لحقول المحتوى."
 
 #: admin/forms.py:61
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "توجد صفحة سابقة بنفس الـ Slug"
 
 #: admin/forms.py:81
 msgid "Menu Title"
-msgstr ""
+msgstr "عنوان القائمة"
 
 #: admin/forms.py:82
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "حرر المعروض في القائمة"
 
 #: admin/forms.py:83
 msgid "Page Title"
-msgstr ""
+msgstr "عنوان الصفحة"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "حرر المعروض في أعلى متصفحك أو في الـ bookmarks."
 
 #: admin/forms.py:85
 msgid "Application"
-msgstr ""
+msgstr "التطبيقات"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr ""
+msgstr "اربط تطبيق بهذه الصفحة"
 
 #: admin/forms.py:88
 msgid "Overwrite URL"
-msgstr ""
+msgstr "حرر عنوان الـ URL"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "اترك هذا الحقل فارغ اذا أردت استخدام العنوان الإفتراضي"
 
 #: admin/forms.py:95
 msgid "Redirect"
-msgstr ""
+msgstr "إعادة توجيه"
 
 #: admin/forms.py:96
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "أعد التوجيه الى عنوان الـ URL هذا"
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "معلومات عن هذه الصفحة، تستخدم من قبل محركات البحث"
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
+msgstr "قائمة بكلمات مفتاحية مفصولة بفاصلة، تستعمل من قبل محركات البحث"
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "توجد صفحة سابقة بعنوان الـ URL هذا"
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "عنوان الـ URL غير صحيح. مثال: /my/url "
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "مستخدم"
 
 #: admin/forms.py:159
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr  ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "حقوق إضافة الصفحةات تتطلب إضافة حقوق تعديل الصفحات أيضاً."
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "الرجاء تحديد مستخدم أو مجموعة أولاً"
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/change_form.html:58
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "أضف"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
 msgid "Change"
-msgstr ""
+msgstr "تغيير"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "إسترجع (أي) صفحة"
 
 #: admin/forms.py:262
 msgid "Notify user"
-msgstr ""
+msgstr "أعلم المستخدم"
 
 #: admin/forms.py:263
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr ""
+"بعث رسالة تنبيهية للمسخدم حول تغيير اسم المستخدم أو كلمة المرور. يتطب "
+"عنوان البريد الإلكتروني للمستخدم."
 
 #: admin/forms.py:283
 msgid "New password"
-msgstr ""
+msgstr "كلمة مرور الجديد"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr ""
+msgstr "تأكيد كلمة المرور"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "التنبيه بالبريد الإلكتروني يتطلب بريد إلكتروني صحيح"
 
 #: admin/forms.py:307
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr ""
+"حقوق إضافة صفحات  يتطلب حقوق تغيير الصفحات أولاً!"
 
 #: admin/forms.py:309
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
-
+"حقوق إضافة مستخدمين جدد يتطلب حقوق تغيير مستخدمين أولاً!"
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "لكي تضيف الحقوق، عليك تعديلها أيضاً."
 
 #: admin/pageadmin.py:109 admin/pageadmin.py:125
 msgid "Hidden"
-msgstr ""
+msgstr "مخفي"
 
 #: admin/pageadmin.py:120
 msgid "Basic Settings"
-msgstr ""
+msgstr "إعدادات إفتراضية"
 
 #: admin/pageadmin.py:123
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "ملاحظة: هذه الصفحة ستقوم بإعادة التحميل عند تغيير المحدد. قم بالحفظ أولاً."
 
 #: admin/pageadmin.py:129
 msgid "Advanced Settings"
-msgstr ""
+msgstr "خيارات متقدمة"
 
 #: admin/pageadmin.py:138
 msgid "SEO Settings"
-msgstr ""
+msgstr "خيارات الإستمثال لمحركات البحث" 
+# الترجمة العربية هذه مأخوذة من مقال ويكيبيديا العربية 
+# http://ar.wikipedia.org/wiki/استمثال_محركات_البحث
 
 #: admin/pageadmin.py:456
 msgid "higher"
-msgstr ""
+msgstr "أعلى"
 
 #: admin/pageadmin.py:604
 msgid "Database error"
-msgstr ""
+msgstr "خطأ في قاعدة البيانات"
 
 #: admin/pageadmin.py:689 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -216,33 +223,33 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "صفحة"
 
 #: admin/pageadmin.py:812
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "تم قبول الصفحة بنجاح!"
 
 #: admin/pageadmin.py:866
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "الـ Object %(name)s بالعنوان المفتاحي %(key)r غير موجود."
 
 #: admin/pageadmin.py:869
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "يوجد ترجمة واحدة متوفرة لهذه الصفحة"
 
 #: admin/pageadmin.py:884
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "تم حذف العنوان والإضافات للغة %(language)s."
 
 #: admin/pageadmin.py:906
 msgid "Are you sure?"
-msgstr ""
+msgstr "هل أنت متأكد؟"
 
 #: admin/pageadmin.py:969
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "ليس لديك الحقوق لنشر هذه الصفحة"
 
 #: admin/pageadmin.py:987
 msgid "You do not have permission to change this page's in_navigation status"
