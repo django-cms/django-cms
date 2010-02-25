@@ -1,206 +1,208 @@
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-10 09:57+0100\n"
-"PO-Revision-Date: 2010-01-15 12:29+0200\n"
-"Last-Translator: Ekrem SEREN <ekrem.seren@gmailcom>\n"
-"Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
+"POT-Creation-Date: 2010-02-23 19:00+0100\n"
+"PO-Revision-Date: 2010-02-23 19:00+0100\n"
+"Last-Translator: Øyvind Saltvik <oyvind@saltvik.no>\n"
+"Language-Team: none <oyvind@saltvik.no>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Country: NORWAY\n"
 
 #: plugin_base.py:98
 msgid "Advanced options"
-msgstr "Gelişmiş seçenekler"
+msgstr "Avanserte valg"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr "Başlık"
+msgstr "Tittel"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr "Öntanımlı başlık"
+msgstr "Standard tittel"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr "Başlığın URL'de kullanılan kısmı"
+msgstr "Delen av tittelen som brukes i adressen"
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr "Dil"
+msgstr "Språk"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr "İçerik alanlarının geçerli dili."
+msgstr ""
 
 #: admin/forms.py:61
-#, fuzzy
 msgid "Another page with this slug already exists"
-msgstr "Bu slug ile başka bir sayfa zaten var"
+msgstr "En annen side med denne slug finnes allerede"
 
 #: admin/forms.py:81
 msgid "Menu Title"
-msgstr "Menü Başlığı"
+msgstr "Menytittel"
 
 #: admin/forms.py:82
 msgid "Overwrite what is displayed in the menu"
-msgstr "Menüde gösterilenin üstüne yaz"
+msgstr "Overstyr hva som vises i menyen"
 
 #: admin/forms.py:83
 msgid "Page Title"
-msgstr "Sayfa Başlığı"
+msgstr "Sidetittel"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Tarayıcınızın üstünde veya yerimlerinde yazanın üzerine yaz"
+msgstr "Overstyrer hva som vises på toppen av nettleseren din eller i bokmerker"
 
 #: admin/forms.py:85
 msgid "Application"
-msgstr "Uygulama"
+msgstr "Applikasjon"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr "Uygulamayı bu sayfaya bağla."
+msgstr "Koble applikasjon til denne siden"
 
 #: admin/forms.py:88
-#, fuzzy
 msgid "Overwrite URL"
-msgstr "URL'nin üzerine yaz"
+msgstr "Overstyr adresse"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
-msgstr "Standart yolu kullanmak için bu alanı boş bırakın."
+msgstr "La dette feltet være tomt hvis standardadresse skal brukes"
 
 #: admin/forms.py:95
 msgid "Redirect"
-msgstr "Yönlendir"
+msgstr "Videresend"
 
 #: admin/forms.py:96
 msgid "Redirects to this URL."
-msgstr "Bu URL'ye yönlendir."
+msgstr "Videresendes til denne adressen"
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
-msgstr "Sayfanın açıklaması, bazen arama motorları tarafından kullanılır."
+msgstr "En beskrivelse som noen ganger brukes av søkemotorer"
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Virgül ile ayrılmış anahtar kelimeler, bazen arama motorları tarafından kullanılır."
+msgstr "En liste av stikkord noen ganger brukes av søkemotorer"
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
-msgstr "Bu ters URL id'si ile bir sayfa zaten var."
+msgstr ""
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr "Geçersiz URL, /benim/url biçiminde girin."
+msgstr ""
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr "kullanıcı"
+msgstr "bruker"
 
 #: admin/forms.py:159
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr "Sayfa ekleme yetkisi aynı zamanda alt başlıkların yetkilerine de ihtiyaç duyar, yoksa sayfa ekleyen kişi içeriğini değiştiremez."
+msgstr ""
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr "Sayfa ekleme yetkisi aynı zamanda sayfa düzenleme yetkisi de gerektirir."
+msgstr ""
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr "Lütfen önce kullanıcı veya grup ekleyin."
+msgstr ""
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/change_form.html:58
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr "Ekle"
+msgstr "Legg til"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
 msgid "Change"
-msgstr "Düzenle"
+msgstr "Endre"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr "Sil"
+msgstr "Slett"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr "Sayfaları (herhangi) kurtar"
+msgstr "Gjenopprett sider"
 
 #: admin/forms.py:262
 msgid "Notify user"
-msgstr "Kullanıcıyı bilgilendir"
+msgstr ""
 
 #: admin/forms.py:263
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr "Kullanıcıya, kullanıcı adı ve parola değişikliği ile ilgili eposta gönder. Kullanıcının epostası olması gerekir."
+msgstr ""
 
 #: admin/forms.py:283
 msgid "New password"
-msgstr "Yeni parola"
+msgstr "Nytt passord"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr "Yeni parola onayı"
+msgstr "Bekreft nytt passord"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr "Eposta bilgilendirmeleri geçerli bir eposta adresi gerektirir."
+msgstr ""
 
 #: admin/forms.py:307
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr "Sayfa ekleme yetkisi, sayfa düzenleme yetkisi de gerektirir!"
+msgstr ""
 
 #: admin/forms.py:309
 msgid "The permission to add new users requires the permission to change users!"
-msgstr "Kullanıcı ekleme yetkisi, kullanıcı düzenleme yetkisi de gerektirir!"
+msgstr ""
 
 #: admin/forms.py:311
-#, fuzzy
 msgid "To add permissions you also need to edit them!"
-msgstr "Yetkileri eklemek için aynı zamanda düzenleyebilmelisiniz de!"
+msgstr ""
 
 #: admin/pageadmin.py:109 admin/pageadmin.py:125
 msgid "Hidden"
-msgstr "Gizli"
+msgstr "Gjemt"
 
 #: admin/pageadmin.py:120
 msgid "Basic Settings"
-msgstr "Temel Ayarlar"
+msgstr ""
 
 #: admin/pageadmin.py:123
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Not: Bu sayfa eğer seçimi değiştirirseniz güncellenir. Önce kaydedin."
+msgstr ""
 
 #: admin/pageadmin.py:129
 msgid "Advanced Settings"
-msgstr "Gelişmiş Ayarlar"
+msgstr "Avanserte instillinger"
 
 #: admin/pageadmin.py:138
 msgid "SEO Settings"
-msgstr "Arama Motoru (SEO) Ayarları"
+msgstr ""
 
 #: admin/pageadmin.py:456
 msgid "higher"
-msgstr "daha yüksek"
+msgstr "høyere"
 
 #: admin/pageadmin.py:604
 msgid "Database error"
-msgstr "Veritabanı hatası"
+msgstr ""
 
 #: admin/pageadmin.py:689 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -211,33 +213,33 @@ msgstr "Veritabanı hatası"
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr "sayfa"
+msgstr "side"
 
 #: admin/pageadmin.py:812
 msgid "Page was successfully approved."
-msgstr "Sayfa başarı ile onaylandı."
+msgstr ""
 
 #: admin/pageadmin.py:866
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(key)r birincil anahtarlı %(name)s nesnesi mevcut değil."
+msgstr ""
 
 #: admin/pageadmin.py:869
 msgid "There only exists one translation for this page"
-msgstr "Bu sayfa için sadece bir çeviri mevcut"
+msgstr ""
 
 #: admin/pageadmin.py:884
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr "%(language)s dilindeki başlık ve eklenti silindi"
+msgstr ""
 
 #: admin/pageadmin.py:906
 msgid "Are you sure?"
-msgstr "Emin misiniz?"
+msgstr "Er du sikker?"
 
 #: admin/pageadmin.py:969
 msgid "You do not have permission to publish this page"
-msgstr "Bu sayfayı yayınlamak için yetkiniz yok"
+msgstr ""
 
 #: admin/pageadmin.py:987
 msgid "You do not have permission to change this page's in_navigation status"
@@ -245,26 +247,25 @@ msgstr ""
 
 #: admin/pageadmin.py:1022 admin/pageadmin.py:1056
 msgid "You do not have permission to change this page"
-msgstr "Bu sayfayı değiştirmek için yetkiniz yok"
+msgstr ""
 
 #: admin/pageadmin.py:1026 admin/pageadmin.py:1058
 msgid "Language must be set to a supported language!"
-msgstr "Dil, desteklenen bir dile ayarlanmalı!"
+msgstr ""
 
 #: admin/pageadmin.py:1038
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr "%(placeholder)s yer tutucusuna %(plugin_name)s eklentisi eklendi"
+msgstr ""
 
 #: admin/pageadmin.py:1060
-#, fuzzy
 msgid "Language must be different then the copied language!"
-msgstr "Dil, desteklenen bir dile ayarlanmalı!"
+msgstr ""
 
 #: admin/pageadmin.py:1106
-#, fuzzy, python-format
+#, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "%(placeholder)s yer tutucusuna %(plugin_name)s eklentisi eklendi"
+msgstr ""
 
 #: admin/pageadmin.py:1179
 #, python-format
@@ -273,7 +274,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1237
 msgid "Plugins where moved"
-msgstr "Eklentiler taşındı"
+msgstr "Plugins ble flyttet"
 
 #: admin/pageadmin.py:1259
 #, python-format
@@ -282,178 +283,178 @@ msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr "Sayfa yetkileri"
+msgstr ""
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr "Kullanıcı & Grup yetkileri"
+msgstr ""
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr "Sayfa yetki yönetimi"
+msgstr ""
 
 #: admin/useradmin.py:21
 msgid "User details"
-msgstr "Kullanıcı detayları"
+msgstr ""
 
 #: admin/useradmin.py:22
 msgid "Groups"
-msgstr "Gruplar"
+msgstr "Grupper"
 
 #: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:853
 msgid "Password"
-msgstr "Parola"
+msgstr ""
 
 #: admin/widgets.py:58
 msgid "Add Another"
-msgstr "Bir tane daha ekle"
+msgstr "Legg til en side til"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr "Kopyalama yetkileri"
+msgstr ""
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr "Kopyalama moderasyonu"
+msgstr ""
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr "En yakın üst sayfanın şablonunu kullan"
+msgstr ""
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr "Genel Bakış"
+msgstr "Oversikt"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr "İndisler ve tablolar"
+msgstr ""
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr "Eksiksiz İçindekiler Sayfası"
+msgstr ""
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr "tüm kısımları ve alt kısımları listele"
+msgstr ""
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr "Sayfa Ara"
+msgstr ""
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr "bu belgeleri ara"
+msgstr ""
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr "Küresel Modül İndeksi"
+msgstr ""
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr "tüm modüllere hızlı erişim"
+msgstr ""
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr "Genel İndeks"
+msgstr ""
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr "tüm fonksiyonlar, sınıflar, terimler"
+msgstr ""
 
 #: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
 #: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
 #: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
-msgstr "İndeks"
+msgstr ""
 
 #: docs/templates/genindex-single.html:44
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr "Bir sayfada tüm indeks"
+msgstr ""
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
-msgstr "Alfabetik olarak indeks sayfaları"
+msgstr ""
 
 #: docs/templates/genindex-split.html:15
 msgid "can be huge"
-msgstr "çok büyük olabilir"
+msgstr ""
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
-msgstr "Navigasyon"
+msgstr "Navigasjon"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
-msgstr "İçindekiler"
+msgstr ""
 
 #: docs/templates/layout.html:48
 msgid "Previous topic"
-msgstr "Önceki konu"
+msgstr ""
 
 #: docs/templates/layout.html:50
 msgid "previous chapter"
-msgstr "önceki bölüm"
+msgstr ""
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr "Sonraki konu"
+msgstr ""
 
 #: docs/templates/layout.html:55
 msgid "next chapter"
-msgstr "sonraki bölüm"
+msgstr ""
 
 #: docs/templates/layout.html:60
 msgid "This Page"
-msgstr "Bu Sayfa"
+msgstr "Denne side"
 
 #: docs/templates/layout.html:63
 msgid "Show Source"
-msgstr "Kaynağı Göster"
+msgstr ""
 
 #: docs/templates/layout.html:73
 msgid "Quick search"
-msgstr "Hızlı Arama"
+msgstr ""
 
 #: docs/templates/layout.html:76
 msgid "Go"
-msgstr "Git"
+msgstr ""
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr "Arama kelimelerini veya bir modül, sınıf veya fonksiyon adını girin."
+msgstr ""
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
-msgstr "Bu belgeler hakkında"
+msgstr ""
 
 #: docs/templates/layout.html:134 docs/templates/search.html:2
 #: docs/templates/search.html.py:5
 msgid "Search"
-msgstr "Ara"
+msgstr ""
 
 #: docs/templates/layout.html:137
 msgid "Copyright"
-msgstr "Telif Hakkı"
+msgstr ""
 
 #: docs/templates/modindex.html:36
 msgid "Deprecated"
-msgstr "Tercih Edilmeyen"
+msgstr ""
 
 #: docs/templates/search.html:21
 msgid "search"
-msgstr "ara"
+msgstr "søk"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
-msgstr "Arama Sonuçları"
+msgstr ""
 
 #: docs/templates/search.html:27
 msgid "Your search did not match any results."
-msgstr "Hiç bir sonuç bulunamadı."
+msgstr ""
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
@@ -462,17 +463,17 @@ msgstr "Hiç bir sonuç bulunamadı."
 #: models/pluginmodel.py:44 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr "dil"
+msgstr "språk"
 
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
 #: migrations/0004_textobjects.py:22 models/pluginmodel.py:42
 msgid "position"
-msgstr "konum"
+msgstr "posisjon"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
 #: models/pluginmodel.py:46 models/titlemodels.py:23
 msgid "creation date"
-msgstr "yaratma tarihi"
+msgstr ""
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
 #: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:43
@@ -481,7 +482,7 @@ msgstr ""
 
 #: migrations/0001_initial.py:18 models/pluginmodel.py:45
 msgid "plugin_name"
-msgstr "eklenti_adı"
+msgstr ""
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
@@ -490,11 +491,11 @@ msgstr "eklenti_adı"
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr "başlık"
+msgstr "tittel"
 
 #: migrations/0001_initial.py:28
 msgid "path"
-msgstr "yol"
+msgstr ""
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
@@ -502,23 +503,23 @@ msgstr ""
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
-msgstr "herkes"
+msgstr "alle"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
-msgstr "düzenleyebilir"
+msgstr ""
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
-msgstr "grup"
+msgstr ""
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
-msgstr "yayınlayabilir"
+msgstr ""
 
 #: migrations/0001_initial.py:42
 msgid "type"
-msgstr "tür"
+msgstr ""
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
@@ -527,32 +528,32 @@ msgstr ""
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr "durum"
+msgstr "status"
 
 #: migrations/0001_initial.py:53 models/pagemodel.py:48
 msgid "navigation extenders"
-msgstr "navigaston genişleticiler"
+msgstr ""
 
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr "url üzerine yazılması var"
+msgstr ""
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
-msgstr "url üzerine yazılması"
+msgstr ""
 
 #: migrations/0001_initial.py:57
 msgid "author"
-msgstr "yazar"
+msgstr ""
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
-msgstr "ters url id'si"
+msgstr ""
 
 #: migrations/0001_initial.py:59 models/pagemodel.py:61
 msgid "login required"
-msgstr "giriş yapılmış olması gerekiyor"
+msgstr ""
 
 #: migrations/0001_initial.py:60 models/pagemodel.py:46
 msgid "soft root"
@@ -560,16 +561,16 @@ msgstr ""
 
 #: migrations/0001_initial.py:63 models/pagemodel.py:44
 msgid "publication end date"
-msgstr "yayınlama bitiş tarihi"
+msgstr ""
 
 #: migrations/0001_initial.py:64 models/pagemodel.py:51
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr "şablon"
+msgstr ""
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:43
 msgid "publication date"
-msgstr "yayınlanma tarihi"
+msgstr ""
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:45
 #: templates/admin/cms/page/change_list_tree.html:9
@@ -579,7 +580,7 @@ msgstr ""
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
 #: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
 msgid "application"
-msgstr "uygulama"
+msgstr ""
 
 #: migrations/0006_apphook.py:65 models/pagemodel.py:47
 msgid "id"
@@ -587,28 +588,28 @@ msgstr ""
 
 #: migrations/0008_redirects.py:11 models/titlemodels.py:18
 msgid "redirect"
-msgstr "yönlendirme"
+msgstr ""
 
 #: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
 msgid "keywords"
-msgstr "anahtar kelimeler"
+msgstr "stikkord"
 
 #: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:15
 msgid "description"
-msgstr "açıklama"
+msgstr "beskrivelse"
 
 #: models/moderatormodels.py:24
 msgid "Current page"
-msgstr "Geçerli sayfa"
+msgstr ""
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
-msgstr "Alt sayfa (hemen)"
+msgstr ""
 
 #: models/moderatormodels.py:26
 msgid "Page and children (immediate)"
-msgstr "Sayfa ve Alt sayfa (hemen)"
+msgstr ""
 
 #: models/moderatormodels.py:27
 msgid "Page descendants"
@@ -620,13 +621,13 @@ msgstr ""
 
 #: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr "Sayfa"
+msgstr "Side"
 
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr "Kullanıcı"
+msgstr ""
 
 #: models/moderatormodels.py:49 templatetags/cms_admin.py:65
 msgid "Moderate page"
@@ -646,11 +647,11 @@ msgstr ""
 
 #: models/moderatormodels.py:97
 msgid "created"
-msgstr "yaratıldı"
+msgstr "opprettet"
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr "değiştirildi"
+msgstr "endret"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
@@ -670,7 +671,7 @@ msgstr ""
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr "onaylanmış"
+msgstr "godkjent"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
@@ -688,7 +689,7 @@ msgstr ""
 #: templates/cms/toolbar/toolbar.html:883
 #: templates/cms/toolbar/toolbar.html:917 utils/moderator.py:91
 msgid "delete"
-msgstr "sil"
+msgstr "slett"
 
 #: models/pagemodel.py:37
 msgid "app. par."
@@ -696,19 +697,19 @@ msgstr ""
 
 #: models/pagemodel.py:39
 msgid "created by"
-msgstr "oluşturan"
+msgstr "opprettet av"
 
 #: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
 msgid "changed by"
-msgstr "değiştiren"
+msgstr "endret av"
 
 #: models/pagemodel.py:43
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr "Sayfa ne zaman yayında olacağı. Sayfanın yayında olması için durumunun \"Yayınlanmış\" olması gerekir."
+msgstr ""
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr "Sayfa ne zaman yayından kaldırılacağı. Hiç bir zaman için boş bırakın."
+msgstr ""
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
@@ -720,15 +721,15 @@ msgstr ""
 
 #: models/pagemodel.py:49
 msgid "is published"
-msgstr "yayınlanmış"
+msgstr "er poblisert"
 
 #: models/pagemodel.py:51
 msgid "The template used to render the content."
-msgstr "İçeriği göstermek için kullanılan şablon"
+msgstr ""
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr "Sayfanın erişilebileceği site."
+msgstr ""
 
 #: models/pagemodel.py:52
 msgid "site"
@@ -748,39 +749,39 @@ msgstr ""
 
 #: models/pagemodel.py:70
 msgid "pages"
-msgstr "sayfalar"
+msgstr ""
 
 #: models/pagemodel.py:176
 msgid "Page was copied."
-msgstr "Sayfa kopyalanmıştı."
+msgstr ""
 
 #: models/pagemodel.py:499
 msgid "default"
-msgstr "öntanımlı"
+msgstr "standard"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr "ekleyebilir"
+msgstr ""
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr "silebilir"
+msgstr ""
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr "gelişmiş seçenekleri değiştirebilir"
+msgstr ""
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr "yetkileri değiştirebilir"
+msgstr ""
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr "sayfa seviyesinde"
+msgstr ""
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr "taşıyabilir"
+msgstr ""
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
@@ -816,167 +817,167 @@ msgstr ""
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
-msgstr "Sayfa yetkileri"
+msgstr ""
 
 #: models/permissionmodels.py:87
 msgid "User (page)"
-msgstr "Kullanıcı (sayfa)"
+msgstr ""
 
 #: models/permissionmodels.py:88
 msgid "Users (page)"
-msgstr "Kullanıcılar (sayfa)"
+msgstr ""
 
 #: models/permissionmodels.py:100
 msgid "User group (page)"
-msgstr "Kullanıcı grubu (sayfa)"
+msgstr ""
 
 #: models/permissionmodels.py:101
 msgid "User groups (page)"
-msgstr "Kullanıcı grupları (sayfa)"
+msgstr ""
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr "menüdeki başlığın üzerine yaz"
+msgstr ""
 
 #: models/titlemodels.py:15
 msgid "Path"
-msgstr "Yol"
+msgstr ""
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
-msgstr "başlık etiketini belirle (html title etiketi)"
+msgstr ""
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
-msgstr "Dosya"
+msgstr "Fil"
 
 #: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
 #: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
-msgstr "dosya"
+msgstr "fil"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
-msgstr ""
+msgstr "Flash"
 
 #: plugins/flash/models.py:9
 msgid "use swf file"
-msgstr "swf dosyası kullan"
+msgstr "bruk swf fil"
 
 #: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
 #: plugins/video/models.py:14
 msgid "width"
-msgstr "genişlik"
+msgstr "bredde"
 
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:15
 msgid "height"
-msgstr "yükseklik"
+msgstr "høyde"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
 msgid "Missing flash plugin."
-msgstr "Flash eklentisi yok."
+msgstr ""
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
-msgstr "Google Haritalar"
+msgstr ""
 
 #: plugins/googlemap/models.py:9
 msgid "map title"
-msgstr "harita başlığı"
+msgstr ""
 
 #: plugins/googlemap/models.py:11
 msgid "address"
-msgstr "adres"
+msgstr ""
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr "posta kodu"
+msgstr ""
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr "şehir"
+msgstr ""
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr "ek içerik"
+msgstr ""
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
-msgstr "yakınlaştırma seviyesi"
+msgstr ""
 
 #: plugins/googlemap/models.py:18
 msgid "latitude"
-msgstr "boylam"
+msgstr ""
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr "Harita konumunu ince ayarlamak için enlem ve boylam kullan."
+msgstr ""
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
-msgstr "boylam"
+msgstr ""
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr "rota planlayıcı başlığı"
+msgstr ""
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr "Buraya en hızlı yolunu hesapla"
+msgstr ""
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
-msgstr "rota planlayıcı"
+msgstr "ruteplanlegger"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
-msgstr "Harita"
+msgstr ""
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:72
 msgid "Your address"
-msgstr "Adresiniz"
+msgstr ""
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:75
 msgid "Calculate route"
-msgstr "Rota hesapla"
+msgstr ""
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr "Eklentileri sayfadan al"
+msgstr ""
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr "Dil veya Sayfa doldurulmalı"
+msgstr ""
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr "Eklentilerini bu yer tutucuda kullanmak için bir sayfa seçin, boş bırakırsanız geçerli sayfa seçilecek."
+msgstr ""
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr "Seçimlik: istediğiniz eklentilerin dili"
+msgstr ""
 
 #: plugins/link/cms_plugins.py:11
 msgid "Link"
-msgstr "Bağlantı"
+msgstr "Link"
 
 #: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
 #: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
-msgstr "isim"
+msgstr "navn"
 
 #: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
 #: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:14
 msgid "link"
-msgstr "bağlantı"
+msgstr "link"
 
 #: plugins/link/models.py:13
 msgid "A link to a page has priority over a text link."
-msgstr "Bir sayfaya bağlantı, bir yazı bağlantısından önceliklidir."
+msgstr ""
 
 #: plugins/link/models.py:14
 msgid "mailto"
@@ -984,48 +985,48 @@ msgstr ""
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
-msgstr "Bir eposta adresi, bir yazı bağlantısından önceliklidir."
+msgstr ""
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
-msgstr "Resim"
+msgstr ""
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr "sol"
+msgstr "venstre"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr "sağ"
+msgstr "høyre"
 
 #: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
 #: plugins/teaser/models.py:12 plugins/video/models.py:12
 msgid "image"
-msgstr "resim"
+msgstr ""
 
 #: plugins/picture/models.py:21 plugins/picture/models.py:22
 msgid "if present image will be clickable"
-msgstr "şu anki resim tıklanabilir olacak mı "
+msgstr ""
 
 #: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
-msgstr "alternatif metin"
+msgstr ""
 
 #: plugins/picture/models.py:23
 msgid "textual description of the image"
-msgstr "Resmin açıklaması"
+msgstr ""
 
 #: plugins/picture/models.py:24
 msgid "long description"
-msgstr "Uzun açıklama"
+msgstr ""
 
 #: plugins/picture/models.py:24
 msgid "additional description of the image"
-msgstr "Resmin ek açıklamaları"
+msgstr ""
 
 #: plugins/picture/models.py:25
 msgid "side"
-msgstr "yan"
+msgstr "side"
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
@@ -1035,15 +1036,15 @@ msgstr ""
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr "%(template)s şablonu mevcut değil."
+msgstr ""
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
-msgstr "HTML"
+msgstr ""
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr "Kullanılacak şablonu (ör. \"snippets/plugin_xy.html\") girin."
+msgstr ""
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1055,69 +1056,69 @@ msgstr ""
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
-msgstr "şu anki resim tıklanabilir olacak mı"
+msgstr ""
 
 #: plugins/teaser/models.py:14
 msgid "If present image will be clickable."
-msgstr "şu anki resim tıklanabilir olacak mı."
+msgstr ""
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
-msgstr "daha fazla"
+msgstr ""
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr "Metin"
+msgstr "Tekst"
 
 #: plugins/text/models.py:15 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr "gövde"
+msgstr "innhold"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
-msgstr "Eklentiler"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr "Lütfen bir eklenti türü seçin."
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
 msgid "Edit selected plugin"
-msgstr "Seçilmiş eklentiyi düzenle"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr "Metin editörü nesnelerin düzenlenmesini desteklemiyor."
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
 msgid "No object selected."
-msgstr "Hiç nesne seçilmedi."
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr "Metin editörü nesne yerleştirmesini desteklemiyor."
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr "Bir eklenti nesnesi değil"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr "Mevcut Eklentiler"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
 msgid "Insert plugin"
-msgstr "Eklenti Ekle"
+msgstr ""
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
@@ -1125,7 +1126,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr "twitter kullanıcısı"
+msgstr ""
 
 #: plugins/twitter/models.py:8
 msgid "count"
@@ -1133,64 +1134,59 @@ msgstr ""
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr "Gösterilecek girdiler"
+msgstr ""
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr "bağlantı ipucu"
+msgstr ""
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr "Eğer verilirse ipucu, Twitter hesabınıza bir bağlantı şeklinde gösterilecek. "
+msgstr ""
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
 msgstr ""
 
 #: plugins/video/cms_plugins.py:38
-#, fuzzy
 msgid "Color Settings"
-msgstr "Ayarlar"
+msgstr ""
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid "movie file"
-msgstr "görüntü"
+msgstr ""
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
 msgstr ""
 
 #: plugins/video/models.py:11
-#, fuzzy
 msgid "movie url"
-msgstr "görüntü"
+msgstr ""
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr ""
 
 #: plugins/video/models.py:12
-#, fuzzy
 msgid "preview image file"
-msgstr "resim dosyası kullan"
+msgstr ""
 
 #: plugins/video/models.py:17
 msgid "auto play"
-msgstr "otomatik oynat"
+msgstr "spill av automatisk"
 
 #: plugins/video/models.py:18
-#, fuzzy
 msgid "auto hide"
-msgstr "otomatik yükle"
+msgstr "gjemm automatisk"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
-msgstr "tam ekran"
+msgstr "fullskjerm"
 
 #: plugins/video/models.py:20
 msgid "loop"
-msgstr "sürekli oynat"
+msgstr ""
 
 #: plugins/video/models.py:23
 msgid "background color"
@@ -1239,25 +1235,25 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:268
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr "Kaydet"
+msgstr "Lagre"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Slatt %(language)s oversettelse"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr "Yeni olarak kaydet"
+msgstr ""
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr "Kaydet ve yeni bir tane ekle"
+msgstr ""
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:269
 msgid "Save and continue editing"
-msgstr "Kaydet ve düzenlemeye devam et"
+msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
@@ -1266,7 +1262,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr "Son değişiklikler"
+msgstr ""
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
@@ -1275,17 +1271,17 @@ msgstr ""
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
-msgstr "Kullanıcı adı:"
+msgstr ""
 
 #: templates/admin/cms/mail/page_user_change.html:11
 msgid "Password:"
-msgstr "Parola:"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr "Bir sayfa düzenle"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:55
 #: templates/admin/cms/page/change_list.html:8
@@ -1293,11 +1289,11 @@ msgstr "Bir sayfa düzenle"
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
-msgstr "Anasayfa"
+msgstr "Hjem"
 
 #: templates/admin/cms/page/change_form.html:64
 msgid "Approve page deletion"
-msgstr "Sayfa silmeyi onayla"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:70
 #, python-format
@@ -1310,54 +1306,55 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Remove delete request"
-msgstr "Silme isteğini iptal et"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Approve delete"
-msgstr "Silmeyi onayla"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Approve"
-msgstr "Onayla"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 #: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr "taslak"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:87
 msgid "Preview"
-msgstr "Önizleme"
+msgstr "Forhåndsvis"
 
 #: templates/admin/cms/page/change_form.html:90
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr "Geçmiş"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "View on site"
-msgstr "Sitede gör"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:121
 #: templates/admin/cms/page/plugin_change_form.html:83
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
+msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:141
 msgid "All permissions"
-msgstr "Tüm yetkiler"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:142
 #: templates/admin/cms/page/change_form.html:154
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr "Yüklüyor..."
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:153
 msgid "Page states"
-msgstr "Sayfa durumu"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:176
 #, python-format
@@ -1366,50 +1363,49 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:178
 msgid "Request approvemet"
-msgstr "Onaylama iste"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
-msgstr "Sayfa listesi"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:55
 msgid "Successfully moved"
-msgstr "Başarıyla taşındı"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:60
 msgid "An error occured. Please reload the page"
-msgstr "Bir hata oluştu. Lütfen sayfayı tekrar yükleyin."
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:80
-#, fuzzy, python-format
+#, python-format
 msgid "Recover deleted %(name)s"
-msgstr "Silinmişleri geri getir: %(name)s"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Add %(name)s"
-msgstr "%(name)s ekle"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:95
-#, fuzzy
 msgid "Pages on:"
-msgstr "Sayfalar:"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "Filter:"
-msgstr "Filtre:"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "on"
-msgstr "açık"
+msgstr "på"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "off"
-msgstr "kapalı"
+msgstr "av"
 
 #: templates/admin/cms/page/change_list.html:114
 msgid "Filter"
-msgstr "Filtre"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
@@ -1421,38 +1417,38 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr "yayınlanmış"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "last changes"
-msgstr "son değişiklikler"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr "bu sayfayı seç"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr "bu sayfayı düzenle"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:889
 #: templates/cms/toolbar/toolbar.html:910
 msgid "edit"
-msgstr "düzenle"
+msgstr "rediger"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr "yukarı ekle"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr "aşağı ekle"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr "içine ekle"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
@@ -1460,117 +1456,114 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "home"
-msgstr "anasayfa"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr "Bu sayfayı %(language)s dilinde düzenle"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
-msgstr "Kes"
+msgstr "Klipp"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "cut"
-msgstr "kes"
+msgstr "klipp"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
-msgstr "Kopyala"
+msgstr "Kopier"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "copy"
-msgstr "kopyala"
+msgstr "kopier"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "Add Child"
-msgstr "Alt Sayfa Ekle"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "add"
-msgstr "ekle"
+msgstr "legg til"
 
 #: templates/admin/cms/page/menu_item.html:65
 #: templates/cms/toolbar/toolbar.html:862
-#, fuzzy
 msgid "Approve directly"
-msgstr "Hemen onayla"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:67
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
 msgid "view"
-msgstr ""
+msgstr "vis"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
-msgstr "Yayından kaldır"
+msgstr "Upubliser"
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
-msgstr "Yayınla"
+msgstr "Publiser"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
-msgstr "Sayfada gör"
+msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
 msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:5
-#, fuzzy
 msgid "Created"
-msgstr "Oluşturma"
+msgstr "Opprettet"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
-msgstr "Mesaj"
+msgstr "Beskjed"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr "Grup"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr "Düzenleyebilir"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr "Ekleyebilir"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr "Silebilir"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr "Yayınlayabilir"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr "Yetkileri değiştirebilir"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr "Taşıyabilir"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
-#, fuzzy
 msgid "(global)"
-msgstr "(genel)"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr "(geçerli)"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr "Hepsi"
+msgstr "Alle"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
@@ -1582,21 +1575,21 @@ msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
-msgstr "Eklenti başarı ile kaydedildi."
+msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:17
-#, fuzzy, python-format
+#, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr "%(verbose_name)s silinmişlerini kurtar"
+msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr "Sayfanın bu sürümünü geri getirmek için aşağıdaki kaydet tuşuna basın."
+msgstr ""
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr "%(verbose_name)s geri al"
+msgstr ""
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
@@ -1604,86 +1597,82 @@ msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr "Kopyalama seçenekleri"
+msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr "Kopyalama seçeneklerin seç"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr "Eklenti Ekle"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
-msgstr "Dil"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
-#, fuzzy
 msgid "Copy Plugins"
-msgstr "Eklentiler"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr "Eklenti eklemek için önce sayfayı kaydetmelisiniz."
+msgstr ""
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr "Hiç eklenti seçilmedi. Sol tarafta bir tane seçildi."
+msgstr ""
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr "Hiç eklenti yok. Yer tutucuya bir eklenti ekle."
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:758
 #, python-format
 msgid "Move to %(name)s"
-msgstr "%(name)s'a taşı"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:804
 msgid "Are you sure you want to delete this plugin?"
-msgstr "Bu eklentiyi silmek istediğinize emin misiniz?"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:833
 msgid "Edit mode"
-msgstr "Düzenleme modu"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:840
 msgid "Status"
-msgstr "Durum"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:851
 msgid "Username"
-msgstr "Kullanıcı adı"
+msgstr "Brukernavn"
 
 #: templates/cms/toolbar/toolbar.html:855
 #: templates/cms/toolbar/toolbar.html:856
 msgid "login"
-msgstr "giriş"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:867
 msgid "Template"
-msgstr "Şablon"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:878
 msgid "move"
-msgstr "taşı"
+msgstr "flytt"
 
 #: templates/cms/toolbar/toolbar.html:878
 msgid "Move/add Pages"
-msgstr "Sayfa Taşı/Ekle"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:880
-#, fuzzy
 msgid "add child"
-msgstr "Alt Sayfa Ekle"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:880
-#, fuzzy
 msgid "Add child page"
-msgstr "Alt Sayfa Ekle"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:881
 msgid "add sibling"
@@ -1695,51 +1684,51 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "Delete Page"
-msgstr "Sayfayı Sil"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:889
 msgid "Site Administration"
-msgstr "Site Yönetimi"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "Page Settings"
-msgstr "Sayfa Ayarları"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "history"
-msgstr "geçmiş"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "View History"
-msgstr "Geçmişi Gör"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:899
 msgid "Lock"
-msgstr "Kilitle"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:899
 msgid "Logout"
-msgstr "Çıkış"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Close"
-msgstr "Kapat"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:912
 msgid "up"
-msgstr "yukarı"
+msgstr "opp"
 
 #: templates/cms/toolbar/toolbar.html:913
 msgid "down"
-msgstr "aşağı"
+msgstr "ned"
 
 #: templates/cms/toolbar/toolbar.html:915
 msgid "Settings"
-msgstr "Ayarlar"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:917
 msgid "Delete Plugin"
-msgstr "Eklentiyi Sil"
+msgstr ""
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
@@ -1804,36 +1793,3 @@ msgstr ""
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
 msgstr ""
-
-#~ msgid "blank"
-#~ msgstr "boşluk"
-
-#~ msgid "window"
-#~ msgstr "pencere"
-
-#~ msgid "opaque"
-#~ msgstr "ışık geçirmez"
-
-#~ msgid "transparent"
-#~ msgstr "saydam"
-
-#~ msgid "controller style"
-#~ msgstr "kontrol tarzı"
-
-#~ msgid "click_url"
-#~ msgstr "tıklama_bağlantısı"
-
-#~ msgid "click target"
-#~ msgstr "tıklama hedefi"
-
-#~ msgid "mute"
-#~ msgstr "sessiz"
-
-#~ msgid "mute only"
-#~ msgstr "sadece sessiz"
-
-#~ msgid "volume"
-#~ msgstr "ses"
-
-#~ msgid "in range <0, 100>"
-#~ msgstr "<0, 100> arasında"
