@@ -133,12 +133,20 @@
         var id = li.attr("id").split("plugin_")[1];
         loadPluginForm(target, id);
     }
-
-    function setiframeheight(height, id){
+	
+	function loadPluginForm(target, id){
+        var object = '<iframe id="iframe_'+id+'" src="edit-plugin/'+id+'/" frameborder="0"></iframe>';
+        target.html(object);
+        $('ul.plugin-list .active').removeClass("active");
+        $('#plugin_'+id).addClass("active");
+    };
+	
+	// global functions
+    setiframeheight = function(height, id){
         $('#iframe_'+id).height(height+"px");
     }
-
-    function hide_iframe(id, type, title, msg){
+	
+    hide_iframe = function (id, type, title, msg){
         html = "<b>"+type+"</b>"
         if( title != "" && title != null){
             html += " [ "+title+ " ]"
@@ -146,11 +154,5 @@
         $('#plugin_'+id+" span.text").html(html);
         $('#iframe_'+id).parent().html("<p>"+msg+"</p>");
     }
-
-    function loadPluginForm(target, id){
-        var object = '<iframe id="iframe_'+id+'" src="edit-plugin/'+id+'/" frameborder="0"></iframe>';
-        target.html(object);
-        $('ul.plugin-list .active').removeClass("active");
-        $('#plugin_'+id).addClass("active");
-    };
+	
 })(jQuery);

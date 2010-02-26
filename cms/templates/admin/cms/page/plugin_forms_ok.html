@@ -3,6 +3,7 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 {{ media }}
 {% endblock %}
 
@@ -10,11 +11,14 @@
 
 {% block content %}
 <script type="text/javascript">
+//<![CDATA[	
+(function($) {
 	if(parent != self){
 		parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
 	}else{
 		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
 	}
-	
+})(jQuery);
+//]]>
 </script>
 {% endblock %}

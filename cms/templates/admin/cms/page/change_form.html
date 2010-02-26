@@ -12,7 +12,9 @@
 <script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
 
 {% if add %}
-	<script type="text/javascript">
+<script type="text/javascript">
+//<![CDATA[	
+(function($) {
 	$(document).ready(function(){
 		$("#id_title").keyup(function() {
 	        var e = $("#id_slug")[0];
@@ -21,7 +23,9 @@
 	        }
 	    });
 	});
-	</script>
+})(jQuery);
+//]]>
+</script>
 {% endif %}
 
 <style type="text/css">
@@ -179,6 +183,8 @@
 		</div>
 
 		<script type="text/javascript">
+		//<![CDATA[	
+		(function($) {
 			$(function(){
 				// override standard uncolapse_all javascript function, we need to call it
 				// only if there is submit, but submit might be cancelled over dialog.
@@ -256,6 +262,8 @@
 					}
 				});
 			});
+		})(jQuery);
+		//]]>
 		</script>
 	{% endif %}
 

@@ -86,19 +86,11 @@
 		    }
 		    return false;	
 	    });	
-	
-	    // load first plugin if there is only one
-	    /*$('ul.plugin-list').each(function(i, a){
-		    var lis = $(this).children("li")
-		    if (lis.length == 1){
-			    load_plugin($($(this).children("li")[0]));
-		    }
-        });*/
 	        
     });
 
-
-    function trigger_lang_button(e, url) {
+	// global functions
+    trigger_lang_button = function(e, url) {
         // also make sure that we will display the confirm dialog
         // in case users switch tabs while editing plugins
         changed = false;
