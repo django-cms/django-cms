@@ -79,10 +79,12 @@ class PageAdmin(model_admin):
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
         list_filter.append('soft_root')
-    if settings.CMS_SHOW_START_DATE:
-        advanced_fields.append('publication_date')
-    if settings.CMS_SHOW_END_DATE:
-        advanced_fields.append( 'publication_end_date')
+    if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
+        general_fields.append(('publication_date', 'publication_end_date'))
+    elif settings.CMS_SHOW_START_DATE:
+        general_fields.append('publication_date')
+    elif settings.CMS_SHOW_END_DATE:
+        general_fields.append( 'publication_end_date')
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
     if settings.CMS_MODERATOR:
