@@ -1054,8 +1054,8 @@ class PageAdmin(model_admin):
             if not language or not language in [ l[0] for l in settings.CMS_LANGUAGES ]:
                 return HttpResponseBadRequest(_("Language must be set to a supported language!"))
             if language == copy_from:
-                return HttpResponseBadRequest(_("Language must be different then the copied language!"))
-            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from).order_by('position', 'tree_id', '-rght'))
+                return HttpResponseBadRequest(_("Language must be different than the copied language!"))
+            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from, placeholder = placeholder).order_by('position', 'tree_id', '-rght'))
             ptree = []
             for p in plugins:
                 try:

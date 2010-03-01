@@ -32,7 +32,9 @@ class PluginEditor(Widget):
             'plugin_list': self.attrs['list'],
             'installed_plugins': self.attrs['installed'],
             'traduction_language': self.attrs['traduction_language'],
-            'language': self.attrs['language']
+            'language': self.attrs['language'],
+            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1 and \
+                not settings.CMS_DBGETTEXT,
         }
         return mark_safe(render_to_string(
             'admin/cms/page/widgets/plugin_editor.html', context))
