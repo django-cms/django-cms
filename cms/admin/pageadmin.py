@@ -506,6 +506,16 @@ class PageAdmin(model_admin):
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
     
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        # add context variables
+        filled_languages = []
+        if obj:
+            filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
+        context.update({
+            'filled_languages': filled_languages,
+        })
+        return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
+    
     def update_language_tab_context(self, request, obj=None, context=None):
         if not context:
             context = {}
