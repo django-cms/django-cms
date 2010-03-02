@@ -48,6 +48,9 @@
     color: white;
 }
 
+.notfilled{
+    color: #808080 !important;
+
 </style>
 
 
@@ -107,7 +110,7 @@
 <div id="page_form_lang_tabs">
     {% for lang_code, lang_name in traduction_language %}
         <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
-            class="language_button {% ifequal lang_code language %}selected{% endifequal %}"
+            class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
             id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
     {% endfor %}
 </div>
