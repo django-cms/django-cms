@@ -17,7 +17,7 @@ msgstr ""
 
 #: plugin_base.py:98
 msgid "Advanced options"
-msgstr "上級設定"
+msgstr "詳細設定"
 
 #: admin/forms.py:25
 msgid "Title"
@@ -186,7 +186,7 @@ msgstr ""
 
 #: admin/pageadmin.py:129
 msgid "Advanced Settings"
-msgstr "上級設定"
+msgstr "詳細設定"
 
 #: admin/pageadmin.py:138
 msgid "SEO Settings"
