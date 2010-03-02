@@ -1,13 +1,10 @@
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 
 def get_default_language(language_code=None):
     """Returns default language depending on settings.LANGUAGE_CODE merged with
     best match from settings.CMS_LANGUAGES
     
     Returns: language_code
-    
-    Raises ImproperlyConfigured if no match found
     """
     
     if not language_code:
@@ -23,7 +20,7 @@ def get_default_language(language_code=None):
     language_code = language_code.split("-")[0]
     
     if not language_code in languages:
-        raise ImproperlyConfigured("No match in CMS_LANGUAGES for LANGUAGE_CODE %s" % settings.LANGUAGE_CODE)
+        return settings.LANGUAGE_CODE
     
     return language_code
 
