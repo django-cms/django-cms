@@ -1567,7 +1567,7 @@ msgstr ""
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "すべて"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
@@ -1610,7 +1610,7 @@ msgstr ""
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "プラグインを追加"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
 msgid "From Language"
@@ -1618,7 +1618,7 @@ msgstr ""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
 msgid "Copy Plugins"
-msgstr ""
+msgstr "プラグインをコピー"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
@@ -1635,7 +1635,7 @@ msgstr ""
 #: templates/cms/toolbar/toolbar.html:758
 #, python-format
 msgid "Move to %(name)s"
-msgstr ""
+msgstr "%(name)s へ移動"
 
 #: templates/cms/toolbar/toolbar.html:804
 msgid "Are you sure you want to delete this plugin?"
@@ -1643,28 +1643,30 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:833
 msgid "Edit mode"
-msgstr ""
+msgstr "編集モード"
 
 #: templates/cms/toolbar/toolbar.html:840
 msgid "Status"
-msgstr ""
+msgstr "状態"
 
 #: templates/cms/toolbar/toolbar.html:851
 msgid "Username"
-msgstr ""
+msgstr "ユーザ名"
 
 #: templates/cms/toolbar/toolbar.html:855
 #: templates/cms/toolbar/toolbar.html:856
+#, fuzzy
 msgid "login"
-msgstr ""
+msgstr "ログイン"
 
 #: templates/cms/toolbar/toolbar.html:867
+#, fuzzy
 msgid "Template"
-msgstr ""
+msgstr "テンプレート"
 
 #: templates/cms/toolbar/toolbar.html:878
 msgid "move"
-msgstr ""
+msgstr "移動"
 
 #: templates/cms/toolbar/toolbar.html:878
 msgid "Move/add Pages"
@@ -1676,7 +1678,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "Add child page"
-msgstr ""
+msgstr "子ページを追加"
 
 #: templates/cms/toolbar/toolbar.html:881
 msgid "add sibling"
@@ -1695,36 +1697,42 @@ msgid "Site Administration"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:891
+#, fuzzy
 msgid "Page Settings"
-msgstr ""
+msgstr "ページ設定"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "history"
-msgstr ""
+msgstr "履歴"
 
 #: templates/cms/toolbar/toolbar.html:893
+#, fuzzy
 msgid "View History"
-msgstr ""
+msgstr "履歴の表示"
 
 #: templates/cms/toolbar/toolbar.html:899
+#, fuzzy
 msgid "Lock"
-msgstr ""
+msgstr "ロック"
 
 #: templates/cms/toolbar/toolbar.html:899
+#, fuzzy
 msgid "Logout"
-msgstr ""
+msgstr "ログアウト"
 
 #: templates/cms/toolbar/toolbar.html:901
+#, fuzzy
 msgid "Close"
-msgstr ""
+msgstr "閉じる"
 
 #: templates/cms/toolbar/toolbar.html:912
+#, fuzzy
 msgid "up"
-msgstr ""
+msgstr "上へ"
 
 #: templates/cms/toolbar/toolbar.html:913
 msgid "down"
-msgstr ""
+msgstr "下へ"
 
 #: templates/cms/toolbar/toolbar.html:915
 msgid "Settings"
