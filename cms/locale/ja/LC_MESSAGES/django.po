@@ -1791,7 +1791,7 @@ msgstr ""
 
 #: utils/moderator.py:91
 msgid "approve"
-msgstr ""
+msgstr "承認"
 
 #: utils/moderator.py:243
 #, python-format
