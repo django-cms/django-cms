@@ -1476,12 +1476,14 @@ msgid "cut"
 msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:34
+#, fuzzy
 msgid "Copy"
-msgstr ""
+msgstr "コピー"
 
 #: templates/admin/cms/page/menu_item.html:34
+#, fuzzy
 msgid "copy"
-msgstr ""
+msgstr "コピー"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
@@ -1490,8 +1492,9 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
+#, fuzzy
 msgid "add"
-msgstr ""
+msgstr "追加する"
 
 #: templates/admin/cms/page/menu_item.html:65
 #: templates/cms/toolbar/toolbar.html:862
@@ -1529,8 +1532,9 @@ msgid "Message"
 msgstr ""
 
 #: templates/admin/cms/page/permissions.html:7
+#, fuzzy
 msgid "Group"
-msgstr ""
+msgstr "グループ"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
