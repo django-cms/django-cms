@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -62,8 +61,7 @@ msgstr "ページタイトル"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
+msgstr "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
 
 #: admin/forms.py:85
 msgid "Application"
@@ -111,18 +109,16 @@ msgid "user"
 msgstr "ユーザ"
 
 #: admin/forms.py:159
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr "ページの権限を設定するには、子ページのアクセス権限も必要です。"
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "ページ追加権限は編集権限も必要です。"
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "ユーザかグループを選択してください。"
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
 #: templates/admin/cms/page/change_form.html:58
@@ -142,19 +138,15 @@ msgstr "変更"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "ページを復元"
 
 #: admin/forms.py:262
 msgid "Notify user"
 msgstr "ユーザに通知"
 
 #: admin/forms.py:263
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-"パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザ"
-"メールが必要です。"
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザメールが必要です。"
 
 #: admin/forms.py:283
 msgid "New password"
@@ -169,13 +161,11 @@ msgid "Email notification requires valid email address."
 msgstr "メール通知はメールアドレスが必要です。"
 
 #: admin/forms.py:307
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "新しいページの権限はページ変更の権限が必要です。"
 
 #: admin/forms.py:309
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr "新しいユーザの権限はページ変更の権限が必要です。"
 
 #: admin/forms.py:311
@@ -223,13 +213,12 @@ msgstr "ページ"
 
 #: admin/pageadmin.py:812
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "ページを承認しました。"
 
 #: admin/pageadmin.py:866
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-"プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
+msgstr "プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
 
 #: admin/pageadmin.py:869
 msgid "There only exists one translation for this page"
@@ -246,15 +235,15 @@ msgstr "続けてもよろしいですか？"
 
 #: admin/pageadmin.py:969
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "このページを発表する権限がありません。"
 
 #: admin/pageadmin.py:987
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "メニューステータスを変更する権限がありません。"
 
 #: admin/pageadmin.py:1022 admin/pageadmin.py:1056
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "このページを変更する権限がありません。"
 
 #: admin/pageadmin.py:1026 admin/pageadmin.py:1058
 msgid "Language must be set to a supported language!"
@@ -276,8 +265,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1179
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1237
@@ -286,9 +274,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1259
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -714,9 +700,7 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:43
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:44
@@ -728,9 +712,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:47
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:49
@@ -965,9 +947,7 @@ msgid "Language or Page must be filled out"
 msgstr "言語かページを入力してください。"
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1059,8 +1039,7 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1182,9 +1161,7 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr ""
 
 #: plugins/video/models.py:12
@@ -1247,9 +1224,7 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1278,8 +1253,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1380,9 +1354,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:176
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:178
@@ -1782,16 +1754,14 @@ msgstr ""
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:656
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
