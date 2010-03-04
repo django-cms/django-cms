@@ -497,7 +497,8 @@ class PageAdmin(model_admin):
                 'moderation_required': moderation_required,
                 'moderator_should_approve': moderator_should_approve(request, obj),
                 'moderation_delete_request': moderation_delete_request,
-                'show_delete_translation': len(obj.get_languages()) > 1 
+                'show_delete_translation': len(obj.get_languages()) > 1,
+                'current_site_id': settings.SITE_ID,
             }
             extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
