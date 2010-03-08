@@ -51,9 +51,10 @@ class CMSPluginBase(admin.ModelAdmin):
     
     form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
-    admin_preview = True #Should the plugin be rendered in the admin?
+    admin_preview = True # Should the plugin be rendered in the admin?
     
     render_template = None
+    render_plugin = True # Should the plugin be rendered at all, or doesn't it have any output?
     model = CMSPlugin
     text_enabled = False
     

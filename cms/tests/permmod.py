@@ -80,7 +80,6 @@ class PermissionModeratorTestCase(CMSTestCase):
             'can_change_pagepermission': can_change_pagepermission, 
             'can_delete_pagepermission': can_delete_pagepermission,            
         }
-        
         response = self.client.post('/admin/cms/pageuser/add/', data)
         self.assertRedirects(response, '/admin/cms/pageuser/')
         
@@ -230,6 +229,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # create basic structure ... 
         
         self.login_user(self.user_super)
+        
         
         home = self.create_page(title="home")
         self.publish_page(home)

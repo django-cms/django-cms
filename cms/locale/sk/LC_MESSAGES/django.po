@@ -1607,14 +1607,12 @@ msgid "Add Plugin"
 msgstr "Pridať zásuvný modul"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
-msgstr "Jazyk"
+msgstr "Z jazyka"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
-#, fuzzy
 msgid "Copy Plugins"
-msgstr "Zásuvné moduly"
+msgstr "Kopírovať zásuvné moduly"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
