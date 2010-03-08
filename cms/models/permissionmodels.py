@@ -38,11 +38,11 @@ class AbstractPagePermission(models.Model):
         targets = filter(lambda item: item, (self.user, self.group,))
         return ", ".join([unicode(t) for t in targets]) or 'No one'
     
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         if not self.user and not self.group:
             # don't allow `empty` objects
             return
-        return super(AbstractPagePermission, self).save(force_insert, force_update)    
+        return super(AbstractPagePermission, self).save(*args, **kwargs)    
 
     
 class GlobalPagePermission(AbstractPagePermission):
