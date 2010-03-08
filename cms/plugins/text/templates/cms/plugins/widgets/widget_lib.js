@@ -46,7 +46,7 @@ function edit_plugin(obj_id) {
 	
 	// Pop up window for editing object.
     window.open("edit-plugin/" + obj_id + "/?_popup=1",
-                "Edit plugin object",
+                "Edit_plugin_object",
                 "menubar=no,titlebar=no,toolbar=no,resizable=yes"
                   + ",width=800,height=300,top=0,left=0,scrollbars=yes"
                   + ",location=no"

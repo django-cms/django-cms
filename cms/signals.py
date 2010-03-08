@@ -1,6 +1,5 @@
 from django.db.models import signals
 from django.conf import settings
-from cms import appresolver
 from cms.models import Page, Title
 from cms.models import CMSPlugin        
 from cms.utils.moderator import page_changed
@@ -104,17 +103,7 @@ def post_save_title(instance, raw, created, **kwargs):
     except AttributeError:
         pass
 
-signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")
-
-
-def clear_appresolver_cache(instance, **kwargs):
-    # reset cached applications - there were a change probably
-    appresolver.dynamic_app_regex_url_resolver.reset_cache()
-
-
-if settings.CMS_APPLICATIONS_URLS:
-    # register this signal only if we have some hookable applications
-    application_post_changed.connect(clear_appresolver_cache, sender=Title, dispatch_uid="cms.title.appchanged")        
+signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")        
 
 
 def post_save_user(instance, raw, created, **kwargs):

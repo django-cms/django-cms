@@ -12,7 +12,9 @@
 <script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
 
 {% if add %}
-	<script type="text/javascript">
+<script type="text/javascript">
+//<![CDATA[	
+(function($) {
 	$(document).ready(function(){
 		$("#id_title").keyup(function() {
 	        var e = $("#id_slug")[0];
@@ -21,7 +23,9 @@
 	        }
 	    });
 	});
-	</script>
+})(jQuery);
+//]]>
+</script>
 {% endif %}
 
 <style type="text/css">
@@ -43,6 +47,9 @@
     background: #7CA0C7 url({{ ADMIN_MEDIA_URL }}img/admin/default-bg.gif) top left repeat-x;
     color: white;
 }
+
+.notfilled{
+    color: #808080 !important;
 
 </style>
 
@@ -84,17 +91,17 @@
 	{% if moderation_delete_request %}<li><a href="remove-delete-state/" class="approvelink">{% trans "Remove delete request" %}</a></li>{% endif %}  	
 	{% if moderator_should_approve %}
 	<li><a href="approve/" class="approvelink">{% if moderation_delete_request %}{% trans "Approve delete" %}{% else %}{% trans "Approve" %} {% trans "draft" %}{% endif %}</a></li>
-	<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview&draft=1" class="previewdraftlink">{% trans "Preview" %} {% trans "draft" %}</a></li>
+	<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview&draft=1" class="previewdraftlink">{% trans "Preview" %} {% trans "draft" %}</a></li>
 	{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{% if cl.current_site %}{% ifnotequal cl.current_site site %}http://{{ cl.current_site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if has_absolute_url %}<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
 
 
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% block form_top %}{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% csrf_token %}{% block form_top %}{% endblock %}
 {{ adminForm.fields.parent }}
 
 <input type="hidden" name="language" value="{{language}}" id="id_language"/>
@@ -103,7 +110,7 @@
 <div id="page_form_lang_tabs">
     {% for lang_code, lang_name in traduction_language %}
         <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
-            class="language_button {% ifequal lang_code language %}selected{% endifequal %}"
+            class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
             id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
     {% endfor %}
 </div>
@@ -179,6 +186,8 @@
 		</div>
 
 		<script type="text/javascript">
+		//<![CDATA[	
+		(function($) {
 			$(function(){
 				// override standard uncolapse_all javascript function, we need to call it
 				// only if there is submit, but submit might be cancelled over dialog.
@@ -256,6 +265,8 @@
 					}
 				});
 			});
+		})(jQuery);
+		//]]>
 		</script>
 	{% endif %}
 

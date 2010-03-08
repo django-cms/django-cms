@@ -99,7 +99,7 @@ Add the following to your ``settings.py`` file::
 
 Now you can link a navigation extender to a page in the 'Advanced' tab of the page settings.
 
-An example of an extender function is in ``utils.py`` in ``myapp`` in the example project included in the source::
+An example of an extender function is in ``menu_extender.py`` in ``sampleapp`` in the example project included in the source::
 
     from categories.models import Category
     

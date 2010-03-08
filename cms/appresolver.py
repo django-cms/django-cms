@@ -1,9 +1,13 @@
 from django.conf import settings 
-from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse
-
-
-from cms.exceptions import NoHomeFound
+from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, RegexURLPattern
+from django.conf.urls.defaults import *
+from django.utils.importlib import import_module
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib.sites.models import Site
+from cms.exceptions import NoHomeFound
+import re
+
+APP_RESOLVERS = []
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application. 
@@ -15,19 +19,21 @@ def applications_page_check(request, current_page=None, path=None):
     if path is None:
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
-    try:
-        page_id = dynamic_app_regex_url_resolver.resolve_page_id(path+"/")
-        # yes, it is application page
-        page = get_page_queryset(request).get(id=page_id)
-        # If current page was matched, then we have some override for content
-        # from cms, but keep current page. Otherwise return page to which was application assigned.
-        return page 
-    except Resolver404:
-        pass
-    return None    
+    for resolver in APP_RESOLVERS:
+        try:
+            page_id = resolver.resolve_page_id(path+"/")
+            # yes, it is application page
+            page = get_page_queryset(request).get(id=page_id)
+            # If current page was matched, then we have some override for content
+            # from cms, but keep current page. Otherwise return page to which was application assigned.
+            return page
+        except Resolver404:
+            pass
+    return None
 
-class PageRegexURLResolver(RegexURLResolver):
+class AppRegexURLResolver(RegexURLResolver):
     page_id = None
+    url_patterns = None
     
     def resolve_page_id(self, path):
         """Resolves requested path similar way how resolve does, but instead
@@ -38,7 +44,7 @@ class PageRegexURLResolver(RegexURLResolver):
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
-            for pattern in self.urlconf_module.urlpatterns:
+            for pattern in self.url_patterns:
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404, e:
@@ -48,143 +54,141 @@ class PageRegexURLResolver(RegexURLResolver):
                         tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['path']])
                 else:
                     if sub_match:
-                        if isinstance(pattern, RegexURLResolver):
-                            return pattern.page_id
-                        else:
-                            return self.page_id
+                        return pattern.page_id
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
-
-class DynamicAppRegexURLResolver(PageRegexURLResolver):
-    """Dynamic application url resolver.
-    
-    Used for adding support to standard reverse function used by standard 
-    applications, so the hookable applications can use it also
-    
-    Paths in hookable applications are dynamic, so some db lookup is required 
-    here.
+def recurse_patterns(path, pattern_list, page_id):
     """
-    
-    def __init__(self):
-        super(DynamicAppRegexURLResolver, self).__init__(r'^', "DynamicAppResolver", {})
-        self._dynamic_url_conf_module = DynamicURLConfModule()
-        
-    # fake this and provide dynamic instance instead of module
-    @property
-    def urlconf_module(self): 
-        return self._dynamic_url_conf_module
-    
-    def reset_cache(self):
-        self._dynamic_url_conf_module.reset_cache()
-        from django.core import urlresolvers
-        urlresolvers._resolver_cache = {}
-            
-    
-
-class ApplicationRegexUrlResolver(PageRegexURLResolver):
-    def __init__(self, path, title, default_kwargs={}, app_name=None, namespace=None):
-        """Creates standard variant of RegexUrlResolver, but adds some usefull
-        functionality to it.
-        
-        Args:
-            title: Title instance
-            default_kwargs
-        """
-        
-        # NOTE: can we use default_kwargs here to pass some aditional data
-        # to application? - can we deefine some data in admin and pass them here
-        # will they be be than passed to pattern, and from pattern to view? 
-        # If it will work, will be give us possibility to configure one
-        # application for multiple hooks. 
-        regex = r'^%s' % path    
-        if settings.APPEND_SLASH:
-            regex += r'/'  
-        urlconf_name = title.application_urls
-        # assign page_id to resolver, so he knows on which page he was assigned
-        self.page_id = title.page_id
-        
-        if not namespace and 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
-            language = title.language
-            namespace = language
-        super(ApplicationRegexUrlResolver, self).__init__(regex, urlconf_name, default_kwargs, app_name, namespace)
-    
-                
-class DynamicURLConfModule(object):
-    """Fake urls module class. Creates resolvers for hookable applications on
-    the fly from db. 
-    
-    Currently only urlpatterns are accessed from url_conf module, so this 
-    provides urlpatterns property.
-    
-    IMPORTANT!: If will be RegexURLResolver changed from django team, this may 
-    lead to problems and have to be fixed.
+    Recurse over a list of to-be-hooked patterns for a given path prefix
     """
-    def __init__(self):
-        self._urlpatterns = None
+    newpatterns = []
+    for pattern in pattern_list:
+        app_pat = pattern.regex.pattern
+        if app_pat.startswith('^'):
+            app_pat = app_pat[1:]
+        regex = r'^%s%s' % (path, app_pat)
+        if isinstance(pattern, RegexURLResolver):
+            # this is an 'include', recurse!
+            resolver = RegexURLResolver(regex, 'cms_appresolver',
+                pattern.default_kwargs, pattern.app_name, pattern.namespace)
+            # This is a bit hacky, usually a RegexURLResolver uses the urlconf_name
+            # to resolve URLs, but we just override the url_patterns...
+            resolver.page_id = page_id
+            resolver.url_patterns = recurse_patterns(regex, pattern.url_patterns, page_id)
+        else:
+            # Re-do the RegexURLPattern with the new regular expression
+            resolver = RegexURLPattern(regex, pattern.callback,
+                pattern.default_args, pattern.name)
+            resolver.page_id = page_id
+        newpatterns.append(resolver)
+    return newpatterns
+
+
+def get_patterns_for_title(path, title):
+    """
+    Resolve the urlconf module for a path+title combination
+    Returns a list of url objects.
+    """
+    urlconf_name = title.application_urls
+    mod = import_module(urlconf_name)
+    if not hasattr(mod, 'urlpatterns'):
+        raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
+            % urlconf_name)
+    pattern_list = getattr(mod, 'urlpatterns')
+    if not path.endswith('/'):
+        path += '/'
+    page_id = title.page.id
+    return recurse_patterns(path, pattern_list, page_id)
+
+
+def get_app_patterns():
+    """
+    Get a list of patterns for all hooked apps.
     
-    @property
-    def urlpatterns(self):
-        """Create urlresolvers for hookable applications on the fly.
-        
-        Caches result, so db lookup is required only once, or when the cache
-        is reseted.
-        """
-        from cms.models import Title
-        from cms.models.pagemodel import Page
-        if not self._urlpatterns:
-            # TODO: will this work with multiple sites? how are they exactly
-            # implemented ?
-            # probably will be better to make caching per site
-            
-            self._urlpatterns, included = [], []
-            # we don't have a request here so get_page_queryset() can't be used,
-            # so, if CMS_MODERATOR, use, public() queryset, otherwise 
-            # use draft(). This can be done, because url patterns are used just 
-            # in frontend
-            
-            is_draft = not settings.CMS_MODERATOR
-            try:
-                home = Page.objects.get_home()
-                home_titles = home.title_set.all()
-            except NoHomeFound:
-                home_titles = []
-            home_slugs = {}
-            for title in home_titles:
-                home_slugs[title.language] = title.slug
-            current_site = Site.objects.get_current()
-            title_qs = Title.objects.filter(page__publisher_is_draft=is_draft, page__site=current_site)
-            
-            urls = []
-            for title in title_qs.filter(application_urls__gt="").select_related():
-                if settings.CMS_FLAT_URLS:
-                    if title.language in home_slugs:
-                        path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
-                    else:
-                        path = title.slug
-                    mixid = "%s:%s" % (path + "/", title.application_urls)
-                else:
-                    if title.language in home_slugs:
-                        path = title.path.split(home_slugs[title.language] + "/", 1)[-1]
-                    else:
-                        path = title.path
-                    mixid = "%s:%s" % (path + "/", title.application_urls)
-                if mixid in included:
-                    # don't add the same thing twice
-                    continue  
-                if not settings.APPEND_SLASH:
-                    path += '/'  
-                urls.append(ApplicationRegexUrlResolver(path, title))
-                included.append(mixid)
-            self._urlpatterns = urls
-        return self._urlpatterns
-        
-    def reset_cache(self):
-        """Reset urlpatterns cache. Should be called always when there is some
-        application change on any page
-        """
-        self._urlpatterns = None
-        # recache patterns with new state
-        #fake = self.urlpatterns        
+    How this works:
     
-dynamic_app_regex_url_resolver = DynamicAppRegexURLResolver()
+    By looking through all titles with an app hook (application_urls) we find all
+    urlconf modules we have to hook into titles.
+    
+    If we use the ML URL Middleware, we namespace those patterns with the title
+    language.
+
+    All 'normal' patterns from the urlconf get re-written by prefixing them with
+    the title path and then included into the cms url patterns.
+    """
+    from cms.models import Title
+    from cms.models.pagemodel import Page
+    current_site = Site.objects.get_current()
+    included = []
+    
+    # we don't have a request here so get_page_queryset() can't be used,
+    # so, if CMS_MODERATOR, use, public() queryset, otherwise 
+    # use draft(). This can be done, because url patterns are used just 
+    # in frontend
+    is_draft = not settings.CMS_MODERATOR
+    try:
+        home = Page.objects.get_home()
+        home_titles = home.title_set.all()
+    except NoHomeFound:
+        home_titles = []
+    home_slugs = {}
+    for title in home_titles:
+        home_slugs[title.language] = title.slug
+    title_qs = Title.objects.filter(page__publisher_is_draft=is_draft, page__site=current_site)
+    
+    if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
+        use_namespaces = True
+        hooked_applications = {}
+    else:
+        use_namespaces = False
+        hooked_applications = []
+    
+    # Loop over all titles with an application hooked to them
+    for title in title_qs.filter(application_urls__gt="").select_related():
+        if settings.CMS_FLAT_URLS:
+            if title.language in home_slugs:
+                path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
+            else:
+                path = title.slug
+            if use_namespaces:
+                mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
+            else:
+                mixid = "%s:%s" % (path + "/", title.application_urls)
+        else:
+            if title.language in home_slugs:
+                path = title.path.split(home_slugs[title.language] + "/", 1)[-1]
+            else:
+                path = title.path
+            if use_namespaces:
+                mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
+            else:
+                mixid = "%s:%s" % (path + "/", title.application_urls)
+        if mixid in included:
+            # don't add the same thing twice
+            continue  
+        if not settings.APPEND_SLASH:
+            path += '/'
+        if use_namespaces:
+            if title.language not in hooked_applications:
+                hooked_applications[title.language] = []
+            hooked_applications[title.language] += get_patterns_for_title(path, title)
+        else:
+            hooked_applications += get_patterns_for_title(path, title)
+        included.append(mixid)
+    # Build the app patterns to be included in the cms urlconfs
+    app_patterns = []
+    if use_namespaces:
+        for ns, currentpatterns in hooked_applications.items():
+            extra_patterns = patterns('', *currentpatterns)
+            resolver = AppRegexURLResolver(r'', 'app_resolver', namespace=ns)
+            resolver.url_patterns = extra_patterns
+            app_patterns.append(resolver)
+            APP_RESOLVERS.append(resolver)
+    else:
+        extra_patterns = patterns('', *hooked_applications)
+        resolver = AppRegexURLResolver(r'', 'app_resolver')
+        resolver.url_patterns = extra_patterns
+        app_patterns.append(resolver)
+        APP_RESOLVERS.append(resolver)
+    return app_patterns

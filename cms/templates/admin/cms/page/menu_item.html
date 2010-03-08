@@ -82,6 +82,9 @@
 			{% endif %}
 		</div>
 		
+		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
+		<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>
+		
 		
 		{% if CMS_MODERATOR %}<div class="col-lastchange">
 			{% for state in page.last_page_states %}<span class="icon state-icon {{ state.css_class }}" title="{{ state.get_action_display }}"></span>
