@@ -99,13 +99,15 @@ class CMSPlugin(MpttPublisher):
         if instance and not (admin and not plugin.admin_preview):
             context = PluginContext(context, instance, placeholder)
             context = plugin.render(context, instance, placeholder)
-            template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
-            if not template:
-                raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
+            if plugin.render_plugin:
+                template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
+                if not template:
+                    raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
+            else:
+                template = None
             renderer = PluginRenderer(context, instance, placeholder, template, processors)
             return renderer.content
-        else:
-            return ""
+        return ""
             
     def get_media_path(self, filename):
         if self.page_id:

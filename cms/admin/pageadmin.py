@@ -79,10 +79,12 @@ class PageAdmin(model_admin):
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
         list_filter.append('soft_root')
-    if settings.CMS_SHOW_START_DATE:
-        advanced_fields.append('publication_date')
-    if settings.CMS_SHOW_END_DATE:
-        advanced_fields.append( 'publication_end_date')
+    if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
+        general_fields.append(('publication_date', 'publication_end_date'))
+    elif settings.CMS_SHOW_START_DATE:
+        general_fields.append('publication_date')
+    elif settings.CMS_SHOW_END_DATE:
+        general_fields.append( 'publication_end_date')
     if settings.CMS_NAVIGATION_EXTENDERS:
         advanced_fields.append('navigation_extenders')
     if settings.CMS_MODERATOR:
@@ -152,7 +154,6 @@ class PageAdmin(model_admin):
             )]
         }
         js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/jquery.js',
             'js/lib/jquery.query.js',
             'js/lib/ui.core.js',
             'js/lib/ui.dialog.js',
@@ -496,7 +497,8 @@ class PageAdmin(model_admin):
                 'moderation_required': moderation_required,
                 'moderator_should_approve': moderator_should_approve(request, obj),
                 'moderation_delete_request': moderation_delete_request,
-                'show_delete_translation': len(obj.get_languages()) > 1 
+                'show_delete_translation': len(obj.get_languages()) > 1,
+                'current_site_id': settings.SITE_ID,
             }
             extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
@@ -506,6 +508,16 @@ class PageAdmin(model_admin):
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
+    
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        # add context variables
+        filled_languages = []
+        if obj:
+            filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
+        context.update({
+            'filled_languages': filled_languages,
+        })
+        return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
     
     def update_language_tab_context(self, request, obj=None, context=None):
         if not context:
@@ -1055,8 +1067,8 @@ class PageAdmin(model_admin):
             if not language or not language in [ l[0] for l in settings.CMS_LANGUAGES ]:
                 return HttpResponseBadRequest(_("Language must be set to a supported language!"))
             if language == copy_from:
-                return HttpResponseBadRequest(_("Language must be different then the copied language!"))
-            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from).order_by('position', 'tree_id', '-rght'))
+                return HttpResponseBadRequest(_("Language must be different than the copied language!"))
+            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from, placeholder = placeholder).order_by('position', 'tree_id', '-rght'))
             ptree = []
             for p in plugins:
                 try:

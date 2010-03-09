@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 import copy
 
-def default_plugin_context_processor(instance, placeholder):
+def plugin_meta_context_processor(instance, placeholder):
     return {
         'plugin_index': instance._render_meta.index, # deprecated template variable
         'plugin': {
@@ -25,10 +25,12 @@ def default_plugin_context_processor(instance, placeholder):
 def mark_safe_plugin_processor(instance, placeholder, rendered_content, original_context):
     return mark_safe(rendered_content)
 
+# these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
-    default_plugin_context_processor,
+    plugin_meta_context_processor,
 )
 
+# these are always called after all other plugin processors
 DEFAULT_PLUGIN_PROCESSORS = (
     mark_safe_plugin_processor,
 )
@@ -80,7 +82,10 @@ class PluginRenderer(object):
     of callables using the "processors" keyword argument.
     """
     def __init__(self, context, instance, placeholder, template, processors=None, current_app=None):
-        self.content = render_to_string(template, context)
+        if template:
+            self.content = render_to_string(template, context)
+        else:
+            self.content = ''
         if processors is None:
             processors = ()
         else:

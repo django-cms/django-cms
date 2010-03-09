@@ -3,15 +3,19 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 {% endblock %}
 
 {% block content_title %}{% trans "An old revision of a plugin can not be saved!" %}{% endblock %}
 
 {% block content %}
 <script type="text/javascript">
+//<![CDATA[	
+(function($) {
 	$(document).ready(function() {
 	   parent.setiframeheight($('body').height(), {{plugin.pk}});
 	});	
+})(jQuery);
+//]]>
 </script>
 {% endblock %}

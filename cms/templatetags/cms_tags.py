@@ -441,6 +441,21 @@ def page_language_url(context, lang):
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
     This is needed if you have slugs in more than one language.
     """
+    # Maybe this fuction should be a filter (e.g. like preview_link
+    # filter for admin) instead of a template tag. As a template tag,
+    # you cannot have conditions on the value it returns to template.
+    # So, if there is no translation of the page for a lang you cannot
+    # use an "if" condition to avoid displaying that lang in the
+    # language chooser.
+    #
+    # If this was a filter, this is how it could be used in the
+    # language chooser: 
+    # {% for language in languages %}
+    #   {% with page|page_language_url:language.0|default:"" as link %}
+    #   {% if link %}<a href="{{ link }}"{% ifequal lang language.0 %} class="current"{% endifequal %}>{{ language.0 }}</a>{% endif %}
+    #   {% endwith %}
+    # {% endfor %} 
+    #
     if not 'request' in context:
         return ''
     
@@ -451,13 +466,17 @@ def page_language_url(context, lang):
     if hasattr(request, "_language_changer"):
         url = "/%s" % lang + request._language_changer(lang)
     else:
+        # Which one of page.get_slug() and page.get_path() is the right
+        # one to use in this block? They both seem to return the same thing.
         try:
-            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=False)
+            from django.core.urlresolvers import reverse
+            root = reverse('pages-root')
+            url = page.get_absolute_url(language=lang, fallback=False)
+            url = root + lang + "/" + url[len(root):] 
         except:
-            url = "/%s/" % lang 
-    if url:
-        return {'content':url}
-    return {'content':''}
+            # no localized path/slug. 
+            url = ''
+    return {'content':url}
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
 
 
