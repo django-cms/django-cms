@@ -892,13 +892,13 @@
 				{% if auth %}
 				{% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
 				<!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
-				<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
+				<li><a href="{% url pages-root %}{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
 				{% endif %}
 				{% endif %}			
 			</ul>
 		</div>
 		{% if auth %}
-		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
+		<a href="{% url pages-root %}{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
 		{% endif %}
 		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
 	</div>
