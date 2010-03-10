@@ -898,7 +898,7 @@
 			</ul>
 		</div>
 		{% if auth %}
-		<a href="{% url pages-root %}{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
+		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
 		{% endif %}
 		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
 	</div>
