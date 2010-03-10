@@ -470,14 +470,13 @@ def page_language_url(context, lang):
         # one to use in this block? They both seem to return the same thing.
         try:
             from django.core.urlresolvers import reverse
-            # attempt to retrieve the localized path/slug and return
-            url = reverse('pages-root')+lang+"/"+page.get_slug(lang, fallback=False)
+            root = reverse('pages-root')
+            url = page.get_absolute_url(language=lang, fallback=False)
+            url = root + lang + "/" + url[len(root):] 
         except:
             # no localized path/slug. 
-            url = None
-    if url:
-        return {'content':url}
-    return {'content':''}
+            url = ''
+    return {'content':url}
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
 
 
