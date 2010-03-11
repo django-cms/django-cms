@@ -120,7 +120,7 @@ INSTALLED_APPS = (
     'cms.plugins.twitter',
     'cms.plugins.inherit',
     'mptt',
-    'reversion',
+    #'reversion',
     'example.categories',
     #'debug_toolbar',
     'south',

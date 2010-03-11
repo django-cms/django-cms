@@ -245,7 +245,9 @@ class Publisher(models.Model):
             return
 
         pk_val = self._get_pk_val()
+        print "adding:", self.__class__, pk_val
         if seen_objs.add(self.__class__, pk_val, self, parent, nullable):
+            print "already added"
             return
 
         for related in self._meta.get_all_related_objects():
@@ -260,6 +262,9 @@ class Publisher(models.Model):
                 except ObjectDoesNotExist:
                     pass
                 else:
+                    print "o2o sub obj collect"
+                    if sub_obj.publisher_is_draft:
+                        continue
                     sub_obj._collect_delete_marked_sub_objects(seen_objs, self.__class__, related.field.null, excluded_models=excluded_models)
             else:
                 # To make sure we can access all elements, we can't use the
@@ -276,6 +281,9 @@ class Publisher(models.Model):
                 for sub_obj in delete_qs:
                     if not isinstance(sub_obj, Publisher) or sub_obj.__class__ in excluded_models:
                         continue
+                    print "m2m or rev sub obj collect"
+                    if sub_obj.publisher_is_draft:
+                        continue
                     sub_obj._collect_delete_marked_sub_objects(seen_objs, self.__class__, related.field.null, excluded_models=excluded_models)
 
         # Handle any ancestors (for the model-inheritance case). We do this by
@@ -291,7 +299,9 @@ class Publisher(models.Model):
                 continue
             # At this point, parent_obj is base class (no ancestor models). So
             # delete it and all its descendents.
-
+            print "parent obj collect"
+            if parent_obj.publisher_is_draft:
+                continue
             parent_obj._collect_delete_marked_sub_objects(seen_objs, excluded_models=excluded_models)
 
 
@@ -307,6 +317,7 @@ class Publisher(models.Model):
             from django.db.models.query import CollectedObjects
             seen = CollectedObjects()
             self._collect_delete_marked_sub_objects(seen)
+            print seen
             for cls, items in seen.items():
                 if issubclass(cls, Publisher):
                     for item in items.values():
