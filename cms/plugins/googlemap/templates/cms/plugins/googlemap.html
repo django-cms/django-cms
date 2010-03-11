@@ -2,7 +2,15 @@
 <div class="plugin_googlemap">
 	<div id="google-map-{{ object.id }}" class="googlemap-map" style="height:385px; width:auto; display: block;"></div>
 
-	<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ request.LANGUAGE_CODE }}"></script>
+	<script type="text/javascript">
+		//<![CDATA[
+			if (typeof googlemapapijs == 'undefined') {				
+				googlemapapijs = "http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_MAPS_API_KEY }}&amp;hl={{ request.LANGUAGE_CODE }}"			
+				document.write("<script language='javascript' type='text/javascript' src='"+googlemapapijs+"'><\/sc" + "ript>");				
+			}
+		//]]>
+	</script>
+	
 	<script type="text/javascript">
 		//<![CDATA[
 		(function(){
