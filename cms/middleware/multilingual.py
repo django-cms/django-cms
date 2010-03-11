@@ -54,7 +54,7 @@ class MultilingualURLMiddleware:
     def process_request(self, request):
         language = self.get_language_from_request(request)
         translation.activate(language)
-        request.LANGUAGE_CODE = translation.get_language()
+        request.LANGUAGE_CODE = language
        
     def process_response(self, request, response):
         patch_vary_headers(response, ("Accept-Language",))
