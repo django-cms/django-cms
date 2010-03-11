@@ -1,440 +1,460 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Beshr Kayali <beshrkayali@gmail.com>, 2010.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-26 14:29+0100\n"
+"POT-Creation-Date: 2010-02-10 09:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Beshr Kayali <beshrkayali@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin_base.py:88
+#: plugin_base.py:98
 msgid "Advanced options"
-msgstr ""
+msgstr "خيارات متقدمة"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "العنوان"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "العنوان الإفتراضي"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "العنوان الذي سيستخدم في الرابط"
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "اللغة"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "اللغة الحالية لحقول المحتوى."
 
 #: admin/forms.py:61
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "توجد صفحة سابقة بنفس الـ Slug"
 
 #: admin/forms.py:81
 msgid "Menu Title"
-msgstr ""
+msgstr "عنوان القائمة"
 
 #: admin/forms.py:82
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "حرر المعروض في القائمة"
 
 #: admin/forms.py:83
 msgid "Page Title"
-msgstr ""
+msgstr "عنوان الصفحة"
 
 #: admin/forms.py:84
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "حرر المعروض في أعلى متصفحك أو في الـ bookmarks."
 
 #: admin/forms.py:85
 msgid "Application"
-msgstr ""
+msgstr "التطبيقات"
 
 #: admin/forms.py:87
 msgid "Hook application to this page."
-msgstr ""
+msgstr "اربط تطبيق بهذه الصفحة"
 
 #: admin/forms.py:88
 msgid "Overwrite URL"
-msgstr ""
+msgstr "حرر عنوان الـ URL"
 
 #: admin/forms.py:89
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "اترك هذا الحقل فارغ اذا أردت استخدام العنوان الإفتراضي"
 
 #: admin/forms.py:95
 msgid "Redirect"
-msgstr ""
+msgstr "إعادة توجيه"
 
 #: admin/forms.py:96
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "أعد التوجيه الى عنوان الـ URL هذا"
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "معلومات عن هذه الصفحة، تستخدم من قبل محركات البحث"
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
+msgstr "قائمة بكلمات مفتاحية مفصولة بفاصلة، تستعمل من قبل محركات البحث"
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "توجد صفحة سابقة بعنوان الـ URL هذا"
 
 #: admin/forms.py:115
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "عنوان الـ URL غير صحيح. مثال: /my/url "
 
 #: admin/forms.py:126 admin/forms.py:127 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "مستخدم"
 
 #: admin/forms.py:159
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr  ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
 
 #: admin/forms.py:162
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "حقوق إضافة الصفحةات تتطلب إضافة حقوق تعديل الصفحات أيضاً."
 
 #: admin/forms.py:189
 msgid "Please select user or group first."
-msgstr ""
+msgstr "الرجاء تحديد مستخدم أو مجموعة أولاً"
 
 #: admin/forms.py:196 admin/forms.py:203 admin/forms.py:207
+#: templates/admin/cms/page/change_form.html:58
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "أضف"
 
 #: admin/forms.py:197 admin/forms.py:204 admin/forms.py:208
 msgid "Change"
-msgstr ""
+msgstr "تغيير"
 
 #: admin/forms.py:198 admin/forms.py:205 admin/forms.py:209
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: admin/forms.py:199
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "إسترجع (أي) صفحة"
 
 #: admin/forms.py:262
 msgid "Notify user"
-msgstr ""
+msgstr "أعلم المستخدم"
 
 #: admin/forms.py:263
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr ""
+"بعث رسالة تنبيهية للمسخدم حول تغيير اسم المستخدم أو كلمة المرور. يتطب "
+"عنوان البريد الإلكتروني للمستخدم."
 
 #: admin/forms.py:283
 msgid "New password"
-msgstr ""
+msgstr "كلمة مرور الجديد"
 
 #: admin/forms.py:285
 msgid "New password confirmation"
-msgstr ""
+msgstr "تأكيد كلمة المرور"
 
 #: admin/forms.py:304
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "التنبيه بالبريد الإلكتروني يتطلب بريد إلكتروني صحيح"
 
 #: admin/forms.py:307
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr ""
+"حقوق إضافة صفحات  يتطلب حقوق تغيير الصفحات أولاً!"
 
 #: admin/forms.py:309
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
-
+"حقوق إضافة مستخدمين جدد يتطلب حقوق تغيير مستخدمين أولاً!"
 #: admin/forms.py:311
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "لكي تضيف الحقوق، عليك تعديلها أيضاً."
 
-#: admin/pageadmin.py:102 admin/pageadmin.py:118
+#: admin/pageadmin.py:109 admin/pageadmin.py:125
 msgid "Hidden"
-msgstr ""
+msgstr "مخفي"
 
-#: admin/pageadmin.py:113
+#: admin/pageadmin.py:120
 msgid "Basic Settings"
-msgstr ""
+msgstr "إعدادات إفتراضية"
 
-#: admin/pageadmin.py:116
+#: admin/pageadmin.py:123
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "ملاحظة: هذه الصفحة ستقوم بإعادة التحميل عند تغيير المحدد. قم بالحفظ أولاً."
 
-#: admin/pageadmin.py:122
+#: admin/pageadmin.py:129
 msgid "Advanced Settings"
-msgstr ""
+msgstr "خيارات متقدمة"
 
-#: admin/pageadmin.py:131
+#: admin/pageadmin.py:138
 msgid "SEO Settings"
-msgstr ""
+msgstr "خيارات الإستمثال لمحركات البحث" 
+# الترجمة العربية هذه مأخوذة من مقال ويكيبيديا العربية 
+# http://ar.wikipedia.org/wiki/استمثال_محركات_البحث
 
-#: admin/pageadmin.py:494
+#: admin/pageadmin.py:456
 msgid "higher"
-msgstr ""
+msgstr "أعلى"
 
-#: admin/pageadmin.py:637
+#: admin/pageadmin.py:604
 msgid "Database error"
-msgstr ""
+msgstr "خطأ في قاعدة البيانات"
 
-#: admin/pageadmin.py:723 migrations/0001_initial.py:13
+#: admin/pageadmin.py:689 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
 #: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
 #: models/pagemodel.py:69 models/permissionmodels.py:68
-#: models/pluginmodel.py:35 models/titlemodels.py:22
+#: models/pluginmodel.py:40 models/titlemodels.py:22
 #: plugins/inherit/forms.py:9 plugins/link/forms.py:9
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
-msgstr ""
+msgstr "صفحة"
 
-#: admin/pageadmin.py:843
+#: admin/pageadmin.py:812
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "تم قبول الصفحة بنجاح!"
 
-#: admin/pageadmin.py:897
+#: admin/pageadmin.py:866
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "الـ Object %(name)s بالعنوان المفتاحي %(key)r غير موجود."
 
-#: admin/pageadmin.py:900
+#: admin/pageadmin.py:869
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "يوجد ترجمة واحدة متوفرة لهذه الصفحة"
 
-#: admin/pageadmin.py:915
+#: admin/pageadmin.py:884
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "تم حذف العنوان والإضافات للغة %(language)s."
 
-#: admin/pageadmin.py:937
+#: admin/pageadmin.py:906
 msgid "Are you sure?"
-msgstr ""
+msgstr "هل أنت متأكد؟"
 
-#: admin/pageadmin.py:1000
+#: admin/pageadmin.py:969
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "ليس لديك الحقوق لنشر هذه الصفحة"
 
-#: admin/pageadmin.py:1018
+#: admin/pageadmin.py:987
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "لا تملك الحقوق لتغيير حالة تصفح هذه الصفحة"
 
-#: admin/pageadmin.py:1053
+#: admin/pageadmin.py:1022 admin/pageadmin.py:1056
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
 
-#: admin/pageadmin.py:1057
+#: admin/pageadmin.py:1026 admin/pageadmin.py:1058
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "يجب تحديد لغة مدعومة!"
 
-#: admin/pageadmin.py:1069
+#: admin/pageadmin.py:1038
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "تمت إضافة الإضافة %(plugin_name)s الى %(placeholder)s"
 
-#: admin/pageadmin.py:1142
+#: admin/pageadmin.py:1060
+msgid "Language must be different then the copied language!"
+msgstr "اللغة يجب أن تكون مختلفة عن لغة النسخة الأصلية"
+
+#: admin/pageadmin.py:1106
+#, python-format
+msgid "Copied %(language)s plugins to %(placeholder)s"
+msgstr "تم نسخ إضافات اللغة %(language)s الى %(placeholder)s"
+
+#: admin/pageadmin.py:1179
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
+"تم تعديل الإضافة %(plugin_name)s في %(position)s الموجودة في %(placeholder)s"
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1237
 msgid "Plugins where moved"
-msgstr ""
+msgstr "تم نقل الإضافات"
 
-#: admin/pageadmin.py:1222
+#: admin/pageadmin.py:1259
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
+"تم حذف الإضافة %(plugin_name)s الموجودة في %(placeholder)s في المكان "
+"%(position)s."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "حقوق الصفخة"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "حقوق المستخدمين والمجموعات"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "إدارة حقوق الصفحة"
 
 #: admin/useradmin.py:21
 msgid "User details"
-msgstr ""
+msgstr "معلومات المستخدم"
 
 #: admin/useradmin.py:22
 msgid "Groups"
-msgstr ""
+msgstr "المجموعات"
 
-#: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:841
+#: admin/useradmin.py:30 templates/cms/toolbar/toolbar.html:853
 msgid "Password"
-msgstr ""
+msgstr "كلمة المرور"
 
-#: admin/widgets.py:56
+#: admin/widgets.py:58
 msgid "Add Another"
-msgstr ""
+msgstr "إضافة آخر"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "نسخ الحقوق"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr ""
+msgstr "نسخ الإدارة"
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "نسخ القالب من أقرب آب"
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "معلومات"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "Indices and tables:"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr ""
+msgstr "جدول المحتويات الكامل"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "قائمة بجميع الأقسام والأقسام الفرعية"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "صفحة البحث"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "ابحث في الملفات التوثيقية"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "Global Module Index"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "وصول سريع لجميع الموديولز"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr ""
+msgstr "الفهرس العام"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr ""
+msgstr "all functions, classes, terms"
 
 #: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
 #: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
 #: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
-msgstr ""
+msgstr "الفهرس"
 
 #: docs/templates/genindex-single.html:44
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr ""
+msgstr "فهرس كامل في صفحة واحدة"
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
-msgstr ""
+msgstr "فهرس الصفحات بحسب الأحرف"
 
 #: docs/templates/genindex-split.html:15
 msgid "can be huge"
-msgstr ""
+msgstr "من الممكن أن يكون ضخماً"
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
-msgstr ""
+msgstr "التصفح"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
-msgstr ""
+msgstr "جدول المحتويات"
 
 #: docs/templates/layout.html:48
 msgid "Previous topic"
-msgstr ""
+msgstr "الموضوع السابق"
 
 #: docs/templates/layout.html:50
 msgid "previous chapter"
-msgstr ""
+msgstr "الفصل السابق"
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr ""
+msgstr "الموضوع التالي"
 
 #: docs/templates/layout.html:55
 msgid "next chapter"
-msgstr ""
+msgstr "الفصل التالي"
 
 #: docs/templates/layout.html:60
 msgid "This Page"
-msgstr ""
+msgstr "هذه الصفحة"
 
 #: docs/templates/layout.html:63
 msgid "Show Source"
-msgstr ""
+msgstr "أظهر الأصل"
 
 #: docs/templates/layout.html:73
 msgid "Quick search"
-msgstr ""
+msgstr "بحث سريع"
 
 #: docs/templates/layout.html:76
 msgid "Go"
-msgstr ""
+msgstr "إذهب"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr ""
+msgstr "أدخل مفتاح البحث، الإضافة أو إسم الوظيفة."
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
-msgstr ""
+msgstr "حول هذه الوثائق"
 
 #: docs/templates/layout.html:134 docs/templates/search.html:2
 #: docs/templates/search.html.py:5
 msgid "Search"
-msgstr ""
+msgstr "البحث"
 
 #: docs/templates/layout.html:137
 msgid "Copyright"
-msgstr ""
+msgstr "حقوق النشر"
 
 #: docs/templates/modindex.html:36
 msgid "Deprecated"
@@ -442,43 +462,43 @@ msgstr ""
 
 #: docs/templates/search.html:21
 msgid "search"
-msgstr ""
+msgstr "بحث"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
-msgstr ""
+msgstr "نتائج البحث"
 
 #: docs/templates/search.html:27
 msgid "Your search did not match any results."
-msgstr ""
+msgstr "لا يوجد أي نتيجة لما تبحث عنه."
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
 #: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
 #: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:39 models/titlemodels.py:11
+#: models/pluginmodel.py:44 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr ""
+msgstr "اللغة"
 
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:37
+#: migrations/0004_textobjects.py:22 models/pluginmodel.py:42
 msgid "position"
-msgstr ""
+msgstr "الموضع"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:41 models/titlemodels.py:23
+#: models/pluginmodel.py:46 models/titlemodels.py:23
 msgid "creation date"
-msgstr ""
+msgstr "تاريخ الإنشاء"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:38
+#: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:43
 msgid "slot"
-msgstr ""
+msgstr "slot"
 
-#: migrations/0001_initial.py:18 models/pluginmodel.py:40
+#: migrations/0001_initial.py:18 models/pluginmodel.py:45
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
@@ -487,563 +507,568 @@ msgstr ""
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr ""
-
+msgstr "العنوان"
+ 
 #: migrations/0001_initial.py:28
 msgid "path"
-msgstr ""
+msgstr "المكان"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
-msgstr ""
+msgstr "الجميع"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
-msgstr ""
+msgstr "يستطيع التعديل"
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
-msgstr ""
+msgstr "مجموعات"
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
-msgstr ""
+msgstr "يستطيع النشر"
 
 #: migrations/0001_initial.py:42
 msgid "type"
-msgstr ""
+msgstr "النوع"
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
-msgstr ""
+msgstr "يستطيع التتغيير"
 
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "الوضع"
 
 #: migrations/0001_initial.py:53 models/pagemodel.py:48
 msgid "navigation extenders"
-msgstr ""
+msgstr "توسيع التصفح"
 
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr ""
+msgstr "يوجد تعديل في عنوان الـ url"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
-msgstr ""
+msgstr "url overwrite"
 
 #: migrations/0001_initial.py:57
 msgid "author"
-msgstr ""
+msgstr "الناشر"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
-msgstr ""
+msgstr "reverse url id"
 
 #: migrations/0001_initial.py:59 models/pagemodel.py:61
 msgid "login required"
-msgstr ""
+msgstr "يتطلب تسجيل الدخول"
 
 #: migrations/0001_initial.py:60 models/pagemodel.py:46
 msgid "soft root"
-msgstr ""
+msgstr "soft root"
 
 #: migrations/0001_initial.py:63 models/pagemodel.py:44
 msgid "publication end date"
-msgstr ""
+msgstr "تاريخ نهاية النشر"
 
 #: migrations/0001_initial.py:64 models/pagemodel.py:51
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr ""
+msgstr "القالب"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:43
 msgid "publication date"
-msgstr ""
+msgstr "تاريخ النشر"
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:45
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
-msgstr ""
+msgstr "التصفح"
 
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
 #: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
 msgid "application"
-msgstr ""
+msgstr "التطبيق"
 
 #: migrations/0006_apphook.py:65 models/pagemodel.py:47
 msgid "id"
-msgstr ""
+msgstr "id"
 
 #: migrations/0008_redirects.py:11 models/titlemodels.py:18
 msgid "redirect"
-msgstr ""
+msgstr "إعادة توجيه"
 
 #: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
 msgid "keywords"
-msgstr ""
+msgstr "كلمات مفتاحية"
 
 #: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:15
 msgid "description"
-msgstr ""
+msgstr "الشرح"
 
 #: models/moderatormodels.py:24
 msgid "Current page"
-msgstr ""
+msgstr "الصفحة الحالية"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "أولاد الصفحة (مباشرة)"
 
 #: models/moderatormodels.py:26
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "الصفحة وأولادها (مباشرة)"
 
 #: models/moderatormodels.py:27
 msgid "Page descendants"
-msgstr ""
+msgstr "تفرعات الصفحة"
 
 #: models/moderatormodels.py:28
 msgid "Page and descendants"
-msgstr ""
+msgstr "الصفحة وتفرعاتها"
 
 #: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr ""
+msgstr "الصفحة"
 
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "المستخدم"
 
 #: models/moderatormodels.py:49 templatetags/cms_admin.py:65
 msgid "Moderate page"
-msgstr ""
+msgstr "إدارة الصفحة"
 
 #: models/moderatormodels.py:50 templatetags/cms_admin.py:66
 msgid "Moderate children"
-msgstr ""
+msgstr "إدارة الأولاد"
 
 #: models/moderatormodels.py:51 templatetags/cms_admin.py:67
 msgid "Moderate descendants"
-msgstr ""
+msgstr "إدارة التفرعات"
 
 #: models/moderatormodels.py:54 models/moderatormodels.py:55
 msgid "PageModerator"
-msgstr ""
+msgstr "مدير الصفحة"
 
 #: models/moderatormodels.py:97
 msgid "created"
-msgstr ""
+msgstr "تم الإنشاء"
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr ""
+msgstr "تم التغيير"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
-msgstr ""
+msgstr "delete req."
 
 #: models/moderatormodels.py:100
 msgid "move req."
-msgstr ""
+msgstr "move req."
 
 #: models/moderatormodels.py:101
 msgid "publish req."
-msgstr ""
+msgstr "publish req."
 
 #: models/moderatormodels.py:102
 msgid "unpublish req."
-msgstr ""
+msgstr "unpublish req."
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr ""
+msgstr "تم القبول"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
-msgstr ""
+msgstr "حالة مدير الصفحة"
 
 #: models/moderatormodels.py:116
 msgid "Page moderator states"
-msgstr ""
+msgstr "حالات مدير الصفحة"
 
 #: models/pagemodel.py:34
 msgid "req. app."
-msgstr ""
+msgstr "req. app."
 
 #: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:872
-#: templates/cms/toolbar/toolbar.html:899 utils/moderator.py:91
+#: templates/cms/toolbar/toolbar.html:883
+#: templates/cms/toolbar/toolbar.html:917 utils/moderator.py:91
 msgid "delete"
-msgstr ""
+msgstr "حذف"
 
 #: models/pagemodel.py:37
 msgid "app. par."
-msgstr ""
+msgstr "app. par."
 
 #: models/pagemodel.py:39
 msgid "created by"
-msgstr ""
+msgstr "منشأ من قبل"
 
 #: models/pagemodel.py:40 templates/admin/cms/page/change_list_tree.html:16
 msgid "changed by"
-msgstr ""
+msgstr "مغير من قبل"
 
 #: models/pagemodel.py:43
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 
 #: models/pagemodel.py:44
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "متى ستنتهي صلاحية الصفحة. إترك فارغاً لعدم التحديد"
 
 #: models/pagemodel.py:46
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "لن يتم عرض الآباء في التصفح"
 
 #: models/pagemodel.py:47
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 
 #: models/pagemodel.py:49
 msgid "is published"
-msgstr ""
+msgstr "هل تم نشره؟"
 
 #: models/pagemodel.py:51
 msgid "The template used to render the content."
-msgstr ""
+msgstr "القالب المستعمل لعرض المحتوى."
 
 #: models/pagemodel.py:52
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "الموقع الذي ستتوفر الصفحة عن طريقه"
 
 #: models/pagemodel.py:52
 msgid "site"
-msgstr ""
+msgstr "الموقع"
 
 #: models/pagemodel.py:54
 msgid "moderator state"
-msgstr ""
+msgstr "حالة المدير"
 
 #: models/pagemodel.py:62
 msgid "menu login required"
-msgstr ""
+msgstr "تسجيل الدخول للقائمة مطلوب"
 
 #: models/pagemodel.py:62
 msgid "only show this page in the menu if the user is logged in"
-msgstr ""
+msgstr "اعرض هذه الصفحة في القائمة في حالة تسجيل الدخول من قبل المستخدم"
 
 #: models/pagemodel.py:70
 msgid "pages"
-msgstr ""
+msgstr "الصفحات"
 
 #: models/pagemodel.py:176
 msgid "Page was copied."
-msgstr ""
+msgstr "تم نسخ الصفحة."
 
-#: models/pagemodel.py:497
+#: models/pagemodel.py:499
 msgid "default"
-msgstr ""
+msgstr "الإفتراضي"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr ""
+msgstr "يستطيع الإضافة"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr ""
+msgstr "يستطيع الحذف"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr ""
+msgstr "يستطيع تغيير الخيارات المتقدمة"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr ""
+msgstr "يستطيع تغيير الصلاحيات"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr ""
+msgstr "على مستوى الصفحة"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "يستطيع التحريك"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
-msgstr ""
+msgstr "يستطيع إدارة"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
-msgstr ""
+msgstr "يستطيع إسترجاع الصفحات"
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "يستطيع إسترجاع أي صفحة محذوفة"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "عند عدم التحديد، سيتم إعطاء المستخدم الصلاحيات لكافة المواقع."
 
 #: models/permissionmodels.py:52
 msgid "sites"
-msgstr ""
+msgstr "المواقع"
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
-msgstr ""
+msgstr "صلاحية الصفحة العامة"
 
 #: models/permissionmodels.py:58
 msgid "Pages global permissions"
-msgstr ""
+msgstr "صلاحيات الصفحة العامة"
 
 #: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
-msgstr ""
+msgstr "السماح عند"
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
-msgstr ""
+msgstr "صلاحيات الصفحة"
 
 #: models/permissionmodels.py:87
 msgid "User (page)"
-msgstr ""
+msgstr "المستخدم (الصفحة)"
 
 #: models/permissionmodels.py:88
 msgid "Users (page)"
-msgstr ""
+msgstr "المستخدمين (الصفحة)"
 
 #: models/permissionmodels.py:100
 msgid "User group (page)"
-msgstr ""
+msgstr "مجموعة المستخدم (الصفحة)"
 
 #: models/permissionmodels.py:101
 msgid "User groups (page)"
-msgstr ""
+msgstr "مجموعات المستخدم (الصفحة)"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "تحرير العنوان في القائمة"
 
 #: models/titlemodels.py:15
 msgid "Path"
-msgstr ""
+msgstr "المكان"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
-msgstr ""
+msgstr "تحرير العنوان في الـ HTML"
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
-msgstr ""
+msgstr "الملف"
 
 #: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
 #: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
-msgstr ""
+msgstr "الملف"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
-msgstr ""
+msgstr "فلاش"
 
-#: plugins/flash/models.py:9 plugins/video/models.py:36
+#: plugins/flash/models.py:9
 msgid "use swf file"
-msgstr ""
+msgstr "استخدم ملف swf"
 
 #: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
-#: plugins/video/models.py:39
+#: plugins/video/models.py:14
 msgid "width"
-msgstr ""
+msgstr "العرض"
 
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
-#: plugins/video/models.py:40
+#: plugins/video/models.py:15
 msgid "height"
-msgstr ""
+msgstr "الطول"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
-#: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin."
-msgstr ""
+msgstr "لا يوجد دعم لفلاش."
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
-msgstr ""
+msgstr "خرائط غوغل"
 
 #: plugins/googlemap/models.py:9
 msgid "map title"
-msgstr ""
+msgstr "عنوان الخريطة"
 
 #: plugins/googlemap/models.py:11
 msgid "address"
-msgstr ""
+msgstr "العنوان"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr ""
+msgstr "zip code"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr ""
+msgstr "المدينة"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr ""
+msgstr "محتويات إضافية"
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
-msgstr ""
+msgstr "درجة التقريب"
 
 #: plugins/googlemap/models.py:18
 msgid "latitude"
-msgstr ""
+msgstr "خط العرض"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr ""
+msgstr "استخدم خطوط الطول والعرض لتحديد الموضع على الخريطة بدقة."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
-msgstr ""
+msgstr "خطوط الطول"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr ""
+msgstr "عنوان مخطط الطريق"
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "احسب أسرع طريق إلى هنا"
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
-msgstr ""
+msgstr "مخطط الطريق"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
-msgstr ""
+msgstr "الخريطة"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:74
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:72
 msgid "Your address"
-msgstr ""
+msgstr "عنوانك"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:77
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:75
 msgid "Calculate route"
-msgstr ""
+msgstr "احسب الطريق"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "قم بوراثة الإضافات من الصفحة"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "يجب أن يتم تعبئة اللغة أو الصفحة"
 
 #: plugins/inherit/models.py:10
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
+"قم باختيار صفحة ليتم وضع إضافاتها في مكان محدد، سيتم إختيار "
+"الصفحة الحالية عند عدم التحديد."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr ""
+msgstr "غير ضروري: لغة الإضافة التي تريد"
 
-#: plugins/link/cms_plugins.py:12
+#: plugins/link/cms_plugins.py:11
 msgid "Link"
-msgstr ""
+msgstr "الرابط"
 
 #: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
 #: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
-msgstr ""
+msgstr "الاسم"
 
 #: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
 #: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:14
 msgid "link"
-msgstr ""
+msgstr "رابط"
 
 #: plugins/link/models.py:13
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "الرابط الى الصفحة يحمل الأفضلية على رابط نصي."
 
 #: plugins/link/models.py:14
 msgid "mailto"
-msgstr ""
+msgstr "mailto"
 
 #: plugins/link/models.py:14
-msgid "An email adress has priority over a text link."
-msgstr ""
+msgid "An email address has priority over a text link."
+msgstr "عنوان بريد إلكتروني لديه الأفضلية على رابط نصي."
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
-msgstr ""
+msgstr "الصورة"
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr ""
+msgstr "يسار"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr ""
+msgstr "يمين"
 
 #: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:12 plugins/video/models.py:37
+#: plugins/teaser/models.py:12 plugins/video/models.py:12
 msgid "image"
-msgstr ""
+msgstr "صورة"
 
 #: plugins/picture/models.py:21 plugins/picture/models.py:22
 msgid "if present image will be clickable"
-msgstr ""
+msgstr "هل ستكون الصفحة الظاهرة قابلة للضغط"
 
 #: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
-msgstr ""
+msgstr "النص الثانوي"
 
 #: plugins/picture/models.py:23
 msgid "textual description of the image"
-msgstr ""
+msgstr "شرح نصي عن الصورة"
 
 #: plugins/picture/models.py:24
 msgid "long description"
-msgstr ""
+msgstr "شرح تفصيلي"
 
 #: plugins/picture/models.py:24
 msgid "additional description of the image"
-msgstr ""
+msgstr "شرح إضافي عن الصورة"
 
 #: plugins/picture/models.py:25
 msgid "side"
-msgstr ""
+msgstr "جانبي"
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
-msgstr ""
+msgstr "Snippet"
 
 #: plugins/snippet/cms_plugins.py:26
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr ""
+msgstr "القالب %(template)s غير موجود."
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
@@ -1052,705 +1077,717 @@ msgstr ""
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
-msgstr ""
+msgstr "Snippets"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
-msgstr ""
+msgstr "معلومات للتشويق"
 
 #: plugins/teaser/models.py:13
 msgid "If present image will be clickable"
-msgstr ""
+msgstr "هل ستكون الصورة الظاهر قابلة للضغط"
 
 #: plugins/teaser/models.py:14
 msgid "If present image will be clickable."
-msgstr ""
+msgstr "هل ستكون الصورة الظاهر قابلة للضغط."
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
-msgstr ""
+msgstr "المزيد"
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr ""
+msgstr "النص"
 
-#: plugins/text/models.py:12 plugins/text/migrations/0001_initial.py:16
+#: plugins/text/models.py:15 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "body"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
-msgstr ""
+msgstr "الإضافات"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "الرجاء تحديد نوع الإضافة"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
 msgid "Edit selected plugin"
-msgstr ""
+msgstr "تحرير الإضافة المحددة"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
+msgstr "المحرر النصي لا يدعم تحرير الـ objects."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
 msgid "No object selected."
-msgstr ""
+msgstr "لم يتم تحديد أي object."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "المحرر النصي لا يسمح بإضافة الـ objects."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "هذه ليست إضافة"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr ""
+msgstr "الإضافات المتوفرة"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
 msgid "Insert plugin"
-msgstr ""
+msgstr "أضف إضافة"
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
-msgstr ""
+msgstr "تويتر"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr ""
+msgstr "حساب مستخدم تويتر"
 
 #: plugins/twitter/models.py:8
 msgid "count"
-msgstr ""
+msgstr "العدد"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr ""
+msgstr "عدد الإدخالات التي سيتم عرضها"
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr ""
+msgstr "شرح الرابط"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "عند التوفر، سيتم عرض شرح الرابط كرابط لحسابك على تويتر."
 
 #: plugins/video/cms_plugins.py:9
 msgid "Video"
-msgstr ""
+msgstr "فيديو"
+
+#: plugins/video/cms_plugins.py:38
+msgid "Color Settings"
+msgstr "إعدادات الألوان"
+
+#: plugins/video/models.py:10
+msgid "movie file"
+msgstr "ملف الفيديو"
+
+#: plugins/video/models.py:10
+msgid "use .flv file or h264 encoded video file"
+msgstr "استخدم ملفات .flv أو ملف فيديو منمط بـ h264"
+
+#: plugins/video/models.py:11
+msgid "movie url"
+msgstr "عنوان url لملف الفيديو"
+
+#: plugins/video/models.py:11
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
+msgstr "عنوان url لفيديو على فيميو أو يوتيوب. مثال http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
+
+#: plugins/video/models.py:12
+msgid "preview image file"
+msgstr "عرض الصورة"
+
+#: plugins/video/models.py:17
+msgid "auto play"
+msgstr "تشغيل تلقائي"
+
+#: plugins/video/models.py:18
+msgid "auto hide"
+msgstr "إخفاء تلقائي"
+
+#: plugins/video/models.py:19
+msgid "fullscreen"
+msgstr "ملئ الشاشة"
 
 #: plugins/video/models.py:20
-msgid "dock"
-msgstr ""
+msgid "loop"
+msgstr "إعاد التشغيل عند الإنتهاء"
 
-#: plugins/video/models.py:21
-msgid "overlay"
-msgstr ""
+#: plugins/video/models.py:23
+msgid "background color"
+msgstr "لون الخلفية"
+
+#: plugins/video/models.py:23 plugins/video/models.py:24
+#: plugins/video/models.py:25 plugins/video/models.py:26
+#: plugins/video/models.py:27 plugins/video/models.py:28
+#: plugins/video/models.py:29 plugins/video/models.py:30
+msgid "Hexadecimal, eg ff00cc"
+msgstr "بنمط ستا عشري، أي ff00cc"
+
+#: plugins/video/models.py:24
+msgid "text color"
+msgstr "لون النص"
 
 #: plugins/video/models.py:25
-msgid "blank"
-msgstr ""
+msgid "seekbar color"
+msgstr "لون شريط التنقل"
 
 #: plugins/video/models.py:26
-msgid "self"
-msgstr ""
+msgid "seekbar bg color"
+msgstr "لون خلفية شريط التنقل"
 
 #: plugins/video/models.py:27
-msgid "parent"
-msgstr ""
+msgid "loadingbar color"
+msgstr "لون شريط التحميل"
 
-#: plugins/video/models.py:31
-msgid "window"
-msgstr ""
+#: plugins/video/models.py:28
+msgid "button out color"
+msgstr "اللون الخارجي للزر"
 
-#: plugins/video/models.py:32
-msgid "opaque"
-msgstr ""
+#: plugins/video/models.py:29
+msgid "button over color"
+msgstr "اللون الأعلى للزر"
 
-#: plugins/video/models.py:33
-msgid "transparent"
-msgstr ""
+#: plugins/video/models.py:30
+msgid "button highlight color"
+msgstr "لون التحديد للزر"
 
-#: plugins/video/models.py:36
-msgid "movie"
+#: plugins/video/templates/cms/plugins/video.html:3
+msgid ""
+"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
+"\">here</a>"
 msgstr ""
-
-#: plugins/video/models.py:37
-msgid "use image file"
-msgstr ""
-
-#: plugins/video/models.py:42
-msgid "auto load"
-msgstr ""
-
-#: plugins/video/models.py:43
-msgid "auto play"
-msgstr ""
-
-#: plugins/video/models.py:44
-msgid "loop"
-msgstr ""
-
-#: plugins/video/models.py:46
-msgid "controller style"
-msgstr ""
-
-#: plugins/video/models.py:48
-msgid "click_url"
-msgstr ""
-
-#: plugins/video/models.py:49
-msgid "click target"
-msgstr ""
-
-#: plugins/video/models.py:51
-msgid "mute"
-msgstr ""
-
-#: plugins/video/models.py:52
-msgid "mute only"
-msgstr ""
-
-#: plugins/video/models.py:53
-msgid "volume"
-msgstr ""
-
-#: plugins/video/models.py:53
-msgid "in range <0, 100>"
-msgstr ""
-
-#: plugins/video/models.py:56
-msgid "fgcolor"
-msgstr ""
-
-#: plugins/video/models.py:56
-msgid "Hexadecimal, eg 13abec"
-msgstr ""
-
-#: plugins/video/models.py:57
-msgid "bgcolor"
-msgstr ""
-
-#: plugins/video/models.py:57
-msgid "Hexadecimal, eg fff000"
-msgstr ""
-
-#: plugins/video/models.py:58
-msgid "fullscreen"
-msgstr ""
-
-#: plugins/video/models.py:59
-msgid "wmode"
-msgstr ""
-
-#: plugins/video/models.py:60
-msgid "flash menu"
-msgstr ""
+"لم يتم العثور على مشغل فلاش. حمل من <a href=\"http://adobe.com/flashplayer"
+"\">هنا</a>"
 
 #: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:236
+#: templates/admin/cms/page/change_form.html:268
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "حفظ"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "احذف الترجمة للغة %(language)s"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "احفظ كجديد"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr ""
+msgstr "احفظ وأضف جديد"
 
 #: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:237
+#: templates/admin/cms/page/change_form.html:269
 msgid "Save and continue editing"
-msgstr ""
+msgstr "إحفظ وأكمل التعديل"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
+"تحتاج الصفة <a href=\"%(admin_url)s\">%(page)s</a> الموافقة منك."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr ""
+msgstr "آخر تعديل"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "سجل الدخول للإدارة من هنا <a href=\"%(login_url)s\">here</a>."
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
-msgstr ""
+msgstr "اسم المستخدم:"
 
 #: templates/admin/cms/mail/page_user_change.html:11
 msgid "Password:"
-msgstr ""
+msgstr "كلمة المرور:"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:32
-msgid "Approve page deletion"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:38
-#, python-format
-msgid "(requires approvement at %(moderation_level)s level)"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:39
-msgid "(you can perform actions on this page directly)"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:52
-msgid "Remove delete request"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:54
-msgid "Approve delete"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:54
-msgid "Approve"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:54
-#: templates/admin/cms/page/change_form.html:55
-#: templates/admin/cms/page/change_list_tree.html:12
-msgid "draft"
-msgstr ""
+msgstr "غير صفحة"
 
 #: templates/admin/cms/page/change_form.html:55
-msgid "Preview"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:58
-#: templates/admin/cms/page/revision_form.html:10
-msgid "History"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:59
-msgid "View on site"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:89
-#: templates/admin/cms/page/plugin_change_form.html:83
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/admin/cms/page/change_form.html:109
-msgid "All permissions"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:110
-#: templates/admin/cms/page/change_form.html:122
-#: templates/admin/cms/page/loading.html:2
-msgid "Loading..."
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:121
-msgid "Page states"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:144
-#, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:146
-msgid "Request approvemet"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:3
-msgid "List of pages"
-msgstr ""
-
 #: templates/admin/cms/page/change_list.html:8
 #: templates/admin/cms/page/plugin_change_form.html:66
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
-msgstr ""
+msgstr "الرئيسية"
+
+#: templates/admin/cms/page/change_form.html:64
+msgid "Approve page deletion"
+msgstr "قبول حذف صفحة"
+
+#: templates/admin/cms/page/change_form.html:70
+#, python-format
+msgid "(requires approvement at %(moderation_level)s level)"
+msgstr "(يتطلب القبول من مستخدم بمستوى %(moderation_level)s)"
+
+#: templates/admin/cms/page/change_form.html:71
+msgid "(you can perform actions on this page directly)"
+msgstr "(يمكنك القيام بتغييرات على هذه الصفحة مباشرة)"
+
+#: templates/admin/cms/page/change_form.html:84
+msgid "Remove delete request"
+msgstr "ألغي طلب الحذف"
+
+#: templates/admin/cms/page/change_form.html:86
+msgid "Approve delete"
+msgstr "قبول الحذف"
+
+#: templates/admin/cms/page/change_form.html:86
+msgid "Approve"
+msgstr "قبول"
+
+#: templates/admin/cms/page/change_form.html:86
+#: templates/admin/cms/page/change_form.html:87
+#: templates/admin/cms/page/change_list_tree.html:12
+msgid "draft"
+msgstr "مسودة"
+
+#: templates/admin/cms/page/change_form.html:87
+msgid "Preview"
+msgstr "عرض"
+
+#: templates/admin/cms/page/change_form.html:90
+#: templates/admin/cms/page/revision_form.html:10
+msgid "History"
+msgstr "تاريخ"
+
+#: templates/admin/cms/page/change_form.html:91
+msgid "View on site"
+msgstr "اعرض على الموقع"
+
+#: templates/admin/cms/page/change_form.html:121
+#: templates/admin/cms/page/plugin_change_form.html:83
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "الرجاء تصحيح الخطأ في الأسفل."
+msgstr[1] "الرجاء تصحيح الأخطاء في الأسفل."
+
+#: templates/admin/cms/page/change_form.html:141
+msgid "All permissions"
+msgstr "جميع الصلاحيات"
+
+#: templates/admin/cms/page/change_form.html:142
+#: templates/admin/cms/page/change_form.html:154
+#: templates/admin/cms/page/loading.html:2
+msgid "Loading..."
+msgstr "جاري التحميل..."
+
+#: templates/admin/cms/page/change_form.html:153
+msgid "Page states"
+msgstr "حالة الصفحة"
+
+#: templates/admin/cms/page/change_form.html:176
+#, python-format
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
+msgstr "يجب إدارة الصفحة من مستخدم بمستوى %(moderation_level)s، أرسل رسالة إلى المدير."
+
+#: templates/admin/cms/page/change_form.html:178
+msgid "Request approvemet"
+msgstr "اطلب القبول"
+
+#: templates/admin/cms/page/change_list.html:3
+msgid "List of pages"
+msgstr "قائمة بالصفحات"
 
 #: templates/admin/cms/page/change_list.html:55
 msgid "Successfully moved"
-msgstr ""
+msgstr "تم النقل بنجاح"
 
 #: templates/admin/cms/page/change_list.html:60
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "حدث خطأ ما. الرجاء إعادة تحميل الصفحة."
 
 #: templates/admin/cms/page/change_list.html:80
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "استرجع %(name)s المحذوف"
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "أضف %(name)s"
 
 #: templates/admin/cms/page/change_list.html:95
 msgid "Pages on:"
-msgstr ""
+msgstr "صفحات عند:"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "Filter:"
-msgstr ""
+msgstr "مرشح:"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "on"
-msgstr ""
+msgstr "على"
 
 #: templates/admin/cms/page/change_list.html:112
 msgid "off"
-msgstr ""
+msgstr "غير مفعل"
 
 #: templates/admin/cms/page/change_list.html:114
 msgid "Filter"
-msgstr ""
+msgstr "مرشح"
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
-msgstr ""
+msgstr "حركات"
 
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "moderate"
-msgstr ""
+msgstr "إدارة"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr ""
+msgstr "منشور"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "last changes"
-msgstr ""
+msgstr "آخر تعديل"
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr ""
+msgstr "حدد هذه الصفحة"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr ""
+msgstr "حرر هذه الصفحة"
 
 #: templates/admin/cms/page/menu_item.html:6
-#: templates/cms/toolbar/toolbar.html:865
-#: templates/cms/toolbar/toolbar.html:888
+#: templates/cms/toolbar/toolbar.html:889
+#: templates/cms/toolbar/toolbar.html:910
 msgid "edit"
-msgstr ""
+msgstr "حرر"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr ""
+msgstr "أدرج في الأعلى"
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr ""
+msgstr "أدرج في الأسفل"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "أردج في الداخل"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
-msgstr ""
+msgstr "softroot"
+
+#: templates/admin/cms/page/menu_item.html:23
+msgid "home"
+msgstr "الرئيسية"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "حرر هذه الصفحة باللغة %(language)s"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
-msgstr ""
+msgstr "قص"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "cut"
-msgstr ""
+msgstr "قص"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
-msgstr ""
+msgstr "نسخ"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "copy"
-msgstr ""
+msgstr "نسخ"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "Add Child"
-msgstr ""
+msgstr "أضف ولداً"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "add"
-msgstr ""
+msgstr "أضف"
 
 #: templates/admin/cms/page/menu_item.html:65
-#: templates/cms/toolbar/toolbar.html:850
+#: templates/cms/toolbar/toolbar.html:862
 msgid "Approve directly"
-msgstr ""
+msgstr "قبول مباشر"
 
 #: templates/admin/cms/page/menu_item.html:67
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
 msgid "view"
-msgstr ""
+msgstr "عرض"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
-msgstr ""
+msgstr "التراجع عن النشر"
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
-msgstr ""
+msgstr "نشر"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
-msgstr ""
+msgstr "عرض على الصفحة"
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
-msgstr ""
+msgstr "الحركة"
 
 #: templates/admin/cms/page/moderation_messages.html:5
 msgid "Created"
-msgstr ""
+msgstr "منشأ"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
-msgstr ""
+msgstr "رسالة"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "مجموعة"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "يستطيع التعديل"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "يستطيع الإضافة"
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "يستطيع الحذف"
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "يستطيع النشر"
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "يستطيع تغيير الصلاحيات"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "يستطيع النقل"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
 msgid "(global)"
-msgstr ""
+msgstr "(عام)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(حالي)"
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "الجميع"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "لن ترث الصفحة أي صلاحية"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "يمكنك حفظ نسخة سابقة من الإضافة!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:14
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "تم حفظ الإضافة بنجاح"
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "قم باسترجاع %(verbose_name)s المحذوف"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "اضغط على زر حفظ في الأسفل لاسترجاع النسخة السابقة من الـ object."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "استرجع %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
+msgstr "اضغط زر حفظ في الأسفل للرجوع الى هذه النسخة من الـ object."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "خيارات النسخ"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "اختر خيار النسخ"
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "أضف إضافة"
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
+msgid "From Language"
+msgstr "من لغة"
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
+msgid "Copy Plugins"
+msgstr "انسخ إضافة"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "يجب حفظ الصفحة أولاً قبل وضع إضافة."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "لم يتم تحديد أي إضافة. المختارة تكون على الجانب الأيسر"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
+msgstr "لم يتم تحديد أي إضافة. ضع إضافة في هذا المكان."
 
-#: templates/cms/toolbar/toolbar.html:746
+#: templates/cms/toolbar/toolbar.html:758
 #, python-format
 msgid "Move to %(name)s"
-msgstr ""
+msgstr "قم بالنقل الى %(name)s"
 
-#: templates/cms/toolbar/toolbar.html:792
+#: templates/cms/toolbar/toolbar.html:804
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "هل أنت متأكد من أنك تريد حذف هذه الإضافة؟"
 
-#: templates/cms/toolbar/toolbar.html:821
+#: templates/cms/toolbar/toolbar.html:833
 msgid "Edit mode"
-msgstr ""
+msgstr "وضع التعديل"
 
-#: templates/cms/toolbar/toolbar.html:828
+#: templates/cms/toolbar/toolbar.html:840
 msgid "Status"
-msgstr ""
+msgstr "الحالة"
 
-#: templates/cms/toolbar/toolbar.html:839
+#: templates/cms/toolbar/toolbar.html:851
 msgid "Username"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:843
-#: templates/cms/toolbar/toolbar.html:844
-msgid "login"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: templates/cms/toolbar/toolbar.html:855
+#: templates/cms/toolbar/toolbar.html:856
+msgid "login"
+msgstr "تسجيل دخول"
+
+#: templates/cms/toolbar/toolbar.html:867
 msgid "Template"
-msgstr ""
+msgstr "القالب"
 
-#: templates/cms/toolbar/toolbar.html:865
-msgid "Site Administration"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:867
+#: templates/cms/toolbar/toolbar.html:878
 msgid "move"
-msgstr ""
+msgstr "انقل"
 
-#: templates/cms/toolbar/toolbar.html:867
+#: templates/cms/toolbar/toolbar.html:878
 msgid "Move/add Pages"
-msgstr ""
+msgstr "انقل/أضف الصفحات"
 
-#: templates/cms/toolbar/toolbar.html:868
-msgid "Page Settings"
-msgstr ""
+#: templates/cms/toolbar/toolbar.html:880
+msgid "add child"
+msgstr "أضف ولداً"
 
-#: templates/cms/toolbar/toolbar.html:870
-msgid "history"
-msgstr ""
+#: templates/cms/toolbar/toolbar.html:880
+msgid "Add child page"
+msgstr "أضف ولداً للصفحة"
 
-#: templates/cms/toolbar/toolbar.html:870
-msgid "View History"
-msgstr ""
+#: templates/cms/toolbar/toolbar.html:881
+msgid "add sibling"
+msgstr "أضف أخوة"
 
-#: templates/cms/toolbar/toolbar.html:872
+#: templates/cms/toolbar/toolbar.html:881
+msgid "Add sibling page"
+msgstr "أضف صفحة أخت"
+
+#: templates/cms/toolbar/toolbar.html:883
 msgid "Delete Page"
-msgstr ""
+msgstr "احذف الصفحة"
 
-#: templates/cms/toolbar/toolbar.html:877
-msgid "Lock"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:877
-msgid "Logout"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:879
-msgid "Close"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:890
-msgid "up"
-msgstr ""
+#: templates/cms/toolbar/toolbar.html:889
+msgid "Site Administration"
+msgstr "إدارة الموقع"
 
 #: templates/cms/toolbar/toolbar.html:891
-msgid "down"
-msgstr ""
+msgid "Page Settings"
+msgstr "خيارات الصفحة"
 
 #: templates/cms/toolbar/toolbar.html:893
-msgid "Settings"
-msgstr ""
+msgid "history"
+msgstr "التاريخ"
+
+#: templates/cms/toolbar/toolbar.html:893
+msgid "View History"
+msgstr "اعرض التاريخ"
 
 #: templates/cms/toolbar/toolbar.html:899
+msgid "Lock"
+msgstr "اقفل"
+
+#: templates/cms/toolbar/toolbar.html:899
+msgid "Logout"
+msgstr "تسجيل خروج"
+
+#: templates/cms/toolbar/toolbar.html:901
+msgid "Close"
+msgstr "أغلق"
+
+#: templates/cms/toolbar/toolbar.html:912
+msgid "up"
+msgstr "اعلى"
+
+#: templates/cms/toolbar/toolbar.html:913
+msgid "down"
+msgstr "اسفل"
+
+#: templates/cms/toolbar/toolbar.html:915
+msgid "Settings"
+msgstr "خيارات"
+
+#: templates/cms/toolbar/toolbar.html:917
 msgid "Delete Plugin"
-msgstr ""
+msgstr "احذف الإضافة"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
-msgstr ""
+msgstr "فك الإرتباط مع مدير الصفحة"
 
 #: templatetags/cms_admin.py:66
 msgid "Unbind children moderation"
-msgstr ""
+msgstr "فك إرتباط الأولاد مع الإدارة"
 
 #: templatetags/cms_admin.py:67
 msgid "Unbind descendants moderation"
-msgstr ""
+msgstr "فك ربط الآباء مع الإدارة"
 
-#: templatetags/cms_tags.py:397 templatetags/cms_tags.py:612
+#: templatetags/cms_tags.py:401 templatetags/cms_tags.py:655
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr ""
+msgstr "Reverse ID not found on %(domain)s"
 
-#: templatetags/cms_tags.py:398
+#: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %"
@@ -1758,7 +1795,7 @@ msgid ""
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:613
+#: templatetags/cms_tags.py:656
 #, python-format
 msgid ""
 "A show_placeholder_by_id template tag didn't found a page with the "
@@ -1766,23 +1803,35 @@ msgid ""
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
+#: tests/util/menu_extender.py:7
+msgid "Sublevel"
+msgstr ""
+
+#: tests/util/menu_extender.py:8
+msgid "Sublevel3"
+msgstr ""
+
+#: tests/util/menu_extender.py:11
+msgid "Sublevel 2"
+msgstr ""
+
 #: utils/moderator.py:84
 msgid "parent first"
-msgstr ""
+msgstr "الأب أولاً"
 
 #: utils/moderator.py:91
 msgid "approve"
-msgstr ""
+msgstr "قبول"
 
 #: utils/moderator.py:243
 #, python-format
 msgid "CMS - Page %s requires approvement."
-msgstr ""
+msgstr "نظام ادارة المحتوى - الصفحة %s تحتاج الى الموافقة."
 
-#: utils/permissions.py:193
+#: utils/permissions.py:206
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "نظام ادارة المحتوى - تم انشاء المستخدم."
 
-#: utils/permissions.py:195
+#: utils/permissions.py:208
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "نظام ادارة المحتوى - تم التغيير على حسابك."

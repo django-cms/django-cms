@@ -8,12 +8,16 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'PublicPage.changed_by'
-        db.add_column('cms_publicpage', 'changed_by', orm['cms.publicpage:changed_by'])
+        field = orm['cms.publicpage:changed_by']
+        field.default = '' #Surely this can't be THE way to do this?
+        db.add_column('cms_publicpage', 'changed_by', field)
         
         # Adding field 'Page.changed_by'
         db.add_column('cms_page', 'changed_by', orm['cms.page:changed_by'])
         
         # Adding field 'PublicPage.created_by'
+        field = orm['cms.publicpage:created_by']
+        field.default = ''
         db.add_column('cms_publicpage', 'created_by', orm['cms.publicpage:created_by'])
         
         # Adding field 'Page.created_by'

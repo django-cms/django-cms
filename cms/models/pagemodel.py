@@ -36,6 +36,9 @@ class Page(MpttPublisher):
         (MODERATOR_APPROVED, _('approved')),
         (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
+    
+    template_choices = [(x, _(y)) for x,y in settings.CMS_TEMPLATES]
+    
     created_by = models.CharField(_("created by"), max_length=70)
     changed_by = models.CharField(_("changed by"), max_length=70)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
@@ -48,7 +51,7 @@ class Page(MpttPublisher):
     navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
     published = models.BooleanField(_("is published"), blank=True)
     
-    template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
+    template = models.CharField(_("template"), max_length=100, choices=template_choices, help_text=_('The template used to render the content.'))
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
     
     moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)

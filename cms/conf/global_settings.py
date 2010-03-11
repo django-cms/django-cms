@@ -76,7 +76,7 @@ CMS_LANGUAGE_FALLBACK = True
 # example: {'de': ['en', 'fr'],
 #           'en': ['de'],
 #          }
-CMS_LANGUAGE_CONF = ()
+CMS_LANGUAGE_CONF = {}
 
 # Defines which languages should be offered.
 CMS_LANGUAGES = settings.LANGUAGES

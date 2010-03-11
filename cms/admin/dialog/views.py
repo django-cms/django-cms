@@ -7,7 +7,7 @@ from cms.models import Page
 
 @staff_member_required
 def get_copy_dialog(request, page_id):
-    if not settings.CMS_PERMISSION or not settings.CMS_MODERATOR:
+    if not (settings.CMS_PERMISSION or settings.CMS_MODERATOR):
         return HttpResponse('')
      
     page = get_object_or_404(Page, pk=page_id)

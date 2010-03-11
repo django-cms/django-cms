@@ -122,9 +122,6 @@ class GenericCmsPermissionAdmin(object):
                 fn = getattr(opts, 'get_%s_permission' % t)
                 if request.user.has_perm(opts.app_label + '.' + fn()):
                     fields.append('can_%s_%s' % (t, name))
-            if model == Page:
-                fields.append('can_recover_page')
-        
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
             i += 1

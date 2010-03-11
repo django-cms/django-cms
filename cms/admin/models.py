@@ -5,7 +5,7 @@ class BaseInlineFormSetWithQuerySet(BaseInlineFormSet):
     _default_manager, see django bug #11019 for more details.
     """
     def __init__(self, data=None, files=None, instance=None,
-                 save_as_new=False, prefix=None):
+                 save_as_new=False, prefix=None, queryset=None):
         from django.db.models.fields.related import RelatedObject
         if instance is None:
             self.instance = self.model()

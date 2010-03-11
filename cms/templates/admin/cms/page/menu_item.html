@@ -2,8 +2,8 @@
 <div class="cont{% if CMS_MODERATOR %} moderatorstate{{ page_moderator_state.state }}{% endif %}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="{{ url }}{{ page.id }}" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>	
-			<a href="{{ url }}{{ page.id }}" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
+			<a href="{{ url }}{{ page.id }}/" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>	
+			<a href="{{ url }}{{ page.id }}/" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>
 		{% endif %}
@@ -81,6 +81,9 @@
 				<a href="./{{ page.id }}/preview/" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 			{% endif %}
 		</div>
+		
+		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
+		<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>
 		
 		
 		{% if CMS_MODERATOR %}<div class="col-lastchange">

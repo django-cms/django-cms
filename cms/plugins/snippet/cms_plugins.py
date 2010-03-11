@@ -14,6 +14,10 @@ class SnippetPlugin(CMSPluginBase):
     text_enabled = True
 
     def render(self, context, instance, placeholder):
+        context.update({
+            'placeholder':placeholder,
+            'object':instance,
+        })
         try:
             if instance.snippet.template:
                 t = template.loader.get_template(instance.snippet.template)
@@ -28,8 +32,6 @@ class SnippetPlugin(CMSPluginBase):
             content = str(e)
         context.update({
             'content': mark_safe(content),
-            'placeholder':placeholder,
-            'object':instance,
         })
         return context
 

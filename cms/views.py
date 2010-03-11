@@ -59,9 +59,9 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
     lang = get_language_from_request(request)
     site = Site.objects.get_current()
     if 'preview' in request.GET.keys():
-        pages = page_queryset.all()
+        pages = page_queryset.filter(site=site)
     else:
-        pages = page_queryset.published()
+        pages = page_queryset.published().filter(site=site)
     
     root_pages = pages.all_root().order_by("tree_id")
     current_page, response = None, None
