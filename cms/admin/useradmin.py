@@ -44,14 +44,6 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     def add_view(self, request):
         return super(UserAdmin, self).add_view(request) 
     
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(PageUserAdmin, self).get_form(request, obj, **kwargs)
-        print form
-        print form().fields
-        
-        return form    
-    
-    
 class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     form = PageUserGroupForm
     list_display = ('name', 'created_by')
