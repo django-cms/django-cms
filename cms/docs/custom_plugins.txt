@@ -161,7 +161,7 @@ A string containing the rendered content of the plugin.
 
 The original context for the template used to render the plugin.
 
-Note that plugin processors are also applied to plugins embedded in Text. Depending on what your processor does, this might break the output. For example, if your processor wraps the output in a DIV tag, you might end up having DIVs inside of P tags, which is invalid. You can prevent such cases by returning `rendered_content` unchanged if `instance._render_meta.text_enabled == True`.  
+Note that plugin processors are also applied to plugins embedded in Text. Depending on what your processor does, this might break the output. For example, if your processor wraps the output in a DIV tag, you might end up having DIVs inside of P tags, which is invalid. You can prevent such cases by returning `rendered_content` unchanged if `instance._render_meta.text_enabled` is True, which is the case when rendering an embedded plugin.  
 
 Example::
 
