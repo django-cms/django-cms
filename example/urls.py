@@ -4,10 +4,7 @@ from django.conf import settings
 
 admin.autodiscover()
 
-admin.site.root_path = "/admin/" # there is probably a bug in django...
-
 urlpatterns = patterns('',
-    #(r'^admin/(.*)', admin.site.root),
     (r'^admin/', include(admin.site.urls)),
     (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
     (r'^categories/', include('categories.urls')),
