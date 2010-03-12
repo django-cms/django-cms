@@ -85,7 +85,7 @@ msgstr "Přesměrování"
 
 #: admin/forms.py:96
 msgid "Redirects to this URL."
-msgstr "Přesměruje se na tuto URL"
+msgstr "Přesměruje se na tuto URL."
 
 #: admin/forms.py:98
 msgid "A description of the page sometimes used by search engines."
@@ -93,7 +93,7 @@ msgstr "Popis stránky, který mohou indexovat vyhledávače."
 
 #: admin/forms.py:100
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Seznam klíčových slov oddělených čárkou, které mohou indexovat vyhledávače"
+msgstr "Seznam klíčových slov oddělených čárkou, které mohou indexovat vyhledávače."
 
 #: admin/forms.py:108
 msgid "A page with this reverse URL id exists already."
