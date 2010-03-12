@@ -120,5 +120,5 @@ class MultilingualURLMiddleware:
             if not prefix and location[1].startswith("/") and \
                     not location[1].startswith(settings.MEDIA_URL) and \
                     not location[1].startswith(settings.ADMIN_MEDIA_PREFIX):
-                response._headers['location'] = (location[0], "%s%s%s" % (pages_root, request.LANGUAGE_CODE, request.path_info))
+                response._headers['location'] = (location[0], "%s%s%s" % (pages_root, request.LANGUAGE_CODE, location[1]))
         return response
