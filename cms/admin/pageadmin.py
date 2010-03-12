@@ -1231,11 +1231,8 @@ class PageAdmin(model_admin):
                 if not placeholder in placeholders:
                     return HttpResponse(str("error"))
                 plugin.placeholder = placeholder
-                position = 0
-                try:
-                    position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).order_by('position')[0].position + 1
-                except IndexError:
-                    pass
+                # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
+                position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).count()
                 plugin.position = position
                 plugin.save()
             else:
