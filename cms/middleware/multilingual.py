@@ -114,11 +114,10 @@ class MultilingualURLMiddleware:
             response.content = FORM_URL_FIX_RE.sub(ur'<form\1action="%s%s/\4"\5>' % (pages_root, request.LANGUAGE_CODE), decoded_response).encode("utf8")
 
         if (response.status_code == 301 or response.status_code == 302 ):
-            location = response._headers['location']
-            prefix = has_lang_prefix(location[1])
-            if not prefix and location[1].startswith("/") and \
-                    not location[1].startswith(settings.MEDIA_URL) and \
-                    not location[1].startswith(settings.ADMIN_MEDIA_PREFIX):
-                response._headers['location'] = (location[0], "%s%s%s" % (pages_root, request.LANGUAGE_CODE, location[1]))
+            location = response['Location']
+            if not has_lang_prefix(location) and location.startswith("/") and \
+                    not location.startswith(settings.MEDIA_URL) and \
+                    not location.startswith(settings.ADMIN_MEDIA_PREFIX):
+                response['Location'] = "%s%s%s" % (pages_root, request.LANGUAGE_CODE, location[len(pages_root)-1:])
         response.set_cookie("django_language", request.LANGUAGE_CODE)
         return response
