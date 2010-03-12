@@ -1,5 +1,6 @@
 import re
 import urllib
+from django.middleware.locale import LocaleMiddleware
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 from django.conf import settings
@@ -32,8 +33,6 @@ class MultilingualURLMiddleware:
                 lang = t
                 if hasattr(request, "session"):
                     request.session["django_language"] = lang
-                else:
-                    request.set_cookie("django_language", lang)
                 changed = True
         else:
             lang = translation.get_language_from_request(request)
@@ -57,8 +56,8 @@ class MultilingualURLMiddleware:
         request.LANGUAGE_CODE = language
        
     def process_response(self, request, response):
-        patch_vary_headers(response, ("Accept-Language",))
-        translation.deactivate()
+        local_middleware = LocaleMiddleware()
+        response =local_middleware.process_response(request, response)
         path = unicode(request.path)
 
         # note: pages_root is assumed to end in '/'.
@@ -121,4 +120,5 @@ class MultilingualURLMiddleware:
                     not location[1].startswith(settings.MEDIA_URL) and \
                     not location[1].startswith(settings.ADMIN_MEDIA_PREFIX):
                 response._headers['location'] = (location[0], "%s%s%s" % (pages_root, request.LANGUAGE_CODE, location[1]))
+        response.set_cookie("django_language", request.LANGUAGE_CODE)
         return response
