@@ -8,7 +8,7 @@ from cms.models import PageUser
 
 
 class PluginEditor(Widget):
-    def __init__(self, attrs=None, installed=None, list=None):
+    def __init__(self, attrs=None):
         if attrs is not None:
             self.attrs = attrs.copy()
         else:
@@ -31,10 +31,9 @@ class PluginEditor(Widget):
         context = {
             'plugin_list': self.attrs['list'],
             'installed_plugins': self.attrs['installed'],
-            'traduction_language': self.attrs['traduction_language'],
+            'copy_languages': self.attrs['copy_languages'],
             'language': self.attrs['language'],
-            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1 and \
-                not settings.CMS_DBGETTEXT,
+            'show_copy': self.attrs['show_copy'],
         }
         return mark_safe(render_to_string(
             'admin/cms/page/widgets/plugin_editor.html', context))

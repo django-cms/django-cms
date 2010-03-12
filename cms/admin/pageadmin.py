@@ -374,6 +374,8 @@ class PageAdmin(model_admin):
             for placeholder_name in get_placeholders(request, selected_template):
                 installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                 plugin_list = []
+                show_copy = False
+                copy_languages = {}
                 if obj:
                     if versioned:
                         from reversion.models import Version
@@ -398,8 +400,14 @@ class PageAdmin(model_admin):
                                 plugin_list.append(plugin)
                     else:
                         plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
+                        other_plugins = CMSPlugin.objects.filter(page=obj, placeholder=placeholder_name, parent=None).exclude(language=language)
+                        for plugin in other_plugins:
+                            if not plugin.language in copy_languages:
+                                copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
                 language = get_language_from_request(request, obj)
-                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'traduction_language': settings.CMS_LANGUAGES, 'language': language } )
+                if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
+                    show_copy = True
+                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'copy_languages': copy_languages.items(), 'show_copy':show_copy, 'language': language } )
                 form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
