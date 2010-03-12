@@ -145,6 +145,11 @@ CMS_LANGUAGE_CONF = {
     'en':['fr', 'de'],
 }
 
+CMS_SITE_LANGUAGES = {
+    1:['fr','de','en','pt-BR'],
+    2:['de','en'],
+}
+
 APPEND_SLASH = True
 
 CMS_TEMPLATES = (

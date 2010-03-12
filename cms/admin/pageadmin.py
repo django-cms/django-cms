@@ -527,14 +527,21 @@ class PageAdmin(model_admin):
         })
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
     
-    def update_language_tab_context(self, request, obj=None, context=None):
+    def update_language_tab_context(self, request, obj, context=None):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
+        site_id = obj.site_id
+        languages = []
+        if site_id in settings.CMS_SITE_LANGUAGES:
+            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
+                languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
+        else:
+            languages = settings.CMS_LANGUAGES
         context.update({
             'language': language,
-            'traduction_language': settings.CMS_LANGUAGES,
-            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1 and \
+            'traduction_language': languages,
+            'show_language_tabs': len(languages) > 1 and \
                 not settings.CMS_DBGETTEXT,
         })
         return context

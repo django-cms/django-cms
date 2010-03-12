@@ -39,6 +39,14 @@ class PageAddForm(forms.ModelForm):
         self.fields['site'].widget = HiddenInput()
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
+        site_id = self.fields['site'].initial
+        languages = []
+        if site_id in settings.CMS_SITE_LANGUAGES:
+            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
+                languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
+        else:
+            languages = settings.CMS_LANGUAGES
+        self.fields['language'].choices = languages
         if self.fields['parent'].initial and \
             settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
             [name for name, value in settings.CMS_TEMPLATES]:
