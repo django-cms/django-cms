@@ -71,19 +71,18 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 INTERNAL_IPS = ('127.0.0.1',)
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
-    #'django.contrib.csrf.middleware.CsrfMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
-    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware', 
     
 )
 
