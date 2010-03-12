@@ -66,16 +66,12 @@ def get_language_from_request(request, current_page=None):
     """
     if settings.CMS_DBGETTEXT: 
         return get_default_language()
-
     language = request.REQUEST.get('language', None)
-    
     if language:
         if not language in dict(settings.CMS_LANGUAGES).keys():
             language = None
-        
     if language is None:
         language = getattr(request, 'LANGUAGE_CODE', None)
-        
     if language:
         if not language in dict(settings.CMS_LANGUAGES).keys():
             language = None

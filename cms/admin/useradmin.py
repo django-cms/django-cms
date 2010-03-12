@@ -23,6 +23,8 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
         (_('Groups'), {'fields': ('groups',)}),
     ]
     
+    add_fieldsets = fieldsets
+    
     def get_fieldsets(self, request, obj=None):
         fieldsets = self.update_permission_fieldsets(request, obj)
         
@@ -40,8 +42,7 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
             return self.model.objects.get_empty_query_set()
     
     def add_view(self, request):
-        return super(UserAdmin, self).add_view(request)        
-    
+        return super(UserAdmin, self).add_view(request) 
     
 class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     form = PageUserGroupForm

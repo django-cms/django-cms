@@ -39,6 +39,14 @@ class PageAddForm(forms.ModelForm):
         self.fields['site'].widget = HiddenInput()
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
+        site_id = self.fields['site'].initial
+        languages = []
+        if site_id in settings.CMS_SITE_LANGUAGES:
+            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
+                languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
+        else:
+            languages = settings.CMS_LANGUAGES
+        self.fields['language'].choices = languages
         if self.fields['parent'].initial and \
             settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
             [name for name, value in settings.CMS_TEMPLATES]:
@@ -56,8 +64,12 @@ class PageAddForm(forms.ModelForm):
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
-        site = self.cleaned_data.get('site', Site.objects.get_current())
-        if not is_valid_page_slug(page, parent, lang, slug, site):
+        try:
+            site = self.cleaned_data.get('site', Site.objects.get_current())
+        except Site.DoesNotExist:
+            site = None
+            raise ValidationError("No site found for current settings.")
+        if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data

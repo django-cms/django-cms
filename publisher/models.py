@@ -260,6 +260,8 @@ class Publisher(models.Model):
                 except ObjectDoesNotExist:
                     pass
                 else:
+                    if sub_obj.publisher_is_draft:
+                        continue
                     sub_obj._collect_delete_marked_sub_objects(seen_objs, self.__class__, related.field.null, excluded_models=excluded_models)
             else:
                 # To make sure we can access all elements, we can't use the
@@ -276,6 +278,8 @@ class Publisher(models.Model):
                 for sub_obj in delete_qs:
                     if not isinstance(sub_obj, Publisher) or sub_obj.__class__ in excluded_models:
                         continue
+                    if sub_obj.publisher_is_draft:
+                        continue
                     sub_obj._collect_delete_marked_sub_objects(seen_objs, self.__class__, related.field.null, excluded_models=excluded_models)
 
         # Handle any ancestors (for the model-inheritance case). We do this by
@@ -291,7 +295,8 @@ class Publisher(models.Model):
                 continue
             # At this point, parent_obj is base class (no ancestor models). So
             # delete it and all its descendents.
-
+            if parent_obj.publisher_is_draft:
+                continue
             parent_obj._collect_delete_marked_sub_objects(seen_objs, excluded_models=excluded_models)
 
 

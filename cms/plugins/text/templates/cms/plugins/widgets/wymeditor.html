@@ -105,14 +105,15 @@ $(document).ready(function(){
 
 
 function get_plugin_html(){
-	html = '<div class="plugin-select-holder">'
-		 + '<select name="plugins">'
-		 + '<option value="" selected="selected">{% filter escapejs %}{% trans "Available Plugins" %}{% endfilter %}</option>'{% for p in installed_plugins %}
-	     + '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
-		 + '</select>'
-		 + '<span class="insert-object addlink">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
-		 + '<span class="edit-object changelink">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
-		 + '</div>';
-	return html;
+	html = '<li class="wym_tools_plugins">'
+        + '<select name="plugins">'
+        + '<option value="" selected="selected">{% filter escapejs %}{% trans "Available Plugins" %}{% endfilter %}</option>'{% for p in installed_plugins %}
+    	+ '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
+        + '</select>'
+        + '<span class="insert-object addlink">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
+        + '<span class="edit-object changelink">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
+        + '</li>';
+return html;
+
 }
     </script>

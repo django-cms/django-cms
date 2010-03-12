@@ -290,16 +290,6 @@ Example::
 	
 By default django-cms hides the menu items that are not translated yet in the current language. With this setting set to False they will show up anyway.
 
-
-CMS_LANGUAGE_FALLBACK
------------------------
-
-Example::
-
-	CMS_LANGUAGE_FALLBACK = True
-	
-This will redirect the browser to the same page in an other language if the page is not available in the current language.
-
 CMS_LANGUAGES
 --------------
 
@@ -314,6 +304,44 @@ Example::
 	)
 	
 Normally the cms takes the LANGUAGES from the settings.py. With this you can overwrite this. Be sure that you don't have more language in here than in the LANGUAGES setting.
+
+
+CMS_LANGUAGE_FALLBACK
+-----------------------
+
+Example::
+
+	CMS_LANGUAGE_FALLBACK = True
+	
+This will redirect the browser to the same page in an other language if the page is not available in the current language.
+
+
+
+CMS_LANGUAGE_CONF
+-----------------
+
+Configures on how to order the fallbacks for languages.
+
+Example::
+
+	CMS_LANGUAGE_CONF = {
+		'de': ['en', 'fr'],
+		'en': ['de'],
+	}
+
+CMS_SITE_LANGUAGES
+------------------
+
+If you have more then one site and CMS_LANGUAGES differs between the site you may want to fill this out so 
+if you switch between the sites in the admin you only get the languages available on this site.
+
+Example::
+
+	CMS_SITE_LANGUAGES = {
+		1:['en','de'],
+		2:['en','fr'],
+	    3:['en'],
+	}
 
 CMS_CONTENT_CACHE_DURATION
 --------------------------
@@ -397,3 +425,12 @@ CMS_PLUGIN_PROCESSORS
 ---------------------
 
 A list of plugin processors. Plugin processors are callables that modify all plugin's output after rendering. See "Custom Plugins" for more information.
+
+
+CMS_TEMPLATE_INHERITANCE
+------------------------
+
+Enables the inheritance of templates from parent pages.
+
+Default: ``True``
+

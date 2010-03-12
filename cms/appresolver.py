@@ -119,7 +119,10 @@ def get_app_patterns():
     """
     from cms.models import Title
     from cms.models.pagemodel import Page
-    current_site = Site.objects.get_current()
+    try:
+        current_site = Site.objects.get_current()
+    except Site.DoesNotExist:
+        current_site = None
     included = []
     
     # we don't have a request here so get_page_queryset() can't be used,

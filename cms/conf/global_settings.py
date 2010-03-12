@@ -15,8 +15,9 @@ SITE_ID = 1
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
 CMS_TEMPLATES = None
 
-
+# Should pages be allowed to inherit their parent templates?
 CMS_TEMPLATE_INHERITANCE = True
+# This is just a STATIC GLOBAL VAR
 CMS_TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 
 CMS_PLACEHOLDER_CONF = {}
@@ -80,6 +81,13 @@ CMS_LANGUAGE_CONF = {}
 
 # Defines which languages should be offered.
 CMS_LANGUAGES = settings.LANGUAGES
+
+# If you have different sites with different languages you can configure them here
+# and you will only be able to edit the languages that are actually on the site.
+# example: {1:['en','de'],
+#           2:['en','fr'],
+#           3:['en'],}
+CMS_SITE_LANGUAGES = {}
 
 # Defines how long page content should be cached, including navigation
 CMS_CONTENT_CACHE_DURATION = 60

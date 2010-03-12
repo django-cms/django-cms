@@ -42,7 +42,10 @@ def current_site(request):
     else:
         site_pk = request.session.get('cms_admin_site', None)
         if site_pk:
-            return Site.objects.get(pk=site_pk)
+            try:
+                return Site.objects.get(pk=site_pk)
+            except Site.DoesNotExist:
+                return None
         else:
             return Site.objects.get_current()
         

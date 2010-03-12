@@ -48,9 +48,14 @@ class CMSPlugin(MpttPublisher):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
 
-    class _render_meta:
+    class RenderMeta:
         index = 0
         total = 1
+        text_enabled = False
+
+    def __init__(self, *args, **kwargs):
+        self._render_meta = self.RenderMeta()
+        super(CMSPlugin, self).__init__(*args, **kwargs)
 
     def __unicode__(self):
         return str(self.id) #""

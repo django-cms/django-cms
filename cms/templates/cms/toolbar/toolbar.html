@@ -849,7 +849,7 @@
 			</div>		
 			{% endif %}
 		{% else %}
-		<form method="post" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>
+		<form method="post" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
 			<label for="cms_username">{% trans "Username" %}</label>
 			<input type="text" name="cms_username" class="cms_textinput"></input>
 			<label for="cms_password">{% trans "Password" %}</label>

@@ -30,7 +30,10 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, width=No
             pass
     c = []
     edit = False
-    if ("edit" in request.GET or request.session.get("cms_edit", False)) and 'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and request.user.is_staff and request.user.is_authenticated:
+    if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
+            'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and \
+            request.user.is_staff and request.user.is_authenticated() and \
+            page.has_change_permission(request):
         edit = True
     if edit:
         installed_plugins = plugin_pool.get_all_plugins(placeholder_name, page)

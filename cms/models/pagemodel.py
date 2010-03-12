@@ -414,7 +414,7 @@ class Page(MpttPublisher):
         """
         page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
         if not page_title:
-            return self.get_menu_title(language, True, version_id, force_reload)
+            return self.get_title(language, True, version_id, force_reload)
         return page_title
 
     def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
