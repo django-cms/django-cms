@@ -204,8 +204,8 @@ msgid "higher"
 msgstr "更高"
 
 #: admin/pageadmin.py:604
-msgid "資料庫錯誤"
-msgstr ""
+msgid "Database error"
+msgstr "資料庫錯誤"
 
 #: admin/pageadmin.py:689 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -815,7 +815,7 @@ msgstr "網站"
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
-msgstr ""
+msgstr "網頁全站權限"
 
 #: models/permissionmodels.py:58
 msgid "Pages global permissions"
