@@ -397,3 +397,12 @@ CMS_PLUGIN_PROCESSORS
 ---------------------
 
 A list of plugin processors. Plugin processors are callables that modify all plugin's output after rendering. See "Custom Plugins" for more information.
+
+
+CMS_TEMPLATE_INHERITANCE
+------------------------
+
+Enables the inheritance of templates from parent pages.
+
+Default: ``True``
+

@@ -15,8 +15,9 @@ SITE_ID = 1
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
 CMS_TEMPLATES = None
 
-
+# Should pages be allowed to inherit their parent templates?
 CMS_TEMPLATE_INHERITANCE = True
+# This is just a STATIC GLOBAL VAR
 CMS_TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 
 CMS_PLACEHOLDER_CONF = {}
