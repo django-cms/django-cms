@@ -1774,36 +1774,36 @@ msgstr ""
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
-msgstr ""
+msgstr "Altseviye"
 
 #: tests/util/menu_extender.py:8
 msgid "Sublevel3"
-msgstr ""
+msgstr "Altseviye3"
 
 #: tests/util/menu_extender.py:11
 msgid "Sublevel 2"
-msgstr ""
+msgstr "Altseviye2"
 
 #: utils/moderator.py:84
 msgid "parent first"
-msgstr ""
+msgstr "önce üst"
 
 #: utils/moderator.py:91
 msgid "approve"
-msgstr ""
+msgstr "onayla"
 
 #: utils/moderator.py:243
 #, python-format
 msgid "CMS - Page %s requires approvement."
-msgstr ""
+msgstr "CMS - %s sayfası onay bekliyor."
 
 #: utils/permissions.py:206
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - kullanıcı hesabınız yaratıldı."
 
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - kullanıcı hesabınız güncellendi."
 
 #~ msgid "blank"
 #~ msgstr "boşluk"
