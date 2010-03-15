@@ -625,85 +625,85 @@ msgstr "पृष्ठ"
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "उपयोगकर्ता"
 
 #: models/moderatormodels.py:49 templatetags/cms_admin.py:65
 msgid "Moderate page"
-msgstr ""
+msgstr "मध्यम पृष्ठ"
 
 #: models/moderatormodels.py:50 templatetags/cms_admin.py:66
 msgid "Moderate children"
-msgstr ""
+msgstr "Moderate बच्चों"
 
 #: models/moderatormodels.py:51 templatetags/cms_admin.py:67
 msgid "Moderate descendants"
-msgstr ""
+msgstr "Moderate वंश"
 
 #: models/moderatormodels.py:54 models/moderatormodels.py:55
 msgid "PageModerator"
-msgstr ""
+msgstr "PageModerator"
 
 #: models/moderatormodels.py:97
 msgid "created"
-msgstr ""
+msgstr "निर्मित"
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr ""
+msgstr "बदला"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
-msgstr ""
+msgstr "अनुरोध हटा दें"
 
 #: models/moderatormodels.py:100
 msgid "move req."
-msgstr ""
+msgstr "अनुरोध बदल दे"
 
 #: models/moderatormodels.py:101
 msgid "publish req."
-msgstr ""
+msgstr "अनुरोध प्रकाशित."
 
 #: models/moderatormodels.py:102
 msgid "unpublish req."
-msgstr ""
+msgstr "अप्रकाशित अनुरोध."
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr ""
+msgstr "अनुमोदित"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
-msgstr ""
+msgstr "पृष्ठ moderator state"
 
 #: models/moderatormodels.py:116
 msgid "Page moderator states"
-msgstr ""
+msgstr "पृष्ठ moderator states"
 
 #: models/pagemodel.py:34
 msgid "req. app."
-msgstr ""
+msgstr "अनुरोध. app."
 
 #: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
 #: templates/cms/toolbar/toolbar.html:885
 #: templates/cms/toolbar/toolbar.html:919 utils/moderator.py:91
 msgid "delete"
-msgstr ""
+msgstr "मिटाना"
 
 #: models/pagemodel.py:37
 msgid "app. par."
-msgstr ""
+msgstr "app. par."
 
 #: models/pagemodel.py:42
 msgid "created by"
-msgstr ""
+msgstr "द्वारा निर्मित"
 
 #: models/pagemodel.py:43 templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
-msgstr ""
+msgstr "बदल द्वारा"
 
 #: models/pagemodel.py:46
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr ""
+msgstr "जब पृष्ठ रह जाना चाहिए. दर्जा \\ \"प्रकाशन चाहिए \" पेज के लिए जीना जाओ."
 
 #: models/pagemodel.py:47
 msgid "When to expire the page. Leave empty to never expire."
