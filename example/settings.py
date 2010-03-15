@@ -71,19 +71,18 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 INTERNAL_IPS = ('127.0.0.1',)
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
-    #'django.contrib.csrf.middleware.CsrfMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
-    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware', 
     
 )
 
@@ -134,12 +133,17 @@ LANGUAGES = (
     ('fr', gettext('French')),
     ('de', gettext('German')),
     ('en', gettext('English')),
-    ('pt-br', gettext("Brazil")),
+    ('pt-BR', gettext("Brazil")),
 )
 
 CMS_LANGUAGE_CONF = {
     'de':['fr', 'en'],
     'en':['fr', 'de'],
+}
+
+CMS_SITE_LANGUAGES = {
+    1:['fr','de','en','pt-BR'],
+    2:['de','en'],
 }
 
 APPEND_SLASH = True

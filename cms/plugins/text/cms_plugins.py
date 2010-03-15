@@ -53,9 +53,9 @@ class TextPlugin(CMSPluginBase):
             from dbgettext.parser import parsed_gettext
             instance.body = parsed_gettext(instance, 'body')
         context.update({
-            'body':plugin_tags_to_user_html(instance.body, context, placeholder), 
-            'placeholder':placeholder,
-            'object':instance
+            'body': plugin_tags_to_user_html(instance.body, context, placeholder), 
+            'placeholder': placeholder,
+            'object': instance
         })
         return context
     

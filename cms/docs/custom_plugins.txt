@@ -161,6 +161,8 @@ A string containing the rendered content of the plugin.
 
 The original context for the template used to render the plugin.
 
+Note that plugin processors are also applied to plugins embedded in Text. Depending on what your processor does, this might break the output. For example, if your processor wraps the output in a DIV tag, you might end up having DIVs inside of P tags, which is invalid. You can prevent such cases by returning `rendered_content` unchanged if `instance._render_meta.text_enabled` is True, which is the case when rendering an embedded plugin.  
+
 Example::
 
 Suppose you want to put wrap each plugin in the main placeholder in a colored box, but it would be too complicated to edit each individual plugin's template. 
@@ -175,9 +177,9 @@ Suppose you want to put wrap each plugin in the main placeholder in a colored bo
         '''
         This plugin processor wraps each plugin's output in a colored box if it is in the "main" placeholder.
         '''
-        if placeholder != 'main':
-            # Plugins not in the main placeholder remain unchanged
-            return rendered_content
+        if placeholder != 'main' \                   # Plugins not in the main placeholder should remain unchanged
+            or instance._render_meta.text_enabled:   # Plugins embedded in Text should remain unchanged in order not to break output
+                return rendered_content
         else:
             from django.template import Context, Template
             # For simplicity's sake, construct the template from a string: 

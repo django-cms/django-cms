@@ -218,13 +218,13 @@
 	        
 	        // don't assume admin site is root-level
 	        // grab base url to construct full absolute URLs
-	        admin_base_url = document.URL.split("/admin")[0];
+	        admin_base_url = document.URL.split("/cms/page/")[0] + "/";
 	        
 			// publish
 			if(jtarget.hasClass("publish-checkbox")) {
 	            var pageId = jtarget.attr("name").split("status-")[1];
 	            // if I don't put data in the post, django doesn't get it
-	            reloadItem(jtarget, admin_base_url + "/admin/cms/page/" + pageId + "/change-status/", { 1:1 });
+	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", { 1:1 });
 				e.stopPropagation();
 	            return true;
 	        }
@@ -233,7 +233,7 @@
 			if(jtarget.hasClass("navigation-checkbox")) {
 	            var pageId = jtarget.attr("name").split("navigation-")[1];
 	            // if I don't put data in the post, django doesn't get it
-				reloadItem(jtarget, admin_base_url + "/admin/cms/page/" + pageId + "/change-navigation/", { 1:1 });
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
 				e.stopPropagation();
 	            return true;
 	        }
@@ -252,7 +252,7 @@
 				// TODO: this must be changed sometimes to reloading just the portion
 				// of the tree = current node + descendants
 				
-				reloadItem(jtarget, admin_base_url + "/admin/cms/page/" + pageId + "/change-moderation/", { moderate: value }, refreshIfChildren(pageId));
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-moderation/", { moderate: value }, refreshIfChildren(pageId));
 				e.stopPropagation();
 	            return true;
 	        }
@@ -263,7 +263,7 @@
 				// just reload the page for now in callback... 
 				// TODO: this must be changed sometimes to reloading just the portion
 				// of the tree = current node + descendants 
-	            reloadItem(jtarget, admin_base_url + "/admin/cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
+	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
 	            return false;
 	        }

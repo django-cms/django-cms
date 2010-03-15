@@ -189,11 +189,7 @@
 		//<![CDATA[	
 		(function($) {
 			$(function(){
-				// override standard uncolapse_all javascript function, we need to call it
-				// only if there is submit, but submit might be cancelled over dialog.
-				var old_uncollapse_all = CollapsedFieldsets.uncollapse_all;
-				CollapsedFieldsets.uncollapse_all = function() {}
-
+			
 				var submitActor;
 				var forceSubmit = false;
 				var seen = false;
@@ -227,8 +223,6 @@
 					$('#id_moderator_state').val(
 						$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
 					);
-
-					old_uncollapse_all(); // uncolapse all fields django way
 					$('#dialog').dialog('close');
 					forceSubmit = true;
 					$(submitActor || '#page_form input[name=_save]').click();

@@ -41,8 +41,8 @@ class Page(MpttPublisher):
     
     template_choices = [(x, _(y)) for x,y in settings.CMS_TEMPLATES]
     
-    created_by = models.CharField(_("created by"), max_length=70)
-    changed_by = models.CharField(_("changed by"), max_length=70)
+    created_by = models.CharField(_("created by"), max_length=70, editable=False)
+    changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
@@ -420,7 +420,7 @@ class Page(MpttPublisher):
         """
         page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
         if not page_title:
-            return self.get_menu_title(language, True, version_id, force_reload)
+            return self.get_title(language, True, version_id, force_reload)
         return page_title
 
     def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):

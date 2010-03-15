@@ -62,7 +62,7 @@ class PageAdmin(model_admin):
     revision_form_template = "admin/cms/page/revision_form.html"
     recover_form_template = "admin/cms/page/recover_form.html"
     
-    exclude = ['created_by', 'changed_by', 'lft', 'rght', 'tree_id', 'level']
+    exclude = []
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
@@ -375,6 +375,8 @@ class PageAdmin(model_admin):
             for placeholder_name in get_placeholders(request, selected_template):
                 installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                 plugin_list = []
+                show_copy = False
+                copy_languages = {}
                 if obj:
                     if versioned:
                         from reversion.models import Version
@@ -399,8 +401,14 @@ class PageAdmin(model_admin):
                                 plugin_list.append(plugin)
                     else:
                         plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
+                        other_plugins = CMSPlugin.objects.filter(page=obj, placeholder=placeholder_name, parent=None).exclude(language=language)
+                        for plugin in other_plugins:
+                            if not plugin.language in copy_languages:
+                                copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
                 language = get_language_from_request(request, obj)
-                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'traduction_language': settings.CMS_LANGUAGES, 'language': language } )
+                if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
+                    show_copy = True
+                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'copy_languages': copy_languages.items(), 'show_copy':show_copy, 'language': language } )
                 form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
@@ -520,14 +528,21 @@ class PageAdmin(model_admin):
         })
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
     
-    def update_language_tab_context(self, request, obj=None, context=None):
+    def update_language_tab_context(self, request, obj, context=None):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
+        site_id = obj.site_id
+        languages = []
+        if site_id in settings.CMS_SITE_LANGUAGES:
+            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
+                languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
+        else:
+            languages = settings.CMS_LANGUAGES
         context.update({
             'language': language,
-            'traduction_language': settings.CMS_LANGUAGES,
-            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1 and \
+            'traduction_language': languages,
+            'show_language_tabs': len(languages) > 1 and \
                 not settings.CMS_DBGETTEXT,
         })
         return context
@@ -893,7 +908,7 @@ class PageAdmin(model_admin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0].lower()}
+                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0]}
             self.log_change(request, titleobj, message)
             self.message_user(request, message)
 
@@ -1232,11 +1247,8 @@ class PageAdmin(model_admin):
                 if not placeholder in placeholders:
                     return HttpResponse(str("error"))
                 plugin.placeholder = placeholder
-                position = 0
-                try:
-                    position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).order_by('position')[0].position + 1
-                except IndexError:
-                    pass
+                # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
+                position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).count()
                 plugin.position = position
                 plugin.save()
             else:

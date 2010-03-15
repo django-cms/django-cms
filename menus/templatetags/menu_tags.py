@@ -212,9 +212,11 @@ def page_language_url(context, lang):
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
     This is needed if you have slugs in more than one language.
     """
-    if not 'request' in context:
-        return ''
-    request = context['request']
+    try:
+        # If there's an exception (500), default context_processors may not be called.
+        request = context['request']
+    except KeyError:
+        return {'template': 'cms/content.html'}
     if hasattr(request, "_language_changer"):
         url = "/%s" % lang + request._language_changer(lang)
     else:
@@ -222,11 +224,12 @@ def page_language_url(context, lang):
         if page == "dummy":
             return ''
         try:
-            url = "/%s" % lang + page.get_absolute_url(language=lang, fallback=False)
+            from django.core.urlresolvers import reverse
+            root = reverse('pages-root')
+            url = page.get_absolute_url(language=lang, fallback=False)
+            url = root + lang + "/" + url[len(root):] 
         except:
-            url = "/%s/" % lang 
-    if url:
-        return {'content':url}
-    return {'content':''}
+            # no localized path/slug. 
+            url = ''
+    return {'content':url}
 page_language_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_language_url)
-

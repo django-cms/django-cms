@@ -98,7 +98,6 @@ def page_id_url(context, reverse_id, lang=None, site=None):
     return {'content':''}
 page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_id_url)
 
-
 def do_placeholder(parser, token):
     error_string = '%r tag requires at least 1 and accepts at most 2 arguments' % token.contents[0]
     try:

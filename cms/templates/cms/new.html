@@ -34,7 +34,7 @@
 <div id="instructions">
   <p>Here's what to do next:</p>
   <ul>
-    <li>Log into <a href="/admin/">admin</a> and <a href="/admin/cms/page/add/">add</a> some pages.</li>
+    <li>Log into <a href="{% url admin:index %}">admin</a> and <a href="{% url pages-root %}admin/cms/page/add/">add</a> some pages.</li>
     <li>Be sure to publish them.</li>
     <li>If you don't see here the django-cms logo be sure that you linked the <code>cms/media</code> folder to your media files: <img src="{{ CMS_MEDIA_URL }}images/logo.jpg" alt="here should be a logo"/></li>
     <li>More information can be found in the <a href="http://www.django-cms.org/en/documentation/">docs</a> on <a href="http://www.django-cms.org/">django-cms.org</a></li>
