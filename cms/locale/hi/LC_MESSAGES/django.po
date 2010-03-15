@@ -1211,7 +1211,7 @@ msgstr "seekbar bg color"
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
-msgstr ""
+msgstr "loadingbar color"
 
 #: plugins/video/models.py:28
 msgid "button out color"
