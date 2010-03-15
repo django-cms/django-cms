@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from django.conf import settings as django_settings
 from cms.utils.i18n import get_fallback_languages
+from cms.exceptions import NoHomeFound
 
 def get_current_page(path, lang, queryset, home_slug=None, home_tree_id=None):
     """Helper for getting current page from path depending on language
@@ -63,22 +64,21 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
     else:
         pages = page_queryset.published().filter(site=site)
     
-    root_pages = pages.all_root().order_by("tree_id")
     current_page, response = None, None
-    if root_pages:
+    if pages.all_root():
         if page_id:
             current_page = get_object_or_404(pages, pk=page_id)
         elif slug != None:
             if slug == "":
-                current_page = filter(lambda p: p.is_home(), pages)[0]
+                current_page = pages.get_home()
             else:
                 pages_root = reverse('pages-root')
                 path = slug.startswith(pages_root) and slug[len(pages_root):] or slug
 
                 try:
-                    home = filter(lambda p: p.is_home(), pages)[0]
+                    home = pages.get_home()
                     current_page, alternative = get_current_page(path, lang, pages, home.get_slug(language=lang), home.tree_id)
-                except IndexError:
+                except NoHomeFound:
                     current_page, alternative = get_current_page(path, lang, pages)
                      
                 if settings.CMS_APPLICATIONS_URLS:
