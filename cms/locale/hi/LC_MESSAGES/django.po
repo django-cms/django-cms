@@ -1038,93 +1038,93 @@ msgstr "टेम्पलेट %(template)s मौजूद नहीं ह�
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
+msgstr "दर्ज करें एक टेम्पलेट (यानी. \"snippets/plugin_xy.html\"), जो प्रदान किया जाएगा."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
-msgstr ""
+msgstr "स्निपेट्स"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
-msgstr ""
+msgstr "Teaser"
 
 #: plugins/teaser/models.py:16
 msgid "If present image will be clickable"
-msgstr ""
+msgstr "यदि वर्तमान छवि क्लिक करने योग्य हो जाएगा"
 
 #: plugins/teaser/models.py:21
 msgid "If present image will be clickable."
-msgstr ""
+msgstr "यदि वर्तमान छवि क्लिक करने योग्य हो जाएगा."
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
-msgstr ""
+msgstr "अधिक"
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr ""
+msgstr "पाठ"
 
 #: plugins/text/models.py:15 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "शरीर"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
-msgstr ""
+msgstr "Plugins"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "कृपया एक प्लगइन प्रकार का चयन करें."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
 msgid "Edit selected plugin"
-msgstr ""
+msgstr "संपादित करें प्लगइन का चयन"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
+msgstr "पाठ संपादक संपादन वस्तुओं का समर्थन नहीं करता."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
 msgid "No object selected."
-msgstr ""
+msgstr "कोई चयनित वस्तु."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "पाठ संपादक वस्तुओं डालने का समर्थन नहीं करता."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "नहीं एक प्लगइन वस्तु"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr ""
+msgstr "उपलब्ध प्लगइन्स"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
 msgid "Insert plugin"
-msgstr ""
+msgstr "डालें प्लगइन"
 
 #: plugins/twitter/cms_plugins.py:8
 msgid "Twitter"
-msgstr ""
+msgstr "चहचहाना"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr ""
+msgstr "twitter उपयोगकर्ता"
 
 #: plugins/twitter/models.py:8
 msgid "count"
