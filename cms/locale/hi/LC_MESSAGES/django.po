@@ -1648,85 +1648,86 @@ msgid "Edit mode"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:842
+#, fuzzy
 msgid "Status"
-msgstr ""
+msgstr "स्थिति"
 
 #: templates/cms/toolbar/toolbar.html:853
 msgid "Username"
-msgstr ""
+msgstr "उपयोगकर्ता नाम"
 
 #: templates/cms/toolbar/toolbar.html:857
 #: templates/cms/toolbar/toolbar.html:858
 msgid "login"
-msgstr ""
+msgstr "लॉग इन"
 
 #: templates/cms/toolbar/toolbar.html:869
 msgid "Template"
-msgstr ""
+msgstr "टेम्पलेट"
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "move"
-msgstr ""
+msgstr "चलना"
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "Move/add Pages"
-msgstr ""
+msgstr "स्थानांतरित / पेज जोड़ें"
 
 #: templates/cms/toolbar/toolbar.html:882
 msgid "add child"
-msgstr ""
+msgstr "child जोड़ें"
 
 #: templates/cms/toolbar/toolbar.html:882
 msgid "Add child page"
-msgstr ""
+msgstr "child पृष्ठ जोड़ें"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "add sibling"
-msgstr ""
+msgstr "sibling जोड़ें"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "Add sibling page"
-msgstr ""
+msgstr "sibling पृष्ठ जोड़ें"
 
 #: templates/cms/toolbar/toolbar.html:885
 msgid "Delete Page"
-msgstr ""
+msgstr "हटाएँ पृष्ठ"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "Site Administration"
-msgstr ""
+msgstr "साइट प्रशासन"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Page Settings"
-msgstr ""
+msgstr "पेज सेटिंग्स"
 
 #: templates/cms/toolbar/toolbar.html:895
 msgid "history"
-msgstr ""
+msgstr "इतिहास"
 
 #: templates/cms/toolbar/toolbar.html:895
 msgid "View History"
-msgstr ""
+msgstr "इतिहास देखें"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Lock"
-msgstr ""
+msgstr "ताला"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Logout"
-msgstr ""
+msgstr "लॉगआउट"
 
 #: templates/cms/toolbar/toolbar.html:903
 msgid "Close"
-msgstr ""
+msgstr "बंद करना"
 
 #: templates/cms/toolbar/toolbar.html:914
 msgid "up"
-msgstr ""
+msgstr "ऊपर"
 
 #: templates/cms/toolbar/toolbar.html:915
 msgid "down"
-msgstr ""
+msgstr "नीचे"
 
 #: templates/cms/toolbar/toolbar.html:917
 msgid "Settings"
