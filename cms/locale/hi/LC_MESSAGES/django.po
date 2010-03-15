@@ -787,85 +787,85 @@ msgstr "मॉडरेट कर सकते हैं"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
-msgstr ""
+msgstr "पृष्ठों को ठीक कर सकते हैं"
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "किसी भी नष्ट पृष्ठ की वसूली कर सकते हैं"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "अगर नहीं चुना, उपयोगकर्ता के सभी साइटों के लिए अनुमति दी गई अमीर."
 
 #: models/permissionmodels.py:52
 msgid "sites"
-msgstr ""
+msgstr "साइटें"
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
-msgstr ""
+msgstr "पृष्ठ वैश्विक अनुमति"
 
 #: models/permissionmodels.py:58
 msgid "Pages global permissions"
-msgstr ""
+msgstr "पेज वैश्विक अनुमति"
 
 #: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
-msgstr ""
+msgstr "अनुदान पर"
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
-msgstr ""
+msgstr "पृष्ठ अनुमति"
 
 #: models/permissionmodels.py:87
 msgid "User (page)"
-msgstr ""
+msgstr "उपयोगकर्ता (पृष्ठ)"
 
 #: models/permissionmodels.py:88
 msgid "Users (page)"
-msgstr ""
+msgstr "पृष्ठ (उपयोगकर्ता)"
 
 #: models/permissionmodels.py:100
 msgid "User group (page)"
-msgstr ""
+msgstr "उपयोगकर्ता समूह (पेज)"
 
 #: models/permissionmodels.py:101
 msgid "User groups (page)"
-msgstr ""
+msgstr "उपयोगकर्ता समूहों (पृष्ठ)"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "मेनू में शीर्षक अधिलेखित"
 
 #: models/titlemodels.py:15
 msgid "Path"
-msgstr ""
+msgstr "रास्ता"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
-msgstr ""
+msgstr "शीर्षक अधिलेखित(HTML शीर्षक टैग)"
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
-msgstr ""
+msgstr "फ़ाइल"
 
 #: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
 #: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
-msgstr ""
+msgstr "फ़ाइल"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
-msgstr ""
+msgstr "फ्लैश"
 
 #: plugins/flash/models.py:9
 msgid "use swf file"
-msgstr ""
+msgstr "उपयोग swf फ़ाइल"
 
 #: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
 #: plugins/video/models.py:14
 msgid "width"
-msgstr ""
+msgstr "चौड़ाई"
 
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:15
