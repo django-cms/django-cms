@@ -444,15 +444,15 @@ msgstr "पदावनत"
 
 #: docs/templates/search.html:21
 msgid "search"
-msgstr ""
+msgstr "खोज"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
-msgstr ""
+msgstr "खोज परिणाम"
 
 #: docs/templates/search.html:27
 msgid "Your search did not match any results."
-msgstr ""
+msgstr "आपकी खोज परिणाम किसी भी मेल नहीं खाती."
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
@@ -461,26 +461,26 @@ msgstr ""
 #: models/pluginmodel.py:42 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr ""
+msgstr "भाषा"
 
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
 #: migrations/0004_textobjects.py:22 models/pluginmodel.py:40
 msgid "position"
-msgstr ""
+msgstr "स्थिति"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
 #: models/pluginmodel.py:44 models/titlemodels.py:23
 msgid "creation date"
-msgstr ""
+msgstr "निर्माण तिथि"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
 #: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:41
 msgid "slot"
-msgstr ""
+msgstr "स्थान"
 
 #: migrations/0001_initial.py:18 models/pluginmodel.py:43
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
@@ -489,53 +489,53 @@ msgstr ""
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr ""
+msgstr "शीर्षक"
 
 #: migrations/0001_initial.py:28
 msgid "path"
-msgstr ""
+msgstr "रास्ता"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
-msgstr ""
+msgstr "सब"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
-msgstr ""
+msgstr "संपादित कर सकते हैं"
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
-msgstr ""
+msgstr "समूह"
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
-msgstr ""
+msgstr "प्रकाशित कर सकते हैं"
 
 #: migrations/0001_initial.py:42
 msgid "type"
-msgstr ""
+msgstr "प्रकार"
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
-msgstr ""
+msgstr "soft-root परिवर्तित कर सकते हैं"
 
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "स्थिति"
 
 #: migrations/0001_initial.py:53 models/pagemodel.py:51
 msgid "navigation extenders"
-msgstr ""
+msgstr "नेविगेशन extenders"
 
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr ""
+msgstr "url अधिलेखित है"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
