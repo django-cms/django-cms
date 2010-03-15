@@ -1128,86 +1128,86 @@ msgstr "twitter उपयोगकर्ता"
 
 #: plugins/twitter/models.py:8
 msgid "count"
-msgstr ""
+msgstr "गिनती"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr ""
+msgstr "प्रविष्टियों की संख्या प्रदर्शित करने के लिए"
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr ""
+msgstr "लिंक संकेत"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "अगर दी, इशारा आपके Twitter प्रोफ़ाइल की कड़ी के रूप में प्रदर्शित होता है."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
-msgstr ""
+msgstr "वीडियो"
 
 #: plugins/video/cms_plugins.py:42
 msgid "Color Settings"
-msgstr ""
+msgstr "रंग सेटिंग्स"
 
 #: plugins/video/models.py:10
 msgid "movie file"
-msgstr ""
+msgstr "फिल्म संचिका"
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "उपयोग flv फाइल या h264 एन्कोडेड फ़ाइल वीडियो."
 
 #: plugins/video/models.py:11
 msgid "movie url"
-msgstr ""
+msgstr "फिल्म url"
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
+msgstr "vimeo या YouTube वीडियो URL. उदाहरण: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
 msgid "preview image file"
-msgstr ""
+msgstr "पूर्वावलोकन छवि फ़ाइल"
 
 #: plugins/video/models.py:17
 msgid "auto play"
-msgstr ""
+msgstr "ऑटो खेल"
 
 #: plugins/video/models.py:18
 msgid "auto hide"
-msgstr ""
+msgstr "ऑटो छिपाना"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
-msgstr ""
+msgstr "fullscreen"
 
 #: plugins/video/models.py:20
 msgid "loop"
-msgstr ""
+msgstr "पाश"
 
 #: plugins/video/models.py:23
 msgid "background color"
-msgstr ""
+msgstr "पृष्ठभूमि का रंग"
 
 #: plugins/video/models.py:23 plugins/video/models.py:24
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
 msgid "Hexadecimal, eg ff00cc"
-msgstr ""
+msgstr "षोडश आधारी, ff00cc उदा"
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "पाठ का रंग"
 
 #: plugins/video/models.py:25
 msgid "seekbar color"
-msgstr ""
+msgstr "seekbar color"
 
 #: plugins/video/models.py:26
 msgid "seekbar bg color"
-msgstr ""
+msgstr "seekbar bg color"
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
