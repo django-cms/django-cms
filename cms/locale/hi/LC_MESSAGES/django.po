@@ -96,107 +96,87 @@ msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "अल्पविराम से अलग कभी कभी खोज इंजन द्वारा उपयोग खोजशब्दों की एक सूची."
 
 #: admin/forms.py:120
-#, fuzzy
 msgid "A page with this reverse URL id exists already."
 msgstr "इस रिवर्स यूआरएल आईडी के साथ एक पृष्ठ पहले से ही मौजूद है."
 
 #: admin/forms.py:127
-#, fuzzy
 msgid "Invalid URL, use /my/url format."
 msgstr "अवैध यूआरएल का प्रयोग करते हैं / मेरी / url प्रारूप."
 
 #: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
-#, fuzzy
 msgid "user"
 msgstr "उपयोगकर्ता"
 
 #: admin/forms.py:171
-#, fuzzy
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "पृष्ठ अनुमति जोड़ें भी बच्चों, या वंश का उपयोग करने की आवश्यकता है, अन्यथा पृष्ठ जोड़े अपने निर्माता से नहीं बदला जा सकता है."
 
 #: admin/forms.py:174
-#, fuzzy
 msgid "Add page permission also requires edit page permission."
 msgstr "पृष्ठ जोड़ें अनुमति भी पृष्ठ को संपादित करने की अनुमति की आवश्यकता है."
 
 #: admin/forms.py:201
-#, fuzzy
 msgid "Please select user or group first."
 msgstr "कृपया चुनें उपयोगकर्ता या समूह में पहले."
 
 #: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
 #: templates/admin/cms/page/change_form.html:65
 #: templates/admin/cms/page/plugin_change_form.html:69
-#, fuzzy
 msgid "Add"
 msgstr "जोड़ना"
 
 #: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
-#, fuzzy
 msgid "Change"
 msgstr "बदलना"
 
 #: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
-#, fuzzy
 msgid "Delete"
 msgstr "मिटाना"
 
 #: admin/forms.py:211
-#, fuzzy
 msgid "Recover (any) pages"
 msgstr "स्वस्थ (किसी भी पन्ने)"
 
 #: admin/forms.py:274
-#, fuzzy
 msgid "Notify user"
 msgstr "सूचित उपयोगकर्ता"
 
 #: admin/forms.py:275
-#, fuzzy
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "उपयोगकर्ता नाम या पासवर्ड को बदलने के बारे में उपयोगकर्ता के लिए ईमेल सूचना भेजें. उपयोगकर्ता ईमेल आवश्यक है."
 
 #: admin/forms.py:295
-#, fuzzy
 msgid "New password"
 msgstr "नया कूटशब्द"
 
 #: admin/forms.py:297
-#, fuzzy
 msgid "New password confirmation"
 msgstr "नए पासवर्ड की पुष्टि"
 
 #: admin/forms.py:316
-#, fuzzy
 msgid "Email notification requires valid email address."
 msgstr "ईमेल अधिसूचना मान्य ईमेल पते की आवश्यकता है."
 
 #: admin/forms.py:318
-#, fuzzy
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "नए पृष्ठ जोड़ने की अनुमति के पन्नों को बदलने की अनुमति की आवश्यकता है!"
 
 #: admin/forms.py:320
-#, fuzzy
 msgid "The permission to add new users requires the permission to change users!"
 msgstr "नए उपयोगकर्ताओं को जोड़ने की अनुमति उपयोगकर्ताओं को बदलने की अनुमति की आवश्यकता है!"
 
 #: admin/forms.py:322
-#, fuzzy
 msgid "To add permissions you also need to edit them!"
 msgstr "के लिए अनुमति आप भी उन्हें संपादित करने की आवश्यकता जोड़ें!"
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
-#, fuzzy
 msgid "Hidden"
 msgstr "छिपा हुआ"
 
 #: admin/pageadmin.py:122
-#, fuzzy
 msgid "Basic Settings"
 msgstr "मूल सेटिंग्स"
 
