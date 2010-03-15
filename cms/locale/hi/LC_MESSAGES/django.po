@@ -870,83 +870,83 @@ msgstr "चौड़ाई"
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:15
 msgid "height"
-msgstr ""
+msgstr "ऊँचाई"
 
 #: plugins/flash/templates/cms/plugins/flash.html:3
 msgid "Missing flash plugin."
-msgstr ""
+msgstr "फ़्लैश प्लगइन ग़ैरहाज़िर."
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
-msgstr ""
+msgstr "गूगल Map"
 
 #: plugins/googlemap/models.py:9
 msgid "map title"
-msgstr ""
+msgstr "Map शीर्षक"
 
 #: plugins/googlemap/models.py:11
 msgid "address"
-msgstr ""
+msgstr "पता"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr ""
+msgstr "ज़िप कोड"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr ""
+msgstr "नगर"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr ""
+msgstr "अतिरिक्त सामग्री"
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
-msgstr ""
+msgstr "ज़ूम स्तर"
 
 #: plugins/googlemap/models.py:18
 msgid "latitude"
-msgstr ""
+msgstr "अक्षांश"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr ""
+msgstr "का प्रयोग करें अक्षांश और ठीक धुन को देशांतर नक्शा possiton."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
-msgstr ""
+msgstr "देशांतर"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr ""
+msgstr "मार्ग चौरस करने का औज़ार शीर्षक"
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "गणना आपके यहाँ का सबसे तेज़ तरीका"
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
-msgstr ""
+msgstr "मार्ग चौरस करने का औज़ार"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
-msgstr ""
+msgstr "मानचित्र"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:73
 msgid "Your address"
-msgstr ""
+msgstr "आपका पता"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:76
 msgid "Calculate route"
-msgstr ""
+msgstr "गणना मार्ग"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "वारिस पृष्ठ से प्लगइन्स"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "भाषा या पृष्ठ से भरा जाना चाहिए"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
