@@ -12,7 +12,7 @@ from django.utils.http import urlquote
 from django.conf import settings as django_settings
 from cms.utils.i18n import get_fallback_languages
 
-def get_current_page(path, lang, queryset, home_slug, home_tree_id):
+def get_current_page(path, lang, queryset, home_slug=None, home_tree_id=None):
     """Helper for getting current page from path depending on language
     
     returns: (Page, None) or (None, path_to_alternative language)
@@ -70,21 +70,19 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
             current_page = get_object_or_404(pages, pk=page_id)
         elif slug != None:
             if slug == "":
-                current_page = root_pages[0]
+                current_page = filter(lambda p: p.is_home(), pages)[0]
             else:
-                if slug.startswith(reverse('pages-root')):
-                    path = slug.replace(reverse('pages-root'), '', 1)
-                else:
-                    path = slug
-                if root_pages:
-                    home_tree_id = root_pages[0].tree_id
-                    home_slug = root_pages[0].get_slug(language=lang)
-                else:
-                    home_slug = ""
-                    home_tree_id = None
-                current_page, alternative = get_current_page(path, lang, pages, home_slug, home_tree_id)
+                pages_root = reverse('pages-root')
+                path = slug.startswith(pages_root) and slug[len(pages_root):] or slug
+
+                try:
+                    home = filter(lambda p: p.is_home(), pages)[0]
+                    current_page, alternative = get_current_page(path, lang, pages, home.get_slug(language=lang), home.tree_id)
+                except IndexError:
+                    current_page, alternative = get_current_page(path, lang, pages)
+                     
                 if settings.CMS_APPLICATIONS_URLS:
-                    # check if it should'nt point to some application, if yes,
+                    # check if it shouldn't point to some application, if yes,
                     # change current page if required
                     current_page = applications_page_check(request, current_page, path)
                 if not current_page:
