@@ -1420,13 +1420,12 @@ msgid "published"
 msgstr "veröffentlicht"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "Status"
+msgstr "Start"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "Ende"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
