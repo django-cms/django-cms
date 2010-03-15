@@ -1390,8 +1390,9 @@ msgid "Pages on:"
 msgstr ""
 
 #: templates/admin/cms/page/change_list.html:115
+#, fuzzy
 msgid "Filter:"
-msgstr ""
+msgstr "फ़िल्टर करें:"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "on"
