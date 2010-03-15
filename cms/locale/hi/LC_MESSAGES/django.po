@@ -1215,71 +1215,71 @@ msgstr "loadingbar color"
 
 #: plugins/video/models.py:28
 msgid "button out color"
-msgstr ""
+msgstr "button out color"
 
 #: plugins/video/models.py:29
 msgid "button over color"
-msgstr ""
+msgstr "button over color"
 
 #: plugins/video/models.py:30
 msgid "button highlight color"
-msgstr ""
+msgstr " button highlight color"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr ""
+msgstr "फ़्लैश प्लगइन गुम. <a href=\"http://adobe.com/flashplayer\">यहाँ</a> डाउनलोड करें"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "बचाना"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "हटाएँ %(language)s अनुवाद "
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "Save as new"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr ""
+msgstr "Save और दूसरा जोड़ें"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:274
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Save और संपादन जारी"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
+msgstr "(पृष्ठ) <a href=\"%(admin_url)s\">%(page)s</a> आपके द्वारा approvement आवश्यकता हो सकती है."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr ""
+msgstr "पिछले परिवर्तन"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "प्रशासन में <a href=\"%(login_url)s\">यहाँ</a> प्रवेश करें."
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
-msgstr ""
+msgstr "प्रयोक्ता नाम:"
 
 #: templates/admin/cms/mail/page_user_change.html:11
 msgid "Password:"
-msgstr ""
+msgstr "पासवर्ड:"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr ""
+msgstr "एक पृष्ठ को बदलें"
 
 #: templates/admin/cms/page/change_form.html:62
 #: templates/admin/cms/page/change_list.html:8
@@ -1287,20 +1287,20 @@ msgstr ""
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
-msgstr ""
+msgstr "घर"
 
 #: templates/admin/cms/page/change_form.html:71
 msgid "Approve page deletion"
-msgstr ""
+msgstr "स्वीकृत पृष्ठ विलोपन"
 
 #: templates/admin/cms/page/change_form.html:77
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
-msgstr ""
+msgstr "( %(moderation_level)s  स्तर में approvement की आवश्यकता है)"
 
 #: templates/admin/cms/page/change_form.html:78
 msgid "(you can perform actions on this page directly)"
-msgstr ""
+msgstr "(आप इस पेज पर कार्रवाई सीधे प्रदर्शन कर सकते हैं)"
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "Remove delete request"
