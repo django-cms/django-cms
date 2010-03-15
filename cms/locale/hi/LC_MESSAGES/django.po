@@ -707,83 +707,83 @@ msgstr "जब पृष्ठ रह जाना चाहिए. दर्ज
 
 #: models/pagemodel.py:47
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "जब पृष्ठ समाप्त होने के लिए. खाली छोड़ना कभी नहीं समाप्त होने के लिए."
 
 #: models/pagemodel.py:49
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "सभी पूर्वजों नेविगेशन में प्रदर्शित नहीं किया जाएगा"
 
 #: models/pagemodel.py:50
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr ""
+msgstr "एक अद्वितीय पहचानकर्ता है कि इस पृष्ठ पर जोड़ने के लिए page_url templatetag के साथ प्रयोग किया जाता है"
 
 #: models/pagemodel.py:52
 msgid "is published"
-msgstr ""
+msgstr "प्रकाशित है"
 
 #: models/pagemodel.py:54
 msgid "The template used to render the content."
-msgstr ""
+msgstr "के लिए सामग्री प्रदान करते थे खाके."
 
 #: models/pagemodel.py:55
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "साइट पृष्ठ पर पहुँचा जा सकता है."
 
 #: models/pagemodel.py:55
 msgid "site"
-msgstr ""
+msgstr "साइट"
 
 #: models/pagemodel.py:57
 msgid "moderator state"
-msgstr ""
+msgstr "मॉडरेटर state"
 
 #: models/pagemodel.py:65
 msgid "menu login required"
-msgstr ""
+msgstr "मेनू लॉगिन आवश्यक"
 
 #: models/pagemodel.py:65
 msgid "only show this page in the menu if the user is logged in"
-msgstr ""
+msgstr "केवल मीनू में इस पृष्ठ शो यदि उपयोगकर्ता में लॉग इन किया है"
 
 #: models/pagemodel.py:73
 msgid "pages"
-msgstr ""
+msgstr "पन्ने"
 
 #: models/pagemodel.py:179
 msgid "Page was copied."
-msgstr ""
+msgstr "पृष्ठ नकल की थी."
 
 #: models/pagemodel.py:502
 msgid "default"
-msgstr ""
+msgstr "default"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr ""
+msgstr "जोड़ सकते हैं"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr ""
+msgstr "नष्ट कर सकते हैं"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr ""
+msgstr "उन्नत सेटिंग्स बदल सकते हैं"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr ""
+msgstr "अनुमति को बदल सकते हैं"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr ""
+msgstr "पृष्ठ स्तर पर"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "कर सकते हैं हिलना"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
-msgstr ""
+msgstr "मॉडरेट कर सकते हैं"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
