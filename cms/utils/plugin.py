@@ -18,9 +18,12 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, width=No
     l = get_language_from_request(context['request'])
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == placeholder_name]
-    if settings.CMS_PLACEHOLDER_CONF and placeholder_name in settings.CMS_PLACEHOLDER_CONF:
-        if "extra_context" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
-            context.update(settings.CMS_PLACEHOLDER_CONF[placeholder_name]["extra_context"])
+    template = page.template
+    extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder_name), {}).get("extra_context", None)
+    if not extra_context:
+        extra_context = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("extra_context", None)
+    if extra_context:
+        context.update(extra_context)
     if width:
         # this may overwrite previously defined key [width] from settings.CMS_PLACEHOLDER_CONF
         try:
@@ -37,10 +40,11 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, width=No
         edit = True
     if edit:
         installed_plugins = plugin_pool.get_all_plugins(placeholder_name, page)
-        name = placeholder_name
-        if settings.CMS_PLACEHOLDER_CONF and placeholder_name in settings.CMS_PLACEHOLDER_CONF:
-            if "name" in settings.CMS_PLACEHOLDER_CONF[placeholder_name]:
-                name = settings.CMS_PLACEHOLDER_CONF[placeholder_name]['name']
+        name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder_name), {}).get("name", None)
+        if not name:
+            name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
+        if not name:
+            name = placeholder_name
         name = title(name)
         c.append(render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                'language':l,
