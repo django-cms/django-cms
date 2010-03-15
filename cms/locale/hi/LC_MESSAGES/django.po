@@ -950,91 +950,91 @@ msgstr "भाषा या पृष्ठ से भरा जाना चा
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "एक पृष्ठ का चयन इस placeholder में अपनी plugins शामिल करने के लिए, खाली वर्तमान पृष्ठ का चयन होगा"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr ""
+msgstr "वैकल्पिक: plugins तुम चाहते हो की भाषा"
 
 #: plugins/link/cms_plugins.py:11
 msgid "Link"
-msgstr ""
+msgstr " लिंक"
 
 #: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
 #: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
-msgstr ""
+msgstr "नाम"
 
 #: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
 #: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:21
 msgid "link"
-msgstr ""
+msgstr "जोड़ना"
 
 #: plugins/link/models.py:13
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "एक पृष्ठ पर एक लिंक एक पाठ लिंक पर प्राथमिकता है."
 
 #: plugins/link/models.py:14
 msgid "mailto"
-msgstr ""
+msgstr "mailto"
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
-msgstr ""
+msgstr "एक ईमेल पता एक पाठ लिंक पर प्राथमिकता है."
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
-msgstr ""
+msgstr "चित्र"
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr ""
+msgstr "छोड़ा"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr ""
+msgstr "सही"
 
 #: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
 #: plugins/teaser/models.py:12 plugins/video/models.py:12
 msgid "image"
-msgstr ""
+msgstr "छवि"
 
 #: plugins/picture/models.py:21 plugins/picture/models.py:22
 msgid "if present image will be clickable"
-msgstr ""
+msgstr "यदि वर्तमान छवि क्लिक करने योग्य हो जाएगा"
 
 #: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
-msgstr ""
+msgstr "वैकल्पिक पाठ"
 
 #: plugins/picture/models.py:23
 msgid "textual description of the image"
-msgstr ""
+msgstr "छवि का पाठ्य विवरण"
 
 #: plugins/picture/models.py:24
 msgid "long description"
-msgstr ""
+msgstr "लंबे विवरण"
 
 #: plugins/picture/models.py:24
 msgid "additional description of the image"
-msgstr ""
+msgstr "छवि का अतिरिक्त विवरण"
 
 #: plugins/picture/models.py:25
 msgid "side"
-msgstr ""
+msgstr "पार्श्व"
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
-msgstr ""
+msgstr "टुकड़ा"
 
 #: plugins/snippet/cms_plugins.py:30
 #, python-format
 msgid "Template %(template)s does not exist."
-msgstr ""
+msgstr "टेम्पलेट %(template)s मौजूद नहीं है."
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
