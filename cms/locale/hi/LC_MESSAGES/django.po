@@ -539,87 +539,104 @@ msgstr "url अधिलेखित है"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
-msgstr ""
+msgstr "url अधिलेखित"
 
 #: migrations/0001_initial.py:57
 msgid "author"
-msgstr ""
+msgstr "लेखक"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
-msgstr ""
+msgstr "रिवर्स url आईडी"
 
 #: migrations/0001_initial.py:59 models/pagemodel.py:64
+#, fuzzy
 msgid "login required"
-msgstr ""
+msgstr "लॉगिन आवश्यक"
 
 #: migrations/0001_initial.py:60 models/pagemodel.py:49
+#, fuzzy
 msgid "soft root"
-msgstr ""
+msgstr "नरम जड़"
 
 #: migrations/0001_initial.py:63 models/pagemodel.py:47
+#, fuzzy
 msgid "publication end date"
-msgstr ""
+msgstr "प्रकाशन समाप्ति तिथि"
 
 #: migrations/0001_initial.py:64 models/pagemodel.py:54
 #: plugins/snippet/models.py:14
+#, fuzzy
 msgid "template"
-msgstr ""
+msgstr "टेम्पलेट"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:46
+#, fuzzy
 msgid "publication date"
-msgstr ""
+msgstr "प्रकाशन तिथि"
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:48
 #: templates/admin/cms/page/change_list_tree.html:9
+#, fuzzy
 msgid "in navigation"
-msgstr ""
+msgstr "नेविगेशन में"
 
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
 #: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
+#, fuzzy
 msgid "application"
-msgstr ""
+msgstr "आवेदन"
 
 #: migrations/0006_apphook.py:65 models/pagemodel.py:50
+#, fuzzy
 msgid "id"
-msgstr ""
+msgstr "आईडी"
 
 #: migrations/0008_redirects.py:11 models/titlemodels.py:18
+#, fuzzy
 msgid "redirect"
-msgstr ""
+msgstr "पुनर्निर्देशित"
 
 #: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
+#, fuzzy
 msgid "keywords"
-msgstr ""
+msgstr "खोजशब्दों"
 
 #: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:22
+#, fuzzy
 msgid "description"
-msgstr ""
+msgstr "वर्णन"
 
 #: models/moderatormodels.py:24
+#, fuzzy
 msgid "Current page"
-msgstr ""
+msgstr "वर्तमान पृष्ठ"
 
 #: models/moderatormodels.py:25
+#, fuzzy
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "पृष्ठ बच्चों को तत्काल ()"
 
 #: models/moderatormodels.py:26
+#, fuzzy
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "पृष्ठ और बच्चों को तत्काल ()"
 
 #: models/moderatormodels.py:27
+#, fuzzy
 msgid "Page descendants"
-msgstr ""
+msgstr "वंश पृष्ठ"
 
 #: models/moderatormodels.py:28
+#, fuzzy
 msgid "Page and descendants"
-msgstr ""
+msgstr "पृष्ठ और वंश"
 
 #: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
+#, fuzzy
 msgid "Page"
-msgstr ""
+msgstr "पृष्ठ"
 
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
