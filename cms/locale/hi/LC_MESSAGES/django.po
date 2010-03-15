@@ -356,89 +356,91 @@ msgstr ""
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr ""
+msgstr "सब functions, classes, terms"
 
 #: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
 #: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
 #: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
-msgstr ""
+msgstr "सूचकांक"
 
 #: docs/templates/genindex-single.html:44
 #: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
-msgstr ""
+msgstr "एक पन्ने पर पूर्ण सूचकांक"
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
-msgstr ""
+msgstr "पत्र के सूचकांक पृष्ठ"
 
 #: docs/templates/genindex-split.html:15
 msgid "can be huge"
-msgstr ""
+msgstr "हो सकता है भारी"
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
-msgstr ""
+msgstr "नेविगेशन"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
-msgstr ""
+msgstr "सामग्री तालिका"
 
 #: docs/templates/layout.html:48
 msgid "Previous topic"
-msgstr ""
+msgstr "पिछला विषय"
 
 #: docs/templates/layout.html:50
 msgid "previous chapter"
-msgstr ""
+msgstr "पिछले अध्याय"
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr ""
+msgstr "अगला विषय"
 
 #: docs/templates/layout.html:55
+#, fuzzy
 msgid "next chapter"
-msgstr ""
+msgstr "अगले अध्याय"
 
 #: docs/templates/layout.html:60
 msgid "This Page"
-msgstr ""
+msgstr "यह पेज"
 
 #: docs/templates/layout.html:63
 msgid "Show Source"
-msgstr ""
+msgstr "दिखाएँ स्रोत"
 
 #: docs/templates/layout.html:73
 msgid "Quick search"
-msgstr ""
+msgstr "त्वरित खोज"
 
 #: docs/templates/layout.html:76
 msgid "Go"
-msgstr ""
+msgstr "जाना"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr ""
+msgstr "खोज शब्द या एक मॉड्यूल, वर्ग या समारोह में नाम दर्ज करें."
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
-msgstr ""
+msgstr "इन दस्तावेजों के बारे में"
 
 #: docs/templates/layout.html:134 docs/templates/search.html:2
 #: docs/templates/search.html.py:5
 msgid "Search"
-msgstr ""
+msgstr "खोज"
 
 #: docs/templates/layout.html:137
+#, fuzzy
 msgid "Copyright"
-msgstr ""
+msgstr "कॉपीराइट"
 
 #: docs/templates/modindex.html:36
 msgid "Deprecated"
-msgstr ""
+msgstr "पदावनत"
 
 #: docs/templates/search.html:21
 msgid "search"
