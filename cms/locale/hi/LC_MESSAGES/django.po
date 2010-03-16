@@ -1579,22 +1579,19 @@ msgid "Page doesn't inherit any permissions."
 msgstr "पृष्ठ नहीं किसी अनुमति के वारिस."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
-#, fuzzy
 msgid "An old revision of a plugin can not be saved!"
 msgstr "एक प्लगइन का एक पुराना संशोधन नहीं बचाया जा सकता है!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
-#, fuzzy
 msgid "Plugin saved successfully."
 msgstr "प्लगइन सफलतापूर्वक बचाया."
 
 #: templates/admin/cms/page/recover_form.html:17
-#, python-format, fuzzy
+#, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr "ठीक नष्ट (% verbose_name) एस"
+msgstr "ठीक नष्ट %(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
-#, fuzzy
 msgid "Press the save button below to recover this version of the object."
 msgstr "प्रेस नीचे बटन को बचाने के लिए वस्तु के इस संस्करण ठीक हो."
 
@@ -1604,48 +1601,39 @@ msgid "Revert %(verbose_name)s"
 msgstr "वापस %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
-#, fuzzy
 msgid "Press the save button below to revert to this version of the object."
 msgstr "प्रेस नीचे बटन को बचाने के लिए वस्तु के इस संस्करण में लौट जाते."
 
 #: templates/admin/cms/page/dialog/copy.html:4
-#, fuzzy
 msgid "Copy options"
 msgstr "कॉपी विकल्प"
 
 #: templates/admin/cms/page/dialog/copy.html:6
-#, fuzzy
 msgid "Choose copy options"
 msgstr "नकल विकल्प चुनें"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
-#, fuzzy
 msgid "Add Plugin"
 msgstr "प्लगइन जोड़ें"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
 msgstr "भाषा से"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
-#, fuzzy
 msgid "Copy Plugins"
 msgstr "कॉपी प्लगइन्स"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
-#, fuzzy
 msgid "You must save the page first to add plugins."
 msgstr "आप को plugins जोड़ने के पहले पृष्ठ बचाने के लिए करना चाहिए."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
-#, fuzzy
 msgid "No Plugin selected. Selected one on the left side"
 msgstr "प्लगइन नहीं चुना है. बाईं ओर एक चयनित"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
-#, fuzzy
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr "नहीं प्लगइन्स उपस्थित. इस placeholder-स्लॉट के लिए एक प्लगइन जोड़ें."
 
@@ -1655,12 +1643,10 @@ msgid "Move to %(name)s"
 msgstr "%(name)s में ले जाएँ"
 
 #: templates/cms/toolbar/toolbar.html:806
-#, fuzzy
 msgid "Are you sure you want to delete this plugin?"
 msgstr "क्या आप सुनिश्चित हैं कि आप इस प्लगइन का हटाना चाहते हैं?"
 
 #: templates/cms/toolbar/toolbar.html:835
-#, fuzzy
 msgid "Edit mode"
 msgstr "संपादित करें मोड"
 
