@@ -1566,7 +1566,7 @@ msgstr "(वैश्विक)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(वर्तमान)"
 
 #: templates/admin/cms/page/permissions.html:41
 #, fuzzy
@@ -1614,46 +1614,55 @@ msgid "Copy options"
 msgstr "कॉपी विकल्प"
 
 #: templates/admin/cms/page/dialog/copy.html:6
+#, fuzzy
 msgid "Choose copy options"
-msgstr ""
+msgstr "नकल विकल्प चुनें"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
+#, fuzzy
 msgid "Add Plugin"
-msgstr ""
+msgstr "प्लगइन जोड़ें"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
+#, fuzzy
 msgid "From Language"
-msgstr ""
+msgstr "भाषा से"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
+#, fuzzy
 msgid "Copy Plugins"
-msgstr ""
+msgstr "कॉपी प्लगइन्स"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
+#, fuzzy
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "आप को plugins जोड़ने के पहले पृष्ठ बचाने के लिए करना चाहिए."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
+#, fuzzy
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "प्लगइन नहीं चुना है. बाईं ओर एक चयनित"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
+#, fuzzy
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
+msgstr "नहीं प्लगइन्स उपस्थित. इस placeholder-स्लॉट के लिए एक प्लगइन जोड़ें."
 
 #: templates/cms/toolbar/toolbar.html:760
 #, python-format
 msgid "Move to %(name)s"
-msgstr ""
+msgstr "%(name)s में ले जाएँ"
 
 #: templates/cms/toolbar/toolbar.html:806
+#, fuzzy
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "क्या आप सुनिश्चित हैं कि आप इस प्लगइन का हटाना चाहते हैं?"
 
 #: templates/cms/toolbar/toolbar.html:835
+#, fuzzy
 msgid "Edit mode"
-msgstr ""
+msgstr "संपादित करें मोड"
 
 #: templates/cms/toolbar/toolbar.html:842
 #, fuzzy
