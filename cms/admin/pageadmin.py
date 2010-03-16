@@ -531,9 +531,11 @@ class PageAdmin(model_admin):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
-        site_id = obj.site_id
+        site_id = None
+        if obj:
+            site_id = obj.site_id
         languages = []
-        if site_id in settings.CMS_SITE_LANGUAGES:
+        if site_id and site_id in settings.CMS_SITE_LANGUAGES:
             for lang in settings.CMS_SITE_LANGUAGES[site_id]:
                 languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
         else:
