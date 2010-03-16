@@ -1403,80 +1403,65 @@ msgid "off"
 msgstr " off"
 
 #: templates/admin/cms/page/change_list.html:117
-#, fuzzy
 msgid "Filter"
 msgstr "फ़िल्टर"
 
 #: templates/admin/cms/page/change_list_tree.html:8
-#, fuzzy
 msgid "actions"
 msgstr "कार्रवाई"
 
 #: templates/admin/cms/page/change_list_tree.html:10
-#, fuzzy
 msgid "moderate"
 msgstr "मध्यम"
 
 #: templates/admin/cms/page/change_list_tree.html:13
-#, fuzzy
 msgid "published"
 msgstr "प्रकाशित"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
 msgstr "प्रारंभ करना"
 
 #: templates/admin/cms/page/change_list_tree.html:16
-#, fuzzy
 msgid "end"
 msgstr "अंत"
 
 #: templates/admin/cms/page/change_list_tree.html:18
-#, fuzzy
 msgid "last changes"
 msgstr "पिछले परिवर्तन"
 
 #: templates/admin/cms/page/menu_item.html:5
-#, fuzzy
 msgid "select this page"
 msgstr "इस पेज का चयन करें"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
-#, fuzzy
 msgid "edit this page"
 msgstr "इस पृष्ठ को संपादित करें"
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:891
 #: templates/cms/toolbar/toolbar.html:912
-#, fuzzy
 msgid "edit"
 msgstr "संपादित करें"
 
 #: templates/admin/cms/page/menu_item.html:16
-#, fuzzy
 msgid "insert above"
 msgstr "ऊपर डालें"
 
 #: templates/admin/cms/page/menu_item.html:17
-#, fuzzy
 msgid "insert below"
 msgstr "डालने के नीचे"
 
 #: templates/admin/cms/page/menu_item.html:19
-#, fuzzy
 msgid "insert inside"
 msgstr "डालने के अंदर"
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "softroot"
 msgstr "softroot"
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "home"
 msgstr "घर"
 
@@ -1486,12 +1471,10 @@ msgid "Edit this page in %(language)s "
 msgstr "%(language)s में इस पृष्ठ को संपादित करें एस"
 
 #: templates/admin/cms/page/menu_item.html:33
-#, fuzzy
 msgid "Cut"
 msgstr "काटना"
 
 #: templates/admin/cms/page/menu_item.html:33
-#, fuzzy
 msgid "cut"
 msgstr "काटना"
 
