@@ -1358,42 +1358,46 @@ msgid "Page states"
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
-#, python-format
+#, python-format, fuzzy
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-msgstr ""
+msgstr "इस पृष्ठ स्तर (% moderation_level) में संचालित होगा एस, मध्यस्थ के लिए एक संदेश पोस्ट."
 
 #: templates/admin/cms/page/change_form.html:185
+#, fuzzy
 msgid "Request approvemet"
-msgstr ""
+msgstr "अनुरोध approvemet"
 
 #: templates/admin/cms/page/change_list.html:3
+#, fuzzy
 msgid "List of pages"
-msgstr ""
+msgstr "पृष्ठों की सूची"
 
 #: templates/admin/cms/page/change_list.html:57
+#, fuzzy
 msgid "Successfully moved"
-msgstr ""
+msgstr "सफलतापूर्वक चला गया"
 
 #: templates/admin/cms/page/change_list.html:62
+#, fuzzy
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "एक त्रुटि हो गई. कृपया पृष्ठ पुनः लोड"
 
 #: templates/admin/cms/page/change_list.html:83
-#, python-format
+#, python-format, fuzzy
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "ठीक नष्ट (% नाम) एस"
 
 #: templates/admin/cms/page/change_list.html:86
-#, python-format
+#, python-format, fuzzy
 msgid "Add %(name)s"
-msgstr ""
+msgstr "(नाम)% s जोड़ें"
 
 #: templates/admin/cms/page/change_list.html:98
+#, fuzzy
 msgid "Pages on:"
-msgstr ""
+msgstr "पन्नों पर:"
 
 #: templates/admin/cms/page/change_list.html:115
-#, fuzzy
 msgid "Filter:"
 msgstr "फ़िल्टर करें:"
 
