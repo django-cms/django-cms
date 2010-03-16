@@ -2,13 +2,14 @@ from django.conf import settings
 from menus.exceptions import NamespaceAllreadyRegistered, NoParentFound
 from django.contrib.sites.models import Site
 import copy
+from django.core.cache import cache
+import pickle
 
 class MenuPool(object):
     def __init__(self):
         self.menus = {}
         self.modifiers = []
         self.discovered = False
-        self.nodes = {}
         
     def discover_menus(self):
         if self.discovered:
@@ -19,8 +20,10 @@ class MenuPool(object):
         register()
         self.discovered = True
         
-    def clear(self):
-        self.nodes = {}
+    def clear(self, site_id):
+        for lang in dict(settings.CMS_LANGUAGES).keys():
+            key = "menu_nodes_%s_%s" % (lang, site_id)
+            cache.delete(key)
     
     def register_menu(self, menu):
         from menus.base import Menu
@@ -38,13 +41,11 @@ class MenuPool(object):
     
     def _build_nodes(self, request, site_id):
         lang = request.LANGUAGE_CODE
-        
-        if not lang in self.nodes:
-            self.nodes[lang] = {}
-        if not site_id in self.nodes[lang]:
-            self.nodes[lang][site_id] = []
-        else:
-            return self.nodes[lang][site_id]
+        key = "menu_nodes_%s_%s" % (lang, site_id)
+        cached_nodes = cache.get(key, None)
+        if cached_nodes:
+            return cached_nodes
+        final_nodes = []
         for ns in self.menus:
             try:
                 nodes = self.menus[ns].get_nodes(request)
@@ -78,9 +79,10 @@ class MenuPool(object):
                         node.parent.children.append(node)
                     else:
                         continue
-                self.nodes[lang][site_id].append(node)
+                final_nodes.append(node)
                 last = node
-        return self.nodes[lang][site_id]
+        cache.set(key, final_nodes, 60*60)
+        return final_nodes
     
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:

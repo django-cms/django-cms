@@ -43,7 +43,7 @@ def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
     
-    menu_pool.clear()
+    menu_pool.clear(instance.page.site_id)
     
     instance.tmp_path = None
     instance.tmp_application_urls = None
@@ -181,7 +181,7 @@ def pre_save_page(instance, raw, **kwargs):
     """Helper pre save signal, assigns old_page attribute, so we can still
     compare changes. Currently used only if CMS_PUBLISHER
     """
-    menu_pool.clear()
+    menu_pool.clear(instance.site_id)
     instance.old_page = None
     try:
         instance.old_page = Page.objects.get(pk=instance.pk)

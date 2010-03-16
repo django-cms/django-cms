@@ -22,7 +22,7 @@ class MenusTestCase(CMSTestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu']}
-        menu_pool.clear()
+        menu_pool.clear(settings.SITE_ID)
         self.create_some_nodes()
         
     def tearDown(self):
@@ -197,7 +197,7 @@ class MenusTestCase(CMSTestCase):
         page4 = Page.objects.get(pk=self.page4.pk)
         page4.in_navigation = True
         page4.save()
-        menu_pool.clear()
+        menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
         nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 2)

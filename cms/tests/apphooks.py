@@ -23,7 +23,7 @@ class ApphookTestCase(CMSTestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu']}
-        menu_pool.clear()
+        menu_pool.clear(settings.SITE_ID)
         self.create_some_nodes()
         
     def tearDown(self):

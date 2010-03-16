@@ -16,7 +16,7 @@ class NavExtenderTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         self.login_user(u)
-        menu_pool.clear()
+        menu_pool.clear(settings.SITE_ID)
         
         if not menu_pool.discovered:
             menu_pool.discover_menus()
