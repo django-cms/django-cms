@@ -1303,16 +1303,19 @@ msgid "(you can perform actions on this page directly)"
 msgstr "(आप इस पेज पर कार्रवाई सीधे प्रदर्शन कर सकते हैं)"
 
 #: templates/admin/cms/page/change_form.html:91
+#, fuzzy
 msgid "Remove delete request"
-msgstr ""
+msgstr "हटाने के अनुरोध को हटाना"
 
 #: templates/admin/cms/page/change_form.html:93
+#, fuzzy
 msgid "Approve delete"
-msgstr ""
+msgstr "स्वीकृत हटाना"
 
 #: templates/admin/cms/page/change_form.html:93
+#, fuzzy
 msgid "Approve"
-msgstr ""
+msgstr "स्वीकृत"
 
 #: templates/admin/cms/page/change_form.html:93
 #: templates/admin/cms/page/change_form.html:94
