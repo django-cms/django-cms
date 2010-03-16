@@ -138,21 +138,27 @@ menu_pool.register_modifier(NavExtender)
 
 class SoftRootCutter(Modifier):
     def modify(self, request, nodes, namespace, id, post_cut, breadcrumb):
-        return nodes
-        if post_cut:
+        if post_cut or not settings.CMS_SOFTROOT:
             return nodes
         selected = None
+        root_nodes = []
         for node in nodes:
             if node.selected:
                 selected = node
-        nodes = []
+            if not node.parent:
+                root_nodes.append(node)
+        
         if selected:
             if selected.attr.get("soft_root", False):
-                nodes = selected.children
+                nodes = selected.get_descendants()
+                selected.parent = None
+                nodes = [selected] + nodes
             else:
-                if selected.parent:
-                    self.find_ancestors(selected.parent, selected, nodes)
-            self.find_children(selected, nodes)
+                nodes = self.find_ancestors(selected, nodes)
+            nodes = self.find_children(selected, nodes)
+        else:
+            for node in root_nodes:
+                self.find_children(node, nodes)
         return nodes   
     
     def find_children(self, node, nodes):
@@ -166,28 +172,26 @@ class SoftRootCutter(Modifier):
             nodes.remove(n)
             self.remove_children(n, nodes)
         node.children = []
-        return nodes
     
-    def find_ancestors(self, node, child, nodes):
+    def find_ancestors(self, node, nodes):
         is_root = False
-        if node.parent and node.parent.attr.get("soft_root", False):
-            is_root = True
-            nodes.remove(node)
-            nodes = self.remove_ancestors(node.parent, node, nodes)
+        if node.parent:
+            if node.parent.attr.get("soft_root", False):
+                is_root = True
+                nodes = node.parent.get_descendants()
+                node.parent.parent = None
+                nodes = [node.parent] + nodes
+            else:
+                nodes = self.find_ancestors(node.parent, nodes)
+        else:
+            for n in nodes:
+                if n != node and not n.parent:
+                    self.find_children(n, nodes)
         for n in node.children:
-            if n != child:
+            if n != node:
                 self.find_children(n, nodes)
             if is_root:
                 n.parent = None
-        return nodes
-    
-    def remove_ancestors(self, node, child, nodes):
-        if node.parent:
-            self.remove_ancestors(node.parent, node, nodes)
-        nodes.remove(node)
-        for n in node.children:
-            if n != child:
-                nodes = self.remove_children(n, nodes)
         return nodes
     
 menu_pool.register_modifier(SoftRootCutter)

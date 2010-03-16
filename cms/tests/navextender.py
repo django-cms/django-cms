@@ -58,7 +58,7 @@ class NavExtenderTestCase(CMSTestCase):
         page4.navigation_extenders = "TestMenu"
         page4.save()
         context = self.get_context()
-        nodes = show_menu(context)['children']
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[1].children), 4)
         

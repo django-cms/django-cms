@@ -210,11 +210,36 @@ class MenusTestCase(CMSTestCase):
         nodes = show_menu(context, 0, 100, 100, 100)['children']
         
     def test_16_softroot(self):
-        self.assertEqual(1, 2)
         page2 = Page.objects.get(pk=self.page2.pk)
         page2.soft_root = True
         page2.save()
         context = self.get_context(path=page2.get_absolute_url())
         nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].get_absolute_url(), page2.get_absolute_url())
+        page3 = Page.objects.get(pk=self.page3.pk)
+        context = self.get_context(path=page3.get_absolute_url())
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].get_absolute_url(), page2.get_absolute_url())
+        
+        page1 = Page.objects.get(pk=self.page1.pk)
+        context = self.get_context(path=page1.get_absolute_url())
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
+        self.assertEqual(len(nodes[0].children[0].children), 0)
+        
+        context = self.get_context(path="/no/real/path/")
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
+        self.assertEqual(len(nodes[0].children[0].children), 0)
+        
+        page5 = Page.objects.get(pk=self.page5.pk)
+        context = self.get_context(path=page5.get_absolute_url())
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
+        self.assertEqual(len(nodes[0].children[0].children), 0)
         

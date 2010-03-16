@@ -101,14 +101,22 @@ class MenuPool(object):
         return nodes 
     
     def _mark_selected(self, request, nodes):
+        sel = None
         for node in nodes:
             node.sibling = False
             node.ancestor = False
             node.descendant = False
-            if node.get_absolute_url() == request.path:
-                node.selected = True
+            node.selected = False
+            if node.get_absolute_url() == request.path[:len(node.get_absolute_url())]:
+                if sel:
+                    if len(node.get_absolute_url()) > len(sel.get_absolute_url()):
+                        sel = node
+                else:
+                    sel = node
             else:
                 node.selected = False
+        if sel:
+            sel.selected = True
         return nodes
     
     def get_menus_by_attribute(self, name, value):

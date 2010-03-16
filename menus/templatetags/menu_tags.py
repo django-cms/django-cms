@@ -78,7 +78,6 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             else:
                 new_nodes = []
             nodes = new_nodes
-        
         children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
         children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
     

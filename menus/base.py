@@ -51,3 +51,10 @@ class NavigationNode(object):
     def get_attribute(self, name):
         return self.attr[name]
     
+    def get_descendants(self):
+        nodes = []
+        for node in self.children:
+            nodes.append(node)
+            nodes += node.get_descendants()
+        return nodes
+    

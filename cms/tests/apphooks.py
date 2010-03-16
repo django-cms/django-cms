@@ -10,6 +10,7 @@ from menus.menu_pool import menu_pool
 from menus.base import NavigationNode
 
 
+
 class ApphookTestCase(CMSTestCase):
 
     def setUp(self):
