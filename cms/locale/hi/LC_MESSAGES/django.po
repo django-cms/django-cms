@@ -1462,21 +1462,24 @@ msgid "softroot"
 msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
+#, fuzzy
 msgid "home"
-msgstr ""
+msgstr "घर"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "%(language)s में इस पृष्ठ को संपादित करें एस"
 
 #: templates/admin/cms/page/menu_item.html:33
+#, fuzzy
 msgid "Cut"
-msgstr ""
+msgstr "काटना"
 
 #: templates/admin/cms/page/menu_item.html:33
+#, fuzzy
 msgid "cut"
-msgstr ""
+msgstr "काटना"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
