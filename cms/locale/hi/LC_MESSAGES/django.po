@@ -1569,12 +1569,10 @@ msgid "(current)"
 msgstr "(वर्तमान)"
 
 #: templates/admin/cms/page/permissions.html:41
-#, fuzzy
 msgid "All"
 msgstr "सब"
 
 #: templates/admin/cms/page/permissions.html:49
-#, fuzzy
 msgid "Page doesn't inherit any permissions."
 msgstr "पृष्ठ नहीं किसी अनुमति के वारिस."
 
