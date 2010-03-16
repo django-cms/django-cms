@@ -1581,30 +1581,34 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
+#, fuzzy
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "प्लगइन सफलतापूर्वक बचाया."
 
 #: templates/admin/cms/page/recover_form.html:17
-#, python-format
+#, python-format, fuzzy
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "ठीक नष्ट (% verbose_name) एस"
 
 #: templates/admin/cms/page/recover_form.html:24
+#, fuzzy
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "प्रेस नीचे बटन को बचाने के लिए वस्तु के इस संस्करण ठीक हो."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "वापस %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
+#, fuzzy
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
+msgstr "प्रेस नीचे बटन को बचाने के लिए वस्तु के इस संस्करण में लौट जाते."
 
 #: templates/admin/cms/page/dialog/copy.html:4
+#, fuzzy
 msgid "Copy options"
-msgstr ""
+msgstr "कॉपी विकल्प"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
