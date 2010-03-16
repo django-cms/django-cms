@@ -87,6 +87,8 @@ class CMSTestCase(TestCase):
         page_data['site'] = site
         page_data['published'] = published
         page_data['in_navigation'] = in_navigation
+        if settings.CMS_SITE_LANGUAGES.get(site, False):
+            page_data['language'] = settings.CMS_SITE_LANGUAGES[site][0]
         page_data.update({
             '_save': 'Save',
         })
