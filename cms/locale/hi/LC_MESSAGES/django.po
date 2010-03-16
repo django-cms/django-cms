@@ -1649,7 +1649,6 @@ msgid "Edit mode"
 msgstr "संपादित करें मोड"
 
 #: templates/cms/toolbar/toolbar.html:842
-#, fuzzy
 msgid "Status"
 msgstr "स्थिति"
 
