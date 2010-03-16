@@ -1569,16 +1569,19 @@ msgid "(current)"
 msgstr ""
 
 #: templates/admin/cms/page/permissions.html:41
+#, fuzzy
 msgid "All"
-msgstr ""
+msgstr "सब"
 
 #: templates/admin/cms/page/permissions.html:49
+#, fuzzy
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "पृष्ठ नहीं किसी अनुमति के वारिस."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
+#, fuzzy
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "एक प्लगइन का एक पुराना संशोधन नहीं बचाया जा सकता है!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 #, fuzzy
