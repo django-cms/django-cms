@@ -1730,85 +1730,73 @@ msgid "down"
 msgstr "नीचे"
 
 #: templates/cms/toolbar/toolbar.html:917
-#, fuzzy
 msgid "Settings"
 msgstr "सेटिंग्स"
 
 #: templates/cms/toolbar/toolbar.html:919
-#, fuzzy
 msgid "Delete Plugin"
 msgstr "हटाएँ प्लगइन"
 
 #: templatetags/cms_admin.py:65
-#, fuzzy
 msgid "Unbind page moderation"
 msgstr "छुड़ाना पृष्ठ मॉडरेशन"
 
 #: templatetags/cms_admin.py:66
-#, fuzzy
 msgid "Unbind children moderation"
 msgstr "छुड़ाना बच्चों मॉडरेशन"
 
 #: templatetags/cms_admin.py:67
-#, fuzzy
 msgid "Unbind descendants moderation"
 msgstr "छुड़ाना वंश मॉडरेशन"
 
 #: templatetags/cms_tags.py:401 templatetags/cms_tags.py:674
-#, python-format, fuzzy
+#, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr "(डोमेन)% पर उल्टा नहीं मिला आईडी s"
+msgstr "%(domain)s पर उल्टा नहीं मिला आईडी "
 
 #: templatetags/cms_tags.py:402
-#, python-format, fuzzy
+#, python-format
 msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
-msgstr "एक page_id_url टैग टेम्पलेट reverse_id (% reverse_id) के साथ एक पृष्ठ पाया नहीं s \\ पृष्ठ की nThe यूआरएल था:% http:// (मेजबान) (पथ)% s"
+msgstr "एक page_id_url टैग टेम्पलेट reverse_id %(reverse_id)s के साथ एक पृष्ठ पाया नहीं \\ पृष्ठ की nThe यूआरएल था:http://%(host)s%(path)s"
 
 #: templatetags/cms_tags.py:675
-#, python-format, fuzzy
+#, python-format
 msgid ""
 "A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
-msgstr "एक show_placeholder_by_id टैग टेम्पलेट reverse_id (% reverse_id) के साथ मिला एक पृष्ठ नहीं s \\ पृष्ठ की nThe यूआरएल था:% http:// (मेजबान) (पथ)% s"
+msgstr "एक show_placeholder_by_id टैग टेम्पलेट reverse_id %(reverse_id)s के साथ मिला एक पृष्ठ नहीं \\ पृष्ठ की nThe यूआरएल था:http://%(host)s%(path)s"
 
 #: tests/util/menu_extender.py:7
-#, fuzzy
 msgid "Sublevel"
 msgstr "Sublevel"
 
 #: tests/util/menu_extender.py:8
-#, fuzzy
 msgid "Sublevel3"
 msgstr "Sublevel3"
 
 #: tests/util/menu_extender.py:11
-#, fuzzy
 msgid "Sublevel 2"
-msgstr "2 Sublevel"
+msgstr "Sublevel 2"
 
 #: utils/moderator.py:84
-#, fuzzy
 msgid "parent first"
-msgstr "माता पिता के पहले"
+msgstr "parent के पहले"
 
 #: utils/moderator.py:91
-#, fuzzy
 msgid "approve"
 msgstr "अनुमोदन"
 
 #: utils/moderator.py:243
-#, python-format, fuzzy
+#, python-format
 msgid "CMS - Page %s requires approvement."
-msgstr "सीएमएस -% पेज एस approvement की आवश्यकता है."
+msgstr "सीएमएस -%s पेज approvement की आवश्यकता है."
 
 #: utils/permissions.py:206
-#, fuzzy
 msgid "CMS - your user account was created."
 msgstr "सीएमएस - आपके उपयोगकर्ता खाते में बनाया गया था."
 
 #: utils/permissions.py:208
-#, fuzzy
 msgid "CMS - your user account was changed."
 msgstr "सीएमएस - आपके उपयोगकर्ता खाते में बदल गया था."
