@@ -37,7 +37,9 @@ class ApphookTestCase(CMSTestCase):
         self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
         
     def test_01_basic_apphooks(self):
-        self.assertEqual(2, 1)
+        page2 = Page.objects.get(pk=self.page2.pk)
+        title = page2.title_set.all()[0]
+        title.application_urls = 
         
     def test_02_two_apphooks_in_different_languages(self):
         self.assertEqual(1, 2)

@@ -208,6 +208,8 @@ If disabled the page would have an url: "/hello/world/"
 CMS_NAVIGATION_EXTENDERS
 ------------------------
 
+XXX: OUTDATED
+
 Example::
 
 	CMS_NAVIGATION_EXTENDERS = (
@@ -225,6 +227,8 @@ This gives you a new field in the advanced-settings tab of the page. You can the
 CMS_NAVIGATION_MODIFIERS
 ------------------------
 
+XXX: OUTDATED
+
 Example::
 
 	CMS_NAVIGATION_MODIFIERS = (
@@ -237,28 +241,21 @@ reorder navigation nodes.
 #TODO: more docs needed
 
 
-CMS_APPLICATIONS_URLS
------------------------
+CMS_APPHOOKS
+------------
+
+A touble with python paths to CMSApp Classes.
+Overwrites the auto-discovered list of CMSApp Classes located in applications cms_app.py.
 
 
 Example::
 
 	CMS_APPLICATIONS_URLS = (
-    	('someapp.urls', 'Some application'),
-    	('sampleapp.urls_en', 'Sample application English URLs'),
-    	('sampleapp.urls_de', 'Sample application German URLs'),
+    	'myapp.cms_app.MyApp',
+    	'otherapp.cms_app.MyFancyApp',
+    	'sampleapp.cms_app.SampleApp',
 	)
 
-You can let cms handle the urls of other 3th party apps and attach them to pages.
-For example you have a page named blog and a blog application. You can attach the blog urls.py to the blog page. After this every url after blog page will be handled by the blog application. The nice thing about this is the cms can be used in the templates of the blog application. So you can use placeholders in the templates and they will be filled up with plugins that are defined in the blog page. Also the blog menu item will be selected if you are on a page that is handled by the blog application.
-
-At the moment if you change this settings you should restart the server as there is a cache invalidation bug.
-
-An simpler way is to have a page with the same url as the app. This will give you also the plugin and menu abilities but has some limitations when it comes to i18n and urls.
-
-**ATTENTION**
-
-All views must return RequestContext beside the normal Context 
 
 CMS_UNIQUE_SLUGS
 ------------------
@@ -303,7 +300,7 @@ Example::
 	    ('en', gettext('English')),
 	)
 	
-Normally the cms takes the LANGUAGES from the settings.py. With this you can overwrite this. Be sure that you don't have more language in here than in the LANGUAGES setting.
+Default is LANGUAGES. Be sure that you don't have more language in here than in the LANGUAGES setting.
 
 
 CMS_LANGUAGE_FALLBACK
@@ -342,6 +339,20 @@ Example::
 		2:['en','fr'],
 	    3:['en'],
 	}
+	
+	
+CMS_FRONTEND_LANGUAGES
+----------------------
+
+A list of languages the cms uses in the frontend. This is used for example if you decide that you want to add 
+a new language to your page but don't want to show it to the world yet.
+
+Example::
+
+	CMS_FRONTEND_LANGUAGES = ("de", "en", "pt-BR")
+	
+Default is CMS_LANGUAGES
+
 
 CMS_CONTENT_CACHE_DURATION
 --------------------------

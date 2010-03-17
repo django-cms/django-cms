@@ -3,9 +3,6 @@ from menus.menu_pool import menu_pool
 
 
 class TestMenu(Menu):
-    cms_enabled = True
-    name = "Some name"
-    namespace = "test"
     
     def get_nodes(self, request):
         nodes = []

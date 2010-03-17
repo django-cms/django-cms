@@ -33,6 +33,7 @@ Add the following to your project's ``INSTALLED_APPS`` setting if not already pr
 		'cms.plugins.googlemap',
 		'mptt',
 		'publisher'
+		'menus',
 		...
 	)
 

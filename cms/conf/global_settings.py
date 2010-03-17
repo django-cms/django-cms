@@ -48,15 +48,8 @@ CMS_REDIRECTS = False
 # admin
 CMS_SEO_FIELDS = False 
 
-# a tuble with a python path to all CMSAttachMenu Classes. Overwrites the auto-discovered list. 
-CMS_ATTACH_NAVIGATIONS = ()
-
-# a tuple with a python path to a function that receives all navigation nodes and can add or remove them
-CMS_NAVIGATION_MODIFIERS = ()
-
 # a tuple of python path to AppHook Classes. Overwrites the auto-discovered apphooks.
-CMS_APPHOOKS = () 
-    
+CMS_APPHOOKS = ()  
 
 #Should the tree of the pages be also be displayed in the urls? or should a flat slug structure be used?
 CMS_FLAT_URLS = False

@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from cms.utils.i18n import get_fallback_languages
 from cms.exceptions import NoHomeFound
 from cms.apphook_pool import apphook_pool
+from cms.models.titlemodels import Title
 
 def page_to_node(page, home, cut):
     parent_id = page.parent_id
@@ -18,7 +19,10 @@ def page_to_node(page, home, cut):
     extenders = []
     if page.navigation_extenders:
         extenders.append(page.navigation_extenders)
-    app_name = page.get_application_urls(fallback=False)
+    try:
+        app_name = page.get_application_urls(fallback=False)
+    except Title.DoesNotExist:
+        app_name = None
     if app_name:
         app = apphook_pool.apps[app_name]
         for menu in app.menus:
