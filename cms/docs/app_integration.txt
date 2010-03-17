@@ -236,7 +236,7 @@ when you attach the app to a page. We assume the following model::
         pass
         
 It is encouraged to use `django-mptt <http://code.google.com/p/django-mptt/>`_ (a
-suitable version is included in the `mptt` directory) if you have data is organized in a tree.
+suitable version is included in the `mptt` directory) if you have data that is organized in a tree.
 
 We would now create a menu out of this categories::
 
@@ -353,6 +353,13 @@ Here is an example of a build in modifier that marks all nodes level::
 
 Custom Plugins
 --------------
+
+If you want to display content of your apps on other pages custom plugins are a great way
+to accomplish that. If you have for example a news app and you want on your homepage to 
+display the top 10 news entries a custom plugin is the way to go.
+
+For a detailed explanation on how to write custom plugins please head over to the `cutom plugin<../custom_plugins/>`_ section.
+
 
 
 
