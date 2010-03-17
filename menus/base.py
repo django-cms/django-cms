@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.translation import get_language
 
 
 class Menu(object):
@@ -32,7 +33,7 @@ class NavigationNode(object):
     def __init__(self, title, url, id, parent_id=None, parent_namespace=None, attr=None):
         self.children = [] # do not touch
         self.title = title
-        self.url = url
+        self.url = self._remove_current_root(url)
         self.id = id
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
@@ -41,6 +42,12 @@ class NavigationNode(object):
             
     def __repr__(self):
         return "<Navigation Node: %s>" % str(unicode(self.title))
+    
+    def _remove_current_root(self, url):
+        current_root = "/%s/" % get_language()
+        if url[:len(current_root)] == current_root:
+            url = url[len(current_root) - 1:]
+        return url
     
     def get_menu_title(self):
         return self.title
