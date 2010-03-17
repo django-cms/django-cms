@@ -22,6 +22,7 @@ class PagePermissionInlineAdmin(admin.TabularInline):
     form = PagePermissionInlineAdminForm
     # use special formset, so we can use queryset defined here
     formset = BaseInlineFormSetWithQuerySet
+    classes = ['collapse', 'collapsed'] 
     
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdmin, self).__init__(*args, **kwargs)

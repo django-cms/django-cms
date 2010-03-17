@@ -6,15 +6,26 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from cms.utils.i18n import get_fallback_languages
 from cms.exceptions import NoHomeFound
+from cms.apphook_pool import apphook_pool
 
 def page_to_node(page, home, cut):
     parent_id = page.parent_id
     if home and page.parent_id == home.pk and cut:
         parent_id = None
-    attr = {'navigation_extenders':page.navigation_extenders,
-            'soft_root':page.soft_root,
+    attr = {'soft_root':page.soft_root,
             'auth_required':page.login_required,
             'reverse_id':page.reverse_id,}
+    extenders = []
+    if page.navigation_extenders:
+        extenders.append(page.navigation_extenders)
+    app_name = page.get_application_urls(fallback=False)
+    if app_name:
+        app = apphook_pool.apps[app_name]
+        for menu in app.menus:
+            extenders.append(menu.__name__)
+    print extenders
+    if extenders:
+        attr['navigation_extenders'] = extenders
     n = NavigationNode(page.get_menu_title(), 
                        page.get_absolute_url(), 
                        page.pk, 
@@ -91,16 +102,18 @@ class NavExtender(Modifier):
         exts = []
         # rearrange the parent relations
         for node in nodes:
-            ext = node.attr.get("navigation_extenders", None)
-            if ext:
-                if not ext in exts:
-                    exts.append(ext)
-                for n in nodes:
-                    if n.namespace == ext and not n.parent_id:
-                        n.parent_id = node.id
-                        n.parent_namespace = node.namespace
-                        n.parent = node
-                        node.children.append(n)
+            extenders = node.attr.get("navigation_extenders", None)
+            if extenders:
+                print extenders
+                for ext in extenders:
+                    if not ext in exts:
+                        exts.append(ext)
+                    for n in nodes:
+                        if n.namespace == ext and not n.parent_id:
+                            n.parent_id = node.id
+                            n.parent_namespace = node.namespace
+                            n.parent = node
+                            node.children.append(n)
         removed = []
         # find all not assigned nodes
         for menu in menu_pool.menus.items():

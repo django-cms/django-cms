@@ -1,7 +1,7 @@
 from django.conf import settings
 from django import forms
 from django.template.defaultfilters import slugify
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import ugettext_lazy as _, get_language
 from django.forms.util import ErrorList
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Permission, Group
@@ -21,6 +21,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from menus.menu_pool import menu_pool
 from django.utils.functional import lazy
+from cms.apphook_pool import apphook_pool
 
 
 class PageAddForm(forms.ModelForm):
@@ -49,6 +50,8 @@ class PageAddForm(forms.ModelForm):
         else:
             languages = settings.CMS_LANGUAGES
         self.fields['language'].choices = languages
+        if not self.fields['language'].initial:
+            self.fields['language'].initial = get_language()
         if self.fields['parent'].initial and \
             settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
             [name for name, value in settings.CMS_TEMPLATES]:
@@ -75,7 +78,7 @@ class PageAddForm(forms.ModelForm):
             site = None
             raise ValidationError("No site found for current settings.")
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
-            self._errors['slug'] = ErrorList([ugettext_lazy('Another page with this slug already exists')])
+            self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
         return cleaned_data
     
@@ -93,15 +96,12 @@ class PageAddForm(forms.ModelForm):
         
     
 class PageForm(PageAddForm):
-    
-    APPLICATION_URLS = (('', '----------'), ) + settings.CMS_APPLICATIONS_URLS
-    
     menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
         help_text=_('Overwrite what is displayed in the menu'), required=False)
     page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
         help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'), required=False)
     application_urls = forms.ChoiceField(label=_('Application'), 
-        choices=APPLICATION_URLS, required=False,  
+        choices=(), required=False,  
         help_text=_('Hook application to this page.'))
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
@@ -115,14 +115,14 @@ class PageForm(PageAddForm):
     meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
         help_text=_('A description of the page sometimes used by search engines.'))
     meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
-        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))    
-    
-    navigation_extenders = forms.ChoiceField(choices=(), required=False)
+        help_text=_('A list of comma seperated keywords sometimes used by search engines.'))
     
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
-        # set the nav extenders for the form
-        self.fields['navigation_extenders'].choices = [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True)
+        if 'navigation_extenders' in self.fields:
+            self.fields['navigation_extenders'].widget = forms.Select({}, [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
+        if 'application_urls' in self.fields:
+            self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
     
     def clean(self):
         cleaned_data = super(PageForm, self).clean()
@@ -130,14 +130,14 @@ class PageForm(PageAddForm):
         site_id = cleaned_data['site']
         if id:
             if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
-                raise forms.ValidationError(ugettext_lazy('A page with this reverse URL id exists already.'))
+                raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
         return cleaned_data
 
     def clean_overwrite_url(self):
         url = self.cleaned_data['overwrite_url']
         if url:
             if not any_path_re.match(url):
-                raise forms.ValidationError(ugettext_lazy('Invalid URL, use /my/url format.'))
+                raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
         return url
     
 
@@ -181,10 +181,10 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # this is a missconfiguration - user can add/move page to current
             # page but after he does this, he will not have permissions to 
             # access this page anymore, so avoid this
-            raise forms.ValidationError(ugettext_lazy('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by its creator.'))
+            raise forms.ValidationError(_('Add page permission requires also access to children, or descendants, otherwise added page can\'t be changed by its creator.'))
         
         if can_add and not can_edit:
-            raise forms.ValidationError(ugettext_lazy('Add page permission also requires edit page permission.'))
+            raise forms.ValidationError(_('Add page permission also requires edit page permission.'))
         # TODO: finish this, but is it really required? might be nice to have 
         
         # check if permissions assigned in cms are correct, and display an message
@@ -211,7 +211,7 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
     def clean(self):
         super(GlobalPagePermissionAdminForm, self).clean()
         if not self.cleaned_data['user'] and not self.cleaned_data['group']:
-            raise forms.ValidationError(ugettext_lazy('Please select user or group first.'))
+            raise forms.ValidationError(_('Please select user or group first.'))
         return self.cleaned_data
 
 

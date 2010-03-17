@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.contrib.sites.models import Site
 from cms.exceptions import NoHomeFound
 import re
+from cms.apphook_pool import apphook_pool
 
 APP_RESOLVERS = []
 
@@ -90,16 +91,19 @@ def get_patterns_for_title(path, title):
     Resolve the urlconf module for a path+title combination
     Returns a list of url objects.
     """
-    urlconf_name = title.application_urls
-    mod = import_module(urlconf_name)
-    if not hasattr(mod, 'urlpatterns'):
-        raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
-            % urlconf_name)
-    pattern_list = getattr(mod, 'urlpatterns')
-    if not path.endswith('/'):
-        path += '/'
-    page_id = title.page.id
-    return recurse_patterns(path, pattern_list, page_id)
+    app = apphook_pool.apps[title.application_urls]
+    patterns = []
+    for urlconf_name in app.urls:
+        mod = import_module(urlconf_name)
+        if not hasattr(mod, 'urlpatterns'):
+            raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
+                % urlconf_name)
+        pattern_list = getattr(mod, 'urlpatterns')
+        if not path.endswith('/'):
+            path += '/'
+        page_id = title.page.id
+        patterns += recurse_patterns(path, pattern_list, page_id)
+    return patterns
 
 
 def get_app_patterns():

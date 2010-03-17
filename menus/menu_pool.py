@@ -122,6 +122,7 @@ class MenuPool(object):
         return nodes
     
     def get_menus_by_attribute(self, name, value):
+        self.discover_menus()
         found = []
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:

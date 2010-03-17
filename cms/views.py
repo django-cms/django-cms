@@ -12,6 +12,7 @@ from django.utils.http import urlquote
 from django.conf import settings as django_settings
 from cms.utils.i18n import get_fallback_languages
 from cms.exceptions import NoHomeFound
+from cms.apphook_pool import apphook_pool
 
 def get_current_page(path, lang, queryset, home_slug=None, home_tree_id=None):
     """Helper for getting current page from path depending on language
@@ -81,7 +82,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
                 except NoHomeFound:
                     current_page, alternative = get_current_page(path, lang, pages)
                      
-                if settings.CMS_APPLICATIONS_URLS:
+                if apphook_pool.get_apphooks():
                     # check if it shouldn't point to some application, if yes,
                     # change current page if required
                     current_page = applications_page_check(request, current_page, path)

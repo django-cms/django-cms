@@ -5,13 +5,24 @@ class ApphookPool(object):
     def __init__(self):
         self.apps = {}
         self.discovered = False
+        self.block_register = False
         
     def discover_apps(self):
         if self.discovered:
             return
         #import all the modules
-        for app in settings.INSTALLED_APPS:
-            __import__(app, {}, {}, ['cms_apps'])
+        if settings.CMS_APPHOOKS:
+            
+            for app in settings.CMS_APPHOOKS:
+                self.block_register = True
+                path = ".".join(app.split(".")[:-1])
+                class_name = app.split(".")[-1]
+                cls = __import__(path, {}, {}, [class_name])
+                self.block_register = False
+                self.register(cls)
+        else:
+            for app in settings.INSTALLED_APPS:
+                __import__(app, {}, {}, ['cms_app'])
         self.discovered = True
         
     def clear(self):
@@ -19,6 +30,8 @@ class ApphookPool(object):
         self.discovered = False
 
     def register(self, app):
+        if self.block_register:
+            return
         from cms.app_base import CMSApp
         assert issubclass(app, CMSApp)
         if app.__name__ in self.apps.keys():
@@ -26,10 +39,13 @@ class ApphookPool(object):
         self.apps[app.__name__] = app
         
     def get_apphooks(self):
+        self.discover_apps()
         hooks = []
+        print self.apps
         for app_name in self.apps.keys():
             app = self.apps[app_name]
-            hooks.append()
+            hooks.append((app_name, app.name))
+        return hooks
             
 
 apphook_pool = ApphookPool()
