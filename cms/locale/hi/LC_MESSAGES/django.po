@@ -250,23 +250,23 @@ msgid "Language must be set to a supported language!"
 msgstr "भाषा एक समर्थित भाषा के लिए सेट किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1063
-#, python-format, fuzzy
+#, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr "(% plugin_name) प्लगइन (s placeholder)% जोड़ा s"
+msgstr "%(plugin_name)s प्लगइन %(placeholder)s जोड़ा "
 
 #: admin/pageadmin.py:1085
 msgid "Language must be different than the copied language!"
 msgstr "भाषा की नकल की भाषा से अलग किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1131
-#, python-format, fuzzy
+#, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "नकल% (भाषा) (placeholder)% के लिए plugins एस एस"
+msgstr "नकल %(language)s के लिए plugins %(placeholder)s"
 
 #: admin/pageadmin.py:1204
-#, python-format, fuzzy
+#, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "(% plugin_name) एस स्थिति (% स्थिति) में संपादित प्लगइन (placeholder)% में एस एस"
+msgstr "%(plugin_name)s  स्थिति %(position)s में संपादित प्लगइन (%(placeholder)s में "
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
