@@ -239,6 +239,9 @@ class Publisher(models.Model):
         return obj.save()
 
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
+        print seen_objs
+        print parent
+        
         if excluded_models is None:
             excluded_models = [self.__class__]
         elif not isinstance(self, Publisher) or self.__class__ in excluded_models:
@@ -312,7 +315,8 @@ class Publisher(models.Model):
             from django.db.models.query import CollectedObjects
             seen = CollectedObjects()
             self._collect_delete_marked_sub_objects(seen)
-            for cls, items in seen.items():
+            for cls in seen.unordered_keys():
+                items = seen[cls]
                 if issubclass(cls, Publisher):
                     for item in items.values():
                         item._publisher_delete_marked(collect=False)
