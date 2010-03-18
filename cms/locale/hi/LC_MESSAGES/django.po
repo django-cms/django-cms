@@ -247,7 +247,6 @@ msgid "You do not have permission to change this page"
 msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1051 admin/pageadmin.py:1083
-#, fuzzy
 msgid "Language must be set to a supported language!"
 msgstr "भाषा एक समर्थित भाषा के लिए सेट किया जाना चाहिए!"
 
@@ -257,7 +256,6 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "(% plugin_name) प्लगइन (s placeholder)% जोड़ा s"
 
 #: admin/pageadmin.py:1085
-#, fuzzy
 msgid "Language must be different than the copied language!"
 msgstr "भाषा की नकल की भाषा से अलग किया जाना चाहिए!"
 
