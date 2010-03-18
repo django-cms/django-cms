@@ -234,7 +234,6 @@ msgid "Are you sure?"
 msgstr "क्या आप सुनिश्चित हैं?"
 
 #: admin/pageadmin.py:994
-#, fuzzy
 msgid "You do not have permission to publish this page"
 msgstr "आप इस पृष्ठ पर प्रकाशित की अनुमति नहीं है"
 
@@ -244,7 +243,6 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "आप इस पृष्ठ की in_navigation स्थिति को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
-#, fuzzy
 msgid "You do not have permission to change this page"
 msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
@@ -278,9 +276,9 @@ msgid "Plugins where moved"
 msgstr "कहाँ चला गया प्लगइन्स"
 
 #: admin/pageadmin.py:1281
-#, python-format
+#, python-format, fuzzy
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr ""
+msgstr "(% plugin_name) की स्थिति (% स्थिति) में प्लगइन एस% में (placeholder) एस एस नष्ट किया गया."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
