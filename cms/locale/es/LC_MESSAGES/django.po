@@ -256,7 +256,6 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugin añadido a %(placeholder)s"
 
 #: admin/pageadmin.py:1085
-#, fuzzy
 msgid "Language must be different than the copied language!"
 msgstr "¡El idioma debe ser diferente del de la copia!"
 
