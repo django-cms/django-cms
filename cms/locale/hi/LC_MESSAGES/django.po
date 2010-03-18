@@ -400,7 +400,6 @@ msgid "Next topic"
 msgstr "अगला विषय"
 
 #: docs/templates/layout.html:55
-#, fuzzy
 msgid "next chapter"
 msgstr "अगले अध्याय"
 
@@ -434,7 +433,6 @@ msgid "Search"
 msgstr "खोज"
 
 #: docs/templates/layout.html:137
-#, fuzzy
 msgid "Copyright"
 msgstr "कॉपीराइट"
 
@@ -1303,17 +1301,14 @@ msgid "(you can perform actions on this page directly)"
 msgstr "(आप इस पेज पर कार्रवाई सीधे प्रदर्शन कर सकते हैं)"
 
 #: templates/admin/cms/page/change_form.html:91
-#, fuzzy
 msgid "Remove delete request"
 msgstr "हटाने के अनुरोध को हटाना"
 
 #: templates/admin/cms/page/change_form.html:93
-#, fuzzy
 msgid "Approve delete"
 msgstr "स्वीकृत हटाना"
 
 #: templates/admin/cms/page/change_form.html:93
-#, fuzzy
 msgid "Approve"
 msgstr "स्वीकृत"
 
@@ -1358,9 +1353,9 @@ msgid "Page states"
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
-#, python-format, fuzzy
+#, python-format
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-msgstr "इस पृष्ठ स्तर (% moderation_level) में संचालित होगा एस, मध्यस्थ के लिए एक संदेश पोस्ट."
+msgstr "इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
 
 #: templates/admin/cms/page/change_form.html:185
 #, fuzzy
@@ -1383,14 +1378,14 @@ msgid "An error occured. Please reload the page"
 msgstr "एक त्रुटि हो गई. कृपया पृष्ठ पुनः लोड"
 
 #: templates/admin/cms/page/change_list.html:83
-#, python-format, fuzzy
+#, python-format
 msgid "Recover deleted %(name)s"
-msgstr "ठीक नष्ट (% नाम) एस"
+msgstr "ठीक नष्ट %(name)s"
 
 #: templates/admin/cms/page/change_list.html:86
-#, python-format, fuzzy
+#, python-format
 msgid "Add %(name)s"
-msgstr "(नाम)% s जोड़ें"
+msgstr "%(name)s जोड़ें"
 
 #: templates/admin/cms/page/change_list.html:98
 msgid "Pages on:"
