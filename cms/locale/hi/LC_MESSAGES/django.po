@@ -230,7 +230,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "शीर्षक और plugins भाषा% (भाषा) के साथ एस नष्ट कर दिया गया"
 
 #: admin/pageadmin.py:931
-#, fuzzy
 msgid "Are you sure?"
 msgstr "क्या आप सुनिश्चित हैं?"
 
@@ -275,7 +274,6 @@ msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s
 msgstr "(% plugin_name) एस स्थिति (% स्थिति) में संपादित प्लगइन (placeholder)% में एस एस"
 
 #: admin/pageadmin.py:1259
-#, fuzzy
 msgid "Plugins where moved"
 msgstr "कहाँ चला गया प्लगइन्स"
 
