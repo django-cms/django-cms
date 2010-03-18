@@ -1393,7 +1393,6 @@ msgid "Add %(name)s"
 msgstr "(नाम)% s जोड़ें"
 
 #: templates/admin/cms/page/change_list.html:98
-#, fuzzy
 msgid "Pages on:"
 msgstr "पन्नों पर:"
 
