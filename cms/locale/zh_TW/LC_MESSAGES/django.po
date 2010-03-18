@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
@@ -110,12 +110,8 @@ msgid "user"
 msgstr "用戶"
 
 #: admin/forms.py:171
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
-"新增網頁的權限也需要能存取子網頁或下層網頁，否則它的建造者將無法對所新增的網"
-"頁做更改。"
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr "新增網頁的權限也需要能存取子網頁或下層網頁，否則它的建造者將無法對所新增的網頁做更改。"
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
@@ -150,11 +146,8 @@ msgid "Notify user"
 msgstr "通知用戶"
 
 #: admin/forms.py:275
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-"發送電子郵件通知用戶有關的用戶名稱或密碼的變更。需要用戶的電子郵件地址。"
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "發送電子郵件通知用戶有關的用戶名稱或密碼的變更。需要用戶的電子郵件地址。"
 
 #: admin/forms.py:295
 msgid "New password"
@@ -169,13 +162,11 @@ msgid "Email notification requires valid email address."
 msgstr "電子郵件通知需要有效的電子郵件地址。"
 
 #: admin/forms.py:318
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "新增網頁的權限需要有修改網頁的權限！"
 
 #: admin/forms.py:320
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr "新增用戶的權限需要有修改用戶的權限！"
 
 #: admin/forms.py:322
@@ -265,7 +256,6 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s 插件被加到 %(placeholder)s"
 
 #: admin/pageadmin.py:1085
-#, fuzzy
 msgid "Language must be different than the copied language!"
 msgstr "語言必須是不同的於被複製的語言！"
 
@@ -276,8 +266,7 @@ msgstr "複製 %(language)s 插件到 %(placeholder)s"
 
 #: admin/pageadmin.py:1204
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s 插件於 %(position)s 位置的 %(placeholder)s 內被編輯"
 
 #: admin/pageadmin.py:1259
@@ -286,9 +275,7 @@ msgstr "插件被移動"
 
 #: admin/pageadmin.py:1281
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr "%(plugin_name)s 插件於 %(position)s 位置的 %(placeholder)s 內被刪除。"
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -714,9 +701,7 @@ msgid "changed by"
 msgstr "修改者"
 
 #: models/pagemodel.py:46
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "何時此網頁要正式發表。狀態必須是\"發佈\"才會使網頁發表出去。"
 
 #: models/pagemodel.py:47
@@ -728,9 +713,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "所有的上層網頁將不會顯示在導航中"
 
 #: models/pagemodel.py:50
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "一個唯一的識別碼，與 page_url 模板標籤一起用於做連結到此網頁"
 
 #: models/pagemodel.py:52
@@ -965,9 +948,7 @@ msgid "Language or Page must be filled out"
 msgstr "語言或網頁必須被填寫"
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr "選擇一個網頁來將它的插件放入這個佔位空間，留空則會選用目前的網頁"
 
 #: plugins/inherit/models.py:11
@@ -1059,8 +1040,7 @@ msgid "HTML"
 msgstr "HEML"
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "輸入一個模板（即 \"snippets/plugin_xy.html\"）用來呈現頁面。"
 
 #: plugins/snippet/models.py:25
@@ -1182,11 +1162,8 @@ msgid "movie url"
 msgstr "電影網址"
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
-msgstr ""
-"vimeo 或 YouTube 影像網址。例如：http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgstr "vimeo 或 YouTube 影像網址。例如：http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
 msgid "preview image file"
@@ -1248,9 +1225,7 @@ msgid "button highlight color"
 msgstr "按鈕突出顯示顏色"
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr "欠缺 flash 插件。<a href=\"http://adobe.com/flashplayer\">這裡</a>下載"
 
 #: templates/admin/page_submit_line.html:3
@@ -1279,8 +1254,7 @@ msgstr "儲存並繼續編輯"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "網頁<a href=\"%(admin_url)s\">%(page)s</a>可能需要你的核准。"
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1381,9 +1355,7 @@ msgstr "網頁狀態"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr "這個頁面必須在 %(moderation_level)s 層級被管制，請發送訊息給管制者。"
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1445,13 +1417,12 @@ msgid "published"
 msgstr "已發佈"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "狀態"
+msgstr "開始"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "結束"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
@@ -1784,8 +1755,7 @@ msgstr "沒有在 %(domain)s 找到反向 ID"
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 "一個 page_id_url 模板標籤沒有找到 reverse_id 是%(reverse_id)s 的網頁\n"
@@ -1794,12 +1764,10 @@ msgstr ""
 #: templatetags/cms_tags.py:675
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
-"一個 show_placeholder_by_id 模板標籤沒有找到 reverse_id 是%(reverse_id)s 的網"
-"頁\n"
+"一個 show_placeholder_by_id 模板標籤沒有找到 reverse_id 是%(reverse_id)s 的網頁\n"
 "該網頁的 url 是：http://%(host)s%(path)s"
 
 #: tests/util/menu_extender.py:7
