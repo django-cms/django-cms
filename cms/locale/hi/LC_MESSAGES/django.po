@@ -182,23 +182,23 @@ msgstr "मूल सेटिंग्स"
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "नोट: यह पृष्ठ अगर आप चयन बदल reloads. सहेजें पहले."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
-msgstr ""
+msgstr "उन्नत सेटिंग्स"
 
 #: admin/pageadmin.py:140
 msgid "SEO Settings"
-msgstr ""
+msgstr "एसईओ सेटिंग्स"
 
 #: admin/pageadmin.py:463
 msgid "higher"
-msgstr ""
+msgstr "उच्च"
 
 #: admin/pageadmin.py:629
 msgid "Database error"
-msgstr ""
+msgstr "डेटाबेस त्रुटि"
 
 #: admin/pageadmin.py:714 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -209,150 +209,150 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:15
 msgid "page"
-msgstr ""
+msgstr "पृष्ठ"
 
 #: admin/pageadmin.py:837
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
 
 #: admin/pageadmin.py:891
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr " %(name)s प्राथमिक कुंजी वस्तु के साथ एस %(key)r आर मौजूद नहीं है."
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "सिर्फ इस पृष्ठ के लिए एक अनुवाद से मौजूद है"
 
 #: admin/pageadmin.py:909
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "शीर्षक और plugins भाषा %(language)s के साथ नष्ट कर दिया गया"
 
 #: admin/pageadmin.py:931
 msgid "Are you sure?"
-msgstr ""
+msgstr "क्या आप सुनिश्चित हैं?"
 
 #: admin/pageadmin.py:994
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "आप इस पृष्ठ पर प्रकाशित की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1012
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "आप इस पृष्ठ की in_navigation स्थिति को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1051 admin/pageadmin.py:1083
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "भाषा एक समर्थित भाषा के लिए सेट किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1063
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "%(plugin_name)s प्लगइन %(placeholder)s जोड़ा "
 
 #: admin/pageadmin.py:1085
 msgid "Language must be different than the copied language!"
-msgstr ""
+msgstr "भाषा की नकल की भाषा से अलग किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1131
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
+msgstr "नकल %(language)s के लिए plugins %(placeholder)s"
 
 #: admin/pageadmin.py:1204
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "%(plugin_name)s  स्थिति %(position)s में संपादित प्लगइन (%(placeholder)s में "
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
-msgstr ""
+msgstr "कहाँ चला गया प्लगइन्स"
 
 #: admin/pageadmin.py:1281
 #, python-format
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr ""
+msgstr "%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट किया गया."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "पृष्ठ अनुमति"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "उपयोगकर्ता और समूह की अनुमति"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "पृष्ठ अनुमति प्रबंधन"
 
 #: admin/useradmin.py:22
 msgid "User details"
-msgstr ""
+msgstr "प्रयोक्ता जानकारी"
 
 #: admin/useradmin.py:23
 msgid "Groups"
-msgstr ""
+msgstr "समूह"
 
 #: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:855
 msgid "Password"
-msgstr ""
+msgstr "पासवर्ड"
 
 #: admin/widgets.py:58
 msgid "Add Another"
-msgstr ""
+msgstr "एक और जोड़ें"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "Copy permissions"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr ""
+msgstr "कॉपी मॉडरेशन"
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "विरासत में निकटतम पूर्वज का खाका"
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "समीक्षा"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "सूचकांक और मेज:"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr ""
+msgstr "सामग्री के पूर्ण तालिका"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "सभी वर्गों और subsections सूची"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "खोज पेज"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "खोज इस दस्तावेज़ीकरण"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "वैश्विक मॉड्यूल सूचकांक"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "जल्दी सभी मॉड्यूल के लिए उपयोग"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr ""
+msgstr "सामान्य सूचकांक"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
@@ -400,7 +400,6 @@ msgid "Next topic"
 msgstr "अगला विषय"
 
 #: docs/templates/layout.html:55
-#, fuzzy
 msgid "next chapter"
 msgstr "अगले अध्याय"
 
@@ -434,7 +433,6 @@ msgid "Search"
 msgstr "खोज"
 
 #: docs/templates/layout.html:137
-#, fuzzy
 msgid "Copyright"
 msgstr "कॉपीराइट"
 
@@ -1303,17 +1301,14 @@ msgid "(you can perform actions on this page directly)"
 msgstr "(आप इस पेज पर कार्रवाई सीधे प्रदर्शन कर सकते हैं)"
 
 #: templates/admin/cms/page/change_form.html:91
-#, fuzzy
 msgid "Remove delete request"
 msgstr "हटाने के अनुरोध को हटाना"
 
 #: templates/admin/cms/page/change_form.html:93
-#, fuzzy
 msgid "Approve delete"
 msgstr "स्वीकृत हटाना"
 
 #: templates/admin/cms/page/change_form.html:93
-#, fuzzy
 msgid "Approve"
 msgstr "स्वीकृत"
 
@@ -1321,79 +1316,75 @@ msgstr "स्वीकृत"
 #: templates/admin/cms/page/change_form.html:94
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "प्रारूप"
 
 #: templates/admin/cms/page/change_form.html:94
 msgid "Preview"
-msgstr ""
+msgstr "पूर्वावलोकन"
 
 #: templates/admin/cms/page/change_form.html:97
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr ""
+msgstr "इतिहास"
 
 #: templates/admin/cms/page/change_form.html:98
 msgid "View on site"
-msgstr ""
+msgstr "देखें साइट पर"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:83
+#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "कृपया नीचे त्रुटि सही. "
+msgstr[1] "कृपया नीचे त्रुटि सही."
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
-msgstr ""
+msgstr "सभी अनुमतियाँ"
 
 #: templates/admin/cms/page/change_form.html:149
 #: templates/admin/cms/page/change_form.html:161
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr ""
+msgstr "लोड हो रहा है ..."
 
 #: templates/admin/cms/page/change_form.html:160
 msgid "Page states"
-msgstr ""
+msgstr "पृष्ठ राज्यों"
 
 #: templates/admin/cms/page/change_form.html:183
-#, python-format, fuzzy
+#, python-format
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-msgstr "इस पृष्ठ स्तर (% moderation_level) में संचालित होगा एस, मध्यस्थ के लिए एक संदेश पोस्ट."
+msgstr "इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
 
 #: templates/admin/cms/page/change_form.html:185
-#, fuzzy
 msgid "Request approvemet"
 msgstr "अनुरोध approvemet"
 
 #: templates/admin/cms/page/change_list.html:3
-#, fuzzy
 msgid "List of pages"
 msgstr "पृष्ठों की सूची"
 
 #: templates/admin/cms/page/change_list.html:57
-#, fuzzy
 msgid "Successfully moved"
 msgstr "सफलतापूर्वक चला गया"
 
 #: templates/admin/cms/page/change_list.html:62
-#, fuzzy
 msgid "An error occured. Please reload the page"
 msgstr "एक त्रुटि हो गई. कृपया पृष्ठ पुनः लोड"
 
 #: templates/admin/cms/page/change_list.html:83
-#, python-format, fuzzy
+#, python-format
 msgid "Recover deleted %(name)s"
-msgstr "ठीक नष्ट (% नाम) एस"
+msgstr "ठीक नष्ट %(name)s"
 
 #: templates/admin/cms/page/change_list.html:86
-#, python-format, fuzzy
+#, python-format
 msgid "Add %(name)s"
-msgstr "(नाम)% s जोड़ें"
+msgstr "%(name)s जोड़ें"
 
 #: templates/admin/cms/page/change_list.html:98
-#, fuzzy
 msgid "Pages on:"
 msgstr "पन्नों पर:"
 
