@@ -182,23 +182,23 @@ msgstr "मूल सेटिंग्स"
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "नोट: यह पृष्ठ अगर आप चयन बदल reloads. सहेजें पहले."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
-msgstr ""
+msgstr "उन्नत सेटिंग्स"
 
 #: admin/pageadmin.py:140
 msgid "SEO Settings"
-msgstr ""
+msgstr "एसईओ सेटिंग्स"
 
 #: admin/pageadmin.py:463
 msgid "higher"
-msgstr ""
+msgstr "उच्च"
 
 #: admin/pageadmin.py:629
 msgid "Database error"
-msgstr ""
+msgstr "डेटाबेस त्रुटि"
 
 #: admin/pageadmin.py:714 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -209,68 +209,75 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:15
 msgid "page"
-msgstr ""
+msgstr "पृष्ठ"
 
 #: admin/pageadmin.py:837
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
 
 #: admin/pageadmin.py:891
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr " %(name)s प्राथमिक कुंजी वस्तु के साथ एस %(key)r आर मौजूद नहीं है."
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "सिर्फ इस पृष्ठ के लिए एक अनुवाद से मौजूद है"
 
 #: admin/pageadmin.py:909
-#, python-format
+#, python-format, fuzzy
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "शीर्षक और plugins भाषा% (भाषा) के साथ एस नष्ट कर दिया गया"
 
 #: admin/pageadmin.py:931
+#, fuzzy
 msgid "Are you sure?"
-msgstr ""
+msgstr "क्या आप सुनिश्चित हैं?"
 
 #: admin/pageadmin.py:994
+#, fuzzy
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "आप इस पृष्ठ पर प्रकाशित की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1012
+#, fuzzy
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "आप इस पृष्ठ की in_navigation स्थिति को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
+#, fuzzy
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1051 admin/pageadmin.py:1083
+#, fuzzy
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "भाषा एक समर्थित भाषा के लिए सेट किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1063
-#, python-format
+#, python-format, fuzzy
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "(% plugin_name) प्लगइन (s placeholder)% जोड़ा s"
 
 #: admin/pageadmin.py:1085
+#, fuzzy
 msgid "Language must be different than the copied language!"
-msgstr ""
+msgstr "भाषा की नकल की भाषा से अलग किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1131
-#, python-format
+#, python-format, fuzzy
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
+msgstr "नकल% (भाषा) (placeholder)% के लिए plugins एस एस"
 
 #: admin/pageadmin.py:1204
-#, python-format
+#, python-format, fuzzy
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "(% plugin_name) एस स्थिति (% स्थिति) में संपादित प्लगइन (placeholder)% में एस एस"
 
 #: admin/pageadmin.py:1259
+#, fuzzy
 msgid "Plugins where moved"
-msgstr ""
+msgstr "कहाँ चला गया प्लगइन्स"
 
 #: admin/pageadmin.py:1281
 #, python-format
