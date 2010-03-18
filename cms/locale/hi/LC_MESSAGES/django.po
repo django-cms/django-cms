@@ -1344,7 +1344,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:148
-#, fuzzy
 msgid "All permissions"
 msgstr "सभी अनुमतियाँ"
 
@@ -1352,7 +1351,7 @@ msgstr "सभी अनुमतियाँ"
 #: templates/admin/cms/page/change_form.html:161
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr ""
+msgstr "लोड हो रहा है ..."
 
 #: templates/admin/cms/page/change_form.html:160
 msgid "Page states"
