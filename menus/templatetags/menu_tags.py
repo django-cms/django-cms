@@ -35,9 +35,10 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             selected = node
     if selected:
         cut_after(selected, extra_active, removed)
+    print removed
     if removed:
-        for node in final:
-            if node in removed:
+        for node in removed:
+            if node in final:
                 final.remove(node)
     return final
 register = template.Library()
