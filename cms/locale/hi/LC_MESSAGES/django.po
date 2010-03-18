@@ -273,9 +273,9 @@ msgid "Plugins where moved"
 msgstr "कहाँ चला गया प्लगइन्स"
 
 #: admin/pageadmin.py:1281
-#, python-format, fuzzy
+#, python-format
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr "(% plugin_name) की स्थिति (% स्थिति) में प्लगइन एस% में (placeholder) एस एस नष्ट किया गया."
+msgstr "%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट किया गया."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
