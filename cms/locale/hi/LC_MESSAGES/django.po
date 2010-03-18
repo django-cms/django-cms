@@ -1344,8 +1344,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:148
+#, fuzzy
 msgid "All permissions"
-msgstr ""
+msgstr "सभी अनुमतियाँ"
 
 #: templates/admin/cms/page/change_form.html:149
 #: templates/admin/cms/page/change_form.html:161
@@ -1355,7 +1356,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:160
 msgid "Page states"
-msgstr ""
+msgstr "पृष्ठ राज्यों"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
