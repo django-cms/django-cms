@@ -1321,20 +1321,20 @@ msgstr "स्वीकृत"
 #: templates/admin/cms/page/change_form.html:94
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "प्रारूप"
 
 #: templates/admin/cms/page/change_form.html:94
 msgid "Preview"
-msgstr ""
+msgstr "पूर्वावलोकन"
 
 #: templates/admin/cms/page/change_form.html:97
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr ""
+msgstr "इतिहास"
 
 #: templates/admin/cms/page/change_form.html:98
 msgid "View on site"
-msgstr ""
+msgstr "देखें साइट पर"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:83
