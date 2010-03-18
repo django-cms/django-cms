@@ -284,7 +284,7 @@ msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "पृष्ठ अनुमति"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
@@ -344,20 +344,20 @@ msgstr "खोज पेज"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "खोज इस दस्तावेज़ीकरण"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "वैश्विक मॉड्यूल सूचकांक"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "जल्दी सभी मॉड्यूल के लिए उपयोग"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr ""
+msgstr "सामान्य सूचकांक"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
