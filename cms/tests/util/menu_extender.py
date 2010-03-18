@@ -1,8 +1,10 @@
 from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool
+from cms.menu_bases import CMSAttachMenu
 
 
-class TestMenu(Menu):
+class TestMenu(CMSAttachMenu):
+    name = "test menu"
     
     def get_nodes(self, request):
         nodes = []

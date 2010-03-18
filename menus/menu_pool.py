@@ -109,12 +109,9 @@ class MenuPool(object):
             node.ancestor = False
             node.descendant = False
             node.selected = False
-            print node.get_absolute_url()
-            print request.path[:len(node.get_absolute_url())]
             if node.get_absolute_url() == request.path[:len(node.get_absolute_url())]:
                 if sel:
                     if len(node.get_absolute_url()) > len(sel.get_absolute_url()):
-                        print "found"
                         sel = node
                 else:
                     sel = node

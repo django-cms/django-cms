@@ -27,7 +27,6 @@ def page_to_node(page, home, cut):
         app = apphook_pool.apps[app_name]
         for menu in app.menus:
             extenders.append(menu.__name__)
-    print extenders
     if extenders:
         attr['navigation_extenders'] = extenders
     n = NavigationNode(page.get_menu_title(), 
@@ -108,7 +107,6 @@ class NavExtender(Modifier):
         for node in nodes:
             extenders = node.attr.get("navigation_extenders", None)
             if extenders:
-                print extenders
                 for ext in extenders:
                     if not ext in exts:
                         exts.append(ext)

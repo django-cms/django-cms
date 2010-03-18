@@ -41,7 +41,6 @@ class ApphookPool(object):
     def get_apphooks(self):
         self.discover_apps()
         hooks = []
-        print self.apps
         for app_name in self.apps.keys():
             app = self.apps[app_name]
             hooks.append((app_name, app.name))
