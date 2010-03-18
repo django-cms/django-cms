@@ -1418,11 +1418,11 @@ msgstr "publicar"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "start"
-msgstr "inicio"
+msgstr "comienza"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr "fin"
+msgstr "termina"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
