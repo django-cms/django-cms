@@ -288,19 +288,19 @@ msgstr ""
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "उपयोगकर्ता और समूह की अनुमति"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "पृष्ठ अनुमति प्रबंधन"
 
 #: admin/useradmin.py:22
 msgid "User details"
-msgstr ""
+msgstr "प्रयोक्ता जानकारी"
 
 #: admin/useradmin.py:23
 msgid "Groups"
-msgstr ""
+msgstr "समूह"
 
 #: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:855
 msgid "Password"
@@ -324,23 +324,23 @@ msgstr "विरासत में निकटतम पूर्वज क�
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "समीक्षा"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "सूचकांक और मेज:"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr ""
+msgstr "सामग्री के पूर्ण तालिका"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "सभी वर्गों और subsections सूची"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "खोज पेज"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
