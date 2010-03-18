@@ -1333,10 +1333,11 @@ msgstr "देखें साइट पर"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:83
+#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "कृपया नीचे त्रुटि सही. "
+msgstr[1] "कृपया नीचे त्रुटि सही."
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
