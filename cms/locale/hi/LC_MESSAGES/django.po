@@ -225,9 +225,9 @@ msgid "There only exists one translation for this page"
 msgstr "सिर्फ इस पृष्ठ के लिए एक अनुवाद से मौजूद है"
 
 #: admin/pageadmin.py:909
-#, python-format, fuzzy
+#, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr "शीर्षक और plugins भाषा% (भाषा) के साथ एस नष्ट कर दिया गया"
+msgstr "शीर्षक और plugins भाषा %(language)s के साथ नष्ट कर दिया गया"
 
 #: admin/pageadmin.py:931
 msgid "Are you sure?"
@@ -238,7 +238,6 @@ msgid "You do not have permission to publish this page"
 msgstr "आप इस पृष्ठ पर प्रकाशित की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1012
-#, fuzzy
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "आप इस पृष्ठ की in_navigation स्थिति को बदलने की अनुमति नहीं है"
 
