@@ -1,7 +1,10 @@
-Django CMS Installation Tutorial
-================================
+Django CMS Tutorial
+===================
 
-I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I dont expect things will be much different for mac at least...if I get a chance i'll run through this process on windows too and update the article but no promises.
+Installation
+-------------
+
+I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't expect things will be much different for mac at least...if I get a chance i'll run through this process on windows too and update the article but no promises.
 
 I'm assuming that Python, Django and sqlite3 are installed already. For reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
 
@@ -95,19 +98,20 @@ Set up the remainder of the file with the following changes/additions::
 	)
 
 	MIDDLEWARE_CLASSES = (
-	    'django.middleware.common.CommonMiddleware',
+		'django.middleware.cache.UpdateCacheMiddleware',
 	    'django.contrib.sessions.middleware.SessionMiddleware',
-	    'django.middleware.csrf.CsrfViewMiddleware',
-	    'django.middleware.csrf.CsrfResponseMiddleware',
 	    'django.contrib.auth.middleware.AuthenticationMiddleware',
-	    'django.contrib.messages.middleware.MessageMiddleware', 
-	    'django.middleware.locale.LocaleMiddleware',  
+	    'django.middleware.common.CommonMiddleware',
+	    'django.middleware.doc.XViewMiddleware',
+	    'django.middleware.csrf.CsrfViewMiddleware',
 	    'cms.middleware.page.CurrentPageMiddleware', 
 	    'cms.middleware.user.CurrentUserMiddleware', 
+		'cms.middleware.toolbar.ToolbarMiddleware',
+		'django.middleware.cache.FetchFromCacheMiddleware', 
 	)
-
+	
 	TEMPLATE_DIRS = os.path.join(PROJECT_PATH, 'templates')
-	(templates being the name of my template dir within project-name)
+	# (templates being the name of my template dir within project-name)
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
 	    'django.core.context_processors.auth', 
@@ -117,9 +121,9 @@ Set up the remainder of the file with the following changes/additions::
 	    'cms.context_processors.media',
 	)
 	
-(I didnt have a "TEMPLATE_CONTEXT_PROCESSORS" specified so had to add all of the above anew.)
+(I didn't have a "TEMPLATE_CONTEXT_PROCESSORS" specified so had to add all of the above anew.)
 
-Set up your available templates (dont worry that they dont actually exist right now, its not that important. Perhaps i'll write about templates next as I discover more.) ::
+Set up your available templates (don't worry that they don't actually exist yet)::
 
 	CMS_TEMPLATES = ( 
 	    ('base.html', gettext('default')), 
@@ -130,10 +134,23 @@ Set up your available templates (dont worry that they dont actually exist right 
 
 Next, Edit your "urls.py" file like so::
 
-	urlpatterns = patterns('', 
-	    (r'^media/(?P<path>.*), 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT } ), 
+	from django.conf.urls.defaults import *
+	from django.contrib import admin
+	from django.conf import settings
+
+	admin.autodiscover()
+
+	urlpatterns = patterns('',
 	    (r'^admin/', include(admin.site.urls)),
-	    (r'^', include('cms.urls')),
+	)
+
+	if settings.DEBUG:
+	    urlpatterns += patterns('',
+	        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True})
+	    )
+
+	urlpatterns += patterns('',
+	    url(r'^', include('cms.urls')),
 	)
 
 Create a folder called 'media' in your project root (that's "project-name" for me), this means you create a symbolic link from the "cms/media/cms" folder in "dist-packages" to your new "media" folder::
@@ -157,4 +174,26 @@ That should hopefully be that. If your development server is still running in yo
 
 Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with appropriate text and if you can see the django-cms logo then your media folder is cool also.
 
-log in via the admin link and enjoy :)
+log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
+
+This is your development enviroment. On how to deploy django projects on real webservers you may want to head over to http://www.django-project.com/
+
+
+Templates
+---------
+
+My First App
+------------
+
+My First Plugin
+---------------
+
+My First Menu
+-------------
+
+My First Attach Menu
+--------------------
+
+My First Apphook
+----------------
+
