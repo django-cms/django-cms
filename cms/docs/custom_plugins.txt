@@ -59,36 +59,11 @@ In there write the following::
 	
 
 CMSPluginBase itself inherits from ModelAdmin so you can use all the things (inlines for example) you would
-use in a regular admin class. CMSPluginBase has some new properties you can or must set tough:
+use in a regular admin class. 
 
-**name**
 
-The plugin name 
-(required)
-  
-**render_template**
+For a list of all the options you have on CMSPluginBase have a look at the plugin reference
 
-The template used to render the plugin. The template will recieve the context the render method returns.
-(required)
-
-**model**
-default = CMSPlugin
-The model the plugin uses. Do not set if plugin uses no model.
-
-**admin_preview**
-
-default = True
-Should the plugin be rendered in the admin for a preview?
-    
-    
-**render_plugin**
-default = True 
-Should the plugin be rendered at all, or doesn't it have any output?
-
-    
-**text_enabled**
-default = False
-Can the plugin be embeded into the text plugin?
 
 Template
 --------
@@ -151,7 +126,7 @@ to have an unified look across the plugins and to have the preview functionality
 
 
 Plugin Context Processors
-=========================
+-------------------------
 
 Plugin context processors are callables that modify all plugin's context before rendering. They are enabled 
 using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
@@ -183,7 +158,7 @@ Example::
         return {'verbose_name': instance._meta.verbose_name}
 
 Plugin Processors
-=================
+-----------------
 
 Plugin processors are callables that modify all plugin's output after rendering. They are enabled using 
 the ``CMS_PLUGIN_PROCESSORS`` setting.
@@ -212,17 +187,19 @@ end up having DIVs inside of P tags, which is invalid. You can prevent such case
 `rendered_content` unchanged if `instance._render_meta.text_enabled` is True, which is the case when 
 rendering an embedded plugin.  
 
-Example::
+Example:
 
 Suppose you want to put wrap each plugin in the main placeholder in a colored box, but it would be too 
-complicated to edit each individual plugin's template::
+complicated to edit each individual plugin's template:
     
-    # settings.py:
+In your settings.py::
+
     CMS_PLUGIN_PROCESSORS = (
         'yourapp.cms_plugin_processors.wrap_in_colored_box',
     )
     
-    # yourapp.cms_plugin_processors.py:
+In your yourapp.cms_plugin_processors.py::
+
     def wrap_in_colored_box(instance, placeholder, rendered_content, original_context):
         '''
         This plugin processor wraps each plugin's output in a colored box if it is in the "main" placeholder.

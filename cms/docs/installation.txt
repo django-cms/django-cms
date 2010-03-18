@@ -3,14 +3,14 @@ Installation
 
 This document assumes that you are familiar with python and django.
 
-A more beginner friendly tutorial should be written shortly.
+A more beginner friendly tutorial can be found `here <../tutorial/>`_
 
 Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
 They all should come with the distribution.
 
 python 2.4 - 2.6 should be supported
 
-django 1.1 is required at this moment.
+django 1.2 is required at this moment.
 
 Apps
 ----

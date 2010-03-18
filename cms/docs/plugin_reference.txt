@@ -6,7 +6,7 @@ model
 -----
 
 Is the CMSPlugin model we created earlier.
-If you don't need a model because you just want to display some template logic, use CMSPlugin from cms.models as the model instead.
+If you don't need a model because you just want to display some template logic, use CMSPlugin from ``cms.models`` as the model instead.
 
 name
 ----
@@ -48,7 +48,7 @@ PluginMedia
 -----------
 
 With a PluginMedia Class you can define a list of javascript and css files that should get loaded with the html.
-You will need to palce a '{% plugin_media %}' templatetag in your <head>
+You will need to palce a ``{% plugin_media %}`` templatetag in your ``<head>``
 
 example::
 
@@ -69,9 +69,9 @@ example::
  			css = {
  				'all': ('%scss/jquery.lightbox-0.5.css' % settings.MEDIA_URL,)
  			}
- 			js = ('%ssimplegallery/js/jquery.cycle.min.js'% settings.MEDIA_URL,
- 				'%ssimplegallery/js/jquery.cycle.trans.min.js'% settings.MEDIA_URL,
- 				'%ssimplegallery/js/jquery.lightbox-0.5.min.js'% settings.MEDIA_URL,)
+ 			js = ('%sgallery/js/jquery.cycle.min.js'% settings.MEDIA_URL,
+ 				'%sgallery/js/jquery.cycle.trans.min.js'% settings.MEDIA_URL,
+ 				'%sgallery/js/jquery.lightbox-0.5.min.js'% settings.MEDIA_URL,)
  
 	plugin_pool.register_plugin(GalleryPlugin)
 
@@ -86,12 +86,28 @@ text_enabled
 
 form
 ----
+
+The form that will be displayed if you edit the plugin.
+Have a read on django forms for this.
     
 change_form_template
 --------------------
 
+The template that renders the form.
+
 admin_preview
 -------------
+
+default = True
+
+Should the plugin be rendered in the admin for a preview?
+
+render_plugin
+-------------
+
+default = True 
+
+Should the plugin be rendered at all, or doesn't it have any output?
     
 
 

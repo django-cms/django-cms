@@ -104,7 +104,7 @@ If this is enabled you get 3 new models in Admin:
 - Users - page
 
 In the edit-view of the pages you can now assign users to pages and grant them permissions.
-In the global permissions you can set the permissions for users globaly.
+In the global permissions you can set the permissions for users globally.
 
 If a user has the right to create new users he can now do so in the "Users - page". But he will only see the users he created.
 The users he created also can only have the rights he already has. So if he has only the right to edit a certain page all users he created also only can edit this page. 
@@ -119,7 +119,7 @@ Example::
 	CMS_MODERATOR = True
 	
 If set to true gives you a new column "moderation" in the tree view.
-You can select to moderate pages or hole trees. If a page is under moderation you will recieve an email if somebody changes a page and you will be asked to approve the changes. Only after you approved the changes they will be updated on the live site. If you change a page you moderate yourself you will need to approve it anyway. This allows you change a lot of pages for a new version of the site and can go live with all the changes on the same time.
+You can select to moderate pages or hole trees. If a page is under moderation you will receive an email if somebody changes a page and you will be asked to approve the changes. Only after you approved the changes they will be updated on the live site. If you change a page you moderate yourself you will need to approve it anyway. This allows you change a lot of pages for a new version of the site and can go live with all the changes on the same time.
 
 
 

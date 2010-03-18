@@ -121,7 +121,7 @@ Set up the remainder of the file with the following changes/additions::
 	    'cms.context_processors.media',
 	)
 	
-(I didn't have a "TEMPLATE_CONTEXT_PROCESSORS" specified so had to add all of the above anew.)
+(I didn't have a ``TEMPLATE_CONTEXT_PROCESSORS`` specified so had to add all of the above anew.)
 
 Set up your available templates (don't worry that they don't actually exist yet)::
 
@@ -132,7 +132,7 @@ Set up your available templates (don't worry that they don't actually exist yet)
 	    ('extra.html', gettext('Some extra fancy template')),
 	) 
 
-Next, Edit your "urls.py" file like so::
+Next, Edit your ``urls.py`` file like this::
 
 	from django.conf.urls.defaults import *
 	from django.contrib import admin
