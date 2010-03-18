@@ -304,23 +304,23 @@ msgstr ""
 
 #: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:855
 msgid "Password"
-msgstr ""
+msgstr "पासवर्ड"
 
 #: admin/widgets.py:58
 msgid "Add Another"
-msgstr ""
+msgstr "एक और जोड़ें"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "Copy permissions"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr ""
+msgstr "कॉपी मॉडरेशन"
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "विरासत में निकटतम पूर्वज का खाका"
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
