@@ -1358,22 +1358,18 @@ msgid "This page must be moderated at level %(moderation_level)s, post a message
 msgstr "इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
 
 #: templates/admin/cms/page/change_form.html:185
-#, fuzzy
 msgid "Request approvemet"
 msgstr "अनुरोध approvemet"
 
 #: templates/admin/cms/page/change_list.html:3
-#, fuzzy
 msgid "List of pages"
 msgstr "पृष्ठों की सूची"
 
 #: templates/admin/cms/page/change_list.html:57
-#, fuzzy
 msgid "Successfully moved"
 msgstr "सफलतापूर्वक चला गया"
 
 #: templates/admin/cms/page/change_list.html:62
-#, fuzzy
 msgid "An error occured. Please reload the page"
 msgstr "एक त्रुटि हो गई. कृपया पृष्ठ पुनः लोड"
 
