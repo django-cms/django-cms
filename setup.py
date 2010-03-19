@@ -61,7 +61,10 @@ setup(
             'sampleapp/media/sampleapp/img/gift.jpg',
             'sampleapp/templates/sampleapp/*.html',
             'categories/templates/categories/*.html',
-        ]
+        ],
+        'menus': [
+            'templates/menu/*.html',
+        ],
     },
     zip_safe = False
 )
