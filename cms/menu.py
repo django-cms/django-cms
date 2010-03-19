@@ -34,6 +34,7 @@ def page_to_node(page, home, cut):
                        page.pk, 
                        parent_id, 
                        attr=attr,
+                       visible=page.in_navigation,
                        )
     return n
 
@@ -48,7 +49,6 @@ class CMSMenu(Menu):
         except NoHomeFound:
             home = None
         filters = {
-            'in_navigation':True,
             'site':site,
         }
         if settings.CMS_HIDE_UNTRANSLATED:

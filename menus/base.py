@@ -29,14 +29,16 @@ class NavigationNode(object):
     parent_id = None
     parent_namespace = None
     parent = None # do not touch
+    visible = True
     
-    def __init__(self, title, url, id, parent_id=None, parent_namespace=None, attr=None):
+    def __init__(self, title, url, id, parent_id=None, parent_namespace=None, attr=None, visible=True):
         self.children = [] # do not touch
         self.title = title
         self.url = self._remove_current_root(url)
         self.id = id
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
+        self.visible = visible
         if attr:
             self.attr = attr
             

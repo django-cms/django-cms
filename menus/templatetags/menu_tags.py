@@ -1,4 +1,3 @@
-
 from menus.menu_pool import menu_pool
 from django import template
 from django.conf import settings
@@ -33,6 +32,10 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
                 node.parent.children.remove(node)
         if node.selected:
             selected = node
+        if not node.visible:
+            removed.append(node)
+            if node.parent:
+                node.parent.children.remove(node)
     if selected:
         cut_after(selected, extra_active, removed)
     if removed:
@@ -164,7 +167,8 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
     if selected and selected != home:
         n = selected
         while n:
-            ancestors.append(n)
+            if n.visible:
+                ancestors.append(n)
             n = n.parent
     if not ancestors or (ancestors and ancestors[-1] != home) and home:
         ancestors.append(home)
