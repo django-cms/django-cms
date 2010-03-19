@@ -239,9 +239,6 @@ class Publisher(models.Model):
         return obj.save()
 
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
-        print seen_objs
-        print parent
-        
         if excluded_models is None:
             excluded_models = [self.__class__]
         elif not isinstance(self, Publisher) or self.__class__ in excluded_models:
