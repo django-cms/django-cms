@@ -837,6 +837,8 @@ class PageAdmin(model_admin):
 
         approve_page(request, page)
         
+        # Django SQLite bug. Does not convert to string the lazy instances
+        from django.utils.translation import ugettext as _
         self.message_user(request, _('Page was successfully approved.'))
         
         if 'node' in request.REQUEST:
