@@ -182,13 +182,13 @@ class Publisher(models.Model):
                         obj = obj.publish(excluded_models=excluded_models, first_instance=False)
                         remote_pk = obj.pk
 
-                updated_obj_ids.append(remote_pk)
-                public_m2m_manager.add(obj)
-                # save obj if it was dirty
-                if obj.publisher_state == Publisher.PUBLISHER_STATE_DIRTY:
-                    self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
-                    self._publisher_keep_state = True
-                    obj.save_base(cls=obj.__class__)
+                    updated_obj_ids.append(remote_pk)
+                    public_m2m_manager.add(obj)
+                    # save obj if it was dirty
+                    if obj.publisher_state == Publisher.PUBLISHER_STATE_DIRTY:
+                        self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
+                        self._publisher_keep_state = True
+                        obj.save_base(cls=obj.__class__)
 
             # remove all not updated instances
             # we have to do this, because m2m doesn't have dirty flag, and
