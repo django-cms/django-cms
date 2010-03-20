@@ -171,6 +171,12 @@ class MenusTestCase(CMSTestCase):
         nodes = show_menu_below_id(context, "hello")['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), self.page3.get_absolute_url())
+        page2.in_navigation = False
+        page2.save()
+        context = self.get_context(path=self.page5.get_absolute_url())
+        nodes = show_menu_below_id(context, "hello")['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].get_absolute_url(), self.page3.get_absolute_url())
         
         
     def test_14_unpublished(self):
