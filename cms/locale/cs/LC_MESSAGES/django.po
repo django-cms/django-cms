@@ -5,15 +5,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-15 13:44+0100\n"
-"PO-Revision-Date: 2010-03-18 01:13+0100\n"
+"PO-Revision-Date: 2010-03-19 15:56+0100\n"
 "Last-Translator: Jiří Suchan <yed@vanyli.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: plugin_base.py:99
 msgid "Advanced options"
@@ -206,7 +207,7 @@ msgstr "SEO nastavení"
 
 #: admin/pageadmin.py:463
 msgid "higher"
-msgstr ""
+msgstr "výš"
 
 #: admin/pageadmin.py:629
 msgid "Database error"
@@ -225,7 +226,7 @@ msgstr "stránka"
 
 #: admin/pageadmin.py:837
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "Stránka byla úspěšně schválena."
 
 #: admin/pageadmin.py:891
 #, python-format
@@ -234,7 +235,7 @@ msgstr ""
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Tato stránka existuje pouze v jedné jazykové variantě"
 
 #: admin/pageadmin.py:909
 #, python-format
@@ -251,15 +252,15 @@ msgstr "Nemáte oprávnění k publikování této stránky"
 
 #: admin/pageadmin.py:1012
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "Nemáte oprávnění měnit tuto vlastno dané stránky."
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "Nemáte oprávnění měnit tuto stránku"
 
 #: admin/pageadmin.py:1051 admin/pageadmin.py:1083
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Zadaný jazyk není podporovaný, zvolte jiný."
 
 #: admin/pageadmin.py:1063
 #, python-format
@@ -268,7 +269,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1085
 msgid "Language must be different than the copied language!"
-msgstr ""
+msgstr "Jazyk kopie se musí lišit od jazyka původní stránky"
 
 #: admin/pageadmin.py:1131
 #, python-format
@@ -283,7 +284,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
-msgstr ""
+msgstr "Typy obsahu byly přesunuty"
 
 #: admin/pageadmin.py:1281
 #, python-format
@@ -294,15 +295,15 @@ msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "Práva stránky"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "Práva uživatele/skupiny"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "Správa práv stránky"
 
 #: admin/useradmin.py:22
 msgid "User details"
@@ -322,7 +323,7 @@ msgstr "Přidat další"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "Zkopírovat oprávnění"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
@@ -330,11 +331,11 @@ msgstr ""
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Podědit šablonu nejbližšího předka"
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "Přehled"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
@@ -350,20 +351,20 @@ msgstr ""
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "Prohledat stránku"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "prohledat dokumentaci"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "Globální seznam modulů"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "rychlý přístup ke všem modulům"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
@@ -388,11 +389,11 @@ msgstr ""
 
 #: docs/templates/genindex-split.html:7
 msgid "Index pages by letter"
-msgstr ""
+msgstr "Seznam stránek dle písmena"
 
 #: docs/templates/genindex-split.html:15
 msgid "can be huge"
-msgstr ""
+msgstr "může být obrovské"
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
@@ -518,7 +519,7 @@ msgstr "všichni"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
-msgstr "lze upravovat"
+msgstr "smí upravovat"
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
@@ -526,7 +527,7 @@ msgstr "skupina"
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
-msgstr "lze publikovat"
+msgstr "smí publikovat"
 
 #: migrations/0001_initial.py:42
 msgid "type"
@@ -548,11 +549,11 @@ msgstr ""
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr ""
+msgstr "má předefinovanou url"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
-msgstr ""
+msgstr "předefinovaná url"
 
 #: migrations/0001_initial.py:57
 msgid "author"
@@ -572,7 +573,7 @@ msgstr ""
 
 #: migrations/0001_initial.py:63 models/pagemodel.py:47
 msgid "publication end date"
-msgstr ""
+msgstr "publikováno do"
 
 #: migrations/0001_initial.py:64 models/pagemodel.py:54
 #: plugins/snippet/models.py:14
@@ -581,7 +582,7 @@ msgstr "šablona"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:46
 msgid "publication date"
-msgstr ""
+msgstr "datum publikace"
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:48
 #: templates/admin/cms/page/change_list_tree.html:9
@@ -772,19 +773,19 @@ msgstr "výchozí"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr "přidávání"
+msgstr "smí přidávat"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr "smazání"
+msgstr "smí mazat"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr "změna rozšířených voleb"
+msgstr "smí měnit Rozšířené možnosti"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr "změny oprávnění"
+msgstr "smí měnit oprávnění"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
@@ -792,7 +793,7 @@ msgstr "na úrovni stránky"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr "přesouvání"
+msgstr "smí přesunovat"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
@@ -816,15 +817,15 @@ msgstr ""
 
 #: models/permissionmodels.py:57
 msgid "Page global permission"
-msgstr ""
+msgstr "Globální oprávnění stránky"
 
 #: models/permissionmodels.py:58
 msgid "Pages global permissions"
-msgstr ""
+msgstr "Globální oprávnění stránek"
 
 #: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
-msgstr ""
+msgstr "Platné pro"
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
@@ -848,7 +849,7 @@ msgstr "Skupiny uživatel (stránka)"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "vlastní popisek v menu"
 
 #: models/titlemodels.py:15
 msgid "Path"
@@ -935,7 +936,7 @@ msgstr ""
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "Spočítat nejrychlejší cestu"
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
@@ -951,11 +952,11 @@ msgstr "Vaše adresa"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:76
 msgid "Calculate route"
-msgstr ""
+msgstr "Spočítat cestu"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "Podědit typy obsahu ze stránky"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
@@ -994,7 +995,7 @@ msgstr ""
 
 #: plugins/link/models.py:14
 msgid "mailto"
-msgstr ""
+msgstr "mailto"
 
 #: plugins/link/models.py:14
 msgid "An email adress has priority over a text link."
@@ -1164,7 +1165,7 @@ msgstr "Video"
 
 #: plugins/video/cms_plugins.py:42
 msgid "Color Settings"
-msgstr ""
+msgstr "Nastavení barev"
 
 #: plugins/video/models.py:10
 msgid "movie file"
@@ -1180,7 +1181,7 @@ msgstr "URL videa"
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
+msgstr "URL adresa na youtube nebo vimeo. Př.: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
 msgid "preview image file"
@@ -1251,16 +1252,16 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:273
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "Uložit"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Smazat překlad v jazyce: %(language)s"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "Uložit jako novou"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
@@ -1283,7 +1284,7 @@ msgstr "Poslední změny"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "<a href=\"%(login_url)s\">Přihlášení do zázemí</a>"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
@@ -1305,7 +1306,7 @@ msgstr "Změnit"
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
-msgstr ""
+msgstr "Domů"
 
 #: templates/admin/cms/page/change_form.html:71
 msgid "Approve page deletion"
@@ -1336,27 +1337,27 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:94
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "náčrt"
 
 #: templates/admin/cms/page/change_form.html:94
 msgid "Preview"
-msgstr ""
+msgstr "Náhled"
 
 #: templates/admin/cms/page/change_form.html:97
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr ""
+msgstr "Historie"
 
 #: templates/admin/cms/page/change_form.html:98
 msgid "View on site"
-msgstr ""
+msgstr "Zobrazit"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:83
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prosím opravte níže uvedenou chybu."
+msgstr[1] "Prosím opravte níže uvedené chyby."
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
@@ -1389,25 +1390,25 @@ msgstr "Seznam stránek"
 
 #: templates/admin/cms/page/change_list.html:57
 msgid "Successfully moved"
-msgstr ""
+msgstr "Úspěšně přesunuto"
 
 #: templates/admin/cms/page/change_list.html:62
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "Nastala chyba. Prosím obnovte stránku"
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "Obnovit smazané: %(name)s"
 
 #: templates/admin/cms/page/change_list.html:86
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Přidat %(name)s"
 
 #: templates/admin/cms/page/change_list.html:98
 msgid "Pages on:"
-msgstr ""
+msgstr "Stránky na:"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "Filter:"
@@ -1435,46 +1436,46 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr ""
+msgstr "publikováno"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "start"
-msgstr ""
+msgstr "od"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "do"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
-msgstr ""
+msgstr "poslední změny"
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr ""
+msgstr "vybrat tuto stránku"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr ""
+msgstr "upravit tuto stránku"
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:891
 #: templates/cms/toolbar/toolbar.html:912
 msgid "edit"
-msgstr ""
+msgstr "upravit"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr ""
+msgstr "vložit nad"
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr ""
+msgstr "vložit pod"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "vložit do"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
@@ -1482,28 +1483,28 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "home"
-msgstr ""
+msgstr "domů"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "Upravit stránku v jazyce:  %(language)s"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
-msgstr ""
+msgstr "Vyjmout"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "cut"
-msgstr ""
+msgstr "vyjmout"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
-msgstr ""
+msgstr "Kopírovat"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "copy"
-msgstr ""
+msgstr "kopírovat"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
@@ -1524,93 +1525,93 @@ msgstr ""
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
 msgid "view"
-msgstr ""
+msgstr "zobrazit"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
-msgstr ""
+msgstr "Depublikovat"
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
-msgstr ""
+msgstr "Publikovat"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
-msgstr ""
+msgstr "Zobrazit"
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
-msgstr ""
+msgstr "Akce"
 
 #: templates/admin/cms/page/moderation_messages.html:5
 msgid "Created"
-msgstr ""
+msgstr "Vytvořeno"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
-msgstr ""
+msgstr "Vzkaz"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "Skupina"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "Smí upravovat"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "Smí přidávat"
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "Smí mazat"
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "Smí publikovat"
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "Smí měnit oprávnění"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Smí přesouvat"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
 msgid "(global)"
-msgstr ""
+msgstr "(globální)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(aktuální)"
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "Vše"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Stránka nemá žádná další kritéria"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "Stará verze typu obsahu nemůže být uložena!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "Typ obsahu byl úspěšně uložen"
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "Obnovit smazané %(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Použijte tlačítko 'uložit' pro obnovu této verze objektu."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1623,28 +1624,28 @@ msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "Kopírovat volby"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Zvolte volby pro zkopírování"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "Přidat typ obsahu"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
 msgid "From Language"
-msgstr ""
+msgstr "Z jazyka"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
 msgid "Copy Plugins"
-msgstr ""
+msgstr "Kopírovat typ obsahu"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "Pro přidání typu obsahu je potřebné nejprve uložit stránku."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
