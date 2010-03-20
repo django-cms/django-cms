@@ -43,7 +43,7 @@ class NavExtenderTestCase(CMSTestCase):
         page1.navigation_extenders = "TestMenu"
         page1.save()
         context = self.get_context()
-        nodes = show_menu(context)['children']
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(len(nodes[0].children[3].children), 1)
@@ -71,7 +71,7 @@ class NavExtenderTestCase(CMSTestCase):
         page2.navigation_extenders = "TestMenu"
         page2.save()
         context = self.get_context()
-        nodes = show_menu(context)['children']
+        nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(nodes[0].children[1].get_absolute_url(), "/" )
