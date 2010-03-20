@@ -98,7 +98,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
 show_menu = register.inclusion_tag('cms/dummy.html', takes_context=True)(show_menu)
 
 
-def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=100, extra_active=100, template_file="cms/menu.html", namespace=None, next_page=None):
+def show_menu_below_id(context, root_id=None, from_level=0, to_level=100, extra_inactive=100, extra_active=100, template_file="menu/menu.html", namespace=None, next_page=None):
     """
     displays a menu below a node that has an uid
     """
