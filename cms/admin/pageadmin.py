@@ -538,7 +538,8 @@ class PageAdmin(model_admin):
         languages = []
         if site_id and site_id in settings.CMS_SITE_LANGUAGES:
             for lang in settings.CMS_SITE_LANGUAGES[site_id]:
-                languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
+                lang_label = dict(settings.CMS_LANGUAGES).get(lang, dict(settings.LANGUAGES).get(lang, lang))
+                languages.append((lang, lang_label))
         else:
             languages = settings.CMS_LANGUAGES
         context.update({
