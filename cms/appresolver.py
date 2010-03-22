@@ -85,13 +85,12 @@ def recurse_patterns(path, pattern_list, page_id):
         newpatterns.append(resolver)
     return newpatterns
 
-
 def get_patterns_for_title(path, title):
     """
     Resolve the urlconf module for a path+title combination
     Returns a list of url objects.
     """
-    app = apphook_pool.apps[title.application_urls]
+    app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
     for urlconf_name in app.urls:
         mod = import_module(urlconf_name)

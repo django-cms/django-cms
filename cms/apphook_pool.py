@@ -45,6 +45,14 @@ class ApphookPool(object):
             app = self.apps[app_name]
             hooks.append((app_name, app.name))
         return hooks
-            
+    
+    def get_apphook(self, app_name):
+        try:
+            return self.apps[app_name]
+        except KeyError:
+            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name 
+            for key, app in self.apps.items():
+                if app_name in app.urls:
+                    return app
 
 apphook_pool = ApphookPool()

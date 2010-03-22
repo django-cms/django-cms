@@ -26,7 +26,7 @@ def page_to_node(page, home, cut):
     except Title.DoesNotExist:
         app_name = None
     if app_name:
-        app = apphook_pool.apps[app_name]
+        app = apphook_pool.get_apphook(app_name)
         for menu in app.menus:
             extenders.append(menu.__name__)
     if extenders:
