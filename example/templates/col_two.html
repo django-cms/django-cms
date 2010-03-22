@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n cms_tags %}
+
+{% block tpl_id %}tpl_col_two{% endblock %}
+
+{% block content %}
+    <div id="col1" class="grid_4">	    
+		{% include "sidebar_submenu.html" %}	
+		{% block col_sidebar %}
+	    	{% placeholder col_sidebar "220" %}
+		{% endblock %}
+    </div>
+	
+    <div id="col2" class="grid_11 push_1">
+    	{% block page_title %}<h1>{% page_attribute title %}</h1>{% endblock %}
+		{% block col_left %}
+			{% placeholder col_left "640" %}
+		{% endblock %}
+    </div>
+{% endblock %}
