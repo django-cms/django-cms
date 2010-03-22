@@ -45,7 +45,9 @@ class VideoPlugin(CMSPluginBase):
             }),
         ]
     
-    
+    class PluginMedia:
+        js = ('http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js',)
+        
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,
