@@ -1,5 +1,6 @@
 from django.conf import settings
 from cms.exceptions import AppAllreadyRegistered
+from django.core.exceptions import ImproperlyConfigured
 
 class ApphookPool(object):
     def __init__(self):
@@ -51,8 +52,9 @@ class ApphookPool(object):
             return self.apps[app_name]
         except KeyError:
             # deprecated: return apphooks registered in db with urlconf name instead of apphook class name 
-            for key, app in self.apps.items():
+            for app in self.apps.values():
                 if app_name in app.urls:
                     return app
+        raise ImproperlyConfigured('No registered apphook `%s` found.')
 
 apphook_pool = ApphookPool()
