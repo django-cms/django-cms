@@ -6,7 +6,7 @@
 	#cms_toolbar_mini{z-index:70010;position:fixed;right:0;top:0;height:41px;padding-top:6px;padding-right:10px;}
 		
 	#cms_toolbar{
-		z-index:70011;position:fixed;left:0;top:0;height:41px;width:100%;min-width: 960px;color:#656565;zoom:1;font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;
+		z-index:70011;position:fixed;left:0;top:0;height:41px;width:100%;min-width: 960px;zoom:1;
 		border-bottom: 2px solid #ddd;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) repeat-x 0 0;
 	}
@@ -24,7 +24,10 @@
 	
 	#cms_toolbar_col2{float:right;height:100%;padding-top:6px;padding-right:10px;height:35px;}
 	
-	/* RESET */	
+	/* RESET */
+	.cms_toolbar, #cms_toolbar{
+		font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;font-size:12px;color:#656565;
+	}
 	.cms_toolbar strong, .cms_toolbar em{font-style:normal;font-weight:normal;margin:0;padding:0;}
 	.cms_toolbar ul, .cms_toolbar li{margin:0;padding:0;list-style:none;background:none;}
 	.cms_toolbar form, .cms_toolbar input, .cms_toolbar label{
