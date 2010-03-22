@@ -17,7 +17,7 @@ DATABASE_ENGINE = 'mysql'#'postgresql_psycopg2'       # 'postgresql_psycopg2', '
 DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
 DATABASE_USER = 'cms'           # Not used with sqlite3.
 DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
-DATABASE_HOST = ''     # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_HOST = 'intra.divio.ch'     # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''              # Set to empty string for default. Not used with sqlite3.
 
 # Test database settings
@@ -40,7 +40,10 @@ SITE_ID = 1
 USE_I18N = True
 
 # Absolute path to the directory that holds media.
-MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/')
+MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
+
+# Absolute path to the directory that holds media.
+CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/cms/')
 #ADMIN_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../admin_media/')
 MEDIA_URL = '/media/'
 
@@ -71,7 +74,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 INTERNAL_IPS = ('127.0.0.1',)
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.cache.UpdateCacheMiddleware',
+    #'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'cms.middleware.multilingual.MultilingualURLMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -82,7 +85,7 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware', 
+    #'django.middleware.cache.FetchFromCacheMiddleware', 
     
 )
 
@@ -122,7 +125,7 @@ INSTALLED_APPS = (
     'reversion',
     'example.sampleapp',
     #'debug_toolbar',
-    'south',
+    #'south',
 )
 
 gettext = lambda s: s
@@ -149,6 +152,9 @@ CMS_SITE_LANGUAGES = {
 APPEND_SLASH = True
 
 CMS_TEMPLATES = (
+    ('col_two.html', gettext('two columns')),
+    ('col_three.html', gettext('three columns')),
+                 
     ('index.html', gettext('default')),
     ('nice.html', gettext('nice one')),
     ('cool.html', gettext('cool one')),
@@ -157,26 +163,43 @@ CMS_TEMPLATES = (
 
 
 
-CMS_PLACEHOLDER_CONF = {                        
-    'right-column': {
-        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
-        "extra_context": {"width":940},
-        "name":gettext("right column")
-    },
+CMS_PLACEHOLDER_CONF = {
+    'col_sidebar': {
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        'name': gettext("sidebar column")
+    },                    
+                        
+    'col_left': {
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        'name': gettext("left column")
+    },                  
+                        
+    'col_right': {
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        'name': gettext("right column")
+    },                     
+                        
+                        
+                                              
+#    'right-column': {
+#        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+#        "extra_context": {"width":940},
+#        "name":gettext("right column")
+#    },
     
-    'body': {
-        "extra_context": {"width":280},
-        "name":gettext("body"),
-    },
-    'fancy-content': {
-        "plugins": ('TextPlugin', 'LinkPlugin'),
-        "extra_context": {"width":"640"},
-        "name":gettext("fancy content custom name"),
-        "limits": {
-            "global": 3,
-            "TextPlugin": 1,
-        },
-    },
+#    'body': {
+#        "extra_context": {"width":280},
+#        "name":gettext("body"),
+#    },
+#    'fancy-content': {
+#        "plugins": ('TextPlugin', 'LinkPlugin'),
+#        "extra_context": {"width":"640"},
+#        "name":gettext("fancy content custom name"),
+#        "limits": {
+#            "global": 3,
+#            "TextPlugin": 1,
+#        },
+#    },
 }
 
 CMS_SOFTROOT = True
