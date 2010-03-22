@@ -17,7 +17,7 @@ DATABASE_ENGINE = 'mysql'#'postgresql_psycopg2'       # 'postgresql_psycopg2', '
 DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
 DATABASE_USER = 'cms'           # Not used with sqlite3.
 DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
-DATABASE_HOST = 'intra.divio.ch'     # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_HOST = ''     # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''              # Set to empty string for default. Not used with sqlite3.
 
 # Test database settings
@@ -42,7 +42,8 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
 
-# Absolute path to the directory that holds media.
+# Absolute path to the directory that holds media. 
+# DO NOT ACTUALLY USE THIS IN YOUR OWN PROJECT!!!! THIS IS JUST FOR TESTING
 CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/cms/')
 #ADMIN_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../admin_media/')
 MEDIA_URL = '/media/'
@@ -125,7 +126,7 @@ INSTALLED_APPS = (
     'reversion',
     'example.sampleapp',
     #'debug_toolbar',
-    #'south',
+    'south',
 )
 
 gettext = lambda s: s
@@ -154,11 +155,7 @@ APPEND_SLASH = True
 CMS_TEMPLATES = (
     ('col_two.html', gettext('two columns')),
     ('col_three.html', gettext('three columns')),
-                 
-    ('index.html', gettext('default')),
-    ('nice.html', gettext('nice one')),
-    ('cool.html', gettext('cool one')),
-    ('long-folder-long/long-template-name.html', gettext('long')),
+    ('nav_playground.html', gettext('navigation examples')),
 )
 
 
