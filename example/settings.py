@@ -71,19 +71,18 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 INTERNAL_IPS = ('127.0.0.1',)
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
-    #'django.contrib.csrf.middleware.CsrfMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
-    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware', 
     
 )
 
@@ -107,7 +106,7 @@ INSTALLED_APPS = (
     
     'cms',
     'publisher',
-    
+    'menus',
     'cms.plugins.text',
     'cms.plugins.picture',
     'cms.plugins.file',
@@ -121,13 +120,9 @@ INSTALLED_APPS = (
     'cms.plugins.inherit',
     'mptt',
     'reversion',
-    'example.categories',
+    'example.sampleapp',
     #'debug_toolbar',
     'south',
-    # sample application
-    'example.sampleapp',
-    #'test_utils',
-    #'store',
 )
 
 gettext = lambda s: s
@@ -138,12 +133,17 @@ LANGUAGES = (
     ('fr', gettext('French')),
     ('de', gettext('German')),
     ('en', gettext('English')),
-    ('pt-br', gettext("Brazil")),
+    ('pt-BR', gettext("Brazil")),
 )
 
 CMS_LANGUAGE_CONF = {
     'de':['fr', 'en'],
     'en':['fr', 'de'],
+}
+
+CMS_SITE_LANGUAGES = {
+    1:['fr','de','en','pt-BR'],
+    2:['de','en'],
 }
 
 APPEND_SLASH = True
@@ -155,10 +155,7 @@ CMS_TEMPLATES = (
     ('long-folder-long/long-template-name.html', gettext('long')),
 )
 
-CMS_APPLICATIONS_URLS = (
-    ('sampleapp.urls', 'Sample application'),
-    ('sampleapp.urlstwo', 'Second sample application'),
-)
+
 
 CMS_PLACEHOLDER_CONF = {                        
     'right-column': {
@@ -181,10 +178,6 @@ CMS_PLACEHOLDER_CONF = {
         },
     },
 }
-
-
-CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),
-                            ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),)
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True

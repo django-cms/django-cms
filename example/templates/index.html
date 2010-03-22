@@ -1,4 +1,4 @@
-{% load cache cms_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% load cache cms_tags menu_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
 <head>
 <title>{% page_attribute page_title %}</title>
@@ -134,14 +134,13 @@
 <h2>Display the sub menu (2 level deep) of the current page</h2>
 
 <ul>
-    {% show_sub_menu 1 %}
+    {% show_sub_menu 2 %}
 </ul>
 
 
 <h2>Show the breadcrumb navigation of the current page</h2>
 <ul class="breadcrumb">
-{% page_attribute title %}
-	{#% show_breadcrumb %#}
+	{% show_breadcrumb %}
 </ul>
 
 <h2>Content</h2>

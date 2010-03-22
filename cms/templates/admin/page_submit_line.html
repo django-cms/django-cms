@@ -4,7 +4,7 @@
 {% if show_delete_link %}
 	<p class="deletelink-box"><a href="delete/" class="deletelink">{% trans "Delete" %}</a>
 	{% if show_delete_translation %}
-		<a href="delete-translation/?language={{ language }}" class="deletelink deletetranslation">{% blocktrans with language_name|lower as language %}Delete {{ language }} translation{% endblocktrans %}</a>
+		<a href="delete-translation/?language={{ language }}" class="deletelink deletetranslation">{% blocktrans with language_name as language %}Delete {{ language }} translation{% endblocktrans %}</a>
 	{% endif %}
 	</p>
 {% endif %}

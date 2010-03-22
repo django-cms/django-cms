@@ -11,8 +11,10 @@ from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from django.conf import settings as django_settings
 from cms.utils.i18n import get_fallback_languages
+from cms.exceptions import NoHomeFound
+from cms.apphook_pool import apphook_pool
 
-def get_current_page(path, lang, queryset, home_slug, home_tree_id):
+def get_current_page(path, lang, queryset, home_slug=None, home_tree_id=None):
     """Helper for getting current page from path depending on language
     
     returns: (Page, None) or (None, path_to_alternative language)
@@ -63,28 +65,25 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
     else:
         pages = page_queryset.published().filter(site=site)
     
-    root_pages = pages.all_root().order_by("tree_id")
     current_page, response = None, None
-    if root_pages:
+    if pages.all_root():
         if page_id:
             current_page = get_object_or_404(pages, pk=page_id)
         elif slug != None:
             if slug == "":
-                current_page = root_pages[0]
+                current_page = pages.get_home()
             else:
-                if slug.startswith(reverse('pages-root')):
-                    path = slug.replace(reverse('pages-root'), '', 1)
-                else:
-                    path = slug
-                if root_pages:
-                    home_tree_id = root_pages[0].tree_id
-                    home_slug = root_pages[0].get_slug(language=lang)
-                else:
-                    home_slug = ""
-                    home_tree_id = None
-                current_page, alternative = get_current_page(path, lang, pages, home_slug, home_tree_id)
-                if settings.CMS_APPLICATIONS_URLS:
-                    # check if it should'nt point to some application, if yes,
+                pages_root = reverse('pages-root')
+                path = slug.startswith(pages_root) and slug[len(pages_root):] or slug
+
+                try:
+                    home = pages.get_home()
+                    current_page, alternative = get_current_page(path, lang, pages, home.get_slug(language=lang), home.tree_id)
+                except NoHomeFound:
+                    current_page, alternative = get_current_page(path, lang, pages)
+                     
+                if apphook_pool.get_apphooks():
+                    # check if it shouldn't point to some application, if yes,
                     # change current page if required
                     current_page = applications_page_check(request, current_page, path)
                 if not current_page:
@@ -107,7 +106,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
             return "cms/new.html", locals()
         raise Http404("CMS: No page found for site %s" % unicode(site.name))
     
-    if current_page:  
+    if current_page:
         has_change_permissions = current_page.has_change_permission(request)
         request._current_page_cache = current_page
         

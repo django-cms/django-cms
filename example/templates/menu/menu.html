@@ -1,4 +1,4 @@
-{% load cms_tags cache %}
+{% load menu_tags cache %}
 {% for child in children %}
 <li>
 	{% if not child.is_leaf_node %}+{% endif %}{{ child.menu_level }}
@@ -9,9 +9,9 @@
 	{% if child.descendant %}descendant{% endif %}
 	{% if child.soft_root %}(softroot){% endif %}
 	(Level: {{ child.level }})</span>
-    {% if child.childrens %}
+    {% if child.children %}
     <ul>
-        {% show_menu from_level to_level extra_inactive extra_active template child %}
+        {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
     </ul>
     {% endif %}
 </li>

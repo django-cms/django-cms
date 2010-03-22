@@ -1,5 +1,6 @@
 import re
 import urllib
+from django.middleware.locale import LocaleMiddleware
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 from django.conf import settings
@@ -32,8 +33,6 @@ class MultilingualURLMiddleware:
                 lang = t
                 if hasattr(request, "session"):
                     request.session["django_language"] = lang
-                else:
-                    request.set_cookie("django_language", lang)
                 changed = True
         else:
             lang = translation.get_language_from_request(request)
@@ -54,11 +53,12 @@ class MultilingualURLMiddleware:
     def process_request(self, request):
         language = self.get_language_from_request(request)
         translation.activate(language)
-        request.LANGUAGE_CODE = translation.get_language()
+        request.LANGUAGE_CODE = language
        
     def process_response(self, request, response):
-        patch_vary_headers(response, ("Accept-Language",))
-        translation.deactivate()
+        language = getattr(request, 'LANGUAGE_CODE', self.get_language_from_request(request))
+        local_middleware = LocaleMiddleware()
+        response =local_middleware.process_response(request, response)
         path = unicode(request.path)
 
         # note: pages_root is assumed to end in '/'.
@@ -115,10 +115,10 @@ class MultilingualURLMiddleware:
             response.content = FORM_URL_FIX_RE.sub(ur'<form\1action="%s%s/\4"\5>' % (pages_root, request.LANGUAGE_CODE), decoded_response).encode("utf8")
 
         if (response.status_code == 301 or response.status_code == 302 ):
-            location = response._headers['location']
-            prefix = has_lang_prefix(location[1])
-            if not prefix and location[1].startswith("/") and \
-                    not location[1].startswith(settings.MEDIA_URL) and \
-                    not location[1].startswith(settings.ADMIN_MEDIA_PREFIX):
-                response._headers['location'] = (location[0], "%s%s%s" % (pages_root, request.LANGUAGE_CODE, request.path_info))
+            location = response['Location']
+            if not has_lang_prefix(location) and location.startswith("/") and \
+                    not location.startswith(settings.MEDIA_URL) and \
+                    not location.startswith(settings.ADMIN_MEDIA_PREFIX):
+                response['Location'] = "%s%s%s" % (pages_root, language, location[len(pages_root)-1:])
+        response.set_cookie("django_language", language)
         return response

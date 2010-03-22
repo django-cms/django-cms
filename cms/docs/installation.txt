@@ -3,14 +3,14 @@ Installation
 
 This document assumes that you are familiar with python and django.
 
-A more beginner friendly tutorial should be written shortly.
+A more beginner friendly tutorial can be found `here <../tutorial/>`_
 
 Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
 They all should come with the distribution.
 
 python 2.4 - 2.6 should be supported
 
-django 1.1 is required at this moment.
+django 1.2 is required at this moment.
 
 Apps
 ----
@@ -33,6 +33,7 @@ Add the following to your project's ``INSTALLED_APPS`` setting if not already pr
 		'cms.plugins.googlemap',
 		'mptt',
 		'publisher'
+		'menus',
 		...
 	)
 
@@ -51,23 +52,32 @@ Middleware
 Add the following middleware classes::
 
 	MIDDLEWARE_CLASSES = (
-		# needed for add/edit page
-		'django.middleware.locale.LocaleMiddleware',
+		'django.middleware.cache.UpdateCacheMiddleware',
 		'django.contrib.sessions.middleware.SessionMiddleware',
+        'cms.middleware.multilingual.MultilingualURLMiddleware'  #<--- new: order is important
 		'django.contrib.auth.middleware.AuthenticationMiddleware',
+		'django.middleware.common.CommonMiddleware',
 		...
-		'cms.middleware.page.CurrentPageMiddleware',
-		'cms.middleware.user.CurrentUserMiddleware',
-		'cms.middleware.multilingual.MultilingualURLMiddleware',
+		'cms.middleware.page.CurrentPageMiddleware', #<--- new
+		'cms.middleware.user.CurrentUserMiddleware', #<--- new
+		'cms.middleware.toolbar.ToolbarMiddleware',  #<--- new
 		...
+		'django.middleware.cache.FetchFromCacheMiddleware', 
 	)
 
 If your site is not multilingual you can leave out ``'cms.middleware.MutilingualURLMiddleware'``.
 
 Note:
 
+The order of the middlewares is critical !
+
+- Be sure that ``django.middleware.cache.UpdateCacheMiddleware`` comes first.
+- Be sure that ``cms.middleware.multilingual.MultilingualURLMiddleware`` comes after ``django.contrib.sessions.middleware.SessionMiddleware``.
 - Be sure that ``cms.middleware.user.CurrentUserMiddleware`` comes after ``django.contrib.auth.middleware.AuthenticationMiddleware``.
 - Be sure that ``cms.middleware.multilingual.MultilingualURLMiddleware`` comes after ``django.middleware.locale.LocaleMiddlewar``.
+- Be sure that ``django.middleware.cache.FetchFromCacheMiddleware`` comes last.
+
+``django.middleware.locale.LocaleMiddleware`` MUST NOT be used, ``cms.middleware.multilingual.MultilingualURLMiddleware`` replaces it and add some additional features.
 
 Template Context Processors
 ---------------------------

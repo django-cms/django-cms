@@ -14,7 +14,7 @@ class Title(Publisher):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
     meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)

@@ -314,7 +314,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         # can he even access it over get?
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        #print response
         page_data = self.get_new_page_data(slave_page.pk)
         
         # request moderation

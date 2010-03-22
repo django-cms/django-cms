@@ -430,8 +430,6 @@ class PagePermissionsPermissionManager(models.Manager):
         # read from cache if posssible
         #cached = get_permission_cache(user, attr)
         #if cached is not None:
-        #    print "retunr cache"
-        #    print cached
         #    return cached
         
         from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\

@@ -1,137 +1,199 @@
-Django CMS installation instructions and setup (done on OS X Snow
-Leopard)
+Django CMS Tutorial
+===================
 
-I assume you have Python and Django installed.
+Installation
+-------------
 
-- 	check python location python: which python
-- 	Go to your Python site-packages directory (<your python path>/site-
-packages)
-- 	Download Django CMS:
-	sudo curl -O http://download.github.com/digi604-django-cms-2.0-c0288a1.tar.gz
-(Django-cms version 2.0.2)
-	(Another version: http://download.github.com/<your-django-cms-version-file>.tar.gz)
-	Check latest version on: http://github.com/digi604/django-cms-2.0/downloads
-- 	Unpack the downloaded file:
-	sudo tar -zxvf digi604-django-cms-2.0-c0288a1.tar.gz
-	(Another version: <your django-cms-version-file>.tar.gz)
-- 	Copy the directories and files you are going to use:
+I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't expect things will be much different for mac at least...if I get a chance i'll run through this process on windows too and update the article but no promises.
+
+I'm assuming that Python, Django and sqlite3 are installed already. For reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
+
+If you dont already have one, create a new folder for your code to live in. My folder lives in my home directory and is named "django_apps". This will pop up throughout this guide so if you're following along and you call yours something else, remember to replace "django_apps" with the name of your own folder when the time comes.
+
+In a terminal, move into your code directory::
+
+	CD ~/django_apps
+
+Create a new Django project (call this whatever you like but remember to change it if you're following along and have called it something else)::
+
+	django-admin.py startproject project-name
+
+No harm in making sure that all is indeed well with Django at this early stage so::
+
+	CD project-name
+
+And... ::
+
+	python manage.py runserver 
+
+Head on over to http://127.0.0.1:8000 and if you see "it worked" then well, its working.
+
+Here comes the science...
+
+If you dont happen to know your Python location then issue the following command::
+
+	which python
+	
+(my one is "/usr/local/lib/python2.6" for example)
+
+Go to your Python dist-packages directory "your-python-path/dist-packages"
+ 
+Download the latest and greatest Django CMS from here: http://www.django-cms.org/en/downloads/
+
+Unzip the downloaded file into the "dist-packages" directory...you will need to do this as "sudo" unless you have your system set up wrongly ;)
+
+Make copies of the following directories like so::
+
 	sudo cp -R digi604-django-cms-2.0-c0288a1/cms/ cms
 	sudo cp -R digi604-django-cms-2.0-c0288a1/mptt/ mptt
 	sudo cp -R digi604-django-cms-2.0-c0288a1/publisher/ publisher
-- 	Clean up your Python site-packages directory if you want:
-	sudo rm -rf digi604-django-cms-2.0-c0288a1.tar.gz
-	sudo rm -rf digi604-django-cms-2.0-c0288a1/
-- 	Start a new Django project on your prefered location (example: /
-Users/lars/Sites/python/):
-	django-admin.py startproject django_cms
-- 	Start you prefered editor and edit settings.py:
 
-	Add this at the beginning of the settings.py file:
+Do a bit of house cleaning to get rid of all the files you don't need::
+
+	sudo rm -rf digi604-django-cms-2.0-c0288a1.zip
+	sudo rm -rf digi604-django-cms-2.0-c0288a1/
+
+Head back to the project you created previously::
+
+	cd ~/django_apps/project-name
+
+In your editor, edit "settings.py" like so:
+
+On lines 1+2 put the following before anything else::
 
 	import os
 	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
-	Insert the following line near the beginning of the file but after
-any import statements that it may have:
+Then, after the import statements, add this::
+
 	gettext = lambda s: s
 
-	Set:
+Set up the remainder of the file with the following changes/additions::
+
 	DATABASE_ENGINE = 'sqlite3'
-	DATABASE_NAME = '/Users/lars/Sites/python/django_cms/db/
-development.db' (Edit your prefered path)
+	DATABASE_NAME = '/path/to/your/data/your-db-name.db/
+
 	MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 	MEDIA_URL = '/media/'
+
 	ADMIN_MEDIA_PREFIX = '/media/admin/'
 
-	Add this to your apps:
-
 	INSTALLED_APPS = (
-	        'django.contrib.auth',
-	        'django.contrib.contenttypes',
-	        'django.contrib.sessions',
-	        'django.contrib.admin',
-	        'django.contrib.sites',
-	        ...
-	        'cms',
-	        'mptt',
-	        'publisher'
-	        ...
+	    'django.contrib.auth',
+	    'django.contrib.admin',
+	    'django.contrib.contenttypes',
+	    'django.contrib.sessions',
+	    'django.contrib.sites',
+	    'django.contrib.messages',
+	    'cms',
+	    'cms.plugins.text',
+	    'cms.plugins.picture',
+	    'cms.plugins.link',
+	    'cms.plugins.file',
+	    'cms.plugins.snippet',
+	    'cms.plugins.googlemap',
+	    'mptt',
+	    'publisher',
+		'menus',
 	)
-
-	Add the following middleware classes:
 
 	MIDDLEWARE_CLASSES = (
-	        # needed for add/edit page
-	        'django.middleware.locale.LocaleMiddleware',
-	        'django.contrib.sessions.middleware.SessionMiddleware',
-	        'django.contrib.auth.middleware.AuthenticationMiddleware',
-	        ...
-	        'cms.middleware.page.CurrentPageMiddleware',
-	        'cms.middleware.user.CurrentUserMiddleware',
-	        ...
+		'django.middleware.cache.UpdateCacheMiddleware',
+	    'django.contrib.sessions.middleware.SessionMiddleware',
+	    'django.contrib.auth.middleware.AuthenticationMiddleware',
+	    'django.middleware.common.CommonMiddleware',
+	    'django.middleware.doc.XViewMiddleware',
+	    'django.middleware.csrf.CsrfViewMiddleware',
+	    'cms.middleware.page.CurrentPageMiddleware', 
+	    'cms.middleware.user.CurrentUserMiddleware', 
+		'cms.middleware.toolbar.ToolbarMiddleware',
+		'django.middleware.cache.FetchFromCacheMiddleware', 
 	)
-
-	Add the following template context processors:
+	
+	TEMPLATE_DIRS = os.path.join(PROJECT_PATH, 'templates')
+	# (templates being the name of my template dir within project-name)
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
-	        "django.core.context_processors.auth",
-	        "django.core.context_processors.i18n",
-	        "django.core.context_processors.request",
-	        "django.core.context_processors.media",
-	        "cms.context_processors.media",
+	    'django.core.context_processors.auth', 
+	    'django.core.context_processors.i18n', 
+	    'django.core.context_processors.request', 
+	    'django.core.context_processors.media', 
+	    'cms.context_processors.media',
 	)
+	
+(I didn't have a ``TEMPLATE_CONTEXT_PROCESSORS`` specified so had to add all of the above anew.)
 
-	CMS_TEMPLATES = (
-	        ('base.html', gettext('default')),
-	        ('2col.html', gettext('2 Column')),
-	        ('3col.html', gettext('3 Column')),
-	        ('extra.html', gettext('Some extra fancy template')),
-	)
+Set up your available templates (don't worry that they don't actually exist yet)::
 
-- 	Then edit your urls.py file:
+	CMS_TEMPLATES = ( 
+	    ('base.html', gettext('default')), 
+	    ('2col.html', gettext('2 Column')), 
+	    ('3col.html', gettext('3 Column')), 
+	    ('extra.html', gettext('Some extra fancy template')),
+	) 
 
-	Uncomment the following lines:
+Next, Edit your ``urls.py`` file like this::
+
+	from django.conf.urls.defaults import *
 	from django.contrib import admin
+	from django.conf import settings
+
 	admin.autodiscover()
 
-	Uncomment the line:
-
-	(r'^admin/', include(admin.site.urls)),
-
-	and add:
-
-	(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-{'document_root': settings.MEDIA_ROOT } ),
-	(r'^', include('cms.urls')),
-
-	It must be like:
-
 	urlpatterns = patterns('',
-		(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-{'document_root': settings.MEDIA_ROOT } ),
 	    (r'^admin/', include(admin.site.urls)),
-		(r'^', include('cms.urls')),
 	)
 
-- 	Make an directory 'media' in your project root:
+	if settings.DEBUG:
+	    urlpatterns += patterns('',
+	        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True})
+	    )
 
-	mkdir media
+	urlpatterns += patterns('',
+	    url(r'^', include('cms.urls')),
+	)
 
-	and go into that directory
+Create a folder called 'media' in your project root (that's "project-name" for me), this means you create a symbolic link from the "cms/media/cms" folder in "dist-packages" to your new "media" folder::
 
-- 	Now make an symbolic link:
+	ln -s /usr/local/lib/python2.6/dist-packages/cms/media/cms cms
 
-	ln -s /usr/local/lib/python2.6/site-packages/cms/media/cms cms
+Now for the magic...if you're not already there::
 
--	Do in your project root:
+	cd ~/django_apps/project-name
+
+and... ::
 
 	python manage.py syncdb
 
-	and follow the instructions (setup and admin user)
+If all goes well, you'll be asked if you want to set up your superuser account...which of course you do so just follow the instructions in the terminal.
 
-- 	Then start the development server:
+That should hopefully be that. If your development server is still running in your terminal stop it, then restart it again just to be sure. ::
 
-	pyton manage.py runserver
+	cmd c
+	python manage.py runserver
 
-	and go to http://127.0.0.1:8000/admin and login with your just added logindata
+Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with appropriate text and if you can see the django-cms logo then your media folder is cool also.
+
+log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
+
+This is your development enviroment. On how to deploy django projects on real webservers you may want to head over to http://www.django-project.com/
+
+
+Templates
+---------
+
+My First App
+------------
+
+My First Plugin
+---------------
+
+My First Menu
+-------------
+
+My First Attach Menu
+--------------------
+
+My First Apphook
+----------------
 

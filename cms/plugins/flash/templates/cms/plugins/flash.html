@@ -9,6 +9,6 @@
 	  id: "flash-plugin-swf-{{ object.id }}",
 	  name: "flash-plugin-name-{{ object.id }}"
 	};
-	swfobject.embedSWF("{{ MEDIA_URL }}{{ object.file }}", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.0", "{{ CMS_MEDIA_URL }}swf/expressInstall.swf",flashvars, params, attributes);
+	swfobject.embedSWF("{{ object.file.url }}", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.0", "{{ CMS_MEDIA_URL }}swf/expressInstall.swf",flashvars, params, attributes);
 //]]>
 </script>
