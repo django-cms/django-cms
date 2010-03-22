@@ -147,3 +147,15 @@ ul.breadcrumb a:hover{
 #main{
 	clear:both;
 }
+
+/* PLUGIN gogole_map */
+.plugin_googlemap{margin-bottom:20px;}
+.googlemap-map{
+	height:250px;
+}
+.grid_4 .googlemap-map{
+	height:220px;
+}
+.grid_6 .googlemap-map{
+	height:340px;
+}
