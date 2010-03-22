@@ -48,7 +48,6 @@ body{
 /* Navigation main */
 #nav_main{
 	clear:both;
-	margin-bottom:20px;
 	border:1px solid #E0E0E0;
 }
 #nav_main ul, #nav_main li{
@@ -124,28 +123,39 @@ ul.breadcrumb, ul.breadcrumb li{
 ul.breadcrumb{
 	clear:both;
 	margin-bottom:20px;
-	padding-left:5px;
+	border-right:1px solid #E0E0E0;	
+	border-bottom:1px solid #E0E0E0;
+	border-left:1px solid #E0E0E0;
+	float:left;
 }
 ul.breadcrumb li{
 	float:left;
 	color:#666;
-	padding-left:5px;
 }
-ul.breadcrumb a{
+ul.breadcrumb a,ul.breadcrumb span{
 	color:#666;
 	text-decoration:none;
 	background:url(../img/sprite.jpg) no-repeat right 0;
 	display:block;
 	float:left;
 	padding-right:13px;
+	padding-left:10px;
+	line-height:22px;
 }
 ul.breadcrumb a:hover{
 	color:#5B80B2;
+}
+ul.breadcrumb span{
+	background:none;
 }
 
 /* Content */
 #main{
 	clear:both;
+}
+
+#col1:after, #col2:after{
+	content: "\00a0";
 }
 
 /* PLUGIN gogole_map */
