@@ -1589,7 +1589,7 @@ msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Premi il pulsante 'salva' sottostante per recuperare questa versione dell'oggetto."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1606,7 +1606,7 @@ msgstr "Copia opzioni"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Seleziona opzioni di copia"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
