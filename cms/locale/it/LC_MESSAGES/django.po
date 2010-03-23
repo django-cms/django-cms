@@ -1768,15 +1768,15 @@ msgstr ""
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
-msgstr ""
+msgstr "Sottolivello"
 
 #: tests/util/menu_extender.py:8
 msgid "Sublevel3"
-msgstr ""
+msgstr "Sottolivello3"
 
 #: tests/util/menu_extender.py:11
 msgid "Sublevel 2"
-msgstr ""
+msgstr "Sottolivello 2"
 
 #: utils/moderator.py:84
 msgid "parent first"
