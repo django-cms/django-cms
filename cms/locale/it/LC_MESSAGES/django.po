@@ -1368,11 +1368,11 @@ msgstr "Lista pagina"
 
 #: templates/admin/cms/page/change_list.html:57
 msgid "Successfully moved"
-msgstr ""
+msgstr "Spostato con successo"
 
 #: templates/admin/cms/page/change_list.html:62
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "Si è verificato un errore. Si prega di ricaricare la pagina"
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
@@ -1390,7 +1390,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "Filter:"
-msgstr ""
+msgstr "Filtro:"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "on"
@@ -1422,7 +1422,7 @@ msgstr "inizio"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "fine"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
