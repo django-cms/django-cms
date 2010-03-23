@@ -1417,9 +1417,8 @@ msgid "published"
 msgstr "pubblicato"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "stato"
+msgstr "inizio"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
@@ -1454,7 +1453,7 @@ msgstr "inserisci dopo"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "inserisci all'interno"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
@@ -1488,7 +1487,7 @@ msgstr "copia"
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "Add Child"
-msgstr ""
+msgstr "Aggiungi figlio"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
@@ -1508,7 +1507,7 @@ msgstr "vedi"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
-msgstr ""
+msgstr "Sospendi la pubblicazione"
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
@@ -1565,7 +1564,7 @@ msgstr "(globale)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(corrente)"
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
@@ -1573,7 +1572,7 @@ msgstr "Tutti"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "La pagina non eredita permessi."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
@@ -1615,9 +1614,8 @@ msgid "Add Plugin"
 msgstr "Aggiungi plugin"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
-msgstr "Lingua"
+msgstr "Dalla lingua"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
 msgid "Copy Plugins"
@@ -1646,7 +1644,7 @@ msgstr "Sei sicuro di voler eliminare questo plugin?"
 
 #: templates/cms/toolbar/toolbar.html:835
 msgid "Edit mode"
-msgstr ""
+msgstr "Modalità di modifca"
 
 #: templates/cms/toolbar/toolbar.html:842
 msgid "Status"
@@ -1675,12 +1673,11 @@ msgstr "Muovi/aggiungi pagina"
 
 #: templates/cms/toolbar/toolbar.html:882
 msgid "add child"
-msgstr ""
+msgstr "aggiungi figlio"
 
 #: templates/cms/toolbar/toolbar.html:882
-#, fuzzy
 msgid "Add child page"
-msgstr "modifica questa pagina"
+msgstr "Aggiungi pagina figlio"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "add sibling"
@@ -1712,7 +1709,7 @@ msgstr "Visualizza cronologia"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Lock"
-msgstr ""
+msgstr "Blocca"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Logout"
