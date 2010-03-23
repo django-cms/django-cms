@@ -1106,7 +1106,7 @@ msgstr "L'editor di testo non supporta l'inserimento di oggetti."
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "Non un plugin"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
@@ -1194,11 +1194,11 @@ msgstr "colore di sfondo"
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
 msgid "Hexadecimal, eg ff00cc"
-msgstr ""
+msgstr "Esadecimale, ad esempio: ff00cc"
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "colore testo"
 
 #: plugins/video/models.py:25
 msgid "seekbar color"
@@ -1226,7 +1226,7 @@ msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr ""
+msgstr "Plugin flash mancante. Scaricare <a href=\"http://adobe.com/flashplayer\">qui</a>"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1237,7 +1237,7 @@ msgstr "Salva"
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Elimina traduzione %(language)s"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
@@ -1264,7 +1264,7 @@ msgstr "Ultime modifiche"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Accedi alla pagina d'amministrazione da <a href=\"%(login_url)s\">qui</a>."
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
@@ -1278,7 +1278,7 @@ msgstr "Password:"
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr ""
+msgstr "Modifica una pagina"
 
 #: templates/admin/cms/page/change_form.html:62
 #: templates/admin/cms/page/change_list.html:8
@@ -1295,7 +1295,7 @@ msgstr "Approva eliminazione pagina"
 #: templates/admin/cms/page/change_form.html:77
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
-msgstr ""
+msgstr "(richiede approvazione al livello %(moderation_level)s)"
 
 #: templates/admin/cms/page/change_form.html:78
 msgid "(you can perform actions on this page directly)"
