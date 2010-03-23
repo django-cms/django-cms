@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -14,6 +14,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: plugin_base.py:99
 msgid "Advanced options"
@@ -61,9 +62,7 @@ msgstr "Titolo pagina"
 
 #: admin/forms.py:96
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Sovrascrive quello che viene visualizzata nella parte superiore del browser "
-"o in segnalibri"
+msgstr "Sovrascrive quello che viene visualizzata nella parte superiore del browser o in segnalibri"
 
 #: admin/forms.py:97
 msgid "Application"
@@ -79,8 +78,7 @@ msgstr "Sovrascrivere URL"
 
 #: admin/forms.py:101
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
-"Mantenere questo campo vuoto se il percorso standard dovrebbe essere usato."
+msgstr "Mantenere questo campo vuoto se il percorso standard dovrebbe essere usato."
 
 #: admin/forms.py:107
 msgid "Redirect"
@@ -96,9 +94,7 @@ msgstr "Una descrizione della pagina talvolta usato dai motori di ricerca."
 
 #: admin/forms.py:112
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Una lista di parole chiave separate da virgola talvolta usato dai motori di "
-"ricerca."
+msgstr "Una lista di parole chiave separate da virgola talvolta usato dai motori di ricerca."
 
 #: admin/forms.py:120
 msgid "A page with this reverse URL id exists already."
@@ -114,19 +110,12 @@ msgid "user"
 msgstr "utente"
 
 #: admin/forms.py:171
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
-"Il permesso \"Aggiungi pagina\" richiede anche l'accesso ai figli o "
-"discendenti, altrimenti la pagina aggiunta non può essere cambiata dal suo "
-"creatore."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr "Il permesso \"Aggiungi pagina\" richiede anche l'accesso ai figli o discendenti, altrimenti la pagina aggiunta non può essere cambiata dal suo creatore."
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
-msgstr ""
-"Il permesso \"Aggiungere pagina\" richiede anche il permesso \"Modificare "
-"pagina\"."
+msgstr "Il permesso \"Aggiungere pagina\" richiede anche il permesso \"Modificare pagina\"."
 
 #: admin/forms.py:201
 msgid "Please select user or group first."
@@ -157,12 +146,8 @@ msgid "Notify user"
 msgstr "Notifica l'utente"
 
 #: admin/forms.py:275
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-"Inviare email di notifica per l'utente su un nome utente o modificare la "
-"password. Richiede email dell'utente."
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "Inviare email di notifica per l'utente su un nome utente o modificare la password. Richiede email dell'utente."
 
 #: admin/forms.py:295
 msgid "New password"
@@ -177,23 +162,16 @@ msgid "Email notification requires valid email address."
 msgstr "E-mail di notifica richiede indirizzo e-mail valido."
 
 #: admin/forms.py:318
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Il permesso di aggiungere nuove pagine richiede l'autorizzazione a "
-"modificare le pagine!"
+msgid "The permission to add new pages requires the permission to change pages!"
+msgstr "Il permesso di aggiungere nuove pagine richiede l'autorizzazione a modificare le pagine!"
 
 #: admin/forms.py:320
-msgid ""
-"The permission to add new users requires the permission to change users!"
-msgstr ""
-"Il permesso di aggiungere nuovi utenti richiede l'autorizzazione a "
-"modificare gli utenti!"
+msgid "The permission to add new users requires the permission to change users!"
+msgstr "Il permesso di aggiungere nuovi utenti richiede l'autorizzazione a modificare gli utenti!"
 
 #: admin/forms.py:322
 msgid "To add permissions you also need to edit them!"
-msgstr ""
-"Per aggiungere le autorizzazioni è necessario anche poterle modificare!"
+msgstr "Per aggiungere le autorizzazioni è necessario anche poterle modificare!"
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
 msgid "Hidden"
@@ -205,9 +183,7 @@ msgstr "Impostazioni di base"
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Nota: Questa pagina viene ricaricata se si cambia la selezione. Salvare la "
-"pagina prima."
+msgstr "Nota: Questa pagina viene ricaricata se si cambia la selezione. Salvare la pagina prima."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
@@ -264,9 +240,7 @@ msgstr "Non hai il permesso di pubblicare questa pagina"
 
 #: admin/pageadmin.py:1012
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
-"Non si dispone dell'autorizzazione per modificare lo status di in_navigation "
-"per questa pagina"
+msgstr "Non si dispone dell'autorizzazione per modificare lo status di in_navigation per questa pagina"
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
@@ -282,9 +256,8 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugin aggiunto a %(placeholder)s "
 
 #: admin/pageadmin.py:1085
-#, fuzzy
 msgid "Language must be different than the copied language!"
-msgstr "Lingua deve essere impostato su una delle lingue supportate!"
+msgstr "La lingua scelta deve essere differente dalla lingua della pagina copiata!"
 
 #: admin/pageadmin.py:1131
 #, fuzzy, python-format
@@ -293,11 +266,8 @@ msgstr "%(plugin_name)s plugin aggiunto a %(placeholder)s "
 
 #: admin/pageadmin.py:1204
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"%(plugin_name)s plugin modificato alla posizione %(position)s in %"
-"(placeholder)s "
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr "%(plugin_name)s plugin modificato alla posizione %(position)s in %(placeholder)s "
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
@@ -305,12 +275,8 @@ msgstr "I plugins sono stati spostati"
 
 #: admin/pageadmin.py:1281
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
-msgstr ""
-"%(plugin_name)s plugin alla posizione %(position)s in %(placeholder)s è "
-"stato eliminato."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgstr "%(plugin_name)s plugin alla posizione %(position)s in %(placeholder)s è stato eliminato."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
@@ -456,8 +422,7 @@ msgstr "Vai"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
-msgstr ""
-"Inserisci i termini di ricerca o un modulo, classe o il nome della funzione."
+msgstr "Inserisci i termini di ricerca o un modulo, classe o il nome della funzione."
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
@@ -736,12 +701,8 @@ msgid "changed by"
 msgstr "cambiato da"
 
 #: models/pagemodel.py:46
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr ""
-"Quando la pagina dovrebbe andare online. Lo stato deve essere \\ "
-"\"Pubblicato \" per la pagina per essere online."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgstr "Quando la pagina dovrebbe andare online. Lo stato deve essere \\ \"Pubblicato \" per la pagina per essere online."
 
 #: models/pagemodel.py:47
 msgid "When to expire the page. Leave empty to never expire."
@@ -749,16 +710,11 @@ msgstr "Quando scade la pagina. Lasciare vuoto per non farla mai scadere."
 
 #: models/pagemodel.py:49
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
-"Tutti gli antenati non verranno visualizzati nella barra di navigazione"
+msgstr "Tutti gli antenati non verranno visualizzati nella barra di navigazione"
 
 #: models/pagemodel.py:50
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
-msgstr ""
-"Un identificativo univoco, che viene utilizzato con il templatetag page_url "
-"per riferirsi a questa pagina"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgstr "Un identificativo univoco, che viene utilizzato con il templatetag page_url per riferirsi a questa pagina"
 
 #: models/pagemodel.py:52
 msgid "is published"
@@ -838,9 +794,7 @@ msgstr "può recuperare qualsiasi pagina cancellata"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"Se nessuno selezionato, l'utente ha concesse le autorizzazioni per tutti i "
-"siti."
+msgstr "Se nessuno selezionato, l'utente ha concesse le autorizzazioni per tutti i siti."
 
 #: models/permissionmodels.py:52
 msgid "sites"
@@ -955,8 +909,7 @@ msgstr "latitudine"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr ""
-"Usa latitudine e longitudine per perfezionare la posizione della mappa."
+msgstr "Usa latitudine e longitudine per perfezionare la posizione della mappa."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -995,12 +948,8 @@ msgid "Language or Page must be filled out"
 msgstr "La Lingua o la Pagina deve essere compilata"
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
-msgstr ""
-"Scegli una pagina da cui includere i plugin in questo segnaposto, vuota "
-"sceglierà la pagina corrente"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgstr "Scegli una pagina da cui includere i plugin in questo segnaposto, vuota sceglierà la pagina corrente"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1091,11 +1040,8 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Inserire un modello (i.e. \"snippets/plugin_xy.html\") che sarà "
-"interpretato. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr "Inserire un modello (i.e. \"snippets/plugin_xy.html\") che sarà interpretato. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1155,12 +1101,12 @@ msgstr "Nessun oggetto selezionato."
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "L'editor di testo non supporta l'inserimento di oggetti."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "Non un plugin"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
@@ -1177,7 +1123,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr ""
+msgstr "utente twitter"
 
 #: plugins/twitter/models.py:8
 msgid "count"
@@ -1185,7 +1131,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
-msgstr ""
+msgstr "Numero di elementi da mostrare"
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
@@ -1193,53 +1139,47 @@ msgstr ""
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "Se dato, il suggerimento viene visualizzato come collegamento verso il tuo profilo Twitter."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
 msgstr "Video"
 
 #: plugins/video/cms_plugins.py:42
-#, fuzzy
 msgid "Color Settings"
-msgstr "Impostazioni"
+msgstr "Impostazioni colore"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid "movie file"
-msgstr "video"
+msgstr "file video"
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "Usa file video codificato .flv o h264"
 
 #: plugins/video/models.py:11
-#, fuzzy
 msgid "movie url"
-msgstr "video"
+msgstr "indirizzo video"
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
-msgstr ""
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgstr "indirizzo video vimeo o youtube. Esempio: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
-#, fuzzy
 msgid "preview image file"
-msgstr "usa file immagine"
+msgstr "anteprima immagine"
 
 #: plugins/video/models.py:17
 msgid "auto play"
-msgstr ""
+msgstr "riproduci automaticamente"
 
 #: plugins/video/models.py:18
 msgid "auto hide"
-msgstr ""
+msgstr "nascondi automaticamente"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
-msgstr ""
+msgstr "schermo intero"
 
 #: plugins/video/models.py:20
 msgid "loop"
@@ -1247,18 +1187,18 @@ msgstr ""
 
 #: plugins/video/models.py:23
 msgid "background color"
-msgstr ""
+msgstr "colore di sfondo"
 
 #: plugins/video/models.py:23 plugins/video/models.py:24
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
 msgid "Hexadecimal, eg ff00cc"
-msgstr ""
+msgstr "Esadecimale, ad esempio: ff00cc"
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "colore testo"
 
 #: plugins/video/models.py:25
 msgid "seekbar color"
@@ -1285,10 +1225,8 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
-msgstr ""
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr "Plugin flash mancante. Scaricare <a href=\"http://adobe.com/flashplayer\">qui</a>"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1299,7 +1237,7 @@ msgstr "Salva"
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "Elimina traduzione %(language)s"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
@@ -1316,8 +1254,7 @@ msgstr "Salva e continua le modifiche"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1327,7 +1264,7 @@ msgstr "Ultime modifiche"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Accedi alla pagina d'amministrazione da <a href=\"%(login_url)s\">qui</a>."
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
@@ -1341,7 +1278,7 @@ msgstr "Password:"
 #: templates/admin/cms/page/plugin_forms_history.html:3
 #: templates/admin/cms/page/plugin_forms_ok.html:3
 msgid "Change a page"
-msgstr ""
+msgstr "Modifica una pagina"
 
 #: templates/admin/cms/page/change_form.html:62
 #: templates/admin/cms/page/change_list.html:8
@@ -1358,11 +1295,11 @@ msgstr "Approva eliminazione pagina"
 #: templates/admin/cms/page/change_form.html:77
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
-msgstr ""
+msgstr "(richiede approvazione al livello %(moderation_level)s)"
 
 #: templates/admin/cms/page/change_form.html:78
 msgid "(you can perform actions on this page directly)"
-msgstr ""
+msgstr "(puoi effettuare direttamente operazioni su questa pagina)"
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "Remove delete request"
@@ -1393,14 +1330,14 @@ msgstr "Cronologia"
 
 #: templates/admin/cms/page/change_form.html:98
 msgid "View on site"
-msgstr ""
+msgstr "Vedi sul sito"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:83
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Per favore correggi l'errore sottostante."
+msgstr[1] "Per favore correggi gli errori sottostanti"
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
@@ -1410,7 +1347,7 @@ msgstr "Tutti i permessi"
 #: templates/admin/cms/page/change_form.html:161
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr ""
+msgstr "Caricamento in corso..."
 
 #: templates/admin/cms/page/change_form.html:160
 msgid "Page states"
@@ -1418,9 +1355,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1429,25 +1364,25 @@ msgstr "Richiedi approvazione"
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
-msgstr ""
+msgstr "Lista pagina"
 
 #: templates/admin/cms/page/change_list.html:57
 msgid "Successfully moved"
-msgstr ""
+msgstr "Spostato con successo"
 
 #: templates/admin/cms/page/change_list.html:62
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "Si è verificato un errore. Si prega di ricaricare la pagina"
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "Recupera %(name)s eliminato"
 
 #: templates/admin/cms/page/change_list.html:86
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Aggiungi %(name)s"
 
 #: templates/admin/cms/page/change_list.html:98
 msgid "Pages on:"
@@ -1455,7 +1390,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "Filter:"
-msgstr ""
+msgstr "Filtro:"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "on"
@@ -1467,7 +1402,7 @@ msgstr "off"
 
 #: templates/admin/cms/page/change_list.html:117
 msgid "Filter"
-msgstr ""
+msgstr "Filtro"
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
@@ -1475,20 +1410,19 @@ msgstr "azioni"
 
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "moderate"
-msgstr ""
+msgstr "modera"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr ""
+msgstr "pubblicato"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "stato"
+msgstr "inizio"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "fine"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
@@ -1511,29 +1445,28 @@ msgstr "modifica"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr ""
+msgstr "inserisci prima"
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr ""
+msgstr "inserisci dopo"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "inserisci all'interno"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
 msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "home"
 msgstr "Home"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "Modifica questa pagina in %(language)s"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
@@ -1554,7 +1487,7 @@ msgstr "copia"
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "Add Child"
-msgstr ""
+msgstr "Aggiungi figlio"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
@@ -1574,7 +1507,7 @@ msgstr "vedi"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
-msgstr ""
+msgstr "Sospendi la pubblicazione"
 
 #: templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
@@ -1582,7 +1515,7 @@ msgstr "Pubblica"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
-msgstr ""
+msgstr "Vedi sulla pagina"
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
@@ -1631,19 +1564,19 @@ msgstr "(globale)"
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr "(corrente)"
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "Tutti"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "La pagina non eredita permessi."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "Una versione precedente di un plugin non può essere salvata!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 msgid "Plugin saved successfully."
@@ -1656,7 +1589,7 @@ msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Premi il pulsante 'salva' sottostante per recuperare questa versione dell'oggetto."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1673,7 +1606,7 @@ msgstr "Copia opzioni"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Seleziona opzioni di copia"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
@@ -1681,14 +1614,12 @@ msgid "Add Plugin"
 msgstr "Aggiungi plugin"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
-msgstr "Lingua"
+msgstr "Dalla lingua"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
-#, fuzzy
 msgid "Copy Plugins"
-msgstr "Plugins"
+msgstr "Copia Plugins"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
@@ -1713,7 +1644,7 @@ msgstr "Sei sicuro di voler eliminare questo plugin?"
 
 #: templates/cms/toolbar/toolbar.html:835
 msgid "Edit mode"
-msgstr ""
+msgstr "Modalità di modifca"
 
 #: templates/cms/toolbar/toolbar.html:842
 msgid "Status"
@@ -1742,12 +1673,11 @@ msgstr "Muovi/aggiungi pagina"
 
 #: templates/cms/toolbar/toolbar.html:882
 msgid "add child"
-msgstr ""
+msgstr "aggiungi figlio"
 
 #: templates/cms/toolbar/toolbar.html:882
-#, fuzzy
 msgid "Add child page"
-msgstr "modifica questa pagina"
+msgstr "Aggiungi pagina figlio"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "add sibling"
@@ -1779,7 +1709,7 @@ msgstr "Visualizza cronologia"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Lock"
-msgstr ""
+msgstr "Blocca"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Logout"
@@ -1825,30 +1755,28 @@ msgstr ""
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:675
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
-msgstr ""
+msgstr "Sottolivello"
 
 #: tests/util/menu_extender.py:8
 msgid "Sublevel3"
-msgstr ""
+msgstr "Sottolivello3"
 
 #: tests/util/menu_extender.py:11
 msgid "Sublevel 2"
-msgstr ""
+msgstr "Sottolivello 2"
 
 #: utils/moderator.py:84
 msgid "parent first"
