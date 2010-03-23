@@ -1,4 +1,4 @@
-VERSION = (2, 1, 0, 'alpha')
+VERSION = (2, 1, 0, 'beta2')
 if VERSION[-1] != "final":
     __version__ = '.'.join(map(str, VERSION))
 else:

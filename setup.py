@@ -53,14 +53,15 @@ setup(
             'plugins/*/templates/cms/plugins/*.html',
             'plugins/*/templates/cms/plugins/*/*.html',
             'plugins/*/templates/cms/plugins/*/*.js',
-            'locale/*/LC_MESSAGES/*'
+            'locale/*/LC_MESSAGES/*',
+            'docs/*.txt'
         ] + media_files,
         'example': [
+            'media/css/*.css',
+            'media/img/*.jpg',
             'templates/*.html',
-            'store/templates/store/plugins/*.html',
             'sampleapp/media/sampleapp/img/gift.jpg',
             'sampleapp/templates/sampleapp/*.html',
-            'categories/templates/categories/*.html',
         ],
         'menus': [
             'templates/menu/*.html',

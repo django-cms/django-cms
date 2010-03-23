@@ -55,6 +55,6 @@ class ApphookPool(object):
             for app in self.apps.values():
                 if app_name in app.urls:
                     return app
-        raise ImproperlyConfigured('No registered apphook `%s` found.')
+        raise ImproperlyConfigured('No registered apphook `%s` found.' % app_name)
 
 apphook_pool = ApphookPool()
