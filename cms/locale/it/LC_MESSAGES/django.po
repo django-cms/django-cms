@@ -1139,7 +1139,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "Se dato, il suggerimento viene visualizzato come collegamento verso il tuo profilo Twitter."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1299,7 +1299,7 @@ msgstr "(richiede approvazione al livello %(moderation_level)s)"
 
 #: templates/admin/cms/page/change_form.html:78
 msgid "(you can perform actions on this page directly)"
-msgstr ""
+msgstr "(puoi effettuare direttamente operazioni su questa pagina)"
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "Remove delete request"
@@ -1515,7 +1515,7 @@ msgstr "Pubblica"
 
 #: templates/admin/cms/page/menu_item.html:79
 msgid "View on page"
-msgstr ""
+msgstr "Vedi sulla pagina"
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
@@ -1576,7 +1576,7 @@ msgstr "La pagina non eredita permessi."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "Una versione precedente di un plugin non può essere salvata!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 msgid "Plugin saved successfully."
