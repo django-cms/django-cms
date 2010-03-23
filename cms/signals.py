@@ -1,11 +1,11 @@
 from django.db.models import signals
 from django.conf import settings
-from cms import appresolver
 from cms.models import Page, Title
 from cms.models import CMSPlugin        
 from cms.utils.moderator import page_changed
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import Signal
+from menus.menu_pool import menu_pool
 
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
@@ -42,6 +42,9 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
+    
+    menu_pool.clear(instance.page.site_id)
+    
     instance.tmp_path = None
     instance.tmp_application_urls = None
     
@@ -104,17 +107,7 @@ def post_save_title(instance, raw, created, **kwargs):
     except AttributeError:
         pass
 
-signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")
-
-
-def clear_appresolver_cache(instance, **kwargs):
-    # reset cached applications - there were a change probably
-    appresolver.dynamic_app_regex_url_resolver.reset_cache()
-
-
-if settings.CMS_APPLICATIONS_URLS:
-    # register this signal only if we have some hookable applications
-    application_post_changed.connect(clear_appresolver_cache, sender=Title, dispatch_uid="cms.title.appchanged")        
+signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")        
 
 
 def post_save_user(instance, raw, created, **kwargs):
@@ -188,6 +181,7 @@ def pre_save_page(instance, raw, **kwargs):
     """Helper pre save signal, assigns old_page attribute, so we can still
     compare changes. Currently used only if CMS_PUBLISHER
     """
+    menu_pool.clear(instance.site_id)
     instance.old_page = None
     try:
         instance.old_page = Page.objects.get(pk=instance.pk)

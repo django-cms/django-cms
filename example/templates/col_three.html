@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n cms_tags %}
+
+{% block tpl_id %}tpl_col_three{% endblock %}
+
+{% block content %}
+    <div id="col1" class="grid_4">	    
+		{% include "sidebar_submenu.html" %}	
+		{% block col_sidebar %}
+	    	{% placeholder col_sidebar "220" %}
+		{% endblock %}
+    </div>
+	
+    <div id="col2" class="grid_6 push_1">
+    	{% block page_title %}<h1>{% page_attribute title %}</h1>{% endblock %}
+		{% block col_left %}
+			{% placeholder col_left "340" %}
+		{% endblock %}
+    </div>
+	
+    <div id="col3" class="grid_4 push_2">
+		{% block col_right %}
+			{% placeholder col_right "220" %}
+		{% endblock %}
+    </div>
+{% endblock %}

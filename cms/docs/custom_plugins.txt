@@ -1,3 +1,6 @@
+You have three options to extend Django CMS: Custom plugins, plugin context processors, and plugin 
+processors.
+
 Custom Plugins
 ==============
 
@@ -53,7 +56,13 @@ In there write the following::
 			return context
 	
 	plugin_pool.register_plugin(CMSGalleryPlugin)		
+	
 
+CMSPluginBase itself inherits from ModelAdmin so you can use all the things (inlines for example) you would
+use in a regular admin class. 
+
+
+For a list of all the options you have on CMSPluginBase have a look at the plugin reference
 
 
 Template
@@ -65,7 +74,8 @@ Now create a gallery.html template in ``templates/gallery/`` and write the follo
 		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
 	{% endfor %}
 
-Now go into the admin create a gallery and afterwards go into a page and add a gallery plugin and some pictures should appear in your page.
+Now go into the admin create a gallery and afterwards go into a page and add a gallery plugin and some 
+pictures should appear in your page.
 
 Limiting Plugins per Placeholder
 --------------------------------
@@ -92,8 +102,15 @@ Example::
 			},
 		},
 	
-"**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so plugin-templates can react to them. In this example we give them some parameters that are used in a CSS Grid Framework.
-You can change the displayed name in the admin with the **name** parameter. In combination with gettext you can translate this names according to the language of the user. Additionally you can limit the number of plugins (either total or by type) for each placeholder with the **limits** parameter (see ``Configuration`` for details). 
+"**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with 
+Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so 
+plugin-templates can react to them. In this example we give them some parameters that are used in a 
+CSS Grid Framework.
+
+You can change the displayed name in the admin with the **name** parameter. In combination with gettext 
+you can translate this names according to the language of the user. Additionally you can limit the number 
+of plugins (either total or by type) for each placeholder with the **limits** parameter (see 
+``Configuration`` for details). 
 
 
 Advanced
@@ -101,7 +118,107 @@ Advanced
 
 CMSGalleryPlugin can be even further customized:
 
-Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use all the things you are used to with normal admin classes. You can defined inlines, the form, the form template etc.
+Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use all the things you are used 
+to with normal admin classes. You can defined inlines, the form, the form template etc.
 
-Note: If you want to overwrite the form be sure to extend from ``admin/cms/page/plugin_change_form.html`` to have an unified look across the plugins and to have the preview functionality automatically installed.
+Note: If you want to overwrite the form be sure to extend from ``admin/cms/page/plugin_change_form.html`` 
+to have an unified look across the plugins and to have the preview functionality automatically installed.
 
+
+Plugin Context Processors
+-------------------------
+
+Plugin context processors are callables that modify all plugin's context before rendering. They are enabled 
+using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
+
+A plugin context processor takes 2 arguments:
+
+**instance**:
+
+The instance of the plugin model
+
+**placeholder**:
+
+The name of the placeholder this plugin appears in.
+
+The return value should be a dictionary containing any variables to be added to the context.
+
+Example::
+
+    # settings.py:
+    CMS_PLUGIN_CONTEXT_PROCESSORS = (
+        'yourapp.cms_plugin_context_processors.add_verbose_name',
+    )
+
+    # yourapp.cms_plugin_context_processors.py:
+    def add_verbose_name(instance, placeholder):
+        '''
+        This plugin context processor adds the plugin model's verbose_name to context.
+        '''
+        return {'verbose_name': instance._meta.verbose_name}
+
+Plugin Processors
+-----------------
+
+Plugin processors are callables that modify all plugin's output after rendering. They are enabled using 
+the ``CMS_PLUGIN_PROCESSORS`` setting.
+
+A plugin processor takes 4 arguments:
+
+**instance**:
+
+The instance of the plugin model
+
+**placeholder**:
+
+The name of the placeholder this plugin appears in.
+
+**rendered_content**:
+
+A string containing the rendered content of the plugin.
+
+**original_context**:
+
+The original context for the template used to render the plugin.
+
+Note that plugin processors are also applied to plugins embedded in Text. Depending on what your processor 
+does, this might break the output. For example, if your processor wraps the output in a DIV tag, you might 
+end up having DIVs inside of P tags, which is invalid. You can prevent such cases by returning 
+`rendered_content` unchanged if `instance._render_meta.text_enabled` is True, which is the case when 
+rendering an embedded plugin.  
+
+Example:
+
+Suppose you want to put wrap each plugin in the main placeholder in a colored box, but it would be too 
+complicated to edit each individual plugin's template:
+    
+In your settings.py::
+
+    CMS_PLUGIN_PROCESSORS = (
+        'yourapp.cms_plugin_processors.wrap_in_colored_box',
+    )
+    
+In your yourapp.cms_plugin_processors.py::
+
+    def wrap_in_colored_box(instance, placeholder, rendered_content, original_context):
+        '''
+        This plugin processor wraps each plugin's output in a colored box if it is in the "main" placeholder.
+        '''
+        if placeholder != 'main' \                   # Plugins not in the main placeholder should remain unchanged
+            or instance._render_meta.text_enabled:   # Plugins embedded in Text should remain unchanged in order not to break output
+                return rendered_content
+        else:
+            from django.template import Context, Template
+            # For simplicity's sake, construct the template from a string: 
+            t = Template('<div style="border: 10px {{ border_color }} solid; background: {{ background_color }};">{{ content|safe }}</div>')
+            # Prepare that template's context:
+            c = Context({
+                'content': rendered_content,
+                # Some plugin models might allow you to customize the colors,
+                # for others, use default colors:
+                'background_color': instance.background_color if hasattr(instance, 'background_color') else 'lightyellow',
+                'border_color': instance.border_color if hasattr(instance, 'border_color') else 'lightblue',
+            })
+            # Finally, render the content through that template, and return the output
+            return t.render(c)
+ 

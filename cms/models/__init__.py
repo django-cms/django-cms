@@ -20,6 +20,8 @@ def validate_settings():
         raise ImproperlyConfigured('django-cms needs django.core.context_processors.request in settings.TEMPLATE_CONTEXT_PROCESSORS to work correctly.')
     if not 'mptt' in d_settings.INSTALLED_APPS:
         raise ImproperlyConfigured('django-cms needs django-mptt installed.')
+    if 'cms.middleware.multilingual.MultilingualURLMiddleware' in d_settings.MIDDLEWARE_CLASSES and 'django.middleware.locale.LocaleMiddleware' in d_settings.MIDDLEWARE_CLASSES:
+        raise ImproperlyConfigured('django-cms MultilingualURLMiddleware replaces django.middleware.locale.LocaleMiddleware! Please remove django.middleware.locale.LocaleMiddleware from your MIDDLEWARE_CLASSES settings.')
     
 def validate_dependencies():
     # check for right version of reversions
@@ -27,7 +29,13 @@ def validate_dependencies():
         from reversion.admin import VersionAdmin
         if not hasattr(VersionAdmin, 'get_urls'):
             raise ImproperlyConfigured('django-cms requires never version of reversion (VersionAdmin must contain get_urls method)')
-        
+
+def remove_current_root(url):
+    current_root = "/%s/" % get_language()
+    if url[:len(current_root)] == current_root:
+        url = url[len(current_root) - 1:]
+    return url
+
 def monkeypatch_reverse():
     django.core.urlresolvers.old_reverse = django.core.urlresolvers.reverse
     
@@ -35,7 +43,7 @@ def monkeypatch_reverse():
         url = ''
         i18n = 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
         lang = None
-        if viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
+        if isinstance(viewname, basestring) and viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
             lang = viewname.split(":")[0]
         try:    
             url = django.core.urlresolvers.old_reverse(viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
@@ -48,15 +56,19 @@ def monkeypatch_reverse():
                         lang = get_language()
                         ml_viewname = "%s:%s" % ( lang, viewname)
                         url = django.core.urlresolvers.old_reverse(ml_viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
-                        url = "/%s%s" % (lang, url)
                         return url
-                    except NoReverseMatch, e:
+                    except NoReverseMatch:
                         pass
-            raise
+            raise e
+        url = remove_current_root(url)
         return url
     
     django.core.urlresolvers.reverse = new_reverse
         
 validate_dependencies()
 validate_settings()
-monkeypatch_reverse()
+
+monkeypatched = False
+if not monkeypatched: 
+    monkeypatch_reverse()
+    monkeypatched = True

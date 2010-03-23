@@ -8,7 +8,7 @@ from cms.models import PageUser
 
 
 class PluginEditor(Widget):
-    def __init__(self, attrs=None, installed=None, list=None):
+    def __init__(self, attrs=None):
         if attrs is not None:
             self.attrs = attrs.copy()
         else:
@@ -16,7 +16,6 @@ class PluginEditor(Widget):
         
     class Media:
         js = [join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/jquery.js',
             'js/lib/ui.core.js',
             'js/lib/ui.sortable.js',
             'js/plugin_editor.js',
@@ -32,8 +31,9 @@ class PluginEditor(Widget):
         context = {
             'plugin_list': self.attrs['list'],
             'installed_plugins': self.attrs['installed'],
-            'traduction_language': self.attrs['traduction_language'],
-            'language': self.attrs['language']
+            'copy_languages': self.attrs['copy_languages'],
+            'language': self.attrs['language'],
+            'show_copy': self.attrs['show_copy'],
         }
         return mark_safe(render_to_string(
             'admin/cms/page/widgets/plugin_editor.html', context))

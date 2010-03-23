@@ -14,7 +14,7 @@ class Title(Publisher):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, choices=settings.CMS_APPLICATIONS_URLS, blank=True, null=True, db_index=True)
+    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
     meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
@@ -31,7 +31,7 @@ class Title(Publisher):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.slug) 
 
-    def save(self, **kwargs):
+    def save(self, *args, **kwargs):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
@@ -43,7 +43,7 @@ class Title(Publisher):
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
-        super(Title, self).save(**kwargs)
+        super(Title, self).save(*args, **kwargs)
         
         # Update descendants only if path changed
         if current_path != self.path:

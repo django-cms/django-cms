@@ -39,8 +39,10 @@ from django.template.context import RequestContext
 from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
+from menus.menu_pool import menu_pool
 import os
+from cms.apphook_pool import apphook_pool
 
 
 
@@ -61,7 +63,7 @@ class PageAdmin(model_admin):
     revision_form_template = "admin/cms/page/revision_form.html"
     recover_form_template = "admin/cms/page/recover_form.html"
     
-    exclude = ['created_by', 'changed_by', 'lft', 'rght', 'tree_id', 'level']
+    exclude = []
     mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
     top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
@@ -79,16 +81,14 @@ class PageAdmin(model_admin):
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
         list_filter.append('soft_root')
-    if settings.CMS_SHOW_START_DATE:
-        advanced_fields.append('publication_date')
-    if settings.CMS_SHOW_END_DATE:
-        advanced_fields.append( 'publication_end_date')
-    if settings.CMS_NAVIGATION_EXTENDERS:
-        advanced_fields.append('navigation_extenders')
+    if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
+        general_fields.append(('publication_date', 'publication_end_date'))
+    elif settings.CMS_SHOW_START_DATE:
+        general_fields.append('publication_date')
+    elif settings.CMS_SHOW_END_DATE:
+        general_fields.append( 'publication_end_date')
     if settings.CMS_MODERATOR:
         additional_hidden_fields.extend(('moderator_state', 'moderator_message'))
-    if settings.CMS_APPLICATIONS_URLS:
-        advanced_fields.append('application_urls')
     if settings.CMS_SEO_FIELDS:
         seo_fields = ('page_title', 'meta_description', 'meta_keywords')
     if settings.CMS_MENU_TITLE_OVERWRITE:
@@ -97,7 +97,10 @@ class PageAdmin(model_admin):
         advanced_fields.remove("overwrite_url")
     if not settings.CMS_REDIRECTS:
         advanced_fields.remove('redirect')
-        
+    if menu_pool.get_menus_by_attribute("cms_enabled", True):
+        advanced_fields.append("navigation_extenders")
+    if apphook_pool.get_apphooks():
+        advanced_fields.append("application_urls")    
     
     # take care with changing fieldsets, get_fieldsets() method removes some
     # fields depending on permissions, but its very static!!
@@ -152,7 +155,6 @@ class PageAdmin(model_admin):
             )]
         }
         js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/jquery.js',
             'js/lib/jquery.query.js',
             'js/lib/ui.core.js',
             'js/lib/ui.dialog.js',
@@ -301,15 +303,14 @@ class PageAdmin(model_admin):
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
             for placeholder_name in get_placeholders(request, placeholders_template):
-                if placeholder_name not in self.mandatory_placeholders:
-                    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
-                    if not name:
-                        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
-                    if not name:
-                        name = placeholder_name
-                    given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
+                name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
+                if not name:
+                    name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
+                if not name:
+                    name = placeholder_name
+                given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
-            if obj.has_advanced_settings_permission(request):
+            if obj.has_advanced_settings_permission(request): 
                 given_fieldsets.append(advanced)
             if settings.CMS_SEO_FIELDS:
                 seo = given_fieldsets.pop(3)
@@ -372,36 +373,43 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
             for placeholder_name in get_placeholders(request, selected_template):
-                if placeholder_name not in self.mandatory_placeholders:
-                    installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
-                    plugin_list = []
-                    if obj:
-                        if versioned:
-                            from reversion.models import Version
-                            version = get_object_or_404(Version, pk=version_id)
-                            revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-                            plugin_list = []
-                            plugins = []
-                            bases = {}
-                            for rev in revs:
-                                pobj = rev.object
-                                if pobj.__class__ == CMSPlugin:
-                                    if pobj.language == language and pobj.placeholder == placeholder_name and not pobj.parent_id:
-                                        if pobj.get_plugin_class() == CMSPlugin:
-                                            plugin_list.append(pobj)
-                                        else:
-                                            bases[int(pobj.pk)] = pobj
-                                if hasattr(pobj, "cmsplugin_ptr_id"): 
-                                    plugins.append(pobj)
-                            for plugin in plugins:
-                                if int(plugin.cmsplugin_ptr_id) in bases:
-                                    bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
-                                    plugin_list.append(plugin)
-                        else:
-                            plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
-                    language = get_language_from_request(request, obj)
-                    widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'traduction_language': settings.CMS_LANGUAGES, 'language': language } )
-                    form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
+                installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
+                plugin_list = []
+                show_copy = False
+                copy_languages = {}
+                if obj:
+                    if versioned:
+                        from reversion.models import Version
+                        version = get_object_or_404(Version, pk=version_id)
+                        revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+                        plugin_list = []
+                        plugins = []
+                        bases = {}
+                        for rev in revs:
+                            pobj = rev.object
+                            if pobj.__class__ == CMSPlugin:
+                                if pobj.language == language and pobj.placeholder == placeholder_name and not pobj.parent_id:
+                                    if pobj.get_plugin_class() == CMSPlugin:
+                                        plugin_list.append(pobj)
+                                    else:
+                                        bases[int(pobj.pk)] = pobj
+                            if hasattr(pobj, "cmsplugin_ptr_id"): 
+                                plugins.append(pobj)
+                        for plugin in plugins:
+                            if int(plugin.cmsplugin_ptr_id) in bases:
+                                bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
+                                plugin_list.append(plugin)
+                    else:
+                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
+                        other_plugins = CMSPlugin.objects.filter(page=obj, placeholder=placeholder_name, parent=None).exclude(language=language)
+                        for plugin in other_plugins:
+                            if not plugin.language in copy_languages:
+                                copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
+                language = get_language_from_request(request, obj)
+                if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
+                    show_copy = True
+                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'copy_languages': copy_languages.items(), 'show_copy':show_copy, 'language': language } )
+                form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
@@ -498,7 +506,8 @@ class PageAdmin(model_admin):
                 'moderation_required': moderation_required,
                 'moderator_should_approve': moderator_should_approve(request, obj),
                 'moderation_delete_request': moderation_delete_request,
-                'show_delete_translation': len(obj.get_languages()) > 1 
+                'show_delete_translation': len(obj.get_languages()) > 1,
+                'current_site_id': settings.SITE_ID,
             }
             extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
@@ -509,14 +518,34 @@ class PageAdmin(model_admin):
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
     
-    def update_language_tab_context(self, request, obj=None, context=None):
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        # add context variables
+        filled_languages = []
+        if obj:
+            filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
+        context.update({
+            'filled_languages': filled_languages,
+        })
+        return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
+    
+    def update_language_tab_context(self, request, obj, context=None):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
+        site_id = None
+        if obj:
+            site_id = obj.site_id
+        languages = []
+        if site_id and site_id in settings.CMS_SITE_LANGUAGES:
+            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
+                lang_label = dict(settings.CMS_LANGUAGES).get(lang, dict(settings.LANGUAGES).get(lang, lang))
+                languages.append((lang, lang_label))
+        else:
+            languages = settings.CMS_LANGUAGES
         context.update({
             'language': language,
-            'traduction_language': settings.CMS_LANGUAGES,
-            'show_language_tabs': len(settings.CMS_LANGUAGES) > 1 and \
+            'traduction_language': languages,
+            'show_language_tabs': len(languages) > 1 and \
                 not settings.CMS_DBGETTEXT,
         })
         return context
@@ -809,6 +838,8 @@ class PageAdmin(model_admin):
 
         approve_page(request, page)
         
+        # Django SQLite bug. Does not convert to string the lazy instances
+        from django.utils.translation import ugettext as _
         self.message_user(request, _('Page was successfully approved.'))
         
         if 'node' in request.REQUEST:
@@ -882,7 +913,7 @@ class PageAdmin(model_admin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0].lower()}
+                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0]}
             self.log_change(request, titleobj, message)
             self.message_user(request, message)
 
@@ -1057,8 +1088,8 @@ class PageAdmin(model_admin):
             if not language or not language in [ l[0] for l in settings.CMS_LANGUAGES ]:
                 return HttpResponseBadRequest(_("Language must be set to a supported language!"))
             if language == copy_from:
-                return HttpResponseBadRequest(_("Language must be different then the copied language!"))
-            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from).order_by('position', 'tree_id', '-rght'))
+                return HttpResponseBadRequest(_("Language must be different than the copied language!"))
+            plugins = list(page.cmsplugin_set.filter(page = page, language = copy_from, placeholder = placeholder).order_by('position', 'tree_id', '-rght'))
             ptree = []
             for p in plugins:
                 try:
@@ -1221,11 +1252,8 @@ class PageAdmin(model_admin):
                 if not placeholder in placeholders:
                     return HttpResponse(str("error"))
                 plugin.placeholder = placeholder
-                position = 0
-                try:
-                    position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).order_by('position')[0].position + 1
-                except IndexError:
-                    pass
+                # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
+                position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).count()
                 plugin.position = position
                 plugin.save()
             else:

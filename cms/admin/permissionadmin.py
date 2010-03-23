@@ -22,6 +22,7 @@ class PagePermissionInlineAdmin(admin.TabularInline):
     form = PagePermissionInlineAdminForm
     # use special formset, so we can use queryset defined here
     formset = BaseInlineFormSetWithQuerySet
+    classes = ['collapse', 'collapsed'] 
     
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdmin, self).__init__(*args, **kwargs)
@@ -122,9 +123,6 @@ class GenericCmsPermissionAdmin(object):
                 fn = getattr(opts, 'get_%s_permission' % t)
                 if request.user.has_perm(opts.app_label + '.' + fn()):
                     fields.append('can_%s_%s' % (t, name))
-            if model == Page:
-                fields.append('can_recover_page')
-        
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
             i += 1

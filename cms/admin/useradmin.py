@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 
 class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     form = PageUserForm
+    add_form = PageUserForm
     model = PageUser
     
     list_display = ('username', 'email', 'first_name', 'last_name', 'created_by')
@@ -21,6 +22,8 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
         (_('User details'), {'fields': (('first_name', 'last_name'), 'email')}),
         (_('Groups'), {'fields': ('groups',)}),
     ]
+    
+    add_fieldsets = fieldsets
     
     def get_fieldsets(self, request, obj=None):
         fieldsets = self.update_permission_fieldsets(request, obj)
@@ -39,8 +42,7 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
             return self.model.objects.get_empty_query_set()
     
     def add_view(self, request):
-        return super(UserAdmin, self).add_view(request)        
-    
+        return super(UserAdmin, self).add_view(request) 
     
 class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     form = PageUserGroupForm

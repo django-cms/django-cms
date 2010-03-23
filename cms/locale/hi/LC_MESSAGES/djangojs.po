@@ -1,0 +1,32 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-15 13:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: media/cms/js/change_form.js:31
+msgid "Are you sure you want to change the %(field_name)s without saving the page first?"
+msgstr "पहले क्या आप सुनिश्चित हैं कि आप (% field_name) बदलना चाहते हैं पृष्ठ बचाने के बिना है?"
+
+#: media/cms/js/change_form.js:68
+msgid "Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost."
+msgstr "नहीं सभी plugins बच रहे हैं. क्या आप सुनिश्चित हैं कि आप पृष्ठ को बचाना चाहते हो? सभी सहेजे न गए प्लगइन सामग्री खो जाएगा."
+
+#: media/cms/js/change_form.js:115
+msgid "Are you sure you want to change tabs without saving the page first?"
+msgstr "क्या आप सुनिश्चित हैं कि आप पृष्ठ टैब को बचाने के बिना परिवर्तन पहली करना चाहते हैं?"
+
+#: media/cms/js/plugin_editor.js:111
+msgid "Are you sure you want to delete this plugin?"
+msgstr "क्या आप सुनिश्चित हैं कि आप इस प्लगइन का हटाना चाहते हैं?"

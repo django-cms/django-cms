@@ -1,8 +1,0 @@
-{% extends "index.html" %}
-{% load cms_tags %}
-
-{% block title %}Nice template{% endblock %}
-
-{% block content %}{{ block.super }}
-    {% placeholder fancy-content markItUpMarkdown %}
-{% endblock %}

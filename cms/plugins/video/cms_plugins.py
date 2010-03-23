@@ -1,6 +1,7 @@
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
+from cms.plugins.video import settings
 from cms.plugins.video.models import Video
 from cms.plugins.video.forms import VideoForm
 
@@ -35,13 +36,18 @@ class VideoPlugin(CMSPluginBase):
         (None, {
             'fields': general_fields,
         }),
-        (_('Color Settings'), {
-            'fields': color_fields,
-            'classes': ('collapse',),
-        }),
     ]
+    if settings.VIDEO_PLUGIN_ENABLE_ADVANCED_SETTINGS:
+        fieldsets += [
+            (_('Color Settings'), {
+                'fields': color_fields,
+                'classes': ('collapse',),
+            }),
+        ]
     
-    
+    class PluginMedia:
+        js = ('http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js',)
+        
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,

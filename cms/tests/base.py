@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from django.core.handlers.wsgi import WSGIRequest
 import copy
 from django.conf import settings
 from django.test.testcases import TestCase
@@ -31,17 +33,19 @@ class CMSTestCase(TestCase):
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
+        self.user = user
         self.assertEqual(logged_in, True)
     
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
             'slug':'test-page-%d' % self.counter, 'language':settings.LANGUAGES[0][0],
-            'site':1, 'template':'index.html', 'parent': parent_id}
+            'site':1, 'template':'nav_playground.html', 'parent': parent_id}
         
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
         
         self.counter = self.counter + 1
         return page_data
@@ -68,7 +72,7 @@ class CMSTestCase(TestCase):
             return
         raise self.failureException, "ObjectDoesNotExist not raised"
     
-    def create_page(self, parent_page=None, user=None, position="last-child", title=None, site=1):
+    def create_page(self, parent_page=None, user=None, position="last-child", title=None, site=1, published=False, in_navigation=False):
         """Common way for page creation with some checks
         """
         if user:
@@ -81,7 +85,10 @@ class CMSTestCase(TestCase):
             
         page_data = self.get_new_page_data(parent_id)
         page_data['site'] = site
-        
+        page_data['published'] = published
+        page_data['in_navigation'] = in_navigation
+        if settings.CMS_SITE_LANGUAGES.get(site, False):
+            page_data['language'] = settings.CMS_SITE_LANGUAGES[site][0]
         page_data.update({
             '_save': 'Save',
         })
@@ -149,5 +156,37 @@ class CMSTestCase(TestCase):
         from db, otherwise we just have old version.
         """
         page = self.assertObjectExist(Page.objects, id=page.pk)
-        return page    
+        return page 
+    
+    
+    def get_context(self, path="/"):
+        context = {}
+        request = self.get_request(path)
         
+        context['request'] = request
+        
+        return context   
+        
+    def get_request(self, path="/"):
+        environ = {
+            'HTTP_COOKIE':      self.client.cookies,
+            'PATH_INFO':         path,
+            'QUERY_STRING':      '',
+            'REMOTE_ADDR':       '127.0.0.1',
+            'REQUEST_METHOD':    'GET',
+            'SCRIPT_NAME':       '',
+            'SERVER_NAME':       'testserver',
+            'SERVER_PORT':       '80',
+            'SERVER_PROTOCOL':   'HTTP/1.1',
+            'wsgi.version':      (1,0),
+            'wsgi.url_scheme':   'http',
+            'wsgi.errors':       self.client.errors,
+            'wsgi.multiprocess': True,
+            'wsgi.multithread':  False,
+            'wsgi.run_once':     False,
+        }
+        request = WSGIRequest(environ)
+        request.session = self.client.session
+        request.user = self.user
+        request.LANGUAGE_CODE = settings.LANGUAGES[0][0]
+        return request

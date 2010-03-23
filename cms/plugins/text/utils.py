@@ -42,6 +42,7 @@ def plugin_tags_to_user_html(text, context, placeholder):
         plugin_id = int(m.groups()[0])
         try:
             obj = CMSPlugin.objects.get(pk=plugin_id)
+            obj._render_meta.text_enabled = True
         except CMSPlugin.DoesNotExist:
             # Object must have been deleted.  It cannot be rendered to
             # end user so just remove it from the HTML altogether

@@ -17,6 +17,8 @@ from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
+from menus.menu_pool import menu_pool
+from django.utils.functional import lazy
 
 class Page(MpttPublisher):
     """
@@ -36,8 +38,11 @@ class Page(MpttPublisher):
         (MODERATOR_APPROVED, _('approved')),
         (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
-    created_by = models.CharField(_("created by"), max_length=70)
-    changed_by = models.CharField(_("changed by"), max_length=70)
+    
+    template_choices = [(x, _(y)) for x,y in settings.CMS_TEMPLATES]
+    
+    created_by = models.CharField(_("created by"), max_length=70, editable=False)
+    changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(editable=False, default=datetime.now)
     publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
@@ -45,10 +50,10 @@ class Page(MpttPublisher):
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
-    navigation_extenders = models.CharField(_("navigation extenders"), max_length=80, db_index=True, blank=True, null=True, choices=settings.CMS_NAVIGATION_EXTENDERS)
+    navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     published = models.BooleanField(_("is published"), blank=True)
     
-    template = models.CharField(_("template"), max_length=100, choices=settings.CMS_TEMPLATES, help_text=_('The template used to render the content.'))
+    template = models.CharField(_("template"), max_length=100, choices=template_choices, help_text=_('The template used to render the content.'))
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
     
     moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True)
@@ -328,14 +333,18 @@ class Page(MpttPublisher):
             path = self.get_slug(language, fallback)
         else:
             path = self.get_path(language, fallback)
-            home_pk = None
-            try:
-                home_pk = self.home_pk_cache
-            except NoHomeFound:
-                pass
-            ancestors = self.get_cached_ancestors(ascending=True)
-            if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
-                path = "/".join(path.split("/")[1:])
+            if hasattr(self, "home_cut_cache") and self.home_cut_cache:
+                if not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
+                    path = "/".join(path.split("/")[1:])
+            else:    
+                home_pk = None
+                try:
+                    home_pk = self.home_pk_cache
+                except NoHomeFound:
+                    pass
+                ancestors = self.get_cached_ancestors(ascending=True)
+                if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
+                    path = "/".join(path.split("/")[1:])
             
         if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
             path = '/'.join([ugettext(p) for p in path.split('/')])
@@ -411,7 +420,7 @@ class Page(MpttPublisher):
         """
         page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
         if not page_title:
-            return self.get_menu_title(language, True, version_id, force_reload)
+            return self.get_title(language, True, version_id, force_reload)
         return page_title
 
     def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):

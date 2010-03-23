@@ -38,10 +38,10 @@ class Video(CMSPlugin):
         return u"%s" % basename(name)
 
     def get_height(self):
-        return "%spx" % (self.height)
+        return "%s" % (self.height)
     
     def get_width(self):
-        return "%spx" % (self.width)    
+        return "%s" % (self.width)    
     
     def get_movie(self):
         if self.movie:

@@ -40,7 +40,11 @@ SITE_ID = 1
 USE_I18N = True
 
 # Absolute path to the directory that holds media.
-MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/')
+MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
+
+# Absolute path to the directory that holds media. 
+# DO NOT ACTUALLY USE THIS IN YOUR OWN PROJECT!!!! THIS IS JUST FOR TESTING
+CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/cms/')
 #ADMIN_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../admin_media/')
 MEDIA_URL = '/media/'
 
@@ -64,24 +68,25 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.debug",
     "django.core.context_processors.request",
     "django.core.context_processors.media",
+    'django.core.context_processors.csrf',
     "cms.context_processors.media",
 )
 
 INTERNAL_IPS = ('127.0.0.1',)
 
 MIDDLEWARE_CLASSES = (
+    #'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.doc.XViewMiddleware',
-
-    #'django.contrib.csrf.middleware.CsrfMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
-    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'django.middleware.cache.FetchFromCacheMiddleware', 
     
 )
 
@@ -105,7 +110,7 @@ INSTALLED_APPS = (
     
     'cms',
     'publisher',
-    
+    'menus',
     'cms.plugins.text',
     'cms.plugins.picture',
     'cms.plugins.file',
@@ -119,13 +124,9 @@ INSTALLED_APPS = (
     'cms.plugins.inherit',
     'mptt',
     'reversion',
-    'example.categories',
+    'example.sampleapp',
     #'debug_toolbar',
     'south',
-    # sample application
-    'example.sampleapp',
-    #'test_utils',
-    #'store',
 )
 
 gettext = lambda s: s
@@ -136,7 +137,7 @@ LANGUAGES = (
     ('fr', gettext('French')),
     ('de', gettext('German')),
     ('en', gettext('English')),
-    ('pt-br', gettext("Brazil")),
+    ('pt-BR', gettext("Brazil")),
 )
 
 CMS_LANGUAGE_CONF = {
@@ -144,45 +145,59 @@ CMS_LANGUAGE_CONF = {
     'en':['fr', 'de'],
 }
 
+CMS_SITE_LANGUAGES = {
+    1:['fr','de','en','pt-BR'],
+    2:['de','en'],
+}
+
 APPEND_SLASH = True
 
 CMS_TEMPLATES = (
-    ('index.html', gettext('default')),
-    ('nice.html', gettext('nice one')),
-    ('cool.html', gettext('cool one')),
-    ('long-folder-long/long-template-name.html', gettext('long')),
+    ('col_two.html', gettext('two columns')),
+    ('col_three.html', gettext('three columns')),
+    ('nav_playground.html', gettext('navigation examples')),
 )
 
-CMS_APPLICATIONS_URLS = (
-    ('sampleapp.urls', 'Sample application'),
-    ('sampleapp.urlstwo', 'Second sample application'),
-)
 
-CMS_PLACEHOLDER_CONF = {                        
-    'right-column': {
-        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
-        "extra_context": {"width":940},
-        "name":gettext("right column")
-    },
+
+CMS_PLACEHOLDER_CONF = {
+    'col_sidebar': {
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        'name': gettext("sidebar column")
+    },                    
+                        
+    'col_left': {
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        'name': gettext("left column")
+    },                  
+                        
+    'col_right': {
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        'name': gettext("right column")
+    },                     
+                        
+                        
+                                              
+#    'right-column': {
+#        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+#        "extra_context": {"width":940},
+#        "name":gettext("right column")
+#    },
     
-    'body': {
-        "extra_context": {"width":280},
-        "name":gettext("body"),
-    },
-    'fancy-content': {
-        "plugins": ('TextPlugin', 'LinkPlugin'),
-        "extra_context": {"width":"640"},
-        "name":gettext("fancy content custom name"),
-        "limits": {
-            "global": 3,
-            "TextPlugin": 1,
-        },
-    },
+#    'body': {
+#        "extra_context": {"width":280},
+#        "name":gettext("body"),
+#    },
+#    'fancy-content': {
+#        "plugins": ('TextPlugin', 'LinkPlugin'),
+#        "extra_context": {"width":"640"},
+#        "name":gettext("fancy content custom name"),
+#        "limits": {
+#            "global": 3,
+#            "TextPlugin": 1,
+#        },
+#    },
 }
-
-
-CMS_NAVIGATION_EXTENDERS = (('example.categories.navigation.get_nodes', 'Categories'),
-                            ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),)
 
 CMS_SOFTROOT = True
 CMS_MODERATOR = True

@@ -1,6 +1,19 @@
 from setuptools import setup, find_packages
-import os
+import os, fnmatch
 import cms
+
+media_files = []
+
+for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
+    for filename in filenames:
+        filepath = os.path.join(dirpath, filename)
+        failed = False
+        for pattern in ('*.py', '*.pyc', '*~', '.*', '*.bak', '*.swp*'):
+            if fnmatch.fnmatchcase(filename, pattern):
+                failed = True
+        if failed:
+            continue
+        media_files.append(os.path.join(*filepath.split(os.sep)[1:]))
 
 setup(
     author="Patrick Lauber",
@@ -28,6 +41,31 @@ setup(
         'django (>1.1.0)',
     ],
     packages=find_packages(exclude=["example", "example.*"]),
-    include_package_data=True,
+    package_data={
+        'cms': [
+            'templates/admin/*.html',
+            'templates/admin/cms/mail/*.html',
+            'templates/admin/cms/mail/*.txt',
+            'templates/admin/cms/page/*.html',
+            'templates/admin/cms/page/*/*.html',
+            'templates/cms/*.html',
+            'templates/cms/*/*.html',
+            'plugins/*/templates/cms/plugins/*.html',
+            'plugins/*/templates/cms/plugins/*/*.html',
+            'plugins/*/templates/cms/plugins/*/*.js',
+            'locale/*/LC_MESSAGES/*',
+            'docs/*.txt'
+        ] + media_files,
+        'example': [
+            'media/css/*.css',
+            'media/img/*.jpg',
+            'templates/*.html',
+            'sampleapp/media/sampleapp/img/gift.jpg',
+            'sampleapp/templates/sampleapp/*.html',
+        ],
+        'menus': [
+            'templates/menu/*.html',
+        ],
+    },
     zip_safe = False
 )

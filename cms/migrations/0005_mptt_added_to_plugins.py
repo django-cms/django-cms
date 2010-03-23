@@ -7,10 +7,10 @@ import datetime
 class Migration:
     
     def forwards(self, orm):
-        db.add_column('cms_cmsplugin', 'tree_id', models.PositiveIntegerField(db_index=True, editable=False))
-        db.add_column('cms_cmsplugin', 'lft', models.PositiveIntegerField(db_index=True, editable=False))
-        db.add_column('cms_cmsplugin', 'rght', models.PositiveIntegerField(db_index=True, editable=False))
-        db.add_column('cms_cmsplugin', 'level', models.PositiveIntegerField(db_index=True, editable=False))
+        db.add_column('cms_cmsplugin', 'tree_id', models.PositiveIntegerField(db_index=True, editable=False, default = 0))
+        db.add_column('cms_cmsplugin', 'lft', models.PositiveIntegerField(db_index=True, editable=False, default = 0))
+        db.add_column('cms_cmsplugin', 'rght', models.PositiveIntegerField(db_index=True, editable=False, default = 0))
+        db.add_column('cms_cmsplugin', 'level', models.PositiveIntegerField(db_index=True, editable=False, default = 0))
         if not db.dry_run:
             plugins = orm.CMSPlugin.objects.all().order_by('page', 'position')
             for plugin in plugins:

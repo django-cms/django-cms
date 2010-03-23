@@ -11,7 +11,10 @@ from cms.exceptions import NoHomeFound
 class PageQuerySet(PublisherQuerySet):
     def on_site(self, site=None):
         if not site:
-            site = Site.objects.get_current()
+            try:
+                site = Site.objects.get_current()
+            except Site.DoesNotExist:
+                site = None
         return self.filter(site=site)
         
     def root(self):
