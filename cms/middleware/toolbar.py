@@ -5,7 +5,7 @@ from cms import settings as cms_settings
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib.auth import authenticate, login
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.context import Context
 from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
@@ -40,8 +40,11 @@ class ToolbarMiddleware(object):
             return False 
         if not response['Content-Type'].split(';')[0] in _HTML_TYPES:
             return False
-        if request.path_info.startswith(reverse("admin:index")):
-            return False
+        try:
+            if request.path_info.startswith(reverse("admin:index")):
+                return False
+        except NoReverseMatch:
+            pass
         if request.path_info.startswith(settings.MEDIA_URL):
             return False
         if "edit" in request.GET:
