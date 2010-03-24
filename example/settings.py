@@ -174,29 +174,7 @@ CMS_PLACEHOLDER_CONF = {
     'col_right': {
         'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("right column")
-    },                     
-                        
-                        
-                                              
-#    'right-column': {
-#        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
-#        "extra_context": {"width":940},
-#        "name":gettext("right column")
-#    },
-    
-#    'body': {
-#        "extra_context": {"width":280},
-#        "name":gettext("body"),
-#    },
-#    'fancy-content': {
-#        "plugins": ('TextPlugin', 'LinkPlugin'),
-#        "extra_context": {"width":"640"},
-#        "name":gettext("fancy content custom name"),
-#        "limits": {
-#            "global": 3,
-#            "TextPlugin": 1,
-#        },
-#    },
+    },
 }
 
 CMS_SOFTROOT = True
