@@ -34,7 +34,7 @@ If the placeholder has no plugins or the plugins do not generate any output, eve
 
 Example::
 
-	{% placeholderor "content" %}There is no content.{% placeholderor %}
+	{% placeholderor "content" %}There is no content.{% endplaceholderor %}
 
 show_placeholder_by_id
 ----------------------
