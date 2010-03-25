@@ -27,4 +27,5 @@
 - menus and apphooks are auto-discovered now
 - example templates look a lot better now.
 - languages are not a dropdown anymore but fancy tabs
+- placeholderend templatetag added: {% placeholder "content" %}There is no content here{% endplaceholder %}
 - a lot of bugfixes
