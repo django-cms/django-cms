@@ -129,27 +129,33 @@ class PlaceholderNode(template.Node):
         if width: self.width = template.Variable(width)
 
     def render(self, context):
-        width_var = getattr(self, 'width', None)
-        if width_var:
-            try:
-                width = width_var.resolve(context)
-            except template.VariableDoesNotExist:
-                # should we raise an error here?
+        try:
+            width_var = getattr(self, 'width', None)
+            if width_var:
+                try:
+                    width = width_var.resolve(context)
+                except template.VariableDoesNotExist:
+                    # should we raise an error here?
+                    width = None
+            else:
                 width = None
-        else:
-            width = None
+                
+            if context.get('display_placeholder_names_only'):
+                return "<!-- PlaceholderNode: %s -->" % self.name
+                
+            if not 'request' in context:
+                return ''
+            request = context['request']
             
-        if context.get('display_placeholder_names_only'):
-            return "<!-- PlaceholderNode: %s -->" % self.name
-            
-        if not 'request' in context:
-            return ''
-        request = context['request']
-        
-        page = request.current_page
-        if page == "dummy":
-            return ""
-        return render_plugins_for_context(self.name, page, context, width)
+            page = request.current_page
+            if page == "dummy":
+                return ""
+            return render_plugins_for_context(self.name, page, context, width)
+        except:
+            import sys
+            import traceback
+            traceback.print_exception(*sys.exc_info())
+            raise
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
@@ -318,14 +324,21 @@ class PluginsMediaNode(template.Node):
         if page == "dummy":
             return ''
         from cms.plugins.utils import get_plugins_media
-        plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        try:
+            plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        except:
+            import sys
+            info = sys.exc_info()
+            import traceback
+            traceback.print_exception(*info)
+            raise
         if plugins_media:
             return plugins_media.render()
         else:
             return u''
         
     def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % self.name
+        return "<PluginsMediaNode Node: %s>" % self.name if hasattr(self, 'name') else ''
         
 register.tag('plugins_media', do_plugins_media)
 

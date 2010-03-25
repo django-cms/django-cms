@@ -1,5 +1,6 @@
 from django.db.models.base import ModelBase
 from cms.models.pagemodel import Page
+from cms.models.placeholdermodel import Placeholder
 from os.path import join
 from datetime import datetime, date
 from django.db import models
@@ -35,10 +36,9 @@ class PluginModelBase(ModelBase):
 class CMSPlugin(MpttPublisher):
     __metaclass__ = PluginModelBase
     
-    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
+    placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
-    placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
@@ -115,8 +115,9 @@ class CMSPlugin(MpttPublisher):
         return ""
             
     def get_media_path(self, filename):
-        if self.page_id:
-            return self.page.get_media_path(filename)
+        pages = self.placeholder.page_set.all()
+        if pages.count():
+            return pages[0].get_media_path(filename)
         else: # django 1.0.2 compatibility
             today = date.today()
             return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
@@ -150,7 +151,7 @@ class CMSPlugin(MpttPublisher):
             
     
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
     
     def _publisher_get_public_copy(self):

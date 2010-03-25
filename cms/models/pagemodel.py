@@ -12,6 +12,7 @@ from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
+from cms.models.placeholdermodel import Placeholder
 
 from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
@@ -66,6 +67,9 @@ class Page(MpttPublisher):
     login_required = models.BooleanField(_("login required"),default=False)
     menu_login_required = models.BooleanField(_("menu login required"),default=False, help_text=_("only show this page in the menu if the user is logged in"))
     
+    # Placeholders (plugins)
+    placeholders = models.ManyToManyField(Placeholder, editable=False)
+    
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -110,6 +114,7 @@ class Page(MpttPublisher):
         
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
+        raise NotImplementedError("Page.copy_page is not implemented yet")
         from cms.utils.moderator import update_moderation_message
         
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
@@ -130,7 +135,8 @@ class Page(MpttPublisher):
         for page in descendants:
            
             titles = list(page.title_set.all())
-            plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            #plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            placeholders = list(page.placeholders.all())
             origin_id = page.id
             page.old_pk = page.pk
             page.pk = None
@@ -186,6 +192,8 @@ class Page(MpttPublisher):
                 title.page = page
                 title.slug = get_available_slug(title)
                 title.save()
+            for p in placeholders:
+                page.placeholders.add(p.get_copy())
             ptree = []
             for p in plugins:
                 try:
@@ -193,7 +201,7 @@ class Page(MpttPublisher):
                 except KeyError: #plugin type not found anymore
                     continue
                 p.page = page
-                p.pk = None
+                p.pk = None # make a new instance
                 p.id = None
                 p.tree_id = None
                 p.lft = None
@@ -211,19 +219,18 @@ class Page(MpttPublisher):
                     ptree = [p]
                 p.level = None
                 p.save()
-                if plugin:
-                    plugin.pk = p.pk
-                    plugin.id = p.pk
-                    plugin.page = page
-                    plugin.tree_id = p.tree_id
-                    plugin.lft = p.lft
-                    plugin.rght = p.rght
-                    plugin.level = p.level
-                    plugin.cmsplugin_ptr = p
-                    plugin.publisher_public_id = None
-                    plugin.public_id = None
-                    plugin.plubished = False
-                    plugin.save()
+                plugin.pk = p.pk
+                plugin.id = p.pk
+                plugin.page = page
+                plugin.tree_id = p.tree_id
+                plugin.lft = p.lft
+                plugin.rght = p.rght
+                plugin.level = p.level
+                plugin.cmsplugin_ptr = p
+                plugin.publisher_public_id = None
+                plugin.public_id = None
+                plugin.plubished = False
+                plugin.save()
     
     def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None, **kwargs):
         """

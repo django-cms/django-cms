@@ -19,7 +19,7 @@ post_publish = Signal(providing_args=["instance"])
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
-    plugins = CMSPlugin.objects.filter(page=plugin.page, language=plugin.language, placeholder=plugin.placeholder).order_by("position")
+    plugins = CMSPlugin.objects.filter(language=plugin.language, placeholder=plugin.placeholder).order_by("position")
     last = 0
     for p in plugins:
         if p.position != last:

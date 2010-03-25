@@ -110,8 +110,10 @@
         var plugin_id = $(this).parent().attr("id").split("plugin_")[1];
         var question = gettext("Are you sure you want to delete this plugin?")
         var answer = confirm(question, true);
+        var pagesplits = window.location.href.split("/");
+        var page_id = pagesplits[pagesplits.length-2];
         if(answer){
-            $.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
+            $.post("remove-plugin/", { plugin_id:plugin_id, page_id:page_id }, function(data){
                 var splits = data.split(",")
                 id = splits.shift()
                 $("#plugin_"+id).remove();

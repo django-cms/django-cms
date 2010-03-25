@@ -17,7 +17,7 @@ def render_plugins_for_context(placeholder_name, page, context_to_copy, width=No
     context = copy.copy(context_to_copy) 
     l = get_language_from_request(context['request'])
     request = context['request']
-    plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == placeholder_name]
+    plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder.slot == placeholder_name]
     template = page.template
     extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder_name), {}).get("extra_context", None)
     if not extra_context:

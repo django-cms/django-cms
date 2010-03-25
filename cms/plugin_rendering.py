@@ -17,7 +17,7 @@ def plugin_meta_context_processor(instance, placeholder):
             'first': instance._render_meta.index == 0,
             'last': instance._render_meta.index == instance._render_meta.total - 1,
             'total': instance._render_meta.total,
-            'id_attr': 'plugin_%i_%i' % (instance.page_id, instance.pk),
+            'id_attr': 'plugin_%i_%i' % (instance.placeholder.pk, instance.pk),
             'instance': instance,
         }
     }

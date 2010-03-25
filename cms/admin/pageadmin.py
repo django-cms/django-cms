@@ -11,6 +11,7 @@ from cms.models import Page, Title, CMSPlugin, PagePermission, \
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
     MASK_DESCENDANTS
+from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.admin import render_admin_menu_item
@@ -59,7 +60,8 @@ if 'reversion' in settings.INSTALLED_APPS:
 class PageAdmin(model_admin):
     form = PageForm
     list_filter = ['published', 'in_navigation', 'template', 'changed_by']
-    search_fields = ('title_set__slug', 'title_set__title', 'cmsplugin__text__body', 'reverse_id')
+    # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
+    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/revision_form.html"
     recover_form_template = "admin/cms/page/recover_form.html"
     
@@ -172,7 +174,7 @@ class PageAdmin(model_admin):
         url_patterns = patterns('',
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'(\d+)/edit-plugin/([0-9]+)/$', self.edit_plugin),
             pat(r'remove-plugin/$', self.remove_plugin),
             pat(r'move-plugin/$', self.move_plugin),
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
@@ -372,44 +374,56 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
-            for placeholder_name in get_placeholders(request, selected_template):
+            # TODO: placeholders!!!!
+            placeholders = get_placeholders(request, selected_template)
+            found = {}
+            for placeholder in obj.placeholders.all():
+                if not placeholder.slot in placeholders:
+                    obj.placeholders.remove(placeholder)
+                else:
+                    found[placeholder.slot] = placeholder
+            for placeholder_name in placeholders:
+                if not placeholder_name in found:
+                    placeholder = Placeholder.objects.create(slot=placeholder_name)
+                    obj.placeholders.add(placeholder)
+                else:
+                    placeholder = found[placeholder_name]
                 installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                 plugin_list = []
                 show_copy = False
                 copy_languages = {}
-                if obj:
-                    if versioned:
-                        from reversion.models import Version
-                        version = get_object_or_404(Version, pk=version_id)
-                        revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-                        plugin_list = []
-                        plugins = []
-                        bases = {}
-                        for rev in revs:
-                            pobj = rev.object
-                            if pobj.__class__ == CMSPlugin:
-                                if pobj.language == language and pobj.placeholder == placeholder_name and not pobj.parent_id:
-                                    if pobj.get_plugin_class() == CMSPlugin:
-                                        plugin_list.append(pobj)
-                                    else:
-                                        bases[int(pobj.pk)] = pobj
-                            if hasattr(pobj, "cmsplugin_ptr_id"): 
-                                plugins.append(pobj)
-                        for plugin in plugins:
-                            if int(plugin.cmsplugin_ptr_id) in bases:
-                                bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
-                                plugin_list.append(plugin)
-                    else:
-                        plugin_list = CMSPlugin.objects.filter(page=obj, language=language, placeholder=placeholder_name, parent=None).order_by('position')
-                        other_plugins = CMSPlugin.objects.filter(page=obj, placeholder=placeholder_name, parent=None).exclude(language=language)
-                        for plugin in other_plugins:
-                            if not plugin.language in copy_languages:
-                                copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
+                if versioned:
+                    from reversion.models import Version
+                    version = get_object_or_404(Version, pk=version_id)
+                    revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+                    plugin_list = []
+                    plugins = []
+                    bases = {}
+                    for rev in revs:
+                        pobj = rev.object
+                        if pobj.__class__ == CMSPlugin:
+                            if pobj.language == language and pobj.placeholder == placeholder and not pobj.parent_id:
+                                if pobj.get_plugin_class() == CMSPlugin:
+                                    plugin_list.append(pobj)
+                                else:
+                                    bases[int(pobj.pk)] = pobj
+                        if hasattr(pobj, "cmsplugin_ptr_id"): 
+                            plugins.append(pobj)
+                    for plugin in plugins:
+                        if int(plugin.cmsplugin_ptr_id) in bases:
+                            bases[int(plugin.cmsplugin_ptr_id)].set_base_attr(plugin)
+                            plugin_list.append(plugin)
+                else:
+                    plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
+                    other_plugins = CMSPlugin.objects.filter(placeholder=placeholder, parent=None).exclude(language=language)
+                    for plugin in other_plugins:
+                        if not plugin.language in copy_languages:
+                            copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
                 language = get_language_from_request(request, obj)
                 if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
                     show_copy = True
                 widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'copy_languages': copy_languages.items(), 'show_copy':show_copy, 'language': language } )
-                form.base_fields[placeholder_name] = CharField(widget=widget, required=False)
+                form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
@@ -475,7 +489,6 @@ class PageAdmin(model_admin):
         """
         The 'change' admin view for the Page model.
         """
-
         try:
             obj = self.model.objects.get(pk=object_id)
         except self.model.DoesNotExist:
@@ -1026,19 +1039,20 @@ class PageAdmin(model_admin):
             parent = None
             if page_id:
                 page = get_object_or_404(Page, pk=page_id)
-                placeholder = request.POST['placeholder'].lower()
+                placeholder_name = request.POST['placeholder'].lower()
+                placeholder = page.placeholders.get(slot=placeholder_name)
                 language = request.POST['language']
-                position = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder).count()
-                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get('limits', None)
+                position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
+                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder.slot), {}).get('limits', None)
                 if not limits:
-                    limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get('limits', None)
+                    limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get('limits', None)
                 if limits:
                     global_limit = limits.get("global")
                     type_limit = limits.get(plugin_type)
                     if global_limit and position >= global_limit:
                         return HttpResponseBadRequest("This placeholder already has the maximum number of plugins")
                     elif type_limit:
-                        type_count = CMSPlugin.objects.filter(page=page, language=language, placeholder=placeholder, plugin_type=plugin_type).count()
+                        type_count = CMSPlugin.objects.filter(language=language, placeholder=placeholder, plugin_type=plugin_type).count()
                         if type_count >= type_limit:
                             return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
             else:
@@ -1056,14 +1070,14 @@ class PageAdmin(model_admin):
             if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
                 return HttpResponseBadRequest(_("Language must be set to a supported language!"))
             
-            plugin = CMSPlugin(page=page, language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
+            plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder) 
     
             if parent:
                 plugin.parent = parent
             plugin.save()
             if 'reversion' in settings.INSTALLED_APPS:
                 page.save()
-                save_all_plugins(request, page)
+                save_all_plugins(request, page, placeholder)
                 reversion.revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
                 reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
@@ -1140,12 +1154,13 @@ class PageAdmin(model_admin):
 
     copy_plugins = create_on_success(copy_plugins)    
     
-    def edit_plugin(self, request, plugin_id):
+    def edit_plugin(self, request, page_id, plugin_id):
         plugin_id = int(plugin_id)
+        page = get_object_or_404(Page, pk=int(page_id))
         if not 'history' in request.path and not 'recover' in request.path:
             cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
-            if not cms_plugin.page.has_change_permission(request):
+            if not page.has_change_permission(request):
                 raise PermissionDenied 
         else:
             # history view with reversion
@@ -1176,6 +1191,7 @@ class PageAdmin(model_admin):
         
         plugin_admin.cms_plugin_instance = cms_plugin
         plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
+        plugin_admin.page = page
         
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
@@ -1203,11 +1219,11 @@ class PageAdmin(model_admin):
             # if reversion is installed, save version of the page plugins
             if 'reversion' in settings.INSTALLED_APPS:
                 # perform this only if object was successfully changed
-                cms_plugin.page.save()
-                save_all_plugins(request, cms_plugin.page, [cms_plugin.pk])
+                page.save()
+                save_all_plugins(request, page, cms_plugin.placeholder, [cms_plugin.pk])
                 reversion.revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
-                reversion.revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':cms_plugin.position, 'placeholder': cms_plugin.placeholder}
+                reversion.revision.comment = _(u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {'plugin_name':plugin_name, 'position':cms_plugin.position, 'placeholder': cms_plugin.placeholder.slot}
                 
             # read the saved object from plugin_admin - ugly but works
             saved_object = plugin_admin.saved_object
@@ -1273,10 +1289,12 @@ class PageAdmin(model_admin):
         if request.method == "POST" and not 'history' in request.path:
             plugin_id = request.POST['plugin_id']
             plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-            page = plugin.page
+            placeholder = plugin.placeholder
+            page_id = request.POST['page_id']
+            page = get_object_or_404(Page, pk=page_id)
             
             if not page.has_change_permission(request):
-                    raise Http404
+                raise Http404
             
             if settings.CMS_MODERATOR and page.is_under_moderation():
                 plugin.delete()
@@ -1286,7 +1304,7 @@ class PageAdmin(model_admin):
             plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
             comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
             if 'reversion' in settings.INSTALLED_APPS:
-                save_all_plugins(request, page)
+                save_all_plugins(request, page, placeholder)
                 page.save()
                 reversion.revision.user = request.user
                 reversion.revision.comment = comment

@@ -9,7 +9,7 @@ def get_plugins(request, obj, lang=None):
     lang = lang or get_language_from_request(request)
     if not hasattr(obj, '_%s_plugins_cache' % lang):
         setattr(obj, '_%s_plugins_cache' % lang,  get_cmsplugin_queryset(request).filter(
-            page=obj, language=lang, parent__isnull=True
+            placeholder__page=obj, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related() )
     return getattr(obj, '_%s_plugins_cache' % lang)
 

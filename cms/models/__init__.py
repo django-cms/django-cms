@@ -3,6 +3,7 @@ from pagemodel import *
 from permissionmodels import *
 from pluginmodel import *
 from titlemodels import *
+from placeholdermodel import *
 
 from django.core.exceptions import ImproperlyConfigured
 from cms import signals as s_import
