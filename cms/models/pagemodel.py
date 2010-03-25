@@ -114,14 +114,13 @@ class Page(MpttPublisher):
         
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
-        raise NotImplementedError("Page.copy_page is not implemented yet")
         from cms.utils.moderator import update_moderation_message
         
         descendants = [self] + list(self.get_descendants().order_by('-rght'))
-        site_reverse_ids = [ x[0] for x in Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id') ]
+        site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
         if target:
             target.old_pk = -1
-            if position == "first_child":
+            if position == "first_child": # BUG??????????
                 tree = [target]
             elif target.parent_id:
                 tree = [target.parent]
@@ -132,12 +131,13 @@ class Page(MpttPublisher):
         if tree:
             tree[0].old_pk = tree[0].pk
         first = True
+        # loop over all affected pages (self is included in descendants)
         for page in descendants:
-           
             titles = list(page.title_set.all())
-            #plugins = list(page.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            # get all current placeholders (->plugins)
             placeholders = list(page.placeholders.all())
             origin_id = page.id
+            # create a copy of this page by setting pk = None (=new instance)
             page.old_pk = page.pk
             page.pk = None
             page.level = None
@@ -185,52 +185,57 @@ class Page(MpttPublisher):
                     moderator.page = page
                     moderator.save()
             update_moderation_message(page, unicode(_('Page was copied.')))
+            # copy titles of this page
             for title in titles:
-                title.pk = None
+                title.pk = None # setting pk = None creates a new instance
                 title.publisher_public_id = None
                 title.published = False
                 title.page = page
                 title.slug = get_available_slug(title)
                 title.save()
-            for p in placeholders:
-                page.placeholders.add(p.get_copy())
-            ptree = []
-            for p in plugins:
-                try:
-                    plugin, cls = p.get_plugin_instance()
-                except KeyError: #plugin type not found anymore
-                    continue
-                p.page = page
-                p.pk = None # make a new instance
-                p.id = None
-                p.tree_id = None
-                p.lft = None
-                p.rght = None
-                p.inherited_public_id = None
-                p.publisher_public_id = None
-                if p.parent:
-                    pdif = p.level - ptree[-1].level
-                    if pdif < 0:
-                        ptree = ptree[:pdif-1]
-                    p.parent = ptree[-1]
-                    if pdif != 0:
-                        ptree.append(p)
-                else:
-                    ptree = [p]
-                p.level = None
-                p.save()
-                plugin.pk = p.pk
-                plugin.id = p.pk
-                plugin.page = page
-                plugin.tree_id = p.tree_id
-                plugin.lft = p.lft
-                plugin.rght = p.rght
-                plugin.level = p.level
-                plugin.cmsplugin_ptr = p
-                plugin.publisher_public_id = None
-                plugin.public_id = None
-                plugin.plubished = False
-                plugin.save()
+            # copy the placeholders (and plugins on those placeholders!)
+            for ph in placeholders:
+                plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
+                ph.pk = None # make a new instance
+                ph.save()
+                page.placeholders.add(ph)
+                ptree = []
+                for p in plugins:
+                    try:
+                        plugin, cls = p.get_plugin_instance()
+                    except KeyError: #plugin type not found anymore
+                        continue
+                    p.placeholder = ph
+                    p.pk = None # make a new instance
+                    p.id = None
+                    p.tree_id = None
+                    p.lft = None
+                    p.rght = None
+                    p.inherited_public_id = None
+                    p.publisher_public_id = None
+                    if p.parent:
+                        pdif = p.level - ptree[-1].level
+                        if pdif < 0:
+                            ptree = ptree[:pdif-1]
+                        p.parent = ptree[-1]
+                        if pdif != 0:
+                            ptree.append(p)
+                    else:
+                        ptree = [p]
+                    p.level = None
+                    p.save()
+                    plugin.pk = p.pk
+                    plugin.id = p.pk
+                    plugin.page = page
+                    plugin.tree_id = p.tree_id
+                    plugin.lft = p.lft
+                    plugin.rght = p.rght
+                    plugin.level = p.level
+                    plugin.cmsplugin_ptr = p
+                    plugin.publisher_public_id = None
+                    plugin.public_id = None
+                    plugin.published = False
+                    plugin.save()
     
     def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None, **kwargs):
         """
