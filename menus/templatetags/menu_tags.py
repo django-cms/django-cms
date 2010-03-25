@@ -35,7 +35,8 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
         if not node.visible:
             removed.append(node)
             if node.parent:
-                node.parent.children.remove(node)
+                if node in node.parent.children:
+                    node.parent.children.remove(node)
     if selected:
         cut_after(selected, extra_active, removed)
     if removed:
