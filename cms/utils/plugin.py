@@ -1,13 +1,18 @@
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils import get_language_from_request
+from cms.models.pagemodel import Page
 from cms import settings
 from django.conf import settings as django_settings
 from cms.plugin_pool import plugin_pool
 from cms.plugins.utils import get_plugins
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
 from cms.plugin_rendering import render_plugins
 import copy
+
+def get_page_from_plugin_or_404(cms_plugin):
+    return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
 
 def render_plugins_for_context(placeholder_name, page, context_to_copy, width=None):
     """

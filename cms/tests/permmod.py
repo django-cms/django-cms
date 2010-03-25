@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE,\
     URL_CMS_PAGE_CHANGE
-from cms.models import Title, Page
+from cms.models import Title, Page, CMSPlugin
 from cms.models.permissionmodels import PagePermission
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS,\
     ACCESS_CHOICES, ACCESS_DESCENDANTS, ACCESS_CHILDREN
@@ -131,8 +131,10 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(user)
         url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
         response = self.client.post(url, post_data)
-        self.assertEqual(slave_page.cmsplugin_set.count(), 1)
-        plugin_id = slave_page.cmsplugin_set.all()[0].id
+        
+        cmsplugin_set = CMSPlugin.objects.filter(placeholder__in=slave_page.placeholders.all())
+        self.assertEqual(cmsplugin_set.count(), 1)
+        plugin_id = cmsplugin_set[0].id
         self.assertEqual(response.content, str(plugin_id))
     
     def publish_page(self, page, approve=False, user=None, published_check=True):

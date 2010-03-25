@@ -226,7 +226,7 @@ class Page(MpttPublisher):
                     p.save()
                     plugin.pk = p.pk
                     plugin.id = p.pk
-                    plugin.page = page
+                    plugin.placeholder = ph
                     plugin.tree_id = p.tree_id
                     plugin.lft = p.lft
                     plugin.rght = p.rght
