@@ -129,33 +129,28 @@ class PlaceholderNode(template.Node):
         if width: self.width = template.Variable(width)
 
     def render(self, context):
-        try:
-            width_var = getattr(self, 'width', None)
-            if width_var:
-                try:
-                    width = width_var.resolve(context)
-                except template.VariableDoesNotExist:
-                    # should we raise an error here?
-                    width = None
-            else:
+        width_var = getattr(self, 'width', None)
+        if width_var:
+            try:
+                width = width_var.resolve(context)
+            except template.VariableDoesNotExist:
+                # should we raise an error here?
                 width = None
-                
-            if context.get('display_placeholder_names_only'):
-                return "<!-- PlaceholderNode: %s -->" % self.name
-                
-            if not 'request' in context:
-                return ''
-            request = context['request']
+        else:
+            width = None
             
-            page = request.current_page
-            if page == "dummy":
-                return ""
-            return render_plugins_for_context(self.name, page, context, width)
-        except:
-            import sys
-            import traceback
-            traceback.print_exception(*sys.exc_info())
-            raise
+        if context.get('display_placeholder_names_only'):
+            return "<!-- PlaceholderNode: %s -->" % self.name
+            
+        if not 'request' in context:
+            return ''
+        request = context['request']
+        
+        page = request.current_page
+        if page == "dummy":
+            return ""
+        placeholder = page.placeholders.get(slot=self.name)
+        return render_plugins_for_context(placeholder, context, width)
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name

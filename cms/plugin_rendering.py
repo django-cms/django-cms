@@ -93,11 +93,11 @@ class PluginRenderer(object):
         for processor in get_standard_processors('CMS_PLUGIN_PROCESSORS') + processors + DEFAULT_PLUGIN_PROCESSORS:
             self.content = processor(instance, placeholder, self.content, context)
 
-def render_plugins(plugins, context, placeholder_name, processors=None):
+def render_plugins(plugins, context, placeholder, processors=None):
     c = []
     total = len(plugins)
     for index, plugin in enumerate(plugins):
         plugin._render_meta.total = total 
         plugin._render_meta.index = index
-        c.append(plugin.render_plugin(copy.copy(context), placeholder_name, processors=processors))
+        c.append(plugin.render_plugin(copy.copy(context), placeholder.slot, processors=processors))
     return c

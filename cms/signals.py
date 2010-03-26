@@ -1,10 +1,14 @@
 from django.db.models import signals
 from django.conf import settings
-from cms.models import Page, Title
-from cms.models import CMSPlugin        
+from cms.models import Page, Title, CMSPlugin, Placeholder
 from cms.utils.moderator import page_changed
+from cms.utils.plugins import get_placeholders
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import Signal
+from django.core.handlers.base import BaseHandler
+from django.core.handlers.wsgi import WSGIRequest
+from django.test import Client
+from django.http import SimpleCookie
 from menus.menu_pool import menu_pool
 
 # fired after page location is changed - is moved from one node to other
@@ -187,6 +191,64 @@ def pre_save_page(instance, raw, **kwargs):
         instance.old_page = Page.objects.get(pk=instance.pk)
     except ObjectDoesNotExist:
         pass
+    
+    
+def _get_request():
+    class RequestFactory(Client):
+        """
+        Class that lets you create mock Request objects for use in testing.
+        
+        Usage:
+        
+        rf = RequestFactory()
+        get_request = rf.get('/hello/')
+        post_request = rf.post('/submit/', {'foo': 'bar'})
+        
+        This class re-uses the django.test.client.Client interface, docs here:
+        http://www.djangoproject.com/documentation/testing/#the-test-client
+        
+        Once you have a request object you can pass it to any view function, 
+        just as if that view had been hooked up using a URLconf.
+        
+        """
+        def request(self, **request):
+            """
+            Similar to parent class, but returns the request object as soon as it
+            has created it.
+            """
+            environ = {
+                'HTTP_COOKIE': self.cookies,
+                'PATH_INFO': '/',
+                'QUERY_STRING': '',
+                'REQUEST_METHOD': 'GET',
+                'SCRIPT_NAME': '',
+                'SERVER_NAME': 'testserver',
+                'SERVER_PORT': 80,
+                'SERVER_PROTOCOL': 'HTTP/1.1',
+            }
+            environ.update(self.defaults)
+            environ.update(request)
+            request = WSGIRequest(environ)
+            handler = BaseHandler()
+            handler.load_middleware()
+            for middleware_method in handler._request_middleware:
+                if middleware_method(request):
+                    raise NotImplementedError("Couldn't create request mock object - "
+                                              "request middleware returned a response")
+            return request
+        
+        def login(self):
+            if not hasattr(self, '__usercache'):
+                u,c = User.objects.get_or_create(username="test", is_staff = True, is_active = True, is_superuser = True)
+                u.set_password("test")
+                u.save()
+                self.__usercache = u
+            return super(RequestFactory, self).login(username=self.__usercache.username,
+                password=self.__usercache.username)
+    # to pass the tests we need to be logged in so as not to override the current user
+    factory = RequestFactory()
+    factory.login()
+    return factory.get('/hello/world/')
         
 
 def post_save_page(instance, raw, created, **kwargs):   
@@ -198,12 +260,36 @@ def post_save_page(instance, raw, created, **kwargs):
     if settings.CMS_MODERATOR:
         # tell moderator something was happen with this page
         page_changed(instance, old_page)
+        
+        
+def _scan_placeholders(nodelist):
+    pass
+        
+def _get_placeholders(template):
+    from django.template.loader import find_template
+    from django.template import compile_string
+    source, origin = find_template(template)
+    nodelist = compile_string(source, origin)
+    placeholders = _scan_placeholders(nodelist)
+    return placeholders
     
+    
+def update_placeholders(instance, **kwargs):
+    placeholders = get_placeholders(_get_request(), instance.template)
+    found = {}
+    for placeholder in instance.placeholders.all():
+        if placeholder.slot in placeholders:
+            found[placeholder.slot] = placeholder
+    for placeholder_name in placeholders:
+        if not placeholder_name in found:
+            placeholder = Placeholder.objects.create(slot=placeholder_name)
+            instance.placeholders.add(placeholder)
 
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
     signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
+signals.post_save.connect(update_placeholders, sender=Page)
     
  
 from cms.models import PagePermission, GlobalPagePermission

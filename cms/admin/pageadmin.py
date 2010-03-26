@@ -375,20 +375,9 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
-            # TODO: placeholders!!!!
             placeholders = get_placeholders(request, selected_template)
-            found = {}
-            for placeholder in obj.placeholders.all():
-                if not placeholder.slot in placeholders:
-                    obj.placeholders.remove(placeholder)
-                else:
-                    found[placeholder.slot] = placeholder
             for placeholder_name in placeholders:
-                if not placeholder_name in found:
-                    placeholder = Placeholder.objects.create(slot=placeholder_name)
-                    obj.placeholders.add(placeholder)
-                else:
-                    placeholder = found[placeholder_name]
+                placeholder = obj.placeholders.get(slot=placeholder_name)
                 installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                 plugin_list = []
                 show_copy = False
@@ -423,7 +412,10 @@ class PageAdmin(model_admin):
                 language = get_language_from_request(request, obj)
                 if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
                     show_copy = True
-                widget = PluginEditor(attrs = { 'installed': installed_plugins, 'list': plugin_list, 'copy_languages': copy_languages.items(), 'show_copy':show_copy, 'language': language } )
+                widget = PluginEditor(attrs={'installed': installed_plugins,
+                    'list': plugin_list, 'copy_languages': copy_languages.items(),
+                     'show_copy':show_copy, 'language': language,
+                     'placeholder': placeholder})
                 form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
         else: 
             for name in ['slug','title']:

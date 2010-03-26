@@ -34,7 +34,7 @@ class PageAddForm(forms.ModelForm):
     
     class Meta:
         model = Page
-        exclude = ["created_by", "changed_by"]
+        exclude = ["created_by", "changed_by", "placeholders"]
     
     def __init__(self, *args, **kwargs):
         super(PageAddForm, self).__init__(*args, **kwargs)

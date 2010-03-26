@@ -81,7 +81,7 @@ class Page(MpttPublisher):
         app_label = 'cms'
     
     class PublisherMeta:
-        exclude_fields_append = ['moderator_state']
+        exclude_fields_append = ['moderator_state', 'placeholders']
     
     def __unicode__(self):
         title = self.get_menu_title(fallback=True)
@@ -120,7 +120,7 @@ class Page(MpttPublisher):
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
         if target:
             target.old_pk = -1
-            if position == "first_child": # BUG??????????
+            if position == "first-child":
                 tree = [target]
             elif target.parent_id:
                 tree = [target.parent]
@@ -237,7 +237,8 @@ class Page(MpttPublisher):
                     plugin.published = False
                     plugin.save()
     
-    def save(self, no_signals=False, change_state=True, commit=True, force_with_moderation=False, force_state=None, **kwargs):
+    def save(self, no_signals=False, change_state=True, commit=True,
+             force_with_moderation=False, force_state=None, **kwargs):
         """
         Args:
             

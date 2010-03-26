@@ -34,6 +34,7 @@ class PluginEditor(Widget):
             'copy_languages': self.attrs['copy_languages'],
             'language': self.attrs['language'],
             'show_copy': self.attrs['show_copy'],
+            'placeholder': self.attrs['placeholder'],
         }
         return mark_safe(render_to_string(
             'admin/cms/page/widgets/plugin_editor.html', context))
