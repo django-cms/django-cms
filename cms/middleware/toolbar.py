@@ -3,6 +3,7 @@ Edit Toolbar middleware
 """
 from cms import settings as cms_settings
 from cms.utils.plugins import get_placeholders
+from cms.utils import get_template_from_request
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
@@ -79,7 +80,8 @@ class ToolbarMiddleware(object):
         page = request.current_page
         move_dict = []
         if edit and page:
-            placeholders = get_placeholders(request)
+            template = get_template_from_request(request)
+            placeholders = get_placeholders(template)
             for placeholder in placeholders:
                 d = {}
                 name = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("name", None)

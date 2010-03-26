@@ -305,7 +305,7 @@ class PageAdmin(model_admin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder_name in get_placeholders(request, placeholders_template):
+            for placeholder_name in get_placeholders(placeholders_template):
                 name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
                 if not name:
                     name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
@@ -375,7 +375,7 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
-            placeholders = get_placeholders(request, selected_template)
+            placeholders = get_placeholders(selected_template)
             for placeholder_name in placeholders:
                 placeholder = obj.placeholders.get(slot=placeholder_name)
                 installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
@@ -501,7 +501,7 @@ class PageAdmin(model_admin):
             
             #activate(user_lang_set)
             extra_context = {
-                'placeholders': get_placeholders(request, selected_template),
+                'placeholders': get_placeholders(selected_template),
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
@@ -1263,7 +1263,7 @@ class PageAdmin(model_admin):
             elif 'plugin_id' in request.POST:
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
                 placeholder = request.POST['placeholder']
-                placeholders = get_placeholders(request, plugin.page.template)
+                placeholders = get_placeholders(plugin.page.template)
                 if not placeholder in placeholders:
                     return HttpResponse(str("error"))
                 plugin.placeholder = placeholder

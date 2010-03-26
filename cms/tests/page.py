@@ -4,7 +4,6 @@ from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.utils.plugins import get_placeholders
 from cms.models import Page, Title, Placeholder
 
 
