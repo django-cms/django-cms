@@ -19,3 +19,5 @@ def render_placeholder(parser, token):
     except ValueError:
         raise template.TemplateSyntaxError("%s takes exactly one argument" % tagname)
     return PlaceholderNode(placeholder)
+
+register.tag('render_placeholder', render_placeholder)
