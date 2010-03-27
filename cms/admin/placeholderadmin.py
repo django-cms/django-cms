@@ -10,6 +10,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.models.fields import PlaceholderFormField
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 import os
@@ -23,6 +24,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
+                'css/plugin_editor.css',
             )]
         }
         js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
@@ -31,6 +33,49 @@ class PlaceholderAdmin(ModelAdmin):
             'js/lib/ui.dialog.js',
             
         )]
+        
+    def get_fieldsets(self, request, obj=None):
+        """
+        Get fieldsets to enforce correct fieldsetting of placeholder fields
+        """
+        form = self.get_form(request, obj)
+        placeholder_fields = self._get_placeholder_fields(form)
+        if self.declared_fieldsets:
+            # check those declared fieldsets
+            found = []
+            fieldsets = tuple(self.declared_fieldsets)
+            for label, fieldset in fieldsets:
+                fields = list(fieldset['fields'])
+                for field in fieldset['fields']:
+                    if field in placeholder_fields:
+                        if (len(fieldset['fields']) == 1 and
+                            'plugin-holder' in fieldset['classes']):
+                            placeholder_fields.remove(fieldset)
+                        else:
+                            fields.remove(field)
+                fieldset['fields'] = field
+            for placeholder in placeholder_fields:
+                fieldsets += (placeholder.capitalize(), {
+                        'fields': (placeholder,),
+                        'classes': ('plugin-holder',),
+                    },)
+            return fieldsets
+        fieldsets = []
+        fieldsets.append((None, {'fields': [f for f in form.base_fields.keys() if not f in placeholder_fields]}))
+        for placeholder in placeholder_fields:
+            fieldsets.append((placeholder.capitalize(), {
+                'fields': (placeholder,),
+                'classes': ('plugin-holder',),
+            }))
+        fieldsets.append((None, {'fields': list(self.get_readonly_fields(request, obj))}))
+        return fieldsets
+    
+    def _get_placeholder_fields(self, form):
+        placeholder_fields = []
+        for key, value in form.base_fields.items():
+            if isinstance(value, PlaceholderFormField):
+                placeholder_fields.append(key)
+        return placeholder_fields
     
     def get_urls(self):
         """
