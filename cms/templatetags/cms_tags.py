@@ -103,14 +103,21 @@ def do_placeholder(parser, token):
     try:
         # split_contents() knows not to split quoted strings.
         bits = token.split_contents()
+        # if the `placeholderor` tag was used, look for closing tag, and pass the enclosed nodes
+        # to PlaceholderNode below
+        if bits[0] == 'placeholderor':
+            nodelist_or = parser.parse(('endplaceholderor',))
+            parser.delete_first_token()
+        else:
+            nodelist_or = None
     except ValueError:
         raise template.TemplateSyntaxError(error_string)
     if len(bits) == 2:
         #tag_name, name
-        return PlaceholderNode(bits[1])
+        return PlaceholderNode(bits[1], nodelist_or=nodelist_or)
     elif len(bits) == 3:
         #tag_name, name, width
-        return PlaceholderNode(bits[1], bits[2])
+        return PlaceholderNode(bits[1], bits[2], nodelist_or=nodelist_or)
     else:
         raise template.TemplateSyntaxError(error_string)
 
@@ -124,9 +131,10 @@ class PlaceholderNode(template.Node):
     name -- the name of the placeholder
     width -- additional width attribute (integer) which gets added to the plugin context
     """
-    def __init__(self, name, width=None):
+    def __init__(self, name, width=None, nodelist_or=None):
         self.name = "".join(name.lower().split('"'))
         if width: self.width = template.Variable(width)
+        self.nodelist_or = nodelist_or
 
     def render(self, context):
         width_var = getattr(self, 'width', None)
@@ -156,6 +164,7 @@ class PlaceholderNode(template.Node):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
+register.tag('placeholderor', do_placeholder)
 
 def do_page_attribute(parser, token):
     error_string = '%r tag requires one argument' % token.contents[0]
