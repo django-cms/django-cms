@@ -124,8 +124,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         post_data = {
             'language': 'en',
-            'page_id': slave_page.pk,
-            'placeholder': 'Right-Column',
+            'placeholder': slave_page.placeholders.get(slot__iexact='Right-Column').pk,
             'plugin_type': 'TextPlugin'
         }
         self.login_user(user)

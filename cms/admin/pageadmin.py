@@ -1086,12 +1086,11 @@ class PageAdmin(model_admin):
             return HttpResponse(str("error"))
         if request.method == "POST":
             copy_from = request.POST['copy_from']
-            page_id = request.POST.get('page_id', None)
-            page = get_object_or_404(Page, pk = page_id)
+            placeholder_id = request.POST['placeholder']
+            placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+            page = get_page_from_placeholder_if_exists(placeholder)
             language = request.POST['language']
             
-            placeholder_name = request.POST['placeholder'].lower()
-            placeholder = page.placeholders.get(slot=placeholder_name)
             if not page.has_change_permission(request):
                 return HttpResponseForbidden(_("You do not have permission to change this page"))
             if not language or not language in [ l[0] for l in settings.CMS_LANGUAGES ]:
