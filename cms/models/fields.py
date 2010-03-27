@@ -53,13 +53,15 @@ class PlaceholderField(models.ForeignKey):
         return Placeholder.objects.create(slot=self.slotname, default_width=self.default_width) 
 
     def pre_save(self, model_instance, add):
-        if add and not getattr(model_instance, self.attname):
+        if not model_instance.pk:
             setattr(model_instance, self.attname, self._get_new_placeholder().pk)
         return super(PlaceholderField, self).pre_save(model_instance, add)
 
     def save_form_data(self, instance, data):
-        if not data:
+        if not instance.pk:
             data = self._get_new_placeholder()
+        else:
+            data = instance.placeholder
         super(PlaceholderField, self).save_form_data(instance, data)
     
     def south_field_triple(self):
