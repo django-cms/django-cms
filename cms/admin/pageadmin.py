@@ -23,6 +23,7 @@ from cms.utils.permissions import has_page_add_permission, \
     has_global_change_permissions_permission
 from cms.utils.plugin import get_page_from_plugin_or_404
 from cms.utils.plugins import get_placeholders
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from copy import deepcopy
 from django import template
 from django.conf import settings
@@ -1028,16 +1029,11 @@ class PageAdmin(model_admin):
             return HttpResponse(str("error"))
         if request.method == "POST":
             plugin_type = request.POST['plugin_type']
-            page_id = request.POST.get('page_id', None)
+            placeholder_id = request.POST['placeholder']
+            placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+            page = get_page_from_placeholder_if_exists(placeholder)
             parent = None
-            if page_id:
-                page = get_object_or_404(Page, pk=page_id)
-                placeholder_name = request.POST['placeholder'].lower()
-                try:
-                    placeholder = page.placeholders.get(slot=placeholder_name)
-                except Placeholder.DoesNotExist:
-                    placeholder = Placeholder.objects.create(slot=placeholder_name)
-                    page.placeholders.add(placeholder)
+            if page:
                 language = request.POST['language']
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
                 limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder.slot), {}).get('limits', None)
@@ -1053,6 +1049,7 @@ class PageAdmin(model_admin):
                         if type_count >= type_limit:
                             return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
             else:
+                raise NotImplementedError('add_plugin:parent_id')
                 parent_id = request.POST['parent_id']
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)
                 page = parent.page
