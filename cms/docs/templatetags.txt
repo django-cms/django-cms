@@ -8,7 +8,7 @@ To use any of the following templatetags you need to load them first at the top 
 placeholder
 -----------
 
-The placeholder templatetag will be filled with plugins. The cms auto-detects all placeholders
+The ``placeholder`` templatetag will be filled with plugins. The cms auto-detects all placeholders
 used in the template.
 
 Example::
@@ -23,7 +23,18 @@ If a width is provided every plugin recieves a "width" context variable when the
 The main use case of the width attribute is for automatically resizing images correctly.
 
 Also be sure to check out the ``PLACEHOLDER_CONF`` setting where you can change some of the behavior
-of the placeholders. 
+of the placeholders.
+
+placeholderor
+-------------
+
+The same as ``placeholder``, with additional content to be displayed in case the placeholder is empty:
+If the placeholder has no plugins or the plugins do not generate any output, everything between 
+``{% placeholderor %}`` and ``{% endplaceholderor %}`` is rendered instead.
+
+Example::
+
+	{% placeholderor "content" %}There is no content.{% endplaceholderor %}
 
 show_placeholder_by_id
 ----------------------

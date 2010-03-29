@@ -404,7 +404,7 @@ class PageAdmin(model_admin):
                         other_plugins = CMSPlugin.objects.filter(page=obj, placeholder=placeholder_name, parent=None).exclude(language=language)
                         for plugin in other_plugins:
                             if not plugin.language in copy_languages:
-                                copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
+                                copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES).get(plugin.language, dict(settings.LANGUAGES).get(plugin.language, plugin.language))
                 language = get_language_from_request(request, obj)
                 if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
                     show_copy = True

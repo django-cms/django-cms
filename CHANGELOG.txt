@@ -20,4 +20,12 @@
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
 - placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)
+- menu is its own app now
+- menu modifiers (you can register menu modifiers that can change menu nodes or rearrange them)
+- menus are now class based.
+- apphooks are now class based and can bring multiple menus and urls.py with them.
+- menus and apphooks are auto-discovered now
+- example templates look a lot better now.
+- languages are not a dropdown anymore but fancy tabs
+- placeholderend templatetag added: {% placeholder "content" %}There is no content here{% endplaceholder %}
 - a lot of bugfixes

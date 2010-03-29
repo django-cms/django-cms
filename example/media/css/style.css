@@ -123,8 +123,8 @@ ul.breadcrumb, ul.breadcrumb li{
 ul.breadcrumb{
 	clear:both;
 	margin-bottom:20px;
-	border-right:1px solid #E0E0E0;	
-	border-bottom:1px solid #E0E0E0;
+	/*border-right:1px solid #E0E0E0;	
+	border-bottom:1px solid #E0E0E0;*/
 	border-left:1px solid #E0E0E0;
 	float:left;
 }
@@ -138,7 +138,7 @@ ul.breadcrumb a,ul.breadcrumb span{
 	background:url(../img/sprite.jpg) no-repeat right 0;
 	display:block;
 	float:left;
-	padding-right:13px;
+	padding-right:15px;
 	padding-left:10px;
 	line-height:22px;
 }
@@ -146,7 +146,7 @@ ul.breadcrumb a:hover{
 	color:#5B80B2;
 }
 ul.breadcrumb span{
-	background:none;
+	background-position:-200px -25px;
 }
 
 /* Content */
