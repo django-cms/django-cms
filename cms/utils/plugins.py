@@ -1,12 +1,7 @@
-#from django.template import loader, TemplateDoesNotExist
-#from cms.utils import get_template_from_request
-#from django.template.context import RequestContext
-#from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from cms.templatetags.cms_tags import PlaceholderNode
 from django.template.loader import find_template
-from django.template import Lexer,
-#import re
+from django.template import Lexer
         
 def get_placeholders(template):
     source, origin = find_template(template)
