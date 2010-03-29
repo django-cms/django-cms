@@ -27,7 +27,7 @@ class Migration(DataMigration):
     
     def backwards(self, orm):
         "Write your backwards methods here."
-        for page in orm.Pages.objects.all():
+        for page in orm.Page.objects.all():
             for placeholder in page.placeholders.all():
                 for plugin in orm.CMSPlugin.objects.filter(new_placeholder=placeholder):
                     plugin.placeholder = placeholder.slot
