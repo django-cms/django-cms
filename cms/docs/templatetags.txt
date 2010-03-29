@@ -184,7 +184,7 @@ if a node is not a direct ancestor or descendant of the current active node.
 Finally, the fourth parameter, `extra_active` (default=100), specifies how many levels of
 descendants of the currently active node should be displayed.
 
-### Some Examples: ####
+### Some Examples: ###
 
 Complete navigation (as a nested list)::
 

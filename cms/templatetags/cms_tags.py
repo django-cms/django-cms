@@ -194,7 +194,7 @@ class PageAttributeNode(template.Node):
 
     Synopsis
          {% page_attribute "field-name" %}        
-         {% page_attribute "field-name" page-arg %}
+         {% page_attribute "field-name" page_lookup %}
      
     Example
          {# Output current page's page_title attribute: #}
@@ -213,7 +213,7 @@ class PageAttributeNode(template.Node):
     - meta_description
     - meta_keywords
     
-    page-arg -- lookup argument for Page, if omitted field-name of current page is returned.
+    page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
     """
@@ -348,9 +348,15 @@ def do_plugins_media(parser, token):
     return PluginsMediaNode(page_lookup)
 
 class PluginsMediaNode(template.Node):
-    """This template node is used to output media for plugins.
-
+    """
+    This template node is used to output media for plugins.
+    
     eg: {% plugins_media %}
+    
+    You can also pass the object a page_lookup arg if you want to output media tags for a specific 
+    page other than the current page. 
+
+    eg: {% plugins_media "gallery" %}
     """
     
     def __init__(self, page_lookup=None):
