@@ -1,8 +1,6 @@
 from django.db.models import signals
 from django.conf import settings
 from cms.models import Page, Title, CMSPlugin, Placeholder
-from cms.utils.moderator import page_changed
-from cms.utils.plugins import get_placeholders
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import Signal
 from menus.menu_pool import menu_pool
@@ -197,10 +195,12 @@ def post_save_page(instance, raw, created, **kwargs):
     
     if settings.CMS_MODERATOR:
         # tell moderator something was happen with this page
+        from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
     
     
 def update_placeholders(instance, **kwargs):
+    from cms.utils.plugins import get_placeholders
     placeholders = get_placeholders(instance.get_template())
     found = {}
     for placeholder in instance.placeholders.all():
