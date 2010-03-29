@@ -21,7 +21,7 @@ class PlaceholderPluginEditorWidget(PluginEditor):
                 'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
                 'copy_languages': [], # TODO?
                 'language': None, # TODO?
-                'show_copy': False, # TODO?
+                'show_copy': False, # The copy function does not make sense on non-page objects
                 'urloverride': True,
                 'placeholder': ph,
             }

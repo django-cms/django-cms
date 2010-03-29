@@ -86,7 +86,6 @@ class PlaceholderAdmin(ModelAdmin):
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         
         url_patterns = patterns('',
-            pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
             pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
             pat(r'remove-plugin/$', self.remove_plugin),
@@ -106,71 +105,6 @@ class PlaceholderAdmin(ModelAdmin):
             position=position, placeholder=placeholder) 
         plugin.save()
         return HttpResponse(str(plugin.pk))
-    
-    @transaction.commit_on_success
-    def copy_plugins(self, request):
-        if request.method != "POST":
-            raise Http404
-        raise NotImplementedError("copy_plugins is not implemented yet")
-        copy_from = request.POST['copy_from']
-        page_id = request.POST.get('page_id', None)
-        page = get_object_or_404(Page, pk = page_id)
-        language = request.POST['language']
-        
-        placeholder_name = request.POST['placeholder'].lower()
-        placeholder = page.placeholders.get(slot=placeholder_name)
-        if not page.has_change_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
-        if not language or not language in [ l[0] for l in settings.CMS_LANGUAGES ]:
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
-        if language == copy_from:
-            return HttpResponseBadRequest(_("Language must be different than the copied language!"))
-        plugins = list(placeholder.cmsplugin_set.all().order_by('tree_id', '-rght'))
-        ptree = []
-        for p in plugins:
-            try:
-                plugin, cls = p.get_plugin_instance()
-            except KeyError: #plugin type not found anymore
-                continue
-            p.placeholder = placeholder 
-            p.pk = None # create a new instance of the plugin
-            p.id = None
-            p.tree_id = None
-            p.lft = None
-            p.rght = None
-            p.inherited_public_id = None
-            p.publisher_public_id = None
-            if p.parent:
-                pdif = p.level - ptree[-1].level
-                if pdif < 0:
-                    ptree = ptree[:pdif-1]
-                p.parent = ptree[-1]
-                if pdif != 0:
-                    ptree.append(p)
-            else:
-                ptree = [p]
-            p.level = None
-            p.language = language
-            p.save()
-            plugin.pk = p.pk
-            plugin.id = p.pk
-            plugin.placeholder = placeholder
-            plugin.tree_id = p.tree_id
-            plugin.lft = p.lft
-            plugin.rght = p.rght
-            plugin.level = p.level
-            plugin.cmsplugin_ptr = p
-            plugin.publisher_public_id = None
-            plugin.public_id = None
-            plugin.published = False
-            plugin.language = language
-            plugin.save()  
-        if 'reversion' in settings.INSTALLED_APPS:
-            page.save()
-            save_all_plugins(request, page, placeholder)
-            reversion.revision.user = request.user
-            reversion.revision.comment = _(u"Copied %(language)s plugins to %(placeholder)s") % {'language':dict(settings.LANGUAGES)[language], 'placeholder':placeholder}
-        return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list':plugins}, RequestContext(request))
     
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)

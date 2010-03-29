@@ -38,7 +38,7 @@
         });
  
         $('span.copy-plugins').click(function(){
-         var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
+            var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
             var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
             var splits = window.location.href.split("/");
             var page_id = splits[splits.length-2];
@@ -50,7 +50,7 @@
             }
  
             if (!to_language) {
-                alert("Unable to determine the correct language for this plugin! Please report the bug!");
+                //alert("Unable to determine the correct language for this plugin! Please report the bug!");
             }
             
             var target_div = $(this).parent().parent().parent().children('div.plugin-editor');

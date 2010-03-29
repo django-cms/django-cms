@@ -1034,7 +1034,7 @@ class PageAdmin(model_admin):
             page = get_page_from_placeholder_if_exists(placeholder)
             parent = None
             if page:
-                language = request.POST['language']
+                language = request.POST['language'] or get_language_from_request(request)
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
                 limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder.slot), {}).get('limits', None)
                 if not limits:
@@ -1049,11 +1049,10 @@ class PageAdmin(model_admin):
                         if type_count >= type_limit:
                             return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
             else:
-                raise NotImplementedError('add_plugin:parent_id')
                 parent_id = request.POST['parent_id']
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)
-                page = parent.page
                 placeholder = parent.placeholder
+                page = get_page_from_placeholder_if_exists(placeholder)
                 language = parent.language
                 position = None
     
@@ -1089,7 +1088,7 @@ class PageAdmin(model_admin):
             placeholder_id = request.POST['placeholder']
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
             page = get_page_from_placeholder_if_exists(placeholder)
-            language = request.POST['language']
+            language = request.POST['language'] or get_language_from_request(request)
             
             if not page.has_change_permission(request):
                 return HttpResponseForbidden(_("You do not have permission to change this page"))
@@ -1247,7 +1246,7 @@ class PageAdmin(model_admin):
                 for id in request.POST['ids'].split("_"):
                     plugin = CMSPlugin.objects.get(pk=id)
                     if not page:
-                        page = plugin.page
+                        page = get_page_from_plugin_or_404(plugin)
                     
                     if not page.has_change_permission(request):
                         raise Http404
@@ -1258,13 +1257,14 @@ class PageAdmin(model_admin):
                     pos += 1
             elif 'plugin_id' in request.POST:
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
+                page = get_page_from_plugin_or_404(plugin)
                 placeholder = request.POST['placeholder']
                 placeholders = get_placeholders(plugin.page.template)
                 if not placeholder in placeholders:
                     return HttpResponse(str("error"))
-                plugin.placeholder = placeholder
+                plugin.placeholder = page.placeholders.get(slot=placeholder)
                 # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
-                position = CMSPlugin.objects.filter(page=plugin.page_id, placeholder=placeholder).count()
+                position = CMSPlugin.objects.filter(placeholder=placeholder).count()
                 plugin.position = position
                 plugin.save()
             else:
@@ -1285,8 +1285,7 @@ class PageAdmin(model_admin):
             plugin_id = request.POST['plugin_id']
             plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
             placeholder = plugin.placeholder
-            page_id = request.POST['page_id']
-            page = get_object_or_404(Page, pk=page_id)
+            page = get_page_from_placeholder_if_exists(placeholder)
             
             if not page.has_change_permission(request):
                 raise Http404
