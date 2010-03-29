@@ -151,7 +151,6 @@ class PlaceholderAdmin(ModelAdmin):
     def move_plugin(self, request):
         if request.method == "POST":
             pos = 0
-            page = None
             if 'ids' in request.POST:
                 for id in request.POST['ids'].split("_"):
                     plugin = CMSPlugin.objects.get(pk=id)
@@ -161,7 +160,7 @@ class PlaceholderAdmin(ModelAdmin):
                     pos += 1
             elif 'plugin_id' in request.POST:
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-                plugin.placeholder = placeholder
+                placeholder = plugin.placeholder
                 # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
                 position = CMSPlugin.objects.filter(placeholder=placeholder).count()
                 plugin.position = position

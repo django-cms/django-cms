@@ -17,7 +17,7 @@ class PlaceholderPluginEditorWidget(PluginEditor):
             context = {'add':True}
         if ph:
             context = {
-                'plugin_list': ph.cmsplugin_set.all(),
+                'plugin_list': ph.cmsplugin_set.all().order_by('position'),
                 'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
                 'copy_languages': [], # TODO?
                 'language': None, # TODO?
