@@ -7,6 +7,7 @@ def get_plugins(request, obj, lang=None):
     if not obj:
         return []
     lang = lang or get_language_from_request(request)
+
     if not hasattr(obj, '_%s_plugins_cache' % lang):
         setattr(obj, '_%s_plugins_cache' % lang,  get_cmsplugin_queryset(request).filter(
             page=obj, language=lang, parent__isnull=True
@@ -18,15 +19,20 @@ def get_plugin_media(request, plugin):
     return plugin.get_plugin_media(request, instance)
 
 def get_plugins_media(request, obj):
+    import logging
     lang = get_language_from_request(request)
     if not obj:
         # current page is unknown
+        logging.debug('NO')
         return []
     if not hasattr(obj, '_%s_plugins_media_cache' % lang):
         plugins = get_plugins(request, obj, lang=lang)
         media_classes = [get_plugin_media(request, plugin) for plugin in plugins]
+        logging.debug(media_classes)
         if media_classes:
             setattr(obj, '_%s_plugins_media_cache' % lang, reduce(operator.add, media_classes))
         else:
             setattr(obj, '_%s_plugins_media_cache' % lang,  Media())
+    else:
+        logging.debug(obj)
     return getattr(obj, '_%s_plugins_media_cache' % lang)

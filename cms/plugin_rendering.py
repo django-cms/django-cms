@@ -1,6 +1,10 @@
+from cms.utils import get_language_from_request
+from cms import settings
+from django.conf import settings as django_settings
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
-from django.template.context import Context
+from django.template import Template, Context
+from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.safestring import mark_safe
@@ -82,8 +86,10 @@ class PluginRenderer(object):
     of callables using the "processors" keyword argument.
     """
     def __init__(self, context, instance, placeholder, template, processors=None, current_app=None):
-        if template:
+        if isinstance(template, basestring):
             self.content = render_to_string(template, context)
+        elif isinstance(template, Template):
+            self.content = template.render(context)
         else:
             self.content = ''
         if processors is None:
@@ -94,6 +100,14 @@ class PluginRenderer(object):
             self.content = processor(instance, placeholder, self.content, context)
 
 def render_plugins(plugins, context, placeholder_name, processors=None):
+    """
+    Renders a collection of plugins with the given context, using the appropriate processors
+    for a given placeholder name, and returns a list containing a "rendered content" string
+    for each plugin.
+    
+    This is the main plugin rendering utility function, use this function rather than
+    Plugin.render_plugin().
+    """
     c = []
     total = len(plugins)
     for index, plugin in enumerate(plugins):
@@ -101,3 +115,57 @@ def render_plugins(plugins, context, placeholder_name, processors=None):
         plugin._render_meta.index = index
         c.append(plugin.render_plugin(copy.copy(context), placeholder_name, processors=processors))
     return c
+
+def render_placeholder(placeholder_name, page, context_to_copy):
+    """
+    Renders plugins for a placeholder on the given page using shallow copies of the 
+    given context, and returns a string containing the rendered output.
+    """
+    from cms.plugins.utils import get_plugins
+    context = copy.copy(context_to_copy) 
+    request = context['request']
+    plugins = [plugin for plugin in get_plugins(request, page) if plugin.placeholder == placeholder_name]
+    template = page.template
+    # Add extra context as defined in settings, but do not overwrite existing context variables,
+    # since settings are general and database/template are specific
+    # TODO this should actually happen as a plugin context processor, but these currently overwrite 
+    # existing context -- maybe change this order?
+    extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder_name), {}).get("extra_context", None)
+    if not extra_context:
+        extra_context = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("extra_context", {})
+    for key, value in extra_context.items():
+        if not key in context:
+            context[key] = value
+
+    c = []
+
+    # Prepend frontedit toolbar output if applicable
+    edit = False
+    if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
+        'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and \
+        request.user.is_staff and request.user.is_authenticated() and \
+        page.has_change_permission(request):
+            edit = True
+    if edit:
+        from cms.plugin_pool import plugin_pool
+        installed_plugins = plugin_pool.get_all_plugins(placeholder_name, page)
+        name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder_name), {}).get("name", None)
+        if not name:
+            name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
+        if not name:
+            name = placeholder_name
+        name = title(name)
+        c.append(render_to_string("cms/toolbar/add_plugins.html", {
+            'installed_plugins': installed_plugins,
+            'language': get_language_from_request(request),
+            'placeholder_label': name,
+            'placeholder_name': placeholder_name,
+            'page': page,
+        }))
+        from cms.middleware.toolbar import toolbar_plugin_processor
+        processors = (toolbar_plugin_processor,)
+    else:
+        processors = None 
+
+    c.extend(render_plugins(plugins, context, placeholder_name, processors))
+    return "".join(c)

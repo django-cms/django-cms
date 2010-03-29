@@ -13,6 +13,7 @@ from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.plugins import PluginsTestCase
 from cms.tests.reversion_tests import ReversionTestCase
 from cms.tests.menu import MenusTestCase
+from cms.tests.rendering import RenderingTestCase
 
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
@@ -41,6 +42,7 @@ def suite():
             s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(MenusTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(RenderingTestCase))
     
     return s
  
