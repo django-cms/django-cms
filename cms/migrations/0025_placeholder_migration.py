@@ -8,15 +8,21 @@ class Migration(DataMigration):
     
     def forwards(self, orm):
         "Write your forwards methods here."
+        from cms.utils.plugins import get_placeholders
         for page in orm.Page.objects.all():
-            placeholders = {}
+            placeholder_cache = {}
+            placeholders = get_placeholders(page.get_template())
             for plugin in orm.CMSPlugin.objects.filter(page=page):
-                if plugin.placeholder not in placeholders:
+                if plugin.placeholder not in placeholder_cache:
                     placeholder = orm.Placeholder.objects.create(slot=plugin.placeholder)
                     page.placeholders.add(placeholder)
-                    placeholders[plugin.placeholder] = placeholder
-                plugin.new_placeholder = placeholders[plugin.placeholder]
+                    placeholder_cache[plugin.placeholder] = placeholder
+                plugin.new_placeholder = placeholder_cache[plugin.placeholder]
                 plugin.save()
+            for placeholder_name in placeholders:
+                if placeholder_name not in placeholder_cache:
+                    placeholder = orm.Placeholder.objects.create(slot=placeholder_name)
+                    page.placeholders.add(placeholder)
     
     
     def backwards(self, orm):
