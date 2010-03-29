@@ -18,8 +18,8 @@ class Placeholder(models.Model):
             return True
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
     
-    def render(self, context):
+    def render(self, context, width):
         from cms.utils.plugin import render_plugins_for_context
         if not 'request' in context:
             return ''
-        return render_plugins_for_context(self, context, self.default_width)
+        return render_plugins_for_context(self, context, width or self.default_width)
