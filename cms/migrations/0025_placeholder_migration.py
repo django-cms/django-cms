@@ -4,6 +4,29 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+def get_template(self):
+    """
+    get the template of this page if defined or if closer parent if
+    defined or DEFAULT_PAGE_TEMPLATE otherwise
+    """
+    from django.conf import settings
+    template = None
+    if self.template and len(self.template)>0 and \
+        self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
+        template = self.template
+    else:
+        opts = self._meta
+        for p in self.__class__.objects.filter(**{
+            'lft__lt': self.lft,
+            'rght__gt': self.rght,
+            'tree_id': self.tree_id,
+        }).order_by('-lft'):
+            template = get_template(p)
+            break
+    if not template:
+        template = settings.CMS_TEMPLATES[0][0]
+    return template
+
 class Migration(DataMigration):
     
     def forwards(self, orm):
@@ -11,7 +34,7 @@ class Migration(DataMigration):
         from cms.utils.plugins import get_placeholders
         for page in orm.Page.objects.all():
             placeholder_cache = {}
-            placeholders = get_placeholders(page.get_template())
+            placeholders = get_placeholders(get_template(page))
             for plugin in orm.CMSPlugin.objects.filter(page=page):
                 if plugin.placeholder not in placeholder_cache:
                     placeholder = orm.Placeholder.objects.create(slot=plugin.placeholder)
@@ -27,12 +50,13 @@ class Migration(DataMigration):
     
     def backwards(self, orm):
         "Write your backwards methods here."
-        for page in orm.Page.objects.all():
-            for placeholder in page.placeholders.all():
-                for plugin in orm.CMSPlugin.objects.filter(new_placeholder=placeholder):
-                    plugin.placeholder = placeholder.slot
-                    plugin.page = page
-                    plugin.save()
+        if not db.dry_run:
+            for page in orm.Page.objects.all():
+                for placeholder in page.placeholders.all():
+                    for plugin in orm.CMSPlugin.objects.filter(new_placeholder=placeholder):
+                        plugin.placeholder = placeholder.slot
+                        plugin.page = page
+                        plugin.save()
                 
     
     models = {
