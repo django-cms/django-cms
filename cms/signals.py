@@ -201,7 +201,7 @@ def post_save_page(instance, raw, created, **kwargs):
     
     
 def update_placeholders(instance, **kwargs):
-    placeholders = get_placeholders(instance.template)
+    placeholders = get_placeholders(instance.get_template())
     found = {}
     for placeholder in instance.placeholders.all():
         if placeholder.slot in placeholders:
