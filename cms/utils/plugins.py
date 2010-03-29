@@ -5,22 +5,17 @@
 from django.contrib.sites.models import Site
 from cms.templatetags.cms_tags import PlaceholderNode
 from django.template.loader import find_template
-from django.template import compile_string
+from django.template import Lexer,
 #import re
-
-def _scan_placeholders(nodelist):
-    placeholders = []
-    for node in nodelist:
-        if isinstance(node, PlaceholderNode):
-            placeholders.append(node.name)
-        elif hasattr(node, 'nodelist'):
-            placeholders += _scan_placeholders(node.nodelist)
-    return placeholders
         
 def get_placeholders(template):
     source, origin = find_template(template)
-    nodelist = compile_string(source, origin)
-    placeholders = _scan_placeholders(nodelist)
+    lexer = Lexer(source, origin)
+    placeholders = []
+    for token in [t for t in lexer.tokenize() if t.token_type == 2]:
+        bits = token.split_contents()
+        if bits[0] == 'placeholder':
+            placeholders.append(bits[1].strip('"\''))
     return placeholders
 
 '''
