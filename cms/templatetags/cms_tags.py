@@ -220,17 +220,18 @@ class PageAttributeNode(template.Node):
     def __init__(self, name, page_lookup=None):
         self.name_var = template.Variable(name)
         self.page_lookup = None
+        self.valid_attributes = ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]
         if page_lookup:
             self.page_lookup_var = template.Variable(page_lookup)
 
     def render(self, context):
         if not 'request' in context:
             return ''
-        try:
-            self.name = self.name_var.resolve(context)
-        except template.VariableDoesNotExist:
+        if self.name_var.var.lower() in self.valid_attributes:
             # Variable name without quotes works, but is deprecated
             self.name = self.name_var.var.lower()
+        else:
+            self.name = self.name_var.resolve(context)
         lang = get_language_from_request(context['request'])
         page_lookup_var = getattr(self, 'page_lookup_var', None)
         if page_lookup_var:
@@ -240,7 +241,7 @@ class PageAttributeNode(template.Node):
         page = _get_page_by_untyped_arg(page_lookup, context['request'], get_site_id(None))
         if page == "dummy":
             return ''
-        if page and self.name in ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]:
+        if page and self.name in self.valid_attributes:
             f = getattr(page, "get_"+self.name)
             return f(language=lang, fallback=True)
         return ''
