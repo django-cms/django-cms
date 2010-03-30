@@ -4,7 +4,7 @@ Edit Toolbar middleware
 from cms import settings as cms_settings
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.context import Context
 from django.template.defaultfilters import title, safe
@@ -56,10 +56,13 @@ class ToolbarMiddleware(object):
         return True
     
     def process_request(self, request):
-        if request.method == "POST" and "edit" in request.GET and "cms_username" in request.POST:
-            user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
-            if user:
-                login(request, user)
+        if request.method == "POST" and "edit" in request.GET:
+            if "cms_username" in request.POST:
+                user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
+                if user:
+                    login(request, user)
+            if "logout_submit" in request.POST:
+                logout(request)
         if request.user.is_authenticated() and request.user.is_staff:
             if "edit-off" in request.GET:
                 request.session['cms_edit'] = False
