@@ -381,7 +381,7 @@ class PluginsMediaNode(template.Node):
         if plugins_media:
             return plugins_media.render()
         else:
-            return u'BLARK'
+            return u''
         
     def __repr__(self):
         return "<PluginsMediaNode Node: %s>" % self.name

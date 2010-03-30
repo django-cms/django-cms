@@ -115,7 +115,7 @@ Example::
 
 	{% plugins_media %}
 
-Attributes::
+Arguments::
 
 - `page_lookup` (optional; see [Page Lookup](#page-lookup) for more information)
 
@@ -131,7 +131,7 @@ page_url
 
 Displays the URL of a page in the current language.
 
-Attributes::
+Arguments::
 
 - `page_lookup` (see [Page Lookup](#page-lookup) for more information)
 
