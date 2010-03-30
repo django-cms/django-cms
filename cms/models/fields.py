@@ -37,6 +37,7 @@ class PlaceholderField(models.ForeignKey):
     def __init__(self, slotname, default_width=None, **kwargs):
         self.slotname = slotname
         self.default_width = default_width
+        kwargs.update({'null':True}) # always allow Null
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
     
     def formfield(self, **kwargs):
@@ -61,7 +62,9 @@ class PlaceholderField(models.ForeignKey):
         if not instance.pk:
             data = self._get_new_placeholder()
         else:
-            data = instance.placeholder
+            data = getattr(instance, self.attname)
+            if not isinstance(data, Placeholder):
+                data = self._get_new_placeholder()
         super(PlaceholderField, self).save_form_data(instance, data)
     
     def south_field_triple(self):
