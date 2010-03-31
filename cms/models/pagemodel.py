@@ -73,7 +73,7 @@ class Page(MpttPublisher):
     class Meta:
         verbose_name = _('page')
         verbose_name_plural = _('pages')
-        ordering = ('tree_id', 'lft')
+        ordering = ('site','tree_id', 'lft')
         app_label = 'cms'
     
     class PublisherMeta:
