@@ -77,7 +77,7 @@ class Page(MpttPublisher):
     class Meta:
         verbose_name = _('page')
         verbose_name_plural = _('pages')
-        ordering = ('tree_id', 'lft')
+        ordering = ('site','tree_id', 'lft')
         app_label = 'cms'
     
     class PublisherMeta:
@@ -87,8 +87,7 @@ class Page(MpttPublisher):
         title = self.get_menu_title(fallback=True)
         if title is None:
             title = u""
-        pre_title = settings.CMS_TITLE_CHARACTER * self.level
-        return u'%s%s' % (pre_title, title)
+        return u'%s' % (title,)
     
     def move_page(self, target, position='first-child'):
         """Called from admin interface when page is moved. Should be used on
