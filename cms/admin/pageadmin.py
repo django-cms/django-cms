@@ -1259,7 +1259,7 @@ class PageAdmin(model_admin):
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
                 page = get_page_from_plugin_or_404(plugin)
                 placeholder = request.POST['placeholder']
-                placeholders = get_placeholders(plugin.page.template)
+                placeholders = get_placeholders(page.template)
                 if not placeholder in placeholders:
                     return HttpResponse(str("error"))
                 plugin.placeholder = page.placeholders.get(slot=placeholder)
@@ -1271,7 +1271,7 @@ class PageAdmin(model_admin):
                 HttpResponse(str("error"))
             if page and 'reversion' in settings.INSTALLED_APPS:
                 page.save()
-                save_all_plugins(request, page)
+                save_all_plugins(request, page, placeholder)
                 reversion.revision.user = request.user
                 reversion.revision.comment = unicode(_(u"Plugins where moved")) 
             return HttpResponse(str("ok"))

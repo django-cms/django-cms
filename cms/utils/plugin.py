@@ -62,7 +62,7 @@ def render_plugins_for_context(placeholder, context_to_copy, width=None):
         c.append(render_to_string("cms/toolbar/add_plugins.html", {'installed_plugins':installed_plugins,
                                                                'language':l,
                                                                'placeholder_label':name,
-                                                               'placeholder_name':placeholder.slot,
+                                                               'placeholder':placeholder,
                                                                'page':page,
                                                                }))
         from cms.middleware.toolbar import toolbar_plugin_processor
