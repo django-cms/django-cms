@@ -181,7 +181,6 @@ def pre_save_page(instance, raw, **kwargs):
     """Helper pre save signal, assigns old_page attribute, so we can still
     compare changes. Currently used only if CMS_PUBLISHER
     """
-    menu_pool.clear(instance.site_id)
     instance.old_page = None
     try:
         instance.old_page = Page.objects.get(pk=instance.pk)
@@ -198,13 +197,16 @@ def post_save_page(instance, raw, created, **kwargs):
     if settings.CMS_MODERATOR:
         # tell moderator something was happen with this page
         page_changed(instance, old_page)
-    
+
+def invalidate_menu_cache(instance, **kwargs):
+    menu_pool.clear(instance.site_id)    
 
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
     signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
-    
+
+signals.pre_save.connect(invalidate_menu_cache, sender=Page)
  
 from cms.models import PagePermission, GlobalPagePermission
 from cms.cache.permissions import clear_user_permission_cache,\
