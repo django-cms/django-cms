@@ -1,5 +1,5 @@
 from cms.models.placeholdermodel import Placeholder
-from cms.admin.widgets import PluginEditor
+from cms.forms.widgets import PluginEditor
 from cms.plugin_pool import plugin_pool
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst

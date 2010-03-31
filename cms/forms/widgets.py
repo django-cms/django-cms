@@ -1,9 +1,13 @@
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
 from django.contrib.sites.models import Site
-from cms.models import Page
-from django.forms.widgets import Select, MultiWidget
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.template.loader import render_to_string
+from django.forms.widgets import Select, MultiWidget, Widget
+from cms.models import Page, PageUser
 from cms.forms.utils import get_site_choices, get_page_choices
+from os.path import join
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
@@ -111,3 +115,56 @@ class PageSelectWidget(MultiWidget):
     
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
+    
+    
+class PluginEditor(Widget):
+    def __init__(self, attrs=None):
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
+        
+    class Media:
+        js = [join(settings.CMS_MEDIA_URL, path) for path in (
+            'js/lib/ui.core.js',
+            'js/lib/ui.sortable.js',
+            'js/plugin_editor.js',
+        )]
+        css = {
+            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
+                'css/plugin_editor.css',
+            )]
+        }
+
+    def render(self, name, value, attrs=None):
+        
+        context = {
+            'plugin_list': self.attrs['list'],
+            'installed_plugins': self.attrs['installed'],
+            'copy_languages': self.attrs['copy_languages'],
+            'language': self.attrs['language'],
+            'show_copy': self.attrs['show_copy'],
+            'placeholder': self.attrs['placeholder'],
+        }
+        return mark_safe(render_to_string(
+            'admin/cms/page/widgets/plugin_editor.html', context))
+
+
+class UserSelectAdminWidget(Select):
+    """Special widget used in page permission inlines, because we have to render
+    an add user (plus) icon, but point it somewhere else - to special user creation
+    view, which is accessible only if user haves "add user" permissions.
+    
+    Current user should be assigned to widget in form constructor as an user 
+    attribute.
+    """
+    def render(self, name, value, attrs=None, choices=()):
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]    
+        if hasattr(self, 'user') and (self.user.is_superuser or \
+            self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
+            # append + icon
+            add_url = '../../../cms/pageuser/add/'
+            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
+                    (add_url, name))
+            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Add Another')))
+        return mark_safe(u''.join(output))

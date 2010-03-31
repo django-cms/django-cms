@@ -14,7 +14,7 @@ from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE,\
 from cms.utils.urlutils import any_path_re
 from cms.utils.permissions import get_current_user, get_subordinate_users,\
     get_subordinate_groups, mail_page_user_change
-from cms.admin.widgets import UserSelectAdminWidget
+from cms.forms.widgets import UserSelectAdminWidget
 from cms.utils.page import is_valid_page_slug
 from django.forms.widgets import HiddenInput
 from django.contrib.sites.models import Site
