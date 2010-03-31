@@ -19,7 +19,7 @@ setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
     name='django-cms-dev',
-    version='2.1.0a-dev25',
+    version='2.1.0a-dev27',
     #name='django-cms',
     #version=cms.__version__,
     description='An Advanced Django CMS',
