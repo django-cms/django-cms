@@ -18,8 +18,10 @@ for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
 setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
-    name='django-cms',
-    version=cms.__version__,
+    name='django-cms-dev',
+    version='2.1.0a-dev25',
+    #name='django-cms',
+    #version=cms.__version__,
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
     url='http://www.django-cms.org/',
