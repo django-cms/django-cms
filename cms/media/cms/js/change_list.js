@@ -428,7 +428,8 @@
 			'success': onSuccess,
 			'error': onError,
 			'type': 'POST',
-			'url': url	
+			'url': url,
+			'xhr': (window.ActiveXObject) ? function(){try {return new window.ActiveXObject("Microsoft.XMLHTTP");} catch(e) {}} : function() {return new window.XMLHttpRequest();}
 		});
 	}
 	
