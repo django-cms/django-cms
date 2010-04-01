@@ -185,10 +185,6 @@ def pre_save_page(instance, raw, **kwargs):
     except ObjectDoesNotExist:
         pass
     
-    
-def invalidate_menu_cache(instance, **kwargs):
-    menu_pool.clear(instance.site_id)
-        
 
 def post_save_page(instance, raw, created, **kwargs):   
     """Helper post save signal, cleans old_page attribute.
@@ -200,7 +196,6 @@ def post_save_page(instance, raw, created, **kwargs):
         # tell moderator something was happen with this page
         from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
-    
     
 def update_placeholders(instance, **kwargs):
     from cms.utils.plugins import get_placeholders
@@ -214,13 +209,15 @@ def update_placeholders(instance, **kwargs):
             placeholder = Placeholder.objects.create(slot=placeholder_name)
             instance.placeholders.add(placeholder)
 
+def invalidate_menu_cache(instance, **kwargs):
+    menu_pool.clear(instance.site_id)    
+
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
     signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
-    
  
 from cms.models import PagePermission, GlobalPagePermission
 from cms.cache.permissions import clear_user_permission_cache,\

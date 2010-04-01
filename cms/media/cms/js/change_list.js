@@ -424,10 +424,10 @@
 		}
 		
 		$.ajax({
-			'data': data,
-			'success': onSuccess,
-			'error': onError,
-			'type': 'POST',
+			data: data,
+			success: onSuccess,
+			error: onError,
+			type: 'POST',
 			url: url,
 			xhr: (window.ActiveXObject) ? function(){try {return new window.ActiveXObject("Microsoft.XMLHTTP");} catch(e) {}} : function() {return new window.XMLHttpRequest();}				
 		});

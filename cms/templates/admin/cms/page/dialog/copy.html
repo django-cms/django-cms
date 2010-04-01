@@ -6,7 +6,8 @@
 {% block header %}<p>{% blocktrans %}Choose copy options{% endblocktrans %}</p>{% endblock %}
 	
 {% block script %}<script type="text/javascript">
-	$(function(){
+(function($) {
+	$(document).ready(function() {
 		// change submit states, open dialog
 		$('#{{ dialog_id }}').dialog({
 			bgiframe: true,
@@ -29,4 +30,5 @@
 			}, 
 		});
 	});
+})(jQuery);
 </script>{% endblock %}
