@@ -1033,6 +1033,7 @@ class PageAdmin(model_admin):
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
             page = get_page_from_placeholder_if_exists(placeholder)
             parent = None
+            # page add-plugin
             if page:
                 language = request.POST['language'] or get_language_from_request(request)
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
@@ -1048,15 +1049,19 @@ class PageAdmin(model_admin):
                         type_count = CMSPlugin.objects.filter(language=language, placeholder=placeholder, plugin_type=plugin_type).count()
                         if type_count >= type_limit:
                             return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
-            else:
+            # in-plugin add-plugin
+            elif request.POST.get('parent_id', None):
                 parent_id = request.POST['parent_id']
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)
                 placeholder = parent.placeholder
                 page = get_page_from_placeholder_if_exists(placeholder)
                 language = parent.language
                 position = None
-    
-            if not page.has_change_permission(request):
+            # placeholder (non-page) add-plugin
+            else:
+                position = None
+                language = request.POST['language'] or get_language_from_request(request)
+            if page and not page.has_change_permission(request):
                 return HttpResponseForbidden(_("You do not have permission to change this page"))
     
             # Sanity check to make sure we're not getting bogus values from JavaScript:
@@ -1068,7 +1073,7 @@ class PageAdmin(model_admin):
             if parent:
                 plugin.parent = parent
             plugin.save()
-            if 'reversion' in settings.INSTALLED_APPS:
+            if 'reversion' in settings.INSTALLED_APPS and page:
                 page.save()
                 save_all_plugins(request, page, placeholder)
                 reversion.revision.user = request.user
@@ -1150,9 +1155,9 @@ class PageAdmin(model_admin):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
             cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-            page = get_page_from_plugin_or_404(cms_plugin)
+            page = get_page_from_placeholder_if_exists(cms_plugin.placeholder)
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
-            if not page.has_change_permission(request):
+            if page and not page.has_change_permission(request):
                 raise PermissionDenied 
         else:
             # history view with reversion
@@ -1211,7 +1216,7 @@ class PageAdmin(model_admin):
         
         if request.method == "POST" and plugin_admin.object_successfully_changed:
             # if reversion is installed, save version of the page plugins
-            if 'reversion' in settings.INSTALLED_APPS:
+            if 'reversion' in settings.INSTALLED_APPS and page:
                 # perform this only if object was successfully changed
                 page.save()
                 save_all_plugins(request, page, cms_plugin.placeholder, [cms_plugin.pk])
@@ -1287,17 +1292,17 @@ class PageAdmin(model_admin):
             placeholder = plugin.placeholder
             page = get_page_from_placeholder_if_exists(placeholder)
             
-            if not page.has_change_permission(request):
+            if page and not page.has_change_permission(request):
                 raise Http404
             
-            if settings.CMS_MODERATOR and page.is_under_moderation():
+            if page and settings.CMS_MODERATOR and page.is_under_moderation():
                 plugin.delete()
             else:
                 plugin.delete_with_public()
                 
             plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
             comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
-            if 'reversion' in settings.INSTALLED_APPS:
+            if page and 'reversion' in settings.INSTALLED_APPS:
                 save_all_plugins(request, page, placeholder)
                 page.save()
                 reversion.revision.user = request.user

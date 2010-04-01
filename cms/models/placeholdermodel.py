@@ -21,5 +21,5 @@ class Placeholder(models.Model):
     def render(self, context, width):
         from cms.utils.plugin import render_plugins_for_context
         if not 'request' in context:
-            return ''
+            return '<!-- missing request -->'
         return render_plugins_for_context(self, context, width or self.default_width)
