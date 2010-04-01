@@ -195,9 +195,12 @@ class Page(MpttPublisher):
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
                 plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
-                ph.pk = None # make a new instance
-                ph.save()
-                page.placeholders.add(ph)
+                try:
+                    ph = page.placeholders.get(slot=ph.slot)
+                except Placeholder.DoesNotExist:
+                    ph.pk = None # make a new instance
+                    ph.save()
+                    page.placeholders.add(ph)
                 ptree = []
                 for p in plugins:
                     try:

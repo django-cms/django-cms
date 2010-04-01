@@ -2,6 +2,8 @@ from setuptools import setup, find_packages
 import os, fnmatch
 import cms
 
+#django-cms-dev-placeholder-2.1.0a-devXX
+
 media_files = []
 
 for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
@@ -18,8 +20,8 @@ for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
 setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
-    name='django-cms-dev',
-    version='2.1.0a-dev29',
+    name='django-cms-dev-placeholder',
+    version='2.1.0a-dev2',
     #name='django-cms',
     #version=cms.__version__,
     description='An Advanced Django CMS',

@@ -57,7 +57,7 @@ class PlaceholderField(models.ForeignKey):
 
     def pre_save(self, model_instance, add):
         if not model_instance.pk:
-            setattr(model_instance, self.name, self._get_new_placeholder().pk)
+            setattr(model_instance, self.name, self._get_new_placeholder())
         return super(PlaceholderField, self).pre_save(model_instance, add)
 
     def save_form_data(self, instance, data):
