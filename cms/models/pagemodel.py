@@ -223,18 +223,19 @@ class Page(MpttPublisher):
                         ptree = [p]
                     p.level = None
                     p.save()
-                    plugin.pk = p.pk
-                    plugin.id = p.pk
-                    plugin.placeholder = ph
-                    plugin.tree_id = p.tree_id
-                    plugin.lft = p.lft
-                    plugin.rght = p.rght
-                    plugin.level = p.level
-                    plugin.cmsplugin_ptr = p
-                    plugin.publisher_public_id = None
-                    plugin.public_id = None
-                    plugin.published = False
-                    plugin.save()
+                    if plugin:
+                        plugin.pk = p.pk
+                        plugin.id = p.pk
+                        plugin.placeholder = ph
+                        plugin.tree_id = p.tree_id
+                        plugin.lft = p.lft
+                        plugin.rght = p.rght
+                        plugin.level = p.level
+                        plugin.cmsplugin_ptr = p
+                        plugin.publisher_public_id = None
+                        plugin.public_id = None
+                        plugin.published = False
+                        plugin.save()
     
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
