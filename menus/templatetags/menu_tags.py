@@ -22,14 +22,17 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     removed = []
     selected = None
     for node in nodes: 
-        if not node.parent and not node.ancestor and not node.selected:
-            cut_after(node, extra_inactive, removed)
         if not hasattr(node, 'level'):
             removed.append(node)
+            if node.parent:
+                if node in node.parent.children:
+                    node.parent.children.remove(node)
             continue
         if node.level == from_level:
             final.append(node)
             node.parent = None
+        if not node.parent and not node.ancestor and not node.selected:
+            cut_after(node, extra_inactive, removed)
         if node.level > to_level and node.parent:
             if node in node.parent.children:
                 node.parent.children.remove(node)
