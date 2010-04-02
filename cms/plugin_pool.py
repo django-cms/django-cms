@@ -1,4 +1,4 @@
-from cms.exceptions import PluginAllreadyRegistered
+from cms.exceptions import PluginAllreadyRegistered, PluginNotRegistered
 from django.conf import settings
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import reversion_register
@@ -7,12 +7,12 @@ class PluginPool(object):
     def __init__(self):
         self.plugins = {}
         self.discovered = False
-        
+
     def discover_plugins(self):
         if self.discovered:
             return
         for app in settings.INSTALLED_APPS:
-            __import__(app, {}, {}, ['cms_plugins']) 
+            __import__(app, {}, {}, ['cms_plugins'])
         self.discovered = True
     
     def register_plugin(self, plugin):
@@ -33,6 +33,20 @@ class PluginPool(object):
             except RegistrationError:
                 pass
     
+    def unregister_plugin(self, plugin_or_iterable):
+        """
+        Unregisters the given plugin(s).
+
+        If a plugin isn't already registered, this will raise PluginNotRegistered.
+        """
+        if isinstance(plugin_or_iterable, CMSPluginBase):
+            plugin_or_iterable = [plugin_or_iterable]
+        for plugin in plugin_or_iterable:
+            plugin_name = plugin.__name__
+            if plugin_name not in self.plugins:
+                raise PluginNotRegistered('The plugin %s is not registered' % plugin_name)
+            del self.plugins[plugin_name]
+
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins"):
         self.discover_plugins()
         plugins = self.plugins.values()[:]
@@ -49,7 +63,7 @@ class PluginPool(object):
                     final_plugins.append(plugin)
             plugins = final_plugins
         return plugins
-    
+
     def get_text_enabled_plugins(self, placeholder, page):
         plugins = self.get_all_plugins(placeholder, page) + self.get_all_plugins(placeholder, page, 'text_only_plugins')
         final = []
