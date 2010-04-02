@@ -14,25 +14,33 @@ class PluginPool(object):
         for app in settings.INSTALLED_APPS:
             __import__(app, {}, {}, ['cms_plugins'])
         self.discovered = True
-    
-    def register_plugin(self, plugin):
-        #from cms.plugins import CMSPluginBase
-        assert issubclass(plugin, CMSPluginBase)
-        if plugin.__name__ in self.plugins.keys():
-            raise PluginAllreadyRegistered, "[%s] a plugin with this name is already registered" % plugin.__name__
-        plugin.value = plugin.__name__
-        self.plugins[plugin.__name__] = plugin 
-        
-        if 'reversion' in settings.INSTALLED_APPS:   
-            try:
-                from reversion.registration import RegistrationError
-            except ImportError:
-                from reversion.revisions import RegistrationError
-            try:
-                reversion_register(plugin.model, follow=["cmsplugin_ptr"])
-            except RegistrationError:
-                pass
-    
+
+    def register_plugin(self, plugin_or_iterable):
+        """
+        Registers the given plugin(s).
+
+        If a plugin is already registered, this will raise PluginAllreadyRegistered.
+        """
+        if isinstance(plugin_or_iterable, CMSPluginBase):
+            plugin_or_iterable = [plugin_or_iterable]
+        for plugin in plugin_or_iterable:
+            assert issubclass(plugin, CMSPluginBase)
+            plugin_name = plugin.__name__
+            if plugin_name in self.plugins:
+                raise PluginAllreadyRegistered("[%s] a plugin with this name is already registered" % plugin_name)
+            plugin.value = plugin_name
+            self.plugins[plugin_name] = plugin
+
+            if 'reversion' in settings.INSTALLED_APPS:
+                try:
+                    from reversion.registration import RegistrationError
+                except ImportError:
+                    from reversion.revisions import RegistrationError
+                try:
+                    reversion_register(plugin.model, follow=["cmsplugin_ptr"])
+                except RegistrationError:
+                    pass
+
     def unregister_plugin(self, plugin_or_iterable):
         """
         Unregisters the given plugin(s).
