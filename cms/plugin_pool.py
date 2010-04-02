@@ -48,6 +48,9 @@ class PluginPool(object):
                 if (not allowed_plugins and setting_key == "plugins") or (allowed_plugins and plugin.__name__ in allowed_plugins):
                     final_plugins.append(plugin)
             plugins = final_plugins
+
+        #plugins sorted by modules
+        plugins = sorted(plugins, key=lambda obj: unicode(obj.module))
         return plugins
     
     def get_text_enabled_plugins(self, placeholder, page):
