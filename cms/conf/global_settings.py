@@ -112,3 +112,6 @@ CMS_DBGETTEXT = 'dbgettext' in settings.INSTALLED_APPS
 
 # Allow gettext translation of slugs (only relevant if CMS_DBGETTEXT used)
 CMS_DBGETTEXT_SLUGS = False # (still experimental)
+
+# Enable non-cms placeholder frontend editing
+PLACEHOLDER_FRONTEND_EDITING = True

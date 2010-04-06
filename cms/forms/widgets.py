@@ -5,7 +5,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 from django.forms.widgets import Select, MultiWidget, Widget
-from cms.models import Page, PageUser
+from cms.models import Page, PageUser, Placeholder
+from cms.plugin_pool import plugin_pool
 from cms.forms.utils import get_site_choices, get_page_choices
 from os.path import join
 
@@ -168,3 +169,26 @@ class UserSelectAdminWidget(Select):
                     (add_url, name))
             output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Add Another')))
         return mark_safe(u''.join(output))
+    
+    
+class PlaceholderPluginEditorWidget(PluginEditor):
+    def render(self, name, value, attrs=None):
+        try:
+            ph = Placeholder.objects.get(pk=value)
+        except Placeholder.DoesNotExist:
+            ph = None
+            context = {'add':True}
+        if ph:
+            context = {
+                'plugin_list': ph.cmsplugin_set.all().order_by('position'),
+                'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
+                'copy_languages': [], # TODO?
+                'language': None, # TODO?
+                'show_copy': False, # The copy function does not make sense on non-page objects
+                'urloverride': True,
+                'placeholder': ph,
+            }
+        #return mark_safe(render_to_string(
+        #    'admin/cms/page/widgets/plugin_editor.html', context))
+        return mark_safe(render_to_string(
+            'admin/cms/page/widgets/placeholder_editor.html', context))

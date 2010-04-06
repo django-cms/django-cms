@@ -1104,43 +1104,7 @@ class PageAdmin(model_admin):
             plugins = list(placeholder.cmsplugin_set.all().order_by('tree_id', '-rght'))
             ptree = []
             for p in plugins:
-                try:
-                    plugin, cls = p.get_plugin_instance()
-                except KeyError: #plugin type not found anymore
-                    continue
-                p.placeholder = placeholder 
-                p.pk = None # create a new instance of the plugin
-                p.id = None
-                p.tree_id = None
-                p.lft = None
-                p.rght = None
-                p.inherited_public_id = None
-                p.publisher_public_id = None
-                if p.parent:
-                    pdif = p.level - ptree[-1].level
-                    if pdif < 0:
-                        ptree = ptree[:pdif-1]
-                    p.parent = ptree[-1]
-                    if pdif != 0:
-                        ptree.append(p)
-                else:
-                    ptree = [p]
-                p.level = None
-                p.language = language
-                p.save()
-                plugin.pk = p.pk
-                plugin.id = p.pk
-                plugin.placeholder = placeholder
-                plugin.tree_id = p.tree_id
-                plugin.lft = p.lft
-                plugin.rght = p.rght
-                plugin.level = p.level
-                plugin.cmsplugin_ptr = p
-                plugin.publisher_public_id = None
-                plugin.public_id = None
-                plugin.published = False
-                plugin.language = language
-                plugin.save()  
+                p.copy_plugin(placeholder, language, ptree)
             if 'reversion' in settings.INSTALLED_APPS:
                 page.save()
                 save_all_plugins(request, page, placeholder)

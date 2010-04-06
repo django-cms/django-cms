@@ -1,38 +1,11 @@
 from cms.models.placeholdermodel import Placeholder
-from cms.forms.widgets import PluginEditor
-from cms.plugin_pool import plugin_pool
+from cms.forms.widgets import PlaceholderPluginEditorWidget
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.template.loader import render_to_string
 from django.db import models
-from django import forms
 from cms.models.pagemodel import Page
-from cms.forms.fields import PageSelectFormField
-
-
-class PlaceholderPluginEditorWidget(PluginEditor):
-    def render(self, name, value, attrs=None):
-        try:
-            ph = Placeholder.objects.get(pk=value)
-        except Placeholder.DoesNotExist:
-            ph = None
-            context = {'add':True}
-        if ph:
-            context = {
-                'plugin_list': ph.cmsplugin_set.all().order_by('position'),
-                'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
-                'copy_languages': [], # TODO?
-                'language': None, # TODO?
-                'show_copy': False, # The copy function does not make sense on non-page objects
-                'urloverride': True,
-                'placeholder': ph,
-            }
-        return mark_safe(render_to_string(
-            'admin/cms/page/widgets/plugin_editor.html', context))
-
-
-class PlaceholderFormField(forms.Field):
-    pass
+from cms.forms.fields import PageSelectFormField, PlaceholderFormField
 
 
 class PlaceholderField(models.ForeignKey):
@@ -53,7 +26,8 @@ class PlaceholderField(models.ForeignKey):
         return PlaceholderFormField(required=False, widget=widget, **defaults)
     
     def _get_new_placeholder(self):
-        return Placeholder.objects.create(slot=self.slotname, default_width=self.default_width) 
+        return Placeholder.objects.create(slot=self.slotname,
+            default_width=self.default_width)
 
     def pre_save(self, model_instance, add):
         if not model_instance.pk:
@@ -77,6 +51,17 @@ class PlaceholderField(models.ForeignKey):
         args, kwargs = introspector(self)
         # That's our definition!
         return (field_class, args, kwargs)
+    
+    def contribute_to_class(self, cls, name):
+        super(PlaceholderField, self).contribute_to_class(cls, name)
+        if not hasattr(cls._meta, 'placeholder_field_names'):
+            cls._meta.placeholder_field_names = []
+        if not hasattr(cls._meta, 'placeholder_fields'):
+            cls._meta.placeholder_fields = {}
+        cls._meta.placeholder_field_names.append(name)
+        cls._meta.placeholder_fields[self] = name
+        self.cls = cls
+
 
 class PageField(models.ForeignKey):
     default_form_class = PageSelectFormField

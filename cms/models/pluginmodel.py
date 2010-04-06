@@ -174,5 +174,45 @@ class CMSPlugin(MpttPublisher):
                 setattr(public_copy, field.name, value)
             public_copy.publisher_is_draft=False
             return public_copy
-                
+        
+    def copy_plugin(self, target_placeholder, target_language, plugin_tree):
+        try:
+            plugin, cls = self.get_plugin_instance()
+        except KeyError: #plugin type not found anymore
+            return
+        self.placeholder = target_placeholder 
+        self.pk = None # create a new instance of the plugin
+        self.id = None
+        self.tree_id = None
+        self.lft = None
+        self.rght = None
+        self.inherited_public_id = None
+        self.publisher_public_id = None
+        if self.parent:
+            pdif = self.level - plugin_tree[-1].level
+            if pdif < 0:
+                plugin_tree[:] = plugin_tree[:pdif-1]
+            self.parent = plugin_tree[-1]
+            if pdif != 0:
+                plugin_tree.append(self)
+        else:
+            plugin_tree[:] = [self]
+        self.level = None
+        self.language = target_language
+        self.save()
+        if plugin:
+            plugin.pk = self.pk
+            plugin.id = self.pk
+            plugin.placeholder = target_placeholder
+            plugin.tree_id = self.tree_id
+            plugin.lft = self.lft
+            plugin.rght = self.rght
+            plugin.level = self.level
+            plugin.cmsplugin_ptr = self
+            plugin.publisher_public_id = None
+            plugin.public_id = None
+            plugin.published = False
+            plugin.language = target_language
+            plugin.save()
+
 reversion_register(CMSPlugin)

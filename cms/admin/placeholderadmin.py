@@ -49,7 +49,8 @@ class PlaceholderAdmin(ModelAdmin):
                 for field in fieldset['fields']:
                     if field in placeholder_fields:
                         if (len(fieldset['fields']) == 1 and
-                            'plugin-holder' in fieldset['classes']):
+                            'plugin-holder' in fieldset['classes'] and
+                            'plugin-holder-nopage' in fieldset['classes']):
                             placeholder_fields.remove(fieldset)
                         else:
                             fields.remove(field)
@@ -57,7 +58,7 @@ class PlaceholderAdmin(ModelAdmin):
             for placeholder in placeholder_fields:
                 fieldsets += (placeholder.capitalize(), {
                         'fields': (placeholder,),
-                        'classes': ('plugin-holder',),
+                        'classes': ('plugin-holder', 'plugin-holder-nopage',),
                     },)
             return fieldsets
         fieldsets = []
@@ -65,7 +66,7 @@ class PlaceholderAdmin(ModelAdmin):
         for placeholder in placeholder_fields:
             fieldsets.append((placeholder.capitalize(), {
                 'fields': (placeholder,),
-                'classes': ('plugin-holder',),
+                'classes': ('plugin-holder', 'plugin-holder-nopage',),
             }))
         fieldsets.append((None, {'fields': list(self.get_readonly_fields(request, obj))}))
         return fieldsets

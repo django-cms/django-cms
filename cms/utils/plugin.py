@@ -51,7 +51,7 @@ def render_plugins_for_context(placeholder, context_to_copy, width=None):
             placeholder.has_change_permission(request) and \
             (not page or page.has_change_permission(request)):
         edit = True
-    if edit:
+    if edit and settings.PLACEHOLDER_FRONTEND_EDITING:
         installed_plugins = plugin_pool.get_all_plugins(placeholder, page)
         name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("name", None)
         if not name:

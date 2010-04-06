@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.core import validators
 from cms.models.pagemodel import Page
+from cms.models.placeholdermodel import Placeholder
 from cms.forms.widgets import PageSelectWidget
 from cms.forms.utils import get_site_choices, get_page_choices
 
@@ -37,3 +38,7 @@ class PageSelectFormField(forms.MultiValueField):
                 raise forms.ValidationError(self.error_messages['invalid_page'])
             return Page.objects.get(pk=page_id)
         return None
+
+
+class PlaceholderFormField(forms.Field):
+    pass
