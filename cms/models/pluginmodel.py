@@ -176,6 +176,9 @@ class CMSPlugin(MpttPublisher):
             return public_copy
         
     def copy_plugin(self, target_placeholder, target_language, plugin_tree):
+        """
+        Copy this plugin. Makes this instance the new plugin!
+        """
         try:
             plugin, cls = self.get_plugin_instance()
         except KeyError: #plugin type not found anymore
@@ -199,7 +202,7 @@ class CMSPlugin(MpttPublisher):
             plugin_tree[:] = [self]
         self.level = None
         self.language = target_language
-        self.save()
+        self.save() # self is now the NEW plugin!!!
         if plugin:
             plugin.pk = self.pk
             plugin.id = self.pk
@@ -214,5 +217,11 @@ class CMSPlugin(MpttPublisher):
             plugin.published = False
             plugin.language = target_language
             plugin.save()
+        self.copy_relations()
+        
+    def copy_relations(self):
+        """
+        Handle copying of any relations attached to this plugin
+        """
 
 reversion_register(CMSPlugin)
