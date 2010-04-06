@@ -1214,10 +1214,9 @@ class PageAdmin(model_admin):
             if 'ids' in request.POST:
                 for id in request.POST['ids'].split("_"):
                     plugin = CMSPlugin.objects.get(pk=id)
-                    if not page:
-                        page = get_page_from_plugin_or_404(plugin)
+                    page = get_page_from_placeholder_if_exists(plugin.placeholder)
                     
-                    if not page.has_change_permission(request):
+                    if page and not page.has_change_permission(request):
                         raise Http404
         
                     if plugin.position != pos:
