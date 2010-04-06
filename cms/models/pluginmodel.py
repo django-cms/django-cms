@@ -177,49 +177,50 @@ class CMSPlugin(MpttPublisher):
         
     def copy_plugin(self, target_placeholder, target_language, plugin_tree):
         """
-        Copy this plugin. Makes this instance the new plugin!
+        Copy this plugin and return the new plugin.
         """
         try:
-            plugin, cls = self.get_plugin_instance()
+            plugin_instance, cls = self.get_plugin_instance()
         except KeyError: #plugin type not found anymore
             return
-        self.placeholder = target_placeholder 
-        self.pk = None # create a new instance of the plugin
-        self.id = None
-        self.tree_id = None
-        self.lft = None
-        self.rght = None
-        self.inherited_public_id = None
-        self.publisher_public_id = None
+        new_plugin = CMSPlugin()
+        new_plugin.placeholder = target_placeholder
+        new_plugin.tree_id = None
+        new_plugin.lft = None
+        new_plugin.rght = None
+        new_plugin.inherited_public_id = None
+        new_plugin.publisher_public_id = None
         if self.parent:
             pdif = self.level - plugin_tree[-1].level
             if pdif < 0:
                 plugin_tree[:] = plugin_tree[:pdif-1]
-            self.parent = plugin_tree[-1]
+            new_plugin.parent = plugin_tree[-1]
             if pdif != 0:
-                plugin_tree.append(self)
+                plugin_tree.append(new_plugin)
         else:
-            plugin_tree[:] = [self]
-        self.level = None
-        self.language = target_language
-        self.save() # self is now the NEW plugin!!!
-        if plugin:
-            plugin.pk = self.pk
-            plugin.id = self.pk
-            plugin.placeholder = target_placeholder
-            plugin.tree_id = self.tree_id
-            plugin.lft = self.lft
-            plugin.rght = self.rght
-            plugin.level = self.level
-            plugin.cmsplugin_ptr = self
-            plugin.publisher_public_id = None
-            plugin.public_id = None
-            plugin.published = False
-            plugin.language = target_language
-            plugin.save()
-        self.copy_relations()
+            plugin_tree[:] = [new_plugin]
+        new_plugin.level = None
+        new_plugin.language = target_language
+        new_plugin.plugin_type = self.plugin_type
+        new_plugin.save()
+        if plugin_instance:
+            plugin_instance.pk = new_plugin.pk
+            plugin_instance.id = new_plugin.pk
+            plugin_instance.placeholder = target_placeholder
+            plugin_instance.tree_id = new_plugin.tree_id
+            plugin_instance.lft = new_plugin.lft
+            plugin_instance.rght = new_plugin.rght
+            plugin_instance.level = new_plugin.level
+            plugin_instance.cmsplugin_ptr = new_plugin
+            plugin_instance.publisher_public_id = None
+            plugin_instance.public_id = None
+            plugin_instance.published = False
+            plugin_instance.language = target_language
+            plugin_instance.save()
+        self.copy_relations(new_plugin, plugin_instance)
+        return new_plugin
         
-    def copy_relations(self):
+    def copy_relations(self, new_plugin, plugin_instance):
         """
         Handle copying of any relations attached to this plugin
         """

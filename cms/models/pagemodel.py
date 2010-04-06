@@ -203,6 +203,8 @@ class Page(MpttPublisher):
                     page.placeholders.add(ph)
                 ptree = []
                 for p in plugins:
+                    p.copy_plugin(ph, p.language, ptree)
+                    """
                     try:
                         plugin, cls = p.get_plugin_instance()
                     except KeyError: #plugin type not found anymore
@@ -239,6 +241,7 @@ class Page(MpttPublisher):
                         plugin.public_id = None
                         plugin.published = False
                         plugin.save()
+                    """
     
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
