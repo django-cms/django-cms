@@ -155,7 +155,7 @@ class PlaceholderNode(template.Node):
         request = context['request']
         
         page = request.current_page
-        if page == "dummy":
+        if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
         return render_plugins_for_context(placeholder, context, width)
