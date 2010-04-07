@@ -950,7 +950,7 @@ msgstr "Idioma or Página devem ser preenchidos"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "Escolha uma página para incluir os plugins nos espaços reservados, se ficar vazio escolherá a página atual"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1220,7 +1220,7 @@ msgstr "cor da barra de carregamento"
 
 #: plugins/video/models.py:28
 msgid "button out color"
-msgstr ""
+msgstr "cor do roll out do botão"
 
 #: plugins/video/models.py:29
 msgid "button over color"
