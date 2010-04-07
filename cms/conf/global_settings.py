@@ -82,6 +82,9 @@ CMS_SITE_LANGUAGES = {}
 # Defines how long page content should be cached, including navigation
 CMS_CONTENT_CACHE_DURATION = 60
 
+CMS_SITE_CHOICES_CACHE_KEY = 'CMS:site_choices'
+CMS_PAGE_CHOICES_CACHE_KEY = 'CMS:page_choices'
+
 # Languages that are visible in the frontend (Language Chooser)
 CMS_FRONTEND_LANGUAGES = [x[0] for x in CMS_LANGUAGES]
 
@@ -109,3 +112,6 @@ CMS_DBGETTEXT = 'dbgettext' in settings.INSTALLED_APPS
 
 # Allow gettext translation of slugs (only relevant if CMS_DBGETTEXT used)
 CMS_DBGETTEXT_SLUGS = False # (still experimental)
+
+# Enable non-cms placeholder frontend editing
+PLACEHOLDER_FRONTEND_EDITING = True

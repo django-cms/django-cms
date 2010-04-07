@@ -3,6 +3,7 @@ Edit Toolbar middleware
 """
 from cms import settings as cms_settings
 from cms.utils.plugins import get_placeholders
+from cms.utils import get_template_from_request
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -26,7 +27,7 @@ def inster_after_tag(string, tag, insertion):
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
     return '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s" type="%s">%s</div>' % \
-        (instance.page_id, instance.pk, instance.placeholder, instance.plugin_type, rendered_content)
+        (instance.placeholder.id, instance.pk, instance.placeholder.slot, instance.plugin_type, rendered_content)
 
 class ToolbarMiddleware(object):
     """
@@ -82,7 +83,8 @@ class ToolbarMiddleware(object):
         page = request.current_page
         move_dict = []
         if edit and page:
-            placeholders = get_placeholders(request)
+            template = get_template_from_request(request)
+            placeholders = get_placeholders(template)
             for placeholder in placeholders:
                 d = {}
                 name = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("name", None)
