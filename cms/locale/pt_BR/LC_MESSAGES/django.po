@@ -256,14 +256,13 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "Plugin %(plugin_name)s foi adicionado a %(placeholder)s"
 
 #: admin/pageadmin.py:1085
-#, fuzzy
 msgid "Language must be different than the copied language!"
-msgstr "a Língua deve ser definida para uma língua suportada pelo sistema!"
+msgstr "a língua definida deve ser diferente da língua copiada!"
 
 #: admin/pageadmin.py:1131
-#, fuzzy, python-format
+#, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "Plugin %(plugin_name)s foi adicionado a %(placeholder)s"
+msgstr "Plugin %(language)s foi adicionado a %(placeholder)s"
 
 #: admin/pageadmin.py:1204
 #, python-format
@@ -1045,9 +1044,8 @@ msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendere
 msgstr "Coloque um template (ex.: \"snippets/plugin_xy.html\") que será renderizado."
 
 #: plugins/snippet/models.py:25
-#, fuzzy
 msgid "Snippets"
-msgstr "Trecho"
+msgstr "Trechos de código"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
@@ -1188,7 +1186,6 @@ msgid "loop"
 msgstr "repetir"
 
 #: plugins/video/models.py:23
-#, fuzzy
 msgid "background color"
 msgstr "cor de fundo"
 
@@ -1196,7 +1193,6 @@ msgstr "cor de fundo"
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
-#, fuzzy
 msgid "Hexadecimal, eg ff00cc"
 msgstr "Hexadecimal, ex: ffff00"
 
@@ -1205,14 +1201,12 @@ msgid "text color"
 msgstr "cor do texto"
 
 #: plugins/video/models.py:25
-#, fuzzy
 msgid "seekbar color"
-msgstr "cor de fundo"
+msgstr "cor da barra de pesquisa"
 
 #: plugins/video/models.py:26
-#, fuzzy
 msgid "seekbar bg color"
-msgstr "cor de fundo"
+msgstr "cor de fundo da barra de pesquisa"
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
@@ -1423,9 +1417,8 @@ msgid "published"
 msgstr "publicado"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "status"
+msgstr "começo"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
@@ -1638,12 +1631,12 @@ msgstr "Nenum plugin selecionado. Selecione um no lado esquerdo"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr "Não á plugins presentes. Adicione um plugin a este espaço."
+msgstr "Não há plugins presentes. Adicione um plugin a este espaço."
 
 #: templates/cms/toolbar/toolbar.html:760
-#, fuzzy, python-format
+#, python-format
 msgid "Move to %(name)s"
-msgstr "Recuperar %(name)s excluído"
+msgstr "Mover para %(name)s"
 
 #: templates/cms/toolbar/toolbar.html:806
 msgid "Are you sure you want to delete this plugin?"
@@ -1654,44 +1647,37 @@ msgid "Edit mode"
 msgstr "Modo de edição"
 
 #: templates/cms/toolbar/toolbar.html:842
-#, fuzzy
 msgid "Status"
 msgstr "status"
 
 #: templates/cms/toolbar/toolbar.html:853
-#, fuzzy
 msgid "Username"
 msgstr "Nome de usuário:"
 
 #: templates/cms/toolbar/toolbar.html:857
 #: templates/cms/toolbar/toolbar.html:858
-#, fuzzy
 msgid "login"
-msgstr "link"
+msgstr "login"
 
 #: templates/cms/toolbar/toolbar.html:869
-#, fuzzy
 msgid "Template"
 msgstr "modelo"
 
 #: templates/cms/toolbar/toolbar.html:880
-#, fuzzy
 msgid "move"
-msgstr "filme"
+msgstr "mover"
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "Move/add Pages"
 msgstr "Mover/adicionar Páginas"
 
 #: templates/cms/toolbar/toolbar.html:882
-#, fuzzy
 msgid "add child"
-msgstr "Adicionar Filho"
+msgstr "adicionar filho"
 
 #: templates/cms/toolbar/toolbar.html:882
-#, fuzzy
 msgid "Add child page"
-msgstr "Adicionar Filho"
+msgstr "Adicionar Página Filho"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "add sibling"
@@ -1702,33 +1688,28 @@ msgid "Add sibling page"
 msgstr "Adicionar página irmã"
 
 #: templates/cms/toolbar/toolbar.html:885
-#, fuzzy
 msgid "Delete Page"
-msgstr "Excluir"
+msgstr "Excluir página"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "Site Administration"
 msgstr "Administração do site"
 
 #: templates/cms/toolbar/toolbar.html:893
-#, fuzzy
 msgid "Page Settings"
-msgstr "Configurações Básicas"
+msgstr "Configurações da Página"
 
 #: templates/cms/toolbar/toolbar.html:895
-#, fuzzy
 msgid "history"
-msgstr "Histórico"
+msgstr "histórico"
 
 #: templates/cms/toolbar/toolbar.html:895
-#, fuzzy
 msgid "View History"
-msgstr "Histórico"
+msgstr "Ver Histórico"
 
 #: templates/cms/toolbar/toolbar.html:901
-#, fuzzy
 msgid "Lock"
-msgstr "dock"
+msgstr "Travar"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Logout"
@@ -1740,22 +1721,19 @@ msgstr "Fechar"
 
 #: templates/cms/toolbar/toolbar.html:914
 msgid "up"
-msgstr "subir"
+msgstr "acima"
 
 #: templates/cms/toolbar/toolbar.html:915
-#, fuzzy
 msgid "down"
-msgstr "ligado"
+msgstr "abaixo"
 
 #: templates/cms/toolbar/toolbar.html:917
-#, fuzzy
 msgid "Settings"
-msgstr "Configurações de SEO"
+msgstr "Configurações"
 
 #: templates/cms/toolbar/toolbar.html:919
-#, fuzzy
 msgid "Delete Plugin"
-msgstr "Editar plugin selecionado"
+msgstr "Excluir Plugin"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
