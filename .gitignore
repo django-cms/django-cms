@@ -16,6 +16,7 @@ dist
 .ropeproject
 .project
 .pydevproject
+.settings
 *.egg-info
 develop-eggs
 downloads

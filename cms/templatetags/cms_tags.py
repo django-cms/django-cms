@@ -155,12 +155,10 @@ class PlaceholderNode(template.Node):
         request = context['request']
         
         page = request.current_page
-        if page == "dummy":
+        if not page or page == "dummy":
             return ""
-        content = render_plugins_for_context(self.name, page, context, width)
-        if not content and self.nodelist_or:
-            return self.nodelist_or.render(context)
-        return content
+        placeholder = page.placeholders.get(slot=self.name)
+        return render_plugins_for_context(placeholder, context, width)
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
@@ -330,14 +328,21 @@ class PluginsMediaNode(template.Node):
         if page == "dummy":
             return ''
         from cms.plugins.utils import get_plugins_media
-        plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        try:
+            plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        except:
+            import sys
+            info = sys.exc_info()
+            import traceback
+            traceback.print_exception(*info)
+            raise
         if plugins_media:
             return plugins_media.render()
         else:
             return u''
         
     def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % self.name
+        return "<PluginsMediaNode Node: %s>" % self.name if hasattr(self, 'name') else ''
         
 register.tag('plugins_media', do_plugins_media)
 

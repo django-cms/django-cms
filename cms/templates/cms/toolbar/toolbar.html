@@ -198,6 +198,8 @@
 	#cms_toolbar_settings_menu{z-index:70012;top:29px;left:-124px;}
 	
 	/* LOGOUT BUTTON */
+	#cms_toolbar_logoutform {float:left;}
+	#cms_toolbar_logoutform .cms_submit{display:none;}
 	#cms_toolbar #cms_toolbar_logoutbutton strong{
 		margin-top:6px;text-indent:-7777px;display:block;float:left;width:15px;height:14px;line-height:14px;
 		background:url({{ CMS_MEDIA_URL }}images/cms_toolbar.png) no-repeat -150px -158px;
@@ -684,7 +686,11 @@
 				$("#cms_toolbar_loginform a.cms_toolbar_button").click(function () {				
 					$("#cms_toolbar_loginform .cms_submit").trigger("click");
 					return false;
-				});		
+				});				
+				$("#cms_toolbar_logoutform a.cms_toolbar_button").click(function () {				
+					$("#cms_toolbar_logoutform .cms_submit").trigger("click");
+					return false;
+				});
 			
 			
 				$(".cms_plugin_holder").each(function (i) {				
@@ -901,7 +907,10 @@
 			</ul>
 		</div>
 		{% if auth %}
-		<a href="{% url admin:logout %}" id="cms_toolbar_logoutbutton" class="cms_toolbar_button"><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
+		<form method="post" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
+			<input type="submit" name="logout_submit" value="{% trans "logout" %}" class="cms_submit"></input>
+		    <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
+		</form>
 		{% endif %}
 		<a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
 	</div>

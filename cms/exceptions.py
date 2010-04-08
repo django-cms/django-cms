@@ -1,6 +1,9 @@
 class PluginAllreadyRegistered(Exception):
     pass
 
+class PluginNotRegistered(Exception):
+    pass
+
 class AppAllreadyRegistered(Exception):
     pass
 

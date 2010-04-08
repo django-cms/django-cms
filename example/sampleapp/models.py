@@ -1,10 +1,12 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+from cms.models.fields import PlaceholderField
 import mptt
 
 class Category(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True)
     name = models.CharField(max_length=20)
+    description = PlaceholderField('category_description', 600)
     
     def __unicode__(self):
         return self.name
