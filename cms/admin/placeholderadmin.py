@@ -10,7 +10,8 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.fields import PlaceholderFormField
+from cms.models.fields import PlaceholderField
+from cms.forms.fields import PlaceholderFormField
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 import os
@@ -70,6 +71,21 @@ class PlaceholderAdmin(ModelAdmin):
             }))
         fieldsets.append((None, {'fields': list(self.get_readonly_fields(request, obj))}))
         return fieldsets
+    
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        """
+        Hook for specifying the form Field instance for a given database Field
+        instance.
+
+        If kwargs are given, they're passed to the form Field's constructor.
+        """
+        request = kwargs.pop("request", None)
+        if isinstance(db_field, PlaceholderField):
+            return db_field.formfield_for_admin(request, self.placeholder_plugin_filter, **kwargs)
+        return super(PlaceholderAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+    
+    def placeholder_plugin_filter(self, request, queryset):
+        return queryset
     
     def _get_placeholder_fields(self, form):
         placeholder_fields = []

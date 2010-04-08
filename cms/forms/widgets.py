@@ -2,13 +2,14 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
 from django.contrib.sites.models import Site
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.template.loader import render_to_string
 from django.forms.widgets import Select, MultiWidget, Widget
 from cms.models import Page, PageUser, Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.forms.utils import get_site_choices, get_page_choices
 from os.path import join
+import copy
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
@@ -172,6 +173,18 @@ class UserSelectAdminWidget(Select):
     
     
 class PlaceholderPluginEditorWidget(PluginEditor):
+    attrs = {}
+    def __init__(self, request, filter_func):
+        self.request = request
+        self.filter_func = filter_func
+            
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.request = copy.copy(self.request)
+        obj.filter_func = self.filter_func
+        memo[id(self)] = obj
+        return obj
+        
     def render(self, name, value, attrs=None):
         try:
             ph = Placeholder.objects.get(pk=value)
@@ -179,11 +192,14 @@ class PlaceholderPluginEditorWidget(PluginEditor):
             ph = None
             context = {'add':True}
         if ph:
+            plugin_list = ph.cmsplugin_set.all().order_by('position')
+            plugin_list = self.filter_func(self.request, plugin_list)
+            language = get_language()
             context = {
-                'plugin_list': ph.cmsplugin_set.all().order_by('position'),
+                'plugin_list': plugin_list,
                 'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
                 'copy_languages': [], # TODO?
-                'language': None, # TODO?
+                'language': language,
                 'show_copy': False, # The copy function does not make sense on non-page objects
                 'urloverride': True,
                 'placeholder': ph,

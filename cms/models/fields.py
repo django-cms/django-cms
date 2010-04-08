@@ -19,9 +19,12 @@ class PlaceholderField(models.ForeignKey):
         """
         Returns a django.forms.Field instance for this database Field.
         """
+        return self.formfield_for_admin(None, lambda qs: qs, **kwargs)
+    
+    def formfield_for_admin(self, request, filter_func, **kwargs):
         defaults = {'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
-        widget = PlaceholderPluginEditorWidget()
+        widget = PlaceholderPluginEditorWidget(request, filter_func)
         widget.choices = []
         return PlaceholderFormField(required=False, widget=widget, **defaults)
     
