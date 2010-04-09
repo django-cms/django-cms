@@ -27,3 +27,5 @@ class PermissionsException(Exception):
 class NoPermissionsException(PermissionsException):
     """Can be fired when some violate action is performed on permission system. 
     """
+    
+class DuplicatePlaceholderWarning(Warning): pass

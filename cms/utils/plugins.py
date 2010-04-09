@@ -1,8 +1,10 @@
 from django.contrib.sites.models import Site
 from cms.templatetags.cms_tags import PlaceholderNode
+from cms.exceptions import DuplicatePlaceholderWarning
 from django.template.loader import get_template
 from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
 from django.template import NodeList, TextNode, VariableNode
+import warnings
 
 def _extend_blocks(extend_node, blocks):
     """
@@ -83,9 +85,15 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
     return placeholders
 
 def get_placeholders(template):
-     compiled_template = get_template(template)
-     placeholders = _scan_placeholders(compiled_template.nodelist)
-     return placeholders
+    compiled_template = get_template(template)
+    placeholders = _scan_placeholders(compiled_template.nodelist)
+    clean_placeholders = []
+    for placeholder in placeholders:
+        if placeholder in clean_placeholders:
+            warnings.warn("Duplicate placeholder found: `%s`" % placeholder, DuplicatePlaceholderWarning)
+        else:
+            clean_placeholders.append(placeholder)
+    return clean_placeholders
 
 SITE_VAR = "site__exact"
 

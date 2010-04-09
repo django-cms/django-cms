@@ -1,0 +1,17 @@
+{% load cms_tags %}
+
+{% comment %}
+
+This file should result in following placeholders:
+
+	- new_one (from this)
+	- new_two (from this)
+	- new_three (from this)
+
+{% endcomment %}
+
+{% if something %}
+	<div class="something">{% placeholder "one" %}</div>
+{% else %}
+	<div class="something_else">{% placeholder "one" %}</div>
+{% endif %}
