@@ -38,10 +38,10 @@ def _extend_nodelist(extend_node):
     _extend_blocks(extend_node, blocks)
     placeholders = []
     for block in blocks.values():
-        placeholders += _scan_placeholders(block.nodelist, block)
+        placeholders += _scan_placeholders(block.nodelist, block, blocks.keys())
     return placeholders
 
-def _scan_placeholders(nodelist, current_block=None):
+def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
     placeholders = []
 
     for node in nodelist:
@@ -59,6 +59,9 @@ def _scan_placeholders(nodelist, current_block=None):
         elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == 'block.super':
                 placeholders += _scan_placeholders(current_block.super.nodelist, current_block.super)
+        # ignore nested blocks which are already handled
+        elif isinstance(node, BlockNode) and node.name in ignore_blocks:
+            continue
         # if the node has the newly introduced 'child_nodelists' attribute, scan
         # those attributes for nodelists and recurse them
         elif hasattr(node, 'child_nodelists'):
