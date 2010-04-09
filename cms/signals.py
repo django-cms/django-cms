@@ -208,6 +208,7 @@ def update_placeholders(instance, **kwargs):
         if not placeholder_name in found:
             placeholder = Placeholder.objects.create(slot=placeholder_name)
             instance.placeholders.add(placeholder)
+            found[placeholder_name] = placeholder
 
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)    
