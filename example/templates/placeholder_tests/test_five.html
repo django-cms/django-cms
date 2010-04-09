@@ -1,0 +1,19 @@
+{% extends "placeholder_tests/base.html" %}
+
+{% load cms_tags %}
+
+{% comment %}
+
+This file should result in following placeholders:
+
+	- one (from base.html)
+	- extra_one (from this)
+	- two (from base.html)
+	- three (from base.html)
+
+{% endcomment %}
+
+{% block one %}
+{{ block.super }}
+{% placeholder "extra_one" %}
+{% endblock %}
