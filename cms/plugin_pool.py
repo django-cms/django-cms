@@ -21,7 +21,7 @@ class PluginPool(object):
 
         If a plugin is already registered, this will raise PluginAllreadyRegistered.
         """
-        if issubclass(plugin_or_iterable, CMSPluginBase):
+        if not hasattr(plugin_or_iterable,'__iter__'):
             plugin_or_iterable = [plugin_or_iterable]
         for plugin in plugin_or_iterable:
             assert issubclass(plugin, CMSPluginBase)
