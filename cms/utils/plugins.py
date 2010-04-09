@@ -41,7 +41,7 @@ def _extend_nodelist(extend_node):
         placeholders += _scan_placeholders(block.nodelist, block)
     return placeholders
 
-def _scan_placeholders(nodelist, parent_node=None):
+def _scan_placeholders(nodelist, current_block=None):
     placeholders = []
 
     for node in nodelist:
@@ -51,14 +51,14 @@ def _scan_placeholders(nodelist, parent_node=None):
         # if it's a Constant Include Node ({% include "template_name.html" %})
         # scan the child template
         elif isinstance(node, ConstantIncludeNode):
-            placeholders += _scan_placeholders(node.template.nodelist, node)
+            placeholders += _scan_placeholders(node.template.nodelist, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
             placeholders += _extend_nodelist(node)
         # in block nodes we have to scan for super blocks
-        elif isinstance(node, VariableNode) and isinstance(parent_node, BlockNode):
+        elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == 'block.super':
-                placeholders += _scan_placeholders(parent_node.super.nodelist, parent_node.super)
+                placeholders += _scan_placeholders(current_block.super.nodelist, current_block.super)
         # if the node has the newly introduced 'child_nodelists' attribute, scan
         # those attributes for nodelists and recurse them
         elif hasattr(node, 'child_nodelists'):
@@ -66,13 +66,17 @@ def _scan_placeholders(nodelist, parent_node=None):
                 if hasattr(node, nodelist_name):
                     subnodelist = getattr(node, nodelist_name)
                     if isinstance(subnodelist, NodeList):
-                        placeholders += _scan_placeholders(subnodelist, node)
+                        if isinstance(node, BlockNode):
+                            current_block = node
+                        placeholders += _scan_placeholders(subnodelist, current_block)
         # else just scan the node for nodelist instance attributes
         else:
             for attr in dir(node):
                 obj = getattr(node, attr)
                 if isinstance(obj, NodeList):
-                    placeholders += _scan_placeholders(obj, node)
+                    if isinstance(node, BlockNode):
+                        current_block = node
+                    placeholders += _scan_placeholders(obj, current_block)
     return placeholders
 
 def get_placeholders(template):
