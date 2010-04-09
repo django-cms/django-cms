@@ -12,6 +12,7 @@ from cms.tests.site import SiteTestCase
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.plugins import PluginsTestCase
 from cms.tests.menu import MenusTestCase
+from cms.tests.placeholder import PlaceholderTestCase
 
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
@@ -41,6 +42,7 @@ def suite():
             s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(MenusTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PlaceholderTestCase))
     
     return s
  
