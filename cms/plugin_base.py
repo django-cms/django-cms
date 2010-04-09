@@ -59,6 +59,7 @@ class CMSPluginBase(admin.ModelAdmin):
     text_enabled = False
     
     opts = {}
+    module = None #track in which module/application belongs
     
     def __init__(self, model=None,  admin_site=None):
         if self.model:

@@ -58,7 +58,7 @@ class CMSPlugin(MpttPublisher):
         super(CMSPlugin, self).__init__(*args, **kwargs)
 
     def __unicode__(self):
-        return str(self.id) #""
+        return unicode(self.id)
         
     class Meta:
         app_label = 'cms'

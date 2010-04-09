@@ -5,9 +5,16 @@
 	</div>
 	<div class="cms_toolbar_addbutton cms_toolbar_button cms_toolbar_submenubutton cms_toolbar_submenuselect"><span><strong>{% trans "Add Plugin" %}</strong><em>arrow</em></span>		
 		<ul class="cms_toolbar_submenu">				
-			{% for p in installed_plugins %}
+			{% regroup installed_plugins by module as module_list %}
+			{% for module in module_list %}
+			<li>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Generic" %}{% endif %}
+			<ul>
+				{% for p in module.list %}
 				<li{% if forloop.first %} class="first"{% endif %}{% if forloop.last %} class="last"{% endif %}><a href="#" rel="{{ p.value }}">{{ p.name }}</a></li>
-			{% endfor %}			
+				{% endfor %}
+			</ul>
+			</li>
+			{% endfor %}
 		</ul>
 	</div>	
 </div>

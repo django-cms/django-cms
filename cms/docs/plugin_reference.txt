@@ -11,7 +11,12 @@ If you don't need a model because you just want to display some template logic, 
 name
 ----
 
-Will be displayed in the plugin editor
+Will be displayed in the plugin editor.
+
+module
+------
+
+Will be group the plugin in the plugin editor. If module is None, plugin is grouped "Generic" group. 
 
 render_template
 ---------------
