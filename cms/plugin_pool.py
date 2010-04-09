@@ -1,4 +1,4 @@
-from cms.exceptions import PluginAllreadyRegistered, PluginNotRegistered
+from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from django.conf import settings
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import reversion_register
@@ -19,7 +19,7 @@ class PluginPool(object):
         """
         Registers the given plugin(s).
 
-        If a plugin is already registered, this will raise PluginAllreadyRegistered.
+        If a plugin is already registered, this will raise PluginAlreadyRegistered.
         """
         if not hasattr(plugin_or_iterable,'__iter__'):
             plugin_or_iterable = [plugin_or_iterable]
@@ -27,7 +27,7 @@ class PluginPool(object):
             assert issubclass(plugin, CMSPluginBase)
             plugin_name = plugin.__name__
             if plugin_name in self.plugins:
-                raise PluginAllreadyRegistered("[%s] a plugin with this name is already registered" % plugin_name)
+                raise PluginAlreadyRegistered("[%s] a plugin with this name is already registered" % plugin_name)
             plugin.value = plugin_name
             self.plugins[plugin_name] = plugin
 

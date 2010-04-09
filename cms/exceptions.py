@@ -1,4 +1,4 @@
-class PluginAllreadyRegistered(Exception):
+class PluginAlreadyRegistered(Exception):
     pass
 
 class PluginNotRegistered(Exception):
