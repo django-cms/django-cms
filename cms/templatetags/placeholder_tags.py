@@ -15,6 +15,8 @@ class PlaceholderNode(template.Node):
         else:
             width = self.width
         placeholder = self.placeholder.resolve(context)
+        if not placeholder:
+            return ''
         return safe(placeholder.render(context, width))
 
 
