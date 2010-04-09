@@ -1,9 +1,0 @@
-#Thu Mar 18 10:06:28 CET 2010
-eclipse.preferences.version=1
-encoding//cms/docs/conf.py=utf-8
-encoding//cms/tests/__init__.py=utf-8
-encoding//cms/tests/menu.py=utf-8
-encoding//cms/tests/navextender.py=utf-8
-encoding//cms/tests/page.py=utf-8
-encoding//cms/tests/plugins.py=utf-8
-encoding//cms/tests/reversion_tests.py=utf-8

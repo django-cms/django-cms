@@ -107,9 +107,10 @@ class CMSPluginBase(admin.ModelAdmin):
         
         self.object_successfully_changed = False
         
-        # variables will be overriden in edit_view, so we got requred
+        # variables will be overwritten in edit_view, so we got required
         self.cms_plugin_instance = None
         self.placeholder = None
+        self.page = None
 
     def render(self, context, instance, placeholder):
         raise NotImplementedError, "render needs to be implemented"
@@ -137,7 +138,10 @@ class CMSPluginBase(admin.ModelAdmin):
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
-        return self.cms_plugin_instance.page.has_change_permission(request)
+        if self.page:
+            return self.page.has_change_permission(request)
+        else:
+            return self.placeholder.has_change_permission(request)
     has_delete_permission = has_change_permission = has_add_permission
     
     def save_model(self, request, obj, form, change):

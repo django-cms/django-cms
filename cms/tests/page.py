@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.models import Page, Title
+from cms.models import Page, Title, Placeholder
 
 
 class PagesTestCase(CMSTestCase):
@@ -38,6 +38,7 @@ class PagesTestCase(CMSTestCase):
         page.save()
         self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(), page_data['slug'])
+        self.assertEqual(page.placeholders.all().count(), 2)
         
         # were public instanes created?
         title = Title.objects.drafts().get(slug=page_data['slug'])
@@ -76,16 +77,16 @@ class PagesTestCase(CMSTestCase):
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
-
+        
         page_data = self.get_new_page_data()
         page_data['published'] = False
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
         try:
             response = self.client.get('/')
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
-
         page_data = self.get_new_page_data()
         page_data['published'] = True
         page_data['slug'] = 'test-page-2'

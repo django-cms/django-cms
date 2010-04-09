@@ -1,0 +1,7 @@
+{% extends "index.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+    <p class="byline">{{ post.created_by.username }} at {{ post.created_at }}</p>
+    {% render_placeholder post.contents "640" %}
+{% endblock content %}
