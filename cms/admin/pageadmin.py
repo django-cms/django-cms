@@ -378,7 +378,7 @@ class PageAdmin(model_admin):
             
             placeholders = get_placeholders(selected_template)
             for placeholder_name in placeholders:
-                placeholder = obj.placeholders.get(slot=placeholder_name)
+                placeholder, created = obj.placeholders.get_or_create(slot=placeholder_name)
                 installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                 plugin_list = []
                 show_copy = False
