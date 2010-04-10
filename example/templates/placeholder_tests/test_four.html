@@ -13,8 +13,10 @@ This file should result in following placeholders:
 {% endcomment %}
 
 {% block three %}
-{% placeholder "four" %}
+	{% block subblockthree %}
+		{% placeholder "four" %}
+	{% endblock %}
 {% endblock %}
 {% block two %}
-{% include "placeholder_tests/child.html" %}
+	{% include "placeholder_tests/child.html" %}
 {% endblock %}
