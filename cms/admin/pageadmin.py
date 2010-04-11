@@ -1029,9 +1029,14 @@ class PageAdmin(model_admin):
             return HttpResponse(str("error"))
         if request.method == "POST":
             plugin_type = request.POST['plugin_type']
-            placeholder_id = request.POST['placeholder']
-            placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-            page = get_page_from_placeholder_if_exists(placeholder)
+            placeholder_id = request.POST.get('placeholder', None)
+            parent_id = request.POST.get('parent_id', None)
+            if placeholder_id:
+                placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+                page = get_page_from_placeholder_if_exists(placeholder)
+            else:
+                placeholder = None
+                page = None
             parent = None
             # page add-plugin
             if page:
@@ -1050,8 +1055,7 @@ class PageAdmin(model_admin):
                         if type_count >= type_limit:
                             return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
             # in-plugin add-plugin
-            elif request.POST.get('parent_id', None):
-                parent_id = request.POST['parent_id']
+            elif parent_id:
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)
                 placeholder = parent.placeholder
                 page = get_page_from_placeholder_if_exists(placeholder)
