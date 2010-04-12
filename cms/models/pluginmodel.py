@@ -10,6 +10,7 @@ from publisher import MpttPublisher
 from cms.plugin_rendering import PluginContext, PluginRenderer
 from django.conf import settings
 from cms.utils.helpers import reversion_register
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
 
 class PluginModelBase(ModelBase):
     """
@@ -122,6 +123,9 @@ class CMSPlugin(MpttPublisher):
             today = date.today()
             return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
             
+    @property
+    def page(self):
+        return get_page_from_placeholder_if_exists(self.placeholder)
     
     def get_instance_icon_src(self):
         """

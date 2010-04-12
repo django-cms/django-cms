@@ -908,7 +908,7 @@
 		</div>
 		{% if auth %}
 		<form method="post" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
-			<input type="submit" name="logout_submit" value="{% trans "logout" %}" class="cms_submit"></input>
+			<input type="submit" name="logout_submit" value="{% trans "logout" %}" class="cms_submit" />
 		    <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
 		</form>
 		{% endif %}
