@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from django.conf import settings
 
 class Link(CMSPlugin):
@@ -15,5 +16,9 @@ class Link(CMSPlugin):
     
     def __unicode__(self):
         return self.name
+
+    @property
+    def page(self):
+        return get_page_from_placeholder_if_exists(self.placeholder)
 
     search_fields = ('name',)
