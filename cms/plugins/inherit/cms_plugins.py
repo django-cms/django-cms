@@ -74,6 +74,6 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
                 form.for_site(self.site)
                 return form
             
-        return FakeForm(Form, self.cms_plugin_instance.page.site) 
+        return FakeForm(Form, self.cms_plugin_instance.page.site or self.page.site)
 
 plugin_pool.register_plugin(InheritPagePlaceholderPlugin)
