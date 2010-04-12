@@ -331,6 +331,7 @@ class PluginsMediaNode(template.Node):
         if page == "dummy":
             return ''
         from cms.plugins.utils import get_plugins_media
+        plugins_media = None
         try:
             plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
         except:
