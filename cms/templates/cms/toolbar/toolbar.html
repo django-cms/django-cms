@@ -158,7 +158,7 @@
 		background:#fff;white-space:nowrap;	
 	}	
 	.cms_toolbar_submenu li{
-		clear:both;zoom:1;height:27px;overflow:hidden;width:100%;
+		clear:both;zoom:1;height:27px;width:100%;
 		white-space:nowrap;
 	}		
 	
@@ -791,7 +791,7 @@
 				$("div.cms_toolbar_placeholder_plugins li a").click(function(e){
 			        var select = $(this);
 			        var pluginvalue = select.attr('rel');
-			        var div = $(this).parent().parent().parent().parent();
+			        var div = $(this).parent().parent().parent().parent().parent().parent();
 			        var placeholder = div.attr("rel")
 			        var splits = div.attr("id").split("cms_placeholder_")[1].split("_");
 			        var page_id = splits[1];
