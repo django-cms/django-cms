@@ -133,7 +133,8 @@ class PlaceholderNode(template.Node):
     """
     def __init__(self, name, width=None, nodelist_or=None):
         self.name = "".join(name.lower().split('"'))
-        if width: self.width = template.Variable(width)
+        if width:
+            self.width = template.Variable(width)
         self.nodelist_or = nodelist_or
 
     def render(self, context):
@@ -158,7 +159,10 @@ class PlaceholderNode(template.Node):
         if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
-        return render_plugins_for_context(placeholder, context, width)
+        content = render_plugins_for_context(placeholder, context, width)
+        if not content and self.nodelist_or:
+            return self.nodelist_or.render(context)
+        return content
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
