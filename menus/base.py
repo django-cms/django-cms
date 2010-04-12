@@ -67,4 +67,3 @@ class NavigationNode(object):
             nodes.append(node)
             nodes += node.get_descendants()
         return nodes
-    
