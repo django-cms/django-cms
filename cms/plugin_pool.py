@@ -47,7 +47,7 @@ class PluginPool(object):
 
         If a plugin isn't already registered, this will raise PluginNotRegistered.
         """
-        if isinstance(plugin_or_iterable, CMSPluginBase):
+        if not hasattr(plugin_or_iterable,'__iter__'):
             plugin_or_iterable = [plugin_or_iterable]
         for plugin in plugin_or_iterable:
             plugin_name = plugin.__name__
