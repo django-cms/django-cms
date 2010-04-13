@@ -32,7 +32,7 @@ Add the following to your project's ``INSTALLED_APPS`` setting if not already pr
 		'cms.plugins.snippet',
 		'cms.plugins.googlemap',
 		'mptt',
-		'publisher'
+		'publisher',
 		'menus',
 		...
 	)
