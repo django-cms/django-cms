@@ -294,7 +294,7 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None,
                           settings.MANAGERS,
                           fail_silently=True)
                 return {'content':''}
-        plugins = get_cmsplugin_queryset(request).filter(placeholder__page_set=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        plugins = get_cmsplugin_queryset(request).filter(placeholder__page=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:
             content += plugin.render_plugin(context, placeholder_name)
