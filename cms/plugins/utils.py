@@ -27,7 +27,7 @@ def get_plugins_for_page(request, page, lang=None):
         ).order_by('placeholder', 'position').select_related())
     return getattr(page, '_%s_plugins_cache' % lang)
 
-def get_plugins_media(request, context page):
+def get_plugins_media(request, context, page):
     lang = get_language_from_request(request)
     if not page:
         # current page is unknown
