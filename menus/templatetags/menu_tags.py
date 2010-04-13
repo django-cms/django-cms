@@ -14,6 +14,12 @@ def cut_after(node, levels, removed):
         for n in node.children:
             cut_after(n, levels - 1, removed)
 
+def remove(node, removed):
+    removed.append(node)
+    if node.parent:
+        if node in node.parent.children:
+            node.parent.children.remove(node)
+
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     """
     cutting nodes away from menus
@@ -22,21 +28,26 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     removed = []
     selected = None
     for node in nodes: 
-        if not node.parent and not node.ancestor and not node.selected:
-            cut_after(node, extra_inactive, removed)
+        if not hasattr(node, 'level'):
+            # remove and ignore nodes that don't have level information
+            remove(node, removed)
+            continue
         if node.level == from_level:
+            # turn nodes that are on from_level into root nodes
             final.append(node)
             node.parent = None
+        if not node.ancestor and not node.selected and not node.descendant:
+            # cut inactive nodes to extra_inactive, but not of descendants of 
+            # the selected node
+            cut_after(node, extra_inactive, removed)
         if node.level > to_level and node.parent:
-            if node in node.parent.children:
-                node.parent.children.remove(node)
+            # remove nodes that are too deep, but not nodes that are on 
+            # from_level (local root nodes)
+            remove(node, removed)
         if node.selected:
             selected = node
         if not node.visible:
-            removed.append(node)
-            if node.parent:
-                if node in node.parent.children:
-                    node.parent.children.remove(node)
+            remove(node, removed)
     if selected:
         cut_after(selected, extra_active, removed)
     if removed:

@@ -1,5 +1,6 @@
 from django.db.models.base import ModelBase
 from cms.models.pagemodel import Page
+from cms.models.placeholdermodel import Placeholder
 from os.path import join
 from datetime import datetime, date
 from django.db import models
@@ -9,6 +10,7 @@ from publisher import MpttPublisher
 from cms.plugin_rendering import PluginContext, PluginRenderer
 from django.conf import settings
 from cms.utils.helpers import reversion_register
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
 
 class PluginModelBase(ModelBase):
     """
@@ -35,10 +37,9 @@ class PluginModelBase(ModelBase):
 class CMSPlugin(MpttPublisher):
     __metaclass__ = PluginModelBase
     
-    page = models.ForeignKey(Page, verbose_name=_("page"), editable=False)
+    placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
-    placeholder = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
@@ -58,7 +59,7 @@ class CMSPlugin(MpttPublisher):
         super(CMSPlugin, self).__init__(*args, **kwargs)
 
     def __unicode__(self):
-        return str(self.id) #""
+        return unicode(self.id)
         
     class Meta:
         app_label = 'cms'
@@ -115,12 +116,16 @@ class CMSPlugin(MpttPublisher):
         return ""
             
     def get_media_path(self, filename):
-        if self.page_id:
-            return self.page.get_media_path(filename)
+        pages = self.placeholder.page_set.all()
+        if pages.count():
+            return pages[0].get_media_path(filename)
         else: # django 1.0.2 compatibility
             today = date.today()
             return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
             
+    @property
+    def page(self):
+        return get_page_from_placeholder_if_exists(self.placeholder)
     
     def get_instance_icon_src(self):
         """
@@ -150,7 +155,7 @@ class CMSPlugin(MpttPublisher):
             
     
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'page_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
     
     def _publisher_get_public_copy(self):
@@ -173,5 +178,55 @@ class CMSPlugin(MpttPublisher):
                 setattr(public_copy, field.name, value)
             public_copy.publisher_is_draft=False
             return public_copy
-                
+        
+    def copy_plugin(self, target_placeholder, target_language, plugin_tree):
+        """
+        Copy this plugin and return the new plugin.
+        """
+        try:
+            plugin_instance, cls = self.get_plugin_instance()
+        except KeyError: #plugin type not found anymore
+            return
+        new_plugin = CMSPlugin()
+        new_plugin.placeholder = target_placeholder
+        new_plugin.tree_id = None
+        new_plugin.lft = None
+        new_plugin.rght = None
+        new_plugin.inherited_public_id = None
+        new_plugin.publisher_public_id = None
+        if self.parent:
+            pdif = self.level - plugin_tree[-1].level
+            if pdif < 0:
+                plugin_tree[:] = plugin_tree[:pdif-1]
+            new_plugin.parent = plugin_tree[-1]
+            if pdif != 0:
+                plugin_tree.append(new_plugin)
+        else:
+            plugin_tree[:] = [new_plugin]
+        new_plugin.level = None
+        new_plugin.language = target_language
+        new_plugin.plugin_type = self.plugin_type
+        new_plugin.save()
+        if plugin_instance:
+            plugin_instance.pk = new_plugin.pk
+            plugin_instance.id = new_plugin.pk
+            plugin_instance.placeholder = target_placeholder
+            plugin_instance.tree_id = new_plugin.tree_id
+            plugin_instance.lft = new_plugin.lft
+            plugin_instance.rght = new_plugin.rght
+            plugin_instance.level = new_plugin.level
+            plugin_instance.cmsplugin_ptr = new_plugin
+            plugin_instance.publisher_public_id = None
+            plugin_instance.public_id = None
+            plugin_instance.published = False
+            plugin_instance.language = target_language
+            plugin_instance.save()
+        self.copy_relations(new_plugin, plugin_instance)
+        return new_plugin
+        
+    def copy_relations(self, new_plugin, plugin_instance):
+        """
+        Handle copying of any relations attached to this plugin
+        """
+
 reversion_register(CMSPlugin)

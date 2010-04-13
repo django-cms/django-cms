@@ -2,7 +2,7 @@ App Integration
 ===============
 
 It is pretty easy to integrate your own django applications with django-cms.
-You have 4 ways of integrating your app:
+You have 5 ways of integrating your app:
 
 1. Menus
 
@@ -14,7 +14,7 @@ You have 4 ways of integrating your app:
 	
 3. App-Hooks
 	
-	Classes that define a urls.py or a menu that can be attached to a page.
+	Attach whole apps with optional menu to a page.
 			
 4. Navigation Modifiers
 
@@ -359,10 +359,3 @@ to accomplish that. If you have for example a news app and you want on your home
 display the top 10 news entries a custom plugin is the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to the `cutom plugin<../custom_plugins/>`_ section.
-
-
-
-
-
-
- 

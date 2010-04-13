@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import get_language
+from django.utils.encoding import smart_str
 
 
 class Menu(object):
@@ -43,7 +44,7 @@ class NavigationNode(object):
             self.attr = attr
             
     def __repr__(self):
-        return "<Navigation Node: %s>" % str(unicode(self.title))
+        return "<Navigation Node: %s>" % smart_str(self.title)
     
     def _remove_current_root(self, url):
         current_root = "/%s/" % get_language()
@@ -66,4 +67,3 @@ class NavigationNode(object):
             nodes.append(node)
             nodes += node.get_descendants()
         return nodes
-    

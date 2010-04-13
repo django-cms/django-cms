@@ -3,9 +3,10 @@ Edit Toolbar middleware
 """
 from cms import settings as cms_settings
 from cms.utils.plugins import get_placeholders
+from cms.utils import get_template_from_request
 from django.conf import settings
-from django.contrib.auth import authenticate, login
-from django.core.urlresolvers import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.context import Context
 from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
@@ -26,7 +27,7 @@ def inster_after_tag(string, tag, insertion):
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
     return '<div id="cms_plugin_%s_%s" class="cms_plugin_holder" rel="%s" type="%s">%s</div>' % \
-        (instance.page_id, instance.pk, instance.placeholder, instance.plugin_type, rendered_content)
+        (instance.placeholder.id, instance.pk, instance.placeholder.slot, instance.plugin_type, rendered_content)
 
 class ToolbarMiddleware(object):
     """
@@ -40,8 +41,11 @@ class ToolbarMiddleware(object):
             return False 
         if not response['Content-Type'].split(';')[0] in _HTML_TYPES:
             return False
-        if request.path_info.startswith(reverse("admin:index")):
-            return False
+        try:
+            if request.path_info.startswith(reverse("admin:index")):
+                return False
+        except NoReverseMatch:
+            pass
         if request.path_info.startswith(settings.MEDIA_URL):
             return False
         if "edit" in request.GET:
@@ -53,10 +57,13 @@ class ToolbarMiddleware(object):
         return True
     
     def process_request(self, request):
-        if request.method == "POST" and "edit" in request.GET and "cms_username" in request.POST:
-            user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
-            if user:
-                login(request, user)
+        if request.method == "POST" and "edit" in request.GET:
+            if "cms_username" in request.POST:
+                user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
+                if user:
+                    login(request, user)
+            if "logout_submit" in request.POST:
+                logout(request)
         if request.user.is_authenticated() and request.user.is_staff:
             if "edit-off" in request.GET:
                 request.session['cms_edit'] = False
@@ -79,7 +86,8 @@ class ToolbarMiddleware(object):
         page = request.current_page
         move_dict = []
         if edit and page:
-            placeholders = get_placeholders(request)
+            template = get_template_from_request(request)
+            placeholders = get_placeholders(template)
             for placeholder in placeholders:
                 d = {}
                 name = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("name", None)

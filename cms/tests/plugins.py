@@ -30,9 +30,8 @@ class PluginsTestCase(CMSTestCase):
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type':"TextPlugin",
-            'page_id':page.pk,
             'language':settings.LANGUAGES[0][0],
-            'placeholder':"body",
+            'placeholder':page.placeholders.get(slot="body").pk,
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
@@ -57,9 +56,8 @@ class PluginsTestCase(CMSTestCase):
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type':"TextPlugin",
-            'page_id':page.pk,
             'language':settings.LANGUAGES[0][0],
-            'placeholder':"body",
+            'placeholder':page.placeholders.get(slot="body").pk,
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
@@ -83,9 +81,8 @@ class PluginsTestCase(CMSTestCase):
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
         self.assertEquals(Page.objects.all().count(), 1)
         copy_data = {
-            'placeholder':'body',
+            'placeholder':page.placeholders.get(slot="body").pk,
             'language':settings.LANGUAGES[1][0],
-            'page_id':page.pk,
             'copy_from':settings.LANGUAGES[0][0],
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)

@@ -3,9 +3,8 @@
         $('span.add-plugin').click(function(){
          var select = $(this).parent().children("select[name=plugins]");
             var pluginvalue = select.attr('value');
-            var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
+            var placeholder_id = $(this).parent().parent().data('id');
             var splits = window.location.href.split("/");
-            var page_id = splits[splits.length-2];
  
             var language = $('input.language_button.selected').attr('name');
  
@@ -14,7 +13,7 @@
             }
  
             if (!language) {
-                alert("Unable to determine the correct language for this plugin! Please report the bug!");
+                //alert("Unable to determine the correct language for this plugin! Please report the bug!");
             }
  
             var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
@@ -23,7 +22,7 @@
                 var ul_list = $(this).parent().parent().children("ul.plugin-list");
                 $.ajax({
                  url: "add-plugin/", dataType: "html", type: "POST",
-                 data: { page_id:page_id, placeholder:placeholder, plugin_type:pluginvalue, language:language },
+                 data: ({ placeholder:placeholder_id, plugin_type:pluginvalue, language:language }),
                  success: function(data) {
                        loadPluginForm(target_div, data);
                        ul_list.append('<li id="plugin_' + data + '" class="' + pluginvalue + ' active"><span class="drag"></span><span class="text">' + pluginname + '</span><span class="delete"></span></li>');
@@ -39,8 +38,8 @@
         });
  
         $('span.copy-plugins').click(function(){
-         var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
-            var placeholder = $(this).parent().parent().parent().children("label").attr("for").split("id_")[1];
+            var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
+            var placeholder = $(this).parent().parent().data('id');
             var splits = window.location.href.split("/");
             var page_id = splits[splits.length-2];
  
@@ -51,7 +50,7 @@
             }
  
             if (!to_language) {
-                alert("Unable to determine the correct language for this plugin! Please report the bug!");
+                //alert("Unable to determine the correct language for this plugin! Please report the bug!");
             }
             
             var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
@@ -110,8 +109,10 @@
         var plugin_id = $(this).parent().attr("id").split("plugin_")[1];
         var question = gettext("Are you sure you want to delete this plugin?")
         var answer = confirm(question, true);
+        var pagesplits = window.location.href.split("/");
+        var page_id = pagesplits[pagesplits.length-2];
         if(answer){
-            $.post("remove-plugin/", { plugin_id:plugin_id }, function(data){
+            $.post("remove-plugin/", { plugin_id:plugin_id, page_id:page_id }, function(data){
                 var splits = data.split(",")
                 id = splits.shift()
                 $("#plugin_"+id).remove();

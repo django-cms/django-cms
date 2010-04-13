@@ -13,7 +13,7 @@ CACHE_BACKEND = 'locmem:///'
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'#'postgresql_psycopg2'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_ENGINE = 'sqlite3'#'postgresql_psycopg2'       # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'cms'           # Or path to database file if using sqlite3.
 DATABASE_USER = 'cms'           # Not used with sqlite3.
 DATABASE_PASSWORD = 'cms'       # Not used with sqlite3.
@@ -57,9 +57,9 @@ SECRET_KEY = '*xq7m@)*f2awoj!spa0(jibsrz9%c0d=e(g)v*!17y(vx0ue_3'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-    'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -123,7 +123,7 @@ INSTALLED_APPS = (
     'cms.plugins.twitter',
     'cms.plugins.inherit',
     'mptt',
-    'reversion',
+#    'reversion',
     'example.sampleapp',
     #'debug_toolbar',
     'south',
@@ -174,29 +174,7 @@ CMS_PLACEHOLDER_CONF = {
     'col_right': {
         'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("right column")
-    },                     
-                        
-                        
-                                              
-#    'right-column': {
-#        "plugins": ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
-#        "extra_context": {"width":940},
-#        "name":gettext("right column")
-#    },
-    
-#    'body': {
-#        "extra_context": {"width":280},
-#        "name":gettext("body"),
-#    },
-#    'fancy-content': {
-#        "plugins": ('TextPlugin', 'LinkPlugin'),
-#        "extra_context": {"width":"640"},
-#        "name":gettext("fancy content custom name"),
-#        "limits": {
-#            "global": 3,
-#            "TextPlugin": 1,
-#        },
-#    },
+    },
 }
 
 CMS_SOFTROOT = True

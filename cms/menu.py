@@ -13,6 +13,9 @@ def page_to_node(page, home, cut):
     parent_id = page.parent_id
     if home and page.parent_id == home.pk and cut:
         parent_id = None
+    # possible fix for a possible problem
+    #if parent_id and not page.parent.get_calculated_status():
+    #    parent_id = None # ????
     attr = {'soft_root':page.soft_root,
             'auth_required':page.login_required,
             'reverse_id':page.reverse_id,}

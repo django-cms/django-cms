@@ -144,6 +144,9 @@ class PlaceholderNode(template.Node):
         self.nodelist_or = nodelist_or
 
     def render(self, context):
+        if not 'request' in context:
+            return ''
+        request = context['request']
         width_var = getattr(self, 'width_var', None)
         if width_var:
             try:
@@ -151,20 +154,14 @@ class PlaceholderNode(template.Node):
                 context.update({'width': width})
             except (template.VariableDoesNotExist, ValueError):
                 pass
-            
-        if context.get('display_placeholder_names_only'):
-            return "<!-- PlaceholderNode: %s -->" % self.name
-            
-        if not 'request' in context:
-            return ''
-        request = context['request']
         
         page = request.current_page
-        if page == "dummy":
+        if not page or page == "dummy":
             return ""
-        content = render_placeholder(self.name, page, context)
-        if not content and self.nodelist_or:
-            return self.nodelist_or.render(context)
+        placeholder = page.placeholders.get(slot=self.name)
+        content = render_plugins_for_context(placeholder, context, width)    
+        if not content and self.nodelist_or:    
+            return self.nodelist_or.render(context)    
         return content
  
     def __repr__(self):
@@ -294,7 +291,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         page = _get_page_by_untyped_arg(page_lookup, request, site_id)
         if not page:
             return {'content': ''}
-        plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        plugins = get_cmsplugin_queryset(request).filter(placeholder__page_set=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         c = render_plugins(plugins, context, placeholder_name)
         content = "".join(c)
             
@@ -370,23 +367,33 @@ class PluginsMediaNode(template.Node):
         if not 'request' in context:
             return ''
         request = context['request']
-        page_lookup_var = getattr(self, 'page_lookup_var', None)
-        if page_lookup_var:
-            page_lookup = page_lookup_var.resolve(context)
-            page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-            plugins_media = get_plugins_media(request, page)
-        else:
-            page = request.current_page
-            if page == "dummy":
-                return ''
-            plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        from cms.plugins.utils import get_plugins_media
+        plugins_media = None
+        try:
+            page_lookup_var = getattr(self, 'page_lookup_var', None)
+            if page_lookup_var:
+                page_lookup = page_lookup_var.resolve(context)
+                page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
+                plugins_media = get_plugins_media(request, page)
+            else:
+                page = request.current_page
+                if page == "dummy":
+                    return ''
+                plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
+        except:
+            import sys
+            info = sys.exc_info()
+            import traceback
+            traceback.print_exception(*info)
+            raise
+
         if plugins_media:
             return plugins_media.render()
         else:
             return u''
         
     def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % self.name
+        return "<PluginsMediaNode Node: %s>" % self.name if hasattr(self, 'name') else ''
         
 register.tag('plugins_media', do_plugins_media)
 

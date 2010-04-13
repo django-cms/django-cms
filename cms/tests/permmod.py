@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE,\
     URL_CMS_PAGE_CHANGE
-from cms.models import Title, Page
+from cms.models import Title, Page, CMSPlugin
 from cms.models.permissionmodels import PagePermission
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS,\
     ACCESS_CHOICES, ACCESS_DESCENDANTS, ACCESS_CHILDREN
@@ -124,15 +124,16 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         post_data = {
             'language': 'en',
-            'page_id': slave_page.pk,
-            'placeholder': 'Right-Column',
+            'placeholder': slave_page.placeholders.get(slot__iexact='Right-Column').pk,
             'plugin_type': 'TextPlugin'
         }
         self.login_user(user)
         url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
         response = self.client.post(url, post_data)
-        self.assertEqual(slave_page.cmsplugin_set.count(), 1)
-        plugin_id = slave_page.cmsplugin_set.all()[0].id
+        
+        cmsplugin_set = CMSPlugin.objects.filter(placeholder__in=slave_page.placeholders.all())
+        self.assertEqual(cmsplugin_set.count(), 1)
+        plugin_id = cmsplugin_set[0].id
         self.assertEqual(response.content, str(plugin_id))
     
     def publish_page(self, page, approve=False, user=None, published_check=True):
@@ -536,7 +537,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_16_patricks_move(self):
         """Special name, special case..
 
-        1. build following tree (msater node is approved and published)
+        1. build following tree (master node is approved and published)
         
                  slave-home
                 /    |    \
@@ -583,7 +584,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         self.assertEqual(not pg.publisher_public, True)
         
-        # login as master for approvement
+        # login as master for approval
         self.login_user(self.user_master)
         
         # first approve slave-home
@@ -627,11 +628,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         ph = self.reload_page(ph)
         
         
-        # check urls - they should stay them same, there wasn't approvement yet
+        # check urls - they should stay them same, there wasn't approved yet
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
         
-        # pg & pe should require approvement
+        # pg & pe should require approval
         self.assertEqual(pg.requires_approvement(), True)
         self.assertEqual(pe.requires_approvement(), True)
         self.assertEqual(ph.requires_approvement(), False)

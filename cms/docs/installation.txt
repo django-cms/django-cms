@@ -118,7 +118,7 @@ For some template examples see the templates used in the example project.
 
 Here's a quick example of what a template might look like::
 
-	{% load cms_tags %}
+	{% load cms_tags menu_tags %}
 
 	<div id="menu">{% show_menu 0 100 100 100 %}</div>
 	<div id="breadcrumb">{% show_breadcrumb %}</div>
