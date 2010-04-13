@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.forms.widgets import Media
+import operator 
 
 
 class Placeholder(models.Model):
@@ -23,3 +25,10 @@ class Placeholder(models.Model):
         if not 'request' in context:
             return '<!-- missing request -->'
         return render_plugins_for_context(self, context, width or self.default_width)
+    
+    def get_media(self, request, context):
+        from cms.plugins.utils import get_plugin_media
+        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.cmsplugin_set.all()]
+        if media_classes:
+            return reduce(operator.add, media_classes)
+        return Media()

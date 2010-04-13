@@ -13,9 +13,9 @@ def get_plugins(request, placeholder, lang=None):
         ).order_by('placeholder', 'position').select_related())
     return getattr(placeholder, '_%s_plugins_cache' % lang)
 
-def get_plugin_media(request, plugin):
+def get_plugin_media(request, context, plugin):
     instance, plugin = plugin.get_plugin_instance()
-    return plugin.get_plugin_media(request, instance)
+    return plugin.get_plugin_media(request, context, instance)
 
 def get_plugins_for_page(request, page, lang=None):
     if not page:

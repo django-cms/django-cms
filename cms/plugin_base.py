@@ -128,7 +128,7 @@ class CMSPluginBase(admin.ModelAdmin):
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
     
-    def get_plugin_media(self, request, plugin):
+    def get_plugin_media(self, request, context, plugin):
         return self.pluginmedia
         
     def has_add_permission(self, request, *args, **kwargs):

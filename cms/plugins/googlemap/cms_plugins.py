@@ -23,7 +23,7 @@ class GoogleMapPlugin(CMSPluginBase):
         })
         return context
     
-    def get_plugin_media(self, request, plugin):
+    def get_plugin_media(self, request, context, plugin):
         return Media(js = ('http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s&amp;hl=%s' % (settings.GOOGLE_MAPS_API_KEY, request.LANGUAGE_CODE),))
  
 plugin_pool.register_plugin(GoogleMapPlugin)
