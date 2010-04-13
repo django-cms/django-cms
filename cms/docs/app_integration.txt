@@ -359,10 +359,3 @@ to accomplish that. If you have for example a news app and you want on your home
 display the top 10 news entries a custom plugin is the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to the `cutom plugin<../custom_plugins/>`_ section.
-
-
-
-
-
-
- 

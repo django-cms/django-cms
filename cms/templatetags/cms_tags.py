@@ -135,33 +135,32 @@ class PlaceholderNode(template.Node):
         self.name = "".join(name.lower().split('"'))
         if width:
             self.width = template.Variable(width)
+        else:
+            self.width = None
         self.nodelist_or = nodelist_or
 
     def render(self, context):
-        width_var = getattr(self, 'width', None)
-        if width_var:
+        if not 'request' in context:
+            return ''
+        
+        if self.width:
             try:
-                width = width_var.resolve(context)
+                width = self.width.resolve(context)
             except template.VariableDoesNotExist:
                 # should we raise an error here?
                 width = None
         else:
             width = None
             
-        if context.get('display_placeholder_names_only'):
-            return "<!-- PlaceholderNode: %s -->" % self.name
-            
-        if not 'request' in context:
-            return ''
         request = context['request']
         
         page = request.current_page
         if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
-        content = render_plugins_for_context(placeholder, context, width)
-        if not content and self.nodelist_or:
-            return self.nodelist_or.render(context)
+        content = render_plugins_for_context(placeholder, context, width)    
+        if not content and self.nodelist_or:    
+            return self.nodelist_or.render(context)    
         return content
  
     def __repr__(self):
@@ -332,6 +331,7 @@ class PluginsMediaNode(template.Node):
         if page == "dummy":
             return ''
         from cms.plugins.utils import get_plugins_media
+        plugins_media = None
         try:
             plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
         except:
