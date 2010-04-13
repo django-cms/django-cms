@@ -1218,7 +1218,6 @@ msgid "seekbar bg color"
 msgstr "背景色"
 
 #: plugins/video/models.py:27
-#, fuzzy
 msgid "loadingbar color"
 msgstr "装载进度条颜色"
 
