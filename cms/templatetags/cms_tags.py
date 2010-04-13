@@ -227,9 +227,10 @@ class PageAttributeNode(template.Node):
     def render(self, context):
         if not 'request' in context:
             return ''
-        if self.name_var.var.lower() in self.valid_attributes:
+        var_name = self.name_var.var.lower()
+        if var_name in self.valid_attributes:
             # Variable name without quotes works, but is deprecated
-            self.name = self.name_var.var.lower()
+            self.name = var_name
         else:
             self.name = self.name_var.resolve(context)
         lang = get_language_from_request(context['request'])
