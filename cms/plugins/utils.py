@@ -27,14 +27,14 @@ def get_plugins_for_page(request, page, lang=None):
         ).order_by('placeholder', 'position').select_related())
     return getattr(page, '_%s_plugins_cache' % lang)
 
-def get_plugins_media(request, page):
+def get_plugins_media(request, context page):
     lang = get_language_from_request(request)
     if not page:
         # current page is unknown
         return []
     if not hasattr(page, '_%s_plugins_media_cache' % lang):
         plugins = get_plugins_for_page(request, page, lang=lang)
-        media_classes = [get_plugin_media(request, plugin) for plugin in plugins]
+        media_classes = [get_plugin_media(request, context, plugin) for plugin in plugins]
         if media_classes:
             setattr(page, '_%s_plugins_media_cache' % lang, reduce(operator.add, media_classes))
         else:

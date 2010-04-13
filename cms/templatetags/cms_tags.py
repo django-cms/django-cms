@@ -336,7 +336,7 @@ class PluginsMediaNode(template.Node):
         from cms.plugins.utils import get_plugins_media
         plugins_media = None
         # make sure the plugin cache is filled
-        plugins_media = get_plugins_media(request, request._current_page_cache)
+        plugins_media = get_plugins_media(request, context, request._current_page_cache)
         return u''
         if plugins_media:
             return plugins_media.render()
