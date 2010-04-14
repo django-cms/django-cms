@@ -110,8 +110,9 @@ def do_placeholder(parser, token):
         bits = token.split_contents()
         # if the `placeholderor` tag was used, look for closing tag, and pass the enclosed nodes
         # to PlaceholderNode below
-        if bits[0] == 'placeholderor':
-            nodelist_or = parser.parse(('endplaceholderor',))
+        if bits[-1].lower() == 'or':
+            bits.pop()
+            nodelist_or = parser.parse(('endplaceholder',))
             parser.delete_first_token()
         else:
             nodelist_or = None
@@ -130,7 +131,7 @@ class PlaceholderNode(template.Node):
     """This template node is used to output page content and
     is also used in the admin to dynamically generate input fields.
     
-    eg: {% placeholder "placeholder_name" width %}
+    eg: {% placeholder "placeholder_name" %}
     
     Keyword arguments:
     name -- the name of the placeholder
@@ -159,16 +160,15 @@ class PlaceholderNode(template.Node):
         if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
-        content = render_plugins_for_context(placeholder, context, width)    
-        if not content and self.nodelist_or:    
-            return self.nodelist_or.render(context)    
+        content = render_placeholder(placeholder, context)
+        if not content and self.nodelist_or:
+            return self.nodelist_or.render(context)
         return content
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
-register.tag('placeholderor', do_placeholder)
 
 def do_page_attribute(parser, token):
     error_string = '%r tag requires one argument' % token.contents[0]
@@ -291,8 +291,9 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         page = _get_page_by_untyped_arg(page_lookup, request, site_id)
         if not page:
             return {'content': ''}
-        plugins = get_cmsplugin_queryset(request).filter(placeholder__page_set=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
-        c = render_plugins(plugins, context, placeholder_name)
+        placeholder = page.placeholders.get(slot=placeholder_name)
+        plugins = get_cmsplugin_queryset(request).filter(placeholder=placeholder, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        c = render_plugins(plugins, context, placeholder)
         content = "".join(c)
             
     if cache_result:

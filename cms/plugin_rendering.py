@@ -1,5 +1,6 @@
 from cms.utils import get_language_from_request
 from cms import settings
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from django.conf import settings as django_settings
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
@@ -113,7 +114,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
     for index, plugin in enumerate(plugins):
         plugin._render_meta.total = total 
         plugin._render_meta.index = index
-        c.append(plugin.render_plugin(copy.copy(context), placeholder.slot, processors=processors))
+        c.append(plugin.render_plugin(copy.copy(context), placeholder, processors=processors))
     return c
 
 def render_placeholder(placeholder, context_to_copy):
