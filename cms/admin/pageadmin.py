@@ -21,8 +21,7 @@ from cms.utils.moderator import update_moderation_message, \
 from cms.utils.permissions import has_page_add_permission, \
     has_page_change_permission, get_user_permission_level, \
     has_global_change_permissions_permission
-from cms.utils.plugin import get_page_from_plugin_or_404
-from cms.utils.plugins import get_placeholders
+from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from copy import deepcopy
 from django import template

@@ -1,18 +1,17 @@
 from cms.exceptions import NoHomeFound
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
-from cms.utils.plugin import render_plugins_for_context
+from cms.plugin_rendering import render_plugins, render_placeholder
+from cms.models import Page
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.mail import send_mail, mail_managers
+from django.core.mail import mail_managers
 from django.template.defaultfilters import title
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.forms.widgets import Media
-
-
 
 register = template.Library()
 
@@ -28,48 +27,53 @@ def get_site_id(site):
         site_id = settings.SITE_ID
     return site_id
                                     
-def ancestors_from_page(page, page_queryset, title_queryset, lang):
-    ancestors = list(page.get_cached_ancestors(False))
-    ancestors.append(page)
-    try:
-        home = page_queryset.get_home()
-    except NoHomeFound:
-        home = None
-    if ancestors and home and ancestors[0].pk != home.pk: 
-        ancestors = [home] + ancestors
-    ids = [page.pk]
-    for anc in ancestors:
-        ids.append(anc.pk)
-    titles = title_queryset.filter(page__in=ids, language=lang)
-    for anc in ancestors:
-        if home:
-            anc.home_pk_cache = home.pk 
-        for title in titles:
-            if title.page_id == anc.pk:
-                if not hasattr(anc, "title_cache"):
-                    anc.title_cache = {}
-                anc.title_cache[title.language] = title
-    for title in titles:
-        if title.page_id == page.pk:
-            if not hasattr(page, "title_cache"):
-                page.title_cache = {}
-            page.title_cache[title.language] = title
-    return ancestors
-            
 def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
 
+def _get_cache_key(name, page_lookup, lang, site_id):
+    if isinstance(page_lookup, Page):
+        page_key = str(page_lookup.pk)
+    else:
+        page_key = str(page_lookup)
+    return name+'__page_lookup:'+page_key+'_site:'+str(site_id)+'_lang:'+str(lang)
 
-def send_missing_mail(reverse_id, request):
-    site = Site.objects.get_current()
-    mail_managers(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                   _("A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                     "The url of the page was: http://%(host)s%(path)s")
-                     % {'reverse_id':reverse_id, 'host':site.domain, 'path':request.path}, 
-                   fail_silently=True)
+def _get_page_by_untyped_arg(page_lookup, request, site_id):
+    """
+    The `page_lookup` argument can be of any of the following types:
+    - Integer: interpreted as `pk` of the desired page
+    - String: interpreted as `reverse_id` of the desired page
+    - `dict`: a dictionary containing keyword arguments to find the desired page 
+    (for instance: `{'pk': 1}`)
+    - `Page`: you can also pass a Page object directly, in which case there will be no database lookup.
+    - `None`: the current page will be used
+    """
+    if page_lookup is None:
+        return request.current_page
+    if isinstance(page_lookup, Page):
+        return page_lookup
+    if isinstance(page_lookup, basestring):
+        page_lookup = {'reverse_id': page_lookup}
+    elif isinstance(page_lookup, (int, long)):
+        page_lookup = {'pk': page_lookup}
+    elif not isinstance(page_lookup, dict):
+        raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
+    page_lookup.update({'site': site_id})
+    try:
+        return get_page_queryset(request).get(**page_lookup)
+    except Page.DoesNotExist:
+        site = Site.objects.get_current()
+        subject = _('Page not found on %(domain)s') % {'domain':site.domain}
+        body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
+            "The URL of the request was: http://%(host)s%(path)s") \
+            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path} 
+        if settings.DEBUG:
+            raise Page.DoesNotExist(body)
+        else:
+            mail_managers(subject, body, fail_silently=True)
+            return None
 
-def page_id_url(context, reverse_id, lang=None, site=None):
+def page_url(context, page_lookup, lang=None, site=None):
     """
     Show the url of a page with a reverse id in the right language
     This is mostly used if you want to have a static link in a template to a page
@@ -77,26 +81,27 @@ def page_id_url(context, reverse_id, lang=None, site=None):
     site_id = get_site_id(site)
     request = context.get('request', False)
     if not request:
-        return {'content':''}
+        return {'content': ''}
 
     if request.current_page == "dummy":
         return {'content': ''}
     
     if lang is None:
         lang = get_language_from_request(request)
-    key = 'page_id_url_pid:'+str(reverse_id)+'_l:'+str(lang)+'_site:'+str(site_id)+'_type:absolute_url'
-    url = cache.get(key)
+    cache_key = _get_cache_key('page_url', page_lookup, lang, site_id)+'_type:absolute_url'
+    url = cache.get(cache_key)
     if not url:
-        try:
-            page = get_page_queryset(request).get(reverse_id=reverse_id,site=site_id)
+        page = _get_page_by_untyped_arg(page_lookup, request, site_id)
+        if page:
             url = page.get_absolute_url(language=lang)
-            cache.set(key, url, settings.CMS_CONTENT_CACHE_DURATION)
-        except:
-            send_missing_mail(reverse_id, request)
-        
+            cache.set(cache_key, url, settings.CMS_CONTENT_CACHE_DURATION)
     if url:
-        return {'content':url}
-    return {'content':''}
+        return {'content': url}
+    return {'content': ''}
+page_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_url)
+
+def page_id_url(context, reverse_id, lang=None, site=None):
+    return page_url(context, {'reverse_id': reverse_id}, lang, site)
 page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_id_url)
 
 def do_placeholder(parser, token):
@@ -106,8 +111,9 @@ def do_placeholder(parser, token):
         bits = token.split_contents()
         # if the `placeholderor` tag was used, look for closing tag, and pass the enclosed nodes
         # to PlaceholderNode below
-        if bits[0] == 'placeholderor':
-            nodelist_or = parser.parse(('endplaceholderor',))
+        if bits[-1].lower() == 'or':
+            bits.pop()
+            nodelist_or = parser.parse(('endplaceholder',))
             parser.delete_first_token()
         else:
             nodelist_or = None
@@ -124,52 +130,47 @@ def do_placeholder(parser, token):
 
 class PlaceholderNode(template.Node):
     """This template node is used to output page content and
-    is also used in the admin to dynamicaly generate input fields.
+    is also used in the admin to dynamically generate input fields.
     
-    eg: {% placeholder content-type-name width %}
+    eg: {% placeholder "placeholder_name" %}
     
     Keyword arguments:
     name -- the name of the placeholder
-    width -- additional width attribute (integer) which gets added to the plugin context
+    width -- additional width attribute (integer) which gets added to the plugin context 
+    (deprecated, use `{% with 320 as width %}{% placeholder "foo"}{% endwith %}`)
     """
     def __init__(self, name, width=None, nodelist_or=None):
         self.name = "".join(name.lower().split('"'))
-        if width:
-            self.width = template.Variable(width)
-        else:
-            self.width = None
+        if width: 
+            self.width_var = template.Variable(width)
         self.nodelist_or = nodelist_or
 
     def render(self, context):
         if not 'request' in context:
             return ''
-        
-        if self.width:
-            try:
-                width = self.width.resolve(context)
-            except template.VariableDoesNotExist:
-                # should we raise an error here?
-                width = None
-        else:
-            width = None
-            
         request = context['request']
+        width_var = getattr(self, 'width_var', None)
+        if width_var:
+            try:
+                width = int(width_var.resolve(context))
+                context.update({'width': width})
+            except (template.VariableDoesNotExist, ValueError):
+                pass
         
         page = request.current_page
         if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
         request.placeholder_media += placeholder.get_media(request, context)
-        content = render_plugins_for_context(placeholder, context, width)    
-        if not content and self.nodelist_or:    
-            return self.nodelist_or.render(context)    
+        content = render_placeholder(placeholder, context)
+        if not content and self.nodelist_or:
+            return self.nodelist_or.render(context)
         return content
  
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
 
 register.tag('placeholder', do_placeholder)
-register.tag('placeholderor', do_placeholder)
 
 def do_page_attribute(parser, token):
     error_string = '%r tag requires one argument' % token.contents[0]
@@ -180,9 +181,9 @@ def do_page_attribute(parser, token):
         raise template.TemplateSyntaxError(error_string)
     if len(bits) >= 2:
         # tag_name, name
-        # tag_name, name, reverse_id
-        reverse_id = len(bits) == 3 and bits[2] or None
-        return PageAttributeNode(bits[1], reverse_id)
+        # tag_name, name, page_lookup
+        page_lookup = len(bits) == 3 and bits[2] or None
+        return PageAttributeNode(bits[1], page_lookup)
     else:
         raise template.TemplateSyntaxError(error_string)
 
@@ -191,15 +192,16 @@ class PageAttributeNode(template.Node):
     as its title or slug.
 
     Synopsis
-         {% page_attribute field-name %}        
-         {% page_attribute field-name reverse-id %}
+         {% page_attribute "field-name" %}        
+         {% page_attribute "field-name" page_lookup %}
      
     Example
-         {# Output current page's page_title attribute #}
-         {% page_attribute page_title %}        
-         {# Output page_title attribute of the page with reverse_id 'the_page' #}
-         {% page_attribute page_title 'the_page' %}
-
+         {# Output current page's page_title attribute: #}
+         {% page_attribute "page_title" %}        
+         {# Output page_title attribute of the page with reverse_id "the_page": #}
+         {% page_attribute "page_title" "the_page" %}
+         {# Output slug attribute of the page with pk 10: #}
+         {% page_attribute "slug" 10 %}
 
     Keyword arguments:
     field-name -- the name of the field to output. Use one of:
@@ -210,34 +212,39 @@ class PageAttributeNode(template.Node):
     - meta_description
     - meta_keywords
     
-    reverse-id -- The page's reverse_id property, if omitted field-name of 
-    current page is returned.
+    page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
+    See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
+    for the page_lookup argument.
     """
-    def __init__(self, name, reverse_id=None):
-        self.name = name.lower()
-        self.reverse_id = reverse_id
-
+    def __init__(self, name, page_lookup=None):
+        self.name_var = template.Variable(name)
+        self.page_lookup = None
+        self.valid_attributes = ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]
+        if page_lookup:
+            self.page_lookup_var = template.Variable(page_lookup)
 
     def render(self, context):
         if not 'request' in context:
             return ''
+        var_name = self.name_var.var.lower()
+        if var_name in self.valid_attributes:
+            # Variable name without quotes works, but is deprecated
+            self.name = var_name
+        else:
+            self.name = self.name_var.resolve(context)
         lang = get_language_from_request(context['request'])
-        page = self._get_page(context['request'])
+        page_lookup_var = getattr(self, 'page_lookup_var', None)
+        if page_lookup_var:
+            page_lookup = page_lookup_var.resolve(context)
+        else:
+            page_lookup = None
+        page = _get_page_by_untyped_arg(page_lookup, context['request'], get_site_id(None))
         if page == "dummy":
             return ''
-        if page and self.name in ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]:
+        if page and self.name in self.valid_attributes:
             f = getattr(page, "get_"+self.name)
             return f(language=lang, fallback=True)
         return ''
-
-    def _get_page(self, request):
-        if self.reverse_id == None:
-            return request.current_page
-        site = Site.objects.get_current()    
-        try:
-            return get_page_queryset(request).get(reverse_id=self.reverse_id, site=site)
-        except:
-            send_missing_mail(self.reverse_id, request)
 
     def __repr__(self):
         return "<PageAttribute Node: %s>" % self.name
@@ -258,86 +265,125 @@ def clean_admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : unique_choices}
 clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
 
-def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None,
+def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
         site=None, cache_result=True):
     """
-    Show the content of a page with a placeholder name and a reverse id in the right language
-    This is mostly used if you want to have static content in a template of a page (like a footer)
+    Shows the content of a page with a placeholder name and given lookup arguments in the given language.
+    This is useful if you want to have some more or less static content that is shared among many pages,
+    such as a footer.
+
+    See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
+    for the page_lookup argument.
     """
     request = context.get('request', False)
     site_id = get_site_id(site)
     
     if not request:
-        return {'content':''}
+        return {'content': ''}
     if lang is None:
         lang = get_language_from_request(request)
         
     content = None
     
     if cache_result:
-        key = 'show_placeholder_by_id_pid:'+reverse_id+'_placeholder:'+placeholder_name+'_site:'+str(site_id)+'_l:'+str(lang)
-        content = cache.get(key)
+        cache_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)+'_placeholder:'+placeholder_name
+        content = cache.get(cache_key)
         
     if not content:
-        try:
-            page = get_page_queryset(request).get(reverse_id=reverse_id, site=site_id)
-        except:
-            if settings.DEBUG:
-                raise
-            else:
-                site = Site.objects.get_current()
-                send_mail(_('Reverse ID not found on %(domain)s') % {'domain':site.domain},
-                          _("A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
-                            "The url of the page was: http://%(host)s%(path)s") %
-                            {'reverse_id':reverse_id, 'host':request.host, 'path':request.path},
-                          settings.DEFAULT_FROM_EMAIL,
-                          settings.MANAGERS,
-                          fail_silently=True)
-                return {'content':''}
-        plugins = get_cmsplugin_queryset(request).filter(placeholder__page=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
-        content = ""
-        for plugin in plugins:
-            content += plugin.render_plugin(context, placeholder_name)
+        page = _get_page_by_untyped_arg(page_lookup, request, site_id)
+        if not page:
+            return {'content': ''}
+        placeholder = page.placeholders.get(slot=placeholder_name)
+        plugins = get_cmsplugin_queryset(request).filter(placeholder=placeholder, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        c = render_plugins(plugins, context, placeholder)
+        content = "".join(c)
             
     if cache_result:
-        cache.set(key, content, settings.CMS_CONTENT_CACHE_DURATION)
+        cache.set(cache_key, content, settings.CMS_CONTENT_CACHE_DURATION)
 
     if content:
-        return {'content':mark_safe(content)}
-    return {'content':''}
+        return {'content': mark_safe(content)}
+    return {'content': ''}
 
 def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
-    return _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=lang, site=site)
-
+    """
+    Show the content of a specific placeholder, from a page found by reverse id, in the given language.
+    This templatetag is deprecated, replace with `show_placeholder`.
+    """
+    return _show_placeholder_for_page(context, placeholder_name, {'reverse_id': reverse_id}, lang=lang, site=site)
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
 
 def show_uncached_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
-    return _show_placeholder_by_id(context, placeholder_name, reverse_id,
+    """
+    Show the uncached content of a specific placeholder, from a page found by reverse id, in the given language.
+    This templatetag is deprecated, replace with `show_uncached_placeholder`.
+    """
+    return _show_placeholder_for_page(context, placeholder_name, {'reverse_id': reverse_id},
             lang=lang, site=site, cache_result=False)
-
 show_uncached_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_uncached_placeholder_by_id)
 
+def show_placeholder(context, placeholder_name, page_lookup, lang=None, site=None):
+    """
+    Show the content of a specific placeholder, from a page found by pk|reverse_id|dict 
+    or passed to the function, in the given language.
+    """
+    return _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=lang, site=site)
+show_placeholder_for_page = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder)
+
+def show_uncached_placeholder(context, placeholder_name, page_lookup, lang=None, site=None):
+    """
+    Show the uncached content of a specific placeholder, from a page found by pk|reverse_id|dict 
+    or passed to the function, in the given language.
+    """
+    return _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=lang, site=site, cache_result=False)
+show_uncached_placeholder_for_page = register.inclusion_tag('cms/content.html', takes_context=True)(show_uncached_placeholder)
+
 def do_plugins_media(parser, token):
-    return PluginsMediaNode()
+    args = token.split_contents()
+    if len(args) > 2:
+        raise template.TemplateSyntaxError("Invalid syntax. Expected "
+            "'{%% %s [page_lookup] %%}'" % tag)
+    elif len(args) == 2:
+        page_lookup = args[1]
+    else:
+        page_lookup = None
+    return PluginsMediaNode(page_lookup)
 
 
 class PluginsMediaNode(template.Node):
-    """This template node is used to output media for plugins.
-
-    eg: {% plugins_media %}
     """
+    This template node is used to output media for plugins.
+    
+    eg: {% plugins_media %}
+    
+    You can also pass the object a page_lookup arg if you want to output media tags for a specific 
+    page other than the current page. 
+
+    eg: {% plugins_media "gallery" %}
+    """
+    
+    def __init__(self, page_lookup=None):
+        if page_lookup:
+            self.page_lookup_var = template.Variable(page_lookup)
+    
     def render(self, context):
+        from cms.plugins.utils import get_plugins_media
         if not 'request' in context:
             return ''
         request = context['request']
-        page = request.current_page
-        if page == "dummy":
-            return ''
         from cms.plugins.utils import get_plugins_media
         plugins_media = None
-        # make sure the plugin cache is filled
-        plugins_media = get_plugins_media(request, context, request._current_page_cache)
-        return u''
+        page_lookup_var = getattr(self, 'page_lookup_var', None)
+        if page_lookup_var:
+            page_lookup = page_lookup_var.resolve(context)
+            page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
+            plugins_media = get_plugins_media(request, page)
+        else:
+            page = request.current_page
+            if page == "dummy":
+                return ''
+            # make sure the plugin cache is filled
+            plugins_media = get_plugins_media(request, context, request._current_page_cache)
         if plugins_media:
             return plugins_media.render()
         else:
