@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 import copy
 from django.core.cache import cache
 import pickle
+from django.utils.translation import get_language
 
 class MenuPool(object):
     def __init__(self):
@@ -41,7 +42,7 @@ class MenuPool(object):
         
     
     def _build_nodes(self, request, site_id):
-        lang = request.LANGUAGE_CODE
+        lang = get_language()
         key = "menu_nodes_%s_%s" % (lang, site_id)
         self.cache_keys.add(key)
         cached_nodes = cache.get(key, None)
