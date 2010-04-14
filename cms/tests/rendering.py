@@ -10,6 +10,7 @@ from django.http import HttpRequest
 from django.db import connection
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms import plugin_rendering
+from django.forms.widgets import Media
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -72,6 +73,7 @@ class RenderingTestCase(CMSTestCase):
     def get_request(self, *args, **kwargs):
         request = super(RenderingTestCase, self).get_request(*args, **kwargs)
         request.current_page = self.test_page
+        request.placeholder_media = Media()
         return request
 
     def init_render_settings(self):

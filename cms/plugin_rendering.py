@@ -149,7 +149,7 @@ def render_placeholder(placeholder, context_to_copy):
     if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
         'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and \
         request.user.is_staff and request.user.is_authenticated() and \
-        page.has_change_permission(request):
+        (not page or page.has_change_permission(request)):
             edit = True
     if edit:
         from cms.plugin_pool import plugin_pool
