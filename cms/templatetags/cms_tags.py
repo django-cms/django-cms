@@ -11,6 +11,7 @@ from django.core.mail import mail_managers
 from django.template.defaultfilters import title
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.forms.widgets import Media
 
 register = template.Library()
 
@@ -160,6 +161,7 @@ class PlaceholderNode(template.Node):
         if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
+        request.placeholder_media += placeholder.get_media(request, context)
         content = render_placeholder(placeholder, context)
         if not content and self.nodelist_or:
             return self.nodelist_or.render(context)
@@ -347,6 +349,7 @@ def do_plugins_media(parser, token):
         page_lookup = None
     return PluginsMediaNode(page_lookup)
 
+
 class PluginsMediaNode(template.Node):
     """
     This template node is used to output media for plugins.
@@ -370,24 +373,17 @@ class PluginsMediaNode(template.Node):
         request = context['request']
         from cms.plugins.utils import get_plugins_media
         plugins_media = None
-        try:
-            page_lookup_var = getattr(self, 'page_lookup_var', None)
-            if page_lookup_var:
-                page_lookup = page_lookup_var.resolve(context)
-                page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-                plugins_media = get_plugins_media(request, page)
-            else:
-                page = request.current_page
-                if page == "dummy":
-                    return ''
-                plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
-        except:
-            import sys
-            info = sys.exc_info()
-            import traceback
-            traceback.print_exception(*info)
-            raise
-
+        page_lookup_var = getattr(self, 'page_lookup_var', None)
+        if page_lookup_var:
+            page_lookup = page_lookup_var.resolve(context)
+            page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
+            plugins_media = get_plugins_media(request, page)
+        else:
+            page = request.current_page
+            if page == "dummy":
+                return ''
+            # make sure the plugin cache is filled
+            plugins_media = get_plugins_media(request, context, request._current_page_cache)
         if plugins_media:
             return plugins_media.render()
         else:
