@@ -7,7 +7,7 @@
 		<ul class="cms_toolbar_submenu">				
 			{% regroup installed_plugins by module as module_list %}
 			{% for module in module_list %}
-			<li>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Generic" %}{% endif %}
+			<li>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}
 			<ul>
 				{% for p in module.list %}
 				<li{% if forloop.first %} class="first"{% endif %}{% if forloop.last %} class="last"{% endif %}><a href="#" rel="{{ p.value }}">{{ p.name }}</a></li>
