@@ -14,7 +14,13 @@ When rendering, the content of these plugins will appear where the `placeholder`
 
 Example::
 
-	{% placeholder "content" %}
+    {% placeholder "content" %}
+
+If you want additional content to be displayed in case the placeholder is empty, use the `or` argument and an additional `{% endplaceholder %}` closing tag. Everything between `{% placeholder "..." or %}` and `{% endplaceholder %}` is rendered instead if the placeholder has no plugins or the plugins do not generate any output.
+
+Example::
+
+    {% placeholder "content" or %}There is no content.{% endplaceholder %}
 
 If you want to add extra variables to the context of the placeholder, you should use Django's 
 `with` tag. For instance, if you want to resize images from your templates according to a context 
@@ -23,17 +29,6 @@ variable called `width`, you can pass it as follows:
     {% with 320 as width %}{% placeholder "content" %}{% endwith %}
 
 See also the `PLACEHOLDER_CONF` setting where you can also add extra context variables and change some other placeholder behavior.
-
-placeholderor
--------------
-
-The same as `placeholder`, with additional content to be displayed in case the placeholder is empty:
-If the placeholder has no plugins or the plugins do not generate any output, everything between 
-`{% placeholderor %}` and `{% endplaceholderor %}` is rendered instead.
-
-Example::
-
-	{% placeholderor "content" %}There is no content.{% endplaceholderor %}
 
 show_placeholder
 ----------------
