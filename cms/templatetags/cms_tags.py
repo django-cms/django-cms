@@ -10,6 +10,7 @@ from django.core.mail import send_mail, mail_managers
 from django.template.defaultfilters import title
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.forms.widgets import Media
 
 
 
@@ -158,6 +159,7 @@ class PlaceholderNode(template.Node):
         if not page or page == "dummy":
             return ""
         placeholder = page.placeholders.get(slot=self.name)
+        request.placeholder_media += placeholder.get_media(request, context)
         content = render_plugins_for_context(placeholder, context, width)    
         if not content and self.nodelist_or:    
             return self.nodelist_or.render(context)    
@@ -292,7 +294,7 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None,
                           settings.MANAGERS,
                           fail_silently=True)
                 return {'content':''}
-        plugins = get_cmsplugin_queryset(request).filter(placeholder__page_set=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
+        plugins = get_cmsplugin_queryset(request).filter(placeholder__page=page, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         content = ""
         for plugin in plugins:
             content += plugin.render_plugin(context, placeholder_name)
@@ -318,6 +320,7 @@ show_uncached_placeholder_by_id = register.inclusion_tag('cms/content.html', tak
 def do_plugins_media(parser, token):
     return PluginsMediaNode()
 
+
 class PluginsMediaNode(template.Node):
     """This template node is used to output media for plugins.
 
@@ -332,14 +335,9 @@ class PluginsMediaNode(template.Node):
             return ''
         from cms.plugins.utils import get_plugins_media
         plugins_media = None
-        try:
-            plugins_media = get_plugins_media(request, request._current_page_cache) # make sure the plugin cache is filled
-        except:
-            import sys
-            info = sys.exc_info()
-            import traceback
-            traceback.print_exception(*info)
-            raise
+        # make sure the plugin cache is filled
+        plugins_media = get_plugins_media(request, context, request._current_page_cache)
+        return u''
         if plugins_media:
             return plugins_media.render()
         else:

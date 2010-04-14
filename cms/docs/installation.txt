@@ -61,6 +61,7 @@ Add the following middleware classes::
 		'cms.middleware.page.CurrentPageMiddleware', #<--- new
 		'cms.middleware.user.CurrentUserMiddleware', #<--- new
 		'cms.middleware.toolbar.ToolbarMiddleware',  #<--- new
+		'cms.middleware.media.PlaceholderMediaMiddleware', #<--- new
 		...
 		'django.middleware.cache.FetchFromCacheMiddleware', 
 	)

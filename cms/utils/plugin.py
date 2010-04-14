@@ -48,7 +48,6 @@ def render_plugins_for_context(placeholder, context_to_copy, width=None):
     if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
             'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and \
             request.user.is_staff and request.user.is_authenticated() and \
-            placeholder.has_change_permission(request) and \
             (not page or page.has_change_permission(request)):
         edit = True
     if edit and settings.PLACEHOLDER_FRONTEND_EDITING:
