@@ -1,5 +1,6 @@
 from django import template
 from django.template.defaultfilters import safe
+from cms.plugins.utils import get_plugin_media
 
 register = template.Library()
 
@@ -10,11 +11,15 @@ class PlaceholderNode(template.Node):
         self.width = width
         
     def render(self, context):
+        request = context.get('request', None)
+        if not request:
+            return ''
         if self.width is not None:
             width = self.width.resolve(context)
         else:
             width = self.width
         placeholder = self.placeholder.resolve(context)
+        request.placeholder_media += placeholder.get_media(request, context)
         if not placeholder:
             return ''
         return safe(placeholder.render(context, width))

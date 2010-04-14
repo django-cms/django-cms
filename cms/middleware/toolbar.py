@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import simplejson
 from django.utils.encoding import smart_unicode
 
-_HTML_TYPES = ('text/html', 'application/xhtml+xml')
+HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
 def inster_after_tag(string, tag, insertion):
     no_case = string.lower()
@@ -39,7 +39,7 @@ class ToolbarMiddleware(object):
             return False
         if response.status_code != 200:
             return False 
-        if not response['Content-Type'].split(';')[0] in _HTML_TYPES:
+        if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
         try:
             if request.path_info.startswith(reverse("admin:index")):
@@ -57,12 +57,12 @@ class ToolbarMiddleware(object):
         return True
     
     def process_request(self, request):
-        if request.method == "POST" and "edit" in request.GET:
-            if "cms_username" in request.POST:
+        if request.method == "POST":
+            if "edit" in request.GET and "cms_username" in request.POST:
                 user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
                 if user:
                     login(request, user)
-            if "logout_submit" in request.POST:
+            if request.user.is_authenticated() and "logout_submit" in request.POST:
                 logout(request)
         if request.user.is_authenticated() and request.user.is_staff:
             if "edit-off" in request.GET:

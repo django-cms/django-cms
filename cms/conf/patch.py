@@ -46,4 +46,5 @@ def post_patch_check():
     if settings.CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in settings.MIDDLEWARE_CLASSES:
         raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
             'Please put it into your MIDDLEWARE_CLASSES in settings file')
-
+    if 'cms.middleware.media.PlaceholderMediaMiddleware' not in settings.MIDDLEWARE_CLASSES:
+        raise ImproperlyConfigured("CMS requires cms.middleware.media.PlaceholderMediaMiddleware to be in MIDDLEWARE_CLASSES.")

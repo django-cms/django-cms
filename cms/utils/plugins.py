@@ -5,6 +5,10 @@ from django.template.loader import get_template
 from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
 from django.template import NodeList, TextNode, VariableNode
 import warnings
+from django.shortcuts import get_object_or_404
+
+def get_page_from_plugin_or_404(cms_plugin):
+    return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
 
 def _extend_blocks(extend_node, blocks):
     """
