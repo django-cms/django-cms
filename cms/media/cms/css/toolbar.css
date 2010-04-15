@@ -25,7 +25,7 @@
     height:41px;
     width:100%;
     min-width:960px;
-    zoom:1px;
+    zoom:1;
     border-bottom:2px solid #ddd;
     background:url(../images/cms_toolbar.png) repeat-x 0 0;
 }
@@ -60,7 +60,7 @@
 #cms_toolbar_col1
 {
     float:left;
-    zoom:1px;
+    zoom:1;
     overflow:hidden;
 }
 
@@ -81,7 +81,7 @@
     font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;
     font-size:12px;
     color:#656565;
-    zoom:1px;
+    zoom:1;
 }
 
 .cms_toolbar strong,
@@ -330,7 +330,7 @@ span.cms_toolbar_icon.cms_toolbar_state-icon.del
 .cms_toolbar_submenu li
 {
     clear:both;
-    zoom:1px;
+    zoom:1;
     height:27px;
     width:100%;
     white-space:nowrap;
