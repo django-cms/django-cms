@@ -954,7 +954,7 @@ msgstr ""
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr ""
+msgstr "Optionnel: la langue désirée pour les greffons"
 
 #: plugins/link/cms_plugins.py:11
 msgid "Link"
@@ -1223,7 +1223,7 @@ msgstr "couleur du bouton (état survolé)"
 
 #: plugins/video/models.py:30
 msgid "button highlight color"
-msgstr ""
+msgstr "Couleur de surlignage du bouton"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
@@ -1681,12 +1681,10 @@ msgid "Add child page"
 msgstr "Ajouter page descendante"
 
 #: templates/cms/toolbar/toolbar.html:883
-#, fuzzy
 msgid "add sibling"
 msgstr "Ajouter \"soeur\""
 
 #: templates/cms/toolbar/toolbar.html:883
-#, fuzzy
 msgid "Add sibling page"
 msgstr "Ajouter page \"soeur\""
 
