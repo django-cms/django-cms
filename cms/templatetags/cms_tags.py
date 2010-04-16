@@ -1,7 +1,9 @@
+from itertools import chain
 from cms.exceptions import NoHomeFound
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, get_template_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
 from cms.plugin_rendering import render_plugins, render_placeholder
+from cms.plugins.utils import get_plugins
 from cms.models import Page
 from django import template
 from django.conf import settings
@@ -26,7 +28,7 @@ def get_site_id(site):
     else:
         site_id = settings.SITE_ID
     return site_id
-                                    
+
 def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
@@ -43,7 +45,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     The `page_lookup` argument can be of any of the following types:
     - Integer: interpreted as `pk` of the desired page
     - String: interpreted as `reverse_id` of the desired page
-    - `dict`: a dictionary containing keyword arguments to find the desired page 
+    - `dict`: a dictionary containing keyword arguments to find the desired page
     (for instance: `{'pk': 1}`)
     - `Page`: you can also pass a Page object directly, in which case there will be no database lookup.
     - `None`: the current page will be used
@@ -66,7 +68,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         subject = _('Page not found on %(domain)s') % {'domain':site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
             "The URL of the request was: http://%(host)s%(path)s") \
-            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path} 
+            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
@@ -85,7 +87,7 @@ def page_url(context, page_lookup, lang=None, site=None):
 
     if request.current_page == "dummy":
         return {'content': ''}
-    
+
     if lang is None:
         lang = get_language_from_request(request)
     cache_key = _get_cache_key('page_url', page_lookup, lang, site_id)+'_type:absolute_url'
@@ -105,7 +107,9 @@ def page_id_url(context, reverse_id, lang=None, site=None):
 page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_id_url)
 
 def do_placeholder(parser, token):
-    error_string = '%r tag requires at least 1 and accepts at most 2 arguments' % token.contents[0]
+    error_string = '%r tag requires at least 1 and accepts at most 2 arguments'
+    nodelist_or = None
+    inherit = False
     try:
         # split_contents() knows not to split quoted strings.
         bits = token.split_contents()
@@ -115,35 +119,47 @@ def do_placeholder(parser, token):
             bits.pop()
             nodelist_or = parser.parse(('endplaceholder',))
             parser.delete_first_token()
-        else:
-            nodelist_or = None
+        if bits[-1].lower() == 'inherit':
+            bits.pop()
+            inherit = True
     except ValueError:
-        raise template.TemplateSyntaxError(error_string)
+        raise template.TemplateSyntaxError(error_string % bits[0])
     if len(bits) == 2:
         #tag_name, name
-        return PlaceholderNode(bits[1], nodelist_or=nodelist_or)
+        return PlaceholderNode(bits[1], nodelist_or=nodelist_or, inherit=inherit)
     elif len(bits) == 3:
         #tag_name, name, width
-        return PlaceholderNode(bits[1], bits[2], nodelist_or=nodelist_or)
+        return PlaceholderNode(bits[1], bits[2], nodelist_or=nodelist_or, inherit=inherit)
     else:
-        raise template.TemplateSyntaxError(error_string)
+        raise template.TemplateSyntaxError(error_string % bits[0])
 
 class PlaceholderNode(template.Node):
     """This template node is used to output page content and
     is also used in the admin to dynamically generate input fields.
-    
+
     eg: {% placeholder "placeholder_name" %}
-    
+
+    {% placeholder "sidebar" inherit %}
+
+    {% placeholder "footer" inherit or %}
+        <a href="/about/">About us</a>
+    {% endplaceholder %}
+
     Keyword arguments:
     name -- the name of the placeholder
-    width -- additional width attribute (integer) which gets added to the plugin context 
+    width -- additional width attribute (integer) which gets added to the plugin context
     (deprecated, use `{% with 320 as width %}{% placeholder "foo"}{% endwith %}`)
+    inherit -- optional argument which if given will result in inheriting
+        the content of the placeholder with the same name on parent pages
+    or -- optional argument which if given will make the template tag a block
+        tag whose content is shown if the placeholder is empty
     """
-    def __init__(self, name, width=None, nodelist_or=None):
+    def __init__(self, name, width=None, nodelist_or=None, inherit=False):
         self.name = "".join(name.lower().split('"'))
-        if width: 
+        if width:
             self.width_var = template.Variable(width)
         self.nodelist_or = nodelist_or
+        self.inherit = inherit
 
     def render(self, context):
         if not 'request' in context:
@@ -156,17 +172,35 @@ class PlaceholderNode(template.Node):
                 context.update({'width': width})
             except (template.VariableDoesNotExist, ValueError):
                 pass
-        
+
         page = request.current_page
         if not page or page == "dummy":
             return ""
+
         placeholder = page.placeholders.get(slot=self.name)
-        request.placeholder_media += placeholder.get_media(request, context)
-        content = render_placeholder(placeholder, context)
+        content = self.get_content(request, page, context)
         if not content and self.nodelist_or:
             return self.nodelist_or.render(context)
         return content
- 
+
+    def get_content(self, request, page, context):
+        from cms.utils.plugins import get_placeholders
+        pages = [page]
+        if self.inherit:
+            pages = chain([page], page.get_cached_ancestors(ascending=True))
+        for page in pages:
+            template = get_template_from_request(request, page)
+            placeholder = page.placeholders.filter(**{
+                'slot__in': get_placeholders(template),
+            }).get(slot=self.name)
+            if not get_plugins(request, placeholder):
+                continue
+            request.placeholder_media += placeholder.get_media(request, context)
+            content = render_placeholder(placeholder, context)
+            if content:
+                return content
+        return ""
+
     def __repr__(self):
         return "<Placeholder Node: %s>" % self.name
 
@@ -192,12 +226,12 @@ class PageAttributeNode(template.Node):
     as its title or slug.
 
     Synopsis
-         {% page_attribute "field-name" %}        
+         {% page_attribute "field-name" %}
          {% page_attribute "field-name" page_lookup %}
-     
+
     Example
          {# Output current page's page_title attribute: #}
-         {% page_attribute "page_title" %}        
+         {% page_attribute "page_title" %}
          {# Output page_title attribute of the page with reverse_id "the_page": #}
          {% page_attribute "page_title" "the_page" %}
          {# Output slug attribute of the page with pk 10: #}
@@ -211,7 +245,7 @@ class PageAttributeNode(template.Node):
     - slug
     - meta_description
     - meta_keywords
-    
+
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
@@ -277,18 +311,18 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     """
     request = context.get('request', False)
     site_id = get_site_id(site)
-    
+
     if not request:
         return {'content': ''}
     if lang is None:
         lang = get_language_from_request(request)
-        
+
     content = None
-    
+
     if cache_result:
         cache_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)+'_placeholder:'+placeholder_name
         content = cache.get(cache_key)
-        
+
     if not content:
         page = _get_page_by_untyped_arg(page_lookup, request, site_id)
         if not page:
@@ -297,7 +331,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         plugins = get_cmsplugin_queryset(request).filter(placeholder=placeholder, language=lang, placeholder__slot__iexact=placeholder_name, parent__isnull=True).order_by('position').select_related()
         c = render_plugins(plugins, context, placeholder)
         content = "".join(c)
-            
+
     if cache_result:
         cache.set(cache_key, content, settings.CMS_CONTENT_CACHE_DURATION)
 
@@ -324,7 +358,7 @@ show_uncached_placeholder_by_id = register.inclusion_tag('cms/content.html', tak
 
 def show_placeholder(context, placeholder_name, page_lookup, lang=None, site=None):
     """
-    Show the content of a specific placeholder, from a page found by pk|reverse_id|dict 
+    Show the content of a specific placeholder, from a page found by pk|reverse_id|dict
     or passed to the function, in the given language.
     """
     return _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=lang, site=site)
@@ -332,7 +366,7 @@ show_placeholder_for_page = register.inclusion_tag('cms/content.html', takes_con
 
 def show_uncached_placeholder(context, placeholder_name, page_lookup, lang=None, site=None):
     """
-    Show the uncached content of a specific placeholder, from a page found by pk|reverse_id|dict 
+    Show the uncached content of a specific placeholder, from a page found by pk|reverse_id|dict
     or passed to the function, in the given language.
     """
     return _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=lang, site=site, cache_result=False)
@@ -353,19 +387,19 @@ def do_plugins_media(parser, token):
 class PluginsMediaNode(template.Node):
     """
     This template node is used to output media for plugins.
-    
+
     eg: {% plugins_media %}
-    
-    You can also pass the object a page_lookup arg if you want to output media tags for a specific 
-    page other than the current page. 
+
+    You can also pass the object a page_lookup arg if you want to output media tags for a specific
+    page other than the current page.
 
     eg: {% plugins_media "gallery" %}
     """
-    
+
     def __init__(self, page_lookup=None):
         if page_lookup:
             self.page_lookup_var = template.Variable(page_lookup)
-    
+
     def render(self, context):
         from cms.plugins.utils import get_plugins_media
         if not 'request' in context:
@@ -388,9 +422,9 @@ class PluginsMediaNode(template.Node):
             return plugins_media.render()
         else:
             return u''
-        
+
     def __repr__(self):
         return "<PluginsMediaNode Node: %s>" % self.name if hasattr(self, 'name') else ''
-        
+
 register.tag('plugins_media', do_plugins_media)
 
