@@ -188,6 +188,7 @@ CMS_MENU_TITLE_OVERWRITE = True
 CMS_HIDE_UNTRANSLATED = False
 CMS_URL_OVERWRITE = True
 
+SOUTH_TESTS_MIGRATE = False
 
 try:
     from local_settings import *
