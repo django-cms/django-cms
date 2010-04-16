@@ -55,7 +55,7 @@ def revert_plugins(request, version_id, obj):
             others.append(rev)
     if not page.has_change_permission(request):
         raise Http404
-    current_plugins = list(CMSPlugin.objects.filter(page=page))
+    current_plugins = list(CMSPlugin.objects.filter(placeholder__page=page))
     for plugin in cms_plugin_list:
         plugin.page = page
         plugin.save(no_signals=True)
