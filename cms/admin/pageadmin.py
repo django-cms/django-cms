@@ -1238,7 +1238,7 @@ class PageAdmin(model_admin):
                 HttpResponse(str("error"))
             if page and 'reversion' in settings.INSTALLED_APPS:
                 page.save()
-                save_all_plugins(request, page, placeholder)
+                save_all_plugins(request, page, plugin.placeholder)
                 reversion.revision.user = request.user
                 reversion.revision.comment = unicode(_(u"Plugins where moved"))
             return HttpResponse(str("ok"))
