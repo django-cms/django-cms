@@ -1102,7 +1102,7 @@ class PageAdmin(model_admin):
                 return HttpResponseBadRequest(_("Language must be set to a supported language!"))
             if language == copy_from:
                 return HttpResponseBadRequest(_("Language must be different than the copied language!"))
-            plugins = list(placeholder.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            plugins = list(placeholder.cmsplugin_set.filter(language=copy_from).order_by('tree_id', '-rght'))
             ptree = []
             for p in plugins:
                 p.copy_plugin(placeholder, language, ptree)
