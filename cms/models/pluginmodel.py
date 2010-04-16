@@ -103,8 +103,10 @@ class CMSPlugin(MpttPublisher):
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
         if instance and not (admin and not plugin.admin_preview):
+            placeholder = instance.placeholder
+            placeholder_slot = placeholder or instance.placeholder.slot
             context = PluginContext(context, instance, placeholder)
-            context = plugin.render(context, instance, placeholder.slot)
+            context = plugin.render(context, instance, placeholder_slot)
             if plugin.render_plugin:
                 template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
                 if not template:

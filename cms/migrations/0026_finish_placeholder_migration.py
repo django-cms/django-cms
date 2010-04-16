@@ -21,7 +21,7 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         
         # Renaming field 'CMSPlugin.placeholder' to 'CMSPlugin.new_placeholder'
-        db.delete_column('cms_cmsplugin', 'placeholder_id', 'new_placeholder_id')
+        db.rename_column('cms_cmsplugin', 'placeholder_id', 'new_placeholder_id')
 
         # Adding field 'CMSPlugin.page'
         db.add_column('cms_cmsplugin', 'page', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['cms.Page']), keep_default=False)
