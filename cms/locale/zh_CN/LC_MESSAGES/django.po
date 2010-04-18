@@ -1146,7 +1146,6 @@ msgid "Video"
 msgstr "视频"
 
 #: plugins/video/cms_plugins.py:42
-#, fuzzy
 msgid "Color Settings"
 msgstr "色彩设置"
 
@@ -1217,15 +1216,15 @@ msgstr "装载进度条颜色"
 
 #: plugins/video/models.py:28
 msgid "button out color"
-msgstr ""
+msgstr "按钮指针移出颜色"
 
 #: plugins/video/models.py:29
 msgid "button over color"
-msgstr ""
+msgstr "按钮指针移入颜色"
 
 #: plugins/video/models.py:30
 msgid "button highlight color"
-msgstr ""
+msgstr "按钮按下颜色"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
@@ -1464,7 +1463,6 @@ msgid "softroot"
 msgstr "伪根节点"
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "home"
 msgstr "首页"
 
@@ -1619,9 +1617,8 @@ msgid "Add Plugin"
 msgstr "添加插件"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
-#, fuzzy
 msgid "From Language"
-msgstr "语言"
+msgstr "源语言"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
 #, fuzzy
