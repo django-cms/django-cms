@@ -1148,39 +1148,35 @@ msgstr "视频"
 #: plugins/video/cms_plugins.py:42
 #, fuzzy
 msgid "Color Settings"
-msgstr "设置"
+msgstr "色彩设置"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid "movie file"
-msgstr "电影"
+msgstr "电影文件"
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "使用.flv或者h264编码的视频文件"
 
 #: plugins/video/models.py:11
-#, fuzzy
 msgid "movie url"
-msgstr "电影"
+msgstr "电影url"
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
+msgstr "vimeo或youtube视频的url。例如： http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
-#, fuzzy
 msgid "preview image file"
-msgstr "使用图片文件"
+msgstr "预览图片文件"
 
 #: plugins/video/models.py:17
 msgid "auto play"
 msgstr "自动播放"
 
 #: plugins/video/models.py:18
-#, fuzzy
 msgid "auto hide"
-msgstr "自动加载"
+msgstr "自动隐藏"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
@@ -1191,7 +1187,6 @@ msgid "loop"
 msgstr "循环播放"
 
 #: plugins/video/models.py:23
-#, fuzzy
 msgid "background color"
 msgstr "背景色"
 
@@ -1199,7 +1194,6 @@ msgstr "背景色"
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
-#, fuzzy
 msgid "Hexadecimal, eg ff00cc"
 msgstr "十六进制，如 fff000"
 
@@ -1234,9 +1228,8 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-#, fuzzy
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr "flash插件丢失. 请点击 <a href=\"http://adobe.com/flashplayer\">这儿</a>下载"
+msgstr "flash插件缺失. 请在 <a href=\"http://adobe.com/flashplayer\">这里</a>下载"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1348,7 +1341,7 @@ msgstr "查看结果"
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "请修正下面的错误。"
-msgstr[1] "请修正下面的错误。"
+msgstr[1] "请修正下面的多个错误。"
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
@@ -1428,13 +1421,12 @@ msgid "published"
 msgstr "已发表"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "状态"
+msgstr "开始"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "结束"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
