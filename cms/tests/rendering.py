@@ -40,6 +40,12 @@ class RenderingTestCase(CMSTestCase):
             'slug': u'RenderingTestCase-slug2',
             'reverse_id': u'renderingtestcase-reverse-id2',
         }
+        self.test_data3 = {
+            'title': u'RenderingTestCase-title3',
+            'slug': u'RenderingTestCase-slug3',
+            'reverse_id': u'renderingtestcase-reverse-id3',
+            'text_sub': u'RenderingTestCase-sub3',
+        }
         self.insert_test_content()
 
     def insert_test_content(self):
@@ -53,7 +59,7 @@ class RenderingTestCase(CMSTestCase):
         for placeholder in p.placeholders.all():
             self.test_placeholders[placeholder.slot] = placeholder
         # Insert another page that is not the home page
-        p2 = Page(site=Site.objects.get_current(), reverse_id=self.test_data2['reverse_id'], template=TEMPLATE_NAME, published=True, publisher_state=1, publisher_is_draft=False)
+        p2 = Page(parent=p, site=Site.objects.get_current(), reverse_id=self.test_data2['reverse_id'], template=TEMPLATE_NAME, published=True, publisher_state=1, publisher_is_draft=False)
         p2.save()
         t2 = Title(page=p2, language=settings.LANGUAGES[0][0], slug=self.test_data2['slug'], title=self.test_data2['title'])
         t2.save()
@@ -62,9 +68,24 @@ class RenderingTestCase(CMSTestCase):
         pl.insert_at(None, commit=True)
         pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'], publisher_state=1, publisher_is_draft=False)
         pl.insert_at(None, commit=True)
+
+        # Insert another page that is not the home page
+        p3 = Page(parent=p2, site=Site.objects.get_current(), reverse_id=self.test_data3['reverse_id'], template=TEMPLATE_NAME, published=True, publisher_state=1, publisher_is_draft=False)
+        p3.save()
+        t3 = Title(page=p3, language=settings.LANGUAGES[0][0], slug=self.test_data3['slug'], title=self.test_data3['title'])
+        t3.save()
+        # Placeholders have been inserted on post_save signal:
+        self.test_placeholders3 = {}
+        for placeholder in p3.placeholders.all():
+            self.test_placeholders3[placeholder.slot] = placeholder
+        # # Insert some test Text plugins
+        pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'], publisher_state=1, publisher_is_draft=False)
+        pl.insert_at(None, commit=True)
+
         # Reload test pages
         self.test_page = Page.objects.get(pk=p.pk)
         self.test_page2 = Page.objects.get(pk=p2.pk)
+        self.test_page3 = Page.objects.get(pk=p3.pk)
 
     def get_context(self, context_vars={}):
         request = self.get_request()
@@ -199,3 +220,13 @@ class RenderingTestCase(CMSTestCase):
         from django.core import mail
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals("'pk': -1" in mail.outbox[0].body, True)
+
+    def test_09_inherit_placeholder(self):
+        t = u'{% load cms_tags %}'+ \
+            u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
+        self.old_test_page = self.test_page
+        self.test_page = self.test_page3
+        r = self.render(t)
+        self.test_page = self.old_test_page
+        self.assertEqual(r, u'|'+self.test_data['text_main']+'|'+self.test_data3['text_sub'])
+
