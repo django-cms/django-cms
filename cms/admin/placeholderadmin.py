@@ -106,7 +106,8 @@ class PlaceholderAdmin(ModelAdmin):
             pat(r'add-plugin/$', self.add_plugin),
             pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
             pat(r'remove-plugin/$', self.remove_plugin),
-            pat(r'move-plugin/$', self.move_plugin),            
+            pat(r'move-plugin/$', self.move_plugin),
+            pat(r'copy-plugins/$', self.copy_plugins),            
         )
         return url_patterns + super(PlaceholderAdmin, self).get_urls()
     
@@ -198,3 +199,17 @@ class PlaceholderAdmin(ModelAdmin):
             comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
             return HttpResponse("%s,%s" % (plugin_id, comment))
         raise Http404
+    
+    def copy_plugins(self, request):
+        if request.method != "POST":
+            raise Http404
+        placeholder_id = request.POST['placeholder']
+        placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+        language = request.POST['language'] or get_language_from_request(request)
+        
+        plugins = placeholder.generic_copy(language)
+        if plugins:
+            return render_to_response('admin/cms/page/widgets/plugin_item.html',
+                {'plugin_list':plugins}, RequestContext(request))
+        else:
+            return HttpResponseBadRequest(_("Error during copy"))

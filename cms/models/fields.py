@@ -2,6 +2,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.forms.widgets import PlaceholderPluginEditorWidget
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
+from django.utils.importlib import import_module
 from django.template.loader import render_to_string
 from django.db import models
 from cms.models.pagemodel import Page
@@ -9,9 +10,12 @@ from cms.forms.fields import PageSelectFormField, PlaceholderFormField
 
 
 class PlaceholderField(models.ForeignKey):
-    def __init__(self, slotname, default_width=None, **kwargs):
+    def __init__(self, slotname, default_width=None, copy_function=None,
+            get_copy_languages_function=None, **kwargs):
         self.slotname = slotname
         self.default_width = default_width
+        self.raw_copy_function = copy_function
+        self.raw_get_copy_languages_function = get_copy_languages_function
         kwargs.update({'null':True}) # always allow Null
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
     
@@ -64,8 +68,34 @@ class PlaceholderField(models.ForeignKey):
         cls._meta.placeholder_field_names.append(name)
         cls._meta.placeholder_fields[self] = name
         self.cls = cls
+        
+    @property
+    def copy_function(self):
+        return self._get_cached_function('_copy_function', 'raw_copy_function')
+    
+    @property
+    def get_copy_languages(self):
+        return self._get_cached_function('_get_copy_languages', 'raw_get_copy_languages_function')
+    
+    def _get_cached_function(self, cache_key, attr_name):
+        if not hasattr(self, cache_key):
+            obj = getattr(self, attr_name)
+            if callable(obj):
+                setattr(self, cache_key, obj)
+            elif isinstance(obj, basestring):
+                func = None
+                if '.' in obj:
+                    mod_name, func_name = obj.rsplit('.', 1)
+                    try:
+                        mod = import_module(mod_name)
+                    except ImportError:
+                        mod = None
+                    if mod:
+                        func = getattr(mod, func_name, None)
+                setattr(self, cache_key, func)
+        return getattr(self, cache_key)
 
-
+        
 class PageField(models.ForeignKey):
     default_form_class = PageSelectFormField
     default_model_class = Page

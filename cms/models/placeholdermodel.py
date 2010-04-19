@@ -32,3 +32,36 @@ class Placeholder(models.Model):
         if media_classes:
             return reduce(operator.add, media_classes)
         return Media()
+    
+    def _get_attached_models(self):
+        from cms.models import CMSPlugin
+        for rel in self._meta.get_all_related_objects():
+            if isinstance(rel.model, CMSPlugin):
+                continue
+            field = getattr(self, rel.get_accessor_name())
+            if field.count():
+                return [(f, rel.field) for f in field.all()]
+        return []
+    
+    def generic_copy(self, target_language):
+        plugins = list(self.cmsplugin_set.all().order_by('tree_id', '-rght'))
+        results = []
+        for model, field in self._get_attached_models():
+            func = getattr(field, 'copy_function', None)
+            if func:
+                success = func(placeholder=self, target_language=target_language,
+                    fieldname=field.name, model=model, plugins=plugins)
+                results.append(success)
+            else:
+                results.append(False)
+        if all(results):
+            return plugins
+        return False
+    
+    def get_copy_languages(self):
+        languages = set()
+        for model, field in self._get_attached_models():
+            func = getattr(field, 'get_copy_languages', None)
+            if func and callable(func):
+                languages.update(func(placeholder=self, model=model, fieldname=field.name))
+        return sorted(languages)

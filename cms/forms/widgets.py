@@ -195,12 +195,15 @@ class PlaceholderPluginEditorWidget(PluginEditor):
             plugin_list = ph.cmsplugin_set.all().order_by('position')
             plugin_list = self.filter_func(self.request, plugin_list)
             language = get_language()
+            import pdb
+            pdb.set_trace()
+            copy_languages = ph.get_copy_languages()
             context = {
                 'plugin_list': plugin_list,
                 'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
-                'copy_languages': [], # TODO?
+                'copy_languages': copy_languages, 
                 'language': language,
-                'show_copy': False, # The copy function does not make sense on non-page objects
+                'show_copy': bool(copy_languages),
                 'urloverride': True,
                 'placeholder': ph,
             }
