@@ -907,13 +907,13 @@ class PageAdmin(model_admin):
             raise Http404(_('There only exists one translation for this page'))
 
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
-        plugins = CMSPlugin.objects.filter(page__id=object_id, language=language)
-
-        deleted_objects = [u'%s: %s' % (capfirst(titleopts.verbose_name), force_unicode(titleobj)), []]
-        perms_needed = set()
-        get_deleted_objects(deleted_objects, perms_needed, request.user, titleobj, titleopts, 1, self.admin_site)
-        for p in plugins:
-            get_deleted_objects(deleted_objects, perms_needed, request.user, p, pluginopts, 1, self.admin_site)
+        plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
+        
+        deleted_objects, perms_needed = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site)
+        to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site)
+        deleted_objects.append(to_delete_plugins)
+        perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
+        
 
         if request.method == 'POST':
             if perms_needed:
@@ -930,7 +930,8 @@ class PageAdmin(model_admin):
 
             if 'reversion' in settings.INSTALLED_APPS:
                 obj.save()
-                save_all_plugins(request, obj)
+                for placeholder in obj.placeholders.all():
+                    save_all_plugins(request, obj, placeholder)
 
             public = obj.publisher_public
             if public:
