@@ -111,7 +111,7 @@ class PageSelectWidget(MultiWidget):
         handleSiteChange( $("#id_%(name)s_0").children(":selected").text() );
         $("#add_id_%(name)s").hide();
     });
-})(jQuery);
+})(django.jQuery);
 </script>''' % {'name': name})
         return mark_safe(self.format_output(output))
     
