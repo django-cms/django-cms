@@ -2,7 +2,7 @@ from itertools import chain
 from cms.exceptions import NoHomeFound
 from cms.utils import get_language_from_request, get_template_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
-from cms.plugin_rendering import render_plugins, render_placeholder
+from cms.plugin_rendering import render_plugins, render_placeholder, render_placeholder_toolbar
 from cms.plugins.utils import get_plugins
 from cms.models import Page
 from django import template
@@ -119,9 +119,16 @@ def do_placeholder(parser, token):
             bits.pop()
             nodelist_or = parser.parse(('endplaceholder',))
             parser.delete_first_token()
-        if bits[-1].lower() == 'inherit':
+        elif bits[-1].lower() == 'inherit':
             bits.pop()
             inherit = True
+        else:
+            bit = bits[-1]
+            if bit[0] == bit[-1] and bit[0] in ('"', "'"):
+                bit = bit[1:-1]
+            if bit.isdigit():
+                import warnings
+                warnings.warn("The width parameter for the placeholder tag is deprecated.", DeprecationWarning)
     except ValueError:
         raise template.TemplateSyntaxError(error_string % bits[0])
     if len(bits) == 2:
@@ -179,9 +186,24 @@ class PlaceholderNode(template.Node):
 
         placeholder = page.placeholders.get(slot=self.name)
         content = self.get_content(request, page, context)
-        if not content and self.nodelist_or:
-            return self.nodelist_or.render(context)
+        if not content:
+            if self.nodelist_or:
+                content = self.nodelist_or.render(context)
+            if self.edit_mode(placeholder, context):
+                return render_placeholder_toolbar(placeholder, context, content)
+            return content
         return content
+    
+    def edit_mode(self, placeholder, context):
+        from cms.utils.placeholder import get_page_from_placeholder_if_exists
+        request = context['request']
+        page = get_page_from_placeholder_if_exists(placeholder)
+        if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
+            'cms.middleware.toolbar.ToolbarMiddleware' in settings.MIDDLEWARE_CLASSES and \
+            request.user.is_staff and request.user.is_authenticated() and \
+            (not page or page.has_change_permission(request)):
+                return True
+        return False
 
     def get_content(self, request, page, context):
         from cms.utils.plugins import get_placeholders

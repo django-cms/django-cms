@@ -152,25 +152,37 @@ def render_placeholder(placeholder, context_to_copy):
         (not page or page.has_change_permission(request)):
             edit = True
     if edit:
-        from cms.plugin_pool import plugin_pool
-        installed_plugins = plugin_pool.get_all_plugins(placeholder, page)
-        name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("name", None)
-        if not name:
-            name = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("name", None)
-        if not name:
-            name = placeholder.slot
-        name = title(name)
-        c.append(render_to_string("cms/toolbar/add_plugins.html", {
-            'installed_plugins': installed_plugins,
-            'language': get_language_from_request(request),
-            'placeholder_label': name,
-            'placeholder': placeholder,
-            'page': page,
-        }))
         from cms.middleware.toolbar import toolbar_plugin_processor
         processors = (toolbar_plugin_processor,)
     else:
         processors = None 
 
     c.extend(render_plugins(plugins, context, placeholder, processors))
-    return "".join(c)
+    content = "".join(c)
+    if edit:
+        content = render_placeholder_toolbar(placeholder, context, content)
+    return content
+
+def render_placeholder_toolbar(placeholder, context, content):
+    from cms.plugin_pool import plugin_pool
+    request = context['request']
+    page = get_page_from_placeholder_if_exists(placeholder)
+    if page:
+        template = page.template
+    else:
+        template = None
+    installed_plugins = plugin_pool.get_all_plugins(placeholder, page)
+    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("name", None)
+    if not name:
+        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("name", None)
+    if not name:
+        name = placeholder.slot
+    name = title(name)
+    toolbar = render_to_string("cms/toolbar/add_plugins.html", {
+        'installed_plugins': installed_plugins,
+        'language': get_language_from_request(request),
+        'placeholder_label': name,
+        'placeholder': placeholder,
+        'page': page,
+    })
+    return "".join([toolbar, content])
