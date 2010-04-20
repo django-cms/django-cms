@@ -205,11 +205,17 @@ class PlaceholderAdmin(ModelAdmin):
             raise Http404
         placeholder_id = request.POST['placeholder']
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        language = request.POST['language'] or get_language_from_request(request)
         
-        plugins = placeholder.generic_copy(language)
+        
+        plugins = placeholder.actions.copy(
+            target_placeholder=placeholder,
+            source_language=request.POST['copy_from'],
+            target_language=get_language_from_request(request),
+            fieldname=placeholder._get_attached_field_name(),
+            model=placeholder._get_attached_model(),
+        )
         if plugins:
             return render_to_response('admin/cms/page/widgets/plugin_item.html',
-                {'plugin_list':plugins}, RequestContext(request))
+                {'plugin_list': list(plugins)}, RequestContext(request))
         else:
-            return HttpResponseBadRequest(_("Error during copy"))
+            return HttpResponseBadRequest("Error during copy")

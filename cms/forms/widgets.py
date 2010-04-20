@@ -2,12 +2,13 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
 from django.contrib.sites.models import Site
 from django.conf import settings
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 from django.forms.widgets import Select, MultiWidget, Widget
 from cms.models import Page, PageUser, Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.forms.utils import get_site_choices, get_page_choices
+from cms.utils import get_language_from_request
 from os.path import join
 import copy
 
@@ -194,16 +195,20 @@ class PlaceholderPluginEditorWidget(PluginEditor):
         if ph:
             plugin_list = ph.cmsplugin_set.all().order_by('position')
             plugin_list = self.filter_func(self.request, plugin_list)
-            language = get_language()
-            import pdb
-            pdb.set_trace()
-            copy_languages = ph.get_copy_languages()
+            language = get_language_from_request(self.request)
+            copy_languages = []
+            if ph.actions.can_copy:
+                copy_languages = ph.actions.get_copy_languages(
+                    placeholder=ph,
+                    model=ph._get_attached_model(),
+                    fieldname=ph._get_attached_field_name()
+                )
             context = {
                 'plugin_list': plugin_list,
                 'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
                 'copy_languages': copy_languages, 
                 'language': language,
-                'show_copy': bool(copy_languages),
+                'show_copy': bool(copy_languages) and ph.actions.can_copy,
                 'urloverride': True,
                 'placeholder': ph,
             }
