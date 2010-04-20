@@ -21,7 +21,7 @@
  *        Scott Lewis (lewiscot a-t gmail dotcom)
  *        Bermi Ferrer (wymeditor a-t bermi dotorg)
  *        Daniel Reszka (d.reszka a-t wymeditor dotorg)
- *        Jonatan Lundin (jonatan.lundin _at_ gmail.com)
+ *        Jonatan Lundin (jonatan.lundin a-t gmail dotcom)
  */
 
 /*
@@ -457,7 +457,9 @@ jQuery.fn.wymeditor = function(options) {
                         + WYMeditor.CLASSES_ITEMS
                         + "</ul></div>",
 
-    classesItemHtml:   "<li><a href='#' name='"
+    classesItemHtml:   "<li class='wym_classes_"
+                        + WYMeditor.CLASS_NAME
+                        + "'><a href='#' name='"
                         + WYMeditor.CLASS_NAME
                         + "'>"
                         + WYMeditor.CLASS_TITLE
@@ -937,10 +939,6 @@ WYMeditor.editor.prototype.exec = function(cmd) {
     case WYMeditor.TOGGLE_HTML:
       this.update();
       this.toggleHtml();
-
-      //partially fixes #121 when the user manually inserts an image
-      if(!jQuery(this._box).find(this._options.htmlSelector).is(':visible'))
-        this.listen();
     break;
     
     case WYMeditor.PREVIEW:
@@ -1271,6 +1269,17 @@ WYMeditor.editor.prototype.unwrap = function() {
     }
 };
 
+WYMeditor.editor.prototype.setFocusToNode = function(node, toStart) {
+    var range = this._doc.createRange(),
+        selection = this._iframe.contentWindow.getSelection();
+    toStart = toStart ? 0 : 1;
+    
+    range.selectNodeContents(node);
+    selection.addRange(range);
+    selection.collapse(node, toStart);
+    this._iframe.contentWindow.focus();
+};
+
 WYMeditor.editor.prototype.addCssRules = function(doc, aCss) {
   var styles = doc.styleSheets[0];
   if(styles) {
@@ -1330,29 +1339,16 @@ WYMeditor.editor.prototype.configureEditorUsingRawCss = function() {
 /********** EVENTS **********/
 
 WYMeditor.editor.prototype.listen = function() {
-  jQuery(this._doc.body).bind("mousedown", this.mousedown);
-  jQuery("img", jQuery(this._doc.body)).bind("mousedown", this.mousedown);
-  var self = this;
-  if (this._doc.body.addEventListener) {
-      // Mozilla specific fix: after dragging object around,
-      // event handlers are lost.  So we rebind (after)
-      this._doc.body.addEventListener("dragdrop", function(evt) {
-                                          setTimeout(
-                                              function() {
-                                                  self.listen();
-                                                  }, 100);
-                                      }, false);
-  }
+    //don't use jQuery.find() on the iframe body
+    //because of MSIE + jQuery + expando issue (#JQ1143)
+    //jQuery(this._doc.body).find("*").bind("mouseup", this.mouseup);
 
-
+    jQuery(this._doc.body).bind("mousedown", this.mousedown);
 };
 
 WYMeditor.editor.prototype.mousedown = function(evt) {
-  
-  var wym = WYMeditor.INSTANCES[this.ownerDocument.title];
-  if (!wym) return;
-  wym._selected_image = (this.tagName.toLowerCase() == WYMeditor.IMG) ? this : null;
-  evt.stopPropagation();
+    var wym = WYMeditor.INSTANCES[this.ownerDocument.title];
+    wym._selected_image = (evt.target.tagName.toLowerCase() == WYMeditor.IMG) ? evt.target : null;
 };
 
 /********** SKINS **********/
@@ -1478,11 +1474,16 @@ WYMeditor.INIT_DIALOG = function(index) {
 
       var sUrl = jQuery(wym._options.hrefSelector).val();
       if(sUrl.length > 0) {
+        var link;
+        
+        if (selected[0] && selected[0].tagName.toLowerCase() == WYMeditor.A) {
+            link = selected;
+        } else {
+            wym._exec(WYMeditor.CREATE_LINK, sStamp);
+            link = jQuery("a[href=" + sStamp + "]", wym._doc.body);
+        }
 
-        wym._exec(WYMeditor.CREATE_LINK, sStamp);
-
-        jQuery("a[href=" + sStamp + "]", wym._doc.body)
-            .attr(WYMeditor.HREF, sUrl)
+        link.attr(WYMeditor.HREF, sUrl)
             .attr(WYMeditor.TITLE, jQuery(wym._options.titleSelector).val());
 
       }
@@ -2900,7 +2901,7 @@ WYMeditor.Lexer.prototype._decodeSpecial = function(mode)
 WYMeditor.Lexer.prototype._invokeParser = function(content, is_match)
 {
 
-  if (!/ +/.test(content) && ((content === '') || (content == false))) {
+  if (content === '') {
     return true;
   }
   var current = this._mode.getCurrent();
@@ -3849,7 +3850,7 @@ WYMeditor.Helper = {
  *        Jean-Francois Hovinne (jf.hovinne a-t wymeditor dotorg)
  *        Bermi Ferrer (wymeditor a-t bermi dotorg)
  *        Frédéric Palluel-Lafleur (fpalluel a-t gmail dotcom)
- *        Jonatan Lundin (jonatan.lundin _at_ gmail.com)
+ *        Jonatan Lundin (jonatan.lundin a-t gmail dotcom)
  */
 
 WYMeditor.WymClassExplorer = function(wym) {
@@ -3951,8 +3952,7 @@ WYMeditor.WymClassExplorer.prototype._exec = function(cmd,param) {
         else this._doc.execCommand(cmd);
     break;
 	}
-    
-    this.listen();
+
 };
 
 WYMeditor.WymClassExplorer.prototype.selected = function() {
@@ -4026,11 +4026,12 @@ WYMeditor.WymClassExplorer.prototype.keyup = function() {
   this._selected_image = null;
 };
 
-WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node) {
+WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
     var range = this._doc.selection.createRange();
+    toStart = toStart ? true : false;
+    
     range.moveToElementText(node);
-    range.collapse(false);
-    range.move('character',-1);
+    range.collapse(toStart);
     range.select();
     node.focus();
 };
@@ -4054,6 +4055,7 @@ WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node) {
  *        Volker Mische (vmx a-t gmx dotde)
  *        Bermi Ferrer (wymeditor a-t bermi dotorg)
  *        Frédéric Palluel-Lafleur (fpalluel a-t gmail dotcom)
+ *        Jonatan Lundin (jonatan.lundin a-t gmail dotcom)
  */
 
 WYMeditor.WymClassMozilla = function(wym) {
@@ -4064,7 +4066,8 @@ WYMeditor.WymClassMozilla = function(wym) {
 };
 
 WYMeditor.WymClassMozilla.prototype.initIframe = function(iframe) {
-
+    var wym = this;
+    
     this._iframe = iframe;
     this._doc = iframe.contentDocument;
     
@@ -4099,7 +4102,10 @@ WYMeditor.WymClassMozilla.prototype.initIframe = function(iframe) {
     jQuery(this._doc).bind("keyup", this.keyup);
     
     //bind editor focus events (used to reset designmode - Gecko bug)
-    jQuery(this._doc).bind("focus", this.enableDesignMode);
+    jQuery(this._doc).bind("focus", function () { 
+        // Fix scope
+        wym.enableDesignMode.call(wym);
+    });
     
     //post-init functions
     if(jQuery.isFunction(this._options.postInit)) this._options.postInit(this);
@@ -4173,10 +4179,6 @@ WYMeditor.WymClassMozilla.prototype._exec = function(cmd,param) {
     var container = this.selected();
     if(container.tagName.toLowerCase() == WYMeditor.BODY)
         this._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P);
-    
-    //add event handlers on doc elements
-
-    this.listen();
 };
 
 /* @name selected
@@ -4247,7 +4249,7 @@ WYMeditor.WymClassMozilla.prototype.keyup = function(evt) {
     jQuery(wym._doc.body).children(WYMeditor.BR).remove();
   }
   
-  else if(evt.keyCode != 8
+  if(evt.keyCode != 8
        && evt.keyCode != 17
        && evt.keyCode != 46
        && evt.keyCode != 224
@@ -4277,21 +4279,12 @@ WYMeditor.WymClassMozilla.prototype.keyup = function(evt) {
 };
 
 WYMeditor.WymClassMozilla.prototype.enableDesignMode = function() {
-    if(this.designMode == "off") {
+    if(this._doc.designMode == "off") {
       try {
-        this.designMode = "on";
-        this.execCommand("styleWithCSS", '', false);
+        this._doc.designMode = "on";
+        this._doc.execCommand("styleWithCSS", '', false);
       } catch(e) { }
     }
-};
-
-WYMeditor.WymClassMozilla.prototype.setFocusToNode = function(node) {
-    var range = document.createRange();
-    range.selectNode(node);
-    var selected = this._iframe.contentWindow.getSelection();
-    selected.addRange(range);
-    selected.collapse(node, node.childNodes.length);
-    this._iframe.contentWindow.focus();
 };
 
 WYMeditor.WymClassMozilla.prototype.openBlockTag = function(tag, attributes)
@@ -4319,7 +4312,7 @@ WYMeditor.WymClassMozilla.prototype.getTagForStyle = function(style) {
   if(/bold/.test(style)) return 'strong';
   if(/italic/.test(style)) return 'em';
   if(/sub/.test(style)) return 'sub';
-  if(/sub/.test(style)) return 'super';
+  if(/super/.test(style)) return 'sup';
   return false;
 };
 
@@ -4393,8 +4386,7 @@ WYMeditor.WymClassOpera.prototype._exec = function(cmd,param) {
 
     if(param) this._doc.execCommand(cmd,false,param);
     else this._doc.execCommand(cmd);
-    
-    this.listen();
+
 };
 
 WYMeditor.WymClassOpera.prototype.selected = function() {
@@ -4443,12 +4435,6 @@ WYMeditor.WymClassOpera.prototype.keyup = function(evt) {
   var wym = WYMeditor.INSTANCES[this.title];
   wym._selected_image = null;
 };
-
-// TODO: implement me
-WYMeditor.WymClassOpera.prototype.setFocusToNode = function(node) {
-
-};
-
 /*
  * WYMeditor : what you see is What You Mean web-based editor
  * Copyright (c) 2005 - 2009 Jean-Francois Hovinne, http://www.wymeditor.org/
@@ -4569,8 +4555,6 @@ WYMeditor.WymClassSafari.prototype._exec = function(cmd,param) {
     if(container && container.tagName.toLowerCase() == WYMeditor.BODY)
         this._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P);
 
-    //add event handlers on doc elements
-    this.listen();
 };
 
 /* @name selected
@@ -4667,15 +4651,6 @@ WYMeditor.WymClassSafari.prototype.keyup = function(evt) {
 
     if(name == WYMeditor.BODY || name == WYMeditor.DIV) wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P); //fix #110 for DIV
   }
-};
-
-WYMeditor.WymClassSafari.prototype.setFocusToNode = function(node) {
-    var range = this._iframe.contentDocument.createRange();
-    range.selectNode(node);
-    var selected = this._iframe.contentWindow.getSelection();
-    selected.addRange(range);
-    selected.collapse(node, node.childNodes.length);
-    this._iframe.contentWindow.focus();
 };
 
 WYMeditor.WymClassSafari.prototype.openBlockTag = function(tag, attributes)
