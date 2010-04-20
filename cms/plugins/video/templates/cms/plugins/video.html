@@ -32,5 +32,5 @@
 	var attributes = {};
 	attributes.align = "middle";
 	
-	swfobject.embedSWF("{{ MEDIA_URL }}cms/swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.45", "{{ CMS_MEDIA_URL }}swf/expressInstall.swf", flashvars, params, attributes);
+	swfobject.embedSWF("{{ CMS_MEDIA_URL }}swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.45", "{{ CMS_MEDIA_URL }}swf/expressInstall.swf", flashvars, params, attributes);
 //]]></script>
