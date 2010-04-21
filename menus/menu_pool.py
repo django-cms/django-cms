@@ -1,10 +1,10 @@
 from django.conf import settings
 from menus.exceptions import NamespaceAllreadyRegistered, NoParentFound
 from django.contrib.sites.models import Site
-import copy
 from django.core.cache import cache
-import pickle
 from django.utils.translation import get_language
+import copy
+import pickle
 
 class MenuPool(object):
     def __init__(self):
@@ -22,10 +22,16 @@ class MenuPool(object):
         register()
         self.discovered = True
         
-    def clear(self, site_id):
-        for lang in dict(settings.CMS_LANGUAGES).keys():
-            key = "menu_nodes_%s_%s" % (lang, site_id)
-            cache.delete(key)
+    def clear(self, site_id=None):
+        to_be_deleted = []
+        if site_id:
+            for key in self.cache_keys:
+                if key.rsplit('_', 2)[-2] == site_id:
+                    to_be_deleted.append(key)
+        else:
+            to_be_deleted = list(self.cache_keys)
+        cache.delete_many(to_be_deleted)
+        self.cache_keys.difference_update(to_be_deleted)
     
     def register_menu(self, menu):
         from menus.base import Menu
@@ -43,7 +49,7 @@ class MenuPool(object):
     
     def _build_nodes(self, request, site_id):
         lang = get_language()
-        key = "menu_nodes_%s_%s" % (lang, site_id)
+        key = "%smenu_nodes_%s_%s" % (settings.CMS_CACHE_PREFIX, lang, site_id)
         self.cache_keys.add(key)
         cached_nodes = cache.get(key, None)
         if cached_nodes:
@@ -84,7 +90,7 @@ class MenuPool(object):
                         continue
                 final_nodes.append(node)
                 last = node
-        cache.set(key, final_nodes, 60*60)
+        cache.set(key, final_nodes, settings.MENU_CACHE_DURATION)
         return final_nodes
     
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
@@ -138,9 +144,5 @@ class MenuPool(object):
             if node.attr.get(name, None) == value:
                 found.append(node)
         return found
-    
-    def invalidate_cache(self):
-        for key in self.cache_keys:
-            cache.delete(key)
      
 menu_pool = MenuPool()
