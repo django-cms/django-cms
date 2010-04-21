@@ -139,7 +139,7 @@ The instance of the plugin model
 
 **placeholder**:
 
-The name of the placeholder this plugin appears in.
+The instance of the placeholder this plugin appears in.
 
 The return value should be a dictionary containing any variables to be added to the context.
 
@@ -171,7 +171,7 @@ The instance of the plugin model
 
 **placeholder**:
 
-The name of the placeholder this plugin appears in.
+The instance of the placeholder this plugin appears in.
 
 **rendered_content**:
 
@@ -204,7 +204,7 @@ In your yourapp.cms_plugin_processors.py::
         '''
         This plugin processor wraps each plugin's output in a colored box if it is in the "main" placeholder.
         '''
-        if placeholder != 'main' \                   # Plugins not in the main placeholder should remain unchanged
+        if placeholder.slot != 'main' \                   # Plugins not in the main placeholder should remain unchanged
             or instance._render_meta.text_enabled:   # Plugins embedded in Text should remain unchanged in order not to break output
                 return rendered_content
         else:
