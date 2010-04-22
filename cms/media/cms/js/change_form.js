@@ -63,14 +63,25 @@
                 e.value = URLify(this.value, 64);
             }
         });
+        // saveform event handler
 	    $('#page_form').submit(function(){
 		    if($('iframe').length){
-			    var question = gettext("Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost.");
+			    var question = gettext("Not all plugins are saved. Are you sure you want to save the page?\nAll unsaved plugin content will tried to save.");
 			    var answer = confirm(question, true);
-			    return answer;
+	    		if (answer){
+		    		$('iframe').contents().find('#content-main>form').each(function(){
+		        		try{
+                    		this.submit();
+	                	} catch(err) { 
+    	                	return false;
+        	        	}
+					});
+            	    return true;
+				}else{
+				    return false;
+				}
 		    }
 	    });
-	
 	    // inline group loader
 	    $('h2 a').click(function() {
 		    // reqest content - do it this way, so we can save some time which
