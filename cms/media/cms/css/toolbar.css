@@ -25,7 +25,7 @@
     height:41px;
     width:100%;
     min-width:960px;
-    zoom:1;
+    zoom:1px;
     border-bottom:2px solid #ddd;
     background:url(../images/cms_toolbar.png) repeat-x 0 0;
 }
