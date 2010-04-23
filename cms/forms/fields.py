@@ -13,8 +13,7 @@ class PageSelectFormField(forms.MultiValueField):
         'invalid_page': _(u'Select a valid page'),
     }
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
-                 required=True, widget=None, label=None, initial=None,
-                 help_text=None, to_field_name=None, *args, **kwargs):
+                 required=True, widget=None, to_field_name=None, *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
