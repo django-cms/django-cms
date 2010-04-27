@@ -7,14 +7,18 @@
     <div id="col1" class="grid_4">	    
 		{% include "sidebar_submenu.html" %}	
 		{% block col_sidebar %}
-	    	{% placeholder col_sidebar "220" %}
+			{% with "220" as width %}
+	    		{% placeholder col_sidebar %}
+			{% endwith %}
 		{% endblock %}
     </div>
 	
     <div id="col2" class="grid_11 push_1">
     	{% block page_title %}<h1>{% page_attribute title %}</h1>{% endblock %}
 		{% block col_left %}
-			{% placeholder col_left "640" %}
+			{% with "640" as width %}
+				{% placeholder col_left %}
+			{% endwith %}
 		{% endblock %}
     </div>
 {% endblock %}
