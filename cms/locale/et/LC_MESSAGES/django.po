@@ -3,209 +3,214 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-15 13:45+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2010-04-28 16:59+0300\n"
+"Last-Translator: Tanel Külaots <sealibora@gmail.com>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: plugin_base.py:99
 msgid "Advanced options"
-msgstr ""
+msgstr "Täpsemad valikud"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "Pealkiri"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "Vaikimisi pealkiri"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "Aadressi komponent"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "Osa pealkirjast, mida kasutatakse internetiaadressi koostamiseks"
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "Keel"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "Sisu väljade aktiivne keel."
 
 #: admin/forms.py:73
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Selle aadressi komponendiga lehekülg on juba olemas"
 
 #: admin/forms.py:93
 msgid "Menu Title"
-msgstr ""
+msgstr "Pealkiri menüüs"
 
 #: admin/forms.py:94
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Kirjuta üle menüüs kuvatav"
 
 #: admin/forms.py:95
 msgid "Page Title"
-msgstr ""
+msgstr "Lehekülje pealkiri"
 
 #: admin/forms.py:96
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Kirjuta üle veebilehitseja ülaosas või järjehoidjas kuvatav"
 
 #: admin/forms.py:97
 msgid "Application"
-msgstr ""
+msgstr "Rakendus"
 
 #: admin/forms.py:99
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Haagi rakendus selle lehekülje külge."
 
 #: admin/forms.py:100
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Kirjuta üle internetiaadress"
 
 #: admin/forms.py:101
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Hoia see väli tühjana, et kasutada standardset rada."
 
 #: admin/forms.py:107
 msgid "Redirect"
-msgstr ""
+msgstr "Ümbersuunamine"
 
 #: admin/forms.py:108
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Suuna ümber sellele internetiaadressile."
 
 #: admin/forms.py:110
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "Lehekülje kirjeldus mida mõnikord kasutavad otsingumootorid."
 
 #: admin/forms.py:112
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
+"Komade eraldatud nimekiri märksõnadest mida mõnikord kasutavad "
+"otsingumootorid."
 
 #: admin/forms.py:120
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Sellise pööratud identifikaatoriga lehekülg on juba olemas."
 
 #: admin/forms.py:127
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "Vigane internetiaadress, kasuta formaati /minu/url ."
 
 #: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "kasutaja"
 
 #: admin/forms.py:171
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
+"Õigus lehekülge lisada nõuab ka ligipääsu alamlehekülgede, vastasel juhul ei "
+"saa lehekülje looja lisatud lehekülge muuta."
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "Õigus lehekülge lisada nõuab ka lehekülje muutmise õigust."
 
 #: admin/forms.py:201
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Palun vali kasutaja või kasutajate grupp."
 
 #: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
 #: templates/admin/cms/page/change_form.html:65
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "Lisa"
 
 #: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
 msgid "Change"
-msgstr ""
+msgstr "Muuda"
 
 #: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "Kustuta"
 
 #: admin/forms.py:211
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Taasta leheküljed."
 
 #: admin/forms.py:274
 msgid "Notify user"
-msgstr ""
+msgstr "Teavita kasutajat"
 
 #: admin/forms.py:275
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr ""
+"Saada kasutajale märguanne kasutajanime või parooli muutusest. Vajab kasutaja "
+"e-posti aadressi. "
 
 #: admin/forms.py:295
 msgid "New password"
-msgstr ""
+msgstr "Uus parool"
 
 #: admin/forms.py:297
 msgid "New password confirmation"
-msgstr ""
+msgstr "Uue parooli kinnitus"
 
 #: admin/forms.py:316
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "E-posti teel teavitamine nõuab kehtivat e-posti aadressi."
 
 #: admin/forms.py:318
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "Õigus lisada uusi lehekülgi nõuab õigust lehekülgi muuta!"
 
 #: admin/forms.py:320
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "Õigus lisada uusi kasutajaid nõuab õigust kasutajaid muuta!"
 
 #: admin/forms.py:322
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Õiguste lisamiseks pead sa neid ka muutma!"
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
 msgid "Hidden"
-msgstr ""
+msgstr "Peidetud"
 
 #: admin/pageadmin.py:122
 msgid "Basic Settings"
-msgstr ""
+msgstr "Põhiseadistused"
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "Tähelepanu: Valiku muutmisel lehekülg laeb ennast uuesti. Salvesta ennem."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Muud seadistused"
 
 #: admin/pageadmin.py:140
 msgid "SEO Settings"
-msgstr ""
+msgstr "Otsingumootoritele suunatud seadistused"
 
 #: admin/pageadmin.py:463
 msgid "higher"
-msgstr ""
+msgstr "kõrgem"
 
 #: admin/pageadmin.py:629
 msgid "Database error"
-msgstr ""
+msgstr "Andmebaasi viga"
 
 #: admin/pageadmin.py:714 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -216,29 +221,29 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:15
 msgid "page"
-msgstr ""
+msgstr "lehekülg"
 
 #: admin/pageadmin.py:837
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "Leheküljele heakskiit antud."
 
 #: admin/pageadmin.py:891
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Objekti %(name)s primaarvõtmega %(key)r ei ole olemas."
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Sellel leheküljel on ainult üks tõlge."
 
 #: admin/pageadmin.py:909
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "Pealkiri ja pluginad %(language)s keeles kustutatud"
 
 #: admin/pageadmin.py:931
 msgid "Are you sure?"
-msgstr ""
+msgstr "Kas oled kindel?"
 
 #: admin/pageadmin.py:994
 msgid "You do not have permission to publish this page"
