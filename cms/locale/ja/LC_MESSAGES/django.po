@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -61,8 +61,7 @@ msgstr "ページタイトル"
 
 #: admin/forms.py:96
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
+msgstr "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
 
 #: admin/forms.py:97
 msgid "Application"
@@ -110,9 +109,7 @@ msgid "user"
 msgstr "ユーザ"
 
 #: admin/forms.py:171
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "ページの権限を設定するには、子ページのアクセス権限も必要です。"
 
 #: admin/forms.py:174
@@ -148,12 +145,8 @@ msgid "Notify user"
 msgstr "ユーザに通知"
 
 #: admin/forms.py:275
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-"パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザ"
-"メールが必要です。"
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザメールが必要です。"
 
 #: admin/forms.py:295
 msgid "New password"
@@ -168,13 +161,11 @@ msgid "Email notification requires valid email address."
 msgstr "メール通知はメールアドレスが必要です。"
 
 #: admin/forms.py:318
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "新しいページの権限はページ変更の権限が必要です。"
 
 #: admin/forms.py:320
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr "新しいユーザの権限はページ変更の権限が必要です。"
 
 #: admin/forms.py:322
@@ -227,8 +218,7 @@ msgstr "ページを承認しました。"
 #: admin/pageadmin.py:891
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-"プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
+msgstr "プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
@@ -275,8 +265,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1204
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1259
@@ -285,9 +274,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1281
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -394,43 +381,43 @@ msgstr ""
 
 #: docs/templates/layout.html:10
 msgid "Navigation"
-msgstr ""
+msgstr "ナビゲーション"
 
 #: docs/templates/layout.html:42
 msgid "Table Of Contents"
-msgstr ""
+msgstr "目次"
 
 #: docs/templates/layout.html:48
 msgid "Previous topic"
-msgstr ""
+msgstr "前のトピック"
 
 #: docs/templates/layout.html:50
 msgid "previous chapter"
-msgstr ""
+msgstr "前章"
 
 #: docs/templates/layout.html:53
 msgid "Next topic"
-msgstr ""
+msgstr "次のトピック"
 
 #: docs/templates/layout.html:55
 msgid "next chapter"
-msgstr ""
+msgstr "次章"
 
 #: docs/templates/layout.html:60
 msgid "This Page"
-msgstr ""
+msgstr "このページ"
 
 #: docs/templates/layout.html:63
 msgid "Show Source"
-msgstr ""
+msgstr "ソースを表示"
 
 #: docs/templates/layout.html:73
 msgid "Quick search"
-msgstr ""
+msgstr "クイックサーチ"
 
 #: docs/templates/layout.html:76
 msgid "Go"
-msgstr ""
+msgstr "移動"
 
 #: docs/templates/layout.html:81
 msgid "Enter search terms or a module, class or function name."
@@ -438,7 +425,7 @@ msgstr ""
 
 #: docs/templates/layout.html:128
 msgid "About these documents"
-msgstr ""
+msgstr "このドキュメントについて"
 
 #: docs/templates/layout.html:134 docs/templates/search.html:2
 #: docs/templates/search.html.py:5
@@ -447,11 +434,11 @@ msgstr "検索"
 
 #: docs/templates/layout.html:137
 msgid "Copyright"
-msgstr ""
+msgstr "著作権"
 
 #: docs/templates/modindex.html:36
 msgid "Deprecated"
-msgstr ""
+msgstr "廃止予定"
 
 #: docs/templates/search.html:21
 msgid "search"
@@ -508,7 +495,7 @@ msgstr "パス"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "スラグ"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
@@ -537,7 +524,7 @@ msgstr ""
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "ステータス"
 
 #: migrations/0001_initial.py:53 models/pagemodel.py:51
 msgid "navigation extenders"
@@ -575,11 +562,11 @@ msgstr ""
 #: migrations/0001_initial.py:64 models/pagemodel.py:54
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr ""
+msgstr "テンプレート"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:46
 msgid "publication date"
-msgstr ""
+msgstr "公開日時"
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:48
 #: templates/admin/cms/page/change_list_tree.html:9
@@ -589,28 +576,28 @@ msgstr ""
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
 #: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
 msgid "application"
-msgstr ""
+msgstr "アプリケーション"
 
 #: migrations/0006_apphook.py:65 models/pagemodel.py:50
 msgid "id"
-msgstr ""
+msgstr "ID"
 
 #: migrations/0008_redirects.py:11 models/titlemodels.py:18
 msgid "redirect"
-msgstr ""
+msgstr "リダイレクト"
 
 #: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
 msgid "keywords"
-msgstr ""
+msgstr "キーワード"
 
 #: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:22
 msgid "description"
-msgstr ""
+msgstr "説明"
 
 #: models/moderatormodels.py:24
 msgid "Current page"
-msgstr ""
+msgstr "現在のページ"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
@@ -660,7 +647,7 @@ msgstr ""
 
 #: models/moderatormodels.py:98 models/pagemodel.py:33
 msgid "changed"
-msgstr ""
+msgstr "変更済み"
 
 #: models/moderatormodels.py:99
 msgid "delete req."
@@ -680,7 +667,7 @@ msgstr ""
 
 #: models/moderatormodels.py:103 models/pagemodel.py:36
 msgid "approved"
-msgstr ""
+msgstr "承認"
 
 #: models/moderatormodels.py:115
 msgid "Page moderator state"
@@ -706,16 +693,14 @@ msgstr ""
 
 #: models/pagemodel.py:42
 msgid "created by"
-msgstr ""
+msgstr "作成者"
 
 #: models/pagemodel.py:43 templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
-msgstr ""
+msgstr "変更者"
 
 #: models/pagemodel.py:46
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:47
@@ -727,14 +712,12 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:50
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:52
 msgid "is published"
-msgstr ""
+msgstr "公開"
 
 #: models/pagemodel.py:54
 msgid "The template used to render the content."
@@ -746,7 +729,7 @@ msgstr ""
 
 #: models/pagemodel.py:55
 msgid "site"
-msgstr ""
+msgstr "サイト"
 
 #: models/pagemodel.py:57
 msgid "moderator state"
@@ -762,7 +745,7 @@ msgstr ""
 
 #: models/pagemodel.py:73
 msgid "pages"
-msgstr ""
+msgstr "ページ"
 
 #: models/pagemodel.py:179
 msgid "Page was copied."
@@ -826,7 +809,7 @@ msgstr "ページグロバール権限"
 
 #: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
-msgstr ""
+msgstr "権限を付与"
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
@@ -871,7 +854,7 @@ msgstr "ファイル"
 
 #: plugins/flash/cms_plugins.py:11
 msgid "Flash"
-msgstr ""
+msgstr "Flash"
 
 #: plugins/flash/models.py:9
 msgid "use swf file"
@@ -964,9 +947,7 @@ msgid "Language or Page must be filled out"
 msgstr "言語かページを入力してください。"
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1058,8 +1039,7 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1181,9 +1161,7 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr ""
 
 #: plugins/video/models.py:12
@@ -1246,9 +1224,7 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1277,8 +1253,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1379,9 +1354,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1767,11 +1740,11 @@ msgstr "下へ"
 
 #: templates/cms/toolbar/toolbar.html:917
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #: templates/cms/toolbar/toolbar.html:919
 msgid "Delete Plugin"
-msgstr ""
+msgstr "プラグイン削除"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
@@ -1793,30 +1766,28 @@ msgstr ""
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:675
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
-msgstr ""
+msgstr "サブレベル"
 
 #: tests/util/menu_extender.py:8
 msgid "Sublevel3"
-msgstr ""
+msgstr "サブレベル３"
 
 #: tests/util/menu_extender.py:11
 msgid "Sublevel 2"
-msgstr ""
+msgstr "サブレベル２"
 
 #: utils/moderator.py:84
 msgid "parent first"
@@ -1829,12 +1800,12 @@ msgstr "承認"
 #: utils/moderator.py:243
 #, python-format
 msgid "CMS - Page %s requires approvement."
-msgstr ""
+msgstr "CMS - Page %s は承認が必要です。"
 
 #: utils/permissions.py:206
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - アカウントが作成されました。"
 
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - アカウントが変更されました。"
