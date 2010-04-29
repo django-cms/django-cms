@@ -2,7 +2,6 @@ from itertools import chain
 from cms.exceptions import NoHomeFound
 from cms.utils import get_language_from_request, get_template_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
-from cms.utils.plugins import get_placeholders
 from cms.plugin_rendering import render_plugins, render_placeholder, render_placeholder_toolbar
 from cms.plugins.utils import get_plugins
 from cms.models import Page, Placeholder
@@ -188,6 +187,7 @@ class PlaceholderNode(template.Node):
         try:
             placeholder = page.placeholders.get(slot=self.name)
         except Placeholder.DoesNotExist:
+            from cms.utils.plugins import get_placeholders
             placeholders = get_placeholders(selected_template)
             found = None
             for slot in placeholders:
