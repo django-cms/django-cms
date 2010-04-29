@@ -1,11 +1,12 @@
 from django.contrib.sites.models import Site
-from cms.templatetags.cms_tags import PlaceholderNode
-from cms.exceptions import DuplicatePlaceholderWarning
 from django.template.loader import get_template
 from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
 from django.template import NodeList, TextNode, VariableNode
-import warnings
 from django.shortcuts import get_object_or_404
+from cms.templatetags.cms_tags import PlaceholderNode
+from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models import Page
+import warnings
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)

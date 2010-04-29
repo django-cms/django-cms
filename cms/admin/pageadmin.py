@@ -1226,11 +1226,12 @@ class PageAdmin(model_admin):
             elif 'plugin_id' in request.POST:
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
                 page = get_page_from_plugin_or_404(plugin)
-                placeholder = request.POST['placeholder']
+                placeholder_slot = request.POST['placeholder']
                 placeholders = get_placeholders(page.template)
-                if not placeholder in placeholders:
+                if not placeholder_slot in placeholders:
                     return HttpResponse(str("error"))
-                plugin.placeholder = page.placeholders.get(slot=placeholder)
+                placeholder = page.placeholders.get(slot=placeholder_slot)
+                plugin.placeholder = placeholder
                 # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
                 position = CMSPlugin.objects.filter(placeholder=placeholder).count()
                 plugin.position = position
