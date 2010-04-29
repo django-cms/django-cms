@@ -54,6 +54,8 @@ select[name="plugins"] {
 	cursor:pointer;
 }
 
+ul.plugin-list{min-height:5px;_height:5px;}
+
 ul.plugin-list li{
 	clear:both;	
 	border-bottom:1px solid #DEDEDC;

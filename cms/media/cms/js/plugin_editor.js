@@ -74,14 +74,14 @@
             }
         });
         
-        
         // Drag'n'Drop sorting/moving
         $('ul.plugin-list').sortable({
             handle:'span.drag',
             axis:'y',
             opacity:0.9,
             zIndex:2000,
-            connectWith:'ul.plugin-list',
+            dropOnEmpty:true,
+            connectWith: '.plugin-list',
  
             update:function(event, ui){
                  var array = $(this).sortable('toArray');
@@ -102,7 +102,10 @@
                 else
                 {
                     // moved in placeholder
-                    $.post("move-plugin/", { ids:d }, function(data){}, "json");   
+                    if (d)
+                    {
+                        $.post("move-plugin/", { ids:d }, function(data){}, "json");
+                    }
                 }
  
             }
