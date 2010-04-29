@@ -2,9 +2,10 @@ from itertools import chain
 from cms.exceptions import NoHomeFound
 from cms.utils import get_language_from_request, get_template_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.plugins import get_placeholders
 from cms.plugin_rendering import render_plugins, render_placeholder, render_placeholder_toolbar
 from cms.plugins.utils import get_plugins
-from cms.models import Page
+from cms.models import Page, Placeholder
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -183,8 +184,17 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         if not page or page == "dummy":
             return ""
-
-        placeholder = page.placeholders.get(slot=self.name)
+        
+        try:
+            placeholder = page.placeholders.get(slot=self.name)
+        except Placeholder.DoesNotExist:
+            placeholders = get_placeholders(selected_template)
+            found = None
+            for slot in placeholders:
+                new, created = page.placeholders.get_or_create(slot=slot)
+                if slot == self.name:
+                    found = new
+            placeholder = found
         content = self.get_content(request, page, context)
         if not content:
             if self.nodelist_or:
