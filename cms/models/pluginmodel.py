@@ -1,16 +1,18 @@
-from django.db.models.base import ModelBase
 from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
-from os.path import join
-from datetime import datetime, date
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from publisher import MpttPublisher
-from cms.plugin_rendering import PluginContext, PluginRenderer
-from django.conf import settings
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
+from cms.plugin_rendering import PluginContext, PluginRenderer
+from cms.exceptions import DontUsePageAttributeWarning
+from publisher import MpttPublisher
+from django.db import models
+from django.db.models.base import ModelBase
+from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.conf import settings
+from os.path import join
+from datetime import datetime, date
+import warnings
 
 class PluginModelBase(ModelBase):
     """
@@ -130,6 +132,7 @@ class CMSPlugin(MpttPublisher):
             
     @property
     def page(self):
+        warnings.warn("Don't use the page attribute on CMSPlugins! CMS Plugins are not guaranteed to have a page associated with them!", DontUsePageAttributeWarning)
         return get_page_from_placeholder_if_exists(self.placeholder)
     
     def get_instance_icon_src(self):

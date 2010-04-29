@@ -1,9 +1,10 @@
 from django.utils.translation import ugettext_lazy as _
-from models import Link
+from django.contrib.sites.models import Site
 from django.conf import settings
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugins.link.forms import LinkForm
+from models import Link
 
 class LinkPlugin(CMSPluginBase):
     model = Link
@@ -50,8 +51,15 @@ class LinkPlugin(CMSPluginBase):
                 # tell form we are on this site
                 form.for_site(self.site)
                 return form
-            
-        return FakeForm(Form, self.cms_plugin_instance.page.site or self.page.site)
+        # TODO: Make sure this works
+        if self.cms_plugin_instance.page and self.cms_plugin_instance.page.site:
+            site = self.cms_plugin_instance.page.site
+        elif self.page and self.page.site:
+            site = self.page.site
+        else:
+            # this might NOT give the result you expect
+            site = Site.objects.get_current()
+        return FakeForm(Form, site)
         
     def icon_src(self, instance):
         return settings.CMS_MEDIA_URL + u"images/plugins/link.png"

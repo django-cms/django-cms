@@ -29,3 +29,5 @@ class NoPermissionsException(PermissionsException):
     """
     
 class DuplicatePlaceholderWarning(Warning): pass
+
+class DontUsePageAttributeWarning(Warning): pass
