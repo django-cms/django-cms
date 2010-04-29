@@ -321,7 +321,7 @@ jQuery(document).ready(function($) {
         $("a.cms_toolbar_move_slot").live("click", function(){
             var target = $(this).attr("rel")
             $.post(
-                urls.cms_page_move_plugin, 
+                urls.cms_page_move_plugin,
                 { placeholder: target, plugin_id: plugin_id },
                 function(data){
                     window.location = window.location.href;

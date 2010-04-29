@@ -1,5 +1,6 @@
 (function($) {
     $(document).ready(function() {
+        // Add Plugin Handler
         $('span.add-plugin').click(function(){
          var select = $(this).parent().children("select[name=plugins]");
             var pluginvalue = select.attr('value');
@@ -11,7 +12,7 @@
             if (!language) {
                 language = $('input[name=language]').attr("value");
             }
- 
+            // The new placeholder branch allows adding non-language plugins!
             if (!language) {
                 //alert("Unable to determine the correct language for this plugin! Please report the bug!");
             }
@@ -36,7 +37,8 @@
                 });
             }
         });
- 
+        
+        // Copy Plugins Handler
         $('span.copy-plugins').click(function(){
             var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
             var placeholder = $(this).parent().parent().data('id');
@@ -72,24 +74,36 @@
             }
         });
         
+        
+        // Drag'n'Drop sorting/moving
         $('ul.plugin-list').sortable({
             handle:'span.drag',
-            //appendTo:'body',
             axis:'y',
             opacity:0.9,
             zIndex:2000,
+            connectWith:'ul.plugin-list',
  
             update:function(event, ui){
-                var array = $(this).sortable('toArray');
-                var d = "";
-                for(var i=0;i<array.length;i++){
-                    d += array[i].split("plugin_")[1];
-                    if (i!=array.length-1){
-                        d += "_";
-                    }
+                 var array = $(this).sortable('toArray');
+                 var d = "";
+                 for(var i=0;i<array.length;i++){
+                     d += array[i].split("plugin_")[1];
+                     if (i!=array.length-1){
+                         d += "_";
+                     }
+                 }
+                if (ui.sender)
+                {
+                    // moved to new placeholder
+                    var plugin_id = ui.item.attr('id').split('plugin_')[1];
+                    var target = ui.item.parent().parent().data('name');
+                    $.post("move-plugin/", { placeholder: target, plugin_id: plugin_id, ids: d }, function(data){}, "json");
                 }
- 
-                $.post("move-plugin/", { ids:d }, function(data){}, "json");
+                else
+                {
+                    // moved in placeholder
+                    $.post("move-plugin/", { ids:d }, function(data){}, "json");   
+                }
  
             }
         });

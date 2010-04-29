@@ -1,7 +1,7 @@
 {% load i18n %}
 {% if not add %}
 <div class="plugin-list-holder" id="placeholder-{{ placeholder.pk }}">
-	<ul class="plugin-list">
+	<ul class="plugin-list" id="plugin-list-{{ placehodler.pk }}">
 		{% include "admin/cms/page/widgets/plugin_item.html" %}
 	</ul>
 	{% include "admin/cms/page/widgets/installed_plugins_inc.html" %}

@@ -1211,19 +1211,8 @@ class PageAdmin(model_admin):
         if request.method == "POST" and not 'history' in request.path:
             pos = 0
             page = None
-            if 'ids' in request.POST:
-                for id in request.POST['ids'].split("_"):
-                    plugin = CMSPlugin.objects.get(pk=id)
-                    page = get_page_from_placeholder_if_exists(plugin.placeholder)
-
-                    if page and not page.has_change_permission(request):
-                        raise Http404
-
-                    if plugin.position != pos:
-                        plugin.position = pos
-                        plugin.save()
-                    pos += 1
-            elif 'plugin_id' in request.POST:
+            success = False
+            if 'plugin_id' in request.POST:
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
                 page = get_page_from_plugin_or_404(plugin)
                 placeholder_slot = request.POST['placeholder']
@@ -1236,7 +1225,21 @@ class PageAdmin(model_admin):
                 position = CMSPlugin.objects.filter(placeholder=placeholder).count()
                 plugin.position = position
                 plugin.save()
-            else:
+                success = True
+            if 'ids' in request.POST:
+                for id in request.POST['ids'].split("_"):
+                    plugin = CMSPlugin.objects.get(pk=id)
+                    page = get_page_from_placeholder_if_exists(plugin.placeholder)
+
+                    if page and not page.has_change_permission(request):
+                        raise Http404
+
+                    if plugin.position != pos:
+                        plugin.position = pos
+                        plugin.save()
+                    pos += 1
+                success = True
+            if not success:
                 HttpResponse(str("error"))
             if page and 'reversion' in settings.INSTALLED_APPS:
                 page.save()
