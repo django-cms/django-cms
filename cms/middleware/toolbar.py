@@ -7,7 +7,7 @@ from cms.utils import get_template_from_request
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template.context import Context
+from django.template.context import Context, RequestContext
 from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
 from django.utils import simplejson
@@ -108,7 +108,7 @@ class ToolbarMiddleware(object):
         if auth and page:
             context = get_admin_menu_item_context(request, page, filtered=False)
         else:
-            context = Context()
+            context = {}
         context.update({
             'auth':auth,
             'page':page,
@@ -118,7 +118,7 @@ class ToolbarMiddleware(object):
             'edit':edit,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
-        from django.core.context_processors import csrf
-        context.update(csrf(request))
-        return render_to_string('cms/toolbar/toolbar.html', context )
+        #from django.core.context_processors import csrf
+        #context.update(csrf(request))
+        return render_to_string('cms/toolbar/toolbar.html', context, RequestContext(request))
 
