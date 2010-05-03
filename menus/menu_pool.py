@@ -6,6 +6,12 @@ from django.utils.translation import get_language
 import copy
 import pickle
 
+def lex_cache_key(key):
+    """
+    Returns the language and site ID a cache key is related to.
+    """
+    return key.rsplit('_', 2)[1:]
+
 class MenuPool(object):
     def __init__(self):
         self.menus = {}
@@ -22,14 +28,20 @@ class MenuPool(object):
         register()
         self.discovered = True
         
-    def clear(self, site_id=None):
+    def clear(self, site_id=None, language=None):
+        def relevance_test(keylang, keysite):
+            sok = not site_id
+            lok = not language
+            if site_id and (site_id == keysite or site_id == int(keysite)):
+                sok = True
+            if language and language == keylang:
+                lok = True
+            return lok and sok
         to_be_deleted = []
-        if site_id:
-            for key in self.cache_keys:
-                if key.rsplit('_', 2)[-2] == site_id:
-                    to_be_deleted.append(key)
-        else:
-            to_be_deleted = list(self.cache_keys)
+        for key in self.cache_keys:
+            keylang, keysite = lex_cache_key(key)
+            if relevance_test(keylang, keysite):
+                to_be_deleted.append(key)
         cache.delete_many(to_be_deleted)
         self.cache_keys.difference_update(to_be_deleted)
     

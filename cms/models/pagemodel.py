@@ -8,18 +8,16 @@ from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.functional import lazy
 from publisher import MpttPublisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
-
 from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
-from menus.menu_pool import menu_pool
-from django.utils.functional import lazy
 
 class Page(MpttPublisher):
     """

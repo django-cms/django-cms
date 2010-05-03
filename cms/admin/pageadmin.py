@@ -23,7 +23,10 @@ from cms.utils.permissions import has_page_add_permission, \
     has_global_change_permissions_permission
 from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from copy import deepcopy
+from cms.apphook_pool import apphook_pool
+
+from menus.menu_pool import menu_pool
+
 from django import template
 from django.conf import settings
 from django.contrib import admin
@@ -42,9 +45,9 @@ from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
-from menus.menu_pool import menu_pool
+
 import os
-from cms.apphook_pool import apphook_pool
+from copy import deepcopy
 
 
 
