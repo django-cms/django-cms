@@ -1219,7 +1219,7 @@ class PageAdmin(model_admin):
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
                 page = get_page_from_plugin_or_404(plugin)
                 placeholder_slot = request.POST['placeholder']
-                placeholders = get_placeholders(page.template)
+                placeholders = get_placeholders(page.get_template())
                 if not placeholder_slot in placeholders:
                     return HttpResponse(str("error"))
                 placeholder = page.placeholders.get(slot=placeholder_slot)
