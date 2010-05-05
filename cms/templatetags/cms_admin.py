@@ -120,3 +120,7 @@ def page_submit_row(context):
         'show_delete_translation': show_delete_translation
     }
 page_submit_row = register.inclusion_tag('admin/page_submit_line.html', takes_context=True)(page_submit_row)
+
+def in_filtered(seq1, seq2):
+    return [x for x in seq1 if x in seq2]
+in_filtered = register.filter('in_filtered', in_filtered)

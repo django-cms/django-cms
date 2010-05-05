@@ -642,6 +642,19 @@ class PageAdmin(model_admin):
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
         cl.set_items(request)
+        
+        site_id = request.GET.get('site__exact', None)
+        if site_id is None:
+            site_id = Site.objects.get_current().pk
+        site_id = int(site_id)
+        
+        # languages
+        languages = []
+        if site_id and site_id in settings.CMS_SITE_LANGUAGES:
+            languages = settings.CMS_SITE_LANGUAGES[site_id]
+        else:
+            languages = [x[0] for x in settings.CMS_LANGUAGES]
+        
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -656,6 +669,7 @@ class PageAdmin(model_admin):
             'CMS_MODERATOR': settings.CMS_MODERATOR,
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
+            'site_languages': languages,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)

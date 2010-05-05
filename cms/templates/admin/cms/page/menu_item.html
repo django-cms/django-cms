@@ -22,7 +22,7 @@
 		
 		{% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}
 		
-		<div class="col-language">{% for lang in page.get_languages %}
+		<div class="col-language">{% for lang in page.get_languages|in_filtered:site_languages %}
 			{% if has_change_permission %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>
 			{% else %}{{ lang|upper }}
 			{% endif %}
