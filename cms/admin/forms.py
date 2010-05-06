@@ -44,9 +44,10 @@ class PageAddForm(forms.ModelForm):
             self.fields['site'].initial = Site.objects.get_current().pk
         site_id = self.fields['site'].initial
         languages = []
+        language_mappings = dict(settings.LANGUAGES)
         if site_id in settings.CMS_SITE_LANGUAGES:
             for lang in settings.CMS_SITE_LANGUAGES[site_id]:
-                languages.append((lang, dict(settings.CMS_LANGUAGES)[lang]))
+                languages.append((lang, language_mappings.get(lang, lang)))
         else:
             languages = settings.CMS_LANGUAGES
         self.fields['language'].choices = languages
