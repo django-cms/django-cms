@@ -1,7 +1,13 @@
 from menus.menu_pool import menu_pool
+from cms.utils import get_language_from_request
 from django import template
 from django.conf import settings
-from cms.utils import get_language_from_request
+from django.utils.translation import activate, get_language, ugettext
+from django.core.cache import cache
+
+
+class NOT_PROVIDED: pass
+
 
 def cut_after(node, levels, removed):
     """
@@ -196,21 +202,51 @@ show_breadcrumb = register.inclusion_tag('cms/dummy.html',
                                          takes_context=True)(show_breadcrumb)
 
 
-def language_chooser(context, template="menu/language_chooser.html"):
+def _raw_language_marker(language, lang_code):
+    return language
+
+def _native_language_marker(language, lang_code):
+    activate(lang_code)
+    return unicode(ugettext(language))
+
+def _current_language_marker(language, lang_code):
+    return unicode(ugettext(language))
+
+MARKERS = {
+    'raw': _raw_language_marker,
+    'native': _native_language_marker,
+    'current': _current_language_marker,
+}
+
+def language_chooser(context, template=NOT_PROVIDED, i18n_mode='raw'):
     """
     Displays a language chooser
     - template: template used to render the language chooser
     """
+    if template in MARKERS:
+        i18n_mode = template
+        template = NOT_PROVIDED
+    if template is NOT_PROVIDED:
+        template = "menu/language_chooser.html"
+    if not i18n_mode in MARKERS:
+        i18n_mode = 'raw'
     try:
         # If there's an exception (500), default context_processors may not be called.
         request = context['request']
     except KeyError:
         return {'template': 'cms/content.html'}
-    languages = []
+    marker = MARKERS[i18n_mode]
     cms_languages = dict(settings.CMS_LANGUAGES)
-    for lang in settings.CMS_FRONTEND_LANGUAGES:
-        if lang in cms_languages:
-            languages.append((lang, cms_languages[lang]))
+    current_lang = get_language()
+    cache_key = '%s-language-chooser-%s-%s' % (settings.CMS_CACHE_PREFIX, current_lang, i18n_mode)
+    languages = cache.get(cache_key, [])
+    if not languages:
+        for lang in settings.CMS_FRONTEND_LANGUAGES:
+            if lang in cms_languages:
+                languages.append((lang, marker(cms_languages[lang], lang)))
+        if current_lang != get_language():
+            activate(current_lang)
+        cache.set(cache_key, languages)
     lang = get_language_from_request(request, request.current_page)
     context.update({
         'languages':languages,
