@@ -456,7 +456,7 @@ class PluginsMediaNode(template.Node):
             return u''
 
     def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % self.name if hasattr(self, 'name') else ''
+        return "<PluginsMediaNode Node: %s>" % getattr(self, 'name', '')
 
 register.tag('plugins_media', do_plugins_media)
 
