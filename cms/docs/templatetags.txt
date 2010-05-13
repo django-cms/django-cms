@@ -342,7 +342,7 @@ language_chooser
 ----------------
 
 The ``language_chooser`` template tag will display a language chooser for the
-current page. You can modify the template in ``cms/language_chooser.html`` or
+current page. You can modify the template in ``menu/language_chooser.html`` or
 provide your own template if necessary.
 
 Example::
@@ -352,6 +352,16 @@ Example::
 or with custom template::
 
     {% language_chooser "myapp/language_chooser.html" %}
+    
+The language_chooser has three different modes in which it will display the
+languages you can choose from: "raw" (default), "native", "current" and "short".
+It can be passed as last argument to the ``language_chooser tag`` as a string.
+In "raw" mode, the language will be displayed like it's verbose name in the
+settings. In "native" mode the languages are displayed in their actual language
+(eg. German will be displayed "Deutsch", Japanese as "日本語" etc). In "current"
+mode the languages are translated into the current language the user is seeing
+the site in (eg. if the site is displayed in German, Japanese will be displayed
+as "Japanisch"). "Short" mode takes the language code (eg. "en") to display.
 
 If the current url has no cms-page and is handled by a navigation extender and
 the url changes based on the language: You will need to set a language_changer

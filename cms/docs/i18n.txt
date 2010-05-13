@@ -20,11 +20,11 @@ Language Chooser
 ----------------
 
 The ``language_chooser`` template tag will display a language chooser for the current page.
-You can modify the template in ``cms/language_chooser.html`` or provide your own template if necessary.
+You can modify the template in ``menu/language_chooser.html`` or provide your own template if necessary.
 
 Example::
 
-	{% load cms_tags %}
+	{% load menu_tags %}
 	{% language_chooser "myapp/language_chooser.html" %}
 
 If the current URL is not handled by the CMS and you have some i18n slugs in the URL you may use

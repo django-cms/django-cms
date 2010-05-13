@@ -212,10 +212,14 @@ def _native_language_marker(language, lang_code):
 def _current_language_marker(language, lang_code):
     return unicode(ugettext(language))
 
+def _short_language_marker(language, lang_code):
+    return lang_code
+
 MARKERS = {
     'raw': _raw_language_marker,
     'native': _native_language_marker,
     'current': _current_language_marker,
+    'short': _short_language_marker,
 }
 
 def language_chooser(context, template=NOT_PROVIDED, i18n_mode='raw'):
