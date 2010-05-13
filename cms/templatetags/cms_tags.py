@@ -188,7 +188,7 @@ class PlaceholderNode(template.Node):
             placeholder = page.placeholders.get(slot=self.name)
         except Placeholder.DoesNotExist:
             from cms.utils.plugins import get_placeholders
-            placeholders = get_placeholders(selected_template)
+            placeholders = get_placeholders(page.get_template())
             found = None
             for slot in placeholders:
                 new, created = page.placeholders.get_or_create(slot=slot)
