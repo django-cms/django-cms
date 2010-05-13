@@ -103,7 +103,7 @@ def page_url(context, page_lookup, lang=None, site=None):
 page_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_url)
 
 def page_id_url(context, reverse_id, lang=None, site=None):
-    return page_url(context, {'reverse_id': reverse_id}, lang, site)
+    return page_url(context, reverse_id, lang, site)
 page_id_url = register.inclusion_tag('cms/content.html', takes_context=True)(page_id_url)
 
 def do_placeholder(parser, token):
