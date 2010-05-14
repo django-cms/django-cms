@@ -409,16 +409,21 @@ class PageAdmin(model_admin):
                 else:
                     plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
                     other_plugins = CMSPlugin.objects.filter(placeholder=placeholder, parent=None).exclude(language=language)
+                    dict_cms_languages = dict(settings.CMS_LANGUAGES)
                     for plugin in other_plugins:
-                        if not plugin.language in copy_languages:
-                            copy_languages[plugin.language] = dict(settings.CMS_LANGUAGES)[plugin.language]
+                        if (not plugin.language in copy_languages) and (plugin.language in dict_cms_languages):
+                            copy_languages[plugin.language] = dict_cms_languages[plugin.language]
                 language = get_language_from_request(request, obj)
                 if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
                     show_copy = True
-                widget = PluginEditor(attrs={'installed': installed_plugins,
-                    'list': plugin_list, 'copy_languages': copy_languages.items(),
-                     'show_copy':show_copy, 'language': language,
-                     'placeholder': placeholder})
+                widget = PluginEditor(attrs={
+                    'installed': installed_plugins,
+                    'list': plugin_list,
+                    'copy_languages': copy_languages.items(),
+                    'show_copy':show_copy,
+                    'language': language,
+                    'placeholder': placeholder
+                })
                 form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
         else:
             for name in ['slug','title']:
@@ -532,15 +537,13 @@ class PageAdmin(model_admin):
         filled_languages = []
         if obj:
             filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
+        allowed_languages = [l[0] for l in self._get_site_languages(obj)]
         context.update({
-            'filled_languages': filled_languages,
+            'filled_languages': [l for l in filled_languages if l in allowed_languages],
         })
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
-
-    def update_language_tab_context(self, request, obj, context=None):
-        if not context:
-            context = {}
-        language = get_language_from_request(request, obj)
+    
+    def _get_site_languages(self, obj):
         site_id = None
         if obj:
             site_id = obj.site_id
@@ -551,9 +554,16 @@ class PageAdmin(model_admin):
                 languages.append((lang, lang_label))
         else:
             languages = settings.CMS_LANGUAGES
+        return languages
+
+    def update_language_tab_context(self, request, obj, context=None):
+        if not context:
+            context = {}
+        language = get_language_from_request(request, obj)
+        languages = self._get_site_languages(obj)
         context.update({
             'language': language,
-            'traduction_language': languages,
+            'language_tabs': languages,
             'show_language_tabs': len(languages) > 1 and \
                 not settings.CMS_DBGETTEXT,
         })

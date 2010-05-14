@@ -108,7 +108,7 @@
 
 {% if show_language_tabs %}
 <div id="page_form_lang_tabs">
-    {% for lang_code, lang_name in traduction_language %}
+    {% for lang_code, lang_name in language_tabs %}
         <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
             class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
             id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
