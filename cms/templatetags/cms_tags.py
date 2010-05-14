@@ -195,6 +195,11 @@ class PlaceholderNode(template.Node):
                 if slot == self.name:
                     found = new
             placeholder = found
+            if not found:
+                if settings.DEBUG:
+                    raise Placeholder.DoesNotExist("No placeholder '%s' found for page '%s'" % (self.name, page.pk))
+                else:
+                    return "<!-- ERROR:cms.utils.plugins.get_placeholders:%s -->" % self.name
         content = self.get_content(request, page, context)
         if not content:
             if self.nodelist_or:
