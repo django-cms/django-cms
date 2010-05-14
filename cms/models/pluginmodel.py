@@ -236,5 +236,20 @@ class CMSPlugin(MpttPublisher):
         """
         Handle copying of any relations attached to this plugin
         """
+        
+    def is_first_in_placeholder(self):
+        return self.position == 0
+    
+    def is_last_in_placeholder(self):
+        """
+        WARNING: this is a rather expensive call compared to is_first_in_placeholder!
+        """
+        return self.placeholder.cmsplugin_set.all().order_by('-position')[0].pk == self.pk
+    
+    def get_position_in_placeholder(self):
+        """
+        1 based position!
+        """
+        return self.position + 1
 
 reversion_register(CMSPlugin)
