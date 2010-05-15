@@ -1,10 +1,9 @@
 from django.conf import settings
-from menus.exceptions import NamespaceAllreadyRegistered, NoParentFound
+from menus.exceptions import NamespaceAllreadyRegistered
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.utils.translation import get_language
 import copy
-import pickle
 
 def lex_cache_key(key):
     """
