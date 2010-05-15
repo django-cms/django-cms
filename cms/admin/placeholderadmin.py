@@ -116,18 +116,19 @@ class PlaceholderAdmin(ModelAdmin):
             raise Http404
         plugin_type = request.POST['plugin_type']
         placeholder_id = request.POST.get('placeholder', None)
+        position = None
+        language = get_language_from_request(request)
         if not placeholder_id:
             parent_id = request.POST.get('parent_id', None)
             if not parent_id:
                 raise Http404
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
-            placeholder = parent.placeholder
+            plugin = CMSPlugin(language=language, plugin_type=plugin_type,
+                position=position, parent=parent)
         else:
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        position = None
-        language = get_language_from_request(request)
-        plugin = CMSPlugin(language=language, plugin_type=plugin_type,
-            position=position, placeholder=placeholder) 
+            plugin = CMSPlugin(language=language, plugin_type=plugin_type,
+                position=position, placeholder=placeholder) 
         plugin.save()
         return HttpResponse(str(plugin.pk))
     
