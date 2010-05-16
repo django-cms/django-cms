@@ -142,12 +142,7 @@ class CMSPluginBase(admin.ModelAdmin):
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
-        if self.page:
-            return self.page.has_change_permission(request)
-        elif self.placeholder:
-            return self.placeholder.has_change_permission(request)
-        else:
-            return self.parent.has_change_permission(request)
+        return self.cms_plugin_instance.has_change_permission(request)
     has_delete_permission = has_change_permission = has_add_permission
     
     def save_model(self, request, obj, form, change):
