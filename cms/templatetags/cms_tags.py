@@ -168,6 +168,9 @@ class PlaceholderNode(template.Node):
         self.nodelist_or = nodelist_or
         self.inherit = inherit
 
+    def __repr__(self):
+        return "<Placeholder Node: %s>" % self.name
+
     def render(self, context):
         if not 'request' in context:
             return ''
@@ -181,9 +184,9 @@ class PlaceholderNode(template.Node):
                 pass
 
         page = request.current_page
-        if not page or page == "dummy":
-            return ""
-        
+        if not page or page == 'dummy':
+            return ''
+
         try:
             placeholder = page.placeholders.get(slot=self.name)
         except Placeholder.DoesNotExist:
@@ -208,7 +211,7 @@ class PlaceholderNode(template.Node):
                 return render_placeholder_toolbar(placeholder, context, content)
             return content
         return content
-    
+
     def edit_mode(self, placeholder, context):
         from cms.utils.placeholder import get_page_from_placeholder_if_exists
         request = context['request']
@@ -227,19 +230,14 @@ class PlaceholderNode(template.Node):
             pages = chain([page], page.get_cached_ancestors(ascending=True))
         for page in pages:
             template = get_template_from_request(request, page)
-            placeholder = page.placeholders.filter(**{
-                'slot__in': get_placeholders(template),
-            }).get(slot=self.name)
+            placeholder = page.placeholders.filter(slot__in=get_placeholders(template)).get(slot=self.name)
             if not get_plugins(request, placeholder):
                 continue
             request.placeholder_media += placeholder.get_media(request, context)
             content = render_placeholder(placeholder, context)
             if content:
                 return content
-        return ""
-
-    def __repr__(self):
-        return "<Placeholder Node: %s>" % self.name
+        return ''
 
 register.tag('placeholder', do_placeholder)
 
