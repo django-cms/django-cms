@@ -10,3 +10,11 @@ class TwitterRecentEntries(CMSPlugin):
     
     def __unicode__(self):
         return self.title
+
+class TwitterSearch(CMSPlugin):
+    title = models.CharField(_('title'), max_length=75, blank=True)
+    query = models.CharField(_('query'), max_length=200, blank=True, default='', help_text=_('Example: "brains AND zombies AND from:umbrella AND to:nemesis": tweets from the user "umbrella" to the user "nemesis" that contain the words "brains" and "zombies"'))
+    count = models.PositiveSmallIntegerField(_('count'), help_text=_('Number of entries to display'), default=3)
+    
+    def __unicode__(self):
+        return self.title
