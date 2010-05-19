@@ -1,4 +1,3 @@
-from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
