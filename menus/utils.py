@@ -154,7 +154,7 @@ def set_language_changer(request, func):
     example:
     
     def get_absolute_url(self, language=None):
-        reverse("product_view", args=[self.get_slug(language=language)])
+        reverse('product_view', args=[self.get_slug(language=language)])
         
     Use this function in your nav extender views that have i18n slugs.
     """
