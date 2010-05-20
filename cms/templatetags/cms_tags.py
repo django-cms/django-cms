@@ -379,7 +379,7 @@ def show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, sit
     Show the content of a specific placeholder, from a page found by reverse id, in the given language.
     This templatetag is deprecated, replace with `show_placeholder`.
     """
-    return _show_placeholder_for_page(context, placeholder_name, {'reverse_id': reverse_id}, lang=lang, site=site)
+    return _show_placeholder_for_page(context, placeholder_name, reverse_id, lang=lang, site=site)
 show_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_placeholder_by_id)
 
 def show_uncached_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None):
@@ -387,7 +387,7 @@ def show_uncached_placeholder_by_id(context, placeholder_name, reverse_id, lang=
     Show the uncached content of a specific placeholder, from a page found by reverse id, in the given language.
     This templatetag is deprecated, replace with `show_uncached_placeholder`.
     """
-    return _show_placeholder_for_page(context, placeholder_name, {'reverse_id': reverse_id},
+    return _show_placeholder_for_page(context, placeholder_name, reverse_id,
             lang=lang, site=site, cache_result=False)
 show_uncached_placeholder_by_id = register.inclusion_tag('cms/content.html', takes_context=True)(show_uncached_placeholder_by_id)
 
