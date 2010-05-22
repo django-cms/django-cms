@@ -8,7 +8,7 @@ def get_plugins(request, placeholder, lang=None):
         return []
     lang = lang or get_language_from_request(request)
     if not hasattr(placeholder, '_%s_plugins_cache' % lang):
-        setattr(placeholder, '_%s_plugins_cache' % lang,  get_cmsplugin_queryset(request).filter(
+        setattr(placeholder, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
             placeholder=placeholder, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related())
     return getattr(placeholder, '_%s_plugins_cache' % lang)

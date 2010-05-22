@@ -25,7 +25,7 @@
     height:41px;
     width:100%;
     min-width:960px;
-    zoom:1px;
+    zoom:1;
     border-bottom:2px solid #ddd;
     background:url(../images/cms_toolbar.png) repeat-x 0 0;
 }
@@ -350,6 +350,10 @@ span.cms_toolbar_icon.cms_toolbar_state-icon.del
 {
     overflow:auto;
     overflow-x:hidden;
+}
+
+*+html .cms_toolbar_submenuselect .cms_toolbar_submenu{
+	height:200px;
 }
 
 .cms_toolbar_submenu a span

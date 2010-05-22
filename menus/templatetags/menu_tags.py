@@ -1,5 +1,6 @@
 from menus.menu_pool import menu_pool
 from cms.utils import get_language_from_request
+from django.contrib.sites.models import Site
 from django import template
 from django.conf import settings
 from django.utils.translation import activate, get_language, ugettext
@@ -242,7 +243,8 @@ def language_chooser(context, template=NOT_PROVIDED, i18n_mode='raw'):
     marker = MARKERS[i18n_mode]
     cms_languages = dict(settings.CMS_LANGUAGES)
     current_lang = get_language()
-    cache_key = '%s-language-chooser-%s-%s' % (settings.CMS_CACHE_PREFIX, current_lang, i18n_mode)
+    site = Site.objects.get_current()
+    cache_key = '%s-language-chooser-%s-%s-%s' % (settings.CMS_CACHE_PREFIX, site.pk, current_lang, i18n_mode)
     languages = cache.get(cache_key, [])
     if not languages:
         for lang in settings.CMS_FRONTEND_LANGUAGES:
@@ -273,6 +275,7 @@ def page_language_url(context, lang):
     except KeyError:
         return {'template': 'cms/content.html'}
     if hasattr(request, "_language_changer"):
+        request._language_changer.request = request
         url = "/%s" % lang + request._language_changer(lang)
     else:
         page = request.current_page

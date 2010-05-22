@@ -154,15 +154,43 @@ def set_language_changer(request, func):
     example:
     
     def get_absolute_url(self, language=None):
-        reverse("product_view", args=[self.get_slug(language=language)])
+        reverse('product_view', args=[self.get_slug(language=language)])
         
     Use this function in your nav extender views that have i18n slugs.
     """
     request._language_changer = func
+
+def language_changer_decorator(language_changer):
+    """
+    A decorator wrapper for set_language_changer.
+    
+        from menus.utils import language_changer_decorator
+        
+        @language_changer_decorator(function_get_language_changer_url)
+        def my_view_function(request, somearg):
+            pass
+    """
+    def _decorator(func):
+        def _wrapped(request, *args, **kwargs):
+            set_language_changer(request, language_changer)
+            return func(request, *args, **kwargs)
+        _wrapped.__name__ = func.__name__
+        _wrapped.__doc__ = func.__doc__
+        return _wrapped
+    return _decorator
+
+def simple_language_changer(func):
+    def _wrapped(request, *args, **kwargs):
+        def _language_changer(lang):
+            return request.path
+        set_language_changer(request, _language_changer)
+        return func(request, *args, **kwargs)
+    _wrapped.__name__ = func.__name__
+    _wrapped.__doc__ = func.__doc__
+    return _wrapped
+
     
 from django.conf import settings 
-
-
 
 def handle_navigation_manipulators(navigation_tree, request):
     for handler_function_name, name in settings.CMS_NAVIGATION_MODIFIERS:

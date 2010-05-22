@@ -75,6 +75,10 @@ class PlaceholderTestCase(CMSTestCase):
     def test_07_placeholder_scanning_duplicate(self):
         placeholders = self.assertWarns(DuplicatePlaceholderWarning, "Duplicate placeholder found: `one`", get_placeholders, 'placeholder_tests/test_seven.html')
         self.assertEqual(sorted(placeholders), sorted([u'one']))
+
+    def test_08_placeholder_scanning_extend_outside_block(self):
+        placeholders = get_placeholders('placeholder_tests/outside.html')
+        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
         
         
     def failUnlessWarns(self, category, message, f, *args, **kwargs):

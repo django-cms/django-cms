@@ -1,0 +1,22 @@
+{# uses the http://tweet.seaofclouds.com/ jquery.tweet plugin #}
+<div class="plugin_twitter teaser_twitter">
+    {% if object.title %}<h3>{{ object.title }}</h3>{% endif %}
+    <ul id="twitter_search_update_list_{{ object.id }}"></ul>
+</div>
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $("#twitter_search_update_list_{{ object.id }}").tweet({
+            username:[],
+            join_text: "auto",
+            avatar_size: 32,
+            count: 3,
+            auto_join_text_default: "we said,", 
+            auto_join_text_ed: "we",
+            auto_join_text_ing: "we were",
+            auto_join_text_reply: "we replied to",
+            auto_join_text_url: "we were checking out",
+            loading_text: "loading tweets..."{% if object.query %},
+            query: "{{ object.query }}"{% endif %}
+        });
+    });
+</script>

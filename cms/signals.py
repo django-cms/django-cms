@@ -219,6 +219,7 @@ if settings.CMS_MODERATOR:
     signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
+signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
  
 from cms.models import PagePermission, GlobalPagePermission
 from cms.cache.permissions import clear_user_permission_cache,\

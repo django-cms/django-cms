@@ -193,7 +193,7 @@ class PlaceholderPluginEditorWidget(PluginEditor):
             ph = None
             context = {'add':True}
         if ph:
-            plugin_list = ph.cmsplugin_set.all().order_by('position')
+            plugin_list = ph.cmsplugin_set.filter(parent=None).order_by('position')
             plugin_list = self.filter_func(self.request, plugin_list)
             language = get_language_from_request(self.request)
             copy_languages = []

@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.utils.translation import get_language
 from django.utils.encoding import smart_str
 

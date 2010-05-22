@@ -44,8 +44,14 @@ def _extend_nodelist(extend_node):
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
     placeholders = []
+
     for block in blocks.values():
         placeholders += _scan_placeholders(block.nodelist, block, blocks.keys())
+
+    parent_template = extend_node.get_parent({})
+    # if this is the topmost template, check for placeholders outside of blocks
+    if not parent_template.nodelist.get_nodes_by_type(ExtendsNode):
+        placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
     return placeholders
 
 def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):

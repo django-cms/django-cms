@@ -1,7 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from cms.plugin_base import CMSPluginBase
-from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.plugins.twitter.models import TwitterRecentEntries, TwitterSearch
 from cms.plugin_pool import plugin_pool
+from django.conf import settings
 
 class TwitterRecentEntriesPlugin(CMSPluginBase):
     model = TwitterRecentEntries
@@ -15,3 +16,19 @@ class TwitterRecentEntriesPlugin(CMSPluginBase):
         return context
     
 plugin_pool.register_plugin(TwitterRecentEntriesPlugin)
+
+class TwitterSearchPlugin(CMSPluginBase):
+    model = TwitterSearch
+    name = _("Twitter Search")
+    render_template = "cms/plugins/twitter_search.html"
+    admin_preview = False
+    
+    def render(self, context, instance, placeholder):
+        context.update({
+            'object': instance,
+        })
+        return context
+    
+    class PluginMedia:
+        js = ('%splugins/twitter/js/jquery.tweet.js' % settings.CMS_MEDIA_URL,)
+plugin_pool.register_plugin(TwitterSearchPlugin)

@@ -1,8 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from django.core import validators
+from django.forms.fields import EMPTY_VALUES
 from cms.models.pagemodel import Page
-from cms.models.placeholdermodel import Placeholder
 from cms.forms.widgets import PageSelectWidget
 from cms.forms.utils import get_site_choices, get_page_choices
 
@@ -29,9 +28,9 @@ class PageSelectFormField(forms.MultiValueField):
         if data_list:
             site_id = data_list[0]
             page_id = data_list[1]
-            if site_id in validators.EMPTY_VALUES:
+            if site_id in EMPTY_VALUES:
                 pass
-            if page_id in validators.EMPTY_VALUES:
+            if page_id in EMPTY_VALUES:
                 if not self.required:
                     return None
                 raise forms.ValidationError(self.error_messages['invalid_page'])

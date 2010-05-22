@@ -124,7 +124,7 @@ class PlaceholderAdmin(ModelAdmin):
                 raise Http404
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             plugin = CMSPlugin(language=language, plugin_type=plugin_type,
-                position=position, parent=parent)
+                position=position, parent=parent, placeholder=parent.placeholder)
         else:
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
             plugin = CMSPlugin(language=language, plugin_type=plugin_type,
