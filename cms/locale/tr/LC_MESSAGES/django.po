@@ -1201,7 +1201,7 @@ msgstr ""
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "metin rengi"
 
 #: plugins/video/models.py:25
 msgid "seekbar color"
@@ -1213,7 +1213,7 @@ msgstr ""
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
-msgstr ""
+msgstr "yükleme çubuğu rengi"
 
 #: plugins/video/models.py:28
 msgid "button out color"
