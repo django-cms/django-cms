@@ -131,7 +131,10 @@ class CMSPlugin(MpttPublisher):
             
     @property
     def page(self):
-        warnings.warn("Don't use the page attribute on CMSPlugins! CMS Plugins are not guaranteed to have a page associated with them!", DontUsePageAttributeWarning)
+        warnings.warn(
+            "Don't use the page attribute on CMSPlugins! CMSPlugins are not "
+            "guaranteed to have a page associated with them!",
+            DontUsePageAttributeWarning)
         return get_page_from_placeholder_if_exists(self.placeholder)
     
     def get_instance_icon_src(self):
