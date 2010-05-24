@@ -1228,7 +1228,7 @@ msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr ""
+msgstr "Flash plugin niet gevonden. Download <a href=\"http://adobe.com/flashplayer\">hier</a>"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1237,7 +1237,7 @@ msgid "Save"
 msgstr "Opslaan"
 
 #: templates/admin/page_submit_line.html:7
-#, fuzzy, python-format
+#, python-format
 msgid "Delete %(language)s translation"
 msgstr "Verwijder %(language)s vertaling"
 
@@ -1462,7 +1462,6 @@ msgid "softroot"
 msgstr "schijnoorsprong"
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
 msgid "home"
 msgstr "Voorpagina"
 
