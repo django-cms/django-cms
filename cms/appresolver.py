@@ -92,12 +92,16 @@ def get_patterns_for_title(path, title):
     """
     app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
-    for urlconf_name in app.urls:
-        mod = import_module(urlconf_name)
-        if not hasattr(mod, 'urlpatterns'):
-            raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
-                % urlconf_name)
-        pattern_list = getattr(mod, 'urlpatterns')
+    for urlconf in app.urls:
+        pattern_list = None
+        if isinstance(urlconf, (str)):
+            mod = import_module(urlconf)
+            if not hasattr(mod, 'urlpatterns'):
+                raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
+                    % urlconf)
+            pattern_list = getattr(mod, 'urlpatterns')
+        else:
+            pattern_list = urlconf
         if not path.endswith('/'):
             path += '/'
         page_id = title.page.id

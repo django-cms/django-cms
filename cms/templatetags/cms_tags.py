@@ -446,7 +446,7 @@ class PluginsMediaNode(template.Node):
         if page_lookup_var:
             page_lookup = page_lookup_var.resolve(context)
             page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-            plugins_media = get_plugins_media(request, page)
+            plugins_media = get_plugins_media(request, context, page)
         else:
             page = request.current_page
             if page == "dummy":
