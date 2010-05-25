@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-15 13:45+0100\n"
-"PO-Revision-Date: 2010-03-04 02:54+0200\n"
+"PO-Revision-Date: 2010-05-24 22:06+0200\n"
 "Last-Translator: Petteri Kääpä <petteri@kaapa.fi>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -107,18 +107,16 @@ msgstr "Sivu tällä käänteisellä URL tunnuksella on jo olemassa."
 msgid "Invalid URL, use /my/url format."
 msgstr "Epäkelpo URL. Ole hyvä ja käytä muotoa /minun/url/"
 
-#: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
+#: admin/forms.py:138
+#: admin/forms.py:139
+#: migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
 msgstr "käyttäjä"
 
 #: admin/forms.py:171
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
-"Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja "
-"ei voi muokata sitä myöhemmin."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr "Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja ei voi muokata sitä myöhemmin."
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
@@ -128,17 +126,23 @@ msgstr "Sivun luonti vaatii myös oikeuden muokata sivuja."
 msgid "Please select user or group first."
 msgstr "Valitse ensin käyttäjä tai käyttäjäryhmä."
 
-#: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
+#: admin/forms.py:208
+#: admin/forms.py:215
+#: admin/forms.py:219
 #: templates/admin/cms/page/change_form.html:65
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
 msgstr "Lisää"
 
-#: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
+#: admin/forms.py:209
+#: admin/forms.py:216
+#: admin/forms.py:220
 msgid "Change"
 msgstr "Muokkaa"
 
-#: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
+#: admin/forms.py:210
+#: admin/forms.py:217
+#: admin/forms.py:221
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
@@ -153,12 +157,8 @@ msgid "Notify user"
 msgstr "Huomauta käyttäjää"
 
 #: admin/forms.py:275
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-"Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. "
-"Vaatii käyttäjän sähköpostiosoitteen."
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. Vaatii käyttäjän sähköpostiosoitteen."
 
 #: admin/forms.py:295
 msgid "New password"
@@ -173,20 +173,19 @@ msgid "Email notification requires valid email address."
 msgstr "Sähköpostitiedote vaatii kelvollisen sähköpostiosoitteen."
 
 #: admin/forms.py:318
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "Oikeus luoda sivuja vaatii oikeuden muokata sivuja!"
 
 #: admin/forms.py:320
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr "Oikeus luoda käyttäjiä vaatii oikeuden muokata käyttäjä!"
 
 #: admin/forms.py:322
 msgid "To add permissions you also need to edit them!"
 msgstr "Luodaksesi käyttöoikeuksia sinun täytyy myös muokata niitä!"
 
-#: admin/pageadmin.py:111 admin/pageadmin.py:127
+#: admin/pageadmin.py:111
+#: admin/pageadmin.py:127
 msgid "Hidden"
 msgstr "Piilotettu"
 
@@ -196,9 +195,7 @@ msgstr "Perusasetukset"
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna "
-"ensin."
+msgstr "Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna ensin."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
@@ -216,14 +213,22 @@ msgstr "korkeammalle"
 msgid "Database error"
 msgstr "Tietokantavirhe"
 
-#: admin/pageadmin.py:714 migrations/0001_initial.py:13
-#: migrations/0001_initial.py:26 migrations/0001_initial.py:40
-#: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
-#: models/pagemodel.py:72 models/permissionmodels.py:68
-#: models/pluginmodel.py:38 models/titlemodels.py:22
-#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22 plugins/teaser/models.py:15
+#: admin/pageadmin.py:714
+#: migrations/0001_initial.py:13
+#: migrations/0001_initial.py:26
+#: migrations/0001_initial.py:40
+#: migrations/0001_initial.py:78
+#: migrations/0003_remove_placeholder.py:21
+#: models/pagemodel.py:72
+#: models/permissionmodels.py:68
+#: models/pluginmodel.py:38
+#: models/titlemodels.py:22
+#: plugins/inherit/forms.py:9
+#: plugins/link/forms.py:9
+#: plugins/link/models.py:13
+#: plugins/link/migrations/0001_initial.py:19
+#: plugins/picture/models.py:22
+#: plugins/teaser/models.py:15
 msgid "page"
 msgstr "sivu"
 
@@ -257,11 +262,13 @@ msgstr "Sinulla ei ole oikeutta julkaista tätä sivua"
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Sinulla ei ole oikeutta vaihtaa tämän sivun valikkonäkyvyyttä"
 
-#: admin/pageadmin.py:1047 admin/pageadmin.py:1081
+#: admin/pageadmin.py:1047
+#: admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
 msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
 
-#: admin/pageadmin.py:1051 admin/pageadmin.py:1083
+#: admin/pageadmin.py:1051
+#: admin/pageadmin.py:1083
 msgid "Language must be set to a supported language!"
 msgstr "Kielen tulee olla tuettu!"
 
@@ -271,23 +278,18 @@ msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "Liitännäinen %(plugin_name)s lisätty sisältöpaikkaan  %(placeholder)s."
 
 #: admin/pageadmin.py:1085
-#, fuzzy
 msgid "Language must be different than the copied language!"
 msgstr "Kopioidun kielen tulee poiketa lähdekielestä!"
 
 #: admin/pageadmin.py:1131
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
-"Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
+msgstr "Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
 
 #: admin/pageadmin.py:1204
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa %"
-"(placeholder)s."
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr "Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa %(placeholder)s."
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
@@ -295,14 +297,11 @@ msgstr "Liitännäisiä siirrettiin"
 
 #: admin/pageadmin.py:1281
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
-msgstr ""
-"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta "
-"%(placeholder)s."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgstr "Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta %(placeholder)s."
 
-#: admin/permissionadmin.py:112 models/permissionmodels.py:74
+#: admin/permissionadmin.py:112
+#: models/permissionmodels.py:74
 msgid "Page permissions"
 msgstr "Sivun oikeudet"
 
@@ -322,7 +321,8 @@ msgstr "Käyttäjätiedot"
 msgid "Groups"
 msgstr "Ryhmät"
 
-#: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:855
+#: admin/useradmin.py:33
+#: templates/cms/toolbar/toolbar.html:855
 msgid "Password"
 msgstr "Salasana"
 
@@ -366,7 +366,8 @@ msgstr "Hakusivu"
 msgid "search this documentation"
 msgstr "Hae tästä dokumentaatiosta"
 
-#: docs/templates/defindex.html:19 docs/templates/modindex.html:2
+#: docs/templates/defindex.html:19
+#: docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
 msgstr "Globaali moduulihakemisto"
@@ -383,15 +384,19 @@ msgstr "Yleisluettelo"
 msgid "all functions, classes, terms"
 msgstr "kaikki funktiot, luokat ja termit"
 
-#: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
-#: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
-#: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
+#: docs/templates/genindex-single.html:2
+#: docs/templates/genindex-split.html:2
+#: docs/templates/genindex-split.html:5
+#: docs/templates/genindex.html:2
+#: docs/templates/genindex.html.py:5
+#: docs/templates/genindex.html:48
 #: docs/templates/layout.html:131
 msgid "Index"
 msgstr "Hakemisto"
 
 #: docs/templates/genindex-single.html:44
-#: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
+#: docs/templates/genindex-split.html:14
+#: docs/templates/genindex-split.html:27
 #: docs/templates/genindex.html:54
 msgid "Full index on one page"
 msgstr "Täydellinen hakemisto yhdellä sivulla"
@@ -452,7 +457,8 @@ msgstr "Syötä hakusanat tai moduulin, luokan tai funtion nimi."
 msgid "About these documents"
 msgstr "Tästä dokumentaatiosta"
 
-#: docs/templates/layout.html:134 docs/templates/search.html:2
+#: docs/templates/layout.html:134
+#: docs/templates/search.html:2
 #: docs/templates/search.html.py:5
 msgid "Search"
 msgstr "Hae"
@@ -477,38 +483,55 @@ msgstr "Hakutulokset"
 msgid "Your search did not match any results."
 msgstr "Hakusi ei tuottanut yhtään tulosta."
 
-#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
-#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
-#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
-#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:42 models/titlemodels.py:11
+#: migrations/0001_initial.py:12
+#: migrations/0001_initial.py:24
+#: migrations/0001_initial.py:75
+#: migrations/0003_remove_placeholder.py:18
+#: migrations/0010_5char_language.py:12
+#: migrations/0010_5char_language.py:15
+#: migrations/0010_5char_language.py:22
+#: migrations/0010_5char_language.py:25
+#: models/pluginmodel.py:42
+#: models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
 msgstr "kieli"
 
-#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:40
+#: migrations/0001_initial.py:14
+#: migrations/0004_textobjects.py:12
+#: migrations/0004_textobjects.py:22
+#: models/pluginmodel.py:40
 msgid "position"
 msgstr "Sijainti"
 
-#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:44 models/titlemodels.py:23
+#: migrations/0001_initial.py:15
+#: migrations/0001_initial.py:29
+#: models/pluginmodel.py:44
+#: models/titlemodels.py:23
 msgid "creation date"
 msgstr "Luontipäiväys"
 
-#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:41
+#: migrations/0001_initial.py:16
+#: migrations/0001_initial.py:77
+#: migrations/0003_remove_placeholder.py:20
+#: models/pluginmodel.py:41
 msgid "slot"
 msgstr "lovi"
 
-#: migrations/0001_initial.py:18 models/pluginmodel.py:43
+#: migrations/0001_initial.py:18
+#: models/pluginmodel.py:43
 msgid "plugin_name"
 msgstr "liitännäisen nimi"
 
-#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
-#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:26
-#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:11
+#: migrations/0001_initial.py:25
+#: migrations/0011_title_overwrites.py:12
+#: migrations/0011_title_overwrites.py:15
+#: models/titlemodels.py:12
+#: models/titlemodels.py:13
+#: models/titlemodels.py:21
+#: plugins/file/models.py:26
+#: plugins/file/migrations/0001_initial.py:18
+#: plugins/teaser/models.py:11
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
@@ -518,7 +541,8 @@ msgstr "otsikko"
 msgid "path"
 msgstr "polku"
 
-#: migrations/0001_initial.py:30 models/titlemodels.py:14
+#: migrations/0001_initial.py:30
+#: models/titlemodels.py:14
 msgid "slug"
 msgstr "slug"
 
@@ -526,15 +550,18 @@ msgstr "slug"
 msgid "everybody"
 msgstr "kaikki"
 
-#: migrations/0001_initial.py:37 models/permissionmodels.py:20
+#: migrations/0001_initial.py:37
+#: models/permissionmodels.py:20
 msgid "can edit"
 msgstr "voi muokata"
 
-#: migrations/0001_initial.py:38 models/permissionmodels.py:17
+#: migrations/0001_initial.py:38
+#: models/permissionmodels.py:17
 msgid "group"
 msgstr "ryhmä"
 
-#: migrations/0001_initial.py:39 models/permissionmodels.py:24
+#: migrations/0001_initial.py:39
+#: models/permissionmodels.py:24
 msgid "can publish"
 msgstr "voi julkaista"
 
@@ -546,21 +573,26 @@ msgstr "tyyppi"
 msgid "can change soft-root"
 msgstr "voi muuttaa soft-roottia"
 
-#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
+#: migrations/0001_initial.py:50
+#: migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
 msgstr "tila"
 
-#: migrations/0001_initial.py:53 models/pagemodel.py:51
+#: migrations/0001_initial.py:53
+#: models/pagemodel.py:51
 msgid "navigation extenders"
 msgstr "navigaation laajentajat"
 
-#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46 models/titlemodels.py:16
+#: migrations/0001_initial.py:54
+#: migrations/0006_apphook.py:12
+#: migrations/0006_apphook.py:46
+#: models/titlemodels.py:16
 msgid "has url overwrite"
 msgstr "omaa URL-ylikirjoituksen"
 
-#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
+#: migrations/0001_initial.py:55
+#: migrations/0006_apphook.py:49
 msgid "url overwrite"
 msgstr "URL-ylikirjoitus"
 
@@ -568,54 +600,67 @@ msgstr "URL-ylikirjoitus"
 msgid "author"
 msgstr "luoja"
 
-#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
+#: migrations/0001_initial.py:58
+#: migrations/0006_apphook.py:37
 msgid "reverse url id"
 msgstr "käänteinen URL-tunniste"
 
-#: migrations/0001_initial.py:59 models/pagemodel.py:64
+#: migrations/0001_initial.py:59
+#: models/pagemodel.py:64
 msgid "login required"
 msgstr "Sisäänkirjautuminen vaadittu"
 
-#: migrations/0001_initial.py:60 models/pagemodel.py:49
+#: migrations/0001_initial.py:60
+#: models/pagemodel.py:49
 msgid "soft root"
 msgstr "Softroot"
 
-#: migrations/0001_initial.py:63 models/pagemodel.py:47
+#: migrations/0001_initial.py:63
+#: models/pagemodel.py:47
 msgid "publication end date"
 msgstr "julkaisun loppupäiväys"
 
-#: migrations/0001_initial.py:64 models/pagemodel.py:54
+#: migrations/0001_initial.py:64
+#: models/pagemodel.py:54
 #: plugins/snippet/models.py:14
 msgid "template"
 msgstr "asettelu"
 
-#: migrations/0001_initial.py:66 models/pagemodel.py:46
+#: migrations/0001_initial.py:66
+#: models/pagemodel.py:46
 msgid "publication date"
 msgstr "julkaisupäiväys"
 
-#: migrations/0001_initial.py:67 models/pagemodel.py:48
+#: migrations/0001_initial.py:67
+#: models/pagemodel.py:48
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
 msgstr "navigaatiossa"
 
-#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
+#: migrations/0006_apphook.py:15
+#: migrations/0007_apphook_longer.py:11
+#: migrations/0007_apphook_longer.py:17
+#: models/titlemodels.py:17
 msgid "application"
 msgstr "sovellus"
 
-#: migrations/0006_apphook.py:65 models/pagemodel.py:50
+#: migrations/0006_apphook.py:65
+#: models/pagemodel.py:50
 msgid "id"
 msgstr "id"
 
-#: migrations/0008_redirects.py:11 models/titlemodels.py:18
+#: migrations/0008_redirects.py:11
+#: models/titlemodels.py:18
 msgid "redirect"
 msgstr "edelleenohjaus"
 
-#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
+#: migrations/0009_added_meta_fields.py:12
+#: models/titlemodels.py:20
 msgid "keywords"
 msgstr "avainsanat"
 
-#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
+#: migrations/0009_added_meta_fields.py:15
+#: models/titlemodels.py:19
 #: plugins/teaser/models.py:22
 msgid "description"
 msgstr "kuvaus"
@@ -640,7 +685,8 @@ msgstr "Sivun jälkeläiset"
 msgid "Page and descendants"
 msgstr "Sivu ja jälkeläiset"
 
-#: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
+#: models/moderatormodels.py:44
+#: templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Sivu"
 
@@ -650,19 +696,23 @@ msgstr "Sivu"
 msgid "User"
 msgstr "Käyttäjä"
 
-#: models/moderatormodels.py:49 templatetags/cms_admin.py:65
+#: models/moderatormodels.py:49
+#: templatetags/cms_admin.py:65
 msgid "Moderate page"
 msgstr "Moderoi sivua"
 
-#: models/moderatormodels.py:50 templatetags/cms_admin.py:66
+#: models/moderatormodels.py:50
+#: templatetags/cms_admin.py:66
 msgid "Moderate children"
 msgstr "Moderoi sivun lapsia"
 
-#: models/moderatormodels.py:51 templatetags/cms_admin.py:67
+#: models/moderatormodels.py:51
+#: templatetags/cms_admin.py:67
 msgid "Moderate descendants"
 msgstr "Moderoi sivun jälkeläisiä"
 
-#: models/moderatormodels.py:54 models/moderatormodels.py:55
+#: models/moderatormodels.py:54
+#: models/moderatormodels.py:55
 msgid "PageModerator"
 msgstr "Sivumoderaattori"
 
@@ -670,7 +720,8 @@ msgstr "Sivumoderaattori"
 msgid "created"
 msgstr "luotu"
 
-#: models/moderatormodels.py:98 models/pagemodel.py:33
+#: models/moderatormodels.py:98
+#: models/pagemodel.py:33
 msgid "changed"
 msgstr "muokattu"
 
@@ -690,7 +741,8 @@ msgstr "julkaisupyyntö"
 msgid "unpublish req."
 msgstr "piilotuspyyntö"
 
-#: models/moderatormodels.py:103 models/pagemodel.py:36
+#: models/moderatormodels.py:103
+#: models/pagemodel.py:36
 msgid "approved"
 msgstr "hyväksytty"
 
@@ -706,9 +758,11 @@ msgstr "Sivun moderointitilat"
 msgid "req. app."
 msgstr "Hyväksyntäpyyntö"
 
-#: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
+#: models/pagemodel.py:35
+#: templates/admin/cms/page/menu_item.html:44
 #: templates/cms/toolbar/toolbar.html:885
-#: templates/cms/toolbar/toolbar.html:919 utils/moderator.py:91
+#: templates/cms/toolbar/toolbar.html:919
+#: utils/moderator.py:91
 msgid "delete"
 msgstr "poista"
 
@@ -720,17 +774,14 @@ msgstr "Hyväksy äitisivu"
 msgid "created by"
 msgstr "luoja"
 
-#: models/pagemodel.py:43 templates/admin/cms/page/change_list_tree.html:19
+#: models/pagemodel.py:43
+#: templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
 msgstr "muokkaaja"
 
 #: models/pagemodel.py:46
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr ""
-"Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" "
-"jotta se tulee näkyviin. "
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgstr "Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" jotta se tulee näkyviin. "
 
 #: models/pagemodel.py:47
 msgid "When to expire the page. Leave empty to never expire."
@@ -741,12 +792,8 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Kaikkia vanhempia ei näytetä navigaatiossa"
 
 #: models/pagemodel.py:50
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
-msgstr ""
-"Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa "
-"tämän sivun linkittämiseksi asettelutiedostoissa. "
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgstr "Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa tämän sivun linkittämiseksi asettelutiedostoissa. "
 
 #: models/pagemodel.py:52
 msgid "is published"
@@ -826,9 +873,7 @@ msgstr "voi palauttaa minkä tahansa poistetun sivun"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"jos mitään ei ole valittu käyttäjälle myönnetään oikeudet kaikkiin "
-"sivustoihin"
+msgstr "jos mitään ei ole valittu käyttäjälle myönnetään oikeudet kaikkiin sivustoihin"
 
 #: models/permissionmodels.py:52
 msgid "sites"
@@ -842,7 +887,8 @@ msgstr "Sivun globaali käyttöoikeus"
 msgid "Pages global permissions"
 msgstr "Sivujen globaalit käyttöoikeudet"
 
-#: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
+#: models/permissionmodels.py:67
+#: templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
 msgstr "Myönnä oikeus"
 
@@ -882,8 +928,10 @@ msgstr "Yliaja otsikko (HTML title)"
 msgid "File"
 msgstr "Tiedosto"
 
-#: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:25
+#: plugins/file/migrations/0001_initial.py:17
+#: plugins/flash/models.py:9
+#: plugins/flash/migrations/0001_initial.py:18
 msgid "file"
 msgstr "tiedosto"
 
@@ -895,12 +943,14 @@ msgstr "Flash"
 msgid "use swf file"
 msgstr "käytä .swf tiedostoa (Flash)"
 
-#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
+#: plugins/flash/models.py:10
+#: plugins/flash/migrations/0001_initial.py:16
 #: plugins/video/models.py:14
 msgid "width"
 msgstr "leveys"
 
-#: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
+#: plugins/flash/models.py:11
+#: plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:15
 msgid "height"
 msgstr "korkeus"
@@ -982,12 +1032,8 @@ msgid "Language or Page must be filled out"
 msgstr "Kieli tai sivu pitää olla täytettynä"
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
-msgstr ""
-"Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä "
-"valitsee nykyisen sivun"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgstr "Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä valitsee nykyisen sivun"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -997,15 +1043,19 @@ msgstr "Valinnainen: haluttujen liitännäisten kieli"
 msgid "Link"
 msgstr "Linkki"
 
-#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
+#: plugins/link/models.py:11
+#: plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
-#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
+#: plugins/snippet/models.py:12
+#: plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
 msgstr "nimi"
 
-#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
-#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
+#: plugins/link/models.py:12
+#: plugins/link/migrations/0001_initial.py:16
+#: plugins/picture/models.py:21
+#: plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:21
 msgid "link"
 msgstr "linkki"
@@ -1034,16 +1084,20 @@ msgstr "vasen"
 msgid "right"
 msgstr "oikea"
 
-#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:12 plugins/video/models.py:12
+#: plugins/picture/models.py:20
+#: plugins/picture/migrations/0001_initial.py:17
+#: plugins/teaser/models.py:12
+#: plugins/video/models.py:12
 msgid "image"
 msgstr "kuva"
 
-#: plugins/picture/models.py:21 plugins/picture/models.py:22
+#: plugins/picture/models.py:21
+#: plugins/picture/models.py:22
 msgid "if present image will be clickable"
 msgstr "verkko-osoite johon kuva klikkaaminen vie"
 
-#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
+#: plugins/picture/models.py:23
+#: plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
 msgstr "vaihtoehtoinen teksti"
 
@@ -1063,7 +1117,8 @@ msgstr "laajempi kuvaus kuvasta"
 msgid "side"
 msgstr "sivu"
 
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
+#: plugins/snippet/cms_plugins.py:12
+#: plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
 msgstr "Snippet"
@@ -1073,16 +1128,14 @@ msgstr "Snippet"
 msgid "Template %(template)s does not exist."
 msgstr "Asettelutiedostoa %(template)s ei ole olemassa."
 
-#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
+#: plugins/snippet/models.py:13
+#: plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan "
-"ruudulle."
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr "Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan ruudulle."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1108,7 +1161,8 @@ msgstr "lisää"
 msgid "Text"
 msgstr "Teksti"
 
-#: plugins/text/models.py:15 plugins/text/migrations/0001_initial.py:16
+#: plugins/text/models.py:15
+#: plugins/text/migrations/0001_initial.py:16
 msgid "body"
 msgstr "vartalo"
 
@@ -1203,12 +1257,8 @@ msgid "movie url"
 msgstr "videon osoite"
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
-msgstr ""
-"Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?"
-"v=YFa59lK-kpo"
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgstr "Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
 msgid "preview image file"
@@ -1234,10 +1284,14 @@ msgstr "silmukka"
 msgid "background color"
 msgstr "taustaväri"
 
-#: plugins/video/models.py:23 plugins/video/models.py:24
-#: plugins/video/models.py:25 plugins/video/models.py:26
-#: plugins/video/models.py:27 plugins/video/models.py:28
-#: plugins/video/models.py:29 plugins/video/models.py:30
+#: plugins/video/models.py:23
+#: plugins/video/models.py:24
+#: plugins/video/models.py:25
+#: plugins/video/models.py:26
+#: plugins/video/models.py:27
+#: plugins/video/models.py:28
+#: plugins/video/models.py:29
+#: plugins/video/models.py:30
 msgid "Hexadecimal, eg ff00cc"
 msgstr "Hexadesimaali, esim. ff00cc"
 
@@ -1270,12 +1324,8 @@ msgid "button highlight color"
 msgstr "napin korostusväri"
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
-msgstr ""
-"Flash-laajennus puuttuu. <a href=\"http://adobe.com/flashplayer\">Lataa "
-"tästä</a>."
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr "Flash-laajennus puuttuu. <a href=\"http://adobe.com/flashplayer\">Lataa tästä</a>."
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1303,11 +1353,8 @@ msgstr "Tallenna ja jatka muokkausta"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta "
-"hyväksyntää."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgstr "Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta hyväksyntää."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
@@ -1407,12 +1454,8 @@ msgstr "Sivun tilat"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
-msgstr ""
-"Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti "
-"moderaattorille."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+msgstr "Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti moderaattorille."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1473,13 +1516,12 @@ msgid "published"
 msgstr "julkaistu"
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "tila"
+msgstr "alku"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "loppu"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
@@ -1688,9 +1730,7 @@ msgstr "Yhtään liitäännäistä ei ole valittuna. Valitse vasemmalta laidalta
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
-"Yhtään liitännäistä ei ole asetettu. Lisää liitännäinen tähän "
-"sisältökenttään."
+msgstr "Yhtään liitännäistä ei ole asetettu. Lisää liitännäinen tähän sisältökenttään."
 
 #: templates/cms/toolbar/toolbar.html:760
 #, python-format
@@ -1806,7 +1846,8 @@ msgstr "Pura lasten moderointi"
 msgid "Unbind descendants moderation"
 msgstr "Pura jälkeläisten moderointi"
 
-#: templatetags/cms_tags.py:401 templatetags/cms_tags.py:674
+#: templatetags/cms_tags.py:401
+#: templatetags/cms_tags.py:674
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
 msgstr "Käänteistunnusta ei löytynyt kohteessa %(domain)s"
@@ -1814,19 +1855,16 @@ msgstr "Käänteistunnusta ei löytynyt kohteessa %(domain)s"
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
-"Template tag page_url ei löytänyt sivua käänteistunnuksella  %(reverse_id)"
-"s.\n"
+"Template tag page_url ei löytänyt sivua käänteistunnuksella  %(reverse_id)s.\n"
 "Sivun URL oli: http://%(host)s%(path)s"
 
 #: templatetags/cms_tags.py:675
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 "Template tag page_url ei löytänyt isvua käänteistuuksella %(reverse_id)s.\n"
