@@ -34,6 +34,11 @@ class MenusTestCase(CMSTestCase):
         self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
         self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
         self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
+        self.page6 = self.create_page(parent_page=None, published=True, in_navigation=False)
+        self.page7 = self.create_page(parent_page=self.page6, published=True, in_navigation=True)
+        self.all_pages = [self.page1, self.page2, self.page3, self.page4,
+                          self.page5, self.page6, self.page7]
+        self.top_level_pages = [self.page1, self.page4, self.page6]
         
     def test_01_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
@@ -44,7 +49,7 @@ class MenusTestCase(CMSTestCase):
         # test the cms menu class
         menu = CMSMenu()
         nodes = menu.get_nodes(request)
-        self.assertEqual(len(nodes), 5)
+        self.assertEqual(len(nodes), len(self.all_pages))
         
     def test_02_show_menu(self):
         
@@ -94,7 +99,7 @@ class MenusTestCase(CMSTestCase):
         context = self.get_context()
         # test standard show_menu 
         nodes = show_menu(context, 1, 1, 100, 100)['children']
-        self.assertEqual(len(nodes), 2)
+        self.assertEqual(len(nodes), len(self.top_level_pages))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
         
@@ -249,3 +254,8 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
         self.assertEqual(len(nodes[0].children[0].children), 0)
         
+    def test_17_show_submenu_from_non_menu_page(self):
+        page6 = Page.objects.get(pk=self.page6.pk)
+        context = self.get_context(page6.get_absolute_url())
+        nodes = show_menu(context, 1, 100, 0, 1)['children']
+        self.assertEqual(len(nodes[0].children), 1)
