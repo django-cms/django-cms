@@ -171,7 +171,7 @@ def render_placeholder_toolbar(placeholder, context, content):
         template = page.template
     else:
         template = None
-    installed_plugins = plugin_pool.get_all_plugins(placeholder, page)
+    installed_plugins = plugin_pool.get_all_plugins(placeholder.slot, page)
     name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("name", None)
     if not name:
         name = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("name", None)
