@@ -240,8 +240,9 @@ class CMSPlugin(MpttPublisher):
         """
         
     def has_change_permission(self, request):
-        if self.page:
-            return self.page.has_change_permission(request)
+        page = get_page_from_placeholder_if_exists(self.placeholder)
+        if page:
+            return page.has_change_permission(request)
         elif self.placeholder:
             return self.placeholder.has_change_permission(request)
         else:

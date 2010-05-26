@@ -470,16 +470,13 @@ class PageAdmin(model_admin):
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
-
         if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
             moderation_required = will_require_moderation(request.GET['target'], request.GET['position'])
-
             extra_context.update({
                 'moderation_required': moderation_required,
                 'moderation_level': _('higher'),
                 'show_save_and_continue':True,
             })
-
         language = get_language_from_request(request)
         extra_context.update({
             'language': language,
@@ -1183,7 +1180,6 @@ class PageAdmin(model_admin):
         plugin_admin.cms_plugin_instance = cms_plugin
         plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
         plugin_admin.page = page
-
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
             # view, which actually does'nt exists
@@ -1205,7 +1201,6 @@ class PageAdmin(model_admin):
             # change_view method, is better if it will be loaded again, so
             # just pass id to plugin_admin
             response = plugin_admin.change_view(request, str(plugin_id))
-
         if request.method == "POST" and plugin_admin.object_successfully_changed:
             # if reversion is installed, save version of the page plugins
             if 'reversion' in settings.INSTALLED_APPS and page:
