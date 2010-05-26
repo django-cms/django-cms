@@ -29,6 +29,19 @@ class MenusTestCase(CMSTestCase):
         menu_pool.menus = self.old_menu
         
     def create_some_nodes(self):
+        """
+        Creates the following structure:
+        
+        + P1
+        | + P2
+        |   + P3
+        + P4
+        | + P5
+        + P6 (not in menu)
+          + P7
+          + P8
+          
+        """
         self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
         self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
         self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
@@ -36,9 +49,10 @@ class MenusTestCase(CMSTestCase):
         self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
         self.page6 = self.create_page(parent_page=None, published=True, in_navigation=False)
         self.page7 = self.create_page(parent_page=self.page6, published=True, in_navigation=True)
+        self.page8 = self.create_page(parent_page=self.page6, published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4,
-                          self.page5, self.page6, self.page7]
-        self.top_level_pages = [self.page1, self.page4, self.page6]
+                          self.page5, self.page6, self.page7, self.page8]
+        self.top_level_pages = [self.page1, self.page4]
         
     def test_01_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
@@ -258,4 +272,12 @@ class MenusTestCase(CMSTestCase):
         page6 = Page.objects.get(pk=self.page6.pk)
         context = self.get_context(page6.get_absolute_url())
         nodes = show_menu(context, 1, 100, 0, 1)['children']
-        self.assertEqual(len(nodes[0].children), 1)
+        self.assertEqual(len(nodes), 0)
+        page7 = Page.objects.get(pk=self.page7.pk)
+        context = self.get_context(page7.get_absolute_url())
+        nodes = show_menu(context, 1, 100, 0, 1)['children']
+        self.assertEqual(len(nodes), 0)
+        
+        
+        
+        
