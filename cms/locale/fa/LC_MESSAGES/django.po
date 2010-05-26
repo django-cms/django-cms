@@ -97,80 +97,80 @@ msgstr "لیست کلمات کلیدی با ویرگول از هم جداشده 
 
 #: admin/forms.py:120
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "صفحه-ای با شناسه-ی این آدرس معکوس وجود دارد."
 
 #: admin/forms.py:127
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "آدرس نامعتبر، از الگوی /my/url استفاده کنید."
 
 #: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "کاربر"
 
 #: admin/forms.py:171
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr " اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن را نخواهد داشت."
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
 
 #: admin/forms.py:201
 msgid "Please select user or group first."
-msgstr ""
+msgstr "لطفا ابتدا کاربر یا گروه را انتخاب کنید."
 
 #: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
 #: templates/admin/cms/page/change_form.html:65
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "اضافه"
 
 #: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
 msgid "Change"
-msgstr ""
+msgstr "تغییر"
 
 #: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: admin/forms.py:211
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "بازیابی (هر صفحه)"
 
 #: admin/forms.py:274
 msgid "Notify user"
-msgstr ""
+msgstr "هشدار به کاربر"
 
 #: admin/forms.py:275
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr ""
+msgstr "از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز به ایمیل کاربر دارد."
 
 #: admin/forms.py:295
 msgid "New password"
-msgstr ""
+msgstr "رمز عبور جدید"
 
 #: admin/forms.py:297
 msgid "New password confirmation"
-msgstr ""
+msgstr "تایید رمز عبور جدید"
 
 #: admin/forms.py:316
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "هشدار از طریق ایمیل به ایمیل معتبر نیاز دارد."
 
 #: admin/forms.py:318
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "اجازه اضافه کردن صفحات جدید نیاز به اجازه ویرایش صفحه دارد!"
 
 #: admin/forms.py:320
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "اجازه ایجاد کاربران نیاز به اجازه تغییر کاربر دارد."
 
 #: admin/forms.py:322
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "برای اضافه کردن دسترسی شما باید دسترسی ویرایش آنها را نیز داشته باشید."
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
 msgid "Hidden"
