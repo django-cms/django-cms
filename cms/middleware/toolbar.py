@@ -1,6 +1,7 @@
 """
 Edit Toolbar middleware
 """
+import urlparse
 from cms import settings as cms_settings
 from cms.utils import get_template_from_request
 from cms.utils.plugins import get_placeholders
@@ -47,7 +48,7 @@ class ToolbarMiddleware(object):
                 return False
         except NoReverseMatch:
             pass
-        if request.path_info.startswith(settings.MEDIA_URL):
+        if request.path_info.startswith(urlparse.urlparse(settings.MEDIA_URL).path):
             return False
         if "edit" in request.GET:
             return True
