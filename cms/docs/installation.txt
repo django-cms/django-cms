@@ -5,7 +5,7 @@ This document assumes that you are familiar with python and django.
 
 A more beginner friendly tutorial can be found `here <../tutorial/>`_
 
-Make sure that `cms`, `mptt` and `publisher` folders are on your pythonpath.
+Make sure that `cms`, `menus`, `mptt` and `publisher` folders are on your pythonpath.
 They all should come with the distribution.
 
 python 2.4 - 2.6 should be supported
