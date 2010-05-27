@@ -651,8 +651,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # check if urls are correct after move
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
-        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')   
-        
+
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')     
         
     def test_17_plugins_get_published(self):
         self.login_user(self.user_super)
@@ -663,4 +663,3 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         self.publish_page(page, True, self.user_super, True)
         self.assertEqual(CMSPlugin.objects.all().count(), 2)
-             

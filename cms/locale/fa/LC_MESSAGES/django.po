@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -18,15 +17,15 @@ msgstr ""
 
 #: plugin_base.py:99
 msgid "Advanced options"
-msgstr ""
+msgstr "گزینه های پیشرفته"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "عنوان"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "عنوان پیش فرض"
 
 #: admin/forms.py:27
 msgid "Slug"
@@ -34,15 +33,15 @@ msgstr ""
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "قسمتی از عنوان که در آدرس اینترنتی استفاده می شود"
 
 #: admin/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "زبان"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "زبان جاری فیلدهای محتوا."
 
 #: admin/forms.py:73
 msgid "Another page with this slug already exists"
@@ -50,134 +49,128 @@ msgstr ""
 
 #: admin/forms.py:93
 msgid "Menu Title"
-msgstr ""
+msgstr "عنوان منو"
 
 #: admin/forms.py:94
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "جاینوشت در منوی نمایش داده شده"
 
 #: admin/forms.py:95
 msgid "Page Title"
-msgstr ""
+msgstr "عنوان صفحه"
 
 #: admin/forms.py:96
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr " عنوان مرورگر یا بوک مارک ها جاینوشت می-شوند"
 
 #: admin/forms.py:97
 msgid "Application"
-msgstr ""
+msgstr "نرم-افزار"
 
 #: admin/forms.py:99
 msgid "Hook application to this page."
-msgstr ""
+msgstr "اتصال نرم-افزار به این صفحه"
 
 #: admin/forms.py:100
 msgid "Overwrite URL"
-msgstr ""
+msgstr "جاینوشت آدرس اینترنتی"
 
 #: admin/forms.py:101
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "اگر از آدرس استاندارد استفاده می-شود، این فیلد خالی گذارده شود."
 
 #: admin/forms.py:107
 msgid "Redirect"
-msgstr ""
+msgstr "تغییر مسیر"
 
 #: admin/forms.py:108
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "تغییرمسیر به این آدرس."
 
 #: admin/forms.py:110
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "شرح صفحه که توسط موتورهای جستجو استفاده می شود."
 
 #: admin/forms.py:112
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
+msgstr "لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده می شود."
 
 #: admin/forms.py:120
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "صفحه-ای با شناسه-ی این آدرس معکوس وجود دارد."
 
 #: admin/forms.py:127
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "آدرس نامعتبر، از الگوی /my/url استفاده کنید."
 
 #: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "کاربر"
 
 #: admin/forms.py:171
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr " اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن را نخواهد داشت."
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
 
 #: admin/forms.py:201
 msgid "Please select user or group first."
-msgstr ""
+msgstr "لطفا ابتدا کاربر یا گروه را انتخاب کنید."
 
 #: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
 #: templates/admin/cms/page/change_form.html:65
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "اضافه"
 
 #: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
 msgid "Change"
-msgstr ""
+msgstr "تغییر"
 
 #: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: admin/forms.py:211
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "بازیابی (هر صفحه)"
 
 #: admin/forms.py:274
 msgid "Notify user"
-msgstr ""
+msgstr "هشدار به کاربر"
 
 #: admin/forms.py:275
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
+msgid "Send email notification to user about username or password change. Requires user email."
+msgstr "از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز به ایمیل کاربر دارد."
 
 #: admin/forms.py:295
 msgid "New password"
-msgstr ""
+msgstr "رمز عبور جدید"
 
 #: admin/forms.py:297
 msgid "New password confirmation"
-msgstr ""
+msgstr "تایید رمز عبور جدید"
 
 #: admin/forms.py:316
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "هشدار از طریق ایمیل به ایمیل معتبر نیاز دارد."
 
 #: admin/forms.py:318
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgid "The permission to add new pages requires the permission to change pages!"
+msgstr "اجازه اضافه کردن صفحات جدید نیاز به اجازه ویرایش صفحه دارد!"
 
 #: admin/forms.py:320
-msgid ""
-"The permission to add new users requires the permission to change users!"
-msgstr ""
+msgid "The permission to add new users requires the permission to change users!"
+msgstr "اجازه ایجاد کاربران نیاز به اجازه تغییر کاربر دارد."
 
 #: admin/forms.py:322
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "برای اضافه کردن دسترسی شما باید دسترسی ویرایش آنها را نیز داشته باشید."
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
 msgid "Hidden"
@@ -272,8 +265,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1204
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1259
@@ -282,9 +274,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1281
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -710,9 +700,7 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:46
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:47
@@ -724,9 +712,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:50
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:52
@@ -961,9 +947,7 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1055,8 +1039,7 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1178,9 +1161,7 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr ""
 
 #: plugins/video/models.py:12
@@ -1243,9 +1224,7 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1274,8 +1253,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1376,9 +1354,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1778,16 +1754,14 @@ msgstr ""
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:675
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
