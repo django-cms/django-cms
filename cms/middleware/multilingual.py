@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
 
-HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join(map(lambda l: l[0], settings.CMS_LANGUAGES)))
+HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join(map(lambda l: re.escape(l[0]), settings.CMS_LANGUAGES)))
 
 def has_lang_prefix(path):
     check = HAS_LANG_PREFIX_RE.match(path)
