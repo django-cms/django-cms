@@ -18,6 +18,7 @@ from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
+from menus.menu_pool import menu_pool
 
 class Page(MpttPublisher):
     """
@@ -202,44 +203,8 @@ class Page(MpttPublisher):
                 ptree = []
                 for p in plugins:
                     p.copy_plugin(ph, p.language, ptree)
-                    """
-                    try:
-                        plugin, cls = p.get_plugin_instance()
-                    except KeyError: #plugin type not found anymore
-                        continue
-                    p.placeholder = ph
-                    p.pk = None # make a new instance
-                    p.id = None
-                    p.tree_id = None
-                    p.lft = None
-                    p.rght = None
-                    p.inherited_public_id = None
-                    p.publisher_public_id = None
-                    if p.parent:
-                        pdif = p.level - ptree[-1].level
-                        if pdif < 0:
-                            ptree = ptree[:pdif-1]
-                        p.parent = ptree[-1]
-                        if pdif != 0:
-                            ptree.append(p)
-                    else:
-                        ptree = [p]
-                    p.level = None
-                    p.save()
-                    if plugin:
-                        plugin.pk = p.pk
-                        plugin.id = p.pk
-                        plugin.placeholder = ph
-                        plugin.tree_id = p.tree_id
-                        plugin.lft = p.lft
-                        plugin.rght = p.rght
-                        plugin.level = p.level
-                        plugin.cmsplugin_ptr = p
-                        plugin.publisher_public_id = None
-                        plugin.public_id = None
-                        plugin.published = False
-                        plugin.save()
-                    """
+        # invalidate the menu for this site
+        menu_pool.clear(site_id=site.pk)
     
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
