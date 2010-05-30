@@ -23,7 +23,6 @@ def cut_after(node, levels, removed):
 
 def remove(node, removed):
     removed.append(node)
-    node.deleted = True
     if node.parent:
         if node in node.parent.children:
             node.parent.children.remove(node)
@@ -35,20 +34,16 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     final = []
     removed = []
     selected = None
-    for node in nodes:
-        if node.selected:
-            selected = node 
+    for node in nodes: 
         if not hasattr(node, 'level'):
             # remove and ignore nodes that don't have level information
             remove(node, removed)
             continue
-        if node in removed:
-            continue
         if node.level == from_level:
             # turn nodes that are on from_level into root nodes
             final.append(node)
-            #node.parent = None
-        if not node.ancestor and not node.selected and not node.descendant and not node.parent:
+            node.parent = None
+        if not node.ancestor and not node.selected and not node.descendant:
             # cut inactive nodes to extra_inactive, but not of descendants of 
             # the selected node
             cut_after(node, extra_inactive, removed)
@@ -56,23 +51,16 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             # remove nodes that are too deep, but not nodes that are on 
             # from_level (local root nodes)
             remove(node, removed)
-            continue
-        n = node
-        while n:# search all parents if they are visible
-            if not n.visible:# remove all children 
-                cut_after(n, 0, removed)
-                remove(node, removed)
-                break
-            n = n.parent
-            
+        if node.selected:
+            selected = node
+        if not node.visible:
+            remove(node, removed)
     if selected:
         cut_after(selected, extra_active, removed)
     if removed:
         for node in removed:
             if node in final:
                 final.remove(node)
-    for node in final:
-        node.parent = None
     return final
 register = template.Library()
 
@@ -114,6 +102,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             nodes = new_nodes
         children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
         children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
+    
     try:
         context.update({'children':children,
                         'template':template,

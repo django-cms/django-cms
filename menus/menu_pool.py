@@ -137,9 +137,6 @@ class MenuPool(object):
                     sel = node
             else:
                 node.selected = False
-        if sel and sel.get_absolute_url() == '/' and request.path != '/':
-            # Home should only be selected if really at home
-            sel = None
         if sel:
             sel.selected = True
         return nodes
