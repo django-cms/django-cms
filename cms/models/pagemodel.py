@@ -559,14 +559,14 @@ class Page(MpttPublisher):
         return False
     
     def get_home_pk_cache(self):
-        attr = "%s_home_pk_cache" % (self.publisher_is_draft and "draft" or "public")
+        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site.pk)
         if not hasattr(self, attr):
             setattr(self, attr, self.get_object_queryset().get_home().pk)
         return getattr(self, attr)
 
     
     def set_home_pk_cache(self, value):
-        attr = "%s_home_pk_cache" % (self.publisher_is_draft and "draft" or "public")
+        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site.pk)
         setattr(self, attr, value)
     
     home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
