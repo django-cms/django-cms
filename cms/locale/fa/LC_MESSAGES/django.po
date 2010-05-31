@@ -218,7 +218,7 @@ msgstr "صفحه با موفقیت به تصویب رسید."
 #: admin/pageadmin.py:891
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "شی %(name)s با کلید اصلی %(key)r موجود نیست."
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
