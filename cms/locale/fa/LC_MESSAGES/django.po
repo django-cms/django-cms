@@ -231,15 +231,15 @@ msgstr "عنوان و افزونه-ها به زبان %(language)s حذف شدن
 
 #: admin/pageadmin.py:931
 msgid "Are you sure?"
-msgstr ""
+msgstr "آیا مطمئن هستید؟"
 
 #: admin/pageadmin.py:994
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "شما اجازه انجام این کار به انتشار این صفحه را ندارید"
 
 #: admin/pageadmin.py:1012
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "شما اجازه  تغییر وضعیت in_navigation این صفحه را ندارید"
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
