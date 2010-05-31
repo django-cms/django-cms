@@ -174,19 +174,19 @@ msgstr "برای اضافه کردن دسترسی شما باید دسترسی �
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
 msgid "Hidden"
-msgstr ""
+msgstr "پنهان"
 
 #: admin/pageadmin.py:122
 msgid "Basic Settings"
-msgstr ""
+msgstr "تنظیمات پایه"
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن را ابتدا ذخیره کنید."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
-msgstr ""
+msgstr "تنظیمات پیشرفته"
 
 #: admin/pageadmin.py:140
 msgid "SEO Settings"
