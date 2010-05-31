@@ -222,12 +222,12 @@ msgstr "شی %(name)s با کلید اصلی %(key)r موجود نیست."
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "تنها یک ترجمه برای این صفحه موجود است."
 
 #: admin/pageadmin.py:909
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "عنوان و افزونه-ها به زبان %(language)s حذف شدند."
 
 #: admin/pageadmin.py:931
 msgid "Are you sure?"
