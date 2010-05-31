@@ -190,15 +190,15 @@ msgstr "تنظیمات پیشرفته"
 
 #: admin/pageadmin.py:140
 msgid "SEO Settings"
-msgstr ""
+msgstr "تنظیمات جستجوگرها"
 
 #: admin/pageadmin.py:463
 msgid "higher"
-msgstr ""
+msgstr "بالاتر"
 
 #: admin/pageadmin.py:629
 msgid "Database error"
-msgstr ""
+msgstr "خطای پایگاه داده"
 
 #: admin/pageadmin.py:714 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -209,11 +209,11 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:15
 msgid "page"
-msgstr ""
+msgstr "صفحه"
 
 #: admin/pageadmin.py:837
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "صفحه با موفقیت به تصویب رسید."
 
 #: admin/pageadmin.py:891
 #, python-format
