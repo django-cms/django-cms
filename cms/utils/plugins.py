@@ -64,7 +64,9 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
         # if it's a Constant Include Node ({% include "template_name.html" %})
         # scan the child template
         elif isinstance(node, ConstantIncludeNode):
-            placeholders += _scan_placeholders(node.template.nodelist, current_block)
+            # if there's an error in the to-be-included template, node.template becomes None
+            if node.template:
+                placeholders += _scan_placeholders(node.template.nodelist, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
             placeholders += _extend_nodelist(node)
