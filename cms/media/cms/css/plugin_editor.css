@@ -3,8 +3,6 @@ select[name="plugins"] {
 }
 
 .plugin-holder-nopage{
-    border-bottom: 0px;
-    margin-bottom: 0px;
 }
 
 .plugin-holder-config{

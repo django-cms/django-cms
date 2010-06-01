@@ -52,10 +52,10 @@ class PlaceholderAdmin(ModelAdmin):
                         if (len(fieldset['fields']) == 1 and
                             'plugin-holder' in fieldset['classes'] and
                             'plugin-holder-nopage' in fieldset['classes']):
-                            placeholder_fields.remove(fieldset)
+                            placeholder_fields.remove(field)
                         else:
                             fields.remove(field)
-                fieldset['fields'] = field
+                fieldset['fields'] = fields
             for placeholder in placeholder_fields:
                 fieldsets += (placeholder.capitalize(), {
                         'fields': (placeholder,),
