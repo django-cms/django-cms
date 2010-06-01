@@ -275,7 +275,10 @@ def page_language_url(context, lang):
     except KeyError:
         return {'template': 'cms/content.html'}
     if hasattr(request, "_language_changer"):
-        request._language_changer.request = request
+        try:
+            setattr(request._language_changer, 'request', request)
+        except AttributeError:
+            pass
         url = "/%s" % lang + request._language_changer(lang)
     else:
         page = request.current_page
