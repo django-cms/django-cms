@@ -3,6 +3,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugins.twitter.models import TwitterRecentEntries, TwitterSearch
 from cms.plugin_pool import plugin_pool
 from django.conf import settings
+from django.forms.widgets import Media
 
 class TwitterRecentEntriesPlugin(CMSPluginBase):
     model = TwitterRecentEntries
@@ -14,6 +15,14 @@ class TwitterRecentEntriesPlugin(CMSPluginBase):
             'object': instance,
         })
         return context
+    
+    def get_plugin_media(self, request, context, plugin):
+        return Media(
+            js =(
+                 'http://twitter.com/javascripts/blogger.js',
+                 'http://twitter.com/statuses/user_timeline/%s.json?callback=twitterCallback2&amp;count=%s' % (plugin.twitter_user, plugin.count),
+            )
+        )
     
 plugin_pool.register_plugin(TwitterRecentEntriesPlugin)
 
