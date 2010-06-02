@@ -541,89 +541,89 @@ msgstr "بازنویسی آدرس"
 
 #: migrations/0001_initial.py:57
 msgid "author"
-msgstr ""
+msgstr "نویسنده"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
-msgstr ""
+msgstr "شناسه آدرس معکوس"
 
 #: migrations/0001_initial.py:59 models/pagemodel.py:64
 msgid "login required"
-msgstr ""
+msgstr "نیاز به ورود دارد"
 
 #: migrations/0001_initial.py:60 models/pagemodel.py:49
 msgid "soft root"
-msgstr ""
+msgstr "ریشه نرم"
 
 #: migrations/0001_initial.py:63 models/pagemodel.py:47
 msgid "publication end date"
-msgstr ""
+msgstr "تاریخ اتمام انتشار"
 
 #: migrations/0001_initial.py:64 models/pagemodel.py:54
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr ""
+msgstr "الگو"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:46
 msgid "publication date"
-msgstr ""
+msgstr "تاریخ انتشار"
 
 #: migrations/0001_initial.py:67 models/pagemodel.py:48
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
-msgstr ""
+msgstr "در گردش"
 
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
 #: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
 msgid "application"
-msgstr ""
+msgstr "نرم افزار"
 
 #: migrations/0006_apphook.py:65 models/pagemodel.py:50
 msgid "id"
-msgstr ""
+msgstr "شناسه"
 
 #: migrations/0008_redirects.py:11 models/titlemodels.py:18
 msgid "redirect"
-msgstr ""
+msgstr "بازفرستادن"
 
 #: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
 msgid "keywords"
-msgstr ""
+msgstr "کلمات کلیدی"
 
 #: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:22
 msgid "description"
-msgstr ""
+msgstr "توصیفات"
 
 #: models/moderatormodels.py:24
 msgid "Current page"
-msgstr ""
+msgstr "صحفه فعلی"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "صحفهات فرزند (بلافاصله)"
 
 #: models/moderatormodels.py:26
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "صفحه و فرزندان (بلافاصله)"
 
 #: models/moderatormodels.py:27
 msgid "Page descendants"
-msgstr ""
+msgstr "نوادگان صفحه"
 
 #: models/moderatormodels.py:28
 msgid "Page and descendants"
-msgstr ""
+msgstr "صفحه و نوادگان"
 
 #: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr ""
+msgstr "صفحه"
 
 #: models/moderatormodels.py:45
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "کاربر"
 
 #: models/moderatormodels.py:49 templatetags/cms_admin.py:65
 msgid "Moderate page"
