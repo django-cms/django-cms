@@ -256,7 +256,7 @@ msgstr "افزونه %(plugin_name)s به %(placeholder)s اضافه شد."
 
 #: admin/pageadmin.py:1085
 msgid "Language must be different than the copied language!"
-msgstr ""
+msgstr "زبان انتخابی باید غیر از زبان کپی شده باشد."
 
 #: admin/pageadmin.py:1131
 #, python-format
