@@ -275,7 +275,7 @@ msgstr "افزونه-ها حذف شدند."
 #: admin/pageadmin.py:1281
 #, python-format
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr ""
+msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف شد."
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
