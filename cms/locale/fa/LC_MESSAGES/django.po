@@ -252,7 +252,7 @@ msgstr "یکی از زبانهای پشتیبانی شده را انتخاب ک�
 #: admin/pageadmin.py:1063
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "افزونه %(plugin_name)s به %(placeholder)s اضافه شد."
 
 #: admin/pageadmin.py:1085
 msgid "Language must be different than the copied language!"
