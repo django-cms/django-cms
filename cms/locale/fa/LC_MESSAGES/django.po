@@ -266,7 +266,7 @@ msgstr "افزونه-های زبان(های) %(language)s به %(placeholder)s �
 #: admin/pageadmin.py:1204
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر کرد."
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
