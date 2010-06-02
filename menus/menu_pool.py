@@ -60,7 +60,8 @@ class MenuPool(object):
     
     def _build_nodes(self, request, site_id):
         lang = get_language()
-        key = "%smenu_nodes_%s_%s" % (settings.CMS_CACHE_PREFIX, lang, site_id)
+        prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
+        key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
         self.cache_keys.add(key)
         cached_nodes = cache.get(key, None)
         if cached_nodes:
@@ -101,7 +102,8 @@ class MenuPool(object):
                         continue
                 final_nodes.append(node)
                 last = node
-        cache.set(key, final_nodes, settings.MENU_CACHE_DURATION)
+        duration = getattr(settings, "MENU_CACHE_DURATION", 60*60)
+        cache.set(key, final_nodes, duration)
         return final_nodes
     
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
