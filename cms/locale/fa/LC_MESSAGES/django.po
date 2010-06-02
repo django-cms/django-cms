@@ -261,7 +261,7 @@ msgstr "زبان انتخابی باید غیر از زبان کپی شده با
 #: admin/pageadmin.py:1131
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
+msgstr "افزونه-های زبان(های) %(language)s به %(placeholder)s کپی شد."
 
 #: admin/pageadmin.py:1204
 #, python-format
