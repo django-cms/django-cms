@@ -279,84 +279,84 @@ msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(place
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
 msgid "Page permissions"
-msgstr ""
+msgstr "اختیارات صفحه"
 
 #: admin/permissionadmin.py:113
 msgid "User & Group permissions"
-msgstr ""
+msgstr "اختیارات کاربر و گروه"
 
 #: admin/permissionadmin.py:114
 msgid "Page permissions management"
-msgstr ""
+msgstr "مدیریت اختیارات صفحه"
 
 #: admin/useradmin.py:22
 msgid "User details"
-msgstr ""
+msgstr "جزئیات کاربر"
 
 #: admin/useradmin.py:23
 msgid "Groups"
-msgstr ""
+msgstr "گروهها"
 
 #: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:855
 msgid "Password"
-msgstr ""
+msgstr "رمز عبور"
 
 #: admin/widgets.py:58
 msgid "Add Another"
-msgstr ""
+msgstr "اضافه کردن یکی دیگر"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
-msgstr ""
+msgstr "اختیارات کپی"
 
 #: admin/dialog/forms.py:11
 msgid "Copy moderation"
-msgstr ""
+msgstr "بازرسی کپی"
 
 #: conf/patch.py:26
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "الگوی نزدیک-ترین والد را در داشته باش."
 
 #: docs/templates/defindex.html:2
 msgid "Overview"
-msgstr ""
+msgstr "خلاصه"
 
 #: docs/templates/defindex.html:11
 msgid "Indices and tables:"
-msgstr ""
+msgstr "اندیسها و جدولها:"
 
 #: docs/templates/defindex.html:14
 msgid "Complete Table of Contents"
-msgstr ""
+msgstr "فهرست محتوای کامل"
 
 #: docs/templates/defindex.html:15
 msgid "lists all sections and subsections"
-msgstr ""
+msgstr "فهرست تمام قسمتها و زیربخشها"
 
 #: docs/templates/defindex.html:16
 msgid "Search Page"
-msgstr ""
+msgstr "صفحه جستجو"
 
 #: docs/templates/defindex.html:17
 msgid "search this documentation"
-msgstr ""
+msgstr "جستجوی این مستندات"
 
 #: docs/templates/defindex.html:19 docs/templates/modindex.html:2
 #: docs/templates/modindex.html.py:13
 msgid "Global Module Index"
-msgstr ""
+msgstr "نمایه کلی پیمانه"
 
 #: docs/templates/defindex.html:20
 msgid "quick access to all modules"
-msgstr ""
+msgstr "دسترسی سریع به تمام پیمانه-ها"
 
 #: docs/templates/defindex.html:21
 msgid "General Index"
-msgstr ""
+msgstr "نمایه عمومی"
 
 #: docs/templates/defindex.html:22
 msgid "all functions, classes, terms"
-msgstr ""
+msgstr "تمام توابع، کلاسها، واژه-ها"
 
 #: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
 #: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
