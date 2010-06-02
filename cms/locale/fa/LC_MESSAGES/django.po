@@ -446,11 +446,11 @@ msgstr "جستجو"
 
 #: docs/templates/search.html:25
 msgid "Search Results"
-msgstr ""
+msgstr "نتایج جستجو"
 
 #: docs/templates/search.html:27
 msgid "Your search did not match any results."
-msgstr ""
+msgstr "جستجوی شما نتیجه-ای در بر نداشت."
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
@@ -459,26 +459,26 @@ msgstr ""
 #: models/pluginmodel.py:42 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr ""
+msgstr "زبان"
 
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
 #: migrations/0004_textobjects.py:22 models/pluginmodel.py:40
 msgid "position"
-msgstr ""
+msgstr "موقعیت"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
 #: models/pluginmodel.py:44 models/titlemodels.py:23
 msgid "creation date"
-msgstr ""
+msgstr "تاریخ ایجاد"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
 #: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:41
 msgid "slot"
-msgstr ""
+msgstr "شیار"
 
 #: migrations/0001_initial.py:18 models/pluginmodel.py:43
 msgid "plugin_name"
-msgstr ""
+msgstr "نام افزونه"
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
@@ -487,57 +487,57 @@ msgstr ""
 #: plugins/twitter/models.py:6
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr ""
+msgstr "عنوان"
 
 #: migrations/0001_initial.py:28
 msgid "path"
-msgstr ""
+msgstr "آدرس"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "نشانک"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
-msgstr ""
+msgstr "همه"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
-msgstr ""
+msgstr "می-تواند ویرایش کند"
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
-msgstr ""
+msgstr "گروه"
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
-msgstr ""
+msgstr "می-تواند منتشر کند"
 
 #: migrations/0001_initial.py:42
 msgid "type"
-msgstr ""
+msgstr "نوع"
 
 #: migrations/0001_initial.py:44
 msgid "can change soft-root"
-msgstr ""
+msgstr "می-تواند ریشه نرم را تغییر دهد"
 
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "وضعیت"
 
 #: migrations/0001_initial.py:53 models/pagemodel.py:51
 msgid "navigation extenders"
-msgstr ""
+msgstr "توسعه-دهندگان گردش"
 
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
 #: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
-msgstr ""
+msgstr "بازنویسی آدرس دارد"
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
-msgstr ""
+msgstr "بازنویسی آدرس"
 
 #: migrations/0001_initial.py:57
 msgid "author"
