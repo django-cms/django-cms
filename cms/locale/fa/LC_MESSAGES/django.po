@@ -270,7 +270,7 @@ msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(place
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
-msgstr ""
+msgstr "افزونه-ها حذف شدند."
 
 #: admin/pageadmin.py:1281
 #, python-format
