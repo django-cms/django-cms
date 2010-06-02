@@ -29,7 +29,7 @@ msgstr "عنوان پیش فرض"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "نشانک (آدرس کوتاه صفحه)"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
@@ -45,7 +45,7 @@ msgstr "زبان جاری فیلدهای محتوا."
 
 #: admin/forms.py:73
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "صفحه-ای با همین نشانک موجود است."
 
 #: admin/forms.py:93
 msgid "Menu Title"
@@ -243,11 +243,11 @@ msgstr "شما اجازه  تغییر وضعیت in_navigation این صفحه �
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "شما اجازه ویرایش این صفحه را ندارید."
 
 #: admin/pageadmin.py:1051 admin/pageadmin.py:1083
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "یکی از زبانهای پشتیبانی شده را انتخاب کنید."
 
 #: admin/pageadmin.py:1063
 #, python-format
