@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -16,25 +16,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: plugin_base.py:99
-#, fuzzy
 msgid "Advanced options"
 msgstr "Opcions avançades"
 
 #: admin/forms.py:25
 msgid "Title"
-msgstr ""
+msgstr "Títol"
 
 #: admin/forms.py:26
 msgid "The default title"
-msgstr ""
+msgstr "El títol per defecte"
 
 #: admin/forms.py:27
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 #: admin/forms.py:28
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "La part del títol que s'utilitza en la direcció URL"
 
 #: admin/forms.py:29
 msgid "Language"
@@ -42,64 +41,63 @@ msgstr "fehefiu"
 
 #: admin/forms.py:30
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "El llenguatge actual dels camps de contingut."
 
 #: admin/forms.py:73
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Una altra pàgina amb aquest slug ja existeix"
 
 #: admin/forms.py:93
 msgid "Menu Title"
-msgstr ""
+msgstr "Títol del menú"
 
 #: admin/forms.py:94
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Sobreescriure el que es mostra al menú"
 
 #: admin/forms.py:95
 msgid "Page Title"
-msgstr ""
+msgstr "Títol de la pàgina"
 
 #: admin/forms.py:96
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Sobreescriu el que es mostra a la part superior del navegador o en els seus favorits"
 
 #: admin/forms.py:97
 msgid "Application"
-msgstr ""
+msgstr "Aplicació"
 
 #: admin/forms.py:99
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Enllaça l'aplicació a aquesta pàgina."
 
 #: admin/forms.py:100
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Sobreescriu URL"
 
 #: admin/forms.py:101
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Manté aquest camp buit si s'ha d'usar la ruta per defecte"
 
 #: admin/forms.py:107
 msgid "Redirect"
-msgstr ""
+msgstr "Redirigir"
 
 #: admin/forms.py:108
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Redirecciona a aquesta URL."
 
 #: admin/forms.py:110
-#, fuzzy
 msgid "A description of the page sometimes used by search engines."
-msgstr "Una descripció de la pàgina a vegades utilitzat pels motors de cerca."
+msgstr "Una descripció de la pàgina a vegades utilitzada pels motors de cerca."
 
 #: admin/forms.py:112
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
+msgstr "Una llista de paraules clau separades per comes a vegades utilitzada pels motors de cerca."
 
 #: admin/forms.py:120
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Una pàgina amb una URL que correspon amb aquest id ja existeix."
 
 #: admin/forms.py:127
 msgid "Invalid URL, use /my/url format."
@@ -111,9 +109,7 @@ msgid "user"
 msgstr ""
 
 #: admin/forms.py:171
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr ""
 
 #: admin/forms.py:174
@@ -149,9 +145,7 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:275
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
+msgid "Send email notification to user about username or password change. Requires user email."
 msgstr ""
 
 #: admin/forms.py:295
@@ -167,13 +161,11 @@ msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:318
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
+msgid "The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:320
-msgid ""
-"The permission to add new users requires the permission to change users!"
+msgid "The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:322
@@ -273,8 +265,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1204
 #, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1259
@@ -283,9 +274,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1281
 #, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
+msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:112 models/permissionmodels.py:74
@@ -711,9 +700,7 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:46
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr ""
 
 #: models/pagemodel.py:47
@@ -725,9 +712,7 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:50
-msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 #: models/pagemodel.py:52
@@ -962,9 +947,7 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
+msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1056,8 +1039,7 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1179,9 +1161,7 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
+msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr ""
 
 #: plugins/video/models.py:12
@@ -1244,9 +1224,7 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
+msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1275,8 +1253,7 @@ msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1377,9 +1354,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
+msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1780,16 +1755,14 @@ msgstr ""
 #: templatetags/cms_tags.py:402
 #, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
+"A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
 #: templatetags/cms_tags.py:675
 #, python-format
 msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
+"A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
 
