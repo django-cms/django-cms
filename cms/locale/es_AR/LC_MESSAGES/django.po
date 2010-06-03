@@ -182,23 +182,23 @@ msgstr "Configuración básica."
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
+msgstr "Nota: Esta página se recargará si cambias la selección. Guárdala primero."
 
 #: admin/pageadmin.py:131
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Configuración avanzada"
 
 #: admin/pageadmin.py:140
 msgid "SEO Settings"
-msgstr ""
+msgstr "Configuración para SEO"
 
 #: admin/pageadmin.py:463
 msgid "higher"
-msgstr ""
+msgstr "más alto"
 
 #: admin/pageadmin.py:629
 msgid "Database error"
-msgstr ""
+msgstr "Error de la base de datos"
 
 #: admin/pageadmin.py:714 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
@@ -209,68 +209,68 @@ msgstr ""
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:15
 msgid "page"
-msgstr ""
+msgstr "página"
 
 #: admin/pageadmin.py:837
 msgid "Page was successfully approved."
-msgstr ""
+msgstr "La página ha sido aprobada."
 
 #: admin/pageadmin.py:891
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "El objeto %(name)s con clave primaria %(key)s no existe."
 
 #: admin/pageadmin.py:894
 msgid "There only exists one translation for this page"
-msgstr ""
+msgstr "Sólo existe una traducción para esta página."
 
 #: admin/pageadmin.py:909
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "El título y los plugins del idioma %(language)s han sido borrados."
 
 #: admin/pageadmin.py:931
 msgid "Are you sure?"
-msgstr ""
+msgstr "¿Estás seguro?"
 
 #: admin/pageadmin.py:994
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "No tienes permisos para publicar esta página"
 
 #: admin/pageadmin.py:1012
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
+msgstr "No tienes permisos para cambiar el estado de navegación de esta página."
 
 #: admin/pageadmin.py:1047 admin/pageadmin.py:1081
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "No tienes permisos para cambiar esta página"
 
 #: admin/pageadmin.py:1051 admin/pageadmin.py:1083
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "El idioma debe ser uno de los soportados!"
 
 #: admin/pageadmin.py:1063
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "El plugin %(plugin_name)s se añadió a %(placeholder)s"
 
 #: admin/pageadmin.py:1085
 msgid "Language must be different than the copied language!"
-msgstr ""
+msgstr "El idioma debe ser distinto de idioma copiado!"
 
 #: admin/pageadmin.py:1131
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
+msgstr "Se copiaron los plugins %(language)s a %(placeholder)s"
 
 #: admin/pageadmin.py:1204
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "Plugin %(plugin_name)s modificado en la posición %(position)s de %(placeholder)s"
 
 #: admin/pageadmin.py:1259
 msgid "Plugins where moved"
-msgstr ""
+msgstr "Plugins movidos"
 
 #: admin/pageadmin.py:1281
 #, python-format
