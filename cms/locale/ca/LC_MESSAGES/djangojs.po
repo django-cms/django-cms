@@ -28,6 +28,5 @@ msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Estàs segur que voleu canviar de secció sense guardar la primera pàgina?"
 
 #: media/cms/js/plugin_editor.js:111
-#, fuzzy
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Estàs segur que vols eliminar aquest plugin?"
