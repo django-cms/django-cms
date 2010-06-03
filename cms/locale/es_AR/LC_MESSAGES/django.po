@@ -97,88 +97,88 @@ msgstr "Una lista de palabras clave separadas por coma se utiliza habitualmente 
 
 #: admin/forms.py:120
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Una página con una URL que se corresponde a este id ya existe"
 
 #: admin/forms.py:127
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "URL inválida, utiliza el formato /mi/url"
 
 #: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
-msgstr ""
+msgstr "usuario"
 
 #: admin/forms.py:171
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr "El permiso para añadir una página implica también el acceso a los hijos y descendientes, en caso contrario la página añadida no podría ser cambiada por su creador."
 
 #: admin/forms.py:174
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "El permiso para añadir una página implica también permisos de edición."
 
 #: admin/forms.py:201
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Por favor selecciona primero un usuario o un grupo."
 
 #: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
 #: templates/admin/cms/page/change_form.html:65
 #: templates/admin/cms/page/plugin_change_form.html:69
 msgid "Add"
-msgstr ""
+msgstr "Añadir"
 
 #: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
 msgid "Change"
-msgstr ""
+msgstr "Cambiar"
 
 #: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr ""
+msgstr "Borrar"
 
 #: admin/forms.py:211
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Recuperar (cualquier) pagina"
 
 #: admin/forms.py:274
 msgid "Notify user"
-msgstr ""
+msgstr "Avisiar al usuario"
 
 #: admin/forms.py:275
 msgid "Send email notification to user about username or password change. Requires user email."
-msgstr ""
+msgstr "Envia un aviso al usuario ante cambios del nombre de usuario o la clave. Requiere el e-mail del usuario."
 
 #: admin/forms.py:295
 msgid "New password"
-msgstr ""
+msgstr "Nueva clave"
 
 #: admin/forms.py:297
 msgid "New password confirmation"
-msgstr ""
+msgstr "Confimación de la nueva clave"
 
 #: admin/forms.py:316
 msgid "Email notification requires valid email address."
-msgstr ""
+msgstr "La notificación por e-mail requiere una dirección de correo válida"
 
 #: admin/forms.py:318
 msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "¡El permiso para añadir páginas necesita del permiso para modificar páginas!"
 
 #: admin/forms.py:320
 msgid "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "¡El permiso para añadir nuevos usuarios necesita del permiso para modificar usuario!"
 
 #: admin/forms.py:322
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Para añadir permisos también necesitas poder editarlos"
 
 #: admin/pageadmin.py:111 admin/pageadmin.py:127
 msgid "Hidden"
-msgstr ""
+msgstr "Oculto"
 
 #: admin/pageadmin.py:122
 msgid "Basic Settings"
-msgstr ""
+msgstr "Configuración básica."
 
 #: admin/pageadmin.py:125
 msgid "Note: This page reloads if you change the selection. Save it first."
