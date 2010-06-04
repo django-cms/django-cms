@@ -34,8 +34,10 @@ def update_site_and_page_choices(lang=None):
     if current_site_pages:
         site_choices.append( (current_site.id, current_site.name ) )
         page_choices.append( (current_site.name, current_site_pages) )
-    cache.set(SITE_CHOICES_KEY, site_choices, settings.CMS_CONTENT_CACHE_DURATION)
-    cache.set(PAGE_CHOICES_KEY, page_choices, settings.CMS_CONTENT_CACHE_DURATION)
+    # We set it to 1 day here because we actively invalidate this cache.
+    # There is absolutely NO point in making this 
+    cache.set(SITE_CHOICES_KEY, site_choices, 86400)
+    cache.set(PAGE_CHOICES_KEY, page_choices, 86400)
     return site_choices, page_choices
 
 def get_site_choices(lang=None):
