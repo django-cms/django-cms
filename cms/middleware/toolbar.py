@@ -48,7 +48,7 @@ class ToolbarMiddleware(object):
                 return False
         except NoReverseMatch:
             pass
-        if request.path_info.startswith(urlparse.urlparse(settings.MEDIA_URL).path):
+        if request.path_info.startswith(urlparse.urlparse(settings.MEDIA_URL)[2]):
             return False
         if "edit" in request.GET:
             return True

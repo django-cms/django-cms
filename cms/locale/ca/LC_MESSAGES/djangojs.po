@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -17,21 +16,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: media/cms/js/change_form.js:31
-msgid ""
-"Are you sure you want to change the %(field_name)s without saving the page "
-"first?"
-msgstr ""
+msgid "Are you sure you want to change the %(field_name)s without saving the page first?"
+msgstr "Estàs segur que vols canviar el %(field_name) sense guardar primer la plana?"
 
 #: media/cms/js/change_form.js:68
-msgid ""
-"Not all plugins are saved. Are you sure you want to save the page? All "
-"unsaved plugin content will be lost."
-msgstr ""
+msgid "Not all plugins are saved. Are you sure you want to save the page? All unsaved plugin content will be lost."
+msgstr "No tots els plugins s'han guardat. Estàs segur de que vols guardar la plana? Tot els continguts dels plugins no guardats es perdran."
 
 #: media/cms/js/change_form.js:115
 msgid "Are you sure you want to change tabs without saving the page first?"
-msgstr ""
+msgstr "Estàs segur que voleu canviar de secció sense guardar la primera pàgina?"
 
 #: media/cms/js/plugin_editor.js:111
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Estàs segur que vols eliminar aquest plugin?"
