@@ -70,7 +70,7 @@
             </div>        
             {% endif %}
         {% else %}
-        <form method="post" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
+        <form method="post" action="" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
             <label for="cms_username">{% trans "Username" %}</label>
             <input type="text" name="cms_username" class="cms_textinput"></input>
             <label for="cms_password">{% trans "Password" %}</label>
@@ -97,7 +97,7 @@
         {% endif %}
         {% if auth %}
         <div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Page</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">                
+            <ul id="cms_toolbar_page_menu" class="cms_toolbar_submenu">                
                 <li class="first"><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
                 {% if has_add_page_permission %}
                 <li><a href="{% url admin:cms_page_add %}?target={{ page.pk }}&position=last-child"><span class="cms_toolbar_icon_add_child">{% trans "add child" %}</span>{% trans "Add child page" %}</a></li>
@@ -119,7 +119,7 @@
             </ul>
         </div>
         {% if auth %}
-        <form method="post" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
+        <form method="post" action="" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
             <input type="submit" name="logout_submit" value="{% trans "Logout" %}" class="cms_submit" />
             <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
         </form>
