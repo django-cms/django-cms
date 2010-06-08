@@ -83,7 +83,7 @@ class Level(Modifier):
 
 
 
-class LoginRequired(Modifier):
+class AuthVisibility(Modifier):
     """
     Remove nodes that are login required or require a group
     """
@@ -92,24 +92,19 @@ class LoginRequired(Modifier):
             return nodes
         final = []
         for node in nodes:
-            good = False
-            if node.attr.get('auth_required', False) and request.user.is_authenticated():
-                good = True
-            if node.attr.get('required_group_id', False) and request.user.is_authenticated():
-                if not hasattr(request.user, "group_cache"):
-                    request.user.group_cache = request.user.groups.all()
-                good = False
-                for group in request.user.group_cache:
-                    if group.pk == node.required_group_id:
-                        good = True
-                        break
-            if good or (not node.attr.get('auth_required', False) and not node.attr.get('required_group_id', False)):
+            if (node.attr.get('visible_for_authenticated', True) and \
+                 request.user.is_authenticated()) or \
+                (node.attr.get('visible_for_anonymous', True) and \
+                 not request.user.is_authenticated()):
                 final.append(node)
+            else:
+                if node.parent and node in node.parent.children:
+                    node.parent.children.remove(node)
         return final
 
 
 def register():
     menu_pool.register_modifier(Marker)
-    menu_pool.register_modifier(LoginRequired)
+    menu_pool.register_modifier(AuthVisibility)
     menu_pool.register_modifier(Level)
     

@@ -77,7 +77,7 @@ class PageAdmin(model_admin):
     if settings.CMS_DBGETTEXT:
         # no need to select language for page
         add_general_fields.remove('language')
-    advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'menu_login_required']
+    advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']

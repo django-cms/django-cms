@@ -39,6 +39,11 @@ class Page(MpttPublisher):
         (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
     
+    LIMIT_VISIBILITY_IN_MENU_CHOICES = (
+            (1,_('for logged in users only')),
+            (2,_('for anonymous users only')),
+    )
+    
     template_choices = [(x, _(y)) for x,y in settings.CMS_TEMPLATES]
     
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
@@ -64,7 +69,7 @@ class Page(MpttPublisher):
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
     login_required = models.BooleanField(_("login required"),default=False)
-    menu_login_required = models.BooleanField(_("menu login required"),default=False, help_text=_("only show this page in the menu if the user is logged in"))
+    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, help_text=_("limit when this page is visible in the menu"))
     
     # Placeholders (plugins)
     placeholders = models.ManyToManyField(Placeholder, editable=False)
