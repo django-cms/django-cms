@@ -85,6 +85,15 @@ def recurse_patterns(path, pattern_list, page_id):
         newpatterns.append(resolver)
     return newpatterns
 
+def _flatten_patterns(patterns):
+    flat = []
+    for pattern in patterns:
+        if isinstance(pattern, RegexURLResolver):
+            flat += _flatten_patterns(pattern.url_patterns)
+        else:
+            flat.append(pattern)
+    return flat
+
 def get_patterns_for_title(path, title):
     """
     Resolve the urlconf module for a path+title combination
@@ -106,6 +115,7 @@ def get_patterns_for_title(path, title):
             path += '/'
         page_id = title.page.id
         patterns += recurse_patterns(path, pattern_list, page_id)
+    patterns = _flatten_patterns(patterns)
     return patterns
 
 
