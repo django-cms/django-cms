@@ -54,15 +54,27 @@ def get_page_choices(lang=None):
         site_choices, page_choices = update_site_and_page_choices(lang)
     return page_choices
 
+def _get_key(prefix, lang):
+    return "%s-%s" % (prefix, lang)
+
 def get_site_cache_key(lang):
-    return "%s-%s" % (settings.CMS_SITE_CHOICES_CACHE_KEY, lang)
+    return _get_key(settings.CMS_SITE_CHOICES_CACHE_KEY, lang)
+
 def get_page_cache_key(lang):
-    return "%s-%s" % (settings.CMS_PAGE_CHOICES_CACHE_KEY, lang)
+    return _get_key(settings.CMS_PAGE_CHOICES_CACHE_KEY, lang)
+
+def _clean_many(prefix):
+    keys = []
+    for lang in [l[0] for l in settings.LANGUAGES]:
+        keys.append(_get_key(prefix, lang))
+    cache.delete_many(keys)
 
 def clean_site_choices_cache(sender, **kwargs):
-    cache.delete(settings.CMS_SITE_CHOICES_CACHE_KEY)
+    _clean_many(settings.CMS_SITE_CHOICES_CACHE_KEY)
+
 def clean_page_choices_cache(sender, **kwargs):
-    cache.delete(settings.CMS_PAGE_CHOICES_CACHE_KEY)
+    _clean_many(settings.CMS_PAGE_CHOICES_CACHE_KEY)
+
 post_save.connect(clean_page_choices_cache, sender=Page)
 post_save.connect(clean_site_choices_cache, sender=Site)
 post_delete.connect(clean_page_choices_cache, sender=Page)
