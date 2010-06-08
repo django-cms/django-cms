@@ -14,6 +14,7 @@ from django.template.defaultfilters import title
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.forms.widgets import Media
+import operator
 
 register = template.Library()
 
@@ -233,7 +234,8 @@ class PlaceholderNode(template.Node):
             placeholder = page.placeholders.filter(slot__in=get_placeholders(template)).get(slot=self.name)
             if not get_plugins(request, placeholder):
                 continue
-            request.placeholder_media += placeholder.get_media(request, context)
+            request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
+            #request.placeholder_media += placeholder.get_media(request, context)
             content = render_placeholder(placeholder, context)
             if content:
                 return content
