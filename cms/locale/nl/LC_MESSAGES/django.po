@@ -1163,9 +1163,7 @@ msgstr "video url"
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
-"Vimeo of YouTube video url. Voorbeeld:\r\n"
-"http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgstr "Vimeo of YouTube video url. Voorbeeld: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
 msgid "preview image file"
