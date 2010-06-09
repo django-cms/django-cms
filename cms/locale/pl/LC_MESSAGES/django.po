@@ -262,9 +262,9 @@ msgid "Language must be different than the copied language!"
 msgstr "Wybrany język musi być inny, niż ten z którego go skopiowano!"
 
 #: admin/pageadmin.py:1131
-#, fuzzy, python-format
+#, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "Plugin %(plugin_name)s został dodany do %(placeholder)s"
+msgstr "Przekopiowano pluginy %(language)s do %(placeholder)s"
 
 #: admin/pageadmin.py:1204
 #, python-format
@@ -950,7 +950,6 @@ msgid "Language or Page must be filled out"
 msgstr "Pola \"język\", bądź \"storna\" muszą zostać wypełnione"
 
 #: plugins/inherit/models.py:10
-#, fuzzy
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr "Wybierz stronę z której pluginy mają zostać umierzone w  tym placeholderze. Pozostaw to pole puste, by wykorzystana została aktualna strona."
 
@@ -1768,13 +1767,13 @@ msgstr ""
 "Url strony: http://%(host)s%(path)s"
 
 #: templatetags/cms_tags.py:675
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
-"Template tag page_id_url nie odnalazł strony o reverse_id: %(reverse_id)s\n"
-"Url strony: http://%(host)s%(path)s"
+"Template tag show_placeholder_by_id tag nie odnalazł strony o reverse_id %(reverse_id)s\n"
+"Adres strony to: http://%(host)s%(path)s"
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
