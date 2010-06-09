@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DJANGO-CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-15 13:47+0100\n"
+"POT-Creation-Date: 2010-06-09 01:54+0200\n"
 "PO-Revision-Date: 2009-11-25 11:12+0500\n"
 "Last-Translator: Lapuhov Alex <lapuhov.alex@gmail.com>\n"
 "Language-Team: DJANGO-CMS-russian <lapuhov.alex@gmail.com>\n"
@@ -17,103 +17,103 @@ msgstr ""
 "X-Poedit-Language: Russian\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 
-#: plugin_base.py:99
+#: plugin_base.py:100
 msgid "Advanced options"
 msgstr "Расширенные настройки"
 
-#: admin/forms.py:25
+#: admin/forms.py:28
 msgid "Title"
 msgstr "Заголовок"
 
-#: admin/forms.py:26
+#: admin/forms.py:29
 msgid "The default title"
 msgstr "Заголовок по умолчанию"
 
-#: admin/forms.py:27
+#: admin/forms.py:30
 msgid "Slug"
 msgstr "Slug"
 
-#: admin/forms.py:28
+#: admin/forms.py:31
 msgid "The part of the title that is used in the URL"
 msgstr "Часть заголовка, используемая в URL"
 
-#: admin/forms.py:29
+#: admin/forms.py:32
 msgid "Language"
 msgstr "Язык"
 
-#: admin/forms.py:30
+#: admin/forms.py:33
 msgid "The current language of the content fields."
 msgstr "Текущий язык содержимого полей."
 
-#: admin/forms.py:73
+#: admin/forms.py:82
 msgid "Another page with this slug already exists"
 msgstr "Страница с таким slug уже существует."
 
-#: admin/forms.py:93
+#: admin/forms.py:100
 msgid "Menu Title"
 msgstr "Заголовок меню"
 
-#: admin/forms.py:94
+#: admin/forms.py:101
 msgid "Overwrite what is displayed in the menu"
 msgstr "То, что будет отображено в меню."
 
-#: admin/forms.py:95
+#: admin/forms.py:102
 msgid "Page Title"
 msgstr "Заголовок страницы"
 
-#: admin/forms.py:96
+#: admin/forms.py:103
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 "Переписать то, что будет изображено в заголовке браузера или закладках."
 
-#: admin/forms.py:97
+#: admin/forms.py:104
 msgid "Application"
 msgstr "Приложение"
 
-#: admin/forms.py:99
+#: admin/forms.py:106
 msgid "Hook application to this page."
 msgstr "Прикрепить приложение к данной странице."
 
-#: admin/forms.py:100
+#: admin/forms.py:107
 msgid "Overwrite URL"
 msgstr "Переписать URL"
 
-#: admin/forms.py:101
+#: admin/forms.py:108
 msgid "Keep this field empty if standard path should be used."
 msgstr "Оставьте это поле пустым для использования стандартного пути"
 
-#: admin/forms.py:107
+#: admin/forms.py:114
 msgid "Redirect"
 msgstr "Перенаправление"
 
-#: admin/forms.py:108
+#: admin/forms.py:115
 msgid "Redirects to this URL."
 msgstr "Перенаправить на URL."
 
-#: admin/forms.py:110
+#: admin/forms.py:117
 msgid "A description of the page sometimes used by search engines."
 msgstr "Описание страницы, иногда используемое поисковыми роботами."
 
-#: admin/forms.py:112
+#: admin/forms.py:119
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
 "Список ключевых слов, разделённых запятыми, иногда используемый поисковыми "
 "роботами."
 
-#: admin/forms.py:120
+#: admin/forms.py:134
 msgid "A page with this reverse URL id exists already."
 msgstr "Страница с таким reverse URL уже существует."
 
-#: admin/forms.py:127
+#: admin/forms.py:141
 msgid "Invalid URL, use /my/url format."
 msgstr "Неправильный URL, используйте /my/url формат."
 
-#: admin/forms.py:138 admin/forms.py:139 migrations/0001_initial.py:41
+#: admin/forms.py:152 admin/forms.py:153 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
 msgstr "пользователь"
 
-#: admin/forms.py:171
+#: admin/forms.py:185
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
@@ -121,39 +121,39 @@ msgstr ""
 "Права на добавление страницы требуют также доступ к потомкам, иначе "
 "созданная страница не сможет быть изменена создателем."
 
-#: admin/forms.py:174
+#: admin/forms.py:188
 msgid "Add page permission also requires edit page permission."
 msgstr "Права на добавления страницы требуют право на изменение."
 
-#: admin/forms.py:201
+#: admin/forms.py:215
 msgid "Please select user or group first."
 msgstr "Сначала выберите пользователя или группу."
 
-#: admin/forms.py:208 admin/forms.py:215 admin/forms.py:219
+#: admin/forms.py:222 admin/forms.py:229 admin/forms.py:233
 #: templates/admin/cms/page/change_form.html:65
-#: templates/admin/cms/page/plugin_change_form.html:69
+#: templates/admin/cms/page/plugin_change_form.html:70
 msgid "Add"
 msgstr "Добавить"
 
-#: admin/forms.py:209 admin/forms.py:216 admin/forms.py:220
+#: admin/forms.py:223 admin/forms.py:230 admin/forms.py:234
 msgid "Change"
 msgstr "Изменить"
 
-#: admin/forms.py:210 admin/forms.py:217 admin/forms.py:221
+#: admin/forms.py:224 admin/forms.py:231 admin/forms.py:235
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
 msgstr "Удалить"
 
-#: admin/forms.py:211
+#: admin/forms.py:225
 msgid "Recover (any) pages"
 msgstr "Восстановить (любую) страницу"
 
-#: admin/forms.py:274
+#: admin/forms.py:288
 msgid "Notify user"
 msgstr "Уведомить пользователя"
 
-#: admin/forms.py:275
+#: admin/forms.py:289
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
@@ -161,153 +161,152 @@ msgstr ""
 "Отправить пользователю email о смене имени или пароля. Требуется email "
 "пользователя."
 
-#: admin/forms.py:295
+#: admin/forms.py:309
 msgid "New password"
 msgstr "Новый пароль"
 
-#: admin/forms.py:297
+#: admin/forms.py:311
 msgid "New password confirmation"
 msgstr "Подтверждение нового пароля"
 
-#: admin/forms.py:316
+#: admin/forms.py:330
 msgid "Email notification requires valid email address."
 msgstr "Уведомление по email требует правильного email адреса."
 
-#: admin/forms.py:318
+#: admin/forms.py:332
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Право на добавление страницы требует право на изменение страницы!"
 
-#: admin/forms.py:320
+#: admin/forms.py:334
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
 "Право на добавление пользователя требует право на изменение пользователя!"
 
-#: admin/forms.py:322
+#: admin/forms.py:336
 msgid "To add permissions you also need to edit them!"
 msgstr "Для добавления прав доступа вы также должны изменять их!"
 
-#: admin/pageadmin.py:111 admin/pageadmin.py:127
+#: admin/pageadmin.py:118 admin/pageadmin.py:134
 msgid "Hidden"
 msgstr "Скрыто"
 
-#: admin/pageadmin.py:122
+#: admin/pageadmin.py:129
 msgid "Basic Settings"
 msgstr "Основные настройки"
 
-#: admin/pageadmin.py:125
+#: admin/pageadmin.py:132
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "Страница будет перезагружена, если изменить выбор. Сохраните её сначала."
 
-#: admin/pageadmin.py:131
+#: admin/pageadmin.py:138
 msgid "Advanced Settings"
 msgstr "Расширенные настройки"
 
-#: admin/pageadmin.py:140
+#: admin/pageadmin.py:147
 msgid "SEO Settings"
 msgstr "Настройки SEO "
 
-#: admin/pageadmin.py:463
+#: admin/pageadmin.py:477
 msgid "higher"
 msgstr "выше"
 
-#: admin/pageadmin.py:629
+#: admin/pageadmin.py:649
 msgid "Database error"
 msgstr "Ошибка базы данные"
 
-#: admin/pageadmin.py:714 migrations/0001_initial.py:13
+#: admin/pageadmin.py:748 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
 #: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
-#: models/pagemodel.py:72 models/permissionmodels.py:68
-#: models/pluginmodel.py:38 models/titlemodels.py:22
-#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: models/pagemodel.py:82 models/permissionmodels.py:68
+#: models/titlemodels.py:22 plugins/inherit/forms.py:9 plugins/link/forms.py:9
 #: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:22 plugins/teaser/models.py:15
 msgid "page"
 msgstr "страница"
 
-#: admin/pageadmin.py:837
+#: admin/pageadmin.py:873
 msgid "Page was successfully approved."
 msgstr "Страница успешно утверждена."
 
-#: admin/pageadmin.py:891
+#: admin/pageadmin.py:928
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "объект %(name)s  с первичным ключом %(key)r не существует."
 
-#: admin/pageadmin.py:894
+#: admin/pageadmin.py:931
 msgid "There only exists one translation for this page"
 msgstr "Для данной страницы создан только один перевод"
 
-#: admin/pageadmin.py:909
+#: admin/pageadmin.py:946
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Заголовок и плагин на %(language)s удалён"
 
-#: admin/pageadmin.py:931
+#: admin/pageadmin.py:969
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: admin/pageadmin.py:994
+#: admin/pageadmin.py:1029
 msgid "You do not have permission to publish this page"
 msgstr "У вас нет прав для публикования этой страницы"
 
-#: admin/pageadmin.py:1012
+#: admin/pageadmin.py:1047
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 "У вас нет прав для изменения статуса \"в навигации\" для данной страницы"
 
-#: admin/pageadmin.py:1047 admin/pageadmin.py:1081
+#: admin/pageadmin.py:1092 admin/pageadmin.py:1125
 msgid "You do not have permission to change this page"
 msgstr "У вас нет прав для изменения данной страницы"
 
-#: admin/pageadmin.py:1051 admin/pageadmin.py:1083
+#: admin/pageadmin.py:1096 admin/pageadmin.py:1127
 msgid "Language must be set to a supported language!"
 msgstr "Язык должен быть установлен из списка поддерживаемых языков!"
 
-#: admin/pageadmin.py:1063
+#: admin/pageadmin.py:1108
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s плагин добавлен в %(placeholder)s"
 
-#: admin/pageadmin.py:1085
+#: admin/pageadmin.py:1129
 #, fuzzy
 msgid "Language must be different than the copied language!"
 msgstr "Язык должен быть установлен из списка поддерживаемых языков!"
 
-#: admin/pageadmin.py:1131
+#: admin/pageadmin.py:1139
 #, fuzzy, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "%(plugin_name)s плагин добавлен в %(placeholder)s"
 
-#: admin/pageadmin.py:1204
+#: admin/pageadmin.py:1213
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s плагин, редактируемый в %(position)s в %(placeholder)s"
 
-#: admin/pageadmin.py:1259
+#: admin/pageadmin.py:1271
 msgid "Plugins where moved"
 msgstr "Плагины перемещены"
 
-#: admin/pageadmin.py:1281
+#: admin/pageadmin.py:1293 admin/placeholderadmin.py:207
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr "%(plugin_name)s плагин в %(position)s в %(placeholder)s удалён."
 
-#: admin/permissionadmin.py:112 models/permissionmodels.py:74
+#: admin/permissionadmin.py:113 models/permissionmodels.py:74
 msgid "Page permissions"
 msgstr "Права доступа к странице"
 
-#: admin/permissionadmin.py:113
+#: admin/permissionadmin.py:114
 msgid "User & Group permissions"
 msgstr "Права доступа пользователя и группы"
 
-#: admin/permissionadmin.py:114
+#: admin/permissionadmin.py:115
 msgid "Page permissions management"
 msgstr "Управление правами доступа к странице"
 
@@ -319,13 +318,9 @@ msgstr "Информация о пользователе"
 msgid "Groups"
 msgstr "Группы"
 
-#: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:855
+#: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:76
 msgid "Password"
 msgstr "Пароль"
-
-#: admin/widgets.py:58
-msgid "Add Another"
-msgstr "Добавить другое"
 
 #: admin/dialog/forms.py:8
 msgid "Copy permissions"
@@ -474,31 +469,44 @@ msgstr "Результаты поиска"
 msgid "Your search did not match any results."
 msgstr "По вашему запросу ничего не найдено."
 
+#: forms/fields.py:18
+msgid "Select a valid site"
+msgstr ""
+
+#: forms/fields.py:19
+#, fuzzy
+msgid "Select a valid page"
+msgstr "выбрать эту страницу"
+
+#: forms/widgets.py:172
+msgid "Add Another"
+msgstr "Добавить другое"
+
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
 #: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
 #: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:42 models/titlemodels.py:11
+#: models/pluginmodel.py:44 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
 msgstr "язык"
 
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:40
+#: migrations/0004_textobjects.py:22 models/pluginmodel.py:43
 msgid "position"
 msgstr "положение"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:44 models/titlemodels.py:23
+#: models/pluginmodel.py:46 models/titlemodels.py:23
 msgid "creation date"
 msgstr "дата создания"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/pluginmodel.py:41
+#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:27
 msgid "slot"
 msgstr "слот"
 
-#: migrations/0001_initial.py:18 models/pluginmodel.py:43
+#: migrations/0001_initial.py:18 models/pluginmodel.py:45
 msgid "plugin_name"
 msgstr "plugin_name"
 
@@ -506,7 +514,7 @@ msgstr "plugin_name"
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
 #: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:26
 #: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:11
-#: plugins/twitter/models.py:6
+#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
 msgstr "заголовок"
@@ -548,7 +556,7 @@ msgstr "может изменить soft-root"
 msgid "status"
 msgstr "статус"
 
-#: migrations/0001_initial.py:53 models/pagemodel.py:51
+#: migrations/0001_initial.py:53
 msgid "navigation extenders"
 msgstr "расширители навигации"
 
@@ -569,28 +577,28 @@ msgstr "автор"
 msgid "reverse url id"
 msgstr "reverse url id"
 
-#: migrations/0001_initial.py:59 models/pagemodel.py:64
+#: migrations/0001_initial.py:59 models/pagemodel.py:71
 msgid "login required"
 msgstr "требуется login"
 
-#: migrations/0001_initial.py:60 models/pagemodel.py:49
+#: migrations/0001_initial.py:60 models/pagemodel.py:56
 msgid "soft root"
 msgstr "soft root"
 
-#: migrations/0001_initial.py:63 models/pagemodel.py:47
+#: migrations/0001_initial.py:63 models/pagemodel.py:54
 msgid "publication end date"
 msgstr "дата окончания публикации"
 
-#: migrations/0001_initial.py:64 models/pagemodel.py:54
+#: migrations/0001_initial.py:64 models/pagemodel.py:61
 #: plugins/snippet/models.py:14
 msgid "template"
 msgstr "шаблон"
 
-#: migrations/0001_initial.py:66 models/pagemodel.py:46
+#: migrations/0001_initial.py:66 models/pagemodel.py:53
 msgid "publication date"
 msgstr "дата публикации"
 
-#: migrations/0001_initial.py:67 models/pagemodel.py:48
+#: migrations/0001_initial.py:67 models/pagemodel.py:55
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
 msgstr "в навигации"
@@ -600,7 +608,7 @@ msgstr "в навигации"
 msgid "application"
 msgstr "приложение"
 
-#: migrations/0006_apphook.py:65 models/pagemodel.py:50
+#: migrations/0006_apphook.py:65 models/pagemodel.py:57
 msgid "id"
 msgstr "id"
 
@@ -667,7 +675,7 @@ msgstr "PageModerator"
 msgid "created"
 msgstr "создан"
 
-#: models/moderatormodels.py:98 models/pagemodel.py:33
+#: models/moderatormodels.py:98 models/pagemodel.py:35
 msgid "changed"
 msgstr "изменён"
 
@@ -687,7 +695,7 @@ msgstr "публикуется"
 msgid "unpublish req."
 msgstr "отменяется публикация"
 
-#: models/moderatormodels.py:103 models/pagemodel.py:36
+#: models/moderatormodels.py:103 models/pagemodel.py:38
 msgid "approved"
 msgstr "утверждено"
 
@@ -699,44 +707,52 @@ msgstr "Статус модератора страницы"
 msgid "Page moderator states"
 msgstr "Статусы модератора страницы"
 
-#: models/pagemodel.py:34
+#: models/pagemodel.py:36
 msgid "req. app."
 msgstr "требуется приложение"
 
-#: models/pagemodel.py:35 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:885
-#: templates/cms/toolbar/toolbar.html:919 utils/moderator.py:91
+#: models/pagemodel.py:37 templates/admin/cms/page/menu_item.html:44
+#: templates/cms/toolbar/toolbar.html:106
+#: templates/cms/toolbar/toolbar.html:143 utils/moderator.py:89
 msgid "delete"
 msgstr "удалить"
 
-#: models/pagemodel.py:37
+#: models/pagemodel.py:39
 msgid "app. par."
 msgstr "часть приложения"
 
-#: models/pagemodel.py:42
+#: models/pagemodel.py:43
+msgid "for logged in users only"
+msgstr ""
+
+#: models/pagemodel.py:44
+msgid "for anonymous users only"
+msgstr ""
+
+#: models/pagemodel.py:49
 msgid "created by"
 msgstr "создан"
 
-#: models/pagemodel.py:43 templates/admin/cms/page/change_list_tree.html:19
+#: models/pagemodel.py:50 templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
 msgstr "изменён"
 
-#: models/pagemodel.py:46
+#: models/pagemodel.py:53
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr ""
 "Для того, чтобы опубликовать страницу, необходимо статус \"Опубликовано\""
 
-#: models/pagemodel.py:47
+#: models/pagemodel.py:54
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Срок действия страницы. Оставьте пустым для бесконечного срока."
 
-#: models/pagemodel.py:49
+#: models/pagemodel.py:56
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Все предки не будут показаны в навигации"
 
-#: models/pagemodel.py:50
+#: models/pagemodel.py:57
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
@@ -744,43 +760,49 @@ msgstr ""
 "Уникальный идентификатор, который используется с тегом page_url для связи с "
 "данной страницей"
 
-#: models/pagemodel.py:52
+#: models/pagemodel.py:58
+#, fuzzy
+msgid "attached menu"
+msgstr "флеш меню"
+
+#: models/pagemodel.py:59
 msgid "is published"
 msgstr "опубликован"
 
-#: models/pagemodel.py:54
+#: models/pagemodel.py:61
 msgid "The template used to render the content."
 msgstr "Шаблон, используемый для отображения."
 
-#: models/pagemodel.py:55
+#: models/pagemodel.py:62
 msgid "The site the page is accessible at."
 msgstr "The site the page is accessible at."
 
-#: models/pagemodel.py:55
+#: models/pagemodel.py:62
 msgid "site"
 msgstr "сайт"
 
-#: models/pagemodel.py:57
+#: models/pagemodel.py:64
 msgid "moderator state"
 msgstr "статус модерации"
 
-#: models/pagemodel.py:65
-msgid "menu login required"
-msgstr "требует меню login"
+#: models/pagemodel.py:72
+msgid "menu visibility"
+msgstr ""
 
-#: models/pagemodel.py:65
-msgid "only show this page in the menu if the user is logged in"
-msgstr "показывать страницу в меню только если пользователь вошёл"
+#: models/pagemodel.py:72
+#, fuzzy
+msgid "limit when this page is visible in the menu"
+msgstr "То, что будет отображено в меню."
 
-#: models/pagemodel.py:73
+#: models/pagemodel.py:83
 msgid "pages"
 msgstr "страницы"
 
-#: models/pagemodel.py:179
+#: models/pagemodel.py:190
 msgid "Page was copied."
 msgstr "Страница скопирована."
 
-#: models/pagemodel.py:502
+#: models/pagemodel.py:495
 msgid "default"
 msgstr "по умолчанию"
 
@@ -860,6 +882,11 @@ msgstr "Группа пользователей(страница)"
 msgid "User groups (page)"
 msgstr "Группы пользователей(страница)"
 
+#: models/placeholdermodel.py:28 plugins/flash/models.py:10
+#: plugins/flash/migrations/0001_initial.py:16 plugins/video/models.py:14
+msgid "width"
+msgstr "ширина"
+
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
 msgstr "переписать заголовок в меню"
@@ -889,21 +916,16 @@ msgstr "Флеш"
 msgid "use swf file"
 msgstr "использовать swf файл"
 
-#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:16
-#: plugins/video/models.py:14
-msgid "width"
-msgstr "ширина"
-
 #: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
 #: plugins/video/models.py:15
 msgid "height"
 msgstr "высота"
 
-#: plugins/flash/templates/cms/plugins/flash.html:3
+#: plugins/flash/templates/cms/plugins/flash.html:2
 msgid "Missing flash plugin."
 msgstr "Отсутствует флеш плагин."
 
-#: plugins/googlemap/cms_plugins.py:9
+#: plugins/googlemap/cms_plugins.py:11
 msgid "Google Map"
 msgstr "Google Map"
 
@@ -959,11 +981,11 @@ msgstr "планировщик пути"
 msgid "Map"
 msgstr "Карта"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:73
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:72
 msgid "Your address"
 msgstr "Ваш адрес"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:76
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:75
 msgid "Calculate route"
 msgstr "Вычислить путь"
 
@@ -987,7 +1009,7 @@ msgstr ""
 msgid "Optional: the language of the plugins you want"
 msgstr "Дополнительно: желаемый язык плагина"
 
-#: plugins/link/cms_plugins.py:11
+#: plugins/link/cms_plugins.py:12
 msgid "Link"
 msgstr "Ссылка"
 
@@ -1153,19 +1175,24 @@ msgstr "Доступные плагины."
 msgid "Insert plugin"
 msgstr "Вставить плагин"
 
-#: plugins/twitter/cms_plugins.py:8
+#: plugins/twitter/cms_plugins.py:10
 msgid "Twitter"
 msgstr "Twitter"
+
+#: plugins/twitter/cms_plugins.py:31
+#, fuzzy
+msgid "Twitter Search"
+msgstr "twitter пользователь"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
 msgstr "twitter пользователь"
 
-#: plugins/twitter/models.py:8
+#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "count"
 msgstr "количество"
 
-#: plugins/twitter/models.py:8
+#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "Number of entries to display"
 msgstr "Количество сообщений для отображения"
 
@@ -1177,6 +1204,18 @@ msgstr "подсказка ссылки"
 msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
 "Если указано, подсказка будет показана как ссылка на ваш профиль Twitter"
+
+#: plugins/twitter/models.py:16
+#, fuzzy
+msgid "query"
+msgstr "пользователь"
+
+#: plugins/twitter/models.py:16
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
+msgstr ""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1280,7 +1319,7 @@ msgstr ""
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
-#: templates/admin/cms/page/plugin_change_form.html:111
+#: templates/admin/cms/page/plugin_change_form.html:112
 msgid "Save"
 msgstr "Сохранить"
 
@@ -1335,7 +1374,7 @@ msgstr "Изменить страницу"
 
 #: templates/admin/cms/page/change_form.html:62
 #: templates/admin/cms/page/change_list.html:8
-#: templates/admin/cms/page/plugin_change_form.html:66
+#: templates/admin/cms/page/plugin_change_form.html:67
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
 msgid "Home"
@@ -1386,7 +1425,7 @@ msgid "View on site"
 msgstr "Посмотреть на сайте"
 
 #: templates/admin/cms/page/change_form.html:128
-#: templates/admin/cms/page/plugin_change_form.html:83
+#: templates/admin/cms/page/plugin_change_form.html:84
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
@@ -1423,41 +1462,41 @@ msgstr "Запросить утверждение"
 msgid "List of pages"
 msgstr "Список страниц"
 
-#: templates/admin/cms/page/change_list.html:57
+#: templates/admin/cms/page/change_list.html:56
 msgid "Successfully moved"
 msgstr "Перенесена удачно"
 
-#: templates/admin/cms/page/change_list.html:62
+#: templates/admin/cms/page/change_list.html:61
 msgid "An error occured. Please reload the page"
 msgstr "Возникла ошибка. Пожалуйста перезагрузите страницу"
 
-#: templates/admin/cms/page/change_list.html:83
+#: templates/admin/cms/page/change_list.html:82
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "Восстановить удалённые %(name)s"
 
-#: templates/admin/cms/page/change_list.html:86
+#: templates/admin/cms/page/change_list.html:85
 #, python-format
 msgid "Add %(name)s"
 msgstr "Добавить %(name)s"
 
-#: templates/admin/cms/page/change_list.html:98
+#: templates/admin/cms/page/change_list.html:97
 msgid "Pages on:"
 msgstr "Страницы на:"
 
-#: templates/admin/cms/page/change_list.html:115
+#: templates/admin/cms/page/change_list.html:114
 msgid "Filter:"
 msgstr "Фильтр:"
 
-#: templates/admin/cms/page/change_list.html:115
+#: templates/admin/cms/page/change_list.html:114
 msgid "on"
 msgstr "вкл"
 
-#: templates/admin/cms/page/change_list.html:115
+#: templates/admin/cms/page/change_list.html:114
 msgid "off"
 msgstr "выкл"
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:116
 msgid "Filter"
 msgstr "Фильтр"
 
@@ -1496,8 +1535,8 @@ msgid "edit this page"
 msgstr "изменить эту страницу"
 
 #: templates/admin/cms/page/menu_item.html:6
-#: templates/cms/toolbar/toolbar.html:891
-#: templates/cms/toolbar/toolbar.html:912
+#: templates/cms/toolbar/toolbar.html:112
+#: templates/cms/toolbar/toolbar.html:136
 msgid "edit"
 msgstr "изменить"
 
@@ -1554,7 +1593,7 @@ msgid "add"
 msgstr "добавить"
 
 #: templates/admin/cms/page/menu_item.html:65
-#: templates/cms/toolbar/toolbar.html:864
+#: templates/cms/toolbar/toolbar.html:85
 msgid "Approve directly"
 msgstr "Утвердить напрямую"
 
@@ -1668,134 +1707,143 @@ msgstr "Настройки копирования"
 msgid "Choose copy options"
 msgstr "Выбрать настройки копирования"
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
+msgid "Generic"
+msgstr ""
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
 msgstr "Добавить плагин"
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:18
 #, fuzzy
 msgid "From Language"
 msgstr "Язык"
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
 #, fuzzy
 msgid "Copy Plugins"
 msgstr "Плагины"
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:10
+#: templates/admin/cms/page/widgets/plugin_editor.html:12
 msgid "You must save the page first to add plugins."
 msgstr "Для добавления плагина вы должны сначала сохранить страницу."
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:13
+#: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugin selected. Selected one on the left side"
 msgstr "Ни один плагин не выбран. Выберите один из перечисленных слева."
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:15
+#: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr "Не указан плагин. Добавьте плагин в этот placeholder-слот."
 
-#: templates/cms/toolbar/toolbar.html:760
+#: templates/cms/toolbar/add_plugins.html:10
+#, fuzzy
+msgid "Available plugins"
+msgstr "Доступные плагины."
+
+#: templates/cms/toolbar/toolbar.html:26
 #, python-format
 msgid "Move to %(name)s"
 msgstr "Переместить %(name)s"
 
-#: templates/cms/toolbar/toolbar.html:806
+#: templates/cms/toolbar/toolbar.html:27
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Вы уверены, что хотите удалить данный плагин?"
 
-#: templates/cms/toolbar/toolbar.html:835
+#: templates/cms/toolbar/toolbar.html:56
 msgid "Edit mode"
 msgstr "Режим редактирования"
 
-#: templates/cms/toolbar/toolbar.html:842
+#: templates/cms/toolbar/toolbar.html:63
 msgid "Status"
 msgstr "Статус"
 
-#: templates/cms/toolbar/toolbar.html:853
+#: templates/cms/toolbar/toolbar.html:74
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: templates/cms/toolbar/toolbar.html:857
-#: templates/cms/toolbar/toolbar.html:858
+#: templates/cms/toolbar/toolbar.html:78 templates/cms/toolbar/toolbar.html:79
 msgid "login"
 msgstr "вход"
 
-#: templates/cms/toolbar/toolbar.html:869
+#: templates/cms/toolbar/toolbar.html:90
 msgid "Template"
 msgstr "Шаблон"
 
-#: templates/cms/toolbar/toolbar.html:880
+#: templates/cms/toolbar/toolbar.html:101
 msgid "move"
 msgstr "переместить"
 
-#: templates/cms/toolbar/toolbar.html:880
+#: templates/cms/toolbar/toolbar.html:101
 msgid "Move/add Pages"
 msgstr "Переместить/добавить страницу"
 
-#: templates/cms/toolbar/toolbar.html:882
+#: templates/cms/toolbar/toolbar.html:103
 #, fuzzy
 msgid "add child"
 msgstr "Добавить потомка"
 
-#: templates/cms/toolbar/toolbar.html:882
+#: templates/cms/toolbar/toolbar.html:103
 #, fuzzy
 msgid "Add child page"
 msgstr "Добавить потомка"
 
-#: templates/cms/toolbar/toolbar.html:883
+#: templates/cms/toolbar/toolbar.html:104
 msgid "add sibling"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:883
+#: templates/cms/toolbar/toolbar.html:104
 msgid "Add sibling page"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:885
+#: templates/cms/toolbar/toolbar.html:106
 msgid "Delete Page"
 msgstr "Удалить страницу"
 
-#: templates/cms/toolbar/toolbar.html:891
+#: templates/cms/toolbar/toolbar.html:112
 msgid "Site Administration"
 msgstr "Управление сайтом"
 
-#: templates/cms/toolbar/toolbar.html:893
+#: templates/cms/toolbar/toolbar.html:114
 msgid "Page Settings"
 msgstr "Настройки страницы"
 
-#: templates/cms/toolbar/toolbar.html:895
+#: templates/cms/toolbar/toolbar.html:116
 msgid "history"
 msgstr "история"
 
-#: templates/cms/toolbar/toolbar.html:895
+#: templates/cms/toolbar/toolbar.html:116
 msgid "View History"
 msgstr "Посмотреть историю"
 
-#: templates/cms/toolbar/toolbar.html:901
-msgid "Lock"
-msgstr "Заблокировать"
-
-#: templates/cms/toolbar/toolbar.html:901
+#: templates/cms/toolbar/toolbar.html:123
+#: templates/cms/toolbar/toolbar.html:124
 msgid "Logout"
 msgstr "Выход"
 
-#: templates/cms/toolbar/toolbar.html:903
+#: templates/cms/toolbar/toolbar.html:124
+msgid "Lock"
+msgstr "Заблокировать"
+
+#: templates/cms/toolbar/toolbar.html:127
 msgid "Close"
 msgstr "Закрыть"
 
-#: templates/cms/toolbar/toolbar.html:914
+#: templates/cms/toolbar/toolbar.html:138
 msgid "up"
 msgstr "вкл"
 
-#: templates/cms/toolbar/toolbar.html:915
+#: templates/cms/toolbar/toolbar.html:139
 msgid "down"
 msgstr "выкл"
 
-#: templates/cms/toolbar/toolbar.html:917
+#: templates/cms/toolbar/toolbar.html:141
 msgid "Settings"
 msgstr "Настройки"
 
-#: templates/cms/toolbar/toolbar.html:919
+#: templates/cms/toolbar/toolbar.html:143
 msgid "Delete Plugin"
 msgstr "Удалить плагин."
 
@@ -1811,53 +1859,30 @@ msgstr "Убрать модерацию непосредственных пот�
 msgid "Unbind descendants moderation"
 msgstr "Убрать модерацию потомков"
 
-#: templatetags/cms_tags.py:401 templatetags/cms_tags.py:674
-#, python-format
-msgid "Reverse ID not found on %(domain)s"
+#: templatetags/cms_tags.py:69
+#, fuzzy, python-format
+msgid "Page not found on %(domain)s"
 msgstr "Обратный ID не найден для %(domain)s"
 
-#: templatetags/cms_tags.py:402
-#, python-format
+#: templatetags/cms_tags.py:70
+#, fuzzy, python-format
 msgid ""
-"A page_id_url template tag didn't found a page with the reverse_id %"
-"(reverse_id)s\n"
-"The url of the page was: http://%(host)s%(path)s"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)"
+"s\n"
+"`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 "Тег page_id_url не найден на странице reverse_id %(reverse_id)s\n"
 "Url страницы был: http://%(host)s%(path)s"
 
-#: templatetags/cms_tags.py:675
-#, python-format
-msgid ""
-"A show_placeholder_by_id template tag didn't found a page with the "
-"reverse_id %(reverse_id)s\n"
-"The url of the page was: http://%(host)s%(path)s"
-msgstr ""
-"Тег show_placeholder_by_id не найден на странице с reverse_id %(reverse_id)"
-"s\n"
-"Url страницы был: http://%(host)s%(path)s"
-
-#: tests/util/menu_extender.py:7
-msgid "Sublevel"
-msgstr ""
-
-#: tests/util/menu_extender.py:8
-msgid "Sublevel3"
-msgstr ""
-
-#: tests/util/menu_extender.py:11
-msgid "Sublevel 2"
-msgstr ""
-
-#: utils/moderator.py:84
+#: utils/moderator.py:82
 msgid "parent first"
 msgstr "первый предок"
 
-#: utils/moderator.py:91
+#: utils/moderator.py:89
 msgid "approve"
 msgstr "утвердить"
 
-#: utils/moderator.py:243
+#: utils/moderator.py:240
 #, python-format
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Страница %s требует утверждения."
@@ -1869,6 +1894,21 @@ msgstr "CMS - ваш аккаунт создан."
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
 msgstr "CMS - ваш аккаунт изменён."
+
+#~ msgid "menu login required"
+#~ msgstr "требует меню login"
+
+#~ msgid "only show this page in the menu if the user is logged in"
+#~ msgstr "показывать страницу в меню только если пользователь вошёл"
+
+#~ msgid ""
+#~ "A show_placeholder_by_id template tag didn't found a page with the "
+#~ "reverse_id %(reverse_id)s\n"
+#~ "The url of the page was: http://%(host)s%(path)s"
+#~ msgstr ""
+#~ "Тег show_placeholder_by_id не найден на странице с reverse_id %"
+#~ "(reverse_id)s\n"
+#~ "Url страницы был: http://%(host)s%(path)s"
 
 #~ msgid "dock"
 #~ msgstr "док"
@@ -1923,9 +1963,6 @@ msgstr "CMS - ваш аккаунт изменён."
 
 #~ msgid "wmode"
 #~ msgstr "wmode"
-
-#~ msgid "flash menu"
-#~ msgstr "флеш меню"
 
 #~ msgid "Twitter recent entries plugin"
 #~ msgstr "Плагин для недавних сообщений Twitter."
