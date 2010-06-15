@@ -717,83 +717,84 @@ msgstr "شناسه-ی بکتایی که برای تگ الگوی page_url برا
 
 #: models/pagemodel.py:52
 msgid "is published"
-msgstr ""
+msgstr "منتشرشده"
 
 #: models/pagemodel.py:54
+#, fuzzy
 msgid "The template used to render the content."
-msgstr ""
+msgstr "الگویی که برای پویش محتوا استفاده می-شود"
 
 #: models/pagemodel.py:55
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "وبگاهی که صفحه در آن در دسترس است."
 
 #: models/pagemodel.py:55
 msgid "site"
-msgstr ""
+msgstr "وبگاه"
 
 #: models/pagemodel.py:57
 msgid "moderator state"
-msgstr ""
+msgstr "نظارت وضعیت"
 
 #: models/pagemodel.py:65
 msgid "menu login required"
-msgstr ""
+msgstr "نیاز به ورود برای منو"
 
 #: models/pagemodel.py:65
 msgid "only show this page in the menu if the user is logged in"
-msgstr ""
+msgstr "تنها زمانی این صفحه را نمایش بده که کار به وبگاه وارد شده باشد"
 
 #: models/pagemodel.py:73
 msgid "pages"
-msgstr ""
+msgstr "صفحات"
 
 #: models/pagemodel.py:179
 msgid "Page was copied."
-msgstr ""
+msgstr "صفحه کپی شد."
 
 #: models/pagemodel.py:502
 msgid "default"
-msgstr ""
+msgstr "پیشفرض"
 
 #: models/permissionmodels.py:21
 msgid "can add"
-msgstr ""
+msgstr "می-تواند اضافه کند"
 
 #: models/permissionmodels.py:22
 msgid "can delete"
-msgstr ""
+msgstr "می-تواند حذف کند"
 
 #: models/permissionmodels.py:23
 msgid "can change advanced settings"
-msgstr ""
+msgstr "می-تواند تنظیمات پیشرفته را تغییر دهد"
 
 #: models/permissionmodels.py:25
 msgid "can change permissions"
-msgstr ""
+msgstr "می-تواند اختیارات را تغییر دهد"
 
 #: models/permissionmodels.py:25
 msgid "on page level"
-msgstr ""
+msgstr "در سطح صفحه"
 
 #: models/permissionmodels.py:26
 msgid "can move"
-msgstr ""
+msgstr "می-تواند جابجا کند"
 
 #: models/permissionmodels.py:27
 msgid "can moderate"
-msgstr ""
+msgstr "می-تواند نظارت کند"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
-msgstr ""
+msgstr "می-تواند صفحات را بازیابی کند"
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "می-تواند هر صفحه پاک-شده را بازیابی کند"
 
 #: models/permissionmodels.py:52
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را خواهد داشت."
 
 #: models/permissionmodels.py:52
 msgid "sites"
