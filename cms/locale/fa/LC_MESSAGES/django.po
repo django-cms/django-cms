@@ -709,11 +709,11 @@ msgstr "زمان انقضای صفحه. خالی بماند اگر هیچ گاه
 
 #: models/pagemodel.py:49
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "تمامی اجداد در گردش نمایش داده نمی-شوند."
 
 #: models/pagemodel.py:50
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr ""
+msgstr "شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده می-شود."
 
 #: models/pagemodel.py:52
 msgid "is published"
