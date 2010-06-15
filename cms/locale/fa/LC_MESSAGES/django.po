@@ -701,7 +701,7 @@ msgstr "تغییریافته به وسیله"
 
 #: models/pagemodel.py:46
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
-msgstr ""
+msgstr "زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
 
 #: models/pagemodel.py:47
 msgid "When to expire the page. Leave empty to never expire."
