@@ -1302,34 +1302,34 @@ msgstr ")شما می‌توانید به طور مستقیم روی این صف�
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "Remove delete request"
-msgstr ""
+msgstr "حذف درخواست حذف"
 
 #: templates/admin/cms/page/change_form.html:93
 msgid "Approve delete"
-msgstr ""
+msgstr "تایید حذف"
 
 #: templates/admin/cms/page/change_form.html:93
 msgid "Approve"
-msgstr ""
+msgstr "تایید"
 
 #: templates/admin/cms/page/change_form.html:93
 #: templates/admin/cms/page/change_form.html:94
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
-msgstr ""
+msgstr "پیش‌نویس"
 
 #: templates/admin/cms/page/change_form.html:94
 msgid "Preview"
-msgstr ""
+msgstr "پیش‌نمایش"
 
 #: templates/admin/cms/page/change_form.html:97
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
-msgstr ""
+msgstr "تاریخچه"
 
 #: templates/admin/cms/page/change_form.html:98
 msgid "View on site"
-msgstr ""
+msgstr "مشاهده روی وب‌گاه"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:83
