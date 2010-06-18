@@ -1298,7 +1298,7 @@ msgstr "(نیاز به تایید در سطح %(moderation_level)s)"
 
 #: templates/admin/cms/page/change_form.html:78
 msgid "(you can perform actions on this page directly)"
-msgstr ""
+msgstr ")شما می‌توانید به طور مستقیم روی این صفحه کار انجام دهید("
 
 #: templates/admin/cms/page/change_form.html:91
 msgid "Remove delete request"
