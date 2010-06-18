@@ -1026,7 +1026,6 @@ msgstr "کنار"
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
-#, fuzzy
 msgid "Snippet"
 msgstr "تکه نوشته"
 
@@ -1041,7 +1040,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
+msgstr "الگویی (مانند \"snippets/plugin_xy.html\") را برای ارزیابی وارد کنید."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
