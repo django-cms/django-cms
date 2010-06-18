@@ -1340,17 +1340,17 @@ msgstr[1] ""
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
-msgstr ""
+msgstr "تمامی اختیارات"
 
 #: templates/admin/cms/page/change_form.html:149
 #: templates/admin/cms/page/change_form.html:161
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr ""
+msgstr "در حال بارگذاری"
 
 #: templates/admin/cms/page/change_form.html:160
 msgid "Page states"
-msgstr ""
+msgstr "حالت‌های صفحه"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
