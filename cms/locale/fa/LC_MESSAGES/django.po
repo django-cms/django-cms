@@ -1258,12 +1258,12 @@ msgstr "صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
-msgstr ""
+msgstr "آخرین تغییرات"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "در <a href=\"%(login_url)s\">اینجا</a> به مدیریت وارد شوید."
 
 #: templates/admin/cms/mail/page_user_change.html:7
 msgid "Username:"
