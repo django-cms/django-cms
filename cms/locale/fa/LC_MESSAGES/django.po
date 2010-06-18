@@ -720,9 +720,8 @@ msgid "is published"
 msgstr "منتشرشده"
 
 #: models/pagemodel.py:54
-#, fuzzy
 msgid "The template used to render the content."
-msgstr "الگویی که برای پویش محتوا استفاده می-شود"
+msgstr "الگویی که برای پویش محتوا استفاده می‌شود"
 
 #: models/pagemodel.py:55
 msgid "The site the page is accessible at."
@@ -877,79 +876,79 @@ msgstr "افزونه فلش موجود نیست."
 
 #: plugins/googlemap/cms_plugins.py:9
 msgid "Google Map"
-msgstr ""
+msgstr "نقشه Google"
 
 #: plugins/googlemap/models.py:9
 msgid "map title"
-msgstr ""
+msgstr "عنوان نقشه"
 
 #: plugins/googlemap/models.py:11
 msgid "address"
-msgstr ""
+msgstr "آدرس"
 
 #: plugins/googlemap/models.py:12
 msgid "zip code"
-msgstr ""
+msgstr "کد پستی"
 
 #: plugins/googlemap/models.py:13
 msgid "city"
-msgstr ""
+msgstr "شهر"
 
 #: plugins/googlemap/models.py:15
 msgid "additional content"
-msgstr ""
+msgstr "محتوای بیشتر"
 
 #: plugins/googlemap/models.py:16
 msgid "zoom level"
-msgstr ""
+msgstr "درجه‌ی بزرگ‌نمایی"
 
 #: plugins/googlemap/models.py:18
 msgid "latitude"
-msgstr ""
+msgstr "عرض جغرافیایی"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr ""
+msgstr "برای تنظیم دقیق نقشه از طول و عرض جغرافیایی استفاده کنید."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
-msgstr ""
+msgstr "طول جغرافیایی"
 
 #: plugins/googlemap/models.py:22
 msgid "route planer title"
-msgstr ""
+msgstr "عنوان برنامه‌ریز مسیر"
 
 #: plugins/googlemap/models.py:22
 msgid "Calculate your fastest way to here"
-msgstr ""
+msgstr "سریع‌ترین راه به اینجا را محاسبه کن."
 
 #: plugins/googlemap/models.py:23
 msgid "route planer"
-msgstr ""
+msgstr "برنامه‌ریز مسیر"
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
-msgstr ""
+msgstr "نقشه"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:73
 msgid "Your address"
-msgstr ""
+msgstr "آدرس شما"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:76
 msgid "Calculate route"
-msgstr ""
+msgstr "محاسبه مسیر"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "افزونه‌ها را از صفحه به ارث ببر."
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "زبان صفحه باید مشخص شود."
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. در صورت عدم انتخاب صفحه جاری انتخاب می‌شود."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
