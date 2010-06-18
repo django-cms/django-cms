@@ -1355,7 +1355,7 @@ msgstr "حالت‌های صفحه"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-msgstr ""
+msgstr "این صفحه باید در سطح %(moderation_level)s نظارت شود، پیامی برای ناظر آن بفرستید."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
