@@ -1217,44 +1217,44 @@ msgstr "رنگ button out"
 
 #: plugins/video/models.py:29
 msgid "button over color"
-msgstr ""
+msgstr "رنگ button over"
 
 #: plugins/video/models.py:30
 msgid "button highlight color"
-msgstr ""
+msgstr "رنگ button highlight"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr ""
+msgstr "افزونه فلش نیست. از <a href=\"http://adobe.com/flashplayer\">اینجا</a> بگیرید."
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
 #: templates/admin/cms/page/plugin_change_form.html:111
 msgid "Save"
-msgstr ""
+msgstr "ذخیره"
 
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "حذف ترجمه‌ی %(language)s "
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
-msgstr ""
+msgstr "ذخیره به عنوان جدید"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr ""
+msgstr "ذخیره و اضافه‌کردن دیگری"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:274
 msgid "Save and continue editing"
-msgstr ""
+msgstr "ذخیره و ادامه ویرایش"
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
+msgstr "صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما داشته باشد."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 msgid "Last changes"
