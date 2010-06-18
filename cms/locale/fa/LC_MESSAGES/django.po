@@ -1134,86 +1134,86 @@ msgstr "تعداد ورودی برای نمایش"
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr ""
+msgstr "راهنمایی پیوند"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
+msgstr "در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر نمایش داده می‌شود."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
-msgstr ""
+msgstr "ویدیو"
 
 #: plugins/video/cms_plugins.py:42
 msgid "Color Settings"
-msgstr ""
+msgstr "تنظیمات رنگ"
 
 #: plugins/video/models.py:10
 msgid "movie file"
-msgstr ""
+msgstr "فایل تصویری ویدیو"
 
 #: plugins/video/models.py:10
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "از نوع .flv یا کدگذاری  h264 استفاده کنید"
 
 #: plugins/video/models.py:11
 msgid "movie url"
-msgstr ""
+msgstr "آدرس اینترنتی ویدیو"
 
 #: plugins/video/models.py:11
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
+msgstr "آدرس ویدیو در YouTube یا vimeo. مثال: http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:12
 msgid "preview image file"
-msgstr ""
+msgstr "پیش‌نمایش تصویر"
 
 #: plugins/video/models.py:17
 msgid "auto play"
-msgstr ""
+msgstr "نمایش خودکار"
 
 #: plugins/video/models.py:18
 msgid "auto hide"
-msgstr ""
+msgstr "پنهان‌سازی خودکار"
 
 #: plugins/video/models.py:19
 msgid "fullscreen"
-msgstr ""
+msgstr "تمام‌صفحه"
 
 #: plugins/video/models.py:20
 msgid "loop"
-msgstr ""
+msgstr "نمایش دوباره"
 
 #: plugins/video/models.py:23
 msgid "background color"
-msgstr ""
+msgstr "رنگ زمینه"
 
 #: plugins/video/models.py:23 plugins/video/models.py:24
 #: plugins/video/models.py:25 plugins/video/models.py:26
 #: plugins/video/models.py:27 plugins/video/models.py:28
 #: plugins/video/models.py:29 plugins/video/models.py:30
 msgid "Hexadecimal, eg ff00cc"
-msgstr ""
+msgstr "هگزادسیمال مانند ff00cc"
 
 #: plugins/video/models.py:24
 msgid "text color"
-msgstr ""
+msgstr "رنگ متن"
 
 #: plugins/video/models.py:25
 msgid "seekbar color"
-msgstr ""
+msgstr "رنگ seekbar"
 
 #: plugins/video/models.py:26
 msgid "seekbar bg color"
-msgstr ""
+msgstr "رنگ زمینه seekbar"
 
 #: plugins/video/models.py:27
 msgid "loadingbar color"
-msgstr ""
+msgstr "رنگ نوار بارگذاری"
 
 #: plugins/video/models.py:28
 msgid "button out color"
-msgstr ""
+msgstr "رنگ button out"
 
 #: plugins/video/models.py:29
 msgid "button over color"
