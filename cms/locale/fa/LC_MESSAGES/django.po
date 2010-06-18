@@ -1359,19 +1359,19 @@ msgstr "این صفحه باید در سطح %(moderation_level)s نظارت ش�
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
-msgstr ""
+msgstr "درخواست تایید"
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
-msgstr ""
+msgstr "فهرست صفحات"
 
 #: templates/admin/cms/page/change_list.html:57
 msgid "Successfully moved"
-msgstr ""
+msgstr "با موفقیت جابجا شد"
 
 #: templates/admin/cms/page/change_list.html:62
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "خطایی رخ داد. صفحه با دوباره بارگذاری کنید."
 
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
