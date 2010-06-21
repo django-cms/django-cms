@@ -228,11 +228,12 @@ def language_chooser(context, template=NOT_PROVIDED, i18n_mode='raw'):
     - template: template used to render the language chooser
     """
     if template in MARKERS:
-        i18n_mode = template
+        _tmp = template
         if i18n_mode not in MARKERS:
             template = i18n_mode
         else:
             template = NOT_PROVIDED
+        i18n_mode = _tmp
     if template is NOT_PROVIDED:
         template = "menu/language_chooser.html"
     if not i18n_mode in MARKERS:

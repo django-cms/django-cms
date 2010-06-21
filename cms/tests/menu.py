@@ -172,10 +172,19 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
         
     def test_11_language_chooser(self):
+        # test simple language chooser with default args 
         context = self.get_context(path=self.page3.get_absolute_url())
         new_context = language_chooser(context)
         self.assertEqual(len(new_context['languages']), len(settings.CMS_SITE_LANGUAGES[settings.SITE_ID]))
         self.assertEqual(new_context['current_language'], settings.LANGUAGE_CODE)
+        # try a different template and some different args
+        new_context = language_chooser(context, 'menu/test_language_chooser.html')
+        self.assertEqual(new_context['template'], 'menu/test_language_chooser.html')
+        new_context = language_chooser(context, 'short', 'menu/test_language_chooser.html')
+        self.assertEqual(new_context['template'], 'menu/test_language_chooser.html')
+        for lang in new_context['languages']:
+            self.assertEqual(*lang)
+        
         
     def test_12_page_language_url(self):
         context = self.get_context(path=self.page3.get_absolute_url())
