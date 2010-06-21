@@ -49,6 +49,13 @@ class CMSPlugin(MpttPublisher):
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+        
+    class Meta:
+        app_label = 'cms'
+        
+    class PublisherMeta:
+        exclude_fields = []
+        exclude_fields_append = ['plugin_ptr']
 
     class RenderMeta:
         index = 0
@@ -61,13 +68,6 @@ class CMSPlugin(MpttPublisher):
 
     def __unicode__(self):
         return unicode(self.id)
-        
-    class Meta:
-        app_label = 'cms'
-        
-    class PublisherMeta:
-        exclude_fields = []
-        exclude_fields_append = ['plugin_ptr']
     
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -245,8 +245,9 @@ class CMSPlugin(MpttPublisher):
             return page.has_change_permission(request)
         elif self.placeholder:
             return self.placeholder.has_change_permission(request)
-        else:
+        elif self.parent:
             return self.parent.has_change_permission(request)
+        return False
         
     def is_first_in_placeholder(self):
         return self.position == 0

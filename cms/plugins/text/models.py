@@ -41,7 +41,7 @@ class AbstractText(CMSPlugin):
         for plugin in plugins:
             if not str(plugin.pk) in ids:
                 plugin.delete() #delete plugins that are not referenced in the text anymore
-        
+
     
 class Text(AbstractText):
     """
