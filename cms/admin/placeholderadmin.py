@@ -57,7 +57,7 @@ class PlaceholderAdmin(ModelAdmin):
                             fields.remove(field)
                 fieldset['fields'] = fields
             for placeholder in placeholder_fields:
-                fieldsets += (placeholder.capitalize(), {
+                fieldsets += (self.get_label_for_placeholder(placeholder), {
                         'fields': (placeholder,),
                         'classes': ('plugin-holder', 'plugin-holder-nopage',),
                     },)
@@ -65,12 +65,15 @@ class PlaceholderAdmin(ModelAdmin):
         fieldsets = []
         fieldsets.append((None, {'fields': [f for f in form.base_fields.keys() if not f in placeholder_fields]}))
         for placeholder in placeholder_fields:
-            fieldsets.append((placeholder.capitalize(), {
+            fieldsets.append((self.get_label_for_placeholder(placeholder), {
                 'fields': (placeholder,),
                 'classes': ('plugin-holder', 'plugin-holder-nopage',),
             }))
         fieldsets.append((None, {'fields': list(self.get_readonly_fields(request, obj))}))
         return fieldsets
+    
+    def get_label_for_placeholder(self, placeholder):
+        return ' '.join([x.capitalize() for x in self.model._meta.get_field_by_name(placeholder)[0].verbose_name.split(' ')])
     
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
