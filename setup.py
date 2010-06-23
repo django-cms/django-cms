@@ -38,7 +38,7 @@ setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
     name='django-cms-dev-placeholder',
-    version='2.1.0a-dev48',
+    version='2.1.0a-dev49',
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
     url='http://www.django-cms.org/',
