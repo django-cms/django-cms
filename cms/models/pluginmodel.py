@@ -1,7 +1,7 @@
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from cms.plugin_rendering import PluginContext, PluginRenderer
+from cms.plugin_rendering import apply_plugin_context_processors, PluginRenderer
 from cms.exceptions import DontUsePageAttributeWarning
 from publisher import MpttPublisher
 from django.db import models
@@ -148,7 +148,7 @@ class CMSPlugin(MpttPublisher):
             else:
                 placeholder_slot = placeholder or instance.placeholder.slot
             placeholder = instance.placeholder
-            context = PluginContext(context, instance, placeholder)
+            apply_plugin_context_processors(context, instance, placeholder)
             context = plugin.render(context, instance, placeholder_slot)
             if plugin.render_plugin:
                 template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
