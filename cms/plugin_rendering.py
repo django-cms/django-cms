@@ -3,7 +3,7 @@ from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Template, Context
+from django.template import Template
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.importlib import import_module
@@ -61,21 +61,14 @@ def get_standard_processors(settings_attr):
         _standard_processors[settings_attr] = tuple(processors)
     return _standard_processors[settings_attr]
 
-class PluginContext(Context):
-    """
-    This subclass of template.Context automatically populates itself using
-    the processors defined in CMS_PLUGIN_CONTEXT_PROCESSORS.
-    Additional processors can be specified as a list of callables
-    using the "processors" keyword argument.
-    """
-    def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
-        Context.__init__(self, dict, current_app=current_app)
-        if processors is None:
-            processors = ()
-        else:
-            processors = tuple(processors)
-        for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS + get_standard_processors('CMS_PLUGIN_CONTEXT_PROCESSORS') + processors:
-            self.update(processor(instance, placeholder))
+
+def apply_plugin_context_processors(context, instance, placeholder, processors=None, current_app=None):
+    if processors is None:
+        processors = ()
+    else:
+        processors = tuple(processors)
+    for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS + get_standard_processors('CMS_PLUGIN_CONTEXT_PROCESSORS') + processors:
+        context.update(processor(instance, placeholder))
 
 class PluginRenderer(object):
     """
