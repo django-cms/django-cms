@@ -5,7 +5,8 @@ from cms.plugin_rendering import PluginContext, PluginRenderer
 from cms.exceptions import DontUsePageAttributeWarning
 from publisher import MpttPublisher
 from django.db import models
-from django.db.models.base import ModelBase
+from django.db.models.base import ModelBase, model_unpickle, simple_class_factory
+from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.conf import settings
@@ -18,6 +19,9 @@ class PluginModelBase(ModelBase):
     Metaclass for all plugins.
     """
     def __new__(cls, name, bases, attrs):
+        render_meta = attrs.pop('RenderMeta', None)
+        if render_meta is not None:
+            attrs['_render_meta'] = render_meta()
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
         found = False
         bbases = bases
@@ -62,13 +66,48 @@ class CMSPlugin(MpttPublisher):
         total = 1
         text_enabled = False
 
-    def __init__(self, *args, **kwargs):
-        self._render_meta = self.RenderMeta()
-        super(CMSPlugin, self).__init__(*args, **kwargs)
+    def __reduce__(self):
+        """
+        Provide pickling support. Normally, this just dispatches to Python's
+        standard handling. However, for models with deferred field loading, we
+        need to do things manually, as they're dynamically created classes and
+        only module-level classes can be pickled by the default path.
+        """
+        data = self.__dict__
+        model = self.__class__
+        # The obvious thing to do here is to invoke super().__reduce__()
+        # for the non-deferred case. Don't do that.
+        # On Python 2.4, there is something wierd with __reduce__,
+        # and as a result, the super call will cause an infinite recursion.
+        # See #10547 and #12121.
+        defers = []
+        pk_val = None
+        if self._deferred:
+            factory = deferred_class_factory
+            for field in self._meta.fields:
+                if isinstance(self.__class__.__dict__.get(field.attname),
+                        DeferredAttribute):
+                    defers.append(field.attname)
+                    if pk_val is None:
+                        # The pk_val and model values are the same for all
+                        # DeferredAttribute classes, so we only need to do this
+                        # once.
+                        obj = self.__class__.__dict__[field.attname]
+                        model = obj.model_ref()
+        else:
+            factory = simple_class_factory
+        return (model_unpickle, (model, defers, factory), data)
 
     def __unicode__(self):
         return unicode(self.id)
     
+    class Meta:
+        app_label = 'cms'
+
+    class PublisherMeta:
+        exclude_fields = []
+        exclude_fields_append = ['plugin_ptr']
+
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_plugin(self.plugin_type).name
@@ -265,3 +304,38 @@ class CMSPlugin(MpttPublisher):
         return self.position + 1
 
 reversion_register(CMSPlugin)
+
+def deferred_class_factory(model, attrs):
+    """
+    Returns a class object that is a copy of "model" with the specified "attrs"
+    being replaced with DeferredAttribute objects. The "pk_value" ties the
+    deferred attributes to a particular instance of the model.
+    """
+    class Meta:
+        pass
+    setattr(Meta, "proxy", True)
+    setattr(Meta, "app_label", model._meta.app_label)
+
+    class RenderMeta:
+        pass
+    setattr(RenderMeta, "index", model._render_meta.index)
+    setattr(RenderMeta, "total", model._render_meta.total)
+    setattr(RenderMeta, "text_enabled", model._render_meta.text_enabled)
+
+    # The app_cache wants a unique name for each model, otherwise the new class
+    # won't be created (we get an old one back). Therefore, we generate the
+    # name using the passed in attrs. It's OK to reuse an old case if the attrs
+    # are identical.
+    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
+
+    overrides = dict([(attr, DeferredAttribute(attr, model))
+            for attr in attrs])
+    overrides["Meta"] = RenderMeta
+    overrides["RenderMeta"] = RenderMeta
+    overrides["__module__"] = model.__module__
+    overrides["_deferred"] = True
+    return type(name, (model,), overrides)
+
+# The above function is also used to unpickle model instances with deferred
+# fields.
+deferred_class_factory.__safe_for_unpickling__ = True
