@@ -1,15 +1,13 @@
-from cms.utils import get_language_from_request
 from cms import settings
+from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from django.conf import settings as django_settings
-from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Template, Context
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
-from django.conf import settings
+from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
-import copy
 
 def plugin_meta_context_processor(instance, placeholder):
     return {
@@ -114,16 +112,15 @@ def render_plugins(plugins, context, placeholder, processors=None):
     for index, plugin in enumerate(plugins):
         plugin._render_meta.total = total 
         plugin._render_meta.index = index
-        c.append(plugin.render_plugin(copy.copy(context), placeholder, processors=processors))
+        c.append(plugin.render_plugin(context, placeholder, processors=processors))
     return c
 
-def render_placeholder(placeholder, context_to_copy):
+def render_placeholder(placeholder, context):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the 
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-    context = copy.copy(context_to_copy) 
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
     page = get_page_from_placeholder_if_exists(placeholder)
