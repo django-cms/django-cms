@@ -1740,16 +1740,16 @@ msgstr "نظارت صفحه را لغو کن"
 
 #: templatetags/cms_admin.py:66
 msgid "Unbind children moderation"
-msgstr ""
+msgstr "نظارت فرزندان را لغو کن"
 
 #: templatetags/cms_admin.py:67
 msgid "Unbind descendants moderation"
-msgstr ""
+msgstr "نظارت نوادگان را لغو کن"
 
 #: templatetags/cms_tags.py:401 templatetags/cms_tags.py:674
 #, python-format
 msgid "Reverse ID not found on %(domain)s"
-msgstr ""
+msgstr "شناسه معکوس در %(domain)s یافت نشد."
 
 #: templatetags/cms_tags.py:402
 #, python-format
