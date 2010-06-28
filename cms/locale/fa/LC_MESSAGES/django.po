@@ -1792,7 +1792,7 @@ msgstr "تأیید کردن"
 #: utils/moderator.py:243
 #, python-format
 msgid "CMS - Page %s requires approvement."
-msgstr ""
+msgstr "CMS - صفحه %s نیاز به تأیید دارد."
 
 #: utils/permissions.py:206
 msgid "CMS - your user account was created."
