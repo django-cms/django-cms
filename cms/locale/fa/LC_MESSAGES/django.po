@@ -1385,82 +1385,82 @@ msgstr "اضافه‌کردن %(name)s"
 
 #: templates/admin/cms/page/change_list.html:98
 msgid "Pages on:"
-msgstr ""
+msgstr "صفحات در:"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "Filter:"
-msgstr ""
+msgstr "فیلتر:"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "on"
-msgstr ""
+msgstr "فعال"
 
 #: templates/admin/cms/page/change_list.html:115
 msgid "off"
-msgstr ""
+msgstr "غیر‌فعال"
 
 #: templates/admin/cms/page/change_list.html:117
 msgid "Filter"
-msgstr ""
+msgstr "فیلتر"
 
 #: templates/admin/cms/page/change_list_tree.html:8
 msgid "actions"
-msgstr ""
+msgstr "کارها"
 
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "moderate"
-msgstr ""
+msgstr "نظارت"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr ""
+msgstr "منتشر‌شده"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "start"
-msgstr ""
+msgstr "شروع"
 
 #: templates/admin/cms/page/change_list_tree.html:16
 msgid "end"
-msgstr ""
+msgstr "پایان"
 
 #: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
-msgstr ""
+msgstr "آخرین تغییرات"
 
 #: templates/admin/cms/page/menu_item.html:5
 msgid "select this page"
-msgstr ""
+msgstr "انتخاب این صفحه"
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
 msgid "edit this page"
-msgstr ""
+msgstr "ویرایش این صفحه"
 
 #: templates/admin/cms/page/menu_item.html:6
 #: templates/cms/toolbar/toolbar.html:891
 #: templates/cms/toolbar/toolbar.html:912
 msgid "edit"
-msgstr ""
+msgstr "ویرایش"
 
 #: templates/admin/cms/page/menu_item.html:16
 msgid "insert above"
-msgstr ""
+msgstr "درج در بالا"
 
 #: templates/admin/cms/page/menu_item.html:17
 msgid "insert below"
-msgstr ""
+msgstr "درج در پایین"
 
 #: templates/admin/cms/page/menu_item.html:19
 msgid "insert inside"
-msgstr ""
+msgstr "درج در داخل"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
-msgstr ""
+msgstr "ریشه‌ی نرم"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "home"
-msgstr ""
+msgstr "آغازه"
 
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
