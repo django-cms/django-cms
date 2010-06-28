@@ -1664,79 +1664,79 @@ msgstr "الگو"
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "move"
-msgstr ""
+msgstr "انتقال"
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "Move/add Pages"
-msgstr ""
+msgstr "انتقال/افزودن صفحات"
 
 #: templates/cms/toolbar/toolbar.html:882
 msgid "add child"
-msgstr ""
+msgstr "افزودن فرزند"
 
 #: templates/cms/toolbar/toolbar.html:882
 msgid "Add child page"
-msgstr ""
+msgstr "صفحه‌ی فرزند اضافه‌کن"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "add sibling"
-msgstr ""
+msgstr "افزودن همسایه"
 
 #: templates/cms/toolbar/toolbar.html:883
 msgid "Add sibling page"
-msgstr ""
+msgstr "صفحه‌ی همسایه اضافه‌کن"
 
 #: templates/cms/toolbar/toolbar.html:885
 msgid "Delete Page"
-msgstr ""
+msgstr "صفحه را پاک‌کن"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "Site Administration"
-msgstr ""
+msgstr "مدیریت وب‌گاه"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Page Settings"
-msgstr ""
+msgstr "تنظیمات صفحه"
 
 #: templates/cms/toolbar/toolbar.html:895
 msgid "history"
-msgstr ""
+msgstr "تاریخچه"
 
 #: templates/cms/toolbar/toolbar.html:895
 msgid "View History"
-msgstr ""
+msgstr "مشاهده تاریخچه"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Lock"
-msgstr ""
+msgstr "قفل"
 
 #: templates/cms/toolbar/toolbar.html:901
 msgid "Logout"
-msgstr ""
+msgstr "خروج"
 
 #: templates/cms/toolbar/toolbar.html:903
 msgid "Close"
-msgstr ""
+msgstr "ببند"
 
 #: templates/cms/toolbar/toolbar.html:914
 msgid "up"
-msgstr ""
+msgstr "بالا"
 
 #: templates/cms/toolbar/toolbar.html:915
 msgid "down"
-msgstr ""
+msgstr "پایین"
 
 #: templates/cms/toolbar/toolbar.html:917
 msgid "Settings"
-msgstr ""
+msgstr "تنظیمات"
 
 #: templates/cms/toolbar/toolbar.html:919
 msgid "Delete Plugin"
-msgstr ""
+msgstr "افزونه را پاک‌کن"
 
 #: templatetags/cms_admin.py:65
 msgid "Unbind page moderation"
-msgstr ""
+msgstr "نظارت صفحه را لغو کن"
 
 #: templatetags/cms_admin.py:66
 msgid "Unbind children moderation"
