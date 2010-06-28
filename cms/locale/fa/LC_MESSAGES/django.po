@@ -1757,6 +1757,8 @@ msgid ""
 "A page_id_url template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
+"الگوی تگ page_id_url صفحه‌ای با شناسه‌ی معکوس %(reverse_id)s\n"
+" آدرس صفحه: http://%(host)s%(path)s"
 
 #: templatetags/cms_tags.py:675
 #, python-format
