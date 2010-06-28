@@ -1550,36 +1550,36 @@ msgstr "می‌تواند منتشر کند"
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "می‌تواند اختیارات را تغییر‌دهد"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "می‌تواند انتقال دهد"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
 msgid "(global)"
-msgstr ""
+msgstr ")سراسری("
 
 #: templates/admin/cms/page/permissions.html:25
 msgid "(current)"
-msgstr ""
+msgstr ")جاری("
 
 #: templates/admin/cms/page/permissions.html:41
 msgid "All"
-msgstr ""
+msgstr "همه"
 
 #: templates/admin/cms/page/permissions.html:49
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "صفحه اختیاراتی به ارث نمی‌برد."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+msgstr "نمی‌توان نگارش قدیمی یک افزونه را ذخیره کرد."
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 msgid "Plugin saved successfully."
-msgstr ""
+msgstr "افزونه با موفقیت ذخیره‌شد."
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
