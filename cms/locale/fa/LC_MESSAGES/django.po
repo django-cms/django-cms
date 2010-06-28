@@ -1376,7 +1376,7 @@ msgstr "خطایی رخ داد. صفحه با دوباره بارگذاری کن
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "%(name)s پاک‌شده را بازیابی کن"
 
 #: templates/admin/cms/page/change_list.html:86
 #, python-format
