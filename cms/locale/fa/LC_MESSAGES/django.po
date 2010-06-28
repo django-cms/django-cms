@@ -1584,83 +1584,83 @@ msgstr "افزونه با موفقیت ذخیره‌شد."
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "%(verbose_name)s پاک‌شده را بازیابی کن."
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "دکمه‌ی ذخیره در زیر را بزنید تا این نگارش این شی بازیابی شود."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "برگشت %(verbose_name)s "
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
+msgstr "دکمه‌ی ذخیره در زیر را بزنید تا این نگارش این شی برگشت داده‌شود."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "تنظیمات کپی"
 
 #: templates/admin/cms/page/dialog/copy.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "تنظیمات کپی را انتخاب کنید"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:10
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr ""
+msgstr "اضافه‌کردن افزونه"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:14
 msgid "From Language"
-msgstr ""
+msgstr "از زبان"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:21
 msgid "Copy Plugins"
-msgstr ""
+msgstr "کپی افزونه‌ها"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:10
 msgid "You must save the page first to add plugins."
-msgstr ""
+msgstr "برای ذخیره‌ی افزونه، ابتدا صفحه را ذخیره کنید."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:13
 msgid "No Plugin selected. Selected one on the left side"
-msgstr ""
+msgstr "افزونه‌ای انتخاب نشده‌است. مورد انتخاب‌شده در سمت چپ"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
+msgstr "افزونه‌ای موجود نیست. افزونه‌ای به این نگهدارنده اضافه کنید."
 
 #: templates/cms/toolbar/toolbar.html:760
 #, python-format
 msgid "Move to %(name)s"
-msgstr ""
+msgstr "انتقال به %(name)s"
 
 #: templates/cms/toolbar/toolbar.html:806
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "آیا شما مطمئن هستید می‌خواهید این افزونه را پاک کنید؟"
 
 #: templates/cms/toolbar/toolbar.html:835
 msgid "Edit mode"
-msgstr ""
+msgstr "حالت ویرایش"
 
 #: templates/cms/toolbar/toolbar.html:842
 msgid "Status"
-msgstr ""
+msgstr "وضعیت"
 
 #: templates/cms/toolbar/toolbar.html:853
 msgid "Username"
-msgstr ""
+msgstr "کاربر"
 
 #: templates/cms/toolbar/toolbar.html:857
 #: templates/cms/toolbar/toolbar.html:858
 msgid "login"
-msgstr ""
+msgstr "ورود"
 
 #: templates/cms/toolbar/toolbar.html:869
 msgid "Template"
-msgstr ""
+msgstr "الگو"
 
 #: templates/cms/toolbar/toolbar.html:880
 msgid "move"
