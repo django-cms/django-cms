@@ -1465,7 +1465,7 @@ msgstr "آغازه"
 #: templates/admin/cms/page/menu_item.html:26
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "ویرایش این صفحه به %(language)s"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
