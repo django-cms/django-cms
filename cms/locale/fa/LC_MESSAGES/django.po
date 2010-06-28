@@ -1800,4 +1800,4 @@ msgstr "CMS - کاربر شما ساخته‌شد."
 
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - حساب کاربری شما تغییر کرد."
