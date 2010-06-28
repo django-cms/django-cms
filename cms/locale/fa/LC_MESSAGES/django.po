@@ -1796,7 +1796,7 @@ msgstr "CMS - صفحه %s نیاز به تأیید دارد."
 
 #: utils/permissions.py:206
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - کاربر شما ساخته‌شد."
 
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
