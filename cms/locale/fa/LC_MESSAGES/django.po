@@ -1766,6 +1766,8 @@ msgid ""
 "A show_placeholder_by_id template tag didn't found a page with the reverse_id %(reverse_id)s\n"
 "The url of the page was: http://%(host)s%(path)s"
 msgstr ""
+"تگ الگوی show_placeholder_by_id صفحه‌ای با شناسه‌ی معکوس %(reverse_id)s نیافت\n"
+"آدرس صفحه: http://%(host)s%(path)s"
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
