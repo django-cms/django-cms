@@ -1771,23 +1771,23 @@ msgstr ""
 
 #: tests/util/menu_extender.py:7
 msgid "Sublevel"
-msgstr ""
+msgstr "زیر‌سطح"
 
 #: tests/util/menu_extender.py:8
 msgid "Sublevel3"
-msgstr ""
+msgstr "زیر‌سطح ۳"
 
 #: tests/util/menu_extender.py:11
 msgid "Sublevel 2"
-msgstr ""
+msgstr "زیر‌سطح ۲"
 
 #: utils/moderator.py:84
 msgid "parent first"
-msgstr ""
+msgstr "ابتدا پدر"
 
 #: utils/moderator.py:91
 msgid "approve"
-msgstr ""
+msgstr "تأیید کردن"
 
 #: utils/moderator.py:243
 #, python-format
