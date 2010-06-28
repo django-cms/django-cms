@@ -1381,7 +1381,7 @@ msgstr ""
 #: templates/admin/cms/page/change_list.html:86
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "اضافه‌کردن %(name)s"
 
 #: templates/admin/cms/page/change_list.html:98
 msgid "Pages on:"
