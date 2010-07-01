@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy  as _
 from django.core.exceptions import ImproperlyConfigured
-
+from warnings import warn
 
 def pre_patch():
     """Patch settings befere adding global cms defaults
@@ -47,4 +47,7 @@ def post_patch_check():
         raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
             'Please put it into your MIDDLEWARE_CLASSES in settings file')
     if 'cms.middleware.media.PlaceholderMediaMiddleware' not in settings.MIDDLEWARE_CLASSES:
-        raise ImproperlyConfigured("CMS requires cms.middleware.media.PlaceholderMediaMiddleware to be in MIDDLEWARE_CLASSES.")
+        warn("The 'cms.middleware.media.PlaceholderMediaMiddleware' is not in "
+             "your MIDDLEWARE_CLASSES setting, it's your own responsiblity to "
+             "ensure all javascript and css files required by the plugins you "
+             "use are available to them.", Warning)
