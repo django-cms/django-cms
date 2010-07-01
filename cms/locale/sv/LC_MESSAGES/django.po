@@ -14,6 +14,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Language: Swedish\n"
 "X-Poedit-Country: SWEDEN\n"
 
@@ -1078,7 +1079,7 @@ msgstr "sida"
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
-msgstr "Snippet"
+msgstr "Kodstycke"
 
 #: plugins/snippet/cms_plugins.py:30
 #, python-format
@@ -1097,7 +1098,7 @@ msgstr ""
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
-msgstr "Snippets"
+msgstr "Kodstycken"
 
 #: plugins/teaser/cms_plugins.py:9
 msgid "Teaser"
@@ -1414,7 +1415,6 @@ msgstr "Visa på sajt"
 
 #: templates/admin/cms/page/change_form.html:128
 #: templates/admin/cms/page/plugin_change_form.html:84
-#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Rätta till nedanstående fel."
