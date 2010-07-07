@@ -58,9 +58,9 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         # this is bit tricky, since i don't wont override add_view and 
         # change_view 
         class FakeForm(object):
-            def __init__(self, Form, site):
+            def __init__(self, Form, page):
                 self.Form = Form
-                self.site = site
+                self.page = page
                 
                 # base fields are required to be in this fake class, this may
                 # do some troubles, with new versions of django, if there will
@@ -71,9 +71,11 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
                 # instanciate the form on call
                 form = self.Form(*args, **kwargs)
                 # tell form we are on this site
-                form.for_site(self.site)
+                form.for_site(self.page.site)
+                # exclude this page from the form
+                form.exclude_page(self.page)
                 return form
-            
-        return FakeForm(Form, self.cms_plugin_instance.page.site or self.page.site)
+
+        return FakeForm(Form, self.cms_plugin_instance.page or self.page)
 
 plugin_pool.register_plugin(InheritPagePlaceholderPlugin)
