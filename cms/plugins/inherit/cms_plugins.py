@@ -39,7 +39,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         if not instance.page.publisher_is_draft and page.publisher_is_draft:
             page = page.publisher_public
             
-        plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder, parent__isnull=True).order_by('position').select_related()
+        plugins = get_cmsplugin_queryset(request).filter(placeholder__page=page, language=lang, placeholder__slot__iexact=placeholder, parent__isnull=True).order_by('position').select_related()
         plugin_output = []
         template_vars['parent_plugins'] = plugins 
         for plg in plugins:
