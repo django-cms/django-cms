@@ -100,8 +100,8 @@
             <ul id="cms_toolbar_page_menu" class="cms_toolbar_submenu">                
                 <li class="first"><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
                 {% if has_add_page_permission %}
-                <li><a href="{% url admin:cms_page_add %}?target={{ page.pk }}&position=last-child"><span class="cms_toolbar_icon_add_child">{% trans "add child" %}</span>{% trans "Add child page" %}</a></li>
-                <li><a href="{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&position=last-child{% endif %}"><span class="cms_toolbar_icon_add_sibling">{% trans "add sibling" %}</span>{% trans "Add sibling page" %}</a></li>
+                <li><a href="{% url admin:cms_page_add %}?target={{ page.pk }}&amp;position=last-child"><span class="cms_toolbar_icon_add_child">{% trans "add child" %}</span>{% trans "Add child page" %}</a></li>
+                <li><a href="{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&amp;position=last-child{% endif %}"><span class="cms_toolbar_icon_add_sibling">{% trans "add sibling" %}</span>{% trans "Add sibling page" %}</a></li>
                 {% endif %}
                 {% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
             </ul>
