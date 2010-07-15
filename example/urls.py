@@ -1,6 +1,7 @@
-from django.conf.urls.defaults import *
-from django.contrib import admin
 from django.conf import settings
+from django.conf.urls.defaults import handler500, handler404, patterns, include, \
+    url
+from django.contrib import admin
 
 admin.autodiscover()
 
