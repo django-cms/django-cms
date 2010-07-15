@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<testsuite errors="0" failures="0" name="cms.tests.navextender.NavExtenderTestCase" tests="5" time="0.003">
+	<testcase classname="cms.tests.navextender.NavExtenderTestCase" name="test_01_menu_registration" time="0.001"/>
+	<testcase classname="cms.tests.navextender.NavExtenderTestCase" name="test_02_extenders_on_root" time="0.001"/>
+	<testcase classname="cms.tests.navextender.NavExtenderTestCase" name="test_03_extenders_on_root_child" time="0.001"/>
+	<testcase classname="cms.tests.navextender.NavExtenderTestCase" name="test_04_extenders_on_child" time="0.001"/>
+	<testcase classname="cms.tests.navextender.NavExtenderTestCase" name="test_05_incorrect_nav_extender_in_db" time="0.001"/>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[/home/jonas/workspace/django-cms/cms/models/pluginmodel.py:176: DontUsePageAttributeWarning: Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!
+  DontUsePageAttributeWarning)
+/home/jonas/workspace/_shared_eggs/unittest_xml_reporting-1.0.3-py2.6.egg/xmlrunner/__init__.py:220: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+  failure.setAttribute('message', test_result.err[1].message)
+]]>	</system-err>
+</testsuite>

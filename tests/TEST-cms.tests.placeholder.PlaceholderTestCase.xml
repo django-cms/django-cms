@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<testsuite errors="0" failures="0" name="cms.tests.placeholder.PlaceholderTestCase" tests="8" time="0.004">
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_01_placeholder_scanning_extend" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_02_placeholder_scanning_include" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_03_placeholder_scanning_double_extend" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_04_placeholder_scanning_complex" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_05_placeholder_scanning_super" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_06_placeholder_scanning_nested" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_07_placeholder_scanning_duplicate" time="0.001"/>
+	<testcase classname="cms.tests.placeholder.PlaceholderTestCase" name="test_08_placeholder_scanning_extend_outside_block" time="0.001"/>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[/home/jonas/workspace/django-cms/cms/models/pluginmodel.py:176: DontUsePageAttributeWarning: Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!
+  DontUsePageAttributeWarning)
+/home/jonas/workspace/_shared_eggs/unittest_xml_reporting-1.0.3-py2.6.egg/xmlrunner/__init__.py:220: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+  failure.setAttribute('message', test_result.err[1].message)
+]]>	</system-err>
+</testsuite>

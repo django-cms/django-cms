@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<testsuite errors="0" failures="0" name="cms.tests.menu.MenusTestCase" tests="18" time="0.009">
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_01_basic_cms_menu" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_02_show_menu" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_03_only_active_tree" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_04_only_one_active_level" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_05_only_level_zero" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_06_only_level_one" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_07_only_level_one_active" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_08_level_zero_and_one" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_09_show_submenu" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_10_show_breadcrumb" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_11_language_chooser" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_12_page_language_url" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_13_show_menu_below_id" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_14_unpublished" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_15_empty_menu" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_15_home_not_in_menu" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_16_softroot" time="0.001"/>
+	<testcase classname="cms.tests.menu.MenusTestCase" name="test_17_show_submenu_from_non_menu_page" time="0.001"/>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[/home/jonas/workspace/django-cms/cms/models/pluginmodel.py:176: DontUsePageAttributeWarning: Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!
+  DontUsePageAttributeWarning)
+/home/jonas/workspace/_shared_eggs/unittest_xml_reporting-1.0.3-py2.6.egg/xmlrunner/__init__.py:220: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+  failure.setAttribute('message', test_result.err[1].message)
+]]>	</system-err>
+</testsuite>

@@ -18,16 +18,15 @@ from cms.tests.placeholder import PlaceholderTestCase
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
 settings.CMS_NAVIGATION_EXTENDERS = (
-    ('example.categories.navigation.get_nodes', 'Categories'),
-    ('example.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+    ('testapp.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
 )
 
 settings.CMS_FLAT_URLS = False
 settings.CMS_MENU_TITLE_OVERWRITE = True
 settings.CMS_HIDE_UNTRANSLATED = False
 settings.CMS_URL_OVERWRITE = True
-if not "example.sampleapp" in settings.INSTALLED_APPS:
-    settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ["example.sampleapp"]
+if not "testapp.sampleapp" in settings.INSTALLED_APPS:
+    settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ["testapp.sampleapp"]
 
 def suite():
     s = unittest.TestSuite()

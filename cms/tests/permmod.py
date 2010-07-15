@@ -662,4 +662,4 @@ class PermissionModeratorTestCase(CMSTestCase):
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         self.publish_page(page, True, self.user_super, True)
-        #self.assertEqual(CMSPlugin.objects.all().count(), 2)
+        self.assertEqual(CMSPlugin.objects.all().count(), 2)
