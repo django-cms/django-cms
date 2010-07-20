@@ -1,5 +1,6 @@
 from django.conf import settings
 from menus.exceptions import NamespaceAllreadyRegistered
+from menus import settings as menus_settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.utils.translation import get_language
