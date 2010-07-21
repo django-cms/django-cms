@@ -663,7 +663,7 @@ class Page(MpttPublisher):
             # retrieve the public page
             public = self.get_public_object()
             
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
 
             # if we already have a public page we need to delete it and copy the draft in it's place
             if public:
