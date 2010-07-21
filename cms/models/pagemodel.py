@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import lazy
-from publisher import MpttPublisher
+from publisher import MpttPublisher, Publisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
@@ -210,6 +210,7 @@ class Page(MpttPublisher):
                     p.copy_plugin(ph, p.language, ptree)
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
+        return page
     
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
@@ -624,6 +625,12 @@ class Page(MpttPublisher):
         """
         return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
     
+    def get_draft_object(self):
+        return self
+        
+    def get_public_object(self):
+        return self.publisher_public
+        
     def publish(self):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible. 
@@ -632,19 +639,56 @@ class Page(MpttPublisher):
         
         Returns: True if page was successfully published.
         """
-        if not settings.CMS_MODERATOR:
+        
+        # Publish can only be called on moderated and draft pages
+        if not settings.CMS_MODERATOR or not self.publisher_is_draft:
             return
         
         # publish, but only if all parents are published!!
         published = None
         
         try:
-            published = super(Page, self).publish()
+            #published = super(Page, self).publish() # no need to publish using publisher - instead we'll override
+            
+            # New Publisher Implementation
+            # When we are publishing a draft page, we either create or overwrite the existing public page
+            
+            # assert self.pk is not None, "Can publish only saved instance, save it first."
+# Validate that this is really required!
+            if not self.pk:
+                self.save()
+            
+            if not self._publisher_can_publish():
+                raise PublisherCantPublish
+            
+            ########################################################################
+            # Publish Public Page
+            public = self.get_public_object()
+            
+            #import pdb; pdb.set_trace()
+
+            # if we already have a public page we need to delete it and copy the draft in it's place
+            if public:
+                public.delete()
+                
+            # we copy the draft page to public and set the publishing states
+            public = self.copy_page(target=None, position=1, site=self.site)
+            
+            # we have to fix the slug - maybe we should provide a new param to copy_page 
+            
+            self.published = True
+            self.publisher_public = public
+            self.publisher_is_draft = False
+            # reset the publisher states
+            self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
+            self._publisher_keep_state = True
+            published = True
+                
             self.moderator_state = Page.MODERATOR_APPROVED
         except PublisherCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
             
-        self.save(change_state=False)
+        self.save()
         if not published:
             # was not published, escape
             return

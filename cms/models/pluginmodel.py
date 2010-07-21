@@ -4,6 +4,7 @@ from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from cms.plugin_rendering import PluginContext, PluginRenderer
 from cms.exceptions import DontUsePageAttributeWarning
 from publisher import MpttPublisher
+from publisher.mptt_support import Mptt
 from django.db import models
 from django.db.models.base import ModelBase, model_unpickle, simple_class_factory
 from django.db.models.query_utils import DeferredAttribute
@@ -39,7 +40,7 @@ class PluginModelBase(ModelBase):
         return new_class 
          
     
-class CMSPlugin(MpttPublisher):
+class CMSPlugin(Mptt):
     __metaclass__ = PluginModelBase
     
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
@@ -100,13 +101,6 @@ class CMSPlugin(MpttPublisher):
 
     def __unicode__(self):
         return unicode(self.id)
-    
-    class Meta:
-        app_label = 'cms'
-
-    class PublisherMeta:
-        exclude_fields = []
-        exclude_fields_append = ['plugin_ptr']
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
