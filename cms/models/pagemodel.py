@@ -111,15 +111,18 @@ class Page(MpttPublisher):
         check_title_slugs(self)
         
         
-    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True):
+    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, copy_descendants=True):
         """
-        copy a page and all its descendants to a new location
-        
+        copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
         """
         from cms.utils.moderator import update_moderation_message
         
-        descendants = [self] + list(self.get_descendants().order_by('-rght'))
+        pages = [self] 
+        
+        if copy_descendants:
+            pages.append(list(self.get_descendants().order_by('-rght')))
+            
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
         if target:
             target.old_pk = -1
@@ -135,7 +138,7 @@ class Page(MpttPublisher):
             tree[0].old_pk = tree[0].pk
         first = True
         # loop over all affected pages (self is included in descendants)
-        for page in descendants:
+        for page in pages:
             titles = list(page.title_set.all())
             # get all current placeholders (->plugins)
             placeholders = list(page.placeholders.all())
@@ -210,7 +213,7 @@ class Page(MpttPublisher):
                     p.copy_plugin(ph, p.language, ptree)
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return page
+        return pages[0]   # return the original page (self)
     
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
@@ -648,11 +651,6 @@ class Page(MpttPublisher):
         published = None
         
         try:
-            #published = super(Page, self).publish() # no need to publish using publisher - instead we'll override
-            
-            # New Publisher Implementation
-            # When we are publishing a draft page, we either create or overwrite the existing public page
-            
             # assert self.pk is not None, "Can publish only saved instance, save it first."
 # Validate that this is really required!
             if not self.pk:
@@ -662,17 +660,17 @@ class Page(MpttPublisher):
                 raise PublisherCantPublish
             
             ########################################################################
-            # Publish Public Page
+            # retrieve the public page
             public = self.get_public_object()
             
-            #import pdb; pdb.set_trace()
+            import pdb; pdb.set_trace()
 
             # if we already have a public page we need to delete it and copy the draft in it's place
             if public:
                 public.delete()
                 
             # we copy the draft page to public and set the publishing states
-            public = self.copy_page(target=None, position=1, site=self.site)
+            public = self.copy_page(target=None, position=1, site=self.site, copy_descendants=False)
             
             # we have to fix the slug - maybe we should provide a new param to copy_page 
             
@@ -688,7 +686,7 @@ class Page(MpttPublisher):
         except PublisherCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
             
-        self.save()
+        self.save(change_state=False)
         if not published:
             # was not published, escape
             return
