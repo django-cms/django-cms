@@ -688,19 +688,15 @@ class Page(MpttPublisher):
                 public.delete()
                 
             # we copy the draft page to public and set the publishing states
-            public = self.copy_page(target=None, position=1, site=self.site, public_copy=True)
+            public = self.copy_page(target=None, site=self.site, position=1, copy_moderation=False, copy_permissions=False, public_copy=True)
             
             self.published = True
             self.publisher_public = public
-            
-    # we also need to set the publish date (publication_date)
-            
-            # reset the publisher states
+            self.moderator_state = Page.MODERATOR_APPROVED
             self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
             self._publisher_keep_state = True
             published = True
-                
-            self.moderator_state = Page.MODERATOR_APPROVED
+            
         except PublisherCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
             
