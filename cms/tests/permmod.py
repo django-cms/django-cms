@@ -329,8 +329,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         response = self.client.post(url, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         # public model shouldn't be available yet, because of the moderation
-        self.assertObjectExist(Title.objects, slug=page_data['slug'])
-        self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
+        # removed test cases since Title object does not inherit from Publisher anymore
+        #self.assertObjectExist(Title.objects, slug=page_data['slug'])
+        #self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
         # page created?
         page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=page_data['slug'])

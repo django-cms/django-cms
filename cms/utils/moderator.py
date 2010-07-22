@@ -34,18 +34,9 @@ def page_changed(page, old_page=None, force_moderation_action=None):
         # see the last message
         mail_approvement_request(page, user)
 
-    # TODO: if page was changed, remove all approvements from hiher instances,
-    # but keep approvements by lover instances, if there are some
+    # TODO: if page was changed, remove all approvements from higher instances,
+    # but keep approvements by lower instances, if there are any
 
-
-def create_draft_copy(public_page):
-    """
-        Helper method defined to aid in the creation of a draft page 
-        Called from the change_page signal when a page has been saved if CMSModeration is enabled and no draft already exists
-        
-        This method is responsible for creating the draft page and copying all placeholders and plugins from the public page
-    """
-    pass
 
 def update_moderation_message(page, message):
     """This is bit special.. It updates last page state made from current user
@@ -213,7 +204,7 @@ def get_model_queryset(model, request=None):
 
 # queryset helpers for basic models
 get_page_queryset = lambda request=None: get_model_queryset(Page, request) 
-get_title_queryset = lambda request=None: get_model_queryset(Title, request)
+get_title_queryset = lambda request=None: Title.objects.all()   # not sure if we need to only grab public items here
 get_cmsplugin_queryset = lambda request=None: CMSPlugin.objects.all()   # CMSPlugin is no longer extending from Publisher
 
 

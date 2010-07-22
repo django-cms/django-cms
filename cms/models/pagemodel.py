@@ -111,17 +111,21 @@ class Page(MpttPublisher):
         check_title_slugs(self)
         
         
-    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, copy_descendants=True):
+    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, public_copy=False):
         """
         copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
+        
+        Note: public_copy was added in order to enable the creation of a copy for creating the public page during
+        the publish operation as it sets the publisher_is_draft=False.
         """
         from cms.utils.moderator import update_moderation_message
+        import copy
         
-        pages = [self] 
-        
-        if copy_descendants:
-            pages.append(list(self.get_descendants().order_by('-rght')))
+        if public_copy:
+            pages = [copy.copy(self)] # copy self so that it doesn't affect original obj when we return pages[0] to the publish method!
+        else:
+            pages = [self] + list(self.get_descendants().order_by('-rght'))
             
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
         if target:
@@ -176,6 +180,13 @@ class Page(MpttPublisher):
                     page.parent = None
             tree.append(page)
             page.site = site
+            
+            # override default page settings specific for public copy
+            if public_copy:
+                page.published = True
+                page.publisher_is_draft=False
+                page.publisher_status = Page.MODERATOR_APPROVED
+                
             page.save()
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
@@ -191,13 +202,20 @@ class Page(MpttPublisher):
                     moderator.page = page
                     moderator.save()
             update_moderation_message(page, unicode(_('Page was copied.')))
+            
             # copy titles of this page
             for title in titles:
                 title.pk = None # setting pk = None creates a new instance
                 title.publisher_public_id = None
                 title.published = False
                 title.page = page
-                title.slug = get_available_slug(title)
+                
+                # override default title settings specific for public copy
+                if public_copy:
+                    title.slug = title.slug
+                else:
+                    title.slug = get_available_slug(title)
+                    
                 title.save()
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
@@ -662,21 +680,21 @@ class Page(MpttPublisher):
             ########################################################################
             # retrieve the public page
             public = self.get_public_object()
-            
-            #import pdb; pdb.set_trace()
 
             # if we already have a public page we need to delete it and copy the draft in it's place
+            # we'll implement a reversion transacton block around these methods in a future release so that
+            # we can easily revert to the last version
             if public:
                 public.delete()
                 
             # we copy the draft page to public and set the publishing states
-            public = self.copy_page(target=None, position=1, site=self.site, copy_descendants=False)
-            
-            # we have to fix the slug - maybe we should provide a new param to copy_page 
+            public = self.copy_page(target=None, position=1, site=self.site, public_copy=True)
             
             self.published = True
             self.publisher_public = public
-            self.publisher_is_draft = False
+            
+    # we also need to set the publish date (publication_date)
+            
             # reset the publisher states
             self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
             self._publisher_keep_state = True
