@@ -176,6 +176,9 @@ def approve_page(request, page):
     will be `copied` to public model, page states log will be cleaned.  
     
     """
+    
+    import pdb; pdb.set_trace()
+    
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
     if not moderator_should_approve(request, page):
         # escape soon if there isn't any approvement required by this user
