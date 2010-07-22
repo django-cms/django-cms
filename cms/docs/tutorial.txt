@@ -44,14 +44,14 @@ Unzip the downloaded file into the "dist-packages" directory...you will need to 
 
 Make copies of the following directories like so::
 
-	sudo cp -R digi604-django-cms-2.0-c0288a1/cms/ cms
-	sudo cp -R digi604-django-cms-2.0-c0288a1/mptt/ mptt
-	sudo cp -R digi604-django-cms-2.0-c0288a1/publisher/ publisher
+	sudo cp -R divio-django-cms-c0288a1/cms/ cms
+	sudo cp -R divio-django-cms-c0288a1/mptt/ mptt
+	sudo cp -R divio-django-cms-c0288a1/publisher/ publisher
 
 Do a bit of house cleaning to get rid of all the files you don't need::
 
-	sudo rm -rf digi604-django-cms-2.0-c0288a1.zip
-	sudo rm -rf digi604-django-cms-2.0-c0288a1/
+	sudo rm -rf divio-django-cms-c0288a1.zip
+	sudo rm -rf divio-django-cms-c0288a1/
 
 Head back to the project you created previously::
 
