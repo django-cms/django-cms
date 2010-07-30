@@ -177,7 +177,7 @@ def approve_page(request, page):
     
     """
     
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
     if not moderator_should_approve(request, page):
