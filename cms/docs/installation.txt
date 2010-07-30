@@ -162,7 +162,7 @@ Other settings
 
 For a list of all settings that can be overridden in your ``settings.py`` file have a look at ``cms/conf/global_settings.py``.
 
-More information is available in the docs folder: `cms/docs/ <http://github.com/digi604/django-cms-2.0/tree/master/cms/docs>`_
+More information is available in the docs folder: `cms/docs/ <http://github.com/divio/django-cms/tree/master/cms/docs>`_
 You may also want to have a look at the example project to see what settings it uses.
 
 Media Files

@@ -43,7 +43,7 @@ Installation instructions can be found [here](http://www.django-cms.org/en/docum
 Sourcecode
 ----------
 
-Can be found [here](http://github.com/digi604/django-cms-2.0/) on github.
+Can be found [here](http://github.com/divio/django-cms/) on github.
 
 Help
 ----
