@@ -2,49 +2,13 @@
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.tests.base import CMSTestCase
 from cms.utils.plugins import get_placeholders
-from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth.models import User
-import sys
-import warnings
-
-class _Warning(object):
-    def __init__(self, message, category, filename, lineno):
-        self.message = message
-        self.category = category
-        self.filename = filename
-        self.lineno = lineno
-
-
-
-def _collectWarnings(observeWarning, f, *args, **kwargs):
-    def showWarning(message, category, filename, lineno, file=None, line=None):
-        assert isinstance(message, Warning)
-        observeWarning(_Warning(
-                message.args[0], category, filename, lineno))
-
-    # Disable the per-module cache for every module otherwise if the warning
-    # which the caller is expecting us to collect was already emitted it won't
-    # be re-emitted by the call to f which happens below.
-    for v in sys.modules.itervalues():
-        if v is not None:
-            try:
-                v.__warningregistry__ = None
-            except:
-                # Don't specify a particular exception type to handle in case
-                # some wacky object raises some wacky exception in response to
-                # the setattr attempt.
-                pass
-
-    origFilters = warnings.filters[:]
-    origShow = warnings.showwarning
-    warnings.simplefilter('always')
-    try:
-        warnings.showwarning = showWarning
-        result = f(*args, **kwargs)
-    finally:
-        warnings.filters[:] = origFilters
-        warnings.showwarning = origShow
-    return result
+from django.core.urlresolvers import reverse
+from testapp.placeholderapp.admin import Example1Admin, Example2Admin, \
+    Example3Admin, Example4Admin, Example5Admin
+from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
+    Example5
 
 
 class PlaceholderTestCase(CMSTestCase):
@@ -87,7 +51,7 @@ class PlaceholderTestCase(CMSTestCase):
         placeholders = get_placeholders('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
     
-    def test_09_fieldsets_(self):
+    def test_09_fieldsets_requests(self):
         response = self.client.get(reverse('admin:placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('admin:placeholderapp_example2_add'))
@@ -99,20 +63,20 @@ class PlaceholderTestCase(CMSTestCase):
         response = self.client.get(reverse('admin:placeholderapp_example5_add'))
         self.assertEqual(response.status_code, 200)
         
-        
-    def failUnlessWarns(self, category, message, f, *args, **kwargs):
-        warningsShown = []
-        result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
-
-        if not warningsShown:
-            self.fail("No warnings emitted")
-        first = warningsShown[0]
-        for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
-                self.fail("Can't handle different warnings")
-        self.assertEqual(first.message, message)
-        self.assertTrue(first.category is category)
-
-        return result
-    assertWarns = failUnlessWarns
+    def test_10_fieldsets(self):
+        request = self.get_request('/')
+        example1_admin = Example1Admin(Example1, admin.site)
+        fieldsets = example1_admin.get_fieldsets(request)
+        self.assertEqual(len(fieldsets),3)
+        example2_admin = Example1Admin(Example2, admin.site)
+        fieldsets = example2_admin.get_fieldsets(request)
+        self.assertEqual(len(fieldsets),3)
+        example3_admin = Example1Admin(Example3, admin.site)
+        fieldsets = example3_admin.get_fieldsets(request)
+        self.assertEqual(len(fieldsets),3)
+        example4_admin = Example1Admin(Example4, admin.site)
+        fieldsets = example4_admin.get_fieldsets(request)
+        self.assertEqual(len(fieldsets),3)
+        example5_admin = Example1Admin(Example5, admin.site)
+        fieldsets = example5_admin.get_fieldsets(request)
+        self.assertEqual(len(fieldsets), 4)

@@ -1,17 +1,57 @@
-from django.contrib.auth.models import User
-from django.core.handlers.wsgi import WSGIRequest
-import copy
-from django.conf import settings
-from django.test.testcases import TestCase
-from django.core.exceptions import ObjectDoesNotExist
-from django.template.defaultfilters import slugify
 from cms.models import Title, Page
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.handlers.wsgi import WSGIRequest
+from django.template.defaultfilters import slugify
+from django.test.testcases import TestCase
+import copy
+import sys
+import warnings
 
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
 URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 
 URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
 URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
+
+class _Warning(object):
+    def __init__(self, message, category, filename, lineno):
+        self.message = message
+        self.category = category
+        self.filename = filename
+        self.lineno = lineno
+
+
+
+def _collectWarnings(observeWarning, f, *args, **kwargs):
+    def showWarning(message, category, filename, lineno, file=None, line=None):
+        assert isinstance(message, Warning)
+        observeWarning(_Warning(
+                message.args[0], category, filename, lineno))
+
+    # Disable the per-module cache for every module otherwise if the warning
+    # which the caller is expecting us to collect was already emitted it won't
+    # be re-emitted by the call to f which happens below.
+    for v in sys.modules.itervalues():
+        if v is not None:
+            try:
+                v.__warningregistry__ = None
+            except:
+                # Don't specify a particular exception type to handle in case
+                # some wacky object raises some wacky exception in response to
+                # the setattr attempt.
+                pass
+
+    origFilters = warnings.filters[:]
+    origShow = warnings.showwarning
+    warnings.simplefilter('always')
+    try:
+        warnings.showwarning = showWarning
+        result = f(*args, **kwargs)
+    finally:
+        warnings.filters[:] = origFilters
+        warnings.showwarning = origShow
+    return result
 
 class CMSTestCase(TestCase):
     counter = 1
@@ -190,3 +230,21 @@ class CMSTestCase(TestCase):
         request.user = self.user
         request.LANGUAGE_CODE = settings.LANGUAGES[0][0]
         return request
+        
+        
+    def failUnlessWarns(self, category, message, f, *args, **kwargs):
+        warningsShown = []
+        result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
+
+        if not warningsShown:
+            self.fail("No warnings emitted")
+        first = warningsShown[0]
+        for other in warningsShown[1:]:
+            if ((other.message, other.category)
+                != (first.message, first.category)):
+                self.fail("Can't handle different warnings")
+        self.assertEqual(first.message, message)
+        self.assertTrue(first.category is category)
+
+        return result
+    assertWarns = failUnlessWarns
