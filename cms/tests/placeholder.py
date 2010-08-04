@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
+from cms.exceptions import DuplicatePlaceholderWarning
 from cms.tests.base import CMSTestCase
 from cms.utils.plugins import get_placeholders
-from cms.exceptions import DuplicatePlaceholderWarning
+from django.conf import settings
+from django.contrib.auth.models import User
 import sys
 import warnings
 
@@ -47,6 +48,12 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 
 
 class PlaceholderTestCase(CMSTestCase):
+    def setUp(self):
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u.set_password("test")
+        u.save()
+        
+        self.login_user(u)
         
     def test_01_placeholder_scanning_extend(self):
         placeholders = get_placeholders('placeholder_tests/test_one.html')
@@ -79,6 +86,18 @@ class PlaceholderTestCase(CMSTestCase):
     def test_08_placeholder_scanning_extend_outside_block(self):
         placeholders = get_placeholders('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+    
+    def test_09_fieldsets_(self):
+        response = self.client.get(reverse('admin:placeholderapp_example1_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example2_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example3_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example4_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example5_add'))
+        self.assertEqual(response.status_code, 200)
         
         
     def failUnlessWarns(self, category, message, f, *args, **kwargs):

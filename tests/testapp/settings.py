@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'cms.plugins.inherit',
     'mptt',
     'testapp.sampleapp',
+    'testapp.placeholderapp',
     'south',
 )
 
