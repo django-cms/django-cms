@@ -43,7 +43,6 @@ class PlaceholderAdmin(ModelAdmin):
         placeholder_fields = self._get_placeholder_fields(form)
         if self.declared_fieldsets:
             # check those declared fieldsets
-            found = []
             fieldsets = list(self.declared_fieldsets)
             for label, fieldset in fieldsets:
                 fields = list(fieldset['fields'])
@@ -73,7 +72,9 @@ class PlaceholderAdmin(ModelAdmin):
                 'fields': (placeholder,),
                 'classes': ('plugin-holder', 'plugin-holder-nopage',),
             }))
-        fieldsets.append((None, {'fields': list(self.get_readonly_fields(request, obj))}))
+        readonly_fields = self.get_readonly_fields(request, obj)
+        if readonly_fields:
+            fieldsets.append((None, {'fields': list(readonly_fields)}))
         return fieldsets
     
     def get_label_for_placeholder(self, placeholder):

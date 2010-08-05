@@ -65,18 +65,28 @@ class PlaceholderTestCase(CMSTestCase):
         
     def test_10_fieldsets(self):
         request = self.get_request('/')
-        example1_admin = Example1Admin(Example1, admin.site)
-        fieldsets = example1_admin.get_fieldsets(request)
-        self.assertEqual(len(fieldsets),3)
-        example2_admin = Example1Admin(Example2, admin.site)
-        fieldsets = example2_admin.get_fieldsets(request)
-        self.assertEqual(len(fieldsets),3)
-        example3_admin = Example1Admin(Example3, admin.site)
-        fieldsets = example3_admin.get_fieldsets(request)
-        self.assertEqual(len(fieldsets),3)
-        example4_admin = Example1Admin(Example4, admin.site)
-        fieldsets = example4_admin.get_fieldsets(request)
-        self.assertEqual(len(fieldsets),3)
-        example5_admin = Example1Admin(Example5, admin.site)
-        fieldsets = example5_admin.get_fieldsets(request)
-        self.assertEqual(len(fieldsets), 4)
+        admins = [
+            (Example1Admin, Example1, 2),
+            (Example2Admin, Example2, 3),
+            (Example3Admin, Example3, 3),
+            (Example4Admin, Example4, 3),
+            (Example5Admin, Example5, 4),
+        ]
+        for admin_class, model, fscount in admins:
+            ainstance = admin_class(model, admin.site)
+            form = ainstance.get_form(request, None)
+            phfields = ainstance._get_placeholder_fields(form)
+            fieldsets = ainstance.get_fieldsets(request)
+            self.assertEqual(len(fieldsets), fscount, 
+                "Asserting fieldset count for %s. Got %s instead of %s: %s" %
+                (model, len(fieldsets), fscount, fieldsets)
+            )
+            for label, fieldset in fieldsets:
+                fields = list(fieldset['fields'])
+                for field in fields:
+                    if field in phfields:
+                        self.assertTrue(len(fields) == 1)
+                        self.assertTrue('plugin-holder' in fieldset['classes'])
+                        self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
+                        phfields.remove(field)
+            self.assertEqual(phfields, [])
