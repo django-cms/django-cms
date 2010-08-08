@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'mptt',
     'testapp.sampleapp',
     'south',
+    'reversion',
 )
 
 gettext = lambda s: s

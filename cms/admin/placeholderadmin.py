@@ -1,20 +1,18 @@
-from django.contrib.admin import ModelAdmin
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
-from django.shortcuts import render_to_response, get_object_or_404
-from django.db import transaction
-from django.conf import settings
-from django.template.defaultfilters import title, escape, force_escape, escapejs
-from django.template import RequestContext
-from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
+from cms.forms.fields import PlaceholderFormField
+from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.fields import PlaceholderField
-from cms.forms.fields import PlaceholderFormField
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
+from django.conf import settings
+from django.contrib.admin import ModelAdmin
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
+from django.template.defaultfilters import force_escape, escapejs
+from django.utils.translation import ugettext_lazy as _
 import os
+
 
 class PlaceholderAdmin(ModelAdmin):
       
