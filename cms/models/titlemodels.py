@@ -1,11 +1,10 @@
+from cms.models.managers import TitleManager
+from cms.models.pagemodel import Page
+from cms.utils.helpers import reversion_register
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from publisher import Publisher
-from django.conf import settings
-from cms.models.managers import TitleManager
-from cms.models.pagemodel import Page
-from cms.utils.helpers import reversion_register
 
 class Title(Publisher):
     language = models.CharField(_("language"), max_length=5, db_index=True)
@@ -86,6 +85,4 @@ class EmptyTitle(object):
         return None
     
     
-if 'reversion' in settings.INSTALLED_APPS: 
-    import reversion       
-    reversion.register(Title)
+reversion_register(Title)

@@ -14,6 +14,7 @@ from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext_lazy as _
 import os
 
+
 class PlaceholderAdmin(ModelAdmin):
       
     class Media:

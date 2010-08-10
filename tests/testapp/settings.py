@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'testapp.sampleapp',
     'testapp.placeholderapp',
     'south',
+    'reversion',
 )
 
 gettext = lambda s: s
