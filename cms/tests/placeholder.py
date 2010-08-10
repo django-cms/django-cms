@@ -5,8 +5,6 @@ from cms.utils.plugins import get_placeholders
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from testapp.placeholderapp.admin import Example1Admin, Example2Admin, \
-    Example3Admin, Example4Admin, Example5Admin
 from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
     Example5
 
@@ -66,21 +64,22 @@ class PlaceholderTestCase(CMSTestCase):
     def test_10_fieldsets(self):
         request = self.get_request('/')
         admins = [
-            (Example1Admin, Example1, 2),
-            (Example2Admin, Example2, 3),
-            (Example3Admin, Example3, 3),
-            (Example4Admin, Example4, 3),
-            (Example5Admin, Example5, 4),
+            (Example1, 2),
+            (Example2, 3),
+            (Example3, 3),
+            (Example4, 3),
+            (Example5, 4),
         ]
-        for admin_class, model, fscount in admins:
-            ainstance = admin_class(model, admin.site)
+        for model, fscount in admins:
+            ainstance = admin.site._registry[model]
+            fieldsets = ainstance.get_fieldsets(request)
             form = ainstance.get_form(request, None)
             phfields = ainstance._get_placeholder_fields(form)
-            fieldsets = ainstance.get_fieldsets(request)
-            self.assertEqual(len(fieldsets), fscount, 
-                "Asserting fieldset count for %s. Got %s instead of %s: %s" %
-                (model, len(fieldsets), fscount, fieldsets)
-            )
+            self.assertEqual(len(fieldsets), fscount, (
+                "Asserting fieldset count for %s. Got %s instead of %s: %s. "
+                "Using %s." % (model.__name__, len(fieldsets),
+                    fscount, fieldsets, ainstance.__class__.__name__)      
+            ))
             for label, fieldset in fieldsets:
                 fields = list(fieldset['fields'])
                 for field in fields:
