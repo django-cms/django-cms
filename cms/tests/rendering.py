@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-from cms import plugin_rendering
-from cms.models import Page, Title, CMSPlugin
-from cms.plugin_rendering import apply_plugin_context_processors, render_plugins
-from cms.plugins.text.models import Text
-from cms.tests.base import CMSTestCase
 from django.conf import settings
+from django.template import Template, RequestContext
 from django.contrib.auth.models import User
+from cms.tests.base import CMSTestCase
+from cms.models import Page, Title, CMSPlugin, Placeholder
 from django.contrib.sites.models import Site
+from cms.plugins.text.models import Text
+from django.http import HttpRequest
+from django.db import connection
+from cms.plugin_rendering import render_plugins, PluginContext
+from cms import plugin_rendering
 from django.forms.widgets import Media
-from django.template import Template, RequestContext, Context
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -133,8 +135,7 @@ class RenderingTestCase(CMSTestCase):
             u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|{{ test_plugin_context_processor }}'
         instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
         instance.render_template = Template(t)
-        context = Context({'original_context_var': 'original_context_var_ok'})
-        apply_plugin_context_processors(context, instance, self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
+        context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance, self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
         plugin_rendering._standard_processors = {}
         c = render_plugins((instance,), context, self.test_placeholders['main'])
         r = "".join(c) 
