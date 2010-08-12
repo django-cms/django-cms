@@ -24,7 +24,8 @@ class LinkPlugin(CMSPluginBase):
             link = ""
         context.update({
             'name':settings.dbgettext(instance.name),
-            'link':link, 
+            'link':link,
+            'target':instance.target,
             'placeholder':placeholder,
             'object':instance
         })
