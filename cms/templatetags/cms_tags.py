@@ -234,7 +234,8 @@ class PlaceholderNode(template.Node):
             placeholder = page.placeholders.filter(slot__in=get_placeholders(template)).get(slot=self.name)
             if not get_plugins(request, placeholder):
                 continue
-            request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
+            if hasattr(request, 'placeholder_media'):
+                request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
             #request.placeholder_media += placeholder.get_media(request, context)
             content = render_placeholder(placeholder, context)
             if content:

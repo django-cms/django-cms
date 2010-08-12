@@ -21,7 +21,8 @@ class PlaceholderNode(template.Node):
         placeholder = self.placeholder.resolve(context)
         if not placeholder:
             return ''
-        request.placeholder_media += placeholder.get_media(request, context)
+        if hasattr(request, 'placeholder_media'):
+            request.placeholder_media += placeholder.get_media(request, context)
         return safe(placeholder.render(context, width))
 
 
