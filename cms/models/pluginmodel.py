@@ -271,10 +271,11 @@ class CMSPlugin(MpttPublisher):
             plugin_instance.published = False
             plugin_instance.language = target_language
             plugin_instance.save()
-        self.copy_relations(new_plugin, plugin_instance)
+            old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
+            plugin_instance.copy_relations(old_instance)
         return new_plugin
         
-    def copy_relations(self, new_plugin, plugin_instance):
+    def copy_relations(self, old_instance):
         """
         Handle copying of any relations attached to this plugin
         """
