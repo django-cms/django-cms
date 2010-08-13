@@ -3,7 +3,7 @@ Installation
 
 This document assumes that you are familiar with python and django.
 
-A more beginner friendly tutorial can be found `here <../tutorial/>`_
+A more beginner friendly tutorial can be found :doc:`here </tutorial>`.
 
 Make sure that `cms`, `menus`, `mptt` and `publisher` folders are on your
 pythonpath. They all should come with the distribution.
