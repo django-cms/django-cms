@@ -13,10 +13,10 @@ class Link(CMSPlugin):
     page_link = models.ForeignKey(Page, verbose_name=_("page"), blank=True, null=True, help_text=_("A link to a page has priority over a text link."))
     mailto = models.EmailField(_("mailto"), blank=True, null=True, help_text=_("An email adress has priority over a text link."))
     target = models.CharField(_("target"), blank=True, max_length=100, choices=((
-        ("", "same window"),
-        ("_blank", "new window"),
-        ("_parent", "parent window"),
-        ("_top", "topmost frame"),
+        ("", _("same window")),
+        ("_blank", _("new window")),
+        ("_parent", _("parent window")),
+        ("_top", _("topmost frame")),
     )))
     
     def __unicode__(self):
