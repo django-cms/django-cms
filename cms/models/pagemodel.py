@@ -19,6 +19,8 @@ from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
 from menus.menu_pool import menu_pool
+import copy
+from django.db import transaction
 
 class Page(MpttPublisher):
     """
@@ -92,7 +94,7 @@ class Page(MpttPublisher):
         if title is None:
             title = u""
         return u'%s' % (title,)
-    
+        
     def move_page(self, target, position='first-child'):
         """Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
@@ -110,7 +112,6 @@ class Page(MpttPublisher):
         # check the slugs
         check_title_slugs(self)
         
-        
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, public_copy=False):
         """
         copy a page [ and all its descendants to a new location ]
@@ -120,10 +121,11 @@ class Page(MpttPublisher):
         the publish operation as it sets the publisher_is_draft=False.
         """
         from cms.utils.moderator import update_moderation_message
-        import copy
+
+        page_copy = None
         
         if public_copy:
-            pages = [copy.copy(self)] # copy self so that it doesn't affect original obj when we return pages[0] to the publish method!
+            pages = [copy.copy(self)] # copy draft page so that it doesn't affect original obj when we return pages[0] to the publish method!                
         else:
             pages = [self] + list(self.get_descendants().order_by('-rght'))
             
@@ -181,13 +183,28 @@ class Page(MpttPublisher):
             tree.append(page)
             page.site = site
             
+            #import ipdb; ipdb.set_trace()
+            
             # override default page settings specific for public copy
             if public_copy:
                 page.published = True
                 page.publisher_is_draft=False
                 page.publisher_status = Page.MODERATOR_APPROVED
+                # we need to set the one2one relationship back to the draft version
+                page.publisher_public = self
+                page.tree_id = self.tree_id
+                page.lft = self.lft
+                page.rght = self.rght
+                page.level = self.level
                 
-            page.save()
+                # only save the page if this isn't a public_copy - when publishing new page -> self._publisher_save_public(public_copy) from Mptt does the save()!
+                # required for mptt relationships
+                page = self._publisher_save_public(page)
+            else:    
+                # need to save the page to ensure related model changes save - thought this was done in publisher_save_public above...
+                page.save()
+            page_copy = page
+            
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
@@ -201,7 +218,9 @@ class Page(MpttPublisher):
                     moderator.pk = None
                     moderator.page = page
                     moderator.save()
-            update_moderation_message(page, unicode(_('Page was copied.')))
+            # only if we aren't doing a public copy
+            if not public_copy:
+                update_moderation_message(page, unicode(_('Page was copied.')))
             
             # copy titles of this page
             for title in titles:
@@ -210,12 +229,10 @@ class Page(MpttPublisher):
                 title.published = False
                 title.page = page
                 
-                # override default title settings specific for public copy
-                if public_copy:
-                    title.slug = title.slug
-                else:
+                # generate copy slug if not public_copy
+                if not public_copy:
                     title.slug = get_available_slug(title)
-                    
+
                 title.save()
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
@@ -231,8 +248,8 @@ class Page(MpttPublisher):
                     p.copy_plugin(ph, p.language, ptree)
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return pages[0]   # return the original page (self)
-    
+        return page_copy   # return the new page if public or None
+
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
         """
@@ -304,6 +321,100 @@ class Page(MpttPublisher):
             self.publish()
             # post_publish signal moved to end of publish method()
 
+    @transaction.commit_manually
+    def publish(self):
+        """Overrides Publisher method, because there may be some descendants, which
+        are waiting for parent to publish, so publish them if possible. 
+
+        IMPORTANT: @See utils.moderator.approve_page for publishing permissions
+
+        Returns: True if page was successfully published.
+        """
+        #import ipdb; ipdb.set_trace()
+
+        # Publish can only be called on moderated and draft pages
+        if not self.publisher_is_draft:
+            return
+
+        # publish, but only if all parents are published!!
+        published = None
+
+        try:
+            if not self.pk:
+                self.save()
+
+            if not self._publisher_can_publish():
+                raise PublisherCantPublish
+
+            ########################################################################
+            # delete the existing public page
+            try:
+                old_public = self.get_public_object()
+                old_public.publisher_state = Publisher.PUBLISHER_STATE_DELETE
+                old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
+                old_public.save()
+            except:
+                transaction.rollback()
+            else:
+                transaction.commit()
+
+            # we copy the draft page to public and set the publishing states
+            public = self.copy_page(target=None, site=self.site, copy_moderation=False, position=None, copy_permissions=False, public_copy=True)
+
+            if getattr(self, 'tree_id', None):
+                me = self._default_manager.get(pk=self.pk)
+                self.tree_id = me.tree_id
+                
+            transaction.commit()
+
+            self.published = True
+            self.publisher_public = public
+            self.moderator_state = Page.MODERATOR_APPROVED
+            self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
+            self._publisher_keep_state = True
+
+            self.save_base(cls=self.__class__)
+            
+            transaction.commit()
+            
+            published = True
+            
+        except PublisherCantPublish:
+            self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
+
+        #self.save(change_state=False)
+        if not published:
+            # was not published, escape
+            return
+
+        # clean moderation log
+        self.pagemoderatorstate_set.all().delete()
+
+        # page was published, check if there are some childs, which are waiting
+        # for publishing (because of the parent)
+        publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+        for page in publish_set:
+            # recursive call to all childrens....
+            page.moderator_state = Page.MODERATOR_APPROVED
+            page.save(change_state=False)
+            page.publish()
+            
+        if old_public:
+            old_public.delete()
+            
+        transaction.commit()
+        # fire signal after publishing is done
+        import cms.signals as cms_signals
+        cms_signals.post_publish.send(sender=Page, instance=self)
+        return published
+
+
+    def get_draft_object(self):
+        return self
+
+    def get_public_object(self):
+        return self.publisher_public
+            
     def get_calculated_status(self):
         """
         get the calculated status of the page based on published_date,
@@ -595,7 +706,6 @@ class Page(MpttPublisher):
     def set_home_pk_cache(self, value):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site.pk)
         setattr(self, attr, value)
-    
     home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
     
     def get_media_path(self, filename):
@@ -645,82 +755,6 @@ class Page(MpttPublisher):
         parents are missing..
         """
         return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
-    
-    def get_draft_object(self):
-        return self
-        
-    def get_public_object(self):
-        return self.publisher_public
-        
-    def publish(self):
-        """Overrides Publisher method, because there may be some descendants, which
-        are waiting for parent to publish, so publish them if possible. 
-        
-        IMPORTANT: @See utils.moderator.approve_page for publishing permissions
-        
-        Returns: True if page was successfully published.
-        """
-        
-        # Publish can only be called on moderated and draft pages
-        if not settings.CMS_MODERATOR or not self.publisher_is_draft:
-            return
-        
-        # publish, but only if all parents are published!!
-        published = None
-        
-        try:
-            # assert self.pk is not None, "Can publish only saved instance, save it first."
-# Validate that this is really required!
-            if not self.pk:
-                self.save()
-            
-            if not self._publisher_can_publish():
-                raise PublisherCantPublish
-            
-            ########################################################################
-            # retrieve the public page
-            public = self.get_public_object()
-
-            # if we already have a public page we need to delete it and copy the draft in it's place
-            # we'll implement a reversion transacton block around these methods in a future release so that
-            # we can easily revert to the last version
-            if public:
-                public.delete()
-                
-            # we copy the draft page to public and set the publishing states
-            public = self.copy_page(target=None, site=self.site, position=1, copy_moderation=False, copy_permissions=False, public_copy=True)
-            
-            self.published = True
-            self.publisher_public = public
-            self.moderator_state = Page.MODERATOR_APPROVED
-            self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
-            self._publisher_keep_state = True
-            published = True
-            
-        except PublisherCantPublish:
-            self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
-            
-        self.save(change_state=False)
-        if not published:
-            # was not published, escape
-            return
-        
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
-            
-        # page was published, check if there are some childs, which are waiting
-        # for publishing (because of the parent)
-        publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
-        for page in publish_set:
-            # recursive call to all childrens....
-            page.moderator_state = Page.MODERATOR_APPROVED
-            page.save(change_state=False)
-            page.publish()
-        
-        # fire signal after publishing is done
-        import cms.signals as cms_signals
-        cms_signals.post_publish.send(sender=Page, instance=self)
-        return published
     
     def is_public_published(self):
         """Returns true if public model is published.
