@@ -199,10 +199,10 @@ class Page(MpttPublisher):
                 page.publisher_status = Page.MODERATOR_APPROVED
                 # we need to set the one2one relationship back to the draft version
                 page.publisher_public = self
-                page.tree_id = self.tree_id
-                page.lft = self.lft
-                page.rght = self.rght
-                page.level = self.level
+                #page.tree_id = self.tree_id
+                #page.lft = self.lft
+                #page.rght = self.rght
+                #page.level = self.level
                 
                 # only save the page if this isn't a public_copy - when publishing new page -> self._publisher_save_public(public_copy) from Mptt does the save()!
                 # required for mptt relationships
