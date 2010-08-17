@@ -191,20 +191,7 @@ class PlaceholderNode(template.Node):
             if self.nodelist_or:
                 content = self.nodelist_or.render(context)
             return content
-        elif placeholder and self.edit_mode(placeholder, context):
-            return render_placeholder_toolbar(placeholder, context, content)
         return content
-
-    def edit_mode(self, placeholder, context):
-        from cms.utils.placeholder import get_page_from_placeholder_if_exists
-        request = context['request']
-        page = get_page_from_placeholder_if_exists(placeholder)
-        if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
-            'cms.middleware.toolbar.ToolbarMiddleware' in settings.MIDDLEWARE_CLASSES and \
-            request.user.is_staff and request.user.is_authenticated() and \
-            (not page or page.has_change_permission(request)):
-                return True
-        return False
     
     @staticmethod
     def _get_placeholder(current_page, page, context, name):

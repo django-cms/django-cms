@@ -3,10 +3,10 @@ Installation
 
 This document assumes that you are familiar with python and django.
 
-A more beginner friendly tutorial can be found `here <../tutorial/>`_
+A more beginner friendly tutorial can be found :doc:`here </tutorial>`.
 
-Make sure that `cms`, `menus`, `mptt` and `publisher` folders are on your pythonpath.
-They all should come with the distribution.
+Make sure that `cms`, `menus`, `mptt` and `publisher` folders are on your
+pythonpath. They all should come with the distribution.
 
 python 2.4 - 2.6 should be supported
 
@@ -15,7 +15,8 @@ django 1.2 is required at this moment.
 Apps
 ----
 
-Add the following to your project's ``INSTALLED_APPS`` setting if not already present::
+Add the following to your project's ``INSTALLED_APPS`` setting if not already
+present::
 
 	INSTALLED_APPS = (
 		'django.contrib.auth',
@@ -63,7 +64,7 @@ Add the following middleware classes::
 		'cms.middleware.toolbar.ToolbarMiddleware',  #<--- new
 		'cms.middleware.media.PlaceholderMediaMiddleware', #<--- new
 		...
-		'django.middleware.cache.FetchFromCacheMiddleware', 
+		'django.middleware.cache.FetchFromCacheMiddleware',
 	)
 
 If your site is not multilingual you can leave out ``'cms.middleware.MutilingualURLMiddleware'``.

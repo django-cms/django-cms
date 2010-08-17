@@ -13,18 +13,22 @@ Contents:
 .. toctree::
 	:maxdepth: 2
    	:numbered:
-   	
+
 	installation
+	tutorial
 	configuration
 	navigation
 	plugins
 	custom_plugins
 	i18n
 	sitemap
+	app_integration
+	plugin_reference
+	templatetags
 	contribution
         placeholders
-	
-	
+
+
 
 Indices and tables
 ==================

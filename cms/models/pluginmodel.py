@@ -1,18 +1,21 @@
+from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import PluginContext, PluginRenderer
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from cms.plugin_rendering import PluginContext, PluginRenderer
 from cms.exceptions import DontUsePageAttributeWarning
 from publisher import MpttPublisher
 from publisher.mptt_support import Mptt
+from datetime import datetime, date
+from django.conf import settings
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import ModelBase, model_unpickle, simple_class_factory
+from django.db.models.base import ModelBase, model_unpickle, \
+    simple_class_factory
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.conf import settings
 from os.path import join
-from datetime import datetime, date
 import warnings
 
 class PluginModelBase(ModelBase):
@@ -264,10 +267,11 @@ class CMSPlugin(Mptt):
             plugin_instance.published = False
             plugin_instance.language = target_language
             plugin_instance.save()
-        self.copy_relations(new_plugin, plugin_instance)
+            old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
+            plugin_instance.copy_relations(old_instance)
         return new_plugin
         
-    def copy_relations(self, new_plugin, plugin_instance):
+    def copy_relations(self, old_instance):
         """
         Handle copying of any relations attached to this plugin
         """

@@ -28,7 +28,7 @@ USE_I18N = True
 
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
 
-CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../cms/media/cms/')
+CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../../cms/media/cms/')
 MEDIA_URL = '/media/'
 
 ADMIN_MEDIA_PREFIX = '/media/admin/'
@@ -98,7 +98,9 @@ INSTALLED_APPS = (
     'cms.plugins.inherit',
     'mptt',
     'testapp.sampleapp',
+    'testapp.placeholderapp',
     'south',
+    'reversion',
 )
 
 gettext = lambda s: s

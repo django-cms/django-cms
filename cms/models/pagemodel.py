@@ -1,14 +1,20 @@
-from os.path import join
+from cms.exceptions import NoHomeFound
+from cms.models.managers import PageManager, PagePermissionsPermissionManager
+from cms.models.placeholdermodel import Placeholder
+from cms.utils.helpers import reversion_register
+from cms.utils.i18n import get_fallback_languages
+from cms.utils.page import get_available_slug, check_title_slugs
+from cms.utils.urlutils import urljoin
 from datetime import datetime
 from django.conf import settings
-from django.db import models
-from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _, get_language, ugettext
-from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
-from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.db import models, transaction
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils.functional import lazy
+from django.utils.translation import ugettext_lazy as _, get_language, ugettext
 from publisher import MpttPublisher, Publisher
 from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
@@ -20,7 +26,8 @@ from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
 from menus.menu_pool import menu_pool
 import copy
-from django.db import transaction
+from os.path import join
+
 
 class Page(MpttPublisher):
     """
@@ -790,4 +797,4 @@ class Page(MpttPublisher):
             
         return moderation_value 
         
-reversion_register(Page, follow=["title_set", "cmsplugin_set", "pagepermission_set"])
+reversion_register(Page, follow=["title_set", "placeholders", "pagepermission_set"])

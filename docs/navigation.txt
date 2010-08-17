@@ -110,7 +110,7 @@ The level of the node. Starts at 0.
 ::
 
 	{{ node.menu_level }}
-	
+
 The level of the node from the root node of the menu. Starts at 0.
 If your menu starts at level 1 or you have a "soft root" (described
 in the next section) the first node still would have 0 as its `menu_level`.
@@ -130,7 +130,7 @@ The title in the current language of the node.
 
 If true this node is the current one selected/active at this URL.
 ::
- 
+
 	{{ node.ancestor }}
 
 If true this node is an ancestor of the current selected node.
@@ -166,7 +166,6 @@ Now you can mark a page as "soft root" in the 'Advanced' tab of the page's setti
 
 
 Modifying & Extending the menu
------------------------------
+------------------------------
 
 Please refer to the app integration documentation
-	

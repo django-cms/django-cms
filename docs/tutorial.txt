@@ -4,17 +4,26 @@ Django CMS Tutorial
 Installation
 -------------
 
-I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't expect things will be much different for mac at least...if I get a chance i'll run through this process on windows too and update the article but no promises.
+I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't
+expect things will be much different for mac at least...if I get a chance i'll
+run through this process on windows too and update the article but no
+promises.
 
-I'm assuming that Python, Django and sqlite3 are installed already. For reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
+I'm assuming that Python, Django and sqlite3 are installed already. For
+reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
 
-If you dont already have one, create a new folder for your code to live in. My folder lives in my home directory and is named "django_apps". This will pop up throughout this guide so if you're following along and you call yours something else, remember to replace "django_apps" with the name of your own folder when the time comes.
+If you don't already have one, create a new folder for your code to live in. My
+folder lives in my home directory and is named "django_apps". This will pop up
+throughout this guide so if you're following along and you call yours
+something else, remember to replace "django_apps" with the name of your own
+folder when the time comes.
 
 In a terminal, move into your code directory::
 
 	CD ~/django_apps
 
-Create a new Django project (call this whatever you like but remember to change it if you're following along and have called it something else)::
+Create a new Django project (call this whatever you like but remember to
+change it if you're following along and have called it something else)::
 
 	django-admin.py startproject project-name
 
@@ -24,7 +33,7 @@ No harm in making sure that all is indeed well with Django at this early stage s
 
 And... ::
 
-	python manage.py runserver 
+	python manage.py runserver
 
 Head on over to http://127.0.0.1:8000 and if you see "it worked" then well, its working.
 
@@ -33,11 +42,11 @@ Here comes the science...
 If you dont happen to know your Python location then issue the following command::
 
 	which python
-	
+
 (my one is "/usr/local/lib/python2.6" for example)
 
 Go to your Python dist-packages directory "your-python-path/dist-packages"
- 
+
 Download the latest and greatest Django CMS from here: http://www.django-cms.org/en/downloads/
 
 Unzip the downloaded file into the "dist-packages" directory...you will need to do this as "sudo" unless you have your system set up wrongly ;)
@@ -104,34 +113,34 @@ Set up the remainder of the file with the following changes/additions::
 	    'django.middleware.common.CommonMiddleware',
 	    'django.middleware.doc.XViewMiddleware',
 	    'django.middleware.csrf.CsrfViewMiddleware',
-	    'cms.middleware.page.CurrentPageMiddleware', 
-	    'cms.middleware.user.CurrentUserMiddleware', 
+	    'cms.middleware.page.CurrentPageMiddleware',
+	    'cms.middleware.user.CurrentUserMiddleware',
 		'cms.middleware.toolbar.ToolbarMiddleware',
 		'cms.middleware.media.PlaceholderMediaMiddleware',
-		'django.middleware.cache.FetchFromCacheMiddleware', 
+		'django.middleware.cache.FetchFromCacheMiddleware',
 	)
-	
+
 	TEMPLATE_DIRS = os.path.join(PROJECT_PATH, 'templates')
 	# (templates being the name of my template dir within project-name)
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
-	    'django.core.context_processors.auth', 
-	    'django.core.context_processors.i18n', 
-	    'django.core.context_processors.request', 
-	    'django.core.context_processors.media', 
+	    'django.core.context_processors.auth',
+	    'django.core.context_processors.i18n',
+	    'django.core.context_processors.request',
+	    'django.core.context_processors.media',
 	    'cms.context_processors.media',
 	)
-	
+
 (I didn't have a ``TEMPLATE_CONTEXT_PROCESSORS`` specified so had to add all of the above anew.)
 
 Set up your available templates (don't worry that they don't actually exist yet)::
 
-	CMS_TEMPLATES = ( 
-	    ('base.html', gettext('default')), 
-	    ('2col.html', gettext('2 Column')), 
-	    ('3col.html', gettext('3 Column')), 
+	CMS_TEMPLATES = (
+	    ('base.html', gettext('default')),
+	    ('2col.html', gettext('2 Column')),
+	    ('3col.html', gettext('3 Column')),
 	    ('extra.html', gettext('Some extra fancy template')),
-	) 
+	)
 
 Next, Edit your ``urls.py`` file like this::
 
@@ -173,11 +182,14 @@ That should hopefully be that. If your development server is still running in yo
 	cmd c
 	python manage.py runserver
 
-Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with appropriate text and if you can see the django-cms logo then your media folder is cool also.
+Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with
+appropriate text and if you can see the django-cms logo then your media folder
+is cool also.
 
 log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
 
-This is your development enviroment. On how to deploy django projects on real webservers you may want to head over to http://www.django-project.com/
+This is your development enviroment. On how to deploy django projects on real
+webservers you may want to head over to http://www.django-project.com/
 
 
 Templates

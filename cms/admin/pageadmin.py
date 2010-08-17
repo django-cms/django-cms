@@ -4,8 +4,9 @@ from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
 from cms.admin.views import save_all_plugins, revert_plugins
-from cms.forms.widgets import PluginEditor
+from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
+from cms.forms.widgets import PluginEditor
 from cms.models import Page, Title, CMSPlugin, PagePermission, \
     PageModeratorState, EmptyTitle, GlobalPagePermission
 from cms.models.managers import PagePermissionsPermissionManager
@@ -21,12 +22,9 @@ from cms.utils.moderator import update_moderation_message, \
 from cms.utils.permissions import has_page_add_permission, \
     has_page_change_permission, get_user_permission_level, \
     has_global_change_permissions_permission
-from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from cms.apphook_pool import apphook_pool
-
-from menus.menu_pool import menu_pool
-
+from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
+from copy import deepcopy
 from django import template
 from django.conf import settings
 from django.contrib import admin
@@ -43,13 +41,9 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
-from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
-
+from menus.menu_pool import menu_pool
 import os
-from copy import deepcopy
-
-
 
 model_admin = admin.ModelAdmin
 create_on_success = lambda x: x

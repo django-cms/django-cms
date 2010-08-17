@@ -1,18 +1,8 @@
-from django.shortcuts import get_object_or_404, render_to_response
-from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpResponseBadRequest
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.template.context import RequestContext
-from django.conf import settings
-from django.template.defaultfilters import escapejs, force_escape
-from django.views.decorators.http import require_POST
-
-from cms.models import Page, Title, CMSPlugin, MASK_CHILDREN, MASK_DESCENDANTS,\
-    MASK_PAGE
-from cms.plugin_pool import plugin_pool
-from cms.utils.admin import render_admin_menu_item
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from cms.models import Page, Title, CMSPlugin
 from cms.utils import get_language_from_request
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
 
 def save_all_plugins(request, page, placeholder, excludes=None):
     if not page.has_change_permission(request):

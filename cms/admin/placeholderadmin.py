@@ -1,20 +1,19 @@
-from django.contrib.admin import ModelAdmin
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
-from django.shortcuts import render_to_response, get_object_or_404
-from django.db import transaction
-from django.conf import settings
-from django.template.defaultfilters import title, escape, force_escape, escapejs
-from django.template import RequestContext
-from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
+from cms.forms.fields import PlaceholderFormField
+from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.fields import PlaceholderField
-from cms.forms.fields import PlaceholderFormField
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
+from copy import deepcopy
+from django.conf import settings
+from django.contrib.admin import ModelAdmin
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
+from django.template.defaultfilters import force_escape, escapejs
+from django.utils.translation import ugettext_lazy as _
 import os
+
 
 class PlaceholderAdmin(ModelAdmin):
       
@@ -43,8 +42,7 @@ class PlaceholderAdmin(ModelAdmin):
         placeholder_fields = self._get_placeholder_fields(form)
         if self.declared_fieldsets:
             # check those declared fieldsets
-            found = []
-            fieldsets = tuple(self.declared_fieldsets)
+            fieldsets = list(deepcopy(self.declared_fieldsets))
             for label, fieldset in fieldsets:
                 fields = list(fieldset['fields'])
                 for field in fieldset['fields']:
@@ -55,12 +53,16 @@ class PlaceholderAdmin(ModelAdmin):
                             placeholder_fields.remove(field)
                         else:
                             fields.remove(field)
-                fieldset['fields'] = fields
+                if fields:
+                    fieldset['fields'] = fields
+                else:
+                    # no fields in the fieldset anymore, delete the fieldset
+                    fieldsets.remove((label, fieldset))
             for placeholder in placeholder_fields:
-                fieldsets += (self.get_label_for_placeholder(placeholder), {
+                fieldsets.append((self.get_label_for_placeholder(placeholder), {
                         'fields': (placeholder,),
                         'classes': ('plugin-holder', 'plugin-holder-nopage',),
-                    },)
+                    },))
             return fieldsets
         fieldsets = []
         fieldsets.append((None, {'fields': [f for f in form.base_fields.keys() if not f in placeholder_fields]}))
@@ -69,7 +71,9 @@ class PlaceholderAdmin(ModelAdmin):
                 'fields': (placeholder,),
                 'classes': ('plugin-holder', 'plugin-holder-nopage',),
             }))
-        fieldsets.append((None, {'fields': list(self.get_readonly_fields(request, obj))}))
+        readonly_fields = self.get_readonly_fields(request, obj)
+        if readonly_fields:
+            fieldsets.append((None, {'fields': list(readonly_fields)}))
         return fieldsets
     
     def get_label_for_placeholder(self, placeholder):
