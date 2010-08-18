@@ -104,9 +104,7 @@ INSTALLED_APPS = (
     'cms.plugins.inherit',
     'mptt',
     'example.sampleapp',
-    'south',
-    
-    'debug_toolbar'
+    'south'
 )
 
 gettext = lambda s: s

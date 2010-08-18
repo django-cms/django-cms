@@ -128,15 +128,17 @@ class Page(MpttPublisher):
         the publish operation as it sets the publisher_is_draft=False.
         """
         from cms.utils.moderator import update_moderation_message
-
+        
         page_copy = None
         
         if public_copy:
-            pages = [copy.copy(self)] # copy draft page so that it doesn't affect original obj when we return pages[0] to the publish method!                
+            # create a copy of the draft page - existing code loops through pages so added it to a list 
+            pages = [copy.copy(self)]            
         else:
             pages = [self] + list(self.get_descendants().order_by('-rght'))
             
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
+        
         if target:
             target.old_pk = -1
             if position == "first-child":
@@ -149,6 +151,7 @@ class Page(MpttPublisher):
             tree = []
         if tree:
             tree[0].old_pk = tree[0].pk
+            
         first = True
         # loop over all affected pages (self is included in descendants)
         for page in pages:
@@ -189,29 +192,24 @@ class Page(MpttPublisher):
                     page.parent = None
             tree.append(page)
             page.site = site
-            
-            #import ipdb; ipdb.set_trace()
-            
+             
             # override default page settings specific for public copy
             if public_copy:
                 page.published = True
                 page.publisher_is_draft=False
                 page.publisher_status = Page.MODERATOR_APPROVED
-                # we need to set the one2one relationship back to the draft version
+                # we need to set relate this new public copy to its draft page (self)
                 page.publisher_public = self
-                #page.tree_id = self.tree_id
-                #page.lft = self.lft
-                #page.rght = self.rght
-                #page.level = self.level
                 
-                # only save the page if this isn't a public_copy - when publishing new page -> self._publisher_save_public(public_copy) from Mptt does the save()!
-                # required for mptt relationships
+                # code taken from Publisher publish() overridden here as we need to save the page
+                # before we are able to use the page object for titles, placeholders etc.. below
+                # the method has been modified to return the object after saving the instance variable
                 page = self._publisher_save_public(page)
+                page_copy = page    # create a copy used in the return
             else:    
-                # need to save the page to ensure related model changes save - thought this was done in publisher_save_public above...
+                # only need to save the page if it isn't public since it is saved above otherwise
                 page.save()
-            page_copy = page
-            
+
             # copy moderation, permissions if necessary
             if settings.CMS_PERMISSION and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
@@ -225,7 +223,8 @@ class Page(MpttPublisher):
                     moderator.pk = None
                     moderator.page = page
                     moderator.save()
-            # only if we aren't doing a public copy
+                    
+            # update moderation message for standard copy
             if not public_copy:
                 update_moderation_message(page, unicode(_('Page was copied.')))
             
@@ -236,11 +235,11 @@ class Page(MpttPublisher):
                 title.published = False
                 title.page = page
                 
-                # generate copy slug if not public_copy
+                # create slug-copy for standard copy
                 if not public_copy:
                     title.slug = get_available_slug(title)
-
                 title.save()
+                
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
                 plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
@@ -255,7 +254,7 @@ class Page(MpttPublisher):
                     p.copy_plugin(ph, p.language, ptree)
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return page_copy   # return the new page if public or None
+        return page_copy   # return the page_copy or None
 
     def save(self, no_signals=False, change_state=True, commit=True,
              force_with_moderation=False, force_state=None, **kwargs):
@@ -326,7 +325,6 @@ class Page(MpttPublisher):
         #if commit and (publish_directly or created and not under_moderation):
         if self.publisher_is_draft and commit and publish_directly:
             self.publish()
-            # post_publish signal moved to end of publish method()
 
     @transaction.commit_manually
     def publish(self):
@@ -334,11 +332,11 @@ class Page(MpttPublisher):
         are waiting for parent to publish, so publish them if possible. 
 
         IMPORTANT: @See utils.moderator.approve_page for publishing permissions
+                   Also added @transaction.commit_manually decorator as delete() 
+                    was removing both draft and public versions
 
         Returns: True if page was successfully published.
         """
-        #import ipdb; ipdb.set_trace()
-
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
             return
@@ -354,7 +352,8 @@ class Page(MpttPublisher):
                 raise PublisherCantPublish
 
             ########################################################################
-            # delete the existing public page
+            # delete the existing public page using transaction block to ensure save() and delete() do not conflict
+            # the draft version was being deleted if I replaced the save() below with a delete()
             try:
                 old_public = self.get_public_object()
                 old_public.publisher_state = Publisher.PUBLISHER_STATE_DELETE
@@ -365,31 +364,29 @@ class Page(MpttPublisher):
             else:
                 transaction.commit()
 
-            # we copy the draft page to public and set the publishing states
+            # we hook into the modified copy_page routing to do the heavy lifting of copying the draft page to a new public page
             public = self.copy_page(target=None, site=self.site, copy_moderation=False, position=None, copy_permissions=False, public_copy=True)
 
+            # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
+            # insert_at() was maybe calling _create_tree_space() method, in this
+            # case may tree_id change, so we must update tree_id from db first
+            # before save
             if getattr(self, 'tree_id', None):
                 me = self._default_manager.get(pk=self.pk)
                 self.tree_id = me.tree_id
-                
-            transaction.commit()
 
             self.published = True
             self.publisher_public = public
             self.moderator_state = Page.MODERATOR_APPROVED
             self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
-            self._publisher_keep_state = True
-
-            self.save_base(cls=self.__class__)
-            
-            transaction.commit()
-            
+            self._publisher_keep_state = True        
             published = True
             
         except PublisherCantPublish:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
 
-        #self.save(change_state=False)
+        self.save(change_state=False)
+        
         if not published:
             # was not published, escape
             return
@@ -406,15 +403,18 @@ class Page(MpttPublisher):
             page.save(change_state=False)
             page.publish()
             
+        # we delete the old public page - this only deletes the public page as we
+        # have removed the old_public.publisher_public=None relationship to the draft page above
         if old_public:
             old_public.delete()
-            
+       
+        # manually commit the last transaction batch     
         transaction.commit()
+        
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
         return published
-
 
     def get_draft_object(self):
         return self
