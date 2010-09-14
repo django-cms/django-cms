@@ -11,13 +11,13 @@ class Migration:
         
         db.rename_table("snippet_snippetptr", "cmsplugin_snippetptr")
         db.rename_table("snippet_publicsnippetptr", "cmsplugin_snippetptrpublic")
+        db.rename_column("cmsplugin_snippetptrpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.alter_column('cmsplugin_snippetptr', 'public_id', orm['snippet.snippetptr:public'])
         try:
             db.delete_foreign_key('cmsplugin_snippetptr' ,'public_id')
         except:
             pass
         db.drop_primary_key("cmsplugin_snippetptrpublic")
-        db.rename_column("cmsplugin_snippetptrpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_snippetptrpublic", ("cmspluginpublic_ptr_id",))
         db.foreign_key_sql('cmsplugin_snippetptr' ,'public_id', 'cmsplugin_snippetptrpublic', 'cmspluginpublic_ptr_id')
     
