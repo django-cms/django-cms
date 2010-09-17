@@ -28,7 +28,7 @@ class PlaceholderMediaMiddleware(object):
         request.placeholder_media = Media()
         
     def process_response(self, request, response):
-        if self.inject_media(request, response) and hasattr('placeholder_media'):
+        if self.inject_media(request, response) and hasattr(request,'placeholder_media'):
             response.content = inster_before_tag(smart_unicode(response.content),
                 u'/head', smart_unicode(request.placeholder_media.render()))
         return response
