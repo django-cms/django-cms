@@ -222,7 +222,9 @@ class PlaceholderNode(template.Node):
             content = render_placeholder(placeholder, context)
             if content:
                 return content, placeholder
-        return '', None
+        placeholder = self._get_placeholder(current_page, current_page, context, self.name)
+        content = render_placeholder(placeholder, context)
+        return content, placeholder
 
 register.tag('placeholder', do_placeholder)
 

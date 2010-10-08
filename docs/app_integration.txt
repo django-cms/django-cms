@@ -1,7 +1,7 @@
 App Integration
 ===============
 
-It is pretty easy to integrate your own django applications with django-cms.
+It is pretty easy to integrate your own Django applications with django-cms.
 You have 5 ways of integrating your app:
 
 1. Menus
@@ -149,7 +149,7 @@ A base class for this purpose can be found in ``cms/utils/navigation.py``
 App-Hooks
 ---------
 
-With App-Hooks you can attach whole django applications to pages. For example
+With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
 
 To create an apphook create a cms_app.py in your application. And in there
@@ -171,8 +171,8 @@ Now edit a page and open the advanced settings tab. Select your new apphook
 under "Application". Save the page.
 
 ** ATTENTION ** If you are on a multi-threaded server (mostly all webservers,
-except the dev-server): Restart the server because the urls are cached by
-django and in a multi-threaded environment we don't know which caches are
+except the dev-server): Restart the server because the URLs are cached by
+Django and in a multi-threaded environment we don't know which caches are
 cleared yet.
 
 If you attached the app to a page with the url `/hello/world/` and the app has
@@ -253,7 +253,7 @@ It is encouraged to use `django-mptt <http://code.google.com/p/django-mptt/>`_
 (a suitable version is included in the `mptt` directory) if you have data that
 is organized in a tree.
 
-We would now create a menu out of this categories::
+We would now create a menu out of these categories::
 
 	from menus.base import NavigationNode
 	from menus.menu_pool import menu_pool
@@ -290,7 +290,7 @@ Navigation Modifiers
 --------------------
 
 Navigation Modifiers can add or change properties of NavigationNodes, they
-even can rearrange whole menus. You normally want to create them in you apps
+even can rearrange whole menus. You normally want to create them in your apps
 menu.py.
 
 A simple modifier looks something like this::
@@ -316,7 +316,7 @@ should take the following arguments:
 
 - request
 
-  A django request instance. Maybe you want to modify based on sessions, or
+  A Django request instance. Maybe you want to modify based on sessions, or
   user or permissions?
 
 - nodes
@@ -378,8 +378,8 @@ Custom Plugins
 --------------
 
 If you want to display content of your apps on other pages custom plugins are
-a great way to accomplish that. If you have for example a news app and you
-want on your homepage to display the top 10 news entries a custom plugin is
+a great way to accomplish that. For example, if you have a news app and you
+want to display the top 10 news entries on your homepage, a custom plugin is
 the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to

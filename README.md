@@ -45,6 +45,19 @@ Sourcecode
 
 Can be found [here](http://github.com/divio/django-cms/) on github.
 
+Running tests
+-------------
+
+`virtualenv` is highly recommended to run tests.
+
+Here's a quick drilldown on how this should work on a unix system:
+- virtualenv --no-site-packages <this directory>
+- source bin/activate
+- ./runtests.sh
+
+The first run will bork and complain about PIL (since it's not always available as an egg, it's not in the dependencies).
+Running `easy_install pil` should take care of it on linuxes.
+
 Help
 ----
 

@@ -11,9 +11,9 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
+        self.discovered = True
         for app in settings.INSTALLED_APPS:
             __import__(app, {}, {}, ['cms_plugins'])
-        self.discovered = True
 
     def register_plugin(self, plugin_or_iterable):
         """

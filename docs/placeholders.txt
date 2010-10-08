@@ -43,3 +43,15 @@ from the `placeholder_tags` template tag library::
 	
 "640" is the width to be used for width-sensitive plugins in this context. This
 argument is optional.
+
+
+Fieldsets
+---------
+
+There are some hard restrictions if you want to add custom fieldsets to an admin 
+page with PlaceholderFields:
+
+1. PlacehoderFields *must* be in their own fieldsets, one per fieldset.
+2. You *must* include the following two classes: `plugin-holder` and `plugin-holder-nopage`
+
+
