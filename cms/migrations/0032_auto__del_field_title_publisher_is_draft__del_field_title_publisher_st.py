@@ -8,6 +8,9 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Removing unique constraint on 'Title', fields ['publisher_is_draft', 'language', 'page']
+        db.delete_unique('cms_title', ['publisher_is_draft', 'language', 'page_id'])
+        
         # Deleting field 'Title.publisher_is_draft'
         db.delete_column('cms_title', 'publisher_is_draft')
 
@@ -16,9 +19,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Title.publisher_public'
         db.delete_column('cms_title', 'publisher_public_id')
-
-        # Removing unique constraint on 'Title', fields ['publisher_is_draft', 'language', 'page']
-        db.delete_unique('cms_title', ['publisher_is_draft', 'language', 'page_id'])
 
         # Adding unique constraint on 'Title', fields ['page', 'language']
         db.create_unique('cms_title', ['page_id', 'language'])
