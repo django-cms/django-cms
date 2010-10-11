@@ -159,7 +159,7 @@ show_sub_menu = register.inclusion_tag('menu/dummy.html',
                                        takes_context=True)(show_sub_menu)
 
 
-def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
+def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html", only_visible=True):
     """
     Shows the breadcrumb from the node that has the same url as the current request
     
@@ -185,7 +185,7 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
     if selected and selected != home:
         n = selected
         while n:
-            if n.visible:
+            if n.visible or not only_visible:
                 ancestors.append(n)
             n = n.parent
     if not ancestors or (ancestors and ancestors[-1] != home) and home:
