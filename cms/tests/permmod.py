@@ -119,8 +119,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         page_permission.save()
         return page_permission
     
-    def add_plugin(self, user):
-        slave_page = self.slave_page
+    def add_plugin(self, user, page=None):
+        if page:
+            slave_page = page
+        else:
+            slave_page = self.slave_page
         
         post_data = {
             'language': 'en',
@@ -659,7 +662,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(self.user_super)
         # create page under root
         page = self.create_page()
-        self.add_plugin(self.user_super)
+        self.add_plugin(self.user_super, page)
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         self.publish_page(page, True, self.user_super, True)

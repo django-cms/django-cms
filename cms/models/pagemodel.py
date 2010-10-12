@@ -406,6 +406,10 @@ class Page(MpttPublisher):
         # we delete the old public page - this only deletes the public page as we
         # have removed the old_public.publisher_public=None relationship to the draft page above
         if old_public:
+            # reparent child pages before delete
+            #for child_page in self.children.all():
+            #    child_page.parent = public
+            #    child_page.save()
             old_public.delete()
        
         # manually commit the last transaction batch     

@@ -61,10 +61,6 @@ class CMSPlugin(Mptt):
     class Meta:
         app_label = 'cms'
         
-    class PublisherMeta:
-        exclude_fields = []
-        exclude_fields_append = ['plugin_ptr']
-
     class RenderMeta:
         index = 0
         total = 1
@@ -123,11 +119,7 @@ class CMSPlugin(Mptt):
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
-                if hasattr(self, '_is_public_model'):
-                    # if it is an public model all field names have public prefix
-                    instance = getattr(self, plugin.model.__name__.lower()+"public")
-                else:
-                    instance = getattr(self, plugin.model.__name__.lower())
+                instance = getattr(self, plugin.model.__name__.lower())
                 # could alternatively be achieved with:
                 # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
                 instance._render_meta = self._render_meta
@@ -199,32 +191,10 @@ class CMSPlugin(Mptt):
         else:
             super(CMSPlugin, self).save()
             
-    
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
-    
-    def _publisher_get_public_copy(self):
-        """Overrides publisher public copy acessor, because of the special
-        kind of relation between Plugins.
-        """   
-        publisher_public = self.publisher_public
-        if not publisher_public:
-            return
-        elif publisher_public.__class__ is self.__class__:
-            return publisher_public
-        try:
-            return self.__class__.objects.get(pk=self.publisher_public_id)
-        except ObjectDoesNotExist:
-            # extender dosent exist yet
-            public_copy = self.__class__()
-            # copy values of all local fields
-            for field in publisher_public._meta.local_fields:
-                value = getattr(publisher_public, field.name)
-                setattr(public_copy, field.name, value)
-            public_copy.publisher_is_draft=False
-            return public_copy
-        
+
     def copy_plugin(self, target_placeholder, target_language, plugin_tree):
         """
         Copy this plugin and return the new plugin.
@@ -238,8 +208,6 @@ class CMSPlugin(Mptt):
         new_plugin.tree_id = None
         new_plugin.lft = None
         new_plugin.rght = None
-        new_plugin.inherited_public_id = None
-        new_plugin.publisher_public_id = None
         if self.parent:
             pdif = self.level - plugin_tree[-1].level
             if pdif < 0:
@@ -262,9 +230,6 @@ class CMSPlugin(Mptt):
             plugin_instance.rght = new_plugin.rght
             plugin_instance.level = new_plugin.level
             plugin_instance.cmsplugin_ptr = new_plugin
-            plugin_instance.publisher_public_id = None
-            plugin_instance.public_id = None
-            plugin_instance.published = False
             plugin_instance.language = target_language
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)

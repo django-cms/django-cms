@@ -25,9 +25,9 @@ def get_current_page(path, lang, queryset, home_slug=None, home_tree_id=None):
             return queryset.filter(title_q & Q(title_set__language=lang)).distinct().select_related()[0], None
         else:
             if home_slug:
-                queryset = queryset.exclude(Q(title_set__path=home_slug)&Q(tree_id=home_tree_id))
+                #queryset = queryset.exclude(Q(title_set__path=home_slug)&Q(tree_id=home_tree_id))
                 home_slug += "/"
-                title_q = Q(title_set__path=path)|(Q(title_set__path=home_slug + path)&Q(tree_id=home_tree_id))
+                title_q = Q(title_set__path=path) | (Q(title_set__path=home_slug + path) & Q(tree_id=home_tree_id))
             else:
                 title_q = Q(title_set__slug=path)
             if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
