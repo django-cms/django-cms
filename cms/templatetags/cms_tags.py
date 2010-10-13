@@ -1,19 +1,17 @@
-from itertools import chain
-from cms.exceptions import NoHomeFound
+from cms.models import Page, Placeholder
+from cms.plugin_rendering import render_plugins, render_placeholder, \
+    render_placeholder_toolbar
+from cms.plugins.utils import get_plugins
 from cms.utils import get_language_from_request, get_template_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
-from cms.plugin_rendering import render_plugins, render_placeholder, render_placeholder_toolbar
-from cms.plugins.utils import get_plugins
-from cms.models import Page, Placeholder
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
-from django.template.defaultfilters import title
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.forms.widgets import Media
+from itertools import chain
 import operator
 
 register = template.Library()
@@ -187,51 +185,35 @@ class PlaceholderNode(template.Node):
         page = request.current_page
         if not page or page == 'dummy':
             return ''
-
-        try:
-            placeholder = page.placeholders.get(slot=self.name)
-        except Placeholder.DoesNotExist:
-            from cms.utils.plugins import get_placeholders
-            placeholders = get_placeholders(page.get_template())
-            found = None
-            for slot in placeholders:
-                new, created = page.placeholders.get_or_create(slot=slot)
-                if slot == self.name:
-                    found = new
-            placeholder = found
-            if not found:
-                if settings.DEBUG:
-                    raise Placeholder.DoesNotExist("No placeholder '%s' found for page '%s'" % (self.name, page.pk))
-                else:
-                    return "<!-- ERROR:cms.utils.plugins.get_placeholders:%s -->" % self.name
-        content = self.get_content(request, page, context)
+        
+        content, placeholder = self.get_content(request, page, context)
         if not content:
             if self.nodelist_or:
                 content = self.nodelist_or.render(context)
-            if self.edit_mode(placeholder, context):
-                return render_placeholder_toolbar(placeholder, context, content)
             return content
         return content
+    
+    @staticmethod
+    def _get_placeholder(current_page, page, context, name):
+        placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
+        if page.pk in placeholder_cache:
+            return placeholder_cache[page.pk].get(name, None)
+        placeholder_cache[page.pk] = {}
+        placeholders = page.placeholders.all()
+        for placeholder in placeholders:
+            placeholder_cache[page.pk][placeholder.slot] = placeholder
+        current_page._tmp_placeholders_cache = placeholder_cache
+        return placeholder_cache[page.pk].get(name, None)
 
-    def edit_mode(self, placeholder, context):
-        from cms.utils.placeholder import get_page_from_placeholder_if_exists
-        request = context['request']
-        page = get_page_from_placeholder_if_exists(placeholder)
-        if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
-            'cms.middleware.toolbar.ToolbarMiddleware' in settings.MIDDLEWARE_CLASSES and \
-            request.user.is_staff and request.user.is_authenticated() and \
-            (not page or page.has_change_permission(request)):
-                return True
-        return False
-
-    def get_content(self, request, page, context):
-        from cms.utils.plugins import get_placeholders
-        pages = [page]
+    def get_content(self, request, current_page, context):
+        pages = [current_page]
         if self.inherit:
-            pages = chain([page], page.get_cached_ancestors(ascending=True))
+            pages = chain([current_page], current_page.get_cached_ancestors(ascending=True))
         for page in pages:
             template = get_template_from_request(request, page)
-            placeholder = page.placeholders.filter(slot__in=get_placeholders(template)).get(slot=self.name)
+            placeholder = self._get_placeholder(current_page, page, context, self.name)
+            if placeholder is None:
+                continue
             if not get_plugins(request, placeholder):
                 continue
             if hasattr(request, 'placeholder_media'):
@@ -239,8 +221,10 @@ class PlaceholderNode(template.Node):
             #request.placeholder_media += placeholder.get_media(request, context)
             content = render_placeholder(placeholder, context)
             if content:
-                return content
-        return ''
+                return content, placeholder
+        placeholder = self._get_placeholder(current_page, current_page, context, self.name)
+        content = render_placeholder(placeholder, context)
+        return content, placeholder
 
 register.tag('placeholder', do_placeholder)
 
@@ -414,7 +398,7 @@ def do_plugins_media(parser, token):
     args = token.split_contents()
     if len(args) > 2:
         raise template.TemplateSyntaxError("Invalid syntax. Expected "
-            "'{%% %s [page_lookup] %%}'" % tag)
+            "'{%% %s [page_lookup] %%}'" % args[0])
     elif len(args) == 2:
         page_lookup = args[1]
     else:

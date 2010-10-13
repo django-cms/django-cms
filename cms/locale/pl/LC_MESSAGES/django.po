@@ -14,9 +14,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Country: POLAND\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Poedit-Language: Polish\n"
-"X-Poedit-Country: POLAND\n"
 
 #: plugin_base.py:99
 msgid "Advanced options"
@@ -604,19 +604,19 @@ msgstr "Bieżąca strona"
 
 #: models/moderatormodels.py:25
 msgid "Page children (immediate)"
-msgstr "Strona podrzędna (bezpośrednio)"
+msgstr "Strony podrzędne (bezpośrednio)"
 
 #: models/moderatormodels.py:26
 msgid "Page and children (immediate)"
-msgstr "Strona i strona podrzędna (bezpośrednio)"
+msgstr "Bieżąca strona i jej podrzędne (bezpośrednio)"
 
 #: models/moderatormodels.py:27
 msgid "Page descendants"
-msgstr "Strony podrzędne"
+msgstr "Wszystkie strony podrzędne"
 
 #: models/moderatormodels.py:28
 msgid "Page and descendants"
-msgstr "Strona i strony podrzędne"
+msgstr "Bieżąca strona i wszystkie jej podrzędne"
 
 #: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
 msgid "Page"
@@ -812,7 +812,7 @@ msgstr "Globalne prawa dostępu do stron"
 
 #: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
 msgid "Grant on"
-msgstr "Nadaj uprawnienia"
+msgstr "Uprawnienia dla"
 
 #: models/permissionmodels.py:73
 msgid "Page permission"
@@ -836,7 +836,7 @@ msgstr "Grupy użytkowników (strona)"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
-msgstr "nadpisz tytuł w menu"
+msgstr "nadpisz tytuł z menu"
 
 #: models/titlemodels.py:15
 msgid "Path"
@@ -1129,7 +1129,7 @@ msgstr "użytkownik na Twitterze"
 
 #: plugins/twitter/models.py:8
 msgid "count"
-msgstr "licz"
+msgstr "ilość"
 
 #: plugins/twitter/models.py:8
 msgid "Number of entries to display"
@@ -1248,7 +1248,7 @@ msgstr "Zapisz jako nowe"
 
 #: templates/admin/page_submit_line.html:12
 msgid "Save and add another"
-msgstr "Zapisz i dodaj inne"
+msgstr "Zapisz i dodaj inny"
 
 #: templates/admin/page_submit_line.html:13
 #: templates/admin/cms/page/change_form.html:274
@@ -1381,7 +1381,7 @@ msgstr "Wystąpił błąd. Proszę przeładować stronę."
 #: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr "Napraw usunięty %(name)s"
+msgstr "Napraw usunięte %(name)s"
 
 #: templates/admin/cms/page/change_list.html:86
 #, python-format
@@ -1418,7 +1418,7 @@ msgstr "moderacja"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "published"
-msgstr "opublikany"
+msgstr "opublikowany"
 
 #: templates/admin/cms/page/change_list_tree.html:15
 msgid "start"
@@ -1560,7 +1560,7 @@ msgstr "Może zmieniać uprawnienia"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr "Może przenieść"
+msgstr "Może przenosić"
 
 #: templates/admin/cms/page/permissions.html:20
 #: templates/admin/cms/page/permissions.html:21
@@ -1585,12 +1585,12 @@ msgstr "Stara wersja pluginu nie może zostać zapisana!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 msgid "Plugin saved successfully."
-msgstr "Plugin zapisany."
+msgstr "Plugin został zapisany."
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr "Napraw usunięty %(verbose_name)s."
+msgstr "Napraw usunięte %(verbose_name)s."
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
@@ -1698,7 +1698,7 @@ msgstr "Usuń stronę"
 
 #: templates/cms/toolbar/toolbar.html:891
 msgid "Site Administration"
-msgstr "Administracja stroną"
+msgstr "Panel administracyjny"
 
 #: templates/cms/toolbar/toolbar.html:893
 msgid "Page Settings"

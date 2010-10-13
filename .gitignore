@@ -6,11 +6,14 @@ cms/django
 *.DS_Store
 *.svn
 .*
+*.xml
+cms.sqlite
 cms/media/cms_page_media/
 cms/docs/build
 example/run
 example/local_settings.py
 reversion/
+htmlcov
 build
 dist
 .ropeproject

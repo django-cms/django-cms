@@ -3,11 +3,11 @@ from cms.models.managers import BasicPagePermissionManager, \
 from cms.models.moderatormodels import ACCESS_CHOICES, \
     ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.pagemodel import Page
+from cms.utils.helpers import reversion_register
 from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from cms.utils.helpers import reversion_register
 
 class AbstractPagePermission(models.Model):
     """Abstract page permissions

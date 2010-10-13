@@ -1,52 +1,21 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
+from cms.exceptions import DuplicatePlaceholderWarning
 from cms.tests.base import CMSTestCase
 from cms.utils.plugins import get_placeholders
-from cms.exceptions import DuplicatePlaceholderWarning
-import sys
-import warnings
-
-class _Warning(object):
-    def __init__(self, message, category, filename, lineno):
-        self.message = message
-        self.category = category
-        self.filename = filename
-        self.lineno = lineno
-
-
-
-def _collectWarnings(observeWarning, f, *args, **kwargs):
-    def showWarning(message, category, filename, lineno, file=None, line=None):
-        assert isinstance(message, Warning)
-        observeWarning(_Warning(
-                message.args[0], category, filename, lineno))
-
-    # Disable the per-module cache for every module otherwise if the warning
-    # which the caller is expecting us to collect was already emitted it won't
-    # be re-emitted by the call to f which happens below.
-    for v in sys.modules.itervalues():
-        if v is not None:
-            try:
-                v.__warningregistry__ = None
-            except:
-                # Don't specify a particular exception type to handle in case
-                # some wacky object raises some wacky exception in response to
-                # the setattr attempt.
-                pass
-
-    origFilters = warnings.filters[:]
-    origShow = warnings.showwarning
-    warnings.simplefilter('always')
-    try:
-        warnings.showwarning = showWarning
-        result = f(*args, **kwargs)
-    finally:
-        warnings.filters[:] = origFilters
-        warnings.showwarning = origShow
-    return result
+from django.contrib import admin
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
+    Example5
 
 
 class PlaceholderTestCase(CMSTestCase):
+    def setUp(self):
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u.set_password("test")
+        u.save()
+        
+        self.login_user(u)
         
     def test_01_placeholder_scanning_extend(self):
         placeholders = get_placeholders('placeholder_tests/test_one.html')
@@ -79,21 +48,44 @@ class PlaceholderTestCase(CMSTestCase):
     def test_08_placeholder_scanning_extend_outside_block(self):
         placeholders = get_placeholders('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+    
+    def test_09_fieldsets_requests(self):
+        response = self.client.get(reverse('admin:placeholderapp_example1_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example2_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example3_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example4_add'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:placeholderapp_example5_add'))
+        self.assertEqual(response.status_code, 200)
         
-        
-    def failUnlessWarns(self, category, message, f, *args, **kwargs):
-        warningsShown = []
-        result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
-
-        if not warningsShown:
-            self.fail("No warnings emitted")
-        first = warningsShown[0]
-        for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
-                self.fail("Can't handle different warnings")
-        self.assertEqual(first.message, message)
-        self.assertTrue(first.category is category)
-
-        return result
-    assertWarns = failUnlessWarns
+    def test_10_fieldsets(self):
+        request = self.get_request('/')
+        admins = [
+            (Example1, 2),
+            (Example2, 3),
+            (Example3, 3),
+            (Example4, 3),
+            (Example5, 4),
+        ]
+        for model, fscount in admins:
+            ainstance = admin.site._registry[model]
+            fieldsets = ainstance.get_fieldsets(request)
+            form = ainstance.get_form(request, None)
+            phfields = ainstance._get_placeholder_fields(form)
+            self.assertEqual(len(fieldsets), fscount, (
+                "Asserting fieldset count for %s. Got %s instead of %s: %s. "
+                "Using %s." % (model.__name__, len(fieldsets),
+                    fscount, fieldsets, ainstance.__class__.__name__)      
+            ))
+            for label, fieldset in fieldsets:
+                fields = list(fieldset['fields'])
+                for field in fields:
+                    if field in phfields:
+                        self.assertTrue(len(fields) == 1)
+                        self.assertTrue('plugin-holder' in fieldset['classes'])
+                        self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
+                        phfields.remove(field)
+            self.assertEqual(phfields, [])

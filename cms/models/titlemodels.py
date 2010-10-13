@@ -1,14 +1,13 @@
+from cms.models.managers import TitleManager
+from cms.models.pagemodel import Page
+from cms.utils.helpers import reversion_register
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from publisher import Publisher
-from django.conf import settings
-from cms.models.managers import TitleManager
-from cms.models.pagemodel import Page
-from cms.utils.helpers import reversion_register
 
 class Title(Publisher):
-    language = models.CharField(_("language"), max_length=5, db_index=True)
+    language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
@@ -86,6 +85,4 @@ class EmptyTitle(object):
         return None
     
     
-if 'reversion' in settings.INSTALLED_APPS: 
-    import reversion       
-    reversion.register(Title)
+reversion_register(Title)

@@ -1,27 +1,26 @@
-from django.conf import settings
-from django import forms
-from django.template.defaultfilters import slugify
-from django.utils.translation import ugettext_lazy as _, get_language
-from django.forms.util import ErrorList
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Permission, Group
-from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields import BooleanField
-
-
-from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE,\
-    PageUserGroup
-from cms.utils.urlutils import any_path_re
-from cms.utils.permissions import get_current_user, get_subordinate_users,\
-    get_subordinate_groups, mail_page_user_change
+from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, \
+    PageUserGroup
 from cms.utils.page import is_valid_page_slug
-from django.forms.widgets import HiddenInput
+from cms.utils.permissions import get_current_user, get_subordinate_users, \
+    get_subordinate_groups, mail_page_user_change
+from cms.utils.urlutils import any_path_re
+from django import forms
+from django.conf import settings
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
+from django.db.models.fields import BooleanField
+from django.forms.util import ErrorList
+from django.forms.widgets import HiddenInput
+from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
-from django.utils.functional import lazy
-from cms.apphook_pool import apphook_pool
+
+
 
 
 class PageAddForm(forms.ModelForm):

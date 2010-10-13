@@ -1,13 +1,10 @@
-from cms.models.placeholdermodel import Placeholder
-from cms.forms.widgets import PlaceholderPluginEditorWidget
-from django.utils.safestring import mark_safe
-from django.utils.text import capfirst
-from django.utils.importlib import import_module
-from django.template.loader import render_to_string
-from django.db import models
-from cms.models.pagemodel import Page
 from cms.forms.fields import PageSelectFormField, PlaceholderFormField
+from cms.forms.widgets import PlaceholderPluginEditorWidget
+from cms.models.pagemodel import Page
+from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction
+from django.db import models
+from django.utils.text import capfirst
 
 
 class PlaceholderField(models.ForeignKey):
