@@ -46,7 +46,7 @@ class CMSPlugin(MpttPublisher):
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
-    language = models.CharField(_("language"), max_length=5, blank=False, db_index=True, editable=False)
+    language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
     
