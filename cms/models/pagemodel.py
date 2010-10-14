@@ -361,7 +361,8 @@ class Page(MpttPublisher):
             try:
                 old_public = self.get_public_object()
                 old_public.publisher_state = Publisher.PUBLISHER_STATE_DELETE
-                old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
+                old_public.publisher_draft=None
+                #old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
                 old_public.save()
             except:
                 transaction.rollback()
@@ -369,7 +370,7 @@ class Page(MpttPublisher):
                 transaction.commit()
 
             # we hook into the modified copy_page routing to do the heavy lifting of copying the draft page to a new public page
-            public = self.copy_page(target=None, site=self.site, copy_moderation=False, position=None, copy_permissions=False, public_copy=True)
+            new_public = self.copy_page(target=None, site=self.site, copy_moderation=False, position=None, copy_permissions=False, public_copy=True)
 
             # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
             # insert_at() was maybe calling _create_tree_space() method, in this
@@ -380,7 +381,7 @@ class Page(MpttPublisher):
                 self.tree_id = me.tree_id
 
             self.published = True
-            self.publisher_public = public
+            self.publisher_public = new_public
             self.moderator_state = Page.MODERATOR_APPROVED
             self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
             self._publisher_keep_state = True        
@@ -413,13 +414,13 @@ class Page(MpttPublisher):
             # reparent public child pages before delete so they don't get purged as well
             for child_page in old_public.children.all():
                 if child_page.publisher_draft:
-                    child_page.parent = public
+                    child_page.parent = new_public
                     child_page.lft = child_page.publisher_draft.lft
                     child_page.rght = child_page.publisher_draft.rght
                     child_page.tree_id = child_page.publisher_draft.tree_id
                     child_page.level = child_page.publisher_draft.level
                     child_page.save(change_state=False)
-                transaction.commit()
+            transaction.commit()
             old_public.delete()
 
         # manually commit the last transaction batch
