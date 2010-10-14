@@ -37,7 +37,7 @@ class Page(MpttPublisher):
     MODERATOR_NEED_APPROVEMENT = 1
     MODERATOR_NEED_DELETE_APPROVEMENT = 2
     MODERATOR_APPROVED = 10
-    # special case - page was approved, but some of page parents if not approved yet
+    # special case - page was approved, but some of page parents are not approved yet
     MODERATOR_APPROVED_WAITING_FOR_PARENTS = 11
     
     moderator_state_choices = (
@@ -199,7 +199,11 @@ class Page(MpttPublisher):
                 page.publisher_is_draft=False
                 page.publisher_status = Page.MODERATOR_APPROVED
                 # we need to set relate this new public copy to its draft page (self)
-                page.publisher_public = self
+                page.publisher_draft = self
+                page.lft = self.lft
+                page.rght = self.rght
+                page.tree_id = self.tree_id
+                page.level = self.level
                 
                 # code taken from Publisher publish() overridden here as we need to save the page
                 # before we are able to use the page object for titles, placeholders etc.. below
@@ -406,13 +410,19 @@ class Page(MpttPublisher):
         # we delete the old public page - this only deletes the public page as we
         # have removed the old_public.publisher_public=None relationship to the draft page above
         if old_public:
-            # reparent child pages before delete
-            #for child_page in self.children.all():
-            #    child_page.parent = public
-            #    child_page.save()
+            # reparent public child pages before delete so they don't get purged as well
+            for child_page in old_public.children.all():
+                if child_page.publisher_draft:
+                    child_page.parent = public
+                    child_page.lft = child_page.publisher_draft.lft
+                    child_page.rght = child_page.publisher_draft.rght
+                    child_page.tree_id = child_page.publisher_draft.tree_id
+                    child_page.level = child_page.publisher_draft.level
+                    child_page.save(change_state=False)
+                transaction.commit()
             old_public.delete()
-       
-        # manually commit the last transaction batch     
+
+        # manually commit the last transaction batch
         transaction.commit()
         
         # fire signal after publishing is done

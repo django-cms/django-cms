@@ -162,6 +162,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         return page
     
     def approve_page(self, page):
+        #import ipdb; ipdb.set_trace()
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
         self.assertRedirects(response, URL_CMS_PAGE)
         # reload page
