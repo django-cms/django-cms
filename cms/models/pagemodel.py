@@ -199,11 +199,7 @@ class Page(MpttPublisher):
                 page.publisher_is_draft=False
                 page.publisher_status = Page.MODERATOR_APPROVED
                 # we need to set relate this new public copy to its draft page (self)
-                page.publisher_draft = self
-                page.lft = self.lft
-                page.rght = self.rght
-                page.tree_id = self.tree_id
-                page.level = self.level
+                page.publisher_public = self
                 
                 # code taken from Publisher publish() overridden here as we need to save the page
                 # before we are able to use the page object for titles, placeholders etc.. below
@@ -361,8 +357,7 @@ class Page(MpttPublisher):
             try:
                 old_public = self.get_public_object()
                 old_public.publisher_state = Publisher.PUBLISHER_STATE_DELETE
-                old_public.publisher_draft=None
-                #old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
+                old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
                 old_public.save()
             except:
                 transaction.rollback()
@@ -413,13 +408,13 @@ class Page(MpttPublisher):
         if old_public:
             # reparent public child pages before delete so they don't get purged as well
             for child_page in old_public.children.all():
-                if child_page.publisher_draft:
+                if child_page.publisher_public:
                     child_page.parent = new_public
-                    child_page.lft = child_page.publisher_draft.lft
-                    child_page.rght = child_page.publisher_draft.rght
-                    child_page.tree_id = child_page.publisher_draft.tree_id
-                    child_page.level = child_page.publisher_draft.level
-                    child_page.save(change_state=False)
+                    child_page.lft = child_page.publisher_public.lft
+                    child_page.rght = child_page.publisher_public.rght
+                    child_page.tree_id = child_page.publisher_public.tree_id
+                    child_page.level = child_page.publisher_public.level
+                    child_page.save()
             transaction.commit()
             old_public.delete()
 
