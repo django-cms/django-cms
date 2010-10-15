@@ -5,6 +5,7 @@ from cms.utils.plugins import get_placeholders
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.template import TemplateSyntaxError
 from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
     Example5
 
@@ -89,3 +90,6 @@ class PlaceholderTestCase(CMSTestCase):
                         self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
                         phfields.remove(field)
             self.assertEqual(phfields, [])
+            
+    def test_11_placeholder_scanning_fail(self):
+        self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
