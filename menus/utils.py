@@ -179,11 +179,26 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
+class _SimpleLanguageChanger(object):
+    def __init__(self, request):
+        self.request = request
+        self._app_path = None
+        
+    @property
+    def app_path(self):
+        if self._app_path is None:
+            self._app_path = self.request.path[len(self.get_page_path(self.request.LANGUAGE_CODE)):]
+        return self._app_path
+        
+    def __call__(self, lang):
+        return '%s%s' % (self.get_page_path(lang), self.app_path)
+    
+    def get_page_path(self, lang):
+        return self.request.current_page.get_absolute_url(language=lang) 
+
 def simple_language_changer(func):
     def _wrapped(request, *args, **kwargs):
-        def _language_changer(lang):
-            return request.path
-        set_language_changer(request, _language_changer)
+        set_language_changer(request, _SimpleLanguageChanger(request))
         return func(request, *args, **kwargs)
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__
