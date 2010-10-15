@@ -162,7 +162,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         return page
     
     def approve_page(self, page):
-        #import ipdb; ipdb.set_trace()
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
         self.assertRedirects(response, URL_CMS_PAGE)
         # reload page
@@ -586,7 +585,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         pg = self.create_page(pf, position="right", title="pg")
         ph = self.create_page(pf, position="right", title="ph")
         
-        
         self.assertEqual(not pg.publisher_public, True)
         
         # login as master for approval
@@ -632,7 +630,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         pg = self.reload_page(pg)
         ph = self.reload_page(ph)
         
-        
         # check urls - they should stay them same, there wasn't approved yet
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
@@ -656,7 +653,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # check if urls are correct after move
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
-
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')     
         
     def test_17_plugins_get_published(self):

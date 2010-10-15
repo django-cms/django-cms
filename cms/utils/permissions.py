@@ -217,7 +217,7 @@ def mail_page_user_change(user, created=False, password=""):
 
 def has_generic_permission(page_id, user, attr, site):
     """Permission getter for single page with given id.
-    """    
+    """
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
     permission = func(user, site)
     return permission == Page.permissions.GRANT_ALL or page_id in permission

@@ -178,8 +178,14 @@ def approve_page(request, page):
     """
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
     if not moderator_should_approve(request, page):
-        # escape soon if there isn't any approvement required by this user
-        return
+        # escape soon if there isn't any approval required by this user
+        try:    # it is possible publisher_public doesn't exist - first time publish
+            if page.get_absolute_url() != page.publisher_public.get_absolute_url():
+                page.publish
+            else:
+                return
+        except:
+            return
     if not moderation_required:
         # this is a second case - user can publish changes
         if page.pagemoderatorstate_set.get_delete_actions().count():

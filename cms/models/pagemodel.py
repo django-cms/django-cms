@@ -414,7 +414,7 @@ class Page(MpttPublisher):
                     child_page.rght = child_page.publisher_public.rght
                     child_page.tree_id = child_page.publisher_public.tree_id
                     child_page.level = child_page.publisher_public.level
-                    child_page.save()
+                    child_page.save(change_state=False)
             transaction.commit()
             old_public.delete()
 
