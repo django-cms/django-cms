@@ -1,3 +1,5 @@
+from cms.models.titlemodels import Title
+from django.conf import settings
 
 
 def mark_descendants(nodes):
@@ -194,7 +196,10 @@ class _SimpleLanguageChanger(object):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
     
     def get_page_path(self, lang):
-        return self.request.current_page.get_absolute_url(language=lang) 
+        try:
+            return self.request.current_page.get_absolute_url(language=lang, fallback=False)
+        except Title.DoesNotExist:
+            return self.request.current_page.get_absolute_url(language=lang, fallback=True)
 
 def simple_language_changer(func):
     def _wrapped(request, *args, **kwargs):
@@ -205,7 +210,6 @@ def simple_language_changer(func):
     return _wrapped
 
     
-from django.conf import settings 
 
 def handle_navigation_manipulators(navigation_tree, request):
     for handler_function_name, name in settings.CMS_NAVIGATION_MODIFIERS:
