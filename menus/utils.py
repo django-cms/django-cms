@@ -187,14 +187,21 @@ class _SimpleLanguageChanger(object):
     @property
     def app_path(self):
         if self._app_path is None:
-            self._app_path = self.request.path[len(self.get_page_path(self.request.LANGUAGE_CODE)):]
+            page_path = self.get_page_path(self.request.LANGUAGE_CODE)
+            if page_path:
+                self._app_path = self.request.path[len(page_path):]
+            else:
+                self._app_path = self.request.path
         return self._app_path
         
     def __call__(self, lang):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
     
     def get_page_path(self, lang):
-        return self.request.current_page.get_absolute_url(language=lang) 
+        if getattr(self.request, 'current_page'):
+            return self.request.current_page.get_absolute_url(language=lang)
+        else:
+            return None
 
 def simple_language_changer(func):
     def _wrapped(request, *args, **kwargs):
