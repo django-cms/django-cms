@@ -18,6 +18,7 @@ class Migration:
             db.delete_foreign_key('cmsplugin_text' ,'public_id')
         except:
             pass
+
         db.drop_primary_key("cmsplugin_textpublic")  
         db.create_primary_key("cmsplugin_textpublic", ("cmspluginpublic_ptr_id",))
         db.foreign_key_sql('cmsplugin_text' ,'public_id', 'cmsplugin_textpublic', 'cmspluginpublic_ptr_id')

@@ -119,8 +119,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         page_permission.save()
         return page_permission
     
-    def add_plugin(self, user):
-        slave_page = self.slave_page
+    def add_plugin(self, user, page=None):
+        if page:
+            slave_page = page
+        else:
+            slave_page = self.slave_page
         
         post_data = {
             'language': 'en',
@@ -329,8 +332,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         response = self.client.post(url, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         # public model shouldn't be available yet, because of the moderation
-        self.assertObjectExist(Title.objects, slug=page_data['slug'])
-        self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
+        # removed test cases since Title object does not inherit from Publisher anymore
+        #self.assertObjectExist(Title.objects, slug=page_data['slug'])
+        #self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
         # page created?
         page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=page_data['slug'])
@@ -581,7 +585,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         pg = self.create_page(pf, position="right", title="pg")
         ph = self.create_page(pf, position="right", title="ph")
         
-        
         self.assertEqual(not pg.publisher_public, True)
         
         # login as master for approval
@@ -627,7 +630,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         pg = self.reload_page(pg)
         ph = self.reload_page(ph)
         
-        
         # check urls - they should stay them same, there wasn't approved yet
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
@@ -651,14 +653,13 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # check if urls are correct after move
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
-
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')     
         
     def test_17_plugins_get_published(self):
         self.login_user(self.user_super)
         # create page under root
         page = self.create_page()
-        self.add_plugin(self.user_super)
+        self.add_plugin(self.user_super, page)
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         self.publish_page(page, True, self.user_super, True)

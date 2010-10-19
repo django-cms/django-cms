@@ -64,9 +64,9 @@ class RenderingTestCase(CMSTestCase):
         t2 = Title(page=p2, language=settings.LANGUAGES[0][0], slug=self.test_data2['slug'], title=self.test_data2['title'])
         t2.save()
         # Insert some test Text plugins
-        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['main'], position=0, body=self.test_data['text_main'], publisher_state=1, publisher_is_draft=False)
+        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['main'], position=0, body=self.test_data['text_main'])
         pl.insert_at(None, commit=True)
-        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'], publisher_state=1, publisher_is_draft=False)
+        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'])
         pl.insert_at(None, commit=True)
 
         # Insert another page that is not the home page
@@ -79,7 +79,7 @@ class RenderingTestCase(CMSTestCase):
         for placeholder in p3.placeholders.all():
             self.test_placeholders3[placeholder.slot] = placeholder
         # # Insert some test Text plugins
-        pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'], publisher_state=1, publisher_is_draft=False)
+        pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'])
         pl.insert_at(None, commit=True)
 
         # Reload test pages

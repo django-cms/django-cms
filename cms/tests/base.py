@@ -152,6 +152,7 @@ class CMSTestCase(TestCase):
         # public model shouldn't be available yet, because of the moderation
         self.assertObjectExist(Title.objects, slug=page_data['slug'])
         
+# test case currently failing because Title model is no longer under Publisher
         if settings.CMS_MODERATOR and page.is_under_moderation(): 
             self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
