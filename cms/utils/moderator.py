@@ -181,7 +181,7 @@ def approve_page(request, page):
         # escape soon if there isn't any approval required by this user
         try:    # it is possible publisher_public doesn't exist - first time publish
             if page.get_absolute_url() != page.publisher_public.get_absolute_url():
-                page.publish
+                page.publish()
             else:
                 return
         except:

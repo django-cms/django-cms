@@ -337,6 +337,7 @@ class Page(MpttPublisher):
 
         Returns: True if page was successfully published.
         """
+        
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
             return
@@ -410,10 +411,6 @@ class Page(MpttPublisher):
             for child_page in old_public.children.all():
                 if child_page.publisher_public:
                     child_page.parent = new_public
-                    child_page.lft = child_page.publisher_public.lft
-                    child_page.rght = child_page.publisher_public.rght
-                    child_page.tree_id = child_page.publisher_public.tree_id
-                    child_page.level = child_page.publisher_public.level
                     child_page.save(change_state=False)
             transaction.commit()
             old_public.delete()
