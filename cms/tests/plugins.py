@@ -123,7 +123,7 @@ class PluginsTestCase(CMSTestCase):
         for text in Text.objects.all():
             self.assertEquals(text.body, "Hello World")
 
-    def test_03_remove_plugin(self):
+    def test_03_remove_plugin_before_published(self):
         """
         When removing a draft plugin we would expect the public copy of the plugin to also be removed
         """
@@ -141,6 +141,8 @@ class PluginsTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
 
         # delete the plugin
         plugin_data = {
@@ -149,3 +151,52 @@ class PluginsTestCase(CMSTestCase):
         remove_url = URL_CMS_PLUGIN_REMOVE
         response = self.client.post(remove_url, plugin_data)
         self.assertEquals(response.status_code, 200)
+        # there should be no plugins
+        self.assertEquals(0, CMSPlugin.objects.all().count())
+        
+        
+    def test_04_remove_plugin_after_published(self):
+        # add a page
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        # add a plugin
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        #publish page
+        page.publish()
+        
+        # there should now be two plugins - 1 draft, 1 public
+        self.assertEquals(2, CMSPlugin.objects.all().count())
+        
+        # delete the plugin
+        plugin_data = {
+            'plugin_id': int(response.content)
+        }
+        remove_url = URL_CMS_PLUGIN_REMOVE
+        response = self.client.post(remove_url, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        
+        # there should be no plugins
+        self.assertEquals(0, CMSPlugin.objects.all().count())
+        
+    def test_05_remove_plugin_after_published_under_moderation(self):
+        pass
+        
+    def test_06_remove_plugin_not_associated_to_page(self):
+        """
+        Test case for PlaceholderField
+        """
+        pass
+        
+    

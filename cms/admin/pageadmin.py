@@ -1280,7 +1280,6 @@ class PageAdmin(model_admin):
             if page and settings.CMS_MODERATOR and page.is_under_moderation():
                 # delete the draft version of the plugin
                 plugin.delete()
-                # set the page to require approval - Publish will take care of the rest
             else:
                 plugin.delete_with_public()
 
