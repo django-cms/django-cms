@@ -4,7 +4,8 @@ from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
+    URL_CMS_PLUGIN_REMOVE
 from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
@@ -121,5 +122,30 @@ class PluginsTestCase(CMSTestCase):
             self.assertNotEqual(link.parent, None)
         for text in Text.objects.all():
             self.assertEquals(text.body, "Hello World")
-        
-        
+
+    def test_03_remove_plugin(self):
+        """
+        When removing a draft plugin we would expect the public copy of the plugin to also be removed
+        """
+        # add a page
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        # add a plugin
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+
+        # delete the plugin
+        plugin_data = {
+            'plugin_id': int(response.content)
+        }
+        remove_url = URL_CMS_PLUGIN_REMOVE
+        response = self.client.post(remove_url, plugin_data)
+        self.assertEquals(response.status_code, 200)
