@@ -15,12 +15,46 @@ from cms.plugins.link.models import Link
 class PluginsTestCase(CMSTestCase):
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
+        self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.super_user.set_password("test")
+        self.super_user.save()
         
-        self.login_user(u)
-    
+        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave.set_password("slave")
+        self.slave.save()
+        
+        self.login_user(self.super_user)
+
+# REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
+    def publish_page(self, page, approve=False, user=None, published_check=True):
+        if user:
+            self.login_user(user)
+
+        # publish / approve page by master
+        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
+        self.assertEqual(response.status_code, 200)
+
+        if not approve:
+            return self.reload_page(page)
+
+        # approve
+        page = self.approve_page(page)
+
+        if published_check:
+            # must have public object now
+            assert(page.publisher_public)
+            # and public object must be published
+            assert(page.publisher_public.published)
+
+        return page
+
+    def approve_page(self, page):
+        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        # reload page
+        return self.reload_page(page)
+
+
     def test_01_add_edit_plugin(self):
         """
         Test that you can add a text plugin
@@ -28,7 +62,6 @@ class PluginsTestCase(CMSTestCase):
         # add a new text plugin
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-#        self.assertRedirects(response, URL_CMS_PAGE)
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type':"TextPlugin",
@@ -173,8 +206,8 @@ class PluginsTestCase(CMSTestCase):
         # there should be only 1 plugin
         self.assertEquals(1, CMSPlugin.objects.all().count())
         
-        #publish page
-        page.publish()
+        # publish page
+        page = self.publish_page(page)
         
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(2, CMSPlugin.objects.all().count())
@@ -191,8 +224,51 @@ class PluginsTestCase(CMSTestCase):
         self.assertEquals(0, CMSPlugin.objects.all().count())
         
     def test_05_remove_plugin_after_published_under_moderation(self):
-        pass
+        # create content as limited rights user
+        self.login_user(self.super_user)
+        page = self.create_page()
+
+        # add a plugin
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
         
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        # check publish box
+        page = self.publish_page(page, published_check=False)
+    
+        # there should now be two plugins - 1 draft, 1 public
+        self.assertEquals(2, CMSPlugin.objects.all().count())
+        
+        # --------------------------------------------
+        #  Login as slave user and delete the plugin
+        # --------------------------------------------
+        self.login_user(self.super_user)
+        # delete the plugin
+        plugin_data = {
+            'plugin_id': int(response.content)
+        }
+        remove_url = URL_CMS_PLUGIN_REMOVE
+        response = self.client.post(remove_url, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        
+        # there should still be 2 plugins - 1 draft, 1 public until approval
+        self.assertEquals(0, CMSPlugin.objects.all().count())
+        
+        # login as super user and approve the page
+        self.login_user(self.super_user)
+        page = self.approve_page(page)
+        
+        # there should now be 0 plugins
+        self.assertEquals(0, CMSPlugin.objects.all().count())
+
     def test_06_remove_plugin_not_associated_to_page(self):
         """
         Test case for PlaceholderField
