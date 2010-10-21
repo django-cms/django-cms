@@ -241,6 +241,17 @@ class CMSPlugin(Mptt):
         Handle copying of any relations attached to this plugin
         """
         
+    def delete_with_public(self):
+        """
+            Delete the public copy of this plugin,
+            then delete the draft
+        """
+        position = self.get_position_in_placeholder()
+        slot = self.placeholder.slot
+        if self.page and getattr(self.page, 'publisher_public'):
+            self.page.publisher_public.cmsplugin_set.filter(slot=slot, position=position).delete()
+        self.delete()
+        
     def has_change_permission(self, request):
         page = get_page_from_placeholder_if_exists(self.placeholder)
         if page:
