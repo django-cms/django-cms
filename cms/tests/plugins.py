@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
     URL_CMS_PLUGIN_REMOVE
-from cms.models import Page, Title
+from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
@@ -197,6 +197,42 @@ class PluginsTestCase(CMSTestCase):
         """
         Test case for PlaceholderField
         """
-        pass
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        # add a plugin
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        ph = Placeholder(slot="subplugin")
+        ph.save()
+        
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder': ph.pk,
+            'parent': int(response.content)
+        }
+        
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        
+        plugin_data = {
+            'plugin_id': int(response.content)
+        }
+        
+        remove_url = URL_CMS_PLUGIN_REMOVE
+        
+        response = response.client.post(remove_url, plugin_data)
+        self.assertEquals(response.status_code, 200)
         
     
