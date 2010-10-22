@@ -1278,6 +1278,7 @@ class PageAdmin(model_admin):
                 raise Http404
 
             if page and settings.CMS_MODERATOR and page.is_under_moderation():
+                # delete the draft version of the plugin
                 plugin.delete()
             else:
                 plugin.delete_with_public()

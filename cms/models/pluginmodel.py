@@ -220,6 +220,7 @@ class CMSPlugin(Mptt):
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
+        new_plugin.position = self.position
         new_plugin.save()
         if plugin_instance:
             plugin_instance.pk = new_plugin.pk
@@ -231,6 +232,7 @@ class CMSPlugin(Mptt):
             plugin_instance.level = new_plugin.level
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
+            plugin_instance.position = new_plugin.position # added to retain the position when creating a public copy of a plugin
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
@@ -240,6 +242,19 @@ class CMSPlugin(Mptt):
         """
         Handle copying of any relations attached to this plugin
         """
+        
+    def delete_with_public(self):
+        """
+            Delete the public copy of this plugin,
+            then delete the draft
+        """
+        position = self.position
+        slot = self.placeholder.slot
+        if self.page and getattr(self.page, 'publisher_public'):
+            placeholder = Placeholder.objects.get(page=self.page.publisher_public, slot=slot)
+            public_plugin = CMSPlugin.objects.get(placeholder=placeholder, position=position)
+            public_plugin.delete()
+        self.delete()
         
     def has_change_permission(self, request):
         page = get_page_from_placeholder_if_exists(self.placeholder)
