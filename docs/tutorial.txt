@@ -195,11 +195,113 @@ webservers you may want to head over to http://www.django-project.com/
 Templates
 ---------
 
-My First App
-------------
-
 My First Plugin
 ---------------
+
+There are a few plugins within the CMS that let you put basic content into the
+placeholders of a page. To be able to put a custom content into a placeholder,
+you need to write a CMS Plugin. A Plugin consists of two things. A Model that
+holds the actual data you want to store and a Plugin Class that tells the CMS
+how to render it. Lets write a Plugin that displays a title and some text.
+
+Create a django application and install it in settings.py. As you want to save
+data to the Database you need to write a model in your models.py. ::
+
+  from cms.models import CMSPlugin
+  class TextWithTitle(CMSPlugin):
+      title = models.CharField(max_length=50)
+      text =  models.TextField()
+
+Note that the model does not inherit from django.db.models.Model but from
+cms.models.CMSPlugin.
+
+Run syncdb to create the according database tables. ::
+
+  python manage.py syncdb
+
+Now that you have a model that stores your plugin data you need to tell django-cms
+about your plugin. For that you need to write the plugin class that inherits from
+CMSPluginBase. Do this in a file called **cms_plugins.py** in your application
+folder. ::
+
+  from cms.plugin_base import CMSPluginBase
+  from cms.plugin_pool import plugin_pool
+  from models import TextWithTitle
+  from django.utils.translation import ugettext as _
+
+  class TextWithTitlePlugin(CMSPluginBase):
+      model = TextWithTitle
+      name = _("Text with Title")
+      render_template = "textwithtitle.html"
+
+      def render(self, context, instance, placeholder):
+          context.update({'instance':instance,
+                          'placeholder':placeholder})
+          return context
+
+The TextWithTitlePlugin class inherits from CMSPluginBase. It holds information
+about its name, the model its associated with and the Template to render it with.
+
+Finaly you have to register this plugin (in cms_plugins.py) to actually tell
+the CMS about your plugin. This happens with: ::
+
+  plugin_pool.register_plugin(TextWithTitlePlugin)
+
+**Attributes**
+
+These are the attributes you have to provide for the plugin to work.
+
+:model:
+  Specify the Model this Plugin uses to save Data. You dont have to write a
+  custom Model if you plugin just wants to display some HTML for example. If
+  doing so you should just Provide the CMSPlugin Class as this Plugins Model
+
+:name:
+  The Name of this plugin in the admin.
+
+:render_template:
+  The Template that is being use to render this plugin. This is not the template
+  beeing used to render the plugin in the admin backend or frontend editing parts.
+
+CMSPluginBase inherits from django.contrib.admin.ModelAdmin which gives you
+the possibility to further customize behaviour in the admin backend. For example
+provide a new change form for this plugin using **the change_form_template**
+attribute. See http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
+
+**The render Function**
+
+The render Function is called when the plugin is rendered on a page. Modify the
+context given and set additional data you want while rendering with the
+template from render_template. This function is only called when rendering the
+plugin on a page. Set change_form_template if you want to modify the form
+that lets you edit its data.
+
+:context:
+  The Context with which the plugin gets rendered.
+
+:instance:
+  The instance of the model specified by model.
+
+:placeholder:
+  The placeholder this plugin gets rendered in.
+
+
+The Template for this Plugin could look like this: ::
+
+  <h1>{{ instance.title }}</h1>
+  <p>{{ instance.text }}</p>
+
+The context while rendering the plugin is the one you return in the render
+function. In our example we passed 'instance' and now can access all our
+pluginmodel's fields through this variable.
+
+You should now be able to select this plugin under its name in any placeholder
+on any page. The Template is searched with normal django template lookup mechanisms
+so you may need to alter the setting of render_template to appropriatly meet your
+needs.
+
+My First App
+------------
 
 My First Menu
 -------------
