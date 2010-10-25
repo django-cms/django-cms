@@ -8,25 +8,50 @@ Welcome to django cms's documentation!
 
 This document refers to version |release|
 
-Contents:
+Getting Started
+---------------
 
 .. toctree::
-	:maxdepth: 2
-   	:numbered:
+    :maxdepth: 2
+    :numbered:
 
-	installation
-	tutorial
-	configuration
-	navigation
-	plugins
-	custom_plugins
-	i18n
-	sitemap
-	app_integration
-	plugin_reference
-	templatetags
-	contribution
-        placeholders
+    installation
+    tutorial
+    configuration
+    navigation
+    plugins
+    
+Advanced
+--------
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+       
+    i18n
+    sitemap
+    templatetags
+    
+Extending the CMS
+-----------------
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    custom_plugins
+    app_integration
+    plugin_reference
+    placeholders
+    
+Contributing to the CMS
+-----------------------
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    contribution
 
 
 
