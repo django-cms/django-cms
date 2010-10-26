@@ -20,6 +20,7 @@ from publisher.errors import PublisherCantPublish
 from cms.utils.urlutils import urljoin
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
 from cms.utils.page import get_available_slug, check_title_slugs
 from cms.exceptions import NoHomeFound
 from cms.utils.helpers import reversion_register
@@ -415,12 +416,14 @@ class Page(MpttPublisher):
             transaction.commit()
             
             # delete its placeholders and plugins
-            from cms.models.pluginmodel import CMSPlugin
             placeholders = old_public.placeholders.all()
             for ph in placeholders:
-                plugin = CMSPlugin.objects.filter(placeholder=ph)
-                plugin.delete()
-                ph.delete()
+                try:
+                    plugin = CMSPlugin.objects.filter(placeholder=ph)
+                    plugin.delete()
+                    ph.delete()
+                except:
+                    pass
                 
             # finally delete the old public page    
             old_public.delete()
