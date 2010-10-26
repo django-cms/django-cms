@@ -403,7 +403,7 @@ class Page(MpttPublisher):
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
             page.publish()
-            
+
         # we delete the old public page - this only deletes the public page as we
         # have removed the old_public.publisher_public=None relationship to the draft page above
         if old_public:
@@ -413,11 +413,20 @@ class Page(MpttPublisher):
                     child_page.parent = new_public
                     child_page.save(change_state=False)
             transaction.commit()
+            
+            # delete its placeholders and plugins
+            from cms.models.pluginmodel import CMSPlugin
+            placeholders = old_public.placeholders.all()
+            for ph in placeholders:
+                plugin = CMSPlugin.objects.filter(placeholder=ph)
+                plugin.delete()
+                ph.delete()
+                
+            # finally delete the old public page    
             old_public.delete()
-
         # manually commit the last transaction batch
         transaction.commit()
-        
+
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
