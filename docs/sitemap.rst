@@ -4,38 +4,23 @@ Sitemap Guide
 Sitemap
 -------
 
-Sitemap are xml files fetched by google to help your site indexation.
-You have to tell google were the sitemap is with the **Webmaster Tools**
+Sitemaps are XML files used by Google to index your website by using their
+**Webmaster Tools** and telling them the location of your sitemap.
 
 The CMSSitemap will create a sitemap with all the published pages of your cms
 
-Apps
-----
+Configuration
+-------------
 
-Add the following to your project's ``INSTALLED_APPS`` setting::
-
-	INSTALLED_APPS = (
-		...
-		'django.contrib.sitemaps',
-		...
-	)
-
-urls.py
--------
-
-In your main ``urls.py`` add the following import at the top of the file:
-   	from cms.sitemaps import CMSSitemap
-
-Then add the following line at the **start** of the ``urlpatterns`` definition::
-
-    urlpatterns = (
-		url(r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}}),
-		...
-	)
+Add ``django.contrib.sitemaps`` to your project's ``INSTALLED_APPS`` setting.
+Add ``from cms.sitemaps import CMSSitemap`` to the top of your main `urls.py`.
+Add ``url(r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}})``
+to your urlpatterns.
 	
 Django.contrib.sitemaps
 -----------------------
 
-More information about ``djangot.contrib.sitemaps`` can be found in the official django documentation `here <http://docs.djangoproject.com/en/dev/ref/contrib/sitemaps/>`_.
+More information about ``djangot.contrib.sitemaps`` can be found in the official
+`Django documentation <http://docs.djangoproject.com/en/dev/ref/contrib/sitemaps/>`_.
 
  

@@ -73,13 +73,13 @@ Template Context Processors
 Templates
 ---------
 
-You have to define at least one template in `CMS_TEMPLATES` which should
-contain at least one `{% placeholder '<name>' %}` tag.
+You have to define at least one template in ``CMS_TEMPLATES`` which should
+contain at least one ``{% placeholder '<name>' %}`` tag.
 
 urls.py
 -------
 
-Include `cms.urls` **at the very end** of your urlpatterns. It **must** be the
+Include ``cms.urls`` **at the very end** of your urlpatterns. It **must** be the
 last pattern in the list!
 
 Media Files
@@ -87,15 +87,15 @@ Media Files
 
 Make sure your Django installation finds the cms media files, for this task we
 recommend using django-appmedia which will create a symbolic link for you. If
-for whatever reason you are unable to use it, copy the folder `cms/media/cms`
+for whatever reason you are unable to use it, copy the folder ``cms/media/cms``
 into your main media folder.
 
 South
 -----
 
 To avoid issues with migrations during the installation process it is currently
-recommended to use `python manage.py syncdb --all` and
-`python manage.py migrate --fake` for **new** projects. Note that the cms
+recommended to use ``python manage.py syncdb --all`` and
+``python manage.py migrate --fake`` for **new** projects. Note that the cms
 migrations can not be supported on sqlite3.
 
 
@@ -110,6 +110,6 @@ If you create a page and you don't see a page in the list view:
 If you edit a Page but don't see a "Add Plugin" button and a dropdown-list
 with plugins:
 
-- Be sure your CMS_TEMPLATES setting is correct and that the templates specified
-  actually exist. Maybe check that you are not missing a '{% placeholder %}'
-  templatetag in the template.
+- Be sure your ``CMS_TEMPLATES`` setting is correct and that the templates
+  specified actually exist and have at least one ``{% placeholder %}``
+  templatetag in them template.
