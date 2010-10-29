@@ -1,6 +1,10 @@
 Contribution Guide
 ==================
 
+Being an open source project we very much appreciate contributions from the
+community. You don't have to know how to code to be able to contribute,
+translations and documentation improvements are at least as welcome as code.
+
 Community
 ---------
 
@@ -27,6 +31,10 @@ Review or write documentation
 People interested in writing documentation and/or reviewing the documentation
 already existing are more than welcome to do so. The best way to do so is to
 `fork`_ the cms on github, change the relevant files and send us a pull request.
+
+If you think you're not familiar enough with the project to write documentation
+you can still read over the existing one and suggest on how to improve it or
+point out mistakes in it.
 
 For our documentation we use `sphinx`_, which is based off Restructured Text.
 
@@ -57,10 +65,10 @@ not to do any work that will not get merged in anyway.
 Coding Guidelines
 ~~~~~~~~~~~~~~~~~
 
-- Follow the `PEP8`_ coding style guidelines whenever possible.
-- All code **must** be unittest covered. Tests are not optional!
-- If you change a public API you must also change their documentation.
-- Please comment your code. 
+* Follow the `PEP8`_ coding style guidelines whenever possible.
+* All code **must** be unittest covered. Tests are not optional!
+* If you change a public API you must also change their documentation.
+3 Please comment your code. 
 
 
 .. _fork: http://github.com/divio/django-cms

@@ -5,200 +5,98 @@ This document assumes that you are familiar with python and django.
 
 A more beginner friendly tutorial can be found :doc:`here </tutorial>`.
 
-Make sure that `cms`, `menus`, `mptt` and `publisher` folders are on your
-pythonpath. They all should come with the distribution.
+Requirements
+------------
 
-python 2.4 - 2.6 should be supported
-
-django 1.2 is required at this moment.
+* Python 2.5 (or a higher release of the 2.x). 2.4 might work, but is not
+  supported.
+* Django 1.2.3 (or a higher release of the 1.2). 1.3 might work, but is not
+  supported yet.
+* South 0.7 or higher
 
 Apps
 ----
 
-Add the following to your project's ``INSTALLED_APPS`` setting if not already
-present::
+Required
+~~~~~~~~
 
-	INSTALLED_APPS = (
-		'django.contrib.auth',
-		'django.contrib.contenttypes',
-		'django.contrib.sessions',
-		'django.contrib.admin',
-		'django.contrib.sites',
-		...
-		'cms',
-		'cms.plugins.text',
-		'cms.plugins.picture',
-		'cms.plugins.link',
-		'cms.plugins.file',
-		'cms.plugins.snippet',
-		'cms.plugins.googlemap',
-		'mptt',
-		'publisher',
-		'menus',
-		...
-	)
+* django.contrib.auth
+* django.contrib.contenttypes
+* django.contrib.sessions
+* django.contrib.admin
+* django.contrib.sites
+* cms
+* mptt
+* menus
 
-Django-cms is compatible with `django-reversion <http://code.google.com/p/django-reversion/>`_ for versioning all the page content and its plugins. Put ``reversion`` in your ``INSTALLED_APPS`` if you have it installed.
+.. note:: mptt is shipped with django-cms and at the moment it is not possible
+		  to use a different version of django-mptt.
 
-If you don't need all the plugins you can comment them out here. For a complete list of all the plugins have a look inside ``cms/plugins/``.
+Optional
+~~~~~~~~
 
-The following apps are also required by the cms:
+* cms.plugins.text
+* cms.plugins.picture
+* cms.plugins.link
+* cms.plugins.file
+* cms.plugins.snippet
+* cms.plugins.googlemap
+* publisher
 
-	'django.contrib.admin'
-	'django.contrib.sites',
 
-Middleware
-----------
+Middlewares
+-----------
 
-Add the following middleware classes::
+Note that the order is important:
 
-	MIDDLEWARE_CLASSES = (
-		'django.middleware.cache.UpdateCacheMiddleware',
-		'django.contrib.sessions.middleware.SessionMiddleware',
-        'cms.middleware.multilingual.MultilingualURLMiddleware'  #<--- new: order is important
-		'django.contrib.auth.middleware.AuthenticationMiddleware',
-		'django.middleware.common.CommonMiddleware',
-		...
-		'cms.middleware.page.CurrentPageMiddleware', #<--- new
-		'cms.middleware.user.CurrentUserMiddleware', #<--- new
-		'cms.middleware.toolbar.ToolbarMiddleware',  #<--- new
-		'cms.middleware.media.PlaceholderMediaMiddleware', #<--- new
-		...
-		'django.middleware.cache.FetchFromCacheMiddleware',
-	)
+#. django.contrib.sessions.middleware.SessionMiddleware
+#. cms.middleware.multilingual.MultilingualURLMiddleware
+#. django.contrib.auth.middleware.AuthenticationMiddleware 
+#. django.middleware.common.CommonMiddleware
+#. cms.middleware.page.CurrentPageMiddleware
+#. cms.middleware.user.CurrentUserMiddleware
+#. cms.middleware.toolbar.ToolbarMiddleware 
+#. cms.middleware.media.PlaceholderMediaMiddleware
 
-If your site is not multilingual you can leave out ``'cms.middleware.MutilingualURLMiddleware'``.
-
-Note:
-
-The order of the middlewares is critical !
-
-- Be sure that ``django.middleware.cache.UpdateCacheMiddleware`` comes first.
-- Be sure that ``cms.middleware.multilingual.MultilingualURLMiddleware`` comes after ``django.contrib.sessions.middleware.SessionMiddleware``.
-- Be sure that ``cms.middleware.user.CurrentUserMiddleware`` comes after ``django.contrib.auth.middleware.AuthenticationMiddleware``.
-- Be sure that ``cms.middleware.multilingual.MultilingualURLMiddleware`` comes after ``django.middleware.locale.LocaleMiddlewar``.
-- Be sure that ``django.middleware.cache.FetchFromCacheMiddleware`` comes last.
-
-``django.middleware.locale.LocaleMiddleware`` MUST NOT be used, ``cms.middleware.multilingual.MultilingualURLMiddleware`` replaces it and add some additional features.
+.. note:: For non-multilingual sites you may remove the 
+		  `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
 
 Template Context Processors
 ---------------------------
 
-Add the following template context processors if not already present::
-
-	TEMPLATE_CONTEXT_PROCESSORS = (
-		"django.core.context_processors.auth",
-		"django.core.context_processors.i18n",
-		"django.core.context_processors.request",
-		"django.core.context_processors.media",
-		"cms.context_processors.media",
-		...
-	)
+* django.core.context_processors.auth
+* django.core.context_processors.i18n
+* django.core.context_processors.request
+* django.core.context_processors.media
+* cms.context_processors.media
 
 Templates
 ---------
 
-If you don't have already a ``gettext`` stub in your ``settings.py`` file, insert the following line
-near the beginning of the file but after any import statements that it may have::
-
-	gettext = lambda s: s
-
-This allows you to use ``gettext`` in ``settings.py``.
-
-Add some templates you want to use within django-cms that contain at least one
-
-``{% placeholder %}`` template tag to your ``settings.py``::
-
-	CMS_TEMPLATES = (
-		('base.html', gettext('default')),
-		('2col.html', gettext('2 Column')),
-		('3col.html', gettext('3 Column')),
-		('extra.html', gettext('Some extra fancy template')),
-	)
-
-For some template examples see the templates used in the example project.
-
-Here's a quick example of what a template might look like::
-
-	{% load cms_tags menu_tags %}
-
-	<div id="menu">{% show_menu 0 100 100 100 %}</div>
-	<div id="breadcrumb">{% show_breadcrumb %}</div>
-	<div id="languagechooser">{% language_chooser %}</div>
-	<div id="content">{% placeholder "content" %}</div>
-	<div id="left_column">{% placeholder "left_column" %}</div>
-
-Internationalization
---------------------
-
-If your site is multilingual be sure to have the ``LANGUAGES`` setting present in your ``settings.py`` file::
-
-	LANGUAGES = (
-		('fr', gettext('French')),
-		('de', gettext('German')),
-		('en', gettext('English')),
-	)
-
-The ´´LANGUAGE_CODE``also must be set to a language that is present in the LANGUAGES touple::
-
-	LANGUAGE_CODE = 'en'
-
-This defines the default language.
+You have to define at least one template in `CMS_TEMPLATES` which should
+contain at least one `{% placeholder '<name>' %}` tag.
 
 urls.py
 -------
 
-
-In your main ``urls.py`` add the following line at the **end** of the ``urlpatterns`` definition::
-
-    urlpatterns = patterns('',
-        url(r'^admin/', include(admin.site.urls)),
-        ...
-        ...
-        url(r'^', include('cms.urls')),
-    )
-
-Other settings
---------------
-
-For a list of all settings that can be overridden in your ``settings.py`` file have a look at ``cms/conf/global_settings.py``.
-
-More information is available in the docs folder: `cms/docs/ <http://github.com/divio/django-cms/tree/master/cms/docs>`_
-You may also want to have a look at the example project to see what settings it uses.
+Include `cms.urls` **at the very end** of your urlpatterns. It **must** be the
+last pattern in the list!
 
 Media Files
 -----------
 
-**ATTENTION:**
-
-Be sure to copy the ``cms/media/cms/`` folder into your media directory or make a symbolic
-link as appropriate.
-
-If installed with pip in a virtualenv the media files may be located in the root folder of the the virtualenv.
-
-You can use something like `django-appmedia <http://code.google.com/p/django-appmedia/>`_ that handles this for you.
-
+Make sure your Django installation finds the cms media files, for this task we
+recommend using django-appmedia which will create a symbolic link for you. If
+for whatever reason you are unable to use it, copy the folder `cms/media/cms`
+into your main media folder.
 
 South
 -----
 
-Django-cms has support for `django-south <http://south.aeracode.org/>`_. South is a database migration tool.
-So if you get a new version of django-cms you also get the db-migrations automatically. Please read the documentation of south
-first before you use it the first time.
-
-If there is a problem with python manage.py migrate:
-
-Create a new ticket on github with your database engine (mysql, postgres), database type (MyIsam, InnoDB), south version
-There are known problems with SQLite and MySQL InnoDB but the Quickfix below should help.
-
-Quick fix:
-
-* Remove ``south`` from the installed apps.
-* Reset database
-* run ``manage.py syncdb``
-* add ``south`` to the installed apps again.
-* run ``manage.py syncdb``
-* run ``manage.py migrate --fake``
+To avoid issues with migrations during the installation process it is currently
+recommended to use `python manage.py syncdb --all` and
+`python manage.py migrate --fake` for **new** projects. Note that the cms
+migrations can not be supported on sqlite3.
 
 
 Troubleshooting
@@ -206,8 +104,12 @@ Troubleshooting
 
 If you create a page and you don't see a page in the list view:
 
-- Be sure you copied all the media files. Check with firebug and its "net" panel if you have any 404s
+- Be sure you copied all the media files. Check with firebug and its "net" panel
+  if you have any 404s
 
-If you edit a Page but don't see a "Add Plugin" button and a dropdown-list with plugins:
+If you edit a Page but don't see a "Add Plugin" button and a dropdown-list
+with plugins:
 
-- Be sure your CMS_TEMPLATES setting is correct and that the templates specified actually exist. Maybe check that you are not missing a '{% placeholder %}' templatetag in the template.
+- Be sure your CMS_TEMPLATES setting is correct and that the templates specified
+  actually exist. Maybe check that you are not missing a '{% placeholder %}'
+  templatetag in the template.
