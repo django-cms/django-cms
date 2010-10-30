@@ -3,11 +3,11 @@ Configuration
 #############
 
 Out of the box django-cms comes not with a lot features. But with some
-settings you can extend it to a enterprise ready solution. All settings
+settings you can extend it to an enterprise ready solution. All settings
 described here can be found in cms/settings.py or in the plugins folder if
-they have a settings.py
+they have a settings.py.
 
-All thoose settings should be placed in your project settings.py
+All these settings should be placed in your project settings.py.
 
 
 Required Settings
@@ -56,21 +56,21 @@ Example::
 			'plugins': ('TextPlugin', 'PicturePlugin'),
 			'text_only_plugins': ('LinkPlugin',)
 			'extra_context': {"width":640},
-			'name':gettext("Content")
+			'name':gettext("Content"),
 		},
 		'right-column': {
 			"plugins": ('TeaserPlugin', 'LinkPlugin'),
 			"extra_context": {"width":280},
-			'name':gettext("Right Column")
+			'name':gettext("Right Column"),
 			'limits': {
 				'global': 2,
 				'TeaserPlugin': 1,
 				'LinkPlugin': 1,
 			},
-    	},
-    	'base.html content': {
-    		"plugins": {'TextPlugin', 'PicturePlugin', 'TeasePlugin'}
-    	},
+		},
+		'base.html content': {
+			"plugins": {'TextPlugin', 'PicturePlugin', 'TeaserPlugin'}
+		},
 	}
 
 You can combine template names and placeholder names to granually define the
@@ -129,7 +129,7 @@ Default: ``True``
 CMS_APPHOOKS
 ------------
 
-A touble with python paths to CMSApp Classes.
+A tuple with python paths to CMSApp Classes.
 
 Overwrites the auto-discovered list of CMSApp Classes located in applications
 cms_app.py.
@@ -171,7 +171,7 @@ Example::
 	    ('en', gettext('English')),
 	)
 
-Default is LANGUAGES. Be sure that you don't have more language in here than
+Default is LANGUAGES. Be sure that you don't have more languages in here than
 in the LANGUAGES setting.
 
 
@@ -202,7 +202,7 @@ Example::
 CMS_SITE_LANGUAGES
 ------------------
 
-If you have more then one site and CMS_LANGUAGES differs between the site you
+If you have more then one site and CMS_LANGUAGES differs between the sites you
 may want to fill this out so if you switch between the sites in the admin you
 only get the languages available on this site.
 
@@ -211,7 +211,7 @@ Example::
 	CMS_SITE_LANGUAGES = {
 		1:['en','de'],
 		2:['en','fr'],
-	    3:['en'],
+		3:['en'],
 	}
 
 
