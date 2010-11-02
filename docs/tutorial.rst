@@ -12,6 +12,9 @@ promises.
 I'm assuming that Python, Django and sqlite3 are installed already. For
 reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
 
+Preparing the environment
+*************************
+
 If you don't already have one, create a new folder for your code to live in. My
 folder lives in my home directory and is named "django_apps". This will pop up
 throughout this guide so if you're following along and you call yours
@@ -35,9 +38,14 @@ And... ::
 
 	python manage.py runserver
 
-Head on over to http://127.0.0.1:8000 and if you see "it worked" then well, its working.
+Head on over to http://127.0.0.1:8000 and if you see the following "it worked" page then well, its working.
+
+|it-worked|
+
+.. |it-worked| image:: images/it-worked.png
 
 Here comes the science...
+*************************
 
 If you dont happen to know your Python location then issue the following command::
 
@@ -61,6 +69,14 @@ Do a bit of house cleaning to get rid of all the files you don't need::
 
 	sudo rm -rf divio-django-cms-c0288a1.zip
 	sudo rm -rf divio-django-cms-c0288a1/
+	
+To ensure the cms is properly installed, invoke a python shell (just type ``python`` at the prompt), and ensure the following command returns without errors:
+    
+    import cms
+
+
+Make a set of basic project files
+*********************************
 
 Head back to the project you created previously::
 
@@ -68,14 +84,14 @@ Head back to the project you created previously::
 
 In your editor, edit "settings.py" like so:
 
-On lines 1+2 put the following before anything else::
+Insert the following before anything else in the file::
 
 	import os
-	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-
-Then, after the import statements, add this::
-
 	gettext = lambda s: s
+	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+	
+This will instruct Django to set the root of the project at "the location of settings.py".
+The gettext line is there for transaltion voodoo. Don't pay attention to it yet.
 
 Set up the remainder of the file with the following changes/additions::
 
@@ -166,6 +182,10 @@ Next, Edit your ``urls.py`` file like this::
 Create a folder called 'media' in your project root (that's "project-name" for me), this means you create a symbolic link from the "cms/media/cms" folder in "dist-packages" to your new "media" folder::
 
 	ln -s /usr/local/lib/python2.6/dist-packages/cms/media/cms cms
+
+
+Loading up on supplies: preparing the database
+**********************************************
 
 Now for the magic...if you're not already there::
 
