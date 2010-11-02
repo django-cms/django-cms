@@ -95,8 +95,15 @@ The gettext line is there for transaltion voodoo. Don't pay attention to it yet.
 
 Set up the remainder of the file with the following changes/additions::
 
-	DATABASE_ENGINE = 'sqlite3'
-	DATABASE_NAME = '/path/to/your/data/your-db-name.db/
+    DATABASES = {
+        # There are more fields in the generated settings.py, but they are not used
+        # if one chooses sqlite3. Feel free to keep them.
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/path/to/your/data/your-db-name.db/',
+        }
+    }
+
 
 	MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 	MEDIA_URL = '/media/'
@@ -105,7 +112,7 @@ Set up the remainder of the file with the following changes/additions::
 
 	INSTALLED_APPS = (
 	    'django.contrib.auth',
-	    'django.contrib.admin',
+	    'django.contrib.admin', # Make sure you uncomment this line
 	    'django.contrib.contenttypes',
 	    'django.contrib.sessions',
 	    'django.contrib.sites',
@@ -121,6 +128,7 @@ Set up the remainder of the file with the following changes/additions::
 	    'publisher',
 		'menus',
 	)
+
 
 	MIDDLEWARE_CLASSES = (
 		'django.middleware.cache.UpdateCacheMiddleware',
