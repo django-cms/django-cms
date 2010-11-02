@@ -205,6 +205,9 @@ and... ::
 
 If all goes well, you'll be asked if you want to set up your superuser account...which of course you do so just follow the instructions in the terminal.
 
+Up and running!
+***************
+
 That should hopefully be that. If your development server is still running in your terminal stop it, then restart it again just to be sure. ::
 
 	cmd c
@@ -214,7 +217,11 @@ Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with
 appropriate text and if you can see the django-cms logo then your media folder
 is cool also.
 
-log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
+|it-works-cms|
+
+.. |it-works-cms| image:: images/it-works-cms.png
+
+Now log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
 
 This is your development enviroment. On how to deploy django projects on real
 webservers you may want to head over to http://www.django-project.com/
