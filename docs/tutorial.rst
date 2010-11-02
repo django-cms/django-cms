@@ -195,6 +195,53 @@ webservers you may want to head over to http://www.django-project.com/
 Templates
 ---------
 
+In django-cms you set one template per page. After you have set a template for
+a page you can put plugins into the defined placeholders. Templates in django-cms
+are just django templates. See official documentation `django template language <http://docs.djangoproject.com/en/1.2/topics/templates/>`_
+
+You have to define the templates in ``settings.CMS_TEMPLATES``. ::
+
+  CMS_TEMPLATES = (
+      ('template_1.html', 'Template One'),
+      ('template_2.html', 'Template Two'),
+      ...
+  )
+
+Each of these templates is now available to be set on a given page in the admin
+backend. When you set a template for a certain page, django-cms will search
+for the placeholders defined in that template and update the page form so you
+can put plugins into them. You can even have a placeholder for all your page
+templates in a base template that the template for a page extends.
+
+For example you have a ``base.html`` like this: ::
+
+  {% load cms_tags %}
+  <html>
+    <body>
+     {% placeholder base_content %}
+     {% block base_content%}{% endblock %}
+    </bod>
+  </html>
+
+And have set ``template_1.html`` to: ::
+
+  {% extends "base.html" %}
+  {% load cms_tags %}
+
+  {% block base_content %}
+    {% placeholder template_1_content %}
+  {% endblock %}
+
+When you set ``template_1.html`` as a template on a page you will get two
+placeholders to put plugins in. One is **template_1_content** from the page
+template ``template_1.html`` and another is **base_content** from extended
+``base.html``.
+
+When working with alot of placeholders, you want to make sure to set proper names
+for your placeholders. These are just spitted out on the page form and it
+can get messy if you have lots of them. Have a look at ``settings.CMS_PLACEHOLDER_CONF``
+to further configure the placeholders.
+
 My First Plugin
 ---------------
 
@@ -308,4 +355,28 @@ My First Attach Menu
 
 My First Apphook
 ----------------
+
+What is an apphook you might ask? "Apphooks" are a way to forward all URLs "under" 
+a CMS page to another Django app.
+For the sake of the example, let's assume you have a very fancy "myapp" django application, 
+that you would like to use in your django-CMS project, as the "/myapp/<something>" pages.
+
+#. Create a ``cms_app.py`` file in your app's module (usually next to ``models.py``)
+#. Paste and adapt the following code to the newly created file, save, restart your server if needed::
+
+    from cms.app_base import CMSApp
+    from cms.apphook_pool import apphook_pool
+
+    class MyApphook(CMSApp):
+        name = "My Apphook's name" # This is visible in the CMS admin page - make it readable!
+        urls = ["myapp.blog.urls"] # Your app's urls.py file
+    apphook_pool.register(MyAppHook) # Like in admin.py file, you need to register your apphook with the CMS
+    
+#. Create a "blog" page in the Django-CMS admin interface.
+#. Still in the admin interface, navigate to your newly create page, edit it, and expand the "Advanced Settings" group
+#. You should see your ``My Apphook's name`` apphook in the "Application" drop-down list.
+#. Once selected, you unfortunately need to restart your django server for the changes to take effect.
+#. Your application is now available at ``http://<your host>/myapp/<your apps urls.py>``!
+
+
 
