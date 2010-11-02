@@ -356,3 +356,27 @@ My First Attach Menu
 My First Apphook
 ----------------
 
+What is an apphook you might ask? "Apphooks" are a way to forward all URLs "under" 
+a CMS page to another Django app.
+For the sake of the example, let's assume you have a very fancy "myapp" django application, 
+that you would like to use in your django-CMS project, as the "/myapp/<something>" pages.
+
+#. Create a ``cms_app.py`` file in your app's module (usually next to ``models.py``)
+#. Paste and adapt the following code to the newly created file, save, restart your server if needed::
+
+    from cms.app_base import CMSApp
+    from cms.apphook_pool import apphook_pool
+
+    class MyApphook(CMSApp):
+        name = "My Apphook's name" # This is visible in the CMS admin page - make it readable!
+        urls = ["myapp.blog.urls"] # Your app's urls.py file
+    apphook_pool.register(MyAppHook) # Like in admin.py file, you need to register your apphook with the CMS
+    
+#. Create a "blog" page in the Django-CMS admin interface.
+#. Still in the admin interface, navigate to your newly create page, edit it, and expand the "Advanced Settings" group
+#. You should see your ``My Apphook's name`` apphook in the "Application" drop-down list.
+#. Once selected, you unfortunately need to restart your django server for the changes to take effect.
+#. Your application is now available at ``http://<your host>/myapp/<your apps urls.py>``!
+
+
+
