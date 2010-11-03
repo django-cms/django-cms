@@ -12,6 +12,9 @@ promises.
 I'm assuming that Python, Django and sqlite3 are installed already. For
 reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
 
+Preparing the environment
+*************************
+
 If you don't already have one, create a new folder for your code to live in. My
 folder lives in my home directory and is named "django_apps". This will pop up
 throughout this guide so if you're following along and you call yours
@@ -35,9 +38,14 @@ And... ::
 
 	python manage.py runserver
 
-Head on over to http://127.0.0.1:8000 and if you see "it worked" then well, its working.
+Head on over to http://127.0.0.1:8000 and if you see the following "it worked" page then well, its working.
+
+|it-worked|
+
+.. |it-worked| image:: images/it-worked.png
 
 Here comes the science...
+*************************
 
 If you dont happen to know your Python location then issue the following command::
 
@@ -61,6 +69,14 @@ Do a bit of house cleaning to get rid of all the files you don't need::
 
 	sudo rm -rf divio-django-cms-c0288a1.zip
 	sudo rm -rf divio-django-cms-c0288a1/
+	
+To ensure the cms is properly installed, invoke a python shell (just type ``python`` at the prompt), and ensure the following command returns without errors:
+    
+    import cms
+
+
+Make a set of basic project files
+*********************************
 
 Head back to the project you created previously::
 
@@ -68,19 +84,26 @@ Head back to the project you created previously::
 
 In your editor, edit "settings.py" like so:
 
-On lines 1+2 put the following before anything else::
+Insert the following before anything else in the file::
 
 	import os
-	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-
-Then, after the import statements, add this::
-
 	gettext = lambda s: s
+	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+	
+This will instruct Django to set the root of the project at "the location of settings.py".
+The gettext line is there for transaltion voodoo. Don't pay attention to it yet.
 
 Set up the remainder of the file with the following changes/additions::
 
-	DATABASE_ENGINE = 'sqlite3'
-	DATABASE_NAME = '/path/to/your/data/your-db-name.db/
+    DATABASES = {
+        # There are more fields in the generated settings.py, but they are not used
+        # if one chooses sqlite3. Feel free to keep them.
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/path/to/your/data/your-db-name.db/',
+        }
+    }
+
 
 	MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 	MEDIA_URL = '/media/'
@@ -89,7 +112,7 @@ Set up the remainder of the file with the following changes/additions::
 
 	INSTALLED_APPS = (
 	    'django.contrib.auth',
-	    'django.contrib.admin',
+	    'django.contrib.admin', # Make sure you uncomment this line
 	    'django.contrib.contenttypes',
 	    'django.contrib.sessions',
 	    'django.contrib.sites',
@@ -105,6 +128,7 @@ Set up the remainder of the file with the following changes/additions::
 	    'publisher',
 		'menus',
 	)
+
 
 	MIDDLEWARE_CLASSES = (
 		'django.middleware.cache.UpdateCacheMiddleware',
@@ -167,6 +191,10 @@ Create a folder called 'media' in your project root (that's "project-name" for m
 
 	ln -s /usr/local/lib/python2.6/dist-packages/cms/media/cms cms
 
+
+Loading up on supplies: preparing the database
+**********************************************
+
 Now for the magic...if you're not already there::
 
 	cd ~/django_apps/project-name
@@ -177,6 +205,9 @@ and... ::
 
 If all goes well, you'll be asked if you want to set up your superuser account...which of course you do so just follow the instructions in the terminal.
 
+Up and running!
+***************
+
 That should hopefully be that. If your development server is still running in your terminal stop it, then restart it again just to be sure. ::
 
 	cmd c
@@ -186,7 +217,11 @@ Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with
 appropriate text and if you can see the django-cms logo then your media folder
 is cool also.
 
-log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
+|it-works-cms|
+
+.. |it-works-cms| image:: images/it-works-cms.png
+
+Now log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
 
 This is your development enviroment. On how to deploy django projects on real
 webservers you may want to head over to http://www.django-project.com/
@@ -220,7 +255,7 @@ For example you have a ``base.html`` like this: ::
     <body>
      {% placeholder base_content %}
      {% block base_content%}{% endblock %}
-    </bod>
+    </body>
   </html>
 
 And have set ``template_1.html`` to: ::
@@ -355,4 +390,28 @@ My First Attach Menu
 
 My First Apphook
 ----------------
+
+What is an apphook you might ask? "Apphooks" are a way to forward all URLs "under" 
+a CMS page to another Django app.
+For the sake of the example, let's assume you have a very fancy "myapp" django application, 
+that you would like to use in your django-CMS project, as the "/myapp/<something>" pages.
+
+#. Create a ``cms_app.py`` file in your app's module (usually next to ``models.py``)
+#. Paste and adapt the following code to the newly created file, save, restart your server if needed::
+
+    from cms.app_base import CMSApp
+    from cms.apphook_pool import apphook_pool
+
+    class MyApphook(CMSApp):
+        name = "My Apphook's name" # This is visible in the CMS admin page - make it readable!
+        urls = ["myapp.blog.urls"] # Your app's urls.py file
+    apphook_pool.register(MyAppHook) # Like in admin.py file, you need to register your apphook with the CMS
+    
+#. Create a "blog" page in the Django-CMS admin interface.
+#. Still in the admin interface, navigate to your newly create page, edit it, and expand the "Advanced Settings" group
+#. You should see your ``My Apphook's name`` apphook in the "Application" drop-down list.
+#. Once selected, you unfortunately need to restart your django server for the changes to take effect.
+#. Your application is now available at ``http://<your host>/myapp/<your apps urls.py>``!
+
+
 

@@ -1,8 +1,13 @@
 Placeholders
 ============
 
-Placeholders are the containers of `CMSPlugins`, they can be used outside the CMS
-in custom applications using the `PlaceholderField`.
+Placeholders are special model fields that DjangoCMS uses to render user-editable 
+content (plugins) in templates. That is, it's the place where a user can add text, 
+video or any other plugin to a webpage, using either the normal Django admin 
+interface or the so called `frontend editing`.
+
+Placeholders can be viewed as containers of `CMSPlugins`, and can be used outside 
+the CMS in custom applications using the `PlaceholderField`.
 
 By defining one (or serveral) `PlaceholderField` on a custom model you can take
 advantage of the full power of `CMSPlugins`, including frontend editing.
@@ -43,6 +48,38 @@ from the `placeholder_tags` template tag library::
 	
 "640" is the width to be used for width-sensitive plugins in this context. This
 argument is optional.
+
+Adding content to a placeholder
+-------------------------------
+
+There are two ways to add or edit content to a placeholder, the front-end admin view
+and the back-end view.
+
+Using the front-end editor
+**************************
+
+Probably the most simple way to add content to a placeholder, simply visit the page
+displaying your model (where you put the ``render_placeholder`` tag), then append "?edit" to the page's URL. 
+This will make a top banner appear, and after switching the "Edit mode" button to "on", 
+the banner will prompt you for your username/password (the user should be allowed to edit the page, obviously)
+
+You are now using the so-called *front-end edit mode*:
+
+|edit-banner|
+
+.. |edit-banner| image:: images/edit-banner.png
+
+Once in Front-end editing mode, your placeholders should display a menu, allowing you to add ``plugins`` to them: 
+the following screenshot shows a default selection of plugins in an empty placeholder.
+
+|frontend-placeholder-add-plugin|
+
+.. |frontend-placeholder-add-plugin| image:: images/frontend-placeholder-add-plugin.png
+
+Plugins are rendered at once, so you can have an idea what it will look like `in fine`, but to view the final
+look of a plugin simply leave edit mode by clicking the "Edit mode" button in the banner again.
+
+
 
 
 Fieldsets
