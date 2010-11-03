@@ -5,7 +5,7 @@ Custom Plugins
 ==============
 
 You can use ``python manage.py startapp`` to get some basefiles for your plugin,
-or just add an folder ``gallery`` to your project root folder, add an empty ``__init__.py``, so that
+or just add a folder ``gallery`` to your project's root folder, add an empty ``__init__.py``, so that
 the module gets detected.
 
 Suppose you have the following gallery model::
@@ -37,7 +37,7 @@ Be sure that your model inherits the CMSPlugin class.
 The plugin model can have any fields it wants. They are the fields that
 get displayed if you edit the plugin.
 
-Now models.py look like the following::
+Now models.py looks like the following::
 
 	from django.db import models
 	from cms.models import CMSPlugin
