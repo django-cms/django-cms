@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from cms.tests.base import CMSTestCase
 from django.conf import settings
 from shutil import rmtree as _rmtree
