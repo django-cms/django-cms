@@ -29,8 +29,10 @@ Required
 * mptt
 * menus
 
-.. note:: mptt is shipped with django-cms and at the moment it is not possible
-		  to use a different version of django-mptt.
+.. warning:: mptt is shipped with django-cms and at the moment it is not possible
+		     to use a different version of django-mptt. If your project has
+             other applications requiring mptt, they have to use the one from
+             the cms which is version 0.3-pre.
 
 Optional
 ~~~~~~~~
