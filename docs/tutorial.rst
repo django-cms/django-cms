@@ -255,7 +255,7 @@ For example you have a ``base.html`` like this: ::
     <body>
      {% placeholder base_content %}
      {% block base_content%}{% endblock %}
-    </bod>
+    </body>
   </html>
 
 And have set ``template_1.html`` to: ::
