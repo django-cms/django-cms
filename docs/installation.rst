@@ -30,7 +30,9 @@ Required
 * menus
 
 .. warning:: mptt is shipped with django-cms and at the moment it is not possible
-		  to use a different version of django-mptt.
+             to use a different version of django-mptt. If your project has
+             other applications requiring mptt, they have to use the one from
+             the cms which is version 0.3-pre.
 
 Optional
 ~~~~~~~~
@@ -59,7 +61,7 @@ Note that the order is important:
 #. cms.middleware.media.PlaceholderMediaMiddleware
 
 .. note:: For non-multilingual sites you may remove the 
-		  `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
+          `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
 
 Template Context Processors
 ---------------------------
