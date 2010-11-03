@@ -37,8 +37,7 @@ Be sure that your model inherits the CMSPlugin class.
 The plugin model can have any fields it wants. They are the fields that
 get displayed if you edit the plugin.
 
-Now models.py look like the following:
-::
+Now models.py look like the following::
 
 	from django.db import models
 	from cms.models import CMSPlugin
@@ -86,9 +85,11 @@ In there write the following::
 		render_template = "gallery/gallery.html"
 
 		def render(self, context, instance, placeholder):
-			context.update({'gallery':instance.gallery,
-			'object':instance,
-			'placeholder':placeholder})
+			context.update({
+				'gallery':instance.gallery,
+				'object':instance,
+				'placeholder':placeholder
+			})
 			return context
 
 	plugin_pool.register_plugin(CMSGalleryPlugin)
@@ -103,15 +104,13 @@ For a list of all the options you have on CMSPluginBase have a look at the plugi
 
 Template
 --------
-Now create a gallery.html template in ``templates/gallery/`` and write the following in there.
-::
+Now create a gallery.html template in ``templates/gallery/`` and write the following in there::
 
 	{% for image in gallery.picture_set.all %}
 		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
 	{% endfor %}
 
-Add a file ``admin.py`` in your plugin root-folder and insert the following.
-::
+Add a file ``admin.py`` in your plugin root-folder and insert the following::
 
 	from django.contrib import admin
 	from cms.admin.placeholderadmin import PlaceholderAdmin
