@@ -1,9 +1,10 @@
 from django.conf import settings
-from menus.exceptions import NamespaceAllreadyRegistered
-from menus import settings as menus_settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.utils.importlib import import_module
 from django.utils.translation import get_language
+from menus import settings as menus_settings
+from menus.exceptions import NamespaceAllreadyRegistered
 import copy
 
 def lex_cache_key(key):
@@ -23,7 +24,10 @@ class MenuPool(object):
         if self.discovered:
             return    
         for app in settings.INSTALLED_APPS:
-            __import__(app, {}, {}, ['menu'])
+            try:
+                import_module('.menu', app)
+            except ImportError:
+                pass
         from menus.modifiers import register
         register()
         self.discovered = True
