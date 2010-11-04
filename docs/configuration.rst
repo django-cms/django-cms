@@ -420,7 +420,7 @@ Example::
 
 If set to true gives you a new column "moderation" in the tree view.
 
-You can select to moderate pages or hole trees. If a page is under moderation
+You can select to moderate pages or whole trees. If a page is under moderation
 you will receive an email if somebody changes a page and you will be asked to
 approve the changes. Only after you approved the changes they will be updated
 on the live site. If you change a page you moderate yourself you will need to
