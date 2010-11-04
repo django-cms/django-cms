@@ -1,0 +1,7 @@
+[run]
+branch = True
+source =
+    cms
+    menu
+    mptt
+    publisher

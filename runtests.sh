@@ -9,11 +9,11 @@ if [ $1 ]; then
 else
     suite='cms'
 fi
-./bin/coverage run ./testapp/manage.py test $suite
+./bin/coverage run --rcfile=.coveragerc testapp/manage.py test $suite
 retcode=$?
 echo "post test actions..."
-./bin/coverage xml --omit=parts,/usr/,eggs > /dev/null
-./bin/coverage html --omit=parts,/usr/,eggs > /dev/null
+./bin/coverage xml
+./bin/coverage html
 cd ..
 echo "done"
 exit $retcode
