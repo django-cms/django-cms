@@ -2,6 +2,6 @@
 branch = True
 source =
     cms
-    menu
+    menus
     mptt
     publisher
