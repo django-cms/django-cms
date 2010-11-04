@@ -34,8 +34,8 @@ def page_changed(page, old_page=None, force_moderation_action=None):
         # see the last message
         mail_approvement_request(page, user)
 
-    # TODO: if page was changed, remove all approvements from hiher instances,
-    # but keep approvements by lover instances, if there are some
+    # TODO: if page was changed, remove all approvements from higher instances,
+    # but keep approvements by lower instances, if there are any
 
 
 def update_moderation_message(page, message):
@@ -178,8 +178,14 @@ def approve_page(request, page):
     """
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
     if not moderator_should_approve(request, page):
-        # escape soon if there isn't any approvement required by this user
-        return
+        # escape soon if there isn't any approval required by this user
+        try:    # it is possible publisher_public doesn't exist - first time publish
+            if page.get_absolute_url() != page.publisher_public.get_absolute_url():
+                page.publish()
+            else:
+                return
+        except:
+            return
     if not moderation_required:
         # this is a second case - user can publish changes
         if page.pagemoderatorstate_set.get_delete_actions().count():
@@ -204,8 +210,8 @@ def get_model_queryset(model, request=None):
 
 # queryset helpers for basic models
 get_page_queryset = lambda request=None: get_model_queryset(Page, request) 
-get_title_queryset = lambda request=None: get_model_queryset(Title, request)
-get_cmsplugin_queryset = lambda request=None: get_model_queryset(CMSPlugin, request)
+get_title_queryset = lambda request=None: Title.objects.all()   # not sure if we need to only grab public items here
+get_cmsplugin_queryset = lambda request=None: CMSPlugin.objects.all()   # CMSPlugin is no longer extending from Publisher
 
 
 def mail_approvement_request(page, user=None):

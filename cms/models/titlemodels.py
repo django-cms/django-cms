@@ -1,14 +1,16 @@
+from cms.models.managers import TitleManager
+from cms.models.pagemodel import Page
+from cms.utils.helpers import reversion_register
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from publisher import Publisher
 from django.conf import settings
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
 
-class Title(Publisher):
-    language = models.CharField(_("language"), max_length=5, db_index=True)
+class Title(models.Model):
+    language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
@@ -25,7 +27,7 @@ class Title(Publisher):
     objects = TitleManager()
     
     class Meta:
-        unique_together = (('publisher_is_draft', 'language', 'page'),)
+        unique_together = (('language', 'page'),)
         app_label = 'cms'
     
     def __unicode__(self):
@@ -44,18 +46,6 @@ class Title(Publisher):
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
         super(Title, self).save(*args, **kwargs)
-        
-        # Update descendants only if path changed
-        if current_path != self.path:
-            descendant_titles = Title.objects.filter(
-                page__lft__gt=self.page.lft, 
-                page__rght__lt=self.page.rght, 
-                page__tree_id__exact=self.page.tree_id,
-                language=self.language
-            )
-            for descendant_title in descendant_titles:
-                descendant_title.path = descendant_title.path.replace(current_path, self.path, 1)
-                descendant_title.save()
 
     @property
     def overwrite_url(self):
@@ -86,6 +76,4 @@ class EmptyTitle(object):
         return None
     
     
-if 'reversion' in settings.INSTALLED_APPS: 
-    import reversion       
-    reversion.register(Title)
+reversion_register(Title)

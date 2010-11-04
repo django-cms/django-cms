@@ -166,6 +166,13 @@ class TitleManager(PublisherManager):
             return None
         else:
             return titles
+            
+    # created new public method to meet test case requirement and to get a list of titles for published pages
+    def public(self):
+        return self.get_query_set().filter(page__publisher_is_draft=False, page__published=True)
+        
+    def drafts(self):
+        return self.get_query_set().filter(page__publisher_is_draft=True)
         
     def set_or_create(self, page, language, slug=None, title=None, application_urls=None,
         overwrite_url=None, redirect=None, meta_description=None, meta_keywords=None, page_title=None, menu_title=None):

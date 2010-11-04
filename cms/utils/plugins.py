@@ -1,11 +1,13 @@
-from django.contrib.sites.models import Site
-from django.template.loader import get_template
-from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
-from django.template import NodeList, TextNode, VariableNode
-from django.shortcuts import get_object_or_404
-from cms.templatetags.cms_tags import PlaceholderNode
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
+from cms.templatetags.cms_tags import PlaceholderNode
+from django.contrib.sites.models import Site
+from django.shortcuts import get_object_or_404
+from django.template import NodeList, TextNode, VariableNode, \
+    TemplateSyntaxError
+from django.template.loader import get_template
+from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, \
+    BlockNode
 import warnings
 
 def get_page_from_plugin_or_404(cms_plugin):
@@ -73,6 +75,8 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
         # in block nodes we have to scan for super blocks
         elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == 'block.super':
+                if not hasattr(current_block.super, 'nodelist'):
+                    raise TemplateSyntaxError("Cannot render block.super for blocks without a parent.")
                 placeholders += _scan_placeholders(current_block.super.nodelist, current_block.super)
         # ignore nested blocks which are already handled
         elif isinstance(node, BlockNode) and node.name in ignore_blocks:

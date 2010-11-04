@@ -461,7 +461,8 @@ class MpttPublisher(Publisher, Mptt):
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.move_to(next_sibling.publisher_public, position="left")
         # or none structural change, just save
-        return obj.save()
+        obj.save()
+        return obj
 
 # install publisher on first import from this module...
 install_publisher()

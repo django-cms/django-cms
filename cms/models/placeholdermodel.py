@@ -1,8 +1,9 @@
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.forms.widgets import Media
-import operator
+from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import PlaceholderNoAction
+from django.db import models
+from django.forms.widgets import Media
+from django.utils.translation import ugettext_lazy as _
+import operator
 
 
 class PlaceholderManager(models.Manager):
@@ -91,3 +92,5 @@ class Placeholder(models.Model):
             field = self._get_attached_field()
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
+
+reversion_register(Placeholder, follow=["cmsplugin_set"])

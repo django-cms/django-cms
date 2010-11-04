@@ -11,13 +11,13 @@ class Migration:
         
         db.rename_table("googlemap_googlemap", "cmsplugin_googlemap")
         db.rename_table("googlemap_publicgooglemap", "cmsplugin_googlemappublic")
+        db.rename_column("cmsplugin_googlemappublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.alter_column('cmsplugin_googlemap', 'public_id', orm['googlemap.googlemap:public'])
         try:
             db.delete_foreign_key('cmsplugin_googlemap' ,'public_id')
         except:
             pass
         db.drop_primary_key("cmsplugin_googlemappublic")
-        db.rename_column("cmsplugin_googlemappublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.create_primary_key("cmsplugin_googlemappublic", ("cmspluginpublic_ptr_id",))
         db.foreign_key_sql('cmsplugin_googlemap' ,'public_id', 'cmsplugin_googlemappublic', 'cmspluginpublic_ptr_id')
     

@@ -12,13 +12,14 @@ class Migration:
     def forwards(self, orm):    
         db.rename_table("text_text", "cmsplugin_text")
         db.rename_table("text_publictext", "cmsplugin_textpublic")
+        db.rename_column("cmsplugin_textpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
         db.alter_column('cmsplugin_text', 'public_id', orm['text.text:public'])
         try:
             db.delete_foreign_key('cmsplugin_text' ,'public_id')
         except:
             pass
-        db.drop_primary_key("cmsplugin_textpublic")
-        db.rename_column("cmsplugin_textpublic", "publiccmsplugin_ptr_id", "cmspluginpublic_ptr_id")
+
+        db.drop_primary_key("cmsplugin_textpublic")  
         db.create_primary_key("cmsplugin_textpublic", ("cmspluginpublic_ptr_id",))
         db.foreign_key_sql('cmsplugin_text' ,'public_id', 'cmsplugin_textpublic', 'cmspluginpublic_ptr_id')
         

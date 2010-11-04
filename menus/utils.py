@@ -1,3 +1,5 @@
+from cms.models.titlemodels import Title
+from django.conf import settings
 
 
 def mark_descendants(nodes):
@@ -179,18 +181,43 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
+class _SimpleLanguageChanger(object):
+    def __init__(self, request):
+        self.request = request
+        self._app_path = None
+        
+    @property
+    def app_path(self):
+        if self._app_path is None:
+            page_path = self.get_page_path(self.request.LANGUAGE_CODE)
+            if page_path:
+                self._app_path = self.request.path[len(page_path):]
+            else:
+                self._app_path = self.request.path
+        return self._app_path
+        
+    def __call__(self, lang):
+        return '%s%s' % (self.get_page_path(lang), self.app_path)
+    
+    def get_page_path(self, lang):
+        if getattr(self.request, 'current_page'):
+            try:
+                return self.request.current_page.get_absolute_url(language=lang, fallback=False)
+            except Title.DoesNotExist:
+                return self.request.current_page.get_absolute_url(language=lang, fallback=True)
+            return self.request.current_page.get_absolute_url(language=lang)
+        else:
+            return ''
+
 def simple_language_changer(func):
     def _wrapped(request, *args, **kwargs):
-        def _language_changer(lang):
-            return request.path
-        set_language_changer(request, _language_changer)
+        set_language_changer(request, _SimpleLanguageChanger(request))
         return func(request, *args, **kwargs)
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__
     return _wrapped
 
     
-from django.conf import settings 
 
 def handle_navigation_manipulators(navigation_tree, request):
     for handler_function_name, name in settings.CMS_NAVIGATION_MODIFIERS:

@@ -14,6 +14,7 @@ from cms.tests.plugins import PluginsTestCase
 from cms.tests.menu import MenusTestCase
 from cms.tests.rendering import RenderingTestCase
 from cms.tests.placeholder import PlaceholderTestCase
+from cms.tests.docs import DocsTestCase
 
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
@@ -44,6 +45,7 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(MenusTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(RenderingTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PlaceholderTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocsTestCase))
     
     return s
  

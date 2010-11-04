@@ -291,5 +291,12 @@ class MenusTestCase(CMSTestCase):
         nodes = show_menu(context, 2, 100, 0, 1)['children']
         self.assertEqual(len(nodes), len(page7.children.all()))
         
-        
-        
+    def test_18_show_breadcrumb_invisible(self):
+        invisible_page = self.create_page(parent_page=self.page3, published=True, in_navigation=False)
+        context = self.get_context(path=invisible_page.get_absolute_url())
+        nodes = show_breadcrumb(context)['ancestors']
+        self.assertEqual(len(nodes), 3)
+        nodes = show_breadcrumb(context, 0, "cms/breadcrumb.html", 1)['ancestors']
+        self.assertEqual(len(nodes), 3)
+        nodes = show_breadcrumb(context, 0, "cms/breadcrumb.html", 0)['ancestors']
+        self.assertEqual(len(nodes), 4)
