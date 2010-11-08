@@ -4,6 +4,10 @@ processors, and plugin processors.
 Custom Plugins
 ==============
 
+You can use ``python manage.py startapp`` to get some basefiles for your plugin,
+or just add a folder ``gallery`` to your project's root folder, add an empty ``__init__.py``, so that
+the module gets detected.
+
 Suppose you have the following gallery model::
 
 	class Gallery(models.Model):
@@ -33,6 +37,36 @@ Be sure that your model inherits the CMSPlugin class.
 The plugin model can have any fields it wants. They are the fields that
 get displayed if you edit the plugin.
 
+Now models.py looks like the following::
+
+	from django.db import models
+	from cms.models import CMSPlugin
+
+	class Gallery(models.Model):
+		parent = models.ForeignKey('self', blank=True, null=True)
+		name = models.CharField(max_length=30)
+
+		def __unicode__(self):
+			return self.name
+    
+		def get_absolute_url(self):
+			return reverse('gallery_view', args=[self.pk])
+    
+		class Meta:
+			verbose_name_plural = 'gallery'
+
+
+	class Picture(models.Model):
+		gallery = models.ForeignKey(Gallery)
+		image = models.ImageField(upload_to="uploads/images/")
+		description = models.CharField(max_length=60)
+
+
+	class GalleryPlugin(CMSPlugin):
+		gallery = models.ForeignKey(Gallery)
+
+
+
 cms_plugins.py
 --------------
 
@@ -51,9 +85,11 @@ In there write the following::
 		render_template = "gallery/gallery.html"
 
 		def render(self, context, instance, placeholder):
-			context.update({'gallery':instance.gallery,
-							'object':instance,
-							'placeholder':placeholder})
+			context.update({
+				'gallery':instance.gallery,
+				'object':instance,
+				'placeholder':placeholder
+			})
 			return context
 
 	plugin_pool.register_plugin(CMSGalleryPlugin)
@@ -68,12 +104,26 @@ For a list of all the options you have on CMSPluginBase have a look at the plugi
 
 Template
 --------
-Now create a gallery.html template in ``templates/gallery/`` and write the following in there.
-::
+Now create a gallery.html template in ``templates/gallery/`` and write the following in there::
 
 	{% for image in gallery.picture_set.all %}
 		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
 	{% endfor %}
+
+Add a file ``admin.py`` in your plugin root-folder and insert the following::
+
+	from django.contrib import admin
+	from cms.admin.placeholderadmin import PlaceholderAdmin
+	from models import Gallery,Picture
+
+	class PictureInline(admin.StackedInline):
+		model = Picture
+
+	class GalleryAdmin(admin.ModelAdmin):
+		inlines = [PictureInline]
+
+	admin.site.register(Gallery, GalleryAdmin)
+
 
 Now go into the admin create a gallery and afterwards go into a page and add a gallery plugin and some
 pictures should appear in your page.
@@ -86,27 +136,25 @@ You can limit in which placeholder certain plugins can appear. Add a ``CMS_PLACE
 Example::
 
 	CMS_PLACEHOLDER_CONF = {
-		'content': {
-			"plugins": ('ContactFormPlugin','FilePlugin','FlashPlugin','LinkPlugin','PicturePlugin','TextPlugin'),
-			"extra_context": {"width":940},
-			"name": gettext("content")
-		},
+	    'col_sidebar': {
+        	'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        	'name': gettext("sidebar column")
+    	},                    
+                        
+    	'col_left': {
+	        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','CMSTextWithTitlePlugin','CMSGalleryPlugin'),
+        	'name': gettext("left column")
+    	},                  
+                        
+    	'col_right': {
+	        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        	'name': gettext("right column")
+    	},
+	}
 
-		'right-column': {
-			"plugins": ('ContactFormPlugin','TextPlugin', 'SimpleGalleryPublicationPlugin'),
-	        "extra_context": {"width":280},
-			"name": gettext("right column")
-			"limits": {
-				"global": 2,
-				"TeaserPlugin": 1,
-				"LinkPlugin": 1,
-			},
-		},
-
-"**content**" and "**right-column**" are the names of two placeholders. The plugins list are filled with
+"**col_left**" and "**col_right**" are the names of two placeholders. The plugins list are filled with
 Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so
-plugin-templates can react to them. In this example we give them some parameters that are used in a
-CSS Grid Framework.
+plugin-templates can react to them. 
 
 You can change the displayed name in the admin with the **name** parameter. In combination with gettext
 you can translate this names according to the language of the user. Additionally you can limit the number

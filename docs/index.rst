@@ -17,6 +17,7 @@ Getting Started
 
     installation
     tutorial
+    using_south
     configuration
     navigation
     plugins

@@ -3,7 +3,7 @@ Installation
 
 This document assumes that you are familiar with python and django.
 
-A more beginner friendly tutorial can be found :doc:`here </tutorial>`.
+A more beginner friendly tutorial can be found `here <tutorial>`_.
 
 Requirements
 ------------
@@ -29,8 +29,10 @@ Required
 * mptt
 * menus
 
-.. note:: mptt is shipped with django-cms and at the moment it is not possible
-		  to use a different version of django-mptt.
+.. warning:: mptt is shipped with django-cms and at the moment it is not possible
+             to use a different version of django-mptt. If your project has
+             other applications requiring mptt, they have to use the one from
+             the cms which is version 0.3-pre.
 
 Optional
 ~~~~~~~~
@@ -59,7 +61,7 @@ Note that the order is important:
 #. cms.middleware.media.PlaceholderMediaMiddleware
 
 .. note:: For non-multilingual sites you may remove the 
-		  `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
+          `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
 
 Template Context Processors
 ---------------------------
