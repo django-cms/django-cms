@@ -32,6 +32,7 @@ Advanced
     i18n
     sitemap
     templatetags
+    settings
     
 Extending the CMS
 -----------------
