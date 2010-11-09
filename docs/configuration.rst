@@ -471,3 +471,16 @@ Defines how long page content should be cached, including navigation and admin
 menu.
 
 Default is 60
+
+CMS_CACHE_PREFIX
+----------------
+
+The CMS will prepend the value associated with this key to every cache access (set and get).
+This is useful when you have several Django-CMS installations, and that you don't want them
+to share cache objects.
+
+Example::
+	CMS_CACHE_PREFIX = 'my_awesome_prefix'
+
+Default is None
+
