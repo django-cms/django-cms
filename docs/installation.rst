@@ -20,14 +20,14 @@ Apps
 Required
 ~~~~~~~~
 
-* django.contrib.auth
-* django.contrib.contenttypes
-* django.contrib.sessions
-* django.contrib.admin
-* django.contrib.sites
-* cms
-* mptt
-* menus
+* ``django.contrib.auth``
+* ``django.contrib.contenttypes``
+* ``django.contrib.sessions``
+* ``django.contrib.admin``
+* ``django.contrib.sites``
+* ``cms``
+* ``mptt``
+* ``menus``
 
 .. warning:: mptt is shipped with django-cms and at the moment it is not possible
              to use a different version of django-mptt. If your project has
@@ -37,13 +37,13 @@ Required
 Optional
 ~~~~~~~~
 
-* cms.plugins.text
-* cms.plugins.picture
-* cms.plugins.link
-* cms.plugins.file
-* cms.plugins.snippet
-* cms.plugins.googlemap
-* publisher
+* ``cms.plugins.text``
+* ``cms.plugins.picture``
+* ``cms.plugins.link``
+* ``cms.plugins.file``
+* ``cms.plugins.snippet``
+* ``cms.plugins.googlemap``
+* ``publisher``
 
 
 Middlewares
@@ -51,14 +51,14 @@ Middlewares
 
 Note that the order is important:
 
-#. django.contrib.sessions.middleware.SessionMiddleware
-#. cms.middleware.multilingual.MultilingualURLMiddleware
-#. django.contrib.auth.middleware.AuthenticationMiddleware 
-#. django.middleware.common.CommonMiddleware
-#. cms.middleware.page.CurrentPageMiddleware
-#. cms.middleware.user.CurrentUserMiddleware
-#. cms.middleware.toolbar.ToolbarMiddleware 
-#. cms.middleware.media.PlaceholderMediaMiddleware
+#. ``django.contrib.sessions.middleware.SessionMiddleware``
+#. ``cms.middleware.multilingual.MultilingualURLMiddleware``
+#. ``django.contrib.auth.middleware.AuthenticationMiddleware`` 
+#. ``django.middleware.common.CommonMiddleware``
+#. ``cms.middleware.page.CurrentPageMiddleware``
+#. ``cms.middleware.user.CurrentUserMiddleware``
+#. ``cms.middleware.toolbar.ToolbarMiddleware ``
+#. ``cms.middleware.media.PlaceholderMediaMiddleware``
 
 .. note:: For non-multilingual sites you may remove the 
           `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
@@ -66,11 +66,11 @@ Note that the order is important:
 Template Context Processors
 ---------------------------
 
-* django.core.context_processors.auth
-* django.core.context_processors.i18n
-* django.core.context_processors.request
-* django.core.context_processors.media
-* cms.context_processors.media
+* ``django.core.context_processors.auth``
+* ``django.core.context_processors.i18n``
+* ``django.core.context_processors.request``
+* ``django.core.context_processors.media``
+* ``cms.context_processors.media``
 
 Templates
 ---------
