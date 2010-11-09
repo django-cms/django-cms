@@ -480,6 +480,7 @@ This is useful when you have several Django-CMS installations, and that you don'
 to share cache objects.
 
 Example::
+
 	CMS_CACHE_PREFIX = 'my_awesome_prefix'
 
 Default is None
