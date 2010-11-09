@@ -3,7 +3,7 @@ Installation
 
 This document assumes that you are familiar with python and django.
 
-A more beginner friendly tutorial can be found `here <tutorial>`_.
+A more beginner friendly tutorial can be found :doc:`here <tutorial>`.
 
 Requirements
 ------------
