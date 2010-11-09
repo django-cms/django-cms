@@ -57,7 +57,7 @@ Note that the order is important:
 #. ``django.middleware.common.CommonMiddleware``
 #. ``cms.middleware.page.CurrentPageMiddleware``
 #. ``cms.middleware.user.CurrentUserMiddleware``
-#. ``cms.middleware.toolbar.ToolbarMiddleware ``
+#. ``cms.middleware.toolbar.ToolbarMiddleware``
 #. ``cms.middleware.media.PlaceholderMediaMiddleware``
 
 .. note:: For non-multilingual sites you may remove the 
