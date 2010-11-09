@@ -31,7 +31,7 @@ Basic Customization
 CMS_TEMPLATE_INHERITANCE
 ------------------------
 
-``Optional``
+*Optional*
 
 Example::
 
@@ -46,7 +46,7 @@ CMS_PLACEHOLDER_CONF
 
 Is used to configure the placeholders.
 
-``Optional``
+*Optional*
 
 Example::
 
