@@ -73,10 +73,7 @@ class MenuPool(object):
             return cached_nodes
         final_nodes = []
         for ns in self.menus:
-            try:
-                nodes = self.menus[ns].get_nodes(request)
-            except:
-                raise
+            nodes = self.menus[ns].get_nodes(request)
             last = None
             for node in nodes:
                 if not node.namespace:
