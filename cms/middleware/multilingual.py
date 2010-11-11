@@ -24,9 +24,7 @@ class MultilingualURLMiddleware:
         prefix = has_lang_prefix(request.path_info)
         pages_root = urllib.unquote(reverse("pages-root"))
         if prefix:
-            request.path = request.path.split("/")
-            del request.path[pages_root.count('/')]
-            request.path = "/".join(request.path)
+            request.path = "/" + "/".join(request.path.split("/")[2:])
             request.path_info = "/" + "/".join(request.path_info.split("/")[2:])
             t = prefix
             if t in SUPPORTED:
@@ -111,7 +109,7 @@ class MultilingualURLMiddleware:
             ))
 
             # Documentation comments for HREF_URL_FIX_RE above explain each match group (\1, \4, \5) represents.
-            decoded_response = HREF_URL_FIX_RE.sub(ur'<a\1href="%s%s/\4"\5>' % (pages_root, request.LANGUAGE_CODE), decoded_response)
+            decoded_response = HREF_URL_FIX_RE.sub(ur'<a\1href="/%s%s\4"\5>' % (request.LANGUAGE_CODE, pages_root), decoded_response)
             response.content = FORM_URL_FIX_RE.sub(ur'<form\1action="%s%s/\4"\5>' % (pages_root, request.LANGUAGE_CODE), decoded_response).encode("utf8")
 
         if (response.status_code == 301 or response.status_code == 302 ):
@@ -119,6 +117,6 @@ class MultilingualURLMiddleware:
             if not has_lang_prefix(location) and location.startswith("/") and \
                     not location.startswith(settings.MEDIA_URL) and \
                     not location.startswith(settings.ADMIN_MEDIA_PREFIX):
-                response['Location'] = "%s%s%s" % (pages_root, language, location[len(pages_root)-1:])
+                response['Location'] = "/%s%s" % (language, location)
         response.set_cookie("django_language", language)
         return response
