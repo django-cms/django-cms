@@ -73,7 +73,7 @@ class PagesTestCase(CMSTestCase):
         Test the details view
         """
         try:
-            response = self.client.get('/')
+            response = self.client.get(self.get_pages_root())
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
@@ -83,7 +83,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         try:
-            response = self.client.get('/')
+            response = self.client.get(self.get_pages_root())
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
@@ -93,7 +93,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         response = self.client.get(URL_CMS_PAGE)
         
-        response = self.client.get('/')
+        response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
     def test_05_edit_page(self):
@@ -191,20 +191,20 @@ class PagesTestCase(CMSTestCase):
         # check page2 path and url
         page2 = Page.objects.get(pk=page2.pk)
         self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
-        self.assertEqual(page2.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
         # check page3 path and url
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
-        self.assertEqual(page3.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
         # publish page 1 (becomes home)
         page1 = Page.objects.all()[0]
         page1.published = True
         page1.save()
         # check that page2 and page3 url have changed
         page2 = Page.objects.get(pk=page2.pk)
-        self.assertEqual(page2.get_absolute_url(), "/"+page_data2['slug']+"/")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/")
         page3 = Page.objects.get(pk=page3.pk)
-        self.assertEqual(page3.get_absolute_url(), "/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
         # move page2 back to root and check path of 2 and 3
         response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"left" })
         self.assertEqual(response.status_code, 200)

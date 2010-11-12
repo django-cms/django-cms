@@ -2,10 +2,12 @@ from cms.models import Title, Page
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 import copy
 import sys
+import urllib
 import warnings
 
 URL_CMS_PAGE = "/admin/cms/page/"
@@ -56,7 +58,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 
 class CMSTestCase(TestCase):
     counter = 1
-        
+
     def _pre_setup(self):
         """We are doing a lot of setting modifications in our tests, this 
         mechanism will restore to original settings after each test case.
@@ -200,8 +202,12 @@ class CMSTestCase(TestCase):
         page = self.assertObjectExist(Page.objects, id=page.pk)
         return page 
     
-    
-    def get_context(self, path="/"):
+    def get_pages_root(self):
+        return urllib.unquote(reverse("pages-root"))
+        
+    def get_context(self, path=None):
+        if not path:
+            path = self.get_pages_root()
         context = {}
         request = self.get_request(path)
         
@@ -209,7 +215,10 @@ class CMSTestCase(TestCase):
         
         return context   
         
-    def get_request(self, path="/"):
+    def get_request(self, path=None):
+        if not path:
+            path = self.get_pages_root()
+
         environ = {
             'HTTP_COOKIE':      self.client.cookies,
             'PATH_INFO':         path,

@@ -288,8 +288,6 @@ def page_language_url(context, lang):
         if page == "dummy":
             return ''
         try:
-            from django.core.urlresolvers import reverse
-            root = reverse('pages-root')
             url = page.get_absolute_url(language=lang, fallback=False)
             url = "/" + lang + url
         except:

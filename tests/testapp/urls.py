@@ -20,4 +20,5 @@ if settings.DEBUG:
 
 urlpatterns += patterns('',
     url(r'^', include('cms.urls')),
+    # url(r'^content/', include('cms.urls')),
 )
