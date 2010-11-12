@@ -9,7 +9,6 @@ from menus.templatetags.menu_tags import show_menu, show_sub_menu,\
 from menus.menu_pool import menu_pool
 from menus.base import NavigationNode
 
-
 class MenusTestCase(CMSTestCase):
 
     def setUp(self):
@@ -58,7 +57,7 @@ class MenusTestCase(CMSTestCase):
         
     def test_01_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
-        response = self.client.get("/")
+        response = self.client.get(self.get_pages_root())
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
         
@@ -78,7 +77,7 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(nodes[0].descendant, False)
         self.assertEqual(nodes[0].children[0].descendant, True)
         self.assertEqual(nodes[0].children[0].children[0].descendant, True)
-        self.assertEqual(nodes[0].get_absolute_url(), "/")
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
         self.assertEqual(nodes[1].get_absolute_url(), self.page4.get_absolute_url())
         self.assertEqual(nodes[1].sibling, True)
         self.assertEqual(nodes[1].selected, False)
@@ -167,7 +166,7 @@ class MenusTestCase(CMSTestCase):
         context = self.get_context(path=self.page2.get_absolute_url())
         nodes = show_breadcrumb(context)['ancestors']
         self.assertEqual(len(nodes), 2)
-        self.assertEqual(nodes[0].get_absolute_url(), "/")
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
         self.assertEqual(isinstance(nodes[0], NavigationNode), True)
         self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
         
@@ -228,8 +227,8 @@ class MenusTestCase(CMSTestCase):
         context = self.get_context()
         nodes = show_menu(context, 0, 100, 100, 100)['children']
         self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].get_absolute_url(), "/%s/" % self.page2.get_slug())
-        self.assertEqual(nodes[0].children[0].get_absolute_url(), "/%s/%s/" % (self.page2.get_slug(), self.page3.get_slug()))
+        self.assertEqual(nodes[0].get_absolute_url(), "%s%s/" % (self.get_pages_root(), self.page2.get_slug()))
+        self.assertEqual(nodes[0].children[0].get_absolute_url(), "%s%s/%s/" % (self.get_pages_root(), self.page2.get_slug(), self.page3.get_slug()))
         page4 = Page.objects.get(pk=self.page4.pk)
         page4.in_navigation = True
         page4.save()
