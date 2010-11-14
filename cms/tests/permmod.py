@@ -47,12 +47,13 @@ class PermissionModeratorTestCase(CMSTestCase):
     # set of heler functions
     
     def create_page_user(self, username, password=None, 
-        can_add_page=True, can_change_page=True, can_delete_page=True, 
-        can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, 
-        can_delete_pageuser=True, can_add_pagepermission=True, 
+        can_add_page=True, can_change_page=True, can_delete_page=True,
+        can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True,
+        can_delete_pageuser=True, can_add_pagepermission=True,
         can_change_pagepermission=True, can_delete_pagepermission=True,
         grant_all=False):
-        """Helper function for creating page user, through form on:
+        """
+        Helper function for creating page user, through form on:
             /admin/cms/pageuser/add/
             
         Returns created user.
@@ -66,19 +67,19 @@ class PermissionModeratorTestCase(CMSTestCase):
             password=username
             
         data = {
-            'username': username, 
+            'username': username,
             'password1': password,
-            'password2': password, 
-            'can_add_page': can_add_page, 
-            'can_change_page': can_change_page, 
-            'can_delete_page': can_delete_page, 
-            'can_recover_page': can_recover_page, 
-            'can_add_pageuser': can_add_pageuser, 
-            'can_change_pageuser': can_change_pageuser, 
-            'can_delete_pageuser': can_delete_pageuser, 
-            'can_add_pagepermission': can_add_pagepermission, 
-            'can_change_pagepermission': can_change_pagepermission, 
-            'can_delete_pagepermission': can_delete_pagepermission,            
+            'password2': password,
+            'can_add_page': can_add_page,
+            'can_change_page': can_change_page,
+            'can_delete_page': can_delete_page,
+            'can_recover_page': can_recover_page,
+            'can_add_pageuser': can_add_pageuser,
+            'can_change_pageuser': can_change_pageuser,
+            'can_delete_pageuser': can_delete_pageuser,
+            'can_add_pagepermission': can_add_pagepermission,
+            'can_change_pagepermission': can_change_pagepermission,
+            'can_delete_pagepermission': can_delete_pagepermission,
         }
         response = self.client.post('/admin/cms/pageuser/add/', data)
         self.assertRedirects(response, '/admin/cms/pageuser/')
@@ -96,7 +97,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         future will be nice.
         """
         if grant_all:
-            return self.assign_user_to_page(page, user, grant_on, 
+            return self.assign_user_to_page(page, user, grant_on,
                 True, True, True, True, True, True, True, True)
         
         # just check if the current logged in user even can change the page and 
@@ -107,14 +108,13 @@ class PermissionModeratorTestCase(CMSTestCase):
         data = {
             'can_add': can_add,
             'can_change': can_change,
-            'can_delete': can_delete, 
+            'can_delete': can_delete,
             'can_change_advanced_settings': can_change_advanced_settings,
-            'can_publish': can_publish, 
-            'can_change_permissions': can_change_permissions, 
-            'can_move_page': can_move_page, 
-            'can_moderate': can_moderate,  
+            'can_publish': can_publish,
+            'can_change_permissions': can_change_permissions,
+            'can_move_page': can_move_page,
+            'can_moderate': can_moderate,
         }
-        
         page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
         page_permission.save()
         return page_permission
@@ -233,7 +233,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         # create basic structure ... 
         
         self.login_user(self.user_super)
-        
         
         home = self.create_page(title="home")
         self.publish_page(home)

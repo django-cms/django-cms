@@ -1,10 +1,11 @@
-from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import PlaceholderNoAction
+import operator
+
 from django.db import models
 from django.forms.widgets import Media
 from django.utils.translation import ugettext_lazy as _
-import operator
 
+from cms.utils.helpers import reversion_register
+from cms.utils.placeholder import PlaceholderNoAction
 
 class PlaceholderManager(models.Manager):
     def _orphans(self):

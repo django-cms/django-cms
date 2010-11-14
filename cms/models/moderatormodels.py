@@ -1,11 +1,11 @@
-from cms.models.pagemodel import Page
 import sys
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+
 from cms.models.managers import PageModeratorStateManager
-
-
+from cms.models.pagemodel import Page
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
@@ -34,11 +34,11 @@ ACCESS_CHOICES = (
 ################################################################################
 
 class PageModerator(models.Model):
-    """Page moderator holds user / page / moderation type states. User can be 
-    assigned to any page (to which he haves permissions), and say which 
+    """
+    Page moderator holds user / page / moderation type states. User can be
+    assigned to any page (to which he haves permissions), and say which
     moderation depth he requires.
     """
-    
     MAX_MODERATION_LEVEL = sys.maxint # just an number
     
     page = models.ForeignKey(Page, verbose_name=_('Page')) 
@@ -54,7 +54,7 @@ class PageModerator(models.Model):
         verbose_name=_('PageModerator')
         verbose_name_plural=_('PageModerator')
         app_label = 'cms'
-
+    
     def set_decimal(self, state):
         """Converts and sets binary state to local attributes
         """
@@ -67,15 +67,16 @@ class PageModerator(models.Model):
         
         self.moderate_children = moderate_children
         self.moderate_descendants = moderate_descendants
-        
+    
     def get_decimal(self):
         return self.moderate_page * MASK_PAGE + \
             self.moderate_children * MASK_CHILDREN + \
             self.moderate_descendants * MASK_DESCENDANTS
+    
+    def __unicode__(self):
+        return u"%s on %s mod: %d" % (self.user, self.page, self.get_decimal())
 
-    __unicode__ = lambda self: "%s on %s mod: %d" % (unicode(self.user), unicode(self.page), self.get_decimal())
-     
-        
+
 class PageModeratorState(models.Model):
     """PageModeratorState memories all actions made on page.
     Page can be in only one advanced state. 
@@ -119,6 +120,5 @@ class PageModeratorState(models.Model):
     
     css_class = lambda self: self.action.lower()
     
-    __unicode__ = lambda self: "%s: %s" % (unicode(self.page), self.get_action_display())
-    
-    
+    def __unicode__(self):
+        return u"%s: %s" % (self.page, self.get_action_display())

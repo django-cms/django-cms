@@ -1,12 +1,14 @@
 from django.conf import settings
+from django.utils.translation import ugettext as _
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
 from cms.admin.forms import PageUserForm, PageUserGroupForm
 from cms.admin.permissionadmin import GenericCmsPermissionAdmin
 from cms.exceptions import NoPermissionsException
 from cms.models import PageUser, PageUserGroup
 from cms.utils.permissions import get_subordinate_users
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.utils.translation import ugettext as _
 
 
 class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):

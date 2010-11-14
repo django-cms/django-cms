@@ -91,6 +91,7 @@ class CMSMenu(Menu):
                     page.title_cache[title.language] = title
                     nodes.append(page_to_node(page, home, home_cut))
                     ids.remove(page.pk)
+
         if ids: # get fallback languages
             fallbacks = get_fallback_languages(lang)
             for l in fallbacks:

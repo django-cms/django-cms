@@ -5,7 +5,8 @@ from cms.utils.urlutils import urljoin
 from django.contrib import admin
 
 def send_mail(subject, txt_template, to, context=None, html_template=None, fail_silently=True):
-    """Multipart message helper with template rendering.
+    """
+    Multipart message helper with template rendering.
     """
     site = Site.objects.get_current()
     

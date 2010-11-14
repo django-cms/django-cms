@@ -2,18 +2,13 @@ from django.conf import settings
 from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models import Q
+
 from cms.exceptions import NoPermissionsException
 from publisher import PublisherManager
 from cms.models.query import PageQuerySet
 from cms.utils.i18n import get_fallback_languages
 
 
-try:
-    set
-except NameError:
-    from sets import Set as set
-
-    
 class PageManager(PublisherManager):
     """Use draft() and public() methods for accessing the corresponding
     instances.
@@ -277,7 +272,7 @@ class PagePermissionManager(BasicPagePermissionManager):
             
             User permissions can be assigned to multiple page nodes, so merge of 
             all of them is required. In this case user can see permissions for 
-            users C,X,D,Y,I,J but not A, because A user in higher in hierarchy.            
+            users C,X,D,Y,I,J but not A, because A user in higher in hierarchy.
         
         If permission object holds group, this permission object can be visible 
         to user only if all of the group members are lover in hierarchy. If any 
@@ -334,12 +329,11 @@ class PagePermissionManager(BasicPagePermissionManager):
 class PagePermissionsPermissionManager(models.Manager):
     """Page permissions permission manager.
     
-    !IMPORTANT: this actually points to Page model, not to PagePermission. Seems 
-    this will be better approach. Accessible under permissions.
+    !IMPORTANT: this actually points to Page model, not to PagePermission.
+    Seems this will be better approach. Accessible under permissions.
     
     Maybe this even shouldn't be a manager - it mixes different models together.
     """
-    
     # we will return this in case we have a superuser, or permissions are not
     # enabled/configured in settings
     GRANT_ALL = 'All'

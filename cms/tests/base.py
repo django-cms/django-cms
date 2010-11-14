@@ -1,12 +1,14 @@
-from cms.models import Title, Page
+import copy
+import sys
+import warnings
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
-import copy
-import sys
-import warnings
+
+from cms.models import Title, Page
 
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
@@ -71,18 +73,20 @@ class CMSTestCase(TestCase):
         settings._wrapped = self._original_settings_wrapped
         super(CMSTestCase, self)._post_teardown()
     
-        
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
         self.user = user
         self.assertEqual(logged_in, True)
     
-    
     def get_new_page_data(self, parent_id=''):
-        page_data = {'title':'test page %d' % self.counter, 
-            'slug':'test-page-%d' % self.counter, 'language':settings.LANGUAGES[0][0],
-            'site':1, 'template':'nav_playground.html', 'parent': parent_id}
-        
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0],
+            'template': 'nav_playground.html',
+            'parent': parent_id,
+            'site': 1,
+        }
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0
@@ -97,7 +101,6 @@ class CMSTestCase(TestCase):
         print "-------------------------- %s --------------------------------" % (title or "page structure")
         for page in Page.objects.drafts().order_by('tree_id', 'parent', 'lft'):
             print "%s%s #%d" % ("    " * (page.level), page, page.id)
-    
     
     def assertObjectExist(self, qs, **filter):
         try:
@@ -153,7 +156,7 @@ class CMSTestCase(TestCase):
         # public model shouldn't be available yet, because of the moderation
         self.assertObjectExist(Title.objects, slug=page_data['slug'])
         
-# test case currently failing because Title model is no longer under Publisher
+        # test case currently failing because Title model is no longer under Publisher
         if settings.CMS_MODERATOR and page.is_under_moderation(): 
             self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         

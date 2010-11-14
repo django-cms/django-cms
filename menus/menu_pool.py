@@ -19,7 +19,7 @@ class MenuPool(object):
         self.modifiers = []
         self.discovered = False
         self.cache_keys = set()
-        
+
     def discover_menus(self):
         if self.discovered:
             return    
@@ -48,21 +48,21 @@ class MenuPool(object):
                 to_be_deleted.append(key)
         cache.delete_many(to_be_deleted)
         self.cache_keys.difference_update(to_be_deleted)
-    
+
     def register_menu(self, menu):
         from menus.base import Menu
         assert issubclass(menu, Menu)
         if menu.__name__ in self.menus.keys():
-            raise NamespaceAllreadyRegistered, "[%s] a menu with this name is already registered" % menu.__name__
+            raise NamespaceAllreadyRegistered(
+                "[%s] a menu with this name is already registered" % menu.__name__)
         self.menus[menu.__name__] = menu()
-        
+
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
         if not modifier_class in self.modifiers:
             self.modifiers.append(modifier_class)
-        
-    
+
     def _build_nodes(self, request, site_id):
         lang = get_language()
         prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
@@ -110,7 +110,7 @@ class MenuPool(object):
         duration = getattr(settings, "MENU_CACHE_DURATION", 60*60)
         cache.set(key, final_nodes, duration)
         return final_nodes
-    
+
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:
             nodes = self._mark_selected(request, nodes)
@@ -118,8 +118,7 @@ class MenuPool(object):
             inst = cls()
             nodes = inst.modify(request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
-            
-    
+
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None, breadcrumb=False):
         self.discover_menus()
         if not site_id:
@@ -128,7 +127,7 @@ class MenuPool(object):
         nodes = copy.deepcopy(nodes)
         nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb=breadcrumb)
         return nodes 
-    
+
     def _mark_selected(self, request, nodes):
         sel = None
         for node in nodes:
@@ -147,7 +146,7 @@ class MenuPool(object):
         if sel:
             sel.selected = True
         return nodes
-    
+
     def get_menus_by_attribute(self, name, value):
         self.discover_menus()
         found = []
@@ -155,12 +154,12 @@ class MenuPool(object):
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
                 found.append((menu[0], menu[1].name))
         return found
-    
+
     def get_nodes_by_attribute(self, nodes, name, value):
         found = []
         for node in nodes:
             if node.attr.get(name, None) == value:
                 found.append(node)
         return found
-     
+
 menu_pool = MenuPool()

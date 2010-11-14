@@ -23,11 +23,10 @@ def set_permission_cache(user, key, value):
     cache_key = get_cache_key(user, key)
     
     if not cache_key in all_keys:
-        all_keys.append(cache_key)        
+        all_keys.append(cache_key)
     if not key in permission_cache_keys:
         permission_cache_keys.append(key)
     cache.set(cache_key, value, TTL)
-    
 
 def clear_user_permission_cache(user):
     """Cleans permission cache for given user.
