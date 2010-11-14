@@ -24,7 +24,7 @@ from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES,
-    PagePermissionInlineAdmin)
+    PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import save_all_plugins, revert_plugins
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
@@ -423,7 +423,7 @@ class PageAdmin(ModelAdmin):
     def get_formsets(self, request, obj=None):
         if obj:
             for inline in self.inline_instances:
-                if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin):
+                if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin) and not isinstance(inline, ViewRestrictionInlineAdmin):
                     if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
                         continue
                     if obj and not obj.has_change_permissions_permission(request):

@@ -69,21 +69,29 @@ class CMSMenu(Menu):
         home_cut = False
         home_children = []
         home = None
+        actual_pages = []
+
         for page in pages:
+            if not page.has_view_permission(request):
+                # Don't include pages the user doesn't have access to
+                continue
             if not home:
                 home = page
-            
             page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
+            elif not settings.CMS_PUBLIC_FOR_ALL:
+                continue
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
                 page.home_cut_cache = True 
                 home_children.append(page.pk)
             if (page.pk == home.pk and home.in_navigation) or page.pk != home.pk:
                 first = False
             ids.append(page.id)
+            actual_pages.append(page)
+
         titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
-        for page in pages:# add the title and slugs and some meta data
+        for page in actual_pages: # add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == page.pk:
                     if not hasattr(page, "title_cache"):
@@ -97,7 +105,7 @@ class CMSMenu(Menu):
             for l in fallbacks:
                 titles = list(get_title_queryset(request).filter(page__in=ids, language=l))
                 for title in titles:
-                    for page in pages:# add the title and slugs and some meta data
+                    for page in actual_pages: # add the title and slugs and some meta data
                         if title.page_id == page.pk:
                             if not hasattr(page, "title_cache"):
                                 page.title_cache = {}

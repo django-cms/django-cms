@@ -204,6 +204,14 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         model = PagePermission
 
 
+class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
+    can_view = forms.BooleanField(label=_('can_view'), widget=HiddenInput(), initial=True)
+
+    def clean_can_view(self):
+        self.cleaned_data["can_view"] = True
+        return self.cleaned_data
+
+
 class GlobalPagePermissionAdminForm(forms.ModelForm):
 
     def clean(self):

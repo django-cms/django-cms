@@ -11,7 +11,9 @@ def lex_cache_key(key):
     """
     Returns the language and site ID a cache key is related to.
     """
-    return key.rsplit('_', 2)[1:]
+    if key.endswith("_user"):
+        return key.split('_user')[0].rsplit('_', 3)[1:]
+    return key.rsplit('_', 2)[1:] + [None]
 
 class MenuPool(object):
     def __init__(self):
@@ -31,9 +33,11 @@ class MenuPool(object):
         from menus.modifiers import register
         register()
         self.discovered = True
-        
-    def clear(self, site_id=None, language=None):
+
+    def clear(self, site_id=None, language=None, all=False):
         def relevance_test(keylang, keysite):
+            if all:
+                return True
             sok = not site_id
             lok = not language
             if site_id and (site_id == keysite or site_id == int(keysite)):
@@ -43,7 +47,7 @@ class MenuPool(object):
             return lok and sok
         to_be_deleted = []
         for key in self.cache_keys:
-            keylang, keysite = lex_cache_key(key)
+            keylang, keysite, keyuser = lex_cache_key(key)
             if relevance_test(keylang, keysite):
                 to_be_deleted.append(key)
         cache.delete_many(to_be_deleted)
@@ -67,6 +71,8 @@ class MenuPool(object):
         lang = get_language()
         prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
         key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
+        if request.user.is_authenticated():
+            key += "_%s_user" % request.user.pk
         self.cache_keys.add(key)
         cached_nodes = cache.get(key, None)
         if cached_nodes:

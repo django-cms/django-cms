@@ -91,6 +91,10 @@ class CMSTestCase(TestCase):
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+
+        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         
         self.counter = self.counter + 1
         return page_data
@@ -116,8 +120,10 @@ class CMSTestCase(TestCase):
             return
         raise self.failureException, "ObjectDoesNotExist not raised"
     
-    def create_page(self, parent_page=None, user=None, position="last-child", title=None, site=1, published=False, in_navigation=False):
-        """Common way for page creation with some checks
+    def create_page(self, parent_page=None, user=None, position="last-child",
+            title=None, site=1, published=False, in_navigation=False):
+        """
+        Common way for page creation with some checks
         """
         if user:
             # change logged in user

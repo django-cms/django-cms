@@ -87,12 +87,38 @@ def has_page_change_permission(request):
     """
     from cms.utils.plugins import current_site
     opts = Page._meta
-    if request.user.is_superuser or \
-        (request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
-            (GlobalPagePermission.objects.with_user(request.user).filter(can_change=True, sites__in=[current_site(request)]).count()>0) or 
-            has_any_page_change_permissions(request)):
+    if request.user.is_superuser or (
+        request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and (
+            GlobalPagePermission.objects.with_user(request.user).filter(
+                can_change=True, sites__in=[current_site(request)]
+            ).exists()) or has_any_page_change_permissions(request)):
         return True
     return False
+
+def has_page_view_permission(request):
+    """
+    Return true if the current user has permission to view any page. This is
+    just used for building the tree - only superuser, or user with can_change in
+    globalpagepermission can change a page.
+    """
+    from cms.utils.plugins import current_site
+    opts = self._meta
+    codename = '%s.%s_%s' % (opts.app_label, "view", opts.object_name.lower())
+    if request.user.is_superuser or (
+        request.user.has_perm(codename) and (
+            GlobalPagePermission.objects.with_user(request.user).filter(
+                can_view=True, sites__in=[current_site(request)]
+            ).exists()) or (
+                settings.CMS_PUBLIC_FOR_STAFF and request.user.is_staff)):
+        return True
+    return False
+
+def get_any_page_view_permissions(request, page):
+    from cms.utils.plugins import current_site
+    return PagePermission.objects.filter(
+            page__pk=page.pk,
+            page__site=current_site(request),
+            can_view=True)
 
 
 def get_user_permission_level(user):
@@ -114,8 +140,8 @@ def get_user_permission_level(user):
         2.
     
     """
-    if user.is_superuser or \
-        GlobalPagePermission.objects.with_can_change_permissions(user).count():
+    if (user.is_superuser or
+            GlobalPagePermission.objects.with_can_change_permissions(user).exists()):
         # those
         return 0
     try:

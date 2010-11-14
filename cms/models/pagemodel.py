@@ -82,6 +82,9 @@ class Page(MpttPublisher):
     permissions = PagePermissionsPermissionManager()
 
     class Meta:
+        permissions = (
+            ('view_page', 'Can view page'),
+        )
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('site','tree_id', 'lft')
@@ -635,6 +638,30 @@ class Page(MpttPublisher):
                 return t[1] 
         return _("default")
     
+    def has_view_permission(self, request):
+        from cms.models.permissionmodels import PagePermission
+        # staff is allowed to see everything
+        if request.user.is_staff and settings.CMS_PUBLIC_FOR_STAFF:
+            return True
+        # does any restriction exist?
+        restricted = PagePermission.objects.filter(page=self, can_view=True).count()
+        # anonymous user, no restriction saved in database
+        if not request.user.is_authenticated() and not restricted:
+            return True
+        # authenticated user, no restriction and public for all fallback
+        if (request.user.is_authenticated() and not restricted and
+                settings.CMS_PUBLIC_FOR_ALL):
+            return True
+        # anyonymous user, page has restriction, generally false
+        if not request.user.is_authenticated() and restricted:
+            return False
+        # Authenticated user
+        # Django wide auth perms "can_view" or cms auth perms "can_view"
+        opts = self._meta
+        codename = '%s.%s_%s' % (opts.app_label, "view", opts.object_name.lower())
+        return (request.user.has_perm(codename) or
+                self.has_generic_permission(request, "view"))
+    
     def has_change_permission(self, request):
         opts = self._meta
         if request.user.is_superuser:
@@ -691,7 +718,8 @@ class Page(MpttPublisher):
                 or request.user.pk != self.permission_user_cache.pk:
             from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            setattr(self, att_name, has_generic_permission(self.id, request.user, type, self.site_id))
+            setattr(self, att_name, has_generic_permission(
+                    self.id, request.user, type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
