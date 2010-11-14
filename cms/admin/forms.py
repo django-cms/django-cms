@@ -15,9 +15,10 @@ from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import (Page, PagePermission, PageUser,
     ACCESS_PAGE, PageUserGroup)
+from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.permissions import (get_current_user, get_subordinate_users,
-    get_subordinate_groups, mail_page_user_change)
+    get_subordinate_groups)
 from cms.utils.urlutils import any_path_re
 
 from menus.menu_pool import menu_pool

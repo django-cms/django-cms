@@ -1,13 +1,12 @@
-from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from cms.models import Page, PagePermission, GlobalPagePermission
-from cms.exceptions import NoPermissionsException
+
+from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
 
-
-
+from cms.models import Page, PagePermission, GlobalPagePermission
+from cms.exceptions import NoPermissionsException
 
 try:
     from threading import local
@@ -23,14 +22,12 @@ def set_current_user(user):
     CurrentUserMiddleware.
     """
     _thread_locals.user=user
-
     
 def get_current_user():
     """
     Returns current user, or None
     """
     return getattr(_thread_locals, 'user', None)
-
 
 def has_page_add_permission(request):
     """
@@ -203,29 +200,9 @@ def has_global_change_permissions_permission(user):
         return True
     return False
 
-
-
-def mail_page_user_change(user, created=False, password=""):
-    """Send email notification to given user. Used it PageUser profile creation/
-    update.
-    """
-    from cms.utils.mail import send_mail
-    
-    if created:
-        subject = _('CMS - your user account was created.')
-    else:
-        subject = _('CMS - your user account was changed.')
-    
-    context = {
-        'user': user,
-        'password': password or "*" * 8,
-        'created': created,
-    }
-    send_mail(subject, 'admin/cms/mail/page_user_change.txt', [user.email], context, 'admin/cms/mail/page_user_change.html')
-
-
 def has_generic_permission(page_id, user, attr, site):
-    """Permission getter for single page with given id.
+    """
+    Permission getter for single page with given id.
     """
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
     permission = func(user, site)
