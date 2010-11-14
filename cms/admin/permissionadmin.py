@@ -1,6 +1,5 @@
 from copy import deepcopy
 from django.conf import settings
-from cms.admin.models import BaseInlineFormSetWithQuerySet
 from django.template.defaultfilters import title
 from django.utils.translation import ugettext as _
 
@@ -32,42 +31,33 @@ class PagePermissionInlineAdmin(admin.TabularInline):
         qs = PagePermission.objects.subordinate_to_user(request.user)
         return qs
     
-    def get_fieldsets(self, request, obj=None):
-        """Request formset with given obj.
-        """
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
-        form = self.get_formset(request, obj).form
-        return [(None, {'fields': form.base_fields.keys()})]
-    
     def get_formset(self, request, obj=None, **kwargs):
-        """Some fields may be excluded here. User can change only 
-        permissions which are available for him. E.g. if user does not haves 
-        can_publish flag, he can't change assign can_publish permissions.
-        
-        Seems django doesn't cares about queryset defined here - its
-        probably a bug, so monkey patching again.. Assign use_queryset
-        attribute to FormSet, our overiden formset knows how to handle this, 
-        @see BaseInlineFormSetWithQuerySet for more details.
         """
+        Some fields may be excluded here. User can change only
+        permissions which are available for him. E.g. if user does not haves
+        can_publish flag, he can't change assign can_publish permissions.
+        """
+        exclude = self.exclude or []
         if obj:
-            self.exclude = []
             if not obj.has_add_permission(request):
-                self.exclude.append('can_add')
+                exclude.append('can_add')
             if not obj.has_delete_permission(request):
-                self.exclude.append('can_delete')
+                exclude.append('can_delete')
             if not obj.has_publish_permission(request):
-                self.exclude.append('can_publish')
+                exclude.append('can_publish')
             if not obj.has_advanced_settings_permission(request):
-                self.exclude.append('can_change_advanced_settings')
+                exclude.append('can_change_advanced_settings')
             if not obj.has_move_page_permission(request):
-                self.exclude.append('can_move_page')
+                exclude.append('can_move_page')
             if not settings.CMS_MODERATOR or not obj.has_moderate_permission(request):
-                self.exclude.append('can_moderate')
-        FormSet = super(PagePermissionInlineAdmin, self).get_formset(request, obj=None, **kwargs)
-        # asign queryset 
-        FormSet.use_queryset = self.queryset(request)
-        return FormSet
+                exclude.append('can_moderate')
+        formset_cls = super(PagePermissionInlineAdmin, self
+            ).get_formset(request, obj=None, exclude=exclude, *kwargs)
+        qs = self.queryset(request)
+        if obj is not None:
+            qs = qs.filter(page=obj)
+        formset_cls._queryset = qs
+        return formset_cls
 
 if settings.CMS_PERMISSION: 
     PAGE_ADMIN_INLINES.append(PagePermissionInlineAdmin)
