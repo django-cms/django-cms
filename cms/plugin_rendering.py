@@ -123,7 +123,8 @@ def render_placeholder(placeholder, context_to_copy):
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-    context = copy.copy(context_to_copy) 
+    context = copy.copy(context_to_copy)
+    context.push()
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
     page = get_page_from_placeholder_if_exists(placeholder)
@@ -161,6 +162,7 @@ def render_placeholder(placeholder, context_to_copy):
     content = "".join(c)
     if edit:
         content = render_placeholder_toolbar(placeholder, context, content)
+    context.pop()
     return content
 
 def render_placeholder_toolbar(placeholder, context, content):
