@@ -612,8 +612,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(pg.publisher_public != None, True)
         
         # check urls
-        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
-        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
+        self.assertEqual(pg.publisher_public.get_absolute_url(), u'%smaster/slave-home/pb/pe/pg/' % self.get_pages_root())
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'%smaster/slave-home/pb/pe/ph/' % self.get_pages_root())
         
         # perform movings under slave...
         self.login_user(self.user_slave)
@@ -631,8 +631,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         ph = self.reload_page(ph)
         
         # check urls - they should stay them same, there wasn't approved yet
-        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/pg/')
-        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pb/pe/ph/')
+        self.assertEqual(pg.publisher_public.get_absolute_url(), u'%smaster/slave-home/pb/pe/pg/' % self.get_pages_root())
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'%smaster/slave-home/pb/pe/ph/' % self.get_pages_root())
         
         # pg & pe should require approval
         self.assertEqual(pg.requires_approvement(), True)
@@ -652,8 +652,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(ph.publisher_public.parent.pk, pe.publisher_public_id)
         
         # check if urls are correct after move
-        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
-        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')     
+        self.assertEqual(pg.publisher_public.get_absolute_url(), u'%smaster/slave-home/pc/pg/' % self.get_pages_root())
+        self.assertEqual(ph.publisher_public.get_absolute_url(), u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root())     
         
     def test_17_plugins_get_published(self):
         self.login_user(self.user_super)
