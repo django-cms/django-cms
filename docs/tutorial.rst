@@ -290,6 +290,8 @@ Create a django application and install it in settings.py. As you want to save
 data to the database you need to write a model in your models.py. ::
 
   from cms.models import CMSPlugin
+  from django.db import models
+  
   class TextWithTitle(CMSPlugin):
       title = models.CharField(max_length=50)
       text =  models.TextField()
