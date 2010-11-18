@@ -186,6 +186,7 @@ class PageAdmin(model_admin):
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/change-moderation/$', self.change_moderation),
             pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page
+            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
@@ -868,6 +869,16 @@ class PageAdmin(model_admin):
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return render_admin_menu_item(request, page)
+        return HttpResponseRedirect('../../')
+
+
+    @transaction.commit_on_success
+    def publish_page(self, request, page_id):
+        page = get_object_or_404(Page, id=page_id)
+        # ensure user has permissions to publish this page
+        if not page.has_moderate_permission(request):
+            raise HttpResponseForbidden("Denied")
+        page.publish()
         return HttpResponseRedirect('../../')
 
 
