@@ -257,6 +257,7 @@ class CMSPlugin(Mptt):
                 public_plugin.delete()
             except:
                 pass
+        self.placeholder = None
         self.delete()
         
     def has_change_permission(self, request):
