@@ -11,7 +11,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
 
-
 class PluginsTestCase(CMSTestCase):
 
     def setUp(self):
@@ -310,5 +309,43 @@ class PluginsTestCase(CMSTestCase):
         
         response = response.client.post(remove_url, plugin_data)
         self.assertEquals(response.status_code, 200)
+
+    def test_07_extended_plugin_model(self):
+        """
+        Test case for extended plugin models
+        """
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        # add an extended plugin
+        plugin_data = {
+            'plugin_type':"ExtendedLinkPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        # create the plugin instance
+        plugin_model_data = {
+            'name':"django-cms",
+            'url':'http://www.django-cms.org/',
+        }
+        post_url = "%s1/"%URL_CMS_PLUGIN_EDIT
+        response = self.client.post(post_url, plugin_model_data)
+        
+        self.assertEquals(response.status_code, 200)
+        # there should still be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        # Test that the plugin instance is identified correctly when retrieved
+        base_plugin = CMSPlugin.objects.get(id=1)
+        instance, plugin = base_plugin.get_plugin_instance()
+        self.assertEquals(instance.__class__.__name__, 'CustomLink')
+        self.assertEquals(plugin.__class__.__name__, 'ExtendedLinkPlugin')
     

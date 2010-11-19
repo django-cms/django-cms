@@ -1,4 +1,5 @@
 from cms.models.fields import PlaceholderField
+from cms.plugins.link.models import Link as CMSLink
 from django.core.urlresolvers import reverse
 from django.db import models
 import mptt
@@ -25,3 +26,6 @@ except mptt.AlreadyRegistered:
 class Picture(models.Model):
     image = models.ImageField(upload_to="pictures")
     category = models.ForeignKey(Category)
+
+class CustomLink(CMSLink):
+    custom_field = models.CharField(max_length=20, blank=True)
