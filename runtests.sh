@@ -1,8 +1,16 @@
 #!/bin/bash
 cd tests
 echo "setting up test environment (this might take a while)..."
-python bootstrap.py >/dev/null 2>&1
-./bin/buildout >/dev/null 2>&1
+python bootstrap.py
+if [ $? != 0 ]; then
+    echo "bootstrap.py failed"
+    exit 1
+fi
+./bin/buildout
+if [ $? != 0 ]; then
+    echo "bin/buildout failed"
+    exit 1
+fi
 echo "running tests"
 if [ $1 ]; then
     suite="cms.$1"

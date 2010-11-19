@@ -5,3 +5,5 @@ source =
     menus
     mptt
     publisher
+omit =
+    *migrations*
