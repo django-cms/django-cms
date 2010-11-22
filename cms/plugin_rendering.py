@@ -135,9 +135,12 @@ def render_placeholder(placeholder, context_to_copy):
     # since settings are general and database/template are specific
     # TODO this should actually happen as a plugin context processor, but these currently overwrite 
     # existing context -- maybe change this order?
-    extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("extra_context", None)
-    if not extra_context:
-        extra_context = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("extra_context", {})
+    slot = getattr(placeholder, 'slot', None)
+    extra_context = {}
+    if slot:
+        extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, slot), {}).get("extra_context", None)
+        if not extra_context:
+            extra_context = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("extra_context", {})
     for key, value in extra_context.items():
         if not key in context:
             context[key] = value

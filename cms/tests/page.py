@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from cms.models import Page, Title, Placeholder
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
-from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.models import Page, Title, Placeholder
+import os.path
 
 
 class PagesTestCase(CMSTestCase):
@@ -213,3 +214,27 @@ class PagesTestCase(CMSTestCase):
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
         
+    def test_11_add_placeholder(self):
+        # create page
+        page = self.create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
+        page.template = 'add_placeholder.html'
+        page.save()
+        url = page.get_absolute_url()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        path = os.path.join(settings.PROJECT_DIR, 'templates', 'add_placeholder.html')
+        f = open(path, 'r')
+        old = f.read()
+        f.close()
+        new = old.replace(
+            '<!-- SECOND_PLACEHOLDER -->',
+            '{% placeholder second_placeholder %}'
+        )
+        f = open(path, 'w')
+        f.write(new)
+        f.close()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        f = open(path, 'w')
+        f.write(old)
+        f.close()
