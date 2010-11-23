@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+
 import unittest
 import doctest
 from django.conf import settings
@@ -11,7 +13,10 @@ from cms.tests.permmod import PermissionModeratorTestCase
 from cms.tests.site import SiteTestCase
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.nonroot import NonRootCase
+
 from cms.tests.plugins import PluginsTestCase
+from cms.tests.reversion_tests import ReversionTestCase
+        
 from cms.tests.menu import MenusTestCase
 from cms.tests.rendering import RenderingTestCase
 from cms.tests.placeholder import PlaceholderTestCase
@@ -50,7 +55,7 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocsTestCase))
     
     return s
- 
+        
 def test_runner_with_coverage(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     """Custom test runner.  Follows the django.test.simple.run_tests() interface."""
     import os, shutil, sys
@@ -59,16 +64,17 @@ def test_runner_with_coverage(test_labels, verbosity=1, interactive=True, extra_
     sys.path = [os.path.join(os.path.dirname(__file__), "lib")] + sys.path
      
     import coverage
-    from django.test.simple import run_tests as django_test_runner
-     
+    from django.test.utils import get_runner
     from django.conf import settings
+    
+    django_test_runner = get_runner(settings)(verbosity=verbosity, interactive=interactive)
     
     # Start code coverage before anything else if necessary
     #if hasattr(settings, 'COVERAGE_MODULES') and not test_labels:
     coverage.use_cache(0) # Do not cache any of the coverage.py stuff
     coverage.start()
  
-    test_results = django_test_runner(test_labels, verbosity, interactive, extra_tests)
+    test_results = django_test_runner(test_labels, extra_tests=extra_tests)
  
     # Stop code coverage after tests have completed
     #if hasattr(settings, 'COVERAGE_MODULES') and not test_labels:
