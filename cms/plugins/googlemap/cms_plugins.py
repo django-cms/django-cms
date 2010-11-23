@@ -1,10 +1,13 @@
+from django.conf import settings as proj_settings
+from django.forms.widgets import Media
+from django.utils.translation import ugettext_lazy as _
+
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
-from django.utils.translation import ugettext_lazy as _
 from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.googlemap.settings import GOOGLE_MAPS_API_KEY
 from cms.plugins.googlemap import settings
-from django.forms.widgets import Media
+
 
 class GoogleMapPlugin(CMSPluginBase):
     model = GoogleMap
@@ -23,6 +26,8 @@ class GoogleMapPlugin(CMSPluginBase):
             key = context['GOOGLE_MAPS_API_KEY']
         else:
             key = GOOGLE_MAPS_API_KEY
-        return Media(js = ('http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s&amp;hl=%s' % (key, request.LANGUAGE_CODE),))
+        lang = getattr(request, 'LANGUAGE_CODE', proj_settings.LANGUAGE_CODE[0:2])
+        return Media(js=('http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s&amp;hl=%s' % (key, lang),))
  
+
 plugin_pool.register_plugin(GoogleMapPlugin)
