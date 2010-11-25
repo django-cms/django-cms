@@ -72,7 +72,8 @@ class ReversionTestCase(CMSTestCase):
         self.assertEquals(response.status_code, 200)
         response = self.client.post(revert_url, self.page_data)
         self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
-        self.assertEquals(Page.objects.all()[1].published, False)
+        # test for publisher_is_draft, published is set for both draft and published page
+        self.assertEquals(Page.objects.all()[0].publisher_is_draft, True)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
         self.assertEquals(Revision.objects.all().count(), 6)
 

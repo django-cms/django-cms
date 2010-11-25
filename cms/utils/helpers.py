@@ -5,7 +5,7 @@ from publisher import Publisher
 # modify reversions to match our needs if required...
 
 
-def reversion_register(model_class, fields=None, follow=(), format="xml", exclude_fields=None):
+def reversion_register(model_class, fields=None, follow=(), format="json", exclude_fields=None):
     """CMS interface to reversion api - helper function. Registers model for 
     reversion only if reversion is available.
     
@@ -36,3 +36,32 @@ def reversion_register(model_class, fields=None, follow=(), format="xml", exclud
 
     from cms.utils import reversion_hacks
     reversion_hacks.register_draft_only(model_class, fields, follow, format)
+
+
+def make_revision_with_plugins(obj, user=None, message=None):
+    from cms.models.pluginmodel import CMSPlugin
+    import reversion
+    """
+    Only add to revision if it is a draft.
+    """
+    revision_manager = reversion.revision
+    
+    cls = obj.__class__
+    
+    if cls in revision_manager._registry:
+        
+        placeholder_relation = find_placeholder_relation(obj)
+
+        if revision_manager.is_active():      
+            # add toplevel object to the revision
+            revision_manager.add(obj)
+            # add plugins and subclasses to the revision
+            filters = {'placeholder__%s' % placeholder_relation: obj}
+            for plugin in CMSPlugin.objects.filter(**filters):
+                plugin_instance, admin = plugin.get_plugin_instance()
+                if plugin_instance:
+                    revision_manager.add(plugin_instance)
+                revision_manager.add(plugin)
+                
+def find_placeholder_relation(obj):
+    return 'page'
