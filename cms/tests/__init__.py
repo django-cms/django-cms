@@ -14,6 +14,8 @@ from cms.tests.nonroot import NonRootCase
 from cms.tests.plugins import PluginsTestCase
 from cms.tests.menu import MenusTestCase
 from cms.tests.rendering import RenderingTestCase
+if "reversion" in settings.INSTALLED_APPS:
+    from cms.tests.reversion_tests import ReversionTestCase
 from cms.tests.placeholder import PlaceholderTestCase
 from cms.tests.docs import DocsTestCase
 
@@ -41,7 +43,6 @@ def suite():
     if "cms.plugins.text" in settings.INSTALLED_APPS:
         s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginsTestCase))
         if "reversion" in settings.INSTALLED_APPS:
-            from cms.tests.reversion_tests import ReversionTestCase
             s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(MenusTestCase))
