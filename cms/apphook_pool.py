@@ -45,6 +45,8 @@ class ApphookPool(object):
         for app_name in self.apps.keys():
             app = self.apps[app_name]
             hooks.append((app_name, app.name))
+        # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
+        hooks = sorted(hooks, key=lambda hook: hook[0])
         return hooks
     
     def get_apphook(self, app_name):
