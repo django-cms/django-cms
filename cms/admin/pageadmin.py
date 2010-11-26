@@ -826,7 +826,7 @@ class PageAdmin(model_admin):
                 return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                kwargs ={
+                kwargs = {
                     'copy_permissions': request.REQUEST.get('copy_permissions', False),
                     'copy_moderation': request.REQUEST.get('copy_moderation', False)
                 }
@@ -1031,10 +1031,8 @@ class PageAdmin(model_admin):
         if page.has_change_permission(request):
             if page.in_navigation:
                 page.in_navigation = False
-                val = 0
             else:
                 page.in_navigation = True
-                val = 1
             page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
             return render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
@@ -1122,8 +1120,8 @@ class PageAdmin(model_admin):
                 return HttpResponseBadRequest(_("Language must be different than the copied language!"))
             plugins = list(placeholder.cmsplugin_set.filter(language=copy_from).order_by('tree_id', '-rght'))
             ptree = []
-            for p in plugins:
-                p.copy_plugin(placeholder, language, ptree)
+            for plug in plugins:
+                plug.copy_plugin(placeholder, language, ptree)
             if 'reversion' in settings.INSTALLED_APPS:
                 page.save()
                 save_all_plugins(request, page, placeholder)
@@ -1243,8 +1241,8 @@ class PageAdmin(model_admin):
                 plugin.save()
                 success = True
             if 'ids' in request.POST:
-                for id in request.POST['ids'].split("_"):
-                    plugin = CMSPlugin.objects.get(pk=id)
+                for plugin_id in request.POST['ids'].split("_"):
+                    plugin = CMSPlugin.objects.get(pk=plugin_id)
                     page = get_page_from_placeholder_if_exists(plugin.placeholder)
 
                     if page and not page.has_change_permission(request):
