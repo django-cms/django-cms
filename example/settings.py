@@ -67,7 +67,7 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
     
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
+    #'debug_toolbar.middleware.DebugToolbarMiddleware'
     
 )
 
