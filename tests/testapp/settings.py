@@ -168,4 +168,4 @@ try:
 except ImportError:
     pass
     
-TEST_RUNNER = 'testapp.testrunner.CMSDjangoTestRunner'
+TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'
