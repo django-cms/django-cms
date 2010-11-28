@@ -14,7 +14,11 @@ from cms.tests.site import SiteTestCase
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.nonroot import NonRootCase
 
-from cms.tests.plugins import PluginsTestCase
+if "cms.plugins.text" in settings.INSTALLED_APPS:
+    from cms.tests.plugins import PluginsTestCase
+    if "reversion" in settings.INSTALLED_APPS:
+        from cms.tests.reversion_tests import ReversionTestCase
+
 from cms.tests.reversion_tests import ReversionTestCase
         
 from cms.tests.menu import MenusTestCase
@@ -46,7 +50,6 @@ def suite():
     if "cms.plugins.text" in settings.INSTALLED_APPS:
         s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginsTestCase))
         if "reversion" in settings.INSTALLED_APPS:
-            from cms.tests.reversion_tests import ReversionTestCase
             s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ReversionTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PermissionModeratorTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(MenusTestCase))
