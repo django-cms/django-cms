@@ -869,7 +869,11 @@ class PageAdmin(model_admin):
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return render_admin_menu_item(request, page)
-        return HttpResponseRedirect('../../')
+        referer = request.META['HTTP_REFERER']
+        path = '../../'
+        if 'admin' not in referer:
+            path = '%s?edit-off' % referer.split('?')[0]
+        return HttpResponseRedirect( path )
 
 
     @transaction.commit_on_success
@@ -879,7 +883,11 @@ class PageAdmin(model_admin):
         if not page.has_moderate_permission(request):
             raise HttpResponseForbidden("Denied")
         page.publish()
-        return HttpResponseRedirect('../../')
+        referer = request.META['HTTP_REFERER']
+        path = '../../'
+        if 'admin' not in referer:
+            path = '%s?edit-off' % referer.split('?')[0]
+        return HttpResponseRedirect( path )
 
 
     def delete_view(self, request, object_id, *args, **kwargs):
