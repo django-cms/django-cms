@@ -47,7 +47,7 @@ Optional
 
 
 Middlewares
-~~~~~~~~~~~
+-----------
 
 Note that the order is important:
 
