@@ -1,7 +1,15 @@
 from django.test.simple import DjangoTestSuiteRunner
-from xmlrunner import XMLTestRunner
 
+try:
+	from xmlrunner import XMLTestRunner as runner
+except:
+    runner = False
 
-class DjangoXMLTestRunner(DjangoTestSuiteRunner):
+class CMSTestSuiteRunner(DjangoTestSuiteRunner):
+    use_runner = runner
+
     def run_suite(self, suite, **kwargs):
-        return XMLTestRunner().run(suite)
+        if self.use_runner and not self.failfast:
+            return self.use_runner().run(suite)
+        else:
+            return super(CMSTestSuiteRunner, self).run_suite(suite, **kwargs)
