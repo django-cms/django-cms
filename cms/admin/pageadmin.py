@@ -772,13 +772,13 @@ class PageAdmin(ModelAdmin):
 
         global_page_permissions = GlobalPagePermission.objects.filter(sites__in=[page.site_id])
         page_permissions = PagePermission.objects.for_page(page)
-        permissions = list(global_page_permissions) + list(page_permissions)
+        all_permissions = list(global_page_permissions) + list(page_permissions)
 
         # does he can change global permissions ?
         has_global = permissions.has_global_change_permissions_permission(request.user)
 
         permission_set = []
-        for permission in permissions:
+        for permission in all_permissions:
             if isinstance(permission, GlobalPagePermission):
                 if has_global:
                     permission_set.append([(True, True), permission])
