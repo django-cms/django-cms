@@ -1,6 +1,5 @@
-==============
- Installation
-==============
+Installation
+============
 
 This document assumes that you are familiar with python and django.
 
@@ -16,10 +15,10 @@ Requirements
 * South 0.7 or higher
 
 Apps
-====
+----
 
 Required
---------
+~~~~~~~~
 
 * ``django.contrib.auth``
 * ``django.contrib.contenttypes``
@@ -36,7 +35,7 @@ Required
              the cms which is version 0.3-pre.
 
 Optional
---------
+~~~~~~~~
 
 * ``cms.plugins.text``
 * ``cms.plugins.picture``
@@ -48,7 +47,7 @@ Optional
 
 
 Middlewares
-===========
+~~~~~~~~~~~
 
 Note that the order is important:
 
@@ -65,7 +64,7 @@ Note that the order is important:
           `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
 
 Template Context Processors
-===========================
+---------------------------
 
 * ``django.core.context_processors.auth``
 * ``django.core.context_processors.i18n``
@@ -74,19 +73,19 @@ Template Context Processors
 * ``cms.context_processors.media``
 
 Templates
-=========
+---------
 
 You have to define at least one template in ``CMS_TEMPLATES`` which should
 contain at least one ``{% placeholder '<name>' %}`` tag.
 
 urls.py
-=======
+-------
 
 Include ``cms.urls`` **at the very end** of your urlpatterns. It **must** be the
 last pattern in the list!
 
 Media Files
-===========
+-----------
 
 Make sure your Django installation finds the cms media files, for this task we
 recommend using django-appmedia which will create a symbolic link for you. If
@@ -94,7 +93,7 @@ for whatever reason you are unable to use it, copy the folder ``cms/media/cms``
 into your main media folder.
 
 South
-=====
+-----
 
 To avoid issues with migrations during the installation process it is currently
 recommended to use ``python manage.py syncdb --all`` and
@@ -102,9 +101,8 @@ recommended to use ``python manage.py syncdb --all`` and
 migrations can not be supported on sqlite3.
 
 
-=================
- Troubleshooting
-=================
+Troubleshooting
+---------------
 
 If you create a page and you don't see a page in the list view:
 
@@ -119,12 +117,12 @@ with plugins:
   templatetag in them template.
 
 Template errors
-===============
+~~~~~~~~~~~~~~~
 If your placeholder content isn't being displayed when you view a CMS page, then change the CMS_MODERATOR variable in settings.py to False. This bug has been fixed, so upgrading to the latest version of Django CMS should resolve the issue. See:  
 https://github.com/divio/django-cms/issues/issue/430
 
 Javascript errors
-=================
+~~~~~~~~~~~~~~~~~
 If the plugins don't work (e.g. you try adding a text plugin, but you don't see the Javascript text editor on the page), you should use a Javascript inspector in your browser to investigate the issue (e.g. Firebug for Firefox, Web Inspector for Safari or Chrome). The Javascript inspector may report one of the following errors:
 
 - **TypeError: Result of expression 'jQuery' [undefined] is not a function.**
