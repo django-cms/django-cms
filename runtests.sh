@@ -11,20 +11,36 @@ if [ $? != 0 ]; then
     echo "bin/buildout failed"
     exit 1
 fi
-echo "running tests"
-if [ $1 ]; then
-	if [ "$1" = '--failfast' ]; then
-		failfast='--failfast'
-		suite='cms'
-	else
-		suite="cms.$1"
-	fi
-else
-    suite='cms'
+
+args=("$@")
+num_args=${#args[@]}
+index=0
+
+while [ "$index" -lt "$num_args" ]
+do
+    if [ "${args[$index]}" = "--failfast" ]; then
+        failfast="--failfast"
+        
+    else
+        suite="cms.${args[$index]}"
+    fi
+    let "index = $index + 1"
+done
+
+if [ "$failfast" ]; then
+    echo "--failfast supplied, not using xmlrunner."
 fi
+
+if [ ! "$suite" ]; then
+    suite="cms"
+    echo "Running complete cms testsuite."
+else
+    echo "Running cms test $suite."
+fi
+
 ./bin/coverage run --rcfile=.coveragerc testapp/manage.py test $suite $failfast
 retcode=$?
-echo "post test actions..."
+echo "Post test actions..."
 ./bin/coverage xml
 ./bin/coverage html
 cd ..

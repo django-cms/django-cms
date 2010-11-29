@@ -5,11 +5,11 @@ try:
 except:
     runner = False
 
-class CMSDjangoTestRunner(DjangoTestSuiteRunner):
+class CMSTestSuiteRunner(DjangoTestSuiteRunner):
     use_runner = runner
 
     def run_suite(self, suite, **kwargs):
-        if self.use_runner:
+        if self.use_runner and not self.failfast:
             return self.use_runner().run(suite)
         else:
-            return super(CMSDjangoTestRunner, self).run_suite(suite, **kwargs)
+            return super(CMSTestSuiteRunner, self).run_suite(suite, **kwargs)
