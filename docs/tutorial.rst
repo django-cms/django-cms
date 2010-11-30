@@ -4,13 +4,69 @@ Django CMS Tutorial
 Installation
 -------------
 
-I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't
+This guide has been tested with Ubuntu 9.10 and Mac OS X Snow Leopard.
+
+<--I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't
 expect things will be much different for mac at least...if I get a chance i'll
 run through this process on windows too and update the article but no
 promises.
 
 I'm assuming that Python, Django and sqlite3 are installed already. For
-reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
+reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.-->
+
+Installing Django CMS
+*********************
+Django CMS can be installed in different ways.
+
+You can use PIP::
+
+    $ pip install django-cms
+
+You can use easy_install::
+
+    $ easy_install django-cms
+
+Or you can download a tarball or check out a specific version from github::
+
+    http://github.com/divio/django-cms/downloads
+
+If you opt for this method, then you then need to run the `setup.py` file in the root folder of the downloaded package::
+
+    $ python setup.py install
+
+Alternatively, you can do everything by hand:
+
+If you don't know your Python location, issue the following command::
+
+    $ which python
+
+(my path is "/usr/local/lib/python2.6" for example)
+
+Go to your Python dist-packages directory "your-python-path/dist-packages"
+
+Download the latest and greatest Django CMS from here: http://www.django-cms.org/en/downloads/
+
+Unzip the downloaded file into the "dist-packages" directory...you will need to do this as the superuser.
+
+Make copies of the following directories like so::
+
+	sudo cp -R divio-django-cms-c0288a1/cms/ cms
+	sudo cp -R divio-django-cms-c0288a1/mptt/ mptt
+	sudo cp -R divio-django-cms-c0288a1/publisher/ publisher
+
+Do a bit of house cleaning to get rid of all the files you don't need::
+
+	sudo rm -rf divio-django-cms-c0288a1.zip
+	sudo rm -rf divio-django-cms-c0288a1/
+	
+To ensure the cms is properly installed, invoke a Python shell (just type ``python`` at the prompt), and ensure the following command returns without errors:
+    
+    import cms
+
+If this works, then you’re ready to create and configure a new project!
+
+Make a set of basic project files
+*********************************
 
 Preparing the environment
 *************************
@@ -38,60 +94,27 @@ And... ::
 
 	python manage.py runserver
 
-Head on over to http://127.0.0.1:8000 and if you see the following "it worked" page then well, its working.
+Head on over to http://127.0.0.1:8000 and if you should see the "It worked!" page:
 
 |it-worked|
 
 .. |it-worked| image:: images/it-worked.png
 
-Here comes the science...
-*************************
-
-If you dont happen to know your Python location then issue the following command::
-
-	which python
-
-(my one is "/usr/local/lib/python2.6" for example)
-
-Go to your Python dist-packages directory "your-python-path/dist-packages"
-
-Download the latest and greatest Django CMS from here: http://www.django-cms.org/en/downloads/
-
-Unzip the downloaded file into the "dist-packages" directory...you will need to do this as "sudo" unless you have your system set up wrongly ;)
-
-Make copies of the following directories like so::
-
-	sudo cp -R divio-django-cms-c0288a1/cms/ cms
-	sudo cp -R divio-django-cms-c0288a1/mptt/ mptt
-	sudo cp -R divio-django-cms-c0288a1/publisher/ publisher
-
-Do a bit of house cleaning to get rid of all the files you don't need::
-
-	sudo rm -rf divio-django-cms-c0288a1.zip
-	sudo rm -rf divio-django-cms-c0288a1/
-	
-To ensure the cms is properly installed, invoke a python shell (just type ``python`` at the prompt), and ensure the following command returns without errors:
-    
-    import cms
-
-
-Make a set of basic project files
-*********************************
-
 Head back to the project you created previously::
 
 	cd ~/django_apps/project-name
 
-In your editor, edit "settings.py" like so:
+To use Django CMS as part of the project, you need to edit the "settings.py" file.
 
 Insert the following before anything else in the file::
 
 	import os
 	gettext = lambda s: s
 	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+
+The gettext line allows us to use translatable strings in the settings.py file (see below).
 	
-This will instruct Django to set the root of the project at "the location of settings.py".
-The gettext line is there for transaltion voodoo. Don't pay attention to it yet.
+The PROJECT_PATH line instructs Django to consider the location of your settings.py file to be the root of the project. 
 
 Set up the remainder of the file with the following changes/additions::
 
@@ -126,12 +149,12 @@ Set up the remainder of the file with the following changes/additions::
 	    'cms.plugins.googlemap',
 	    'mptt',
 	    'publisher',
-		'menus',
+	    'menus',
 	)
 
 
 	MIDDLEWARE_CLASSES = (
-		'django.middleware.cache.UpdateCacheMiddleware',
+	    'django.middleware.cache.UpdateCacheMiddleware',
 	    'django.contrib.sessions.middleware.SessionMiddleware',
 	    'django.contrib.auth.middleware.AuthenticationMiddleware',
 	    'django.middleware.common.CommonMiddleware',
@@ -139,9 +162,9 @@ Set up the remainder of the file with the following changes/additions::
 	    'django.middleware.csrf.CsrfViewMiddleware',
 	    'cms.middleware.page.CurrentPageMiddleware',
 	    'cms.middleware.user.CurrentUserMiddleware',
-		'cms.middleware.toolbar.ToolbarMiddleware',
-		'cms.middleware.media.PlaceholderMediaMiddleware',
-		'django.middleware.cache.FetchFromCacheMiddleware',
+	    'cms.middleware.toolbar.ToolbarMiddleware',
+	    'cms.middleware.media.PlaceholderMediaMiddleware',
+	    'django.middleware.cache.FetchFromCacheMiddleware',
 	)
 
 	TEMPLATE_DIRS = os.path.join(PROJECT_PATH, 'templates')
@@ -166,6 +189,23 @@ Set up your available templates (don't worry that they don't actually exist yet)
 	    ('extra.html', gettext('Some extra fancy template')),
 	)
 
+The CMS_MEDIA_URL setting
+*************************
+
+Although the Django CMS media is located in the same folder as the rest of your media, you should set up a specific URL for just the Django CMS media. Then add a CMS_MEDIA_URL variable to settings.py, eg:: 
+    
+    CMS_MEDIA_URL = 'http://127.0.0.1:8000/static_media/cms/'
+
+This configuration is necessary to overcome cross-site security issues relating to wymeditor, the Javascript utility used by Django CMS for the WYSIWYM text editor plugin. Although it is common to serve static files from a different domain, the Django CMS media must be served by the same domain that serves the dynamic Python files. 
+
+In a development / test setting, the Django development server should be used to serve the Django CMS media files (see the "URLs configuration" section).
+
+In a production environment, a server alias should be created which sends requests for the Django CMS media files to a folder on the main server.
+
+
+URLs configuration
+******************
+
 Next, Edit your ``urls.py`` file like this::
 
 	from django.conf.urls.defaults import *
@@ -180,16 +220,22 @@ Next, Edit your ``urls.py`` file like this::
 
 	if settings.DEBUG:
 	    urlpatterns += patterns('',
-	        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True})
+	        url(r'^static_media/cms/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True})
 	    )
 
 	urlpatterns += patterns('',
 	    url(r'^', include('cms.urls')),
 	)
 
-Create a folder called 'media' in your project root (that's "project-name" for me), this means you create a symbolic link from the "cms/media/cms" folder in "dist-packages" to your new "media" folder::
+It is necessary to include the Django CMS media folder in the media folder of your Django project:
 
-	ln -s /usr/local/lib/python2.6/dist-packages/cms/media/cms cms
+1. Create a folder called 'media' in your project root (that's "project-name" for me).
+ 
+2. Create a symbolic link from the "cms/media/cms" folder in "dist-packages" to your new "media" folder, for example::
+
+    ln -s /usr/local/lib/python2.6/dist-packages/cms/media/cms cms
+
+Make sure that read permissions are set on this folder. Now all of the static media files used by Django CMS can be served to your site.
 
 
 Loading up on supplies: preparing the database
