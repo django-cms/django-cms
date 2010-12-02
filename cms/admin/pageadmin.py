@@ -34,7 +34,7 @@ from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import transaction
+from django.db import transaction, models
 from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404, \
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
@@ -386,23 +386,32 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
             placeholders = get_placeholders(selected_template)
-            for placeholder_name in placeholders:  
+            for placeholder_name in placeholders:
                 plugin_list = []
                 show_copy = False
                 copy_languages = {}
                 if versioned:
                     from reversion.models import Version
                     version = get_object_or_404(Version, pk=version_id)
-                    revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                     installed_plugins = plugin_pool.get_all_plugins()
                     plugin_list = []
                     plugins = []
                     bases = {}
+                    revs = []
+                    for related_version in version.revision.version_set.all():
+                        try:
+                            rev = related_version.object_version
+                        except models.FieldDoesNotExist:
+                            # in case the model has changed in the meantime
+                            continue
+                        else:
+                            revs.append(rev)
                     for rev in revs:
-                        phobj = rev.object
-                        if phobj.__class__ == Placeholder:
-                            if phobj.slot == placeholder_name:
-                                placeholder = phobj
+                        pobj = rev.object
+                        if pobj.__class__ == Placeholder:
+                            if pobj.slot == placeholder_name:
+                                placeholder = pobj
+                                break
                     for rev in revs:
                         pobj = rev.object
                         if pobj.__class__ == CMSPlugin:
@@ -427,6 +436,7 @@ class PageAdmin(model_admin):
                     for plugin in other_plugins:
                         if (not plugin.language in copy_languages) and (plugin.language in dict_cms_languages):
                             copy_languages[plugin.language] = dict_cms_languages[plugin.language]
+
                 language = get_language_from_request(request, obj)
                 if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
                     show_copy = True
@@ -1166,22 +1176,26 @@ class PageAdmin(model_admin):
             version_id = pre_edit.split("/")[-1]
             Version.objects.get(pk=version_id)
             version = get_object_or_404(Version, pk=version_id)
-            revs = [related_version.object_version for related_version in version.revision.version_set.all()]
+            rev_objs = []
+            for related_version in version.revision.version_set.all():
+                try:
+                    rev = related_version.object_version
+                except models.FieldDoesNotExist:
+                    continue
+                else:
+                    rev_objs.append(rev.object)
             # TODO: check permissions
 
-            for rev in revs:
-                obj = rev.object
+            for obj in rev_objs:
                 if obj.__class__ == CMSPlugin and obj.pk == plugin_id:
                     cms_plugin = obj
                     break
-            page = get_page_from_plugin_or_404(cms_plugin)
             inst, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
             instance = None
             if cms_plugin.get_plugin_class().model == CMSPlugin:
                 instance = cms_plugin
             else:
-                for rev in revs:
-                    obj = rev.object
+                for obj in rev_objs:
                     if hasattr(obj, "cmsplugin_ptr_id") and int(obj.cmsplugin_ptr_id) == int(cms_plugin.pk):
                         instance = obj
                         break
@@ -1189,8 +1203,10 @@ class PageAdmin(model_admin):
                 raise Http404("This plugin is not saved in a revision")
 
         plugin_admin.cms_plugin_instance = cms_plugin
-        plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
-        plugin_admin.page = page
+        try:
+            plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
+        except Placeholder.DoesNotExist:
+            pass
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
             # view, which actually does'nt exists
