@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page, Title, Placeholder
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
+from cms.sitemaps import CMSSitemap
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest
@@ -238,3 +239,15 @@ class PagesTestCase(CMSTestCase):
         f = open(path, 'w')
         f.write(old)
         f.close()
+
+    def test_12_sitemap_login_required_pages(self):
+        """
+        Test that CMSSitemap object contains only published,public (login_required=False) pages
+        """
+        self.create_page(parent_page=None, published=True, in_navigation=True)
+        page1 = Page.objects.all()[0]
+        page1.login_required = True
+        page1.save()
+        self.assertEqual(CMSSitemap().items().count(),0)
+
+	
