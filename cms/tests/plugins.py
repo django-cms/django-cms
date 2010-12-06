@@ -10,6 +10,8 @@ from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
+from testapp.pluginapp.models import Article, Section
+from testapp.pluginapp.plugins.cms_plugins import ArticlesPlugin
 
 
 class PluginsTestCase(CMSTestCase):
@@ -311,4 +313,40 @@ class PluginsTestCase(CMSTestCase):
         response = response.client.post(remove_url, plugin_data)
         self.assertEquals(response.status_code, 200)
         
-    
+
+class PluginManyToManyTestCase(CMSTestCase):
+
+    def setUp(self):
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u.set_password("test")
+        u.save()
+        
+        self.login_user(u)
+        
+        # create 3 sections
+        sections = {}
+        for i in range(3):
+            sections[i] = Section(name="section %s" %i)
+            sections[i].save()
+        
+        # create 10 articles by section
+        for i in sections.keys():
+            for j in range(10):
+                article = Article(title="article %s" % j,
+                                  section=sections[i])
+                article.save()
+         
+        # Create a page       
+        self.page = self.create_page()
+        
+        # create a plugin
+        #plugin = ArticlesPlugin(plugin_type='TextPlugin', language='en',
+        #              placeholder=self.page.placeholders[1], position=0,
+        #              title="Articles Plugin 1",
+        #              sections=sections.items())
+        #plugin.insert_at(None, commit=True)
+
+    def test_01_add_articles_plugin(self):
+        import pdb; pdb.set_trace()
+        self.assertEquals(True, False)
+        

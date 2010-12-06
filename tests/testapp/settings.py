@@ -99,6 +99,8 @@ INSTALLED_APPS = (
     'mptt',
     'testapp.sampleapp',
     'testapp.placeholderapp',
+    'testapp.pluginapp',
+    'testapp.pluginapp.plugins.manytomany_rel',
     'south',
     'reversion',
 )
@@ -168,4 +170,4 @@ try:
 except ImportError:
     pass
     
-TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'
+#TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'

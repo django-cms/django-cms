@@ -18,7 +18,7 @@ if "cms.plugins.text" in settings.INSTALLED_APPS:
     from cms.tests.plugins import PluginsTestCase
     if "reversion" in settings.INSTALLED_APPS:
         from cms.tests.reversion_tests import ReversionTestCase
-
+from cms.tests.plugins import PluginManyToManyTestCase
 from cms.tests.reversion_tests import ReversionTestCase
         
 from cms.tests.menu import MenusTestCase
@@ -56,5 +56,6 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(RenderingTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PlaceholderTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocsTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginManyToManyTestCase))
     
     return s
