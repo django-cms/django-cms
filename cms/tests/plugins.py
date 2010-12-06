@@ -11,7 +11,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
 from testapp.pluginapp.models import Article, Section
-from testapp.pluginapp.plugins.cms_plugins import ArticlesPlugin
+from testapp.pluginapp.plugins.manytomany_rel.cms_plugins import ArticlesPlugin
 
 
 class PluginsTestCase(CMSTestCase):
@@ -340,13 +340,14 @@ class PluginManyToManyTestCase(CMSTestCase):
         self.page = self.create_page()
         
         # create a plugin
-        #plugin = ArticlesPlugin(plugin_type='TextPlugin', language='en',
-        #              placeholder=self.page.placeholders[1], position=0,
-        #              title="Articles Plugin 1",
-        #              sections=sections.items())
-        #plugin.insert_at(None, commit=True)
+        #import pdb; pdb.set_trace()
+        plugin = ArticlesPlugin(plugin_type='TextPlugin', language='en',
+                      placeholder=self.page.placeholders[1], position=0,
+                      title="Articles Plugin 1",
+                      sections=sections.items())
+        plugin.insert_at(None, commit=True)
 
     def test_01_add_articles_plugin(self):
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         self.assertEquals(True, False)
         
