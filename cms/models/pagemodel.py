@@ -170,7 +170,7 @@ class Page(MpttPublisher):
             page.published = False
             page.publisher_status = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
-            if page.reverse_id in site_reverse_ids:
+            if not public_copy and page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
             if first:
                 first = False
