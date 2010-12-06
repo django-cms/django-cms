@@ -19,7 +19,7 @@ do
             reuse_env=true
             ;;
 
-	"--disable-coverage")
+        "--disable-coverage")
             disable_coverage=true
             ;;
 
