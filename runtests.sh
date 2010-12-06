@@ -6,6 +6,7 @@ num_args=${#args[@]}
 index=0
 
 reuse_env=false
+disable_coverage=false
 
 while [ "$index" -lt "$num_args" ]
 do
@@ -18,14 +19,20 @@ do
             reuse_env=true
             ;;
 
+	"--disable-coverage")
+            disable_coverage=true
+            ;;
+
         "--help")
             echo ""
             echo "usage:"
             echo "    runtests.sh"
+            echo "    or runtests.sh [testcase]"
             echo "    or runtests.sh [flags] [testcase]"
             echo ""
             echo "flags:"
             echo "    --failfast - abort at first failing test"
+            echo "    --disable-coverage - don't use coverage"
             echo "    --reuse-env - don't run builout, use last built environment" 
             exit 1
             ;;
@@ -63,11 +70,17 @@ else
     echo "Running cms test $suite."
 fi
 
-./bin/coverage run --rcfile=.coveragerc testapp/manage.py test $suite $failfast
-retcode=$?
-echo "Post test actions..."
-./bin/coverage xml
-./bin/coverage html
+if [ $disable_coverage == false ]; then
+    ./bin/coverage run --rcfile=.coveragerc testapp/manage.py test $suite $failfast
+    retcode=$?
+
+    echo "Post test actions..."
+    ./bin/coverage xml
+    ./bin/coverage html
+else
+    ./bin/django test $suite $failfast
+    retcode=$?
+fi
 cd ..
 echo "done"
 exit $retcode
