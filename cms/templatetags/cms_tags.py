@@ -236,10 +236,14 @@ def do_page_attribute(parser, token):
     except ValueError:
         raise template.TemplateSyntaxError(error_string)
     if len(bits) >= 2:
+        variable_name = None
+        if bits[-2] == "as":
+            variable_name = bits[-1]
+            bits = bits[:-2]
         # tag_name, name
         # tag_name, name, page_lookup
         page_lookup = len(bits) == 3 and bits[2] or None
-        return PageAttributeNode(bits[1], page_lookup)
+        return PageAttributeNode(bits[1], page_lookup, variable_name)
     else:
         raise template.TemplateSyntaxError(error_string)
 
@@ -250,6 +254,8 @@ class PageAttributeNode(template.Node):
     Synopsis
          {% page_attribute "field-name" %}
          {% page_attribute "field-name" page_lookup %}
+         {% page_attribute "field-name" as foo %}
+         {% page_attribute "field-name" page_lookup as foo %}
 
     Example
          {# Output current page's page_title attribute: #}
@@ -272,35 +278,40 @@ class PageAttributeNode(template.Node):
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
     """
-    def __init__(self, name, page_lookup=None):
+    def __init__(self, name, page_lookup=None, variable_name=None):
         self.name_var = template.Variable(name)
         self.page_lookup = None
         self.valid_attributes = ["title", "slug", "meta_description", "meta_keywords", "page_title", "menu_title"]
         if page_lookup:
             self.page_lookup_var = template.Variable(page_lookup)
+        self.variable_name = variable_name
 
     def render(self, context):
         if not 'request' in context:
             return ''
-        var_name = self.name_var.var.lower()
-        if var_name in self.valid_attributes:
+        attr_name = self.name_var.var.lower()
+        if attr_name in self.valid_attributes:
             # Variable name without quotes works, but is deprecated
-            self.name = var_name
+            self.name = attr_name
         else:
             self.name = self.name_var.resolve(context)
         lang = get_language_from_request(context['request'])
         page_lookup_var = getattr(self, 'page_lookup_var', None)
+        result = ''
         if page_lookup_var:
             page_lookup = page_lookup_var.resolve(context)
         else:
             page_lookup = None
         page = _get_page_by_untyped_arg(page_lookup, context['request'], get_site_id(None))
         if page == "dummy":
-            return ''
-        if page and self.name in self.valid_attributes:
+            result = ''
+        elif page and self.name in self.valid_attributes:
             f = getattr(page, "get_"+self.name)
-            return f(language=lang, fallback=True)
-        return ''
+            result = f(language=lang, fallback=True)
+        if self.variable_name:
+            context[self.variable_name] = result
+            return ''
+        return result or ''
 
     def __repr__(self):
         return "<PageAttribute Node: %s>" % self.name
