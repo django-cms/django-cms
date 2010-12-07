@@ -223,6 +223,8 @@ class PlaceholderNode(template.Node):
             if content:
                 return content, placeholder
         placeholder = self._get_placeholder(current_page, current_page, context, self.name)
+        if not placeholder:
+            return None, None
         content = render_placeholder(placeholder, context)
         return content, placeholder
 
