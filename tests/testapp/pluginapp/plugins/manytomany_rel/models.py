@@ -11,3 +11,6 @@ class ArticlePluginModel(CMSPlugin):
     
     def __unicode__(self):
         return self.title
+    
+    def copy_relations(self, oldinstance):
+        self.sections = oldinstance.sections.all()
