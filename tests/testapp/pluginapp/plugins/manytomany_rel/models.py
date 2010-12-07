@@ -5,7 +5,7 @@ from cms.models import CMSPlugin
 from testapp.pluginapp.models import Section
 
 
-class Articles(CMSPlugin):
+class ArticlePluginModel(CMSPlugin):
     title = models.CharField(max_length=50)
     sections =  models.ManyToManyField(Section)
     

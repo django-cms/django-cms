@@ -3,13 +3,13 @@ from django.utils.translation import ugettext as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from testapp.pluginapp.plugins.manytomany_rel.models import Articles
+from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from testapp.pluginapp.models import Article
 
 
 
-class ArticlesPlugin(CMSPluginBase):
-    model = Articles
+class ArticlePlugin(CMSPluginBase):
+    model = ArticlePluginModel
     name = _("Articles")
     render_template = "newsroom/plugins/articles.html"
     admin_preview = False
@@ -21,4 +21,4 @@ class ArticlesPlugin(CMSPluginBase):
                         'placeholder':placeholder})
         return context
     
-plugin_pool.register_plugin(ArticlesPlugin)
+plugin_pool.register_plugin(ArticlePlugin)

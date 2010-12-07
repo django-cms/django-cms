@@ -11,7 +11,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
 from testapp.pluginapp.models import Article, Section
-from testapp.pluginapp.plugins.manytomany_rel.models import Articles
+from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 
 class PluginsTestBaseCase(CMSTestCase):
 
@@ -330,44 +330,63 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.login_user(self.super_user)
         
         # create 3 sections
-        self.sections = {}
+        self.sections = []
+        self.section_pks = []
         for i in range(3):
-            self.sections[i] = Section(name="section %s" %i)
-            self.sections[i].save()
-        
+            section = Section.objects.create(name="section %s" %i)
+            self.sections.append(section)
+            self.section_pks.append(section.pk)
+        self.section_count = len(self.sections)
         # create 10 articles by section
-        for i in self.sections.keys():
+        for section in self.sections:
             for j in range(10):
-                article = Article(title="article %s" % j,
-                                  section=self.sections[i])
-                article.save()
-         
-        
+                Article.objects.create(
+                    title="article %s" % j,
+                    section=section
+                )
+        self.FIRST_LANG = settings.LANGUAGES[0][0]
+        self.SECOND_LANG = settings.LANGUAGES[1][0]
+
 
     def test_01_add_articles_plugin_api(self):
-        # Create a page       
-        self.page = self.create_page()
-        
-        # create a plugin
-        plugin = Articles(plugin_type='Articles',
-                          language=settings.LANGUAGES[0][0],
-                          placeholder=self.page.placeholders.all()[1],
-                          position=0, title="Articles Plugin 1")
-        
-        plugin.insert_at(None, commit=True)
-        plugin.sections = [item[1].id for item in self.sections.items()]
-        plugin.save()
-        self.page.publish()
-        self.assertEquals(Page.objects.count(), 2)
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        placeholder = page.placeholders.get(slot="body")
+        plugin_data = {
+            'plugin_type': "ArticlePlugin",
+            'language': self.FIRST_LANG,
+            'placeholder': placeholder.pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            'title': "Articles Plugin 1",
+            "sections": self.section_pks
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ArticlePluginModel.objects.count(), 1)
+        plugin = ArticlePluginModel.objects.all()[0]
+        self.assertEquals(self.section_count, plugin.sections.count())
     
     def test_02_add_articles_plugin_url(self):
-        page = self.create_page()
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        placeholder = page.placeholders.get(slot="body")
 
         # add a plugin
         plugin_data = {
-            'plugin_type':"ArticlesPlugin",
-            'language':settings.LANGUAGES[0][0],
-            'placeholder':page.placeholders.get(slot="body").pk,
+            'plugin_type': "ArticlePlugin",
+            'language': self.FIRST_LANG,
+            'placeholder': placeholder.pk,
             
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
@@ -383,23 +402,80 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
         
         data = {
-            'title':"Articles Plugin 1",
-            'sections':[item[1].id for item in self.sections.items()]
+            'title': "Articles Plugin 1",
+            'sections': self.section_pks
         }
         response = self.client.post(edit_url, data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(1, Articles.objects.all().count())
-        articles_plugin = Articles.objects.all()[0]
+        self.assertEquals(1, ArticlePluginModel.objects.count())
+        articles_plugin = ArticlePluginModel.objects.all()[0]
         self.assertEquals(u'Articles Plugin 1', articles_plugin.title)
-        self.assertEquals(3, articles_plugin.sections.count())
+        self.assertEquals(self.section_count, articles_plugin.sections.count())
         
         
         # check publish box
-        page = self.publish_page(page, published_check=False)
+        page = self.publish_page(page)
     
         # there should now be two plugins - 1 draft, 1 public
-        self.assertEquals(2, Articles.objects.all().count())
+        self.assertEquals(2, ArticlePluginModel.objects.all().count())
         
-        self.assertEquals([3, 3],
-                          [arts_plugin.sections.count() for arts_plugin in Articles.objects.all()])
+        for plugin in ArticlePluginModel.objects.all():
+            self.assertEquals(plugin.sections.count(), self.section_count)
         
+        
+    def test_03_copy_plugins(self):
+        
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        
+        placeholder = page.placeholders.all()[1]
+        
+        plugin_data = {
+            'plugin_type': "ArticlePlugin",
+            'language': self.FIRST_LANG,
+            'placeholder': placeholder.pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        plugin_pk = int(response.content)
+        self.assertEquals(plugin_pk, CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        
+        data = {
+            'title': "Articles Plugin 1",
+            "sections": self.section_pks
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(ArticlePluginModel.objects.count(), 1)
+        
+        self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
+        
+        #create 2nd language page
+        page_data.update({
+            'language': self.SECOND_LANG,
+            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+        })
+        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        
+        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
+        self.assertEquals(CMSPlugin.objects.count(), 1)
+        self.assertEquals(Page.objects.all().count(), 1)
+        copy_data = {
+            'placeholder': placeholder.pk,
+            'language': self.SECOND_LANG,
+            'copy_from': self.FIRST_LANG,
+        }
+        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.content.count('<li '), 1)
+        # assert copy success
+        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
+        self.assertEquals(CMSPlugin.objects.count(), 2)
+        for plugin in ArticlePluginModel.objects.all():
+            self.assertEquals(plugin.sections.count(), self.section_count)
