@@ -4,15 +4,14 @@ Django CMS Tutorial
 Installation
 -------------
 
-This guide has been tested with Ubuntu 9.10 and Mac OS X Snow Leopard.
+This guide assumes you have the following software installed:
 
-<--I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't
-expect things will be much different for mac at least...if I get a chance i'll
-run through this process on windows too and update the article but no
-promises.
+* Python 2.5 or higher
+* Django 1.2 or higher
+* pip
 
-I'm assuming that Python, Django and sqlite3 are installed already. For
-reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.-->
+It also assumes you're on a unix based system.
+
 
 Installing Django CMS
 *********************
