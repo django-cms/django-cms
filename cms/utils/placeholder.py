@@ -1,4 +1,6 @@
 def get_page_from_placeholder_if_exists(placeholder):
+    if placeholder is None:
+        return None
     from cms.models.pagemodel import Page
     try:
         return Page.objects.get(placeholders=placeholder)
