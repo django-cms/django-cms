@@ -170,4 +170,4 @@ try:
 except ImportError:
     pass
     
-#TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'
+TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'
