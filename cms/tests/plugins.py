@@ -419,8 +419,9 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(2, ArticlePluginModel.objects.all().count())
         
-        for plugin in ArticlePluginModel.objects.all():
-            self.assertEquals(plugin.sections.count(), self.section_count)
+        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
+        expected = [self.section_count for i in range(len(db_counts))]
+        self.assertEqual(expected, db_counts)
         
         
     def test_03_copy_plugins(self):
@@ -477,5 +478,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.count(), 2)
-        for plugin in ArticlePluginModel.objects.all():
-            self.assertEquals(plugin.sections.count(), self.section_count)
+        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
+        expected = [self.section_count for i in range(len(db_counts))]
+        self.assertEqual(expected, db_counts)
