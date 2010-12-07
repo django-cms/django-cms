@@ -15,54 +15,26 @@ It also assumes you're on a unix based system.
 
 Installing Django CMS
 *********************
-Django CMS can be installed in different ways.
 
-You can use PIP::
+While you should install the Django CMS using `buildout`_ or `virtualenv`_, for
+the sake of simplicity this guide will install the Django CMS system wide.
 
-    $ pip install django-cms
+Install the latest package of the Django CMS::
 
-You can use easy_install::
+    $ sudo pip install django-cms
 
-    $ easy_install django-cms
+Or install the latest revision from github::
 
-Or you can download a tarball or check out a specific version from github::
+    $ sudo pip install -e git+git://github.com/divio/django-cms.git#egg=django-cms
 
-    http://github.com/divio/django-cms/downloads
-
-If you opt for this method, then you then need to run the `setup.py` file in the root folder of the downloaded package::
-
-    $ python setup.py install
-
-Alternatively, you can do everything by hand:
-
-If you don't know your Python location, issue the following command::
-
-    $ which python
-
-(my path is "/usr/local/lib/python2.6" for example)
-
-Go to your Python dist-packages directory "your-python-path/dist-packages"
-
-Download the latest and greatest Django CMS from here: http://www.django-cms.org/en/downloads/
-
-Unzip the downloaded file into the "dist-packages" directory...you will need to do this as the superuser.
-
-Make copies of the following directories like so::
-
-	sudo cp -R divio-django-cms-c0288a1/cms/ cms
-	sudo cp -R divio-django-cms-c0288a1/mptt/ mptt
-	sudo cp -R divio-django-cms-c0288a1/publisher/ publisher
-
-Do a bit of house cleaning to get rid of all the files you don't need::
-
-	sudo rm -rf divio-django-cms-c0288a1.zip
-	sudo rm -rf divio-django-cms-c0288a1/
-	
-To ensure the cms is properly installed, invoke a Python shell (just type ``python`` at the prompt), and ensure the following command returns without errors:
+To check if you installed the Django CMS properly, open a python shell and do::
     
     import cms
+    
+If this does not give you an error, you've successfully installed the Django CMS.
 
-If this works, then you’re ready to create and configure a new project!
+.. _buildout: http://www.buildout.org/
+.. _virtualenv: http://virtualenv.openplans.org/
 
 Make a set of basic project files
 *********************************
