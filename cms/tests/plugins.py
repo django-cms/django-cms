@@ -348,7 +348,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.SECOND_LANG = settings.LANGUAGES[1][0]
 
 
-    def test_01_add_articles_plugin_api(self):
+    def test_01_add_plugin_with_m2m(self):
         # add a new text plugin
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -376,7 +376,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEquals(self.section_count, plugin.sections.count())
     
-    def test_02_add_articles_plugin_url(self):
+    def test_01_add_plugin_with_m2m_and_publisher(self):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
@@ -424,7 +424,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(expected, db_counts)
         
         
-    def test_03_copy_plugins(self):
+    def test_03_copy_plugin_with_m2m(self):
         
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
