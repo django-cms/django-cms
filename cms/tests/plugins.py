@@ -11,10 +11,9 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
 from testapp.pluginapp.models import Article, Section
-from testapp.pluginapp.plugins.manytomany_rel.cms_plugins import ArticlesPlugin
+from testapp.pluginapp.plugins.manytomany_rel.models import Articles
 
-
-class PluginsTestCase(CMSTestCase):
+class PluginsTestBaseCase(CMSTestCase):
 
     def setUp(self):
         self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
@@ -55,6 +54,9 @@ class PluginsTestCase(CMSTestCase):
         self.assertRedirects(response, URL_CMS_PAGE)
         # reload page
         return self.reload_page(page)
+
+
+class PluginsTestCase(PluginsTestBaseCase):
 
 
     def test_01_add_edit_plugin(self):
@@ -314,40 +316,90 @@ class PluginsTestCase(CMSTestCase):
         self.assertEquals(response.status_code, 200)
         
 
-class PluginManyToManyTestCase(CMSTestCase):
+class PluginManyToManyTestCase(PluginsTestBaseCase):
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
+        self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.super_user.set_password("test")
+        self.super_user.save()
         
-        self.login_user(u)
+        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave.set_password("slave")
+        self.slave.save()
+        
+        self.login_user(self.super_user)
         
         # create 3 sections
-        sections = {}
+        self.sections = {}
         for i in range(3):
-            sections[i] = Section(name="section %s" %i)
-            sections[i].save()
+            self.sections[i] = Section(name="section %s" %i)
+            self.sections[i].save()
         
         # create 10 articles by section
-        for i in sections.keys():
+        for i in self.sections.keys():
             for j in range(10):
                 article = Article(title="article %s" % j,
-                                  section=sections[i])
+                                  section=self.sections[i])
                 article.save()
          
+        
+
+    def test_01_add_articles_plugin_api(self):
         # Create a page       
         self.page = self.create_page()
         
         # create a plugin
-        #import pdb; pdb.set_trace()
-        plugin = ArticlesPlugin(plugin_type='TextPlugin', language='en',
-                      placeholder=self.page.placeholders[1], position=0,
-                      title="Articles Plugin 1",
-                      sections=sections.items())
+        plugin = Articles(plugin_type='Articles',
+                          language=settings.LANGUAGES[0][0],
+                          placeholder=self.page.placeholders.all()[1],
+                          position=0, title="Articles Plugin 1")
+        
         plugin.insert_at(None, commit=True)
+        plugin.sections = [item[1].id for item in self.sections.items()]
+        plugin.save()
+        self.page.publish()
+        self.assertEquals(Page.objects.count(), 2)
+    
+    def test_02_add_articles_plugin_url(self):
+        page = self.create_page()
 
-    def test_01_add_articles_plugin(self):
-        #import pdb; pdb.set_trace()
-        self.assertEquals(True, False)
+        # add a plugin
+        plugin_data = {
+            'plugin_type':"ArticlesPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+            
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+ 
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        articles_plugin_pk = int(response.content)
+        self.assertEquals(articles_plugin_pk, CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        
+        data = {
+            'title':"Articles Plugin 1",
+            'sections':[item[1].id for item in self.sections.items()]
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(1, Articles.objects.all().count())
+        articles_plugin = Articles.objects.all()[0]
+        self.assertEquals(u'Articles Plugin 1', articles_plugin.title)
+        self.assertEquals(3, articles_plugin.sections.count())
+        
+        
+        # check publish box
+        page = self.publish_page(page, published_check=False)
+    
+        # there should now be two plugins - 1 draft, 1 public
+        self.assertEquals(2, Articles.objects.all().count())
+        
+        self.assertEquals([3, 3],
+                          [arts_plugin.sections.count() for arts_plugin in Articles.objects.all()])
         
