@@ -66,6 +66,41 @@ Now models.py looks like the following::
 		gallery = models.ForeignKey(Gallery)
 
 
+Handling Relations
+~~~~~~~~~~~~~~~~~~
+
+If your custom plugin has foreign key or many-to-many relations you are
+responsible for copying those if necessary whenever the CMS copies the plugin.
+
+To do this you can implement a method called ``copy_relations`` on your plugin
+model which get's the *old* instance of the plugin as argument.
+
+Lets assume this is your plugin::
+
+    class ArticlePluginModel(CMSPlugin):
+        title = models.CharField(max_length=50)
+        sections =  models.ManyToManyField(Section)
+        
+        def __unicode__(self):
+            return self.title
+            
+Now when the plugin gets copied, you want to make sure the sections stay::
+
+        def copy_relations(self, oldinstance):
+            self.sections = oldinstance.sections.all()
+            
+Your full model now::
+
+    class ArticlePluginModel(CMSPlugin):
+        title = models.CharField(max_length=50)
+        sections =  models.ManyToManyField(Section)
+        
+        def __unicode__(self):
+            return self.title
+        
+        def copy_relations(self, oldinstance):
+            self.sections = oldinstance.sections.all()
+
 
 cms_plugins.py
 --------------
