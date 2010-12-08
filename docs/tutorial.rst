@@ -61,7 +61,8 @@ Set up your Django project::
 	cd myproject
 	python manage.py runserver
 
-Open `127.0.0.1:8000 <http://127.0.0.1:8000>`_ in your browser. You should see a nice "It Worked" message from Django.
+Open `127.0.0.1:8000 <http://127.0.0.1:8000>`_ in your browser. You should see a
+nice "It Worked" message from Django.
 
 |it-worked|
 
@@ -141,9 +142,9 @@ Add at least one template to ``CMS_TEMPLATES``; for example::
 
 .. note::
 
-    The templates you define in ``CMS_TEMPLATES`` have to actually exist and contain
-    at least one ``{% placeholder <name> %}`` template tag to be useful for
-    Django CMS. For more details see `Templates`_
+    The templates you define in ``CMS_TEMPLATES`` have to actually exist and
+    contain at least one ``{% placeholder <name> %}`` template tag to be useful
+    for Django CMS. For more details see `Templates`_
 
 
 URL configuration
@@ -272,11 +273,11 @@ names for your placeholders, to more easily identify them in the admin panel.
 My First Plugin
 ---------------
 
-There are a few plugins included with the CMS that let you put basic content into a
-page's placeholders. To put custom content into a placeholder,
+There are a few plugins included with the CMS that let you put basic content
+into a page's placeholders. To put custom content into a placeholder,
 you need to write a CMS plugin. A plugin consists of two things: A model that
 holds the actual data you want to store, and a plugin class that tells the CMS
-how to render the plugin. Let's write a plugin that displays a title and some text.
+how to render the plugin. Let's write a plugin that displays a title & some text.
 
 Create a django application and install it in settings.py. If you want to save
 data to the database, you must create a model in the plugin's ``models.py``. ::
@@ -315,8 +316,8 @@ application folder. ::
                           'placeholder':placeholder})
           return context
 
-Note that the `TextWithTitlePlugin` class inherits from `CMSPluginBase`. It holds
-information about its name, the model and the template to render.
+Note that the `TextWithTitlePlugin` class inherits from `CMSPluginBase`. It
+holds information about its name, the model and the template to render.
 
 Finaly you have to register this plugin (in cms_plugins.py) to actually tell
 the CMS about your plugin. ::
@@ -341,13 +342,14 @@ These are the attributes you have to provide for the plugin to work.
 
 **The render Function**
 
-The render Function is called when the plugin is rendered on a page. It modifies the
-context given and sets any additional data you want while rendering the given
+The render Function is called when the plugin is rendered on a page. It modifies
+the context given and sets any additional data you want while rendering the given
 template. This function is only called when rendering the plugin on a page.
 
 To provide a new change form for this plugin use the **change_form_template**
 attribute. `CMSPluginBase` inherits from `ModelAdmin`, so you can change the
-Plugin as you would a `ModelAdmin`. See http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
+Plugin as you would a `ModelAdmin`. See
+http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
 
 :context:
   The Context used to render the plugin.
@@ -385,11 +387,13 @@ My First Apphook
 
 What is an apphook you might ask? "Apphooks" are a way to forward all URLs "under"
 a CMS page to another Django app.
-For the sake of the example, let's assume you have a very fancy "myapp" Django application,
-which you want to use in your Django-CMS project, as the "/myapp/<something>" pages.
+For the sake of the example, let's assume you have a very fancy "myapp" Django
+application, which you want to use in your Django-CMS project, as the
+"/myapp/<something>" pages.
 
 #. Create a ``cms_app.py`` file in your app's module (usually next to ``models.py``)
-#. Paste and adapt the following code to the newly created file, save, restart your server if needed::
+#. Paste and adapt the following code to the newly created file, save, restart
+your server if needed::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
@@ -400,10 +404,14 @@ which you want to use in your Django-CMS project, as the "/myapp/<something>" pa
     apphook_pool.register(MyAppHook) # As in ``admin.py`` file, you need to register your apphook with the CMS
 
 #. Create a "blog" page in the Django-CMS admin interface.
-#. Still in the admin interface, navigate to your newly created page, edit it, and expand the "Advanced Settings" group.
-#. You should see your ``My Apphook's name`` apphook in the "Application" drop-down list.
-#. Select your apphook & save the page. You must restart your Django server for the changes to take effect (Django caches urls).
-#. Your application is now available at ``http://<your host>/myapp/<your apps urls>``!
+#. Still in the admin interface, navigate to your newly created page, edit it,
+and expand the "Advanced Settings" group.
+#. You should see your ``My Apphook's name`` apphook in the "Application"
+drop-down list.
+#. Select your apphook & save the page. You must restart your Django server for
+the changes to take effect (Django caches urls).
+#. Your application is now available at
+``http://<your host>/myapp/<your apps urls>``!
 
 
 

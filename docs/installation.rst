@@ -9,7 +9,8 @@ Requirements
 ============
 
 * Python 2.5 (or a higher release of 2.x). 2.4 might work, but is not supported.
-* Django 1.2.3 (or a higher release of 1.2). 1.3 might work, but is not supported yet.
+* Django 1.2.3 (or a higher release of 1.2). 1.3 might work, but is not yet
+supported.
 * South 0.7 or higher
 
 Apps
@@ -27,7 +28,10 @@ Required
 * ``mptt``
 * ``menus``
 
-.. warning:: Django CMS ships with an older version of mptt (0.3-pre). Django CMS is not yet compatible with the latest version of django-mptt. If your project has other applications requiring mptt, they must use the mptt included with Django CMS.
+.. warning:: Django CMS ships with an older version of mptt (0.3-pre). Django
+CMS is not yet compatible with the latest version of django-mptt. If your
+project has other applications requiring mptt, they must use the mptt included
+with Django CMS.
 
 Optional
 ~~~~~~~~
@@ -99,32 +103,46 @@ migrations are not supported with sqlite3.
 Troubleshooting
 ---------------
 
-If you've created a page and you don't see it in the cms list of the Django admin:
+If you've created a page & you don't see it in the cms list of the Django admin:
 
 - Be sure you copied all the media files. Check with firebug and its "net" panel
   to see if you have any 404s.
 
-If you're editing a Page in the Django admin, but don't see an "Add Plugin" button with
-a dropdown-list of plugins:
+If you're editing a Page in the Django admin, but don't see an "Add Plugin"
+button with a dropdown-list of plugins:
 
-- Be sure your ``CMS_TEMPLATES`` setting is correct and that the templates
-  specified actually exist and contain at least one ``{% placeholder %}`` templatetag.
+- Be sure your ``CMS_TEMPLATES`` setting is correct, the templates specified
+exist, and they contain at least one ``{% placeholder %}`` templatetag.
 
 Template errors
 ~~~~~~~~~~~~~~~
-If your placeholder content isn't displayed when you view a CMS page: change the CMS_MODERATOR variable in settings.py to False. This bug has been recently fixed, so upgrade to the latest version of Django CMS. See:
+If your placeholder content isn't displayed when you view a CMS page: change the
+CMS_MODERATOR variable in settings.py to False. This bug has been recently
+fixed, so upgrade to the latest version of Django CMS. See:
 https://github.com/divio/django-cms/issues/issue/430
 
 Javascript errors
 ~~~~~~~~~~~~~~~~~
-If plugins don't work (e.g.: you add a text plugin, but don't see the Javascript text editor in the plugin window), you should use a Javascript inspector in your browser to investigate the issue (e.g.: Firebug for Firefox, Web Inspector for Safari or Chrome). The Javascript inspector may report one of the following errors:
+If plugins don't work (e.g.: you add a text plugin, but don't see the Javascript
+text editor in the plugin window), you should use a Javascript inspector in your
+browser to investigate the issue (e.g.: Firebug for Firefox, Web Inspector for
+Safari or Chrome). The Javascript inspector may report the following errors:
 
 - **TypeError: Result of expression 'jQuery' [undefined] is not a function.**
 
-If you see this, check the MEDIA_URL variable in your settings.py file. Your webserver (e.g.: Apache) should be configured to serve static media files from this URL.
+If you see this, check the ``MEDIA_URL`` variable in your settings.py file. Your
+webserver (e.g.: Apache) should be configured to serve static media files from
+this URL.
 
-- **Unsafe JavaScript attempt to access frame with URL http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame with URL http://127.0.0.1:8000/admin/cms/page/1/edit-plugin/2/. Domains, protocols and ports must match.**
+- **Unsafe JavaScript attempt to access frame with URL
+http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame
+with URL http://127.0.0.1:8000/admin/cms/page/1/edit-plugin/2/. Domains,
+protocols and ports must match.**
 
-This error is due to the Django test server running on a different port and URL than the main webserver. In your test environment, you can overcome this issue by adding a CMS_MEDIA_URL variable to your settings.py file, and adding a url rule in urls.py to make the Django development serve the Django CMS files from this location.
+This error is due to the Django test server running on a different port and URL
+than the main webserver. In your test environment, you can overcome this issue
+by adding a CMS_MEDIA_URL variable to your settings.py file, and adding a url
+rule in urls.py to make the Django development serve the Django CMS files from
+this location.
 
 
