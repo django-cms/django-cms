@@ -1,13 +1,13 @@
-from cms.utils import get_language_from_request
 from cms import settings
+from cms.models.placeholdermodel import Placeholder
+from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from django.conf import settings as django_settings
-from django.utils.importlib import import_module
+from django.conf import settings, settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Template, Context
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
-from django.conf import settings
+from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
 import copy
 
@@ -170,8 +170,13 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     from cms.plugin_pool import plugin_pool
     request = context['request']
     page = get_page_from_placeholder_if_exists(placeholder)
+    if not page:
+        page = getattr(request, 'current_page', None)
     if page:
         template = page.template
+        if name_fallback and not placeholder:
+            placeholder = Placeholder.objects.create(slot=name_fallback)
+            page.placeholders.add(placeholder)
     else:
         template = None
     if placeholder:
