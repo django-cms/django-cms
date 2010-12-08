@@ -117,7 +117,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
         c.append(plugin.render_plugin(copy.copy(context), placeholder, processors=processors))
     return c
 
-def render_placeholder(placeholder, context_to_copy):
+def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the 
     given context, and returns a string containing the rendered output.
@@ -163,10 +163,10 @@ def render_placeholder(placeholder, context_to_copy):
     c.extend(render_plugins(plugins, context, placeholder, processors))
     content = "".join(c)
     if edit:
-        content = render_placeholder_toolbar(placeholder, context, content)
+        content = render_placeholder_toolbar(placeholder, context, content, name_fallback)
     return content
 
-def render_placeholder_toolbar(placeholder, context, content):
+def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
     request = context['request']
     page = get_page_from_placeholder_if_exists(placeholder)
@@ -174,12 +174,19 @@ def render_placeholder_toolbar(placeholder, context, content):
         template = page.template
     else:
         template = None
-    installed_plugins = plugin_pool.get_all_plugins(placeholder.slot, page)
-    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("name", None)
+    if placeholder:
+        slot = placeholder.slot
+    else:
+        slot = None
+    installed_plugins = plugin_pool.get_all_plugins(slot, page)
+    mixed_key = "%s %s" % (template, slot)
+    name = settings.CMS_PLACEHOLDER_CONF.get(mixed_key, {}).get("name", None)
     if not name:
-        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("name", None)
+        name = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("name", None)
     if not name:
-        name = placeholder.slot
+        name = slot
+    if not name:
+        name = name_fallback
     name = title(name)
     toolbar = render_to_string("cms/toolbar/add_plugins.html", {
         'installed_plugins': installed_plugins,

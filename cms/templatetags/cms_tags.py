@@ -219,11 +219,11 @@ class PlaceholderNode(template.Node):
             if hasattr(request, 'placeholder_media'):
                 request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
             #request.placeholder_media += placeholder.get_media(request, context)
-            content = render_placeholder(placeholder, context)
+            content = render_placeholder(placeholder, context, self.name)
             if content:
                 return content, placeholder
         placeholder = self._get_placeholder(current_page, current_page, context, self.name)
-        content = render_placeholder(placeholder, context)
+        content = render_placeholder(placeholder, context, self.name)
         return content, placeholder
 
 register.tag('placeholder', do_placeholder)
