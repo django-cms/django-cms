@@ -99,6 +99,8 @@ INSTALLED_APPS = (
     'mptt',
     'testapp.sampleapp',
     'testapp.placeholderapp',
+    'testapp.pluginapp',
+    'testapp.pluginapp.plugins.manytomany_rel',
     'south',
     'reversion',
 )
