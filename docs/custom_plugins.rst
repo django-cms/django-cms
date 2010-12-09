@@ -289,7 +289,8 @@ In your yourapp.cms_plugin_processors.py::
         This plugin processor wraps each plugin's output in a colored box if it is in the "main" placeholder.
         '''
         if placeholder.slot != 'main' \                   # Plugins not in the main placeholder should remain unchanged
-            or instance._render_meta.text_enabled:   # Plugins embedded in Text should remain unchanged in order not to break output
+            or (instance._render_meta.text_enabled   # Plugins embedded in Text should remain unchanged in order not to break output
+                            and instance.parent):
                 return rendered_content
         else:
             from django.template import Context, Template
