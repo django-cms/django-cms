@@ -281,7 +281,7 @@ class MenusTestCase(CMSTestCase):
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         
-    def test_15_empty_menu(self):
+    def test_16_empty_menu(self):
         Page.objects.all().delete()
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -289,7 +289,7 @@ class MenusTestCase(CMSTestCase):
         nodes = context['children']
         self.assertEqual(len(nodes), 0)
         
-    def test_16_softroot(self):
+    def test_17_softroot(self):
         page2 = Page.objects.get(pk=self.page2.pk)
         page2.soft_root = True
         page2.save()
@@ -333,7 +333,7 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
         self.assertEqual(len(nodes[0].children[0].children), 0)
         
-    def test_17_show_submenu_from_non_menu_page(self):
+    def test_18_show_submenu_from_non_menu_page(self):
         """
         Here's the structure bit we're interested in:
         
@@ -365,7 +365,7 @@ class MenusTestCase(CMSTestCase):
         number_of_p7_children = len(page7.children.filter(in_navigation=True))
         self.assertEqual(len(nodes), number_of_p7_children)
         
-    def test_18_show_breadcrumb_invisible(self):
+    def test_19_show_breadcrumb_invisible(self):
         invisible_page = self.create_page(parent_page=self.page3, 
                                           published=True, 
                                           in_navigation=False)
@@ -382,3 +382,87 @@ class MenusTestCase(CMSTestCase):
         tpl.render(context) 
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 4)
+
+    def test_20_build_nodes_inner_for_worst_case_menu(self):
+        '''
+            Tests the worst case scenario
+            
+            node5
+             node4
+              node3
+               node2
+                node1
+        '''
+        node1 = NavigationNode('Test1', '/test1/', 1, 2)
+        node2 = NavigationNode('Test2', '/test2/', 2, 3)
+        node3 = NavigationNode('Test3', '/test3/', 3, 4)
+        node4 = NavigationNode('Test4', '/test4/', 4, 5)
+        node5 = NavigationNode('Test5', '/test5/', 5, None)
+        
+        menu_class_name = 'Test'
+        nodes = [node1,node2,node3,node4,node5,]
+        len_nodes = len(nodes)
+        
+        final_list = menu_pool._build_nodes_inner_for_one_menu(nodes, 
+                                                               menu_class_name)
+        self.assertEqual(len(final_list), len_nodes)
+        
+        self.assertEqual(node1.parent, node2)
+        self.assertEqual(node2.parent, node3)
+        self.assertEqual(node3.parent, node4)
+        self.assertEqual(node4.parent, node5)
+        self.assertEqual(node5.parent, None)
+        
+        self.assertEqual(node1.children, [])
+        self.assertEqual(node2.children, [node1])
+        self.assertEqual(node3.children, [node2])
+        self.assertEqual(node4.children, [node3])
+        self.assertEqual(node5.children, [node4])
+        
+    def test_21_build_nodes_inner_for_circular_menu(self):
+        '''
+        TODO: 
+            To properly handle this test we need to have a circular dependency 
+            detection system.
+            Go nuts implementing it :)
+        '''
+        pass
+    
+    def test_22_build_nodes_inner_for_broken_menu(self):
+        '''
+            Tests a broken menu tree (non-existing parent)
+            
+            node5
+             node4
+              node3
+              
+            <non-existant>
+             node2
+              node1
+        '''
+        node1 = NavigationNode('Test1', '/test1/', 1, 2)
+        node2 = NavigationNode('Test2', '/test2/', 2, 12)
+        node3 = NavigationNode('Test3', '/test3/', 3, 4)
+        node4 = NavigationNode('Test4', '/test4/', 4, 5)
+        node5 = NavigationNode('Test5', '/test5/', 5, None)
+        
+        menu_class_name = 'Test'
+        nodes = [node1,node2,node3,node4,node5,]
+        
+        final_list = menu_pool._build_nodes_inner_for_one_menu(nodes, 
+                                                               menu_class_name)
+        self.assertEqual(len(final_list), 3) 
+        self.assertFalse(node1 in final_list)
+        self.assertFalse(node2 in final_list)
+        
+        self.assertEqual(node1.parent, None)
+        self.assertEqual(node2.parent, None)
+        self.assertEqual(node3.parent, node4)
+        self.assertEqual(node4.parent, node5)
+        self.assertEqual(node5.parent, None)
+        
+        self.assertEqual(node1.children, [])
+        self.assertEqual(node2.children, [])
+        self.assertEqual(node3.children, [])
+        self.assertEqual(node4.children, [node3])
+        self.assertEqual(node5.children, [node4])
