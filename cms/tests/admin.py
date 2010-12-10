@@ -7,11 +7,12 @@ Created on Dec 10, 2010
 
 from __future__ import with_statement
 from cms.models.pagemodel import Page
+from cms.models.permissionmodels import GlobalPagePermission
 from cms.tests import base
 from cms.tests.base import CMSTestCase
-from cms.tests.util.settings_contextmanager import SettingsOverride
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
+from django.contrib.sites.models import Site
 
 class AdminTestCase(CMSTestCase):
     
@@ -21,28 +22,25 @@ class AdminTestCase(CMSTestCase):
         admin.save()
         self.login_user(admin)
         USERNAME = 'test'
-        data = {
-            'username': USERNAME, 
-            'password1': USERNAME,
-            'password2': USERNAME, 
-            'can_add_page': True, 
-            'can_change_page': True, 
-            'can_delete_page': True, 
-            'can_recover_page': True, 
-            'can_add_pageuser': False, 
-            'can_change_pageuser': False, 
-            'can_delete_pageuser': False, 
-            'can_add_pagepermission': False, 
-            'can_change_pagepermission': False, 
-            'can_delete_pagepermission': False,
-        }
-        response = self.client.post('/admin/cms/pageuser/add/', data)
-        self.assertRedirects(response, '/admin/cms/pageuser/')
         
-        normal_guy = User.objects.get(username=USERNAME)
+        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
         normal_guy.is_staff = True
         normal_guy.is_active = True
         normal_guy.save()
+        normal_guy.user_permissions = Permission.objects.filter(
+            codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
+        )
+        gpp = GlobalPagePermission.objects.create(
+            user=normal_guy,
+            can_change=True,
+            can_delete=True,
+            can_change_advanced_settings=False,
+            can_publish=True,
+            can_change_permissions=False,
+            can_move_page=True,
+            can_moderate=True,
+        )
+        gpp.sites = Site.objects.all()
         return admin, normal_guy
     
     def test_01_edit_does_not_reset_page_adv_fields(self):
@@ -71,9 +69,8 @@ class AdminTestCase(CMSTestCase):
         page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
         
         self.login_user(normal_guy)
-        with SettingsOverride(CMS_PERMISSION=False):
-            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
-                                    follow=True)
+        resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
+                                follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateNotUsed(resp, 'admin/login.html')
         page = Page.objects.get(pk=page.pk)

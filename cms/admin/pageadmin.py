@@ -449,7 +449,15 @@ class PageAdmin(model_admin):
         Given a ModelForm return an unsaved instance. ``change`` is True if
         the object is being changed, and False if it's being added.
         """
-        instance = super(PageAdmin, self).save_form(request, form, change)
+        super_save_form = super(PageAdmin, self).save_form 
+        if not form.instance.pk or form.instance.has_advanced_settings_permission(request):
+            return super_save_form(request, form, change)
+        real_page = Page.objects.get(pk=form.instance.pk)
+        instance = super_save_form(request, form, change)
+        page_fields = Page._meta.get_all_field_names()
+        for field in self.advanced_fields:
+            if field in page_fields:
+                setattr(instance, field, getattr(real_page, field, getattr(instance, field)))
         return instance
 
     def get_widget(self, request, page, lang, name):
