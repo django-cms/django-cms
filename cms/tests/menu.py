@@ -282,12 +282,11 @@ class MenusTestCase(CMSTestCase):
         
     def test_15_empty_menu(self):
         Page.objects.all().delete()
-        request = self.get_request()
-        nodes = menu_pool.get_nodes(request)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context) 
         nodes = context['children']
+        self.assertEqual(len(nodes), 0)
         
     def test_16_softroot(self):
         page2 = Page.objects.get(pk=self.page2.pk)
