@@ -25,6 +25,7 @@ from cms.tests.menu import MenusTestCase
 from cms.tests.rendering import RenderingTestCase
 from cms.tests.placeholder import PlaceholderTestCase
 from cms.tests.docs import DocsTestCase
+from cms.tests.apphooks import ApphooksTestCase
 
 settings.CMS_PERMISSION = True
 settings.CMS_MODERATOR = True
@@ -57,5 +58,6 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PlaceholderTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocsTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginManyToManyTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ApphooksTestCase))
     
     return s

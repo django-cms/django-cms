@@ -1,6 +1,7 @@
-from django.conf import settings
 from cms.exceptions import AppAllreadyRegistered
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 class ApphookPool(object):
     def __init__(self):
@@ -18,7 +19,12 @@ class ApphookPool(object):
                 self.block_register = True
                 path = ".".join(app.split(".")[:-1])
                 class_name = app.split(".")[-1]
-                cls = __import__(path, {}, {}, [class_name])
+                module = import_module(path)
+                cls = getattr(module, class_name, None)
+                if cls is None:
+                    raise ImproperlyConfigured(
+                        "Cannot find class %s" % app
+                    )
                 self.block_register = False
                 self.register(cls)
         else:
