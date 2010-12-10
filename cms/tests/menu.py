@@ -334,25 +334,41 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes[0].children[0].children), 0)
         
     def test_17_show_submenu_from_non_menu_page(self):
+        """
+        Here's the structure bit we're interested in:
+        
+        + P6 (not in menu)
+          + P7
+          + P8
+          
+        When we render P6, there should be a menu entry for P7 and P8 if the
+        tag parameters are "1 XXX XXX XXX"
+        """
         page6 = Page.objects.get(pk=self.page6.pk)
         context = self.get_context(page6.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context) 
         nodes = context['children']
-        self.assertEqual(len(nodes), len(page6.children.all()))
+        number_of_p6_children = len(page6.children.filter(in_navigation=True))
+        self.assertEqual(len(nodes), number_of_p6_children)
+        
         page7 = Page.objects.get(pk=self.page7.pk)
         context = self.get_context(page7.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context) 
         nodes = context['children']
-        self.assertEqual(len(nodes), len(page6.children.all()))
+        self.assertEqual(len(nodes), number_of_p6_children)
+        
         tpl = Template("{% load menu_tags %}{% show_menu 2 100 0 1 %}")
         tpl.render(context) 
         nodes = context['children']
-        self.assertEqual(len(nodes), len(page7.children.all()))
+        number_of_p7_children = len(page7.children.filter(in_navigation=True))
+        self.assertEqual(len(nodes), number_of_p7_children)
         
     def test_18_show_breadcrumb_invisible(self):
-        invisible_page = self.create_page(parent_page=self.page3, published=True, in_navigation=False)
+        invisible_page = self.create_page(parent_page=self.page3, 
+                                          published=True, 
+                                          in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context) 
