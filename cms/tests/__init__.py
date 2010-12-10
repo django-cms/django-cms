@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.tests.admin import AdminTestCase
 from cms.tests.apphooks import ApphooksTestCase
 from cms.tests.docs import DocsTestCase
 from cms.tests.menu import MenusTestCase
@@ -32,4 +33,5 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocsTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginManyToManyTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ApphooksTestCase))
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(AdminTestCase))
     return s
