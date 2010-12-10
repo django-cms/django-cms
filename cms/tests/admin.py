@@ -7,45 +7,50 @@ Created on Dec 10, 2010
 
 from __future__ import with_statement
 from cms.models.pagemodel import Page
-from cms.models.titlemodels import Title
 from cms.tests import base
 from cms.tests.base import CMSTestCase
+from cms.tests.util.settings_contextmanager import SettingsOverride
 from django.conf import settings
-from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
 
 class AdminTestCase(CMSTestCase):
     
-    def _get_normal_guy(self):
-        normal_guy = User.objects.create_user('test', 'Testnormal@gmail.com', 'test')
-        normal_guy.is_active = True
-        normal_guy.is_staff = True
-        normal_guy.save()
-        
-        normal_guy.user_permissions = Permission.objects.filter(
-                                            codename__in=['change_page',
-                                                          'add_page',
-                                                          'delete_page',
-                                                          'add_title',
-                                                          'change_title',
-                                                          'delete_title',
-                                                          ])
-        self.assertTrue(normal_guy.has_perm('cms.change_page'))
-        return normal_guy
-    
-    def _get_admin(self):
+    def _get_guys(self):
         admin = User(username="admin", is_staff = True, is_active = True, is_superuser = True)
         admin.set_password("admin")
         admin.save()
-        return admin
+        self.login_user(admin)
+        USERNAME = 'test'
+        data = {
+            'username': USERNAME, 
+            'password1': USERNAME,
+            'password2': USERNAME, 
+            'can_add_page': True, 
+            'can_change_page': True, 
+            'can_delete_page': True, 
+            'can_recover_page': True, 
+            'can_add_pageuser': False, 
+            'can_change_pageuser': False, 
+            'can_delete_pageuser': False, 
+            'can_add_pagepermission': False, 
+            'can_change_pagepermission': False, 
+            'can_delete_pagepermission': False,
+        }
+        response = self.client.post('/admin/cms/pageuser/add/', data)
+        self.assertRedirects(response, '/admin/cms/pageuser/')
+        
+        normal_guy = User.objects.get(username=USERNAME)
+        normal_guy.is_staff = True
+        normal_guy.is_active = True
+        normal_guy.save()
+        return admin, normal_guy
     
     def test_01_edit_does_not_reset_page_adv_fields(self):
         
         NEW_PAGE_NAME = 'Test page 2'
         REVERSE_ID = 'Test'
         
-        admin = self._get_admin()
-        normal_guy = self._get_normal_guy()
+        admin, normal_guy = self._get_guys()
         
         # The admin creates the page
         page = self.create_page(None, admin, 1, 'Test Page')
@@ -66,14 +71,12 @@ class AdminTestCase(CMSTestCase):
         page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
         
         self.login_user(normal_guy)
-        resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
-                                follow=True)
+        with SettingsOverride(CMS_PERMISSION=False):
+            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
+                                    follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateNotUsed(resp, 'admin/login.html')
         page = Page.objects.get(pk=page.pk)
         
         self.assertEqual(page.get_title(), NEW_PAGE_NAME)
         self.assertEqual(page.reverse_id, REVERSE_ID)
-        
-        
-        
