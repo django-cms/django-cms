@@ -25,6 +25,7 @@ class MenusTestCase(CMSTestCase):
         
     def tearDown(self):
         menu_pool.menus = self.old_menu
+        settings.CMS_MODERATOR = True
         
     def create_some_nodes(self):
         """
