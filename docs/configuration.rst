@@ -128,15 +128,17 @@ Default: ``True``
 CMS_APPHOOKS
 ------------
 
-A tuple with python paths to CMSApp Classes.
+A list of import paths for ``cms.app_base.CMSApp`` subclasses.
 
-Overwrites the auto-discovered list of CMSApp Classes located in applications
-cms_app.py.
+Defaults to an empty list which means CMS applications are auto-discovered in
+all ``INSTALLED_APPS`` by trying to import their ``cms_app`` module.
+
+If this setting is set, the auto-discovery is disabled.
 
 
 Example::
 
-	CMS_APPLICATIONS_URLS = (
+	CMS_APPHOOKS = (
     	'myapp.cms_app.MyApp',
     	'otherapp.cms_app.MyFancyApp',
     	'sampleapp.cms_app.SampleApp',
