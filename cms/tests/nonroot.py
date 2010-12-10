@@ -8,7 +8,7 @@ from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 
 class NonRootCase(CMSTestCase):
-    urls = 'nonroot_urls'
+    urls = 'testapp.nonroot_urls'
 
     def setUp(self):
         settings.CMS_MODERATOR = False
