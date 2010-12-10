@@ -29,7 +29,11 @@ class ApphookPool(object):
                 self.register(cls)
         else:
             for app in settings.INSTALLED_APPS:
-                __import__(app, {}, {}, ['cms_app'])
+                cms_app = '%s.cms_app' % app
+                try:
+                    import_module(cms_app)
+                except ImportError:
+                    pass
         self.discovered = True
         
     def clear(self):
