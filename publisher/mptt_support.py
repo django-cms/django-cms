@@ -74,8 +74,7 @@ class MpttMeta:
         meta = main_cls._meta
         
         # Instanciate tree manager
-        TreeManager(meta.parent_attr, meta.left_attr, meta.right_attr, 
-            meta.tree_id_attr, meta.level_attr).contribute_to_class(main_cls, meta.tree_manager_attr)
+        TreeManager(cls).contribute_to_class(main_cls, meta.tree_manager_attr)
         
         # Add a custom tree manager
         #setattr(main_cls, meta.tree_manager_attr, tree_manager)
@@ -115,7 +114,7 @@ def install_mptt(cls, name, bases, attrs):
     
     # import required stuff here, so we will have import errors only when mptt
     # is really in use
-    from mptt import models as mptt_models
+    from mptt.models import MPTTModel as mptt_model
         
     attrs['_is_mptt_model'] = lambda self: True
     
@@ -139,7 +138,7 @@ def install_mptt(cls, name, bases, attrs):
     
     # Add tree methods for model instances
     for method_name in methods:
-        attrs[method_name] = getattr(mptt_models, method_name)
+        attrs[method_name] = getattr(mptt_model, method_name)
           
     return attrs
 
@@ -148,8 +147,12 @@ def finish_mptt(cls):
     if not hasattr(cls, '_is_mptt_model'):
         return
     
-    from mptt import registry
-    if not cls in registry:
-        registry.append(cls)
+    import mptt
+    
+    if hasattr(mptt, 'register'):
+        try:
+            mptt.register(cls)
+        except mptt.AlreadyRegistered:
+            pass
     
 
