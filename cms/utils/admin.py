@@ -80,9 +80,17 @@ def render_admin_menu_item(request, page):
     
     if not page.pk:
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
+        
+    # languages
+    languages = []
+    if page.site_id in settings.CMS_SITE_LANGUAGES:
+        languages = settings.CMS_SITE_LANGUAGES[page.site_id]
+    else:
+        languages = [x[0] for x in settings.CMS_LANGUAGES]
     
     context = RequestContext(request, {
         'has_add_permission': has_page_add_permission(request),
+        'site_languages': languages,
     })
     
     filtered = 'filtered' in request.REQUEST
