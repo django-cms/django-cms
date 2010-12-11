@@ -240,7 +240,8 @@ class Publisher(models.Model):
         """Save method for object which should be published. obj is a instance
         of the same class as self.
         """
-        return obj.save()
+        obj.save()
+        return obj
 
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
         if excluded_models is None:
