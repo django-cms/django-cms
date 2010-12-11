@@ -718,6 +718,8 @@ class PageAdmin(model_admin):
                     obj.parent = None
                     obj.parent_id = None
                     version.field_dict['parent'] = None
+                    
+        if obj._state.db is None: obj.save(no_signals=True)
 
         response = super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
         if request.method == "POST" \
