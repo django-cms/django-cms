@@ -126,18 +126,20 @@ class PageForm(PageAddForm):
     
     def clean(self):
         cleaned_data = super(PageForm, self).clean()
-        id = cleaned_data['reverse_id']
-        site_id = cleaned_data['site']
-        if id:
-            if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
-                raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
+        if 'reverse_id' in self.fields:
+            id = cleaned_data['reverse_id']
+            site_id = cleaned_data['site']
+            if id:
+                if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
+                    raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
         return cleaned_data
 
     def clean_overwrite_url(self):
-        url = self.cleaned_data['overwrite_url']
-        if url:
-            if not any_path_re.match(url):
-                raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
+        if 'overwrite_url' in self.fields:
+            url = self.cleaned_data['overwrite_url']
+            if url:
+                if not any_path_re.match(url):
+                    raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
         return url
     
 

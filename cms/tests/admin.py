@@ -44,24 +44,37 @@ class AdminTestCase(CMSTestCase):
         return admin, normal_guy
     
     def test_01_edit_does_not_reset_page_adv_fields(self):
-        
+        """
+        Makes sure that if a non-superuser with no rights to edit advanced page
+        fields edits a page, those advanced fields are not touched.
+        """
+        OLD_PAGE_NAME = 'Test Page'
         NEW_PAGE_NAME = 'Test page 2'
         REVERSE_ID = 'Test'
+        OVERRIDE_URL = 'my/override/url'
         
         admin, normal_guy = self._get_guys()
         
         # The admin creates the page
-        page = self.create_page(None, admin, 1, 'Test Page')
+        page = self.create_page(None, admin, 1, OLD_PAGE_NAME)
         page.reverse_id = REVERSE_ID
         page.save()
+        title = page.get_title_obj()
+        title.has_url_overwrite = True
+        title.path = OVERRIDE_URL
+        title.save()
+        
+        self.assertEqual(page.get_title(), OLD_PAGE_NAME)
+        self.assertEqual(page.reverse_id, REVERSE_ID)
+        self.assertEqual(title.overwrite_url, OVERRIDE_URL)
         
         # The user edits the page (change the page name for ex.)
         page_data = {
-            'title':NEW_PAGE_NAME, 
-            'slug':page.get_slug(), 
-            'language':settings.LANGUAGES[0][0],
-            'site':page.site.pk, 
-            'template':page.template
+            'title': NEW_PAGE_NAME, 
+            'slug': page.get_slug(), 
+            'language': title.language,
+            'site': page.site.pk, 
+            'template': page.template,
         }
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
@@ -77,3 +90,31 @@ class AdminTestCase(CMSTestCase):
         
         self.assertEqual(page.get_title(), NEW_PAGE_NAME)
         self.assertEqual(page.reverse_id, REVERSE_ID)
+        title = page.get_title_obj()
+        self.assertEqual(title.overwrite_url, OVERRIDE_URL)
+        
+        # The admin edits the page (change the page name for ex.)
+        page_data = {
+            'title': OLD_PAGE_NAME, 
+            'slug': page.get_slug(), 
+            'language': title.language,
+            'site': page.site.pk, 
+            'template': page.template,
+            'reverse_id': page.reverse_id,
+        }
+        # required only if user haves can_change_permission
+        page_data['pagepermission_set-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+        
+        self.login_user(admin)
+        resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
+                                follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateNotUsed(resp, 'admin/login.html')
+        page = Page.objects.get(pk=page.pk)
+        
+        self.assertEqual(page.get_title(), OLD_PAGE_NAME)
+        self.assertEqual(page.reverse_id, REVERSE_ID)
+        title = page.get_title_obj()
+        self.assertEqual(title.overwrite_url, None)

@@ -174,40 +174,44 @@ class TitleManager(PublisherManager):
     def drafts(self):
         return self.get_query_set().filter(page__publisher_is_draft=True)
         
-    def set_or_create(self, page, language, slug=None, title=None, application_urls=None,
-        overwrite_url=None, redirect=None, meta_description=None, meta_keywords=None, page_title=None, menu_title=None):
+    def set_or_create(self, request, page, form, language):
         """
         set or create a title for a particular page and language
         """
+        base_fields = [
+            'slug',
+            'title',
+            'application_urls',
+            'redirect',
+            'meta_description',
+            'meta_keywords',
+            'page_title',
+            'menu_title'
+        ]
+        cleaned_data = form.cleaned_data
         try:
             obj = self.get(page=page, language=language)
-            if title != None:
-                obj.title = title
-            if slug != None:
-                obj.slug = slug
-            if application_urls != None:
-                obj.application_urls = application_urls
-            if redirect != None:
-                obj.redirect = redirect
-            if meta_description != None:
-                obj.meta_description = meta_description
-            if meta_keywords != None:
-                obj.meta_keywords = meta_keywords            
-            if page_title != None:
-                obj.page_title = page_title
-            if menu_title != None:
-                obj.menu_title = menu_title                            
         except self.model.DoesNotExist:
-            obj = self.model(
-                page=page, language=language, title=title, slug=slug,
-                application_urls=application_urls, redirect=redirect,
-                meta_description=meta_description, meta_keywords=meta_keywords,
-                page_title=page_title, menu_title=menu_title)
-        if overwrite_url:
-            obj.has_url_overwrite = True
+            data = {}
+            for name in base_fields:
+                if name in cleaned_data:
+                    data[name] = cleaned_data[name]
+            data['page'] = page
+            data['language'] = language
+            if page.has_advanced_settings_permission(request):
+                overwrite_url = cleaned_data.get('overwrite_url', None)
+                if overwrite_url:
+                    data['has_url_overwrite'] = True
+                    data['path'] = overwrite_url
+            return self.create(**data)
+        
+        for name in base_fields:
+            value = cleaned_data.get(name, None)
+            setattr(obj, name, value)
+        if page.has_advanced_settings_permission(request):
+            overwrite_url = cleaned_data.get('overwrite_url', None)
+            obj.has_url_overwrite = bool(overwrite_url)
             obj.path = overwrite_url
-        else:
-            obj.has_url_overwrite = False
         obj.save()
         return obj
 

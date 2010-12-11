@@ -246,17 +246,10 @@ class PageAdmin(model_admin):
 
 
         Title.objects.set_or_create(
+            request,
             obj,
+            form,
             language,
-            slug=form.cleaned_data['slug'],
-            title=form.cleaned_data['title'],
-            application_urls=form.cleaned_data.get('application_urls', None),
-            overwrite_url=form.cleaned_data.get('overwrite_url', None),
-            redirect=form.cleaned_data.get('redirect', None),
-            meta_description=form.cleaned_data.get('meta_description', None),
-            meta_keywords=form.cleaned_data.get('meta_keywords', None),
-            page_title=form.cleaned_data.get('page_title', None),
-            menu_title=form.cleaned_data.get('menu_title', None),
         )
 
         # is there any moderation message? save/update state
@@ -425,6 +418,9 @@ class PageAdmin(model_admin):
             form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
             form.base_fields['template'].initial = settings.CMS_TEMPLATES[0][0]
+        if obj and not obj.has_advanced_settings_permission(request):
+            for field in self.advanced_fields:
+                del form.base_fields[field]
         return form
 
     # remove permission inlines, if user isn't allowed to change them
@@ -443,22 +439,6 @@ class PageAdmin(model_admin):
                             continue
                 yield inline.get_formset(request, obj)
 
-
-    def save_form(self, request, form, change):
-        """
-        Given a ModelForm return an unsaved instance. ``change`` is True if
-        the object is being changed, and False if it's being added.
-        """
-        super_save_form = super(PageAdmin, self).save_form 
-        if not form.instance.pk or form.instance.has_advanced_settings_permission(request):
-            return super_save_form(request, form, change)
-        real_page = Page.objects.get(pk=form.instance.pk)
-        instance = super_save_form(request, form, change)
-        page_fields = Page._meta.get_all_field_names()
-        for field in self.advanced_fields:
-            if field in page_fields:
-                setattr(instance, field, getattr(real_page, field, getattr(instance, field)))
-        return instance
 
     def get_widget(self, request, page, lang, name):
         """
