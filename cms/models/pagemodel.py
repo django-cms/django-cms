@@ -167,7 +167,7 @@ class Page(MpttPublisher):
             page.lft = None
             page.tree_id = None
             page.published = False
-            page.publisher_status = Page.MODERATOR_CHANGED
+            page.moderator_state = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
             if page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
@@ -197,7 +197,7 @@ class Page(MpttPublisher):
             if public_copy:
                 page.published = True
                 page.publisher_is_draft=False
-                page.publisher_status = Page.MODERATOR_APPROVED
+                page.moderator_state = Page.MODERATOR_APPROVED
                 # we need to set relate this new public copy to its draft page (self)
                 page.publisher_public = self
                 
@@ -337,14 +337,15 @@ class Page(MpttPublisher):
 
         Returns: True if page was successfully published.
         """
-        
+
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
+            transaction.rollback()
             return
 
         # publish, but only if all parents are published!!
         published = None
-
+        
         try:
             if not self.pk:
                 self.save()
@@ -390,6 +391,7 @@ class Page(MpttPublisher):
         
         if not published:
             # was not published, escape
+            transaction.rollback()
             return
 
         # clean moderation log
@@ -421,6 +423,7 @@ class Page(MpttPublisher):
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
+           
         return published
 
     def get_draft_object(self):
