@@ -165,6 +165,10 @@ CMS_URL_OVERWRITE = True
 
 SOUTH_TESTS_MIGRATE = False
 
+CMS_NAVIGATION_EXTENDERS = (
+    ('testapp.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+)
+
 try:
     from local_settings import *
 except ImportError:

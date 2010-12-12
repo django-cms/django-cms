@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
+from cms.models import Page
+from cms.tests.base import CMSTestCase
 from django.conf import settings
 from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase
-from cms.tests.menu import MenusTestCase
-from cms.models import Page
-from menus.templatetags.menu_tags import show_menu, show_breadcrumb
-from menus.menu_pool import menu_pool
+from django.template import Template
 from menus.base import NavigationNode
+from menus.menu_pool import menu_pool
 
 class NonRootCase(CMSTestCase):
-    urls = 'nonroot_urls'
+    urls = 'testapp.nonroot_urls'
 
     def setUp(self):
         settings.CMS_MODERATOR = False
@@ -51,14 +50,18 @@ class NonRootCase(CMSTestCase):
 
     def test_02_show_menu(self):
         context = self.get_context()
-        nodes = show_menu(context)['children']
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        tpl.render(context) 
+        nodes = context['children']
         self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
         self.assertEqual(nodes[0].get_absolute_url(), "/content/")
 
     def test_03_show_breadcrumb(self):
         page2 = Page.objects.get(pk=self.page2.pk)
         context = self.get_context(path=self.page2.get_absolute_url())
-        nodes = show_breadcrumb(context)['ancestors']
+        tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
+        tpl.render(context) 
+        nodes = context['ancestors']
         self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
         self.assertEqual(nodes[0].get_absolute_url(), "/content/")
         self.assertEqual(isinstance(nodes[0], NavigationNode), True)

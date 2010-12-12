@@ -13,20 +13,12 @@ from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, get_language, ugettext
+from menus.menu_pool import menu_pool
+from os.path import join
 from publisher import MpttPublisher, Publisher
 from publisher.errors import PublisherCantPublish
-from cms.utils.urlutils import urljoin
-from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models.placeholdermodel import Placeholder
-from cms.utils.page import get_available_slug, check_title_slugs
-from cms.exceptions import NoHomeFound
-from cms.utils.helpers import reversion_register
-from cms.utils.i18n import get_fallback_languages
-from menus.menu_pool import menu_pool
 import copy
-from os.path import join
 
 
 class Page(MpttPublisher):

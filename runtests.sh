@@ -5,7 +5,7 @@ args=("$@")
 num_args=${#args[@]}
 index=0
 
-reuse_env=false
+reuse_env=true
 disable_coverage=false
 
 while [ "$index" -lt "$num_args" ]
@@ -15,8 +15,8 @@ do
             failfast="--failfast"
             ;;
 
-        "--reuse-env")
-            reuse_env=true
+        "--rebuild-env")
+            reuse_env=false
             ;;
 
         "--disable-coverage")
@@ -33,7 +33,7 @@ do
             echo "flags:"
             echo "    --failfast - abort at first failing test"
             echo "    --disable-coverage - don't use coverage"
-            echo "    --reuse-env - don't run builout, use last built environment" 
+            echo "    --rebuild-env - run buildout before the tests" 
             exit 1
             ;;
 
