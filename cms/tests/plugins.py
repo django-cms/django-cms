@@ -10,16 +10,52 @@ from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.plugins.link.models import Link
+from testapp.pluginapp.models import Article, Section
+from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 
-
-class PluginsTestCase(CMSTestCase):
+class PluginsTestBaseCase(CMSTestCase):
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
+        self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.super_user.set_password("test")
+        self.super_user.save()
         
-        self.login_user(u)
+        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave.set_password("slave")
+        self.slave.save()
+        
+        self.login_user(self.super_user)
+
+# REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
+    def publish_page(self, page, approve=False, user=None, published_check=True):
+        if user:
+            self.login_user(user)
+
+        # publish / approve page by master
+        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
+        self.assertEqual(response.status_code, 200)
+
+        if not approve:
+            return self.reload_page(page)
+
+        # approve
+        page = self.approve_page(page)
+
+        if published_check:
+            # must have public object now
+            assert(page.publisher_public)
+            # and public object must be published
+            assert(page.publisher_public.published)
+
+        return page
+
+    def approve_page(self, page):
+        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        # reload page
+        return self.reload_page(page)
+class PluginsTestCase(PluginsTestBaseCase):
+
 
     def test_01_add_edit_plugin(self):
         """
@@ -228,3 +264,169 @@ class PluginsTestCase(CMSTestCase):
         }
         response = response.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
         self.assertEquals(response.status_code, 200)
+
+class PluginManyToManyTestCase(PluginsTestBaseCase):
+
+    def setUp(self):
+        self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.super_user.set_password("test")
+        self.super_user.save()
+        
+        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave.set_password("slave")
+        self.slave.save()
+        
+        self.login_user(self.super_user)
+        
+        # create 3 sections
+        self.sections = []
+        self.section_pks = []
+        for i in range(3):
+            section = Section.objects.create(name="section %s" %i)
+            self.sections.append(section)
+            self.section_pks.append(section.pk)
+        self.section_count = len(self.sections)
+        # create 10 articles by section
+        for section in self.sections:
+            for j in range(10):
+                Article.objects.create(
+                    title="article %s" % j,
+                    section=section
+                )
+        self.FIRST_LANG = settings.LANGUAGES[0][0]
+        self.SECOND_LANG = settings.LANGUAGES[1][0]
+
+
+    def test_01_add_plugin_with_m2m(self):
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        placeholder = page.placeholders.get(slot="body")
+        plugin_data = {
+            'plugin_type': "ArticlePlugin",
+            'language': self.FIRST_LANG,
+            'placeholder': placeholder.pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            'title': "Articles Plugin 1",
+            "sections": self.section_pks
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ArticlePluginModel.objects.count(), 1)
+        plugin = ArticlePluginModel.objects.all()[0]
+        self.assertEquals(self.section_count, plugin.sections.count())
+    
+    def test_01_add_plugin_with_m2m_and_publisher(self):
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        placeholder = page.placeholders.get(slot="body")
+
+        # add a plugin
+        plugin_data = {
+            'plugin_type': "ArticlePlugin",
+            'language': self.FIRST_LANG,
+            'placeholder': placeholder.pk,
+            
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+ 
+        # there should be only 1 plugin
+        self.assertEquals(1, CMSPlugin.objects.all().count())
+        
+        articles_plugin_pk = int(response.content)
+        self.assertEquals(articles_plugin_pk, CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        
+        data = {
+            'title': "Articles Plugin 1",
+            'sections': self.section_pks
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(1, ArticlePluginModel.objects.count())
+        articles_plugin = ArticlePluginModel.objects.all()[0]
+        self.assertEquals(u'Articles Plugin 1', articles_plugin.title)
+        self.assertEquals(self.section_count, articles_plugin.sections.count())
+        
+        
+        # check publish box
+        page = self.publish_page(page)
+    
+        # there should now be two plugins - 1 draft, 1 public
+        self.assertEquals(2, ArticlePluginModel.objects.all().count())
+        
+        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
+        expected = [self.section_count for i in range(len(db_counts))]
+        self.assertEqual(expected, db_counts)
+        
+        
+    def test_03_copy_plugin_with_m2m(self):
+        
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        
+        placeholder = page.placeholders.all()[1]
+        
+        plugin_data = {
+            'plugin_type': "ArticlePlugin",
+            'language': self.FIRST_LANG,
+            'placeholder': placeholder.pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        plugin_pk = int(response.content)
+        self.assertEquals(plugin_pk, CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        
+        data = {
+            'title': "Articles Plugin 1",
+            "sections": self.section_pks
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(ArticlePluginModel.objects.count(), 1)
+        
+        self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
+        
+        #create 2nd language page
+        page_data.update({
+            'language': self.SECOND_LANG,
+            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+        })
+        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        
+        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
+        self.assertEquals(CMSPlugin.objects.count(), 1)
+        self.assertEquals(Page.objects.all().count(), 1)
+        copy_data = {
+            'placeholder': placeholder.pk,
+            'language': self.SECOND_LANG,
+            'copy_from': self.FIRST_LANG,
+        }
+        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.content.count('<li '), 1)
+        # assert copy success
+        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
+        self.assertEquals(CMSPlugin.objects.count(), 2)
+        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
+        expected = [self.section_count for i in range(len(db_counts))]
+        self.assertEqual(expected, db_counts)

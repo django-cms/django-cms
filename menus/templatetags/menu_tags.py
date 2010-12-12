@@ -173,6 +173,10 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html", onl
         request = context['request']
     except KeyError:
         return {'template': 'cms/content.html'}
+    if not isinstance(start_level, int) or (isinstance(start_level, basestring) and start_level.isdigit()):
+        only_visible = template
+        template = start_level
+        start_level = 0
     ancestors = []
     nodes = menu_pool.get_nodes(request, breadcrumb=True)
     selected = None

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
+from django.template.context import Context
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 import copy
@@ -213,7 +214,7 @@ class CMSTestCase(TestCase):
         
         context['request'] = request
         
-        return context   
+        return Context(context)   
         
     def get_request(self, path=None):
         if not path:

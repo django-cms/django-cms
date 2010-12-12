@@ -66,9 +66,6 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
-    
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
-    
 )
 
 DEBUG_TOOLBAR_CONFIG = {

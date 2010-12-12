@@ -1,8 +1,10 @@
+from django.core.exceptions import MultipleObjectsReturned
+
 def get_page_from_placeholder_if_exists(placeholder):
     from cms.models.pagemodel import Page
     try:
         return Page.objects.get(placeholders=placeholder)
-    except Page.DoesNotExist:
+    except (Page.DoesNotExist, MultipleObjectsReturned,):
         return None
     
 class PlaceholderNoAction(object):
