@@ -160,7 +160,8 @@
         {% endif %}    
     </div>
     <div id="cms_toolbar_col2">
-        {% if auth and edit %}
+        {% if edit %}
+        {% if auth %}
             {% if moderator_should_approve and has_moderate_permission %}
             <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">
                 <span class="state">{{ page_moderator_state.label }}</span>
@@ -176,6 +177,7 @@
                     </a>
                 {% endif %}
             {% endif %}
+        {% endif %}
         {% endif %}
         <!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
         {% if auth and has_change_permission %}
