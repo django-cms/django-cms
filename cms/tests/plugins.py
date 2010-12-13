@@ -1,17 +1,29 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
-from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
-    URL_CMS_PLUGIN_REMOVE
+from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugins.text.models import Text
+from cms.plugin_base import CMSPluginBase
+from cms.plugin_pool import plugin_pool
 from cms.plugins.link.models import Link
+from cms.plugins.text.models import Text
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
+    URL_CMS_PLUGIN_REMOVE
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.http import HttpRequest
+from django.template import TemplateDoesNotExist
 from testapp.pluginapp.models import Article, Section
 from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+
+class DumbFixturePlugin(CMSPluginBase):
+    model = CMSPlugin
+    name = "Dumb Test Plugin. It does nothing."
+    render_template = ""
+    admin_preview = False
+
+    def render(self, context, instance, placeholder):
+        return context
 
 class PluginsTestBaseCase(CMSTestCase):
 
@@ -315,6 +327,38 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = response.client.post(remove_url, plugin_data)
         self.assertEquals(response.status_code, 200)
         
+    def test_07_register_plugin_twice_should_raise(self):
+        number_of_plugins_before = len(plugin_pool.get_all_plugins())
+        # The first time we register the plugin is should work
+        plugin_pool.register_plugin(DumbFixturePlugin)
+        # Let's add it a second time. We should catch and exception
+        raised = False
+        try:
+            plugin_pool.register_plugin(DumbFixturePlugin)
+        except PluginAlreadyRegistered:
+            raised = True
+        self.assertTrue(raised)
+        # Let's also unregister the plugin now, and assert it's not in the 
+        # pool anymore
+        plugin_pool.unregister_plugin(DumbFixturePlugin)
+        # Let's make sure we have the same number of plugins as before:
+        number_of_plugins_after = len(plugin_pool.get_all_plugins())
+        self.assertEqual(number_of_plugins_before, number_of_plugins_after)
+        
+    def test_08_unregister_non_existing_plugin_should_raise(self):
+        number_of_plugins_before = len(plugin_pool.get_all_plugins())
+        raised = False
+        try:
+            # There should not be such a plugin registered if the others tests
+            # don't leak plugins
+            plugin_pool.unregister_plugin(DumbFixturePlugin)
+        except PluginNotRegistered:
+            raised = True
+        self.assertTrue(raised)
+        # Let's count, to make sure we didn't remove a plugin accidentally.
+        number_of_plugins_after = len(plugin_pool.get_all_plugins())
+        self.assertEqual(number_of_plugins_before, number_of_plugins_after)
+        
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
@@ -481,3 +525,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
+        
+    
+            
