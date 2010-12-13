@@ -1,17 +1,16 @@
 Installation
 ============
 
-This document assumes that you are familiar with python and django.
+This document assumes you are familiar with Python and Django.
 
-A more beginner friendly tutorial can be found :doc:`here <tutorial>`.
+A more beginner-friendly tutorial can be found :doc:`here <tutorial>`.
 
 Requirements
 ============
 
-* Python 2.5 (or a higher release of the 2.x). 2.4 might work, but is not
+* Python 2.5 (or a higher release of 2.x). 2.4 might work, but is not supported.
+* Django 1.2.3 (or a higher release of 1.2). 1.3 might work, but is not yet
   supported.
-* Django 1.2.3 (or a higher release of the 1.2). 1.3 might work, but is not
-  supported yet.
 * South 0.7 or higher
 
 Apps
@@ -29,10 +28,10 @@ Required
 * ``mptt``
 * ``menus``
 
-.. warning:: mptt is shipped with django-cms and at the moment it is not possible
-             to use a different version of django-mptt. If your project has
-             other applications requiring mptt, they have to use the one from
-             the cms which is version 0.3-pre.
+.. warning:: Django CMS ships with an older version of mptt (0.3-pre). Django
+    CMS is not yet compatible with the latest version of django-mptt. If your
+    project has other applications requiring mptt, they must use the mptt
+    included with Django CMS.
 
 Optional
 ~~~~~~~~
@@ -53,14 +52,14 @@ Note that the order is important:
 
 #. ``django.contrib.sessions.middleware.SessionMiddleware``
 #. ``cms.middleware.multilingual.MultilingualURLMiddleware``
-#. ``django.contrib.auth.middleware.AuthenticationMiddleware`` 
+#. ``django.contrib.auth.middleware.AuthenticationMiddleware``
 #. ``django.middleware.common.CommonMiddleware``
 #. ``cms.middleware.page.CurrentPageMiddleware``
 #. ``cms.middleware.user.CurrentUserMiddleware``
 #. ``cms.middleware.toolbar.ToolbarMiddleware``
 #. ``cms.middleware.media.PlaceholderMediaMiddleware``
 
-.. note:: For non-multilingual sites you may remove the 
+.. note:: For non-multilingual sites you may remove the
           `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
 
 Template Context Processors
@@ -75,7 +74,7 @@ Template Context Processors
 Templates
 ---------
 
-You have to define at least one template in ``CMS_TEMPLATES`` which should
+You must define at least one template in ``CMS_TEMPLATES``, which should
 contain at least one ``{% placeholder '<name>' %}`` tag.
 
 urls.py
@@ -87,8 +86,8 @@ last pattern in the list!
 Media Files
 -----------
 
-Make sure your Django installation finds the cms media files, for this task we
-recommend using django-appmedia which will create a symbolic link for you. If
+Make sure your Django installation finds the cms media files. We recommend
+using django-appmedia, which will create a symbolic link for you. If
 for whatever reason you are unable to use it, copy the folder ``cms/media/cms``
 into your main media folder.
 
@@ -97,40 +96,53 @@ South
 
 To avoid issues with migrations during the installation process it is currently
 recommended to use ``python manage.py syncdb --all`` and
-``python manage.py migrate --fake`` for **new** projects. Note that the cms
-migrations can not be supported on sqlite3.
+``python manage.py migrate --fake`` for **new** projects. Note that cms
+migrations are not supported with sqlite3.
 
 
 Troubleshooting
 ---------------
 
-If you create a page and you don't see a page in the list view:
+If you've created a page & you don't see it in the cms list of the Django admin:
 
 - Be sure you copied all the media files. Check with firebug and its "net" panel
-  if you have any 404s
+  to see if you have any 404s.
 
-If you edit a Page but don't see a "Add Plugin" button and a dropdown-list
-with plugins:
+If you're editing a Page in the Django admin, but don't see an "Add Plugin"
+button with a dropdown-list of plugins:
 
-- Be sure your ``CMS_TEMPLATES`` setting is correct and that the templates
-  specified actually exist and have at least one ``{% placeholder %}``
-  templatetag in them template.
+- Be sure your ``CMS_TEMPLATES`` setting is correct, the templates specified
+  exist, and they contain at least one ``{% placeholder %}`` templatetag.
 
 Template errors
 ~~~~~~~~~~~~~~~
-If your placeholder content isn't being displayed when you view a CMS page, then change the CMS_MODERATOR variable in settings.py to False. This bug has been fixed, so upgrading to the latest version of Django CMS should resolve the issue. See:  
+If your placeholder content isn't displayed when you view a CMS page: change the
+CMS_MODERATOR variable in settings.py to False. This bug has been recently
+fixed, so upgrade to the latest version of Django CMS. See:
 https://github.com/divio/django-cms/issues/issue/430
 
 Javascript errors
 ~~~~~~~~~~~~~~~~~
-If the plugins don't work (e.g. you try adding a text plugin, but you don't see the Javascript text editor on the page), you should use a Javascript inspector in your browser to investigate the issue (e.g. Firebug for Firefox, Web Inspector for Safari or Chrome). The Javascript inspector may report one of the following errors:
+If plugins don't work (e.g.: you add a text plugin, but don't see the Javascript
+text editor in the plugin window), you should use a Javascript inspector in your
+browser to investigate the issue (e.g.: Firebug for Firefox, Web Inspector for
+Safari or Chrome). The Javascript inspector may report the following errors:
 
 - **TypeError: Result of expression 'jQuery' [undefined] is not a function.**
 
-If you see this, check the MEDIA_URL variable in your settings.py file. Your webserver (e.g. Apache) should be set up to serve the static media files from this URL.
+If you see this, check the ``MEDIA_URL`` variable in your settings.py file. Your
+webserver (e.g.: Apache) should be configured to serve static media files from
+this URL.
 
-- **Unsafe JavaScript attempt to access frame with URL http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame with URL http://127.0.0.1:8000/admin/cms/page/1/edit-plugin/2/. Domains, protocols and ports must match.**
+- **Unsafe JavaScript attempt to access frame with URL
+  http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame
+  with URL http://127.0.0.1:8000/admin/cms/page/1/edit-plugin/2/. Domains,
+  protocols and ports must match.**
 
-This error is due to the Django test server running on a different port and URL to the main webserver. In your test environment, you can overcome this issue by adding a CMS_MEDIA_URL variable to your settings.py file, and adding a url rule in urls.py to make the Django development serve the Django CMS files from this location.
+This error is due to the Django test server running on a different port and URL
+than the main webserver. In your test environment, you can overcome this issue
+by adding a CMS_MEDIA_URL variable to your settings.py file, and adding a url
+rule in urls.py to make the Django development serve the Django CMS files from
+this location.
 
-   
+
