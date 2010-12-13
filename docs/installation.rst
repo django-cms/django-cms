@@ -8,10 +8,19 @@ A more beginner-friendly tutorial can be found :doc:`here <tutorial>`.
 Requirements
 ============
 
-* Python 2.5 (or a higher release of 2.x). 2.4 might work, but is not supported.
-* Django 1.2.3 (or a higher release of 1.2). 1.3 might work, but is not yet
+* `Python`_ 2.5 (or a higher release of 2.x). 2.4 might work, but is not
   supported.
-* South 0.7 or higher
+* `Django`_ 1.2.3 (or a higher release of 1.2). 1.3 might work, but is not yet
+  supported.
+* `South`_ 0.7 or higher
+* `PIL`_ 1.1.6 or higher
+* `django-classy-tags`_ 0.2.2 or higher
+
+.. _Python: http://www.python.org
+.. _Django: http://www.djangoproject.com
+.. _PIL: http://www.pythonware.com/products/pil/
+.. _South: http://south.aeracode.org/
+.. _django-classy-tags: https://github.com/ojii/django-classy-tags
 
 Apps
 ----
