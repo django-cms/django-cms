@@ -11,6 +11,7 @@ This guide assumes you have the following software installed:
 * `pip`_ 0.8.2 or higher
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
+* `django-classy-tags`_ 0.2.2 or higher
 
 It also assumes you're on a Unix based system.
 
@@ -19,6 +20,7 @@ It also assumes you're on a Unix based system.
 .. _pip: http://pip.openplans.org/
 .. _PIL: http://www.pythonware.com/products/pil/
 .. _South: http://south.aeracode.org/
+.. _django-classy-tags: https://github.com/ojii/django-classy-tags
 
 Installing Django CMS
 *********************
