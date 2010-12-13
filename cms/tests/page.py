@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from cms.models import Page, Title, Placeholder
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
+from cms.sitemaps import CMSSitemap
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
-from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.models import Page, Title, Placeholder
+import os.path
 
 
 class PagesTestCase(CMSTestCase):
@@ -73,7 +75,7 @@ class PagesTestCase(CMSTestCase):
         Test the details view
         """
         try:
-            response = self.client.get('/')
+            response = self.client.get(self.get_pages_root())
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
@@ -83,7 +85,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         try:
-            response = self.client.get('/')
+            response = self.client.get(self.get_pages_root())
         except TemplateDoesNotExist, e:
             if e.args != ('404.html',):
                 raise
@@ -93,7 +95,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         response = self.client.get(URL_CMS_PAGE)
         
-        response = self.client.get('/')
+        response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
     def test_05_edit_page(self):
@@ -191,20 +193,20 @@ class PagesTestCase(CMSTestCase):
         # check page2 path and url
         page2 = Page.objects.get(pk=page2.pk)
         self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
-        self.assertEqual(page2.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
         # check page3 path and url
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
-        self.assertEqual(page3.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
         # publish page 1 (becomes home)
         page1 = Page.objects.all()[0]
         page1.published = True
         page1.save()
         # check that page2 and page3 url have changed
         page2 = Page.objects.get(pk=page2.pk)
-        self.assertEqual(page2.get_absolute_url(), "/"+page_data2['slug']+"/")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/")
         page3 = Page.objects.get(pk=page3.pk)
-        self.assertEqual(page3.get_absolute_url(), "/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
         # move page2 back to root and check path of 2 and 3
         response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"left" })
         self.assertEqual(response.status_code, 200)
@@ -213,3 +215,39 @@ class PagesTestCase(CMSTestCase):
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
         
+    def test_11_add_placeholder(self):
+        # create page
+        page = self.create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
+        page.template = 'add_placeholder.html'
+        page.save()
+        url = page.get_absolute_url()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        path = os.path.join(settings.PROJECT_DIR, 'templates', 'add_placeholder.html')
+        f = open(path, 'r')
+        old = f.read()
+        f.close()
+        new = old.replace(
+            '<!-- SECOND_PLACEHOLDER -->',
+            '{% placeholder second_placeholder %}'
+        )
+        f = open(path, 'w')
+        f.write(new)
+        f.close()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        f = open(path, 'w')
+        f.write(old)
+        f.close()
+
+    def test_12_sitemap_login_required_pages(self):
+        """
+        Test that CMSSitemap object contains only published,public (login_required=False) pages
+        """
+        self.create_page(parent_page=None, published=True, in_navigation=True)
+        page1 = Page.objects.all()[0]
+        page1.login_required = True
+        page1.save()
+        self.assertEqual(CMSSitemap().items().count(),0)
+
+	

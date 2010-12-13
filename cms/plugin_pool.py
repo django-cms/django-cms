@@ -1,7 +1,8 @@
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from django.conf import settings
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import reversion_register
+from django.conf import settings
+from django.utils.importlib import import_module
 
 class PluginPool(object):
     def __init__(self):
@@ -13,7 +14,10 @@ class PluginPool(object):
             return
         self.discovered = True
         for app in settings.INSTALLED_APPS:
-            __import__(app, {}, {}, ['cms_plugins'])
+            try:
+                import_module('.cms_plugins', app)
+            except ImportError:
+                pass
 
     def register_plugin(self, plugin_or_iterable):
         """

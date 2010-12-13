@@ -1,10 +1,11 @@
+import urllib
 from menus.menu_pool import menu_pool
 from django.contrib.sites.models import Site
 from django import template
 from django.conf import settings
 from django.utils.translation import activate, get_language, ugettext
 from django.core.cache import cache
-
+from django.core.urlresolvers import reverse
 
 class NOT_PROVIDED: pass
 
@@ -101,7 +102,7 @@ def show_menu(context, from_level=0, to_level=100, extra_inactive=0, extra_activ
             nodes = new_nodes
         children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
         children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
-    
+
     try:
         context.update({'children':children,
                         'template':template,
@@ -159,7 +160,7 @@ show_sub_menu = register.inclusion_tag('menu/dummy.html',
                                        takes_context=True)(show_sub_menu)
 
 
-def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
+def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html", only_visible=True):
     """
     Shows the breadcrumb from the node that has the same url as the current request
     
@@ -172,6 +173,10 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
         request = context['request']
     except KeyError:
         return {'template': 'cms/content.html'}
+    if not isinstance(start_level, int) or (isinstance(start_level, basestring) and start_level.isdigit()):
+        only_visible = template
+        template = start_level
+        start_level = 0
     ancestors = []
     nodes = menu_pool.get_nodes(request, breadcrumb=True)
     selected = None
@@ -179,13 +184,12 @@ def show_breadcrumb(context, start_level=0, template="menu/breadcrumb.html"):
     for node in nodes:
         if node.selected:
             selected = node
-        # find home: TODO: maybe home is not on "/"?
-        if node.get_absolute_url() == "/":
+        if node.get_absolute_url() == urllib.unquote(reverse("pages-root")):
             home = node
     if selected and selected != home:
         n = selected
         while n:
-            if n.visible:
+            if n.visible or not only_visible:
                 ancestors.append(n)
             n = n.parent
     if not ancestors or (ancestors and ancestors[-1] != home) and home:
@@ -288,10 +292,8 @@ def page_language_url(context, lang):
         if page == "dummy":
             return ''
         try:
-            from django.core.urlresolvers import reverse
-            root = reverse('pages-root')
             url = page.get_absolute_url(language=lang, fallback=False)
-            url = root + lang + "/" + url[len(root):] 
+            url = "/" + lang + url
         except:
             # no localized path/slug. 
             url = ''

@@ -3,8 +3,10 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from cms.utils.i18n import get_default_language
+import urllib
 
 # !IMPORTANT: Page cant be imported here, because we will get cyclic import!!
 
@@ -17,8 +19,8 @@ def auto_render(func):
             # return only context dictionary
             del(kwargs['only_context'])
             response = func(request, *args, **kwargs)
-            if isinstance(response, HttpResponseRedirect):
-                raise Exception("cannot return context dictionary because a HttpResponseRedirect has been found")
+            if isinstance(response, HttpResponse):
+                return response
             (template_name, context) = response
             return context
         if "template_name" in kwargs:
@@ -97,6 +99,8 @@ def get_page_from_request(request):
     """
     tries to get a page from a request if the page hasn't been handled by the cms urls.py
     """
+
+    # TODO: Looks redundant this is also checked in cms.middleware.page and thats the only place this method get called
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
     else:
@@ -109,7 +113,8 @@ def get_page_from_request(request):
         if path.startswith('/admin/'):
             kw['page_id']=path.split("/")[0]
         else:
-            kw['slug']=path[1:-1]
+            pages_root = urllib.unquote(reverse("pages-root"))
+            kw['slug']=path[len(pages_root):-1]
         resp = details(request, no404=True, only_context=True, **kw)
         return resp['current_page']
 

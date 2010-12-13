@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.models import User
 from cms.models import Page
-from menus.templatetags.menu_tags import show_menu
-from django.conf import settings
 from cms.tests.base import CMSTestCase
-from menus.menu_pool import menu_pool
 from cms.tests.util.menu_extender import TestMenu
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.template import Template
+from menus.menu_pool import menu_pool
 
 class NavExtenderTestCase(CMSTestCase):
 
@@ -43,13 +43,18 @@ class NavExtenderTestCase(CMSTestCase):
         page1.navigation_extenders = "TestMenu"
         page1.save()
         context = self.get_context()
-        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context) 
+        nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(len(nodes[0].children[3].children), 1)
         page1.in_navigation = False
         page1.save()
-        nodes = show_menu(context)['children']
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        tpl.render(context) 
+        nodes = context['children']
         self.assertEqual(len(nodes), 5)
         
     def test_03_extenders_on_root_child(self):
@@ -58,7 +63,9 @@ class NavExtenderTestCase(CMSTestCase):
         page4.navigation_extenders = "TestMenu"
         page4.save()
         context = self.get_context()
-        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context) 
+        nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[1].children), 4)
         
@@ -71,7 +78,9 @@ class NavExtenderTestCase(CMSTestCase):
         page2.navigation_extenders = "TestMenu"
         page2.save()
         context = self.get_context()
-        nodes = show_menu(context, 0, 100, 100, 100)['children']
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context) 
+        nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(nodes[0].children[1].get_absolute_url(), "/" )
@@ -82,7 +91,9 @@ class NavExtenderTestCase(CMSTestCase):
         page2.navigation_extenders = "SomethingWrong"
         page2.save()
         context = self.get_context()
-        nodes = show_menu(context)['children']
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        tpl.render(context) 
+        nodes = context['children']
         self.assertEqual(len(nodes), 2)
         
         

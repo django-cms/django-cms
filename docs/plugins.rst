@@ -221,3 +221,5 @@ For installation be sure you have the following in your project's ``INSTALLED_AP
 		# ...
 	)
 
+.. warning:: The inherit plugin is currently the only core-plugin which can
+			 **not** be used in non-cms placeholders.

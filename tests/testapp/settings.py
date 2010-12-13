@@ -99,6 +99,8 @@ INSTALLED_APPS = (
     'mptt',
     'testapp.sampleapp',
     'testapp.placeholderapp',
+    'testapp.pluginapp',
+    'testapp.pluginapp.plugins.manytomany_rel',
     'south',
     'reversion',
 )
@@ -163,18 +165,13 @@ CMS_URL_OVERWRITE = True
 
 SOUTH_TESTS_MIGRATE = False
 
+CMS_NAVIGATION_EXTENDERS = (
+    ('testapp.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+)
+
 try:
     from local_settings import *
 except ImportError:
     pass
-
-# set xmlrunner as test runner if available
-try:
-    import xmlrunner
-except ImportError:
-    xmlrunner = None
     
-if xmlrunner:
-    TEST_RUNNER = 'testapp.testrunner.DjangoXMLTestRunner'
-else:
-    TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'

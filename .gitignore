@@ -27,3 +27,5 @@ eggs
 parts
 bin
 /dist
+*.rst~
+/docs/*.html

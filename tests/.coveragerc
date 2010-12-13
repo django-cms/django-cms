@@ -1,0 +1,9 @@
+[run]
+branch = True
+source =
+    cms
+    menus
+    mptt
+    publisher
+omit =
+    *migrations*

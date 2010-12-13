@@ -86,8 +86,8 @@ class PlaceholderAdmin(ModelAdmin):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        request = kwargs.pop("request", None)
         if isinstance(db_field, PlaceholderField):
+            request = kwargs.pop("request", None)
             return db_field.formfield_for_admin(request, self.placeholder_plugin_filter, **kwargs)
         return super(PlaceholderAdmin, self).formfield_for_dbfield(db_field, **kwargs)
     

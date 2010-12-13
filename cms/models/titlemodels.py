@@ -10,7 +10,7 @@ from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
 
 class Title(models.Model):
-    language = models.CharField(_("language"), max_length=5, db_index=True)
+    language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title in the menu"))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)

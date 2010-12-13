@@ -1,6 +1,7 @@
-from django.conf import settings
 from cms.exceptions import AppAllreadyRegistered
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 class ApphookPool(object):
     def __init__(self):
@@ -18,12 +19,21 @@ class ApphookPool(object):
                 self.block_register = True
                 path = ".".join(app.split(".")[:-1])
                 class_name = app.split(".")[-1]
-                cls = __import__(path, {}, {}, [class_name])
+                module = import_module(path)
+                cls = getattr(module, class_name, None)
+                if cls is None:
+                    raise ImproperlyConfigured(
+                        "Cannot find class %s" % app
+                    )
                 self.block_register = False
                 self.register(cls)
         else:
             for app in settings.INSTALLED_APPS:
-                __import__(app, {}, {}, ['cms_app'])
+                cms_app = '%s.cms_app' % app
+                try:
+                    import_module(cms_app)
+                except ImportError:
+                    pass
         self.discovered = True
         
     def clear(self):
@@ -45,6 +55,8 @@ class ApphookPool(object):
         for app_name in self.apps.keys():
             app = self.apps[app_name]
             hooks.append((app_name, app.name))
+        # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
+        hooks = sorted(hooks, key=lambda hook: hook[1])
         return hooks
     
     def get_apphook(self, app_name):
