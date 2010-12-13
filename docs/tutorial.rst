@@ -393,7 +393,7 @@ application, which you want to use in your Django-CMS project, as the
 
 #. Create a ``cms_app.py`` file in your app's module (usually next to ``models.py``)
 #. Paste and adapt the following code to the newly created file, save, restart
-your server if needed::
+   your server if needed::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
@@ -405,13 +405,13 @@ your server if needed::
 
 #. Create a "blog" page in the Django-CMS admin interface.
 #. Still in the admin interface, navigate to your newly created page, edit it,
-and expand the "Advanced Settings" group.
+   and expand the "Advanced Settings" group.
 #. You should see your ``My Apphook's name`` apphook in the "Application"
-drop-down list.
+   drop-down list.
 #. Select your apphook & save the page. You must restart your Django server for
-the changes to take effect (Django caches urls).
+   the changes to take effect (Django caches urls).
 #. Your application is now available at
-``http://<your host>/myapp/<your apps urls>``!
+   ``http://<your host>/myapp/<your apps urls>``!
 
 
 

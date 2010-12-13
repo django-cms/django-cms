@@ -10,7 +10,7 @@ Requirements
 
 * Python 2.5 (or a higher release of 2.x). 2.4 might work, but is not supported.
 * Django 1.2.3 (or a higher release of 1.2). 1.3 might work, but is not yet
-supported.
+  supported.
 * South 0.7 or higher
 
 Apps
@@ -29,9 +29,9 @@ Required
 * ``menus``
 
 .. warning:: Django CMS ships with an older version of mptt (0.3-pre). Django
-CMS is not yet compatible with the latest version of django-mptt. If your
-project has other applications requiring mptt, they must use the mptt included
-with Django CMS.
+    CMS is not yet compatible with the latest version of django-mptt. If your
+    project has other applications requiring mptt, they must use the mptt
+    included with Django CMS.
 
 Optional
 ~~~~~~~~
@@ -112,7 +112,7 @@ If you're editing a Page in the Django admin, but don't see an "Add Plugin"
 button with a dropdown-list of plugins:
 
 - Be sure your ``CMS_TEMPLATES`` setting is correct, the templates specified
-exist, and they contain at least one ``{% placeholder %}`` templatetag.
+  exist, and they contain at least one ``{% placeholder %}`` templatetag.
 
 Template errors
 ~~~~~~~~~~~~~~~
@@ -135,9 +135,9 @@ webserver (e.g.: Apache) should be configured to serve static media files from
 this URL.
 
 - **Unsafe JavaScript attempt to access frame with URL
-http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame
-with URL http://127.0.0.1:8000/admin/cms/page/1/edit-plugin/2/. Domains,
-protocols and ports must match.**
+  http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame
+  with URL http://127.0.0.1:8000/admin/cms/page/1/edit-plugin/2/. Domains,
+  protocols and ports must match.**
 
 This error is due to the Django test server running on a different port and URL
 than the main webserver. In your test environment, you can overcome this issue
