@@ -17,6 +17,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 from os.path import join
 import warnings
+from django.db.models import signals
 
 class PluginModelBase(ModelBase):
     """
@@ -190,7 +191,7 @@ class CMSPlugin(Mptt):
             super(CMSPlugin, self).save_base(cls=self.__class__)
         else:
             super(CMSPlugin, self).save()
-            
+                           
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
@@ -253,10 +254,11 @@ class CMSPlugin(Mptt):
         if self.page and getattr(self.page, 'publisher_public'):
             try:
                 placeholder = Placeholder.objects.get(page=self.page.publisher_public, slot=slot)
-                public_plugin = CMSPlugin.objects.get(placeholder=placeholder, position=position)
+            except Placeholder.DoesNotExist:
+                pass                
+            else:
+                public_plugin = CMSPlugin.objects.filter(placeholder=placeholder, position=position)
                 public_plugin.delete()
-            except:
-                pass
         self.placeholder = None
         self.delete()
         

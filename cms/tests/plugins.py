@@ -16,11 +16,44 @@ from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 class PluginsTestBaseCase(CMSTestCase):
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
+        self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.super_user.set_password("test")
+        self.super_user.save()
         
-        self.login_user(u)
+        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave.set_password("slave")
+        self.slave.save()
+        
+        self.login_user(self.super_user)
+
+# REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
+    def publish_page(self, page, approve=False, user=None, published_check=True):
+        if user:
+            self.login_user(user)
+
+        # publish / approve page by master
+        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
+        self.assertEqual(response.status_code, 200)
+
+        if not approve:
+            return self.reload_page(page)
+
+        # approve
+        page = self.approve_page(page)
+
+        if published_check:
+            # must have public object now
+            assert(page.publisher_public)
+            # and public object must be published
+            assert(page.publisher_public.published)
+
+        return page
+
+    def approve_page(self, page):
+        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        # reload page
+        return self.reload_page(page)
 
 class PluginsTestCase(PluginsTestBaseCase):
 
@@ -232,9 +265,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = response.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
         self.assertEquals(response.status_code, 200)
-<<<<<<< HEAD
-=======
-        
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
@@ -401,4 +431,3 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
->>>>>>> 603a3dafa6d8573fadae6588bcaced36e52f6a39

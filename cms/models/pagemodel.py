@@ -1,6 +1,7 @@
 from cms.exceptions import NoHomeFound
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page import get_available_slug, check_title_slugs
@@ -18,18 +19,6 @@ from menus.menu_pool import menu_pool
 from os.path import join
 from publisher import MpttPublisher, Publisher
 from publisher.errors import PublisherCantPublish
-<<<<<<< HEAD
-from cms.utils.urlutils import urljoin
-from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
-from cms.utils.page import get_available_slug, check_title_slugs
-from cms.exceptions import NoHomeFound
-from cms.utils.helpers import reversion_register
-from cms.utils.i18n import get_fallback_languages
-from menus.menu_pool import menu_pool
-=======
->>>>>>> 603a3dafa6d8573fadae6588bcaced36e52f6a39
 import copy
 
 
@@ -173,10 +162,7 @@ class Page(MpttPublisher):
             page.published = False
             page.publisher_status = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
-<<<<<<< HEAD
-=======
             # only set reverse_id on standard copy
->>>>>>> 603a3dafa6d8573fadae6588bcaced36e52f6a39
             if not public_copy and page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
             if first:
@@ -425,13 +411,9 @@ class Page(MpttPublisher):
             # delete its placeholders and plugins
             placeholders = old_public.placeholders.all()
             for ph in placeholders:
-                try:
-                    plugin = CMSPlugin.objects.filter(placeholder=ph)
-                    plugin.delete()
-                    ph.delete()
-                except:
-                    pass
-                
+                plugin = CMSPlugin.objects.filter(placeholder=ph)
+                plugin.delete()
+                ph.delete()
             # finally delete the old public page    
             old_public.delete()
         # manually commit the last transaction batch
@@ -441,7 +423,33 @@ class Page(MpttPublisher):
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
         return published
+        
+    def delete(self):
+        """Mark public instance for deletion and delete draft.
+        """
+        placeholders = self.placeholders.all()
+        
+        for ph in placeholders:
+            plugin = CMSPlugin.objects.filter(placeholder=ph)
+            plugin.delete()
+            ph.delete()
+    
+        super(Page, self).delete()
 
+
+    def delete_with_public(self):
+        
+        placeholders = list(self.placeholders.all())
+        if self.publisher_public_id:
+            placeholders = placeholders + list(self.publisher_public.placeholders.all())
+            
+        for ph in placeholders:
+            plugin = CMSPlugin.objects.filter(placeholder=ph)
+            plugin.delete()
+            ph.delete()
+                               
+        super(Page, self).delete_with_public()        
+                        
     def get_draft_object(self):
         return self
 

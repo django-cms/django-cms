@@ -653,15 +653,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(ph.publisher_public.parent.pk, pe.publisher_public_id)
         
         # check if urls are correct after move
-<<<<<<< HEAD
-        self.assertEqual(pg.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/')
-        self.assertEqual(ph.publisher_public.get_absolute_url(), u'/master/slave-home/pc/pg/pe/ph/')     
-
-=======
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'%smaster/slave-home/pc/pg/' % self.get_pages_root())
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root())     
         
->>>>>>> 603a3dafa6d8573fadae6588bcaced36e52f6a39
     def test_17_plugins_get_published(self):
         self.login_user(self.user_super)
         # create page under root
