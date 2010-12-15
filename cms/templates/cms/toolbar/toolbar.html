@@ -39,82 +39,80 @@
     }
     //]]>
 </script>
-
 <script type="text/javascript">
-       //<![CDATA[ 
-       (function($) {
-           $(document).ready(function() {
-           
-               var submitActor;
-               var forceSubmit = false;
-               var seen = false;
+    //<![CDATA[ 
+    (function($) {
+        $(document).ready(function() {
+        
+            var submitActor;
+            var forceSubmit = false;
+            var seen = false;
 
-               // change submit states, open dialog
-               $('#cms_toolbar_requestapproval').click(function(event){
-                   return showDialog(event);
-               });
+            // change submit states, open dialog
+            $('#cms_toolbar_requestapproval').click(function(event){
+                return showDialog(event);
+            });
 
-               function showDialog(event, actor) {
-                   if (forceSubmit) return true; // escape sequence
+            function showDialog(event, actor) {
+                if (forceSubmit) return true; // escape sequence
 
-                   if (!seen) {
-                       // show previously posted message if there were an error
-                       //$('#id_df_moderator_message').val($('#id_moderator_message').val());
-                   }
-                   seen = true
-                   event.preventDefault();
-                   submitActor = actor;
-                   $('#dialog').dialog('open');
-                   return false;
-               }
+                if (!seen) {
+                    // show previously posted message if there were an error
+                    //$('#id_df_moderator_message').val($('#id_moderator_message').val());
+                }
+                seen = true
+                event.preventDefault();
+                submitActor = actor;
+                $('#dialog').dialog('open');
+                return false;
+            }
 
-               function dialogSave(){
-                   // assign values from dialog form to real form
-                   $('#id_moderator_message').val($('#id_df_moderator_message').val());
-                   $('#id_moderator_state').val(
-                       $('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
-                   );
-                   $('#dialog').dialog('close');
-                   forceSubmit = true;
-                   
-                   // we need to post an updated to server-side to send the email!
-                   $(submitActor || '#page_form input[name=_save]').click();
-                   return false;
-               }
+            function dialogSave(){
+                // assign values from dialog form to real form
+                $('#id_moderator_message').val($('#id_df_moderator_message').val());
+                $('#id_moderator_state').val(
+                    $('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
+                );
+                $('#dialog').dialog('close');
+                forceSubmit = true;
+                
+                // we need to post an updated to server-side to send the email!
+                $(submitActor || '#page_form input[name=_save]').click();
+                return false;
+            }
 
-               $('#dialog').dialog({
-                   bgiframe: true,
-                   autoOpen: false,
-                   height: 200,
-                   width: 400,
-                   modal: true,
-                   buttons: {
-                       Cancel: function() {
-                           $(this).dialog('close');
-                       },
-                       Save: function() {
-                           dialogSave();
-                       }
-                   },
-                   open: function(){
-                       var val = $('#id_moderator_state').val();
-                       $('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
-                       $('#id_df_moderator_message')
-                           .focus()
-                           .keydown(function(event) { if (event.keyCode == 13) dialogSave()});
+            $('#dialog').dialog({
+                bgiframe: true,
+                autoOpen: false,
+                height: 200,
+                width: 400,
+                modal: true,
+                buttons: {
+                    Cancel: function() {
+                        $(this).dialog('close');
+                    },
+                    Save: function() {
+                        dialogSave();
+                    }
+                },
+                open: function(){
+                    var val = $('#id_moderator_state').val();
+                    $('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
+                    $('#id_df_moderator_message')
+                        .focus()
+                        .keydown(function(event) { if (event.keyCode == 13) dialogSave()});
 
-                       // add default button class to last rendered button (Save)
-                       $(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
-                   },
-                   close: function(){
-                       forceSubmit = false;
-                   }
-               });
-           });
-       })(jQuery);
-       //]]>
-       </script>
--->
+                    // add default button class to last rendered button (Save)
+                    $(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
+                },
+                close: function(){
+                    forceSubmit = false;
+                }
+            });
+        });
+    })(jQuery);
+    //]]>
+</script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/toolbar.js"></script>
 <script type="text/javascript" charset="utf-8">
     //<![CDATA[
@@ -246,7 +244,7 @@
         <div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
         <div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">Request approval</label></div>
     </div>
-    
+
 </div>
 <div id="cms_plugin_overlay2">
     <div class="cms_plugin_overlay_bg">&nbsp;</div>
