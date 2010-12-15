@@ -1051,7 +1051,7 @@ class PageAdmin(model_admin):
             page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
             return render_admin_menu_item(request, page)
         else:
-            return HttpResponseForbidden(_("You do not have permission to publish this page"))
+            return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
     def change_innavigation(self, request, page_id):
         """

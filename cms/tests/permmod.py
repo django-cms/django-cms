@@ -143,22 +143,33 @@ class PermissionModeratorTestCase(CMSTestCase):
     def publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
             self.login_user(user)
+        
+        if published_check:
+            # must have public object now
+            self.assertFalse(page.publisher_public)
+            self.assertFalse(page.published)
             
         # publish / approve page by master
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
         self.assertEqual(response.status_code, 200)
         
         if not approve:
-            return self.reload_page(page)
+            page = self.reload_page(page)
+            if published_check:
+                # must have public object now
+                self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)
+                # and public object must be published
+                self.assertTrue(page.publisher_public.published)
+            return page
         
         # approve
         page = self.approve_page(page)
         
         if published_check:
             # must have public object now
-            assert(page.publisher_public)
+            self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)
             # and public object must be published
-            assert(page.publisher_public.published)
+            self.assertTrue(page.publisher_public.published)
         
         return page
     
@@ -230,19 +241,16 @@ class PermissionModeratorTestCase(CMSTestCase):
             is_superuser=True)
         self.user_super.set_password("super")
         self.user_super.save()
-        
-        # create basic structure ... 
-        
         self.login_user(self.user_super)
         
-        
-        home = self.create_page(title="home")
+        home = self.create_page(title="home", user=self.user_super)
         self.publish_page(home)
         
         # master page & master user
         
         master = self.create_page(title="master")
         self.publish_page(master)
+        
         # create master user
         self.user_master = self.create_page_user("master", grant_all=True)
         
@@ -255,7 +263,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # slave page & slave user
         
-        slave = self.create_page(title="slave-home", parent_page=master)  
+        slave = self.create_page(title="slave-home", parent_page=master, user=self.user_super)  
         self.user_slave = self.create_page_user("slave", 
             can_add_page=True, can_change_page=True, can_delete_page=True)
         
@@ -263,18 +271,15 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # create page_a - sample page from master
         
-        page_a = self.create_page(title="pageA")
+        page_a = self.create_page(title="pageA", user=self.user_super)
         self.assign_user_to_page(page_a, self.user_master, 
             can_add=True, can_change=True, can_delete=True, can_publish=True, 
             can_move_page=True, can_moderate=True)
         
         # logg in as master, and request moderation for slave page and descendants
-        self.login_user(self.user_master)
         self.request_moderation(slave, 7)
         
         self.client.logout()
-        # login super again
-        self.login_user(self.user_super)
          
     
     def test_00_test_configuration(self):
@@ -293,22 +298,18 @@ class PermissionModeratorTestCase(CMSTestCase):
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, status_code)
     
-    
     def test_02_master_can_add_page_to_root(self, status_code=403):
         self.login_user(self.user_master)
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, status_code)
-    
         
     def test_03_slave_can_add_page_to_root(self, status_code=403):
         self.login_user(self.user_slave)
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, status_code)
     
-    
     def test_04_moderation_on_slave_home(self):
         self.assertEqual(self.slave_page.get_moderator_queryset().count(), 1)
-    
     
     def test_05_slave_can_add_page_under_slave_home(self):
         self.login_user(self.user_slave)
@@ -319,38 +320,30 @@ class PermissionModeratorTestCase(CMSTestCase):
         # can he even access it over get?
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        page_data = self.get_new_page_data(slave_page.pk)
-        
-        # request moderation
-        page_data.update({
-            #'moderator_state': Page.MODERATOR_NEED_APPROVEMENT,
-            #'moderator_message': "Approve me!",
-            '_save': 'Save',
-        })
         
         # add page
-        self.login_user(self.user_slave)
-        response = self.client.post(url, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        page = self.create_page(slave_page, user=self.user_slave)
         # public model shouldn't be available yet, because of the moderation
         # removed test cases since Title object does not inherit from Publisher anymore
         #self.assertObjectExist(Title.objects, slug=page_data['slug'])
         #self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
-        # page created?
-        page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=page_data['slug'])
         # moderators and approvement ok?
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         #assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
-        self.assertEqual(not page.publisher_public, True)
+        self.assertFalse(page.publisher_public)
         
         # publish / approve page by master
         self.login_user(self.user_master)
         
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        self.assertEqual(response.status_code, 200)
+        self.publish_page(page, False, self.user_master, True)
+#        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
+#        self.assertEqual(response.status_code, 200,
+#            "Page '%s' could not be approved by '%s', response code was '%s'" % (
+#                page, self.user_master, response.status_code
+#        ))
         
         # approve / publish
         page = self.approve_page(page)
