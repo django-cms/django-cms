@@ -479,7 +479,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.create_page()
         
         # public must not exist
-        self.assertEqual(not page.publisher_public, True)
+        self.assertFalse(page.publisher_public)
         
         # moderator_state must be changed
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
