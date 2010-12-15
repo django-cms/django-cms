@@ -380,7 +380,7 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
             placeholders = get_placeholders(selected_template)
-            for placeholder_name in placeholders:
+            for placeholder_name in sorted(placeholders):
                 plugin_list = []
                 show_copy = False
                 copy_languages = {}
