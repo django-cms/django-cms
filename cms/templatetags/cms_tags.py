@@ -79,6 +79,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
 
 class PageUrl(InclusionTag):
     template = 'cms/content.html'
+    name = 'page_url'
     
     options = Options(
         Argument('page_lookup'),
@@ -177,6 +178,7 @@ class Placeholder(Tag):
     or -- optional argument which if given will make the template tag a block
         tag whose content is shown if the placeholder is empty
     """
+    name = 'placeholder'
     options = PlaceholderOptions(
         Argument('name', resolve=False),
         MultiValueArgument('extra_bits', required=False, resolve=False),
@@ -248,6 +250,7 @@ class PageAttribute(Tag):
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
     """
+    name = 'page_attribute'
     options = Options(
         Argument('name', resolve=False),
         Argument('page_lookup', required=False, default=None)
@@ -279,6 +282,7 @@ register.tag(PageAttribute)
 
 class CleanAdminListFilter(InclusionTag):
     template = 'admin/filter.html'
+    name = 'clean_admin_list_filter'
     
     options = Options(
         Argument('cl'),
@@ -345,6 +349,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
 
 class ShowPlaceholderById(InclusionTag):
     template = 'cms/content.html'
+    name = 'show_placeholder_by_id'
     
     options = Options(
         Argument('placeholder_name'),
@@ -368,6 +373,7 @@ register.tag(ShowPlaceholderById)
 register.tag('show_placeholder', ShowPlaceholderById)
 
 class ShowUncachedPlaceholderById(ShowPlaceholderById):
+    name = 'show_uncached_placeholder_by_id'
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
         kwargs['cache_result'] = True
@@ -387,6 +393,7 @@ class PluginsMedia(Tag):
 
     eg: {% plugins_media "gallery" %}
     """
+    name = 'plugins_media'
     options = Options(
         Argument('page_lookup', required=False, default=None),
     )

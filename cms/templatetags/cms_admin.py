@@ -12,6 +12,7 @@ register = template.Library()
 
 
 class ShowAdminMenu(InclusionTag):
+    name = 'show_admin_menu'
     template = 'admin/cms/page/menu.html'
     
     options = Options(
@@ -46,6 +47,7 @@ class CleanAdminListFilter(InclusionTag):
     used in admin to display only these users that have actually edited a page
     and not everybody
     """
+    name = 'clean_admin_list_filter'
     template = 'admin/filter.html'
     
     options = Options(
@@ -123,6 +125,7 @@ register.tag(RenderPlugin)
 
 
 class PageSubmitRow(InclusionTag):
+    name = 'page_submit_row'
     template = 'admin/page_submit_line.html'
     
     def get_context(self, context):

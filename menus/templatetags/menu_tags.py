@@ -79,6 +79,7 @@ class ShowMenu(InclusionTag):
     - root_id: the id of the root node
     - template: template used to render the menu
     """
+    name = 'show_menu'
     template = 'menu/dummy.html'
     
     options = Options(
@@ -135,6 +136,7 @@ register.tag(ShowMenu)
 
 
 class ShowMenuBelowId(ShowMenu):
+    name = 'show_menu_below_id'
     options = Options(
         Argument('root_id', default=None, required=False),
         IntegerArgument('from_level', default=0, required=False),
@@ -154,6 +156,7 @@ class ShowSubMenu(InclusionTag):
     -levels: how many levels deep
     -temlplate: template used to render the navigation
     """
+    name = 'show_sub_menu'
     template = 'menu/dummy.html'
     
     options = Options(
@@ -195,6 +198,7 @@ class ShowBreadcrumb(InclusionTag):
     - start level: after which level should the breadcrumb start? 0=home
     - template: template used to render the breadcrumb 
     """
+    name = 'show_breadcrumb'
     template = 'menu/dummy.html'
     
     options = Options(
@@ -270,6 +274,7 @@ class LanguageChooser(InclusionTag):
     Displays a language chooser
     - template: template used to render the language chooser
     """
+    name = 'language_chooser'
     template = 'menu/dummy.html'
     
     options = Options(
@@ -323,6 +328,7 @@ class PageLanguageUrl(InclusionTag):
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
     This is needed if you have slugs in more than one language.
     """
+    name = 'page_language_url'
     template = 'cms/content.html'
     
     options = Options(

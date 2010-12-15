@@ -7,6 +7,7 @@ register = template.Library()
 
 
 class RenderPlaceholder(Tag):
+    name = 'render_placeholder'
     options = Options(
         Argument('placeholder'),
         Argument('width', default=None, required=False),
