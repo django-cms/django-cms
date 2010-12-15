@@ -309,7 +309,7 @@ class PageAdmin(model_admin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder_name in get_placeholders(placeholders_template):
+            for placeholder_name in sorted(get_placeholders(placeholders_template)):
                 name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
                 if not name:
                     name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
@@ -380,7 +380,7 @@ class PageAdmin(model_admin):
                 form.base_fields['template'].initial = force_unicode(selected_template)
             
             placeholders = get_placeholders(selected_template)
-            for placeholder_name in sorted(placeholders):
+            for placeholder_name in placeholders:
                 plugin_list = []
                 show_copy = False
                 copy_languages = {}
