@@ -123,6 +123,7 @@ class CMSTestCase(TestCase):
         """
         Common way for page creation with some checks
         """
+        _thread_locals.user = user
         language = settings.LANGUAGES[0][0]
         if settings.CMS_SITE_LANGUAGES.get(site, False):
             language = settings.CMS_SITE_LANGUAGES[site][0]
@@ -131,19 +132,20 @@ class CMSTestCase(TestCase):
         page_data = {
             'site': site,
             'template': 'nav_playground.html',
-            'parent': parent_page,
             'published': published,
             'in_navigation': in_navigation,
         }
         if user:
             page_data['created_by'] = user
             page_data['changed_by'] = user
+        if parent_page:
+            page_data['parent'] = parent_page
         page_data.update(**extra)
 
-        _thread_locals.user = user
         page = Page.objects.create(**page_data)
-        page.move_to(parent_page, position)
-        page.save()
+        if parent_page:
+            page.move_to(parent_page, position)
+            page.save()
         
         if settings.CMS_MODERATOR and user:
             page.pagemoderator_set.create(user=user)
@@ -157,7 +159,7 @@ class CMSTestCase(TestCase):
         self.counter = self.counter + 1
         if title:
             title_data['title'] = title
-            title_data['slug'] = title
+            title_data['slug'] = slugify(title)
         Title.objects.create(**title_data)
             
         del _thread_locals.user
