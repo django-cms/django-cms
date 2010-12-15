@@ -1,5 +1,7 @@
 from cms.models import Title, Page
+from cms.utils.permissions import _thread_locals
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
@@ -116,50 +118,49 @@ class CMSTestCase(TestCase):
             return
         raise self.failureException, "ObjectDoesNotExist not raised"
     
-    def create_page(self, parent_page=None, user=None, position="last-child", title=None, site=1, published=False, in_navigation=False):
-        """Common way for page creation with some checks
+    def create_page(self, parent_page=None, user=None, position="last-child", 
+            title=None, site=1, published=False, in_navigation=False, **extra):
         """
-        if user:
-            # change logged in user
-            self.login_user(user)
-        
-        parent_id = ''
-        if parent_page:
-            parent_id=parent_page.id
-            
-        page_data = self.get_new_page_data(parent_id)
-        page_data['site'] = site
-        page_data['published'] = published
-        page_data['in_navigation'] = in_navigation
+        Common way for page creation with some checks
+        """
+        language = settings.LANGUAGES[0][0]
         if settings.CMS_SITE_LANGUAGES.get(site, False):
-            page_data['language'] = settings.CMS_SITE_LANGUAGES[site][0]
-        page_data.update({
-            '_save': 'Save',
-        })
+            language = settings.CMS_SITE_LANGUAGES[site][0]
+        site = Site.objects.get(pk=site)
         
-        if title is not None:
-            page_data['title'] = title
-            page_data['slug'] = slugify(title)
+        page_data = {
+            'site': site,
+            'template': 'nav_playground.html',
+            'parent': parent_page,
+            'published': published,
+            'in_navigation': in_navigation,
+        }
+        if user:
+            page_data['created_by'] = user
+            page_data['changed_by'] = user
+        page_data.update(**extra)
+
+        _thread_locals.user = user
+        page = Page.objects.create(**page_data)
+        page.move_to(parent_page, position)
+        page.save()
         
-        # add page
-        if parent_page:
-            url = URL_CMS_PAGE_ADD + "?target=%d&position=%s" % (parent_page.pk, position)
-        else:
-            url = URL_CMS_PAGE_ADD
-        response = self.client.post(url, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        if settings.CMS_MODERATOR and user:
+            page.pagemoderator_set.create(user=user)
         
-        # check existence / get page
-        page = self.assertObjectExist(Page.objects, title_set__slug=page_data['slug'])
-        self.assertEqual(page.site_id, site)
-        
-        # public model shouldn't be available yet, because of the moderation
-        self.assertObjectExist(Title.objects, slug=page_data['slug'])
-        
-# test case currently failing because Title model is no longer under Publisher
-        if settings.CMS_MODERATOR and page.is_under_moderation(): 
-            self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
-        
+        title_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': language,
+            'page': page,
+        }
+        self.counter = self.counter + 1
+        if title:
+            title_data['title'] = title
+            title_data['slug'] = title
+        Title.objects.create(**title_data)
+            
+        del _thread_locals.user
         return page
     
     
