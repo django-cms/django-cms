@@ -2,7 +2,7 @@ from cms import settings
 from cms.models.placeholdermodel import Placeholder
 from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from django.conf import settings, settings as django_settings
+from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Template, Context
 from django.template.defaultfilters import title
@@ -42,12 +42,11 @@ DEFAULT_PLUGIN_PROCESSORS = (
 _standard_processors = {}
 
 def get_standard_processors(settings_attr):
-    from django.conf import settings
     global _standard_processors
     if not _standard_processors.has_key(settings_attr):
         processors = []
-        if hasattr(settings, settings_attr):
-            for path in getattr(settings, settings_attr):
+        if hasattr(django_settings, settings_attr):
+            for path in getattr(django_settings, settings_attr):
                 i = path.rfind('.')
                 module, attr = path[:i], path[i+1:]
                 try:
