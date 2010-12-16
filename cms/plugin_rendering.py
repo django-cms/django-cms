@@ -114,7 +114,9 @@ def render_plugins(plugins, context, placeholder, processors=None):
     for index, plugin in enumerate(plugins):
         plugin._render_meta.total = total 
         plugin._render_meta.index = index
-        c.append(plugin.render_plugin(copy.copy(context), placeholder, processors=processors))
+        context.push()
+        c.append(plugin.render_plugin(context, placeholder, processors=processors))
+        context.pop()
     return c
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
@@ -123,7 +125,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-    context = copy.copy(context_to_copy) 
+    context = context_to_copy 
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
     page = get_page_from_placeholder_if_exists(placeholder)
