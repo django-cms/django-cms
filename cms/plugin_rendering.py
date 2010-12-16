@@ -9,7 +9,6 @@ from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
-import copy
 
 def plugin_meta_context_processor(instance, placeholder):
     return {
