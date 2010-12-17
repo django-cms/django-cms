@@ -8,6 +8,7 @@ from cms.plugins.link.models import Link
 from cms.plugins.text.models import Text
 from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.models import InheritPagePlaceholder
+from cms.plugins.file.models import File
 
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
@@ -18,6 +19,7 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.template import TemplateDoesNotExist, RequestContext
 from django.forms.widgets import Media
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from testapp.pluginapp.models import Article, Section
 from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
@@ -352,6 +354,20 @@ class PluginsTestCase(PluginsTestBaseCase):
         context = RequestContext(request, {})
         inherit_plugin.render_plugin(context, inherited_body)
         self.assertEquals(unicode(request.placeholder_media).find('maps.google.com') != -1, True)
+        
+    def test_10_fileplugin_icon_uppercase(self):
+        page = self.create_page(title='testpage')
+        body = page.placeholders.get(slot="body") 
+        plugin = File(
+            plugin_type='FilePlugin',
+            placeholder=body,
+            position=1, 
+            language=settings.LANGUAGE_CODE,
+        )
+        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
+        plugin.insert_at(None, position='last-child', commit=True)
+        
+        self.assertEquals(plugin.get_icon_url().find('jpg') != -1, True)
         
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
