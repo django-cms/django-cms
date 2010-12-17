@@ -44,8 +44,6 @@ def get_template_from_request(request, obj=None, no_current_page=False):
     template = None
     if len(settings.CMS_TEMPLATES) == 1:
         return settings.CMS_TEMPLATES[0][0]
-    if "template" in request.REQUEST:
-        template = request.REQUEST['template']
     if not template and obj is not None:
         template = obj.get_template()
     if not template and not no_current_page and hasattr(request, "current_page"):
