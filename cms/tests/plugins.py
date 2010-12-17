@@ -6,13 +6,19 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.link.models import Link
 from cms.plugins.text.models import Text
+from cms.plugins.googlemap.models import GoogleMap
+from cms.plugins.inherit.models import InheritPagePlaceholder
+
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
     URL_CMS_PLUGIN_REMOVE
+    
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, RequestContext
+from django.forms.widgets import Media
+
 from testapp.pluginapp.models import Article, Section
 from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 
@@ -66,9 +72,13 @@ class PluginsTestBaseCase(CMSTestCase):
         self.assertRedirects(response, URL_CMS_PAGE)
         # reload page
         return self.reload_page(page)
-
+        
+    def get_request(self, *args, **kwargs):
+        request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
+        request.placeholder_media = Media()
+        return request
+        
 class PluginsTestCase(PluginsTestBaseCase):
-
 
     def test_01_add_edit_plugin(self):
         """
@@ -309,7 +319,40 @@ class PluginsTestCase(PluginsTestBaseCase):
         # Let's count, to make sure we didn't remove a plugin accidentally.
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
-
+                
+    def test_09_iheritplugin_media(self):
+        """
+        Test case for InheritPagePlaceholder
+        """
+        inheritfrompage = self.create_page(title='page to inherit from')
+        
+        body = inheritfrompage.placeholders.get(slot="body")
+        
+        plugin = GoogleMap(
+            plugin_type='GoogleMapPlugin',
+            placeholder=body, 
+            position=1, 
+            language=settings.LANGUAGE_CODE, lat=1, lng=1)
+        plugin.insert_at(None, position='last-child', commit=True)
+        
+        page = self.create_page(title='inherit from page')
+        
+        inherited_body = page.placeholders.get(slot="body")
+                
+        inherit_plugin = InheritPagePlaceholder(
+            plugin_type='InheritPagePlaceholderPlugin',
+            placeholder=inherited_body, 
+            position=1, 
+            language=settings.LANGUAGE_CODE,
+            from_page=inheritfrompage,
+            from_language=settings.LANGUAGE_CODE)
+        inherit_plugin.insert_at(None, position='last-child', commit=True)
+        
+        request = self.get_request()
+        context = RequestContext(request, {})
+        inherit_plugin.render_plugin(context, inherited_body)
+        self.assertEquals(unicode(request.placeholder_media).find('maps.google.com') != -1, True)
+        
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
     def setUp(self):
