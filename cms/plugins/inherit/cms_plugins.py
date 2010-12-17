@@ -26,7 +26,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         }
         template_vars['object'] = instance
         lang = instance.from_language
-        request = context['request']
+        request = context.get('request', None)
         if not lang:
             if context.has_key('request'):
                 lang = get_language_from_request(request)
@@ -53,7 +53,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
             inst, name = plg.get_plugin_instance()
             outstr = inst.render_plugin(tmpctx, placeholder)
             plugin_output.append(outstr)
-            if hasattr(request, 'placeholder_media'):
+            if request and hasattr(request, 'placeholder_media'):
                 request.placeholder_media += get_plugin_media(request, context, inst)
         template_vars['parent_output'] = plugin_output
         context.update(template_vars)
