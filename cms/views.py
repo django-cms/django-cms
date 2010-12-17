@@ -128,7 +128,7 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
         # If we're not being a view
         if not slug and settings.DEBUG:
             CMS_MEDIA_URL = settings.CMS_MEDIA_URL
-            return "cms/new.html", locals() # damn, a dict!
+            return "cms/new.html", locals() # damn, it should be a dict!
         raise Http404("CMS: No page found for site %s" % unicode(site.name))
     
     if current_page:
@@ -151,5 +151,5 @@ def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLAT
             return HttpResponseRedirect('%s?%s=%s' % tup)
     else:
         has_change_permissions = False
-    return template_name, locals()
+    return template_name, locals() # Ah well, passing the whole context again
 details = auto_render(details)
