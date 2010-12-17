@@ -18,6 +18,8 @@ def applications_page_check(request, current_page=None, path=None):
     if current_page:
         return current_page
     if path is None:
+        # We should get in this branch only if an apphook is active on /
+        # This removes the non-CMS part of the URL.
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
     for resolver in APP_RESOLVERS:
@@ -29,6 +31,7 @@ def applications_page_check(request, current_page=None, path=None):
             # from cms, but keep current page. Otherwise return page to which was application assigned.
             return page
         except Resolver404:
+            # Raised if the page is not managed by an apphook
             pass
     return None
 
