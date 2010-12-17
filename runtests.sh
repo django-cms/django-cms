@@ -6,7 +6,7 @@ num_args=${#args[@]}
 index=0
 
 reuse_env=true
-disable_coverage=false
+disable_coverage=true
 
 while [ "$index" -lt "$num_args" ]
 do
@@ -19,8 +19,8 @@ do
             reuse_env=false
             ;;
 
-        "--disable-coverage")
-            disable_coverage=true
+        "--with-coverage")
+            disable_coverage=false
             ;;
 
         "--help")
@@ -32,7 +32,7 @@ do
             echo ""
             echo "flags:"
             echo "    --failfast - abort at first failing test"
-            echo "    --disable-coverage - don't use coverage"
+            echo "    --with-coverage - enables coverage"
             echo "    --rebuild-env - run buildout before the tests" 
             exit 1
             ;;
