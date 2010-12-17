@@ -319,18 +319,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         # Let's count, to make sure we didn't remove a plugin accidentally.
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
-
-    def get_context(self, context_vars={}):
-        request = self.get_request()
-        return RequestContext(request, context_vars)
                 
     def test_09_iheritplugin_media(self):
         """
         Test case for InheritPagePlaceholder
         """
-        page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        inheritfrompage = Page.objects.all()[0]
+        inheritfrompage = self.create_page(title='page to inherit from')
         
         body = inheritfrompage.placeholders.get(slot="body")
         
@@ -341,9 +335,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE, lat=1, lng=1)
         plugin.insert_at(None, position='last-child', commit=True)
         
-        page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[1]
+        page = self.create_page(title='inherit from page')
         
         inherited_body = page.placeholders.get(slot="body")
                 
