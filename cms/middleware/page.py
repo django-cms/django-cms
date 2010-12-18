@@ -1,4 +1,4 @@
-from cms.utils import get_page_from_request
+from cms.utils.page_resolver import get_page_from_request
 
 class LazyPage(object):
     def __get__(self, request, obj_type=None):
