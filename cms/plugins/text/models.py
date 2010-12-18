@@ -46,8 +46,9 @@ class AbstractText(CMSPlugin):
         replace_ids = {}
         for idx, plugin in enumerate(old_plugins):
             replace_ids[plugin.pk] = plugin_tree[idx].pk
-        self.body = replace_tags(replace_ids)
-        return super(AbstractText, self).copy_plugin(target_placeholder, target_language, plugin_tree, old_plugin_tree)
+        new_plugin = super(AbstractText, self).copy_plugin(target_placeholder, target_language, plugin_tree, old_plugin_tree)
+        new_plugin.body = replace_tags(self.body, replace_ids)
+        new_plugin.save()
             
 class Text(AbstractText):
     """
