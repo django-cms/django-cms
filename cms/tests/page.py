@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from cms.models import Page, Title, Placeholder
+from cms.models import Page, Title
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.sitemaps import CMSSitemap
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
 import os.path
 
 
@@ -74,27 +73,19 @@ class PagesTestCase(CMSTestCase):
         """
         Test the details view
         """
-        try:
-            response = self.client.get(self.get_pages_root())
-        except TemplateDoesNotExist, e:
-            if e.args != ('404.html',):
-                raise
-        
-        page_data = self.get_new_page_data()
-        page_data['published'] = False
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        try:
-            response = self.client.get(self.get_pages_root())
-        except TemplateDoesNotExist, e:
-            if e.args != ('404.html',):
-                raise
-        page_data = self.get_new_page_data()
-        page_data['published'] = True
-        page_data['slug'] = 'test-page-2'
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        response = self.client.get(URL_CMS_PAGE)
-        
+        response = self.client.get(self.get_pages_root())
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Page.objects.count(), 0)
+        self.create_page(title='test page 1', published=False)
+        self.assertEqual(Page.objects.count(), 1)
+        response = self.client.get(self.get_pages_root())
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Page.objects.count(), 1)
+        self.create_page(title='test page 2', published=True)
+        self.assertEqual(Page.objects.count(), 3)
+        self.assertEqual(Page.objects.published().count(), 1)
+        homepage = Page.objects.get_home()
+        self.assertTrue(homepage.get_slug(), 'test-page-2')
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
@@ -249,5 +240,3 @@ class PagesTestCase(CMSTestCase):
         page1.login_required = True
         page1.save()
         self.assertEqual(CMSSitemap().items().count(),0)
-
-	
