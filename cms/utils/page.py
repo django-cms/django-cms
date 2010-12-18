@@ -1,8 +1,8 @@
-import re
 from django.conf import settings
+import re
 
 APPEND_TO_SLUG = "-copy"
-copy_slug_re = re.compile(r'^.*-copy(?:-(\d)*)?$')
+COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d)*)?$')
 
 def is_valid_page_slug(page, parent, lang, slug, site):
     """Validates given slug depending on settings.
@@ -39,7 +39,7 @@ def get_available_slug(title, new_slug=None):
         return slug
     
     # add nice copy attribute, first is -copy, then -copy-2, -copy-3, .... 
-    match = copy_slug_re.match(slug)
+    match = COPY_SLUG_REGEX.match(slug)
     if match:
         try:
             next = int(match.groups()[0]) + 1
