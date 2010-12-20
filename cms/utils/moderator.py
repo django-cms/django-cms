@@ -205,7 +205,7 @@ def get_model_queryset(model, request=None):
     # If we don't use moderator, everything is a draft anyway.
     if not settings.CMS_MODERATOR:
         return model.objects.drafts()
-    # We don't use moderator
+    # We do use moderator
     if request:
         preview_draft = ('preview' in request.GET and 'draft' in request.GET)
         edit_mode = ('edit' in request.GET or request.session.get('cms_edit', False))
