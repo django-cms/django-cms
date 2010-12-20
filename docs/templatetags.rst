@@ -226,7 +226,6 @@ Some Examples:
 
 Complete navigation (as a nested list)::
 
-    {% load cache cms_tags %}
     <ul>
         {% show_menu 0 100 100 100 %}
     </ul>
