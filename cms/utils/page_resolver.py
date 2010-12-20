@@ -8,8 +8,6 @@ from django.db.models.query_utils import Q
 import urllib
 
 
-
-
 def get_page_from_request(request, use_path=None):
     """
     Gets the current page from a request object.
@@ -24,7 +22,6 @@ def get_page_from_request(request, use_path=None):
         an empty page slug (slug == '')
         
     The page slug can then be resolved to a Page model object
-    
     """
     if 'django.contrib.admin' in settings.INSTALLED_APPS:
         admin_base = reverse('admin:index')
@@ -42,12 +39,15 @@ def get_page_from_request(request, use_path=None):
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     
+    # TODO: Isn't there a permission check needed here?
     if 'preview' in request.GET:
         pages = page_queryset.filter(site=site)
     else:
         pages = page_queryset.published().filter(site=site)
-        
+    
+    # Check if this is called from an admin request
     if admin_base and request.path.startswith(admin_base):
+        # if so, get the page ID to query the page
         page_id = request.path.split('/')[0]
         try:
             page = pages.get(pk=page_id)
@@ -55,25 +55,43 @@ def get_page_from_request(request, use_path=None):
             return None
         request._current_page_cache = page
         return page
+    
+    # If use_path is given, someone already did the path cleaning
     if use_path:
         path = use_path
     else:
+        # otherwise strip of the non-cms part of the URL 
         path = request.path[len(pages_root):-1]
+        
+    # Check if there are any pages
     if not pages.all_root():
         return None
     
+    # get the home page (needed to get the page)
     try:
         home = pages.get_home()
     except NoHomeFound:
         home = None
+    # if there is no path (slashes stripped) and we found a home, this is the
+    # home page.
     if not path and home:
         page = home
         request._current_page_cache = page
         return page
+    
+    # title_set__path=path should be clear, get the pages where the path of the
+    # title object is equal to our path.
     q = Q(title_set__path=path)
     if home:
+        # if we have a home, also search for all paths prefixed with the
+        # home slug that are on the same tree as home, since home isn't ussually
+        # called with it's slug, thus it's children don't have the home bit in
+        # the request either, thus we need to re-add it.
         q |= Q(title_set__path='%s/%s' % (home.get_slug(), path))
         q &= Q(tree_id=home.tree_id)
+        
+    # TODO: We should probably get rid of this odd DB-Gettext thingy, no idea
+    # how and why this should work
     if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
         # ugly hack -- brute force search for reverse path translation:
         from django.utils.translation import ugettext

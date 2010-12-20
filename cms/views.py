@@ -18,6 +18,10 @@ def _handle_no_page(request, slug):
     raise Http404('CMS: Page not found for "%s"' % slug)
 
 def details(request, slug):
+    """
+    The main view of the Django-CMS! Takes a request and a slug, renders the
+    page.
+    """
     # get the right model
     context = RequestContext(request)
     # Get a Page model object from the request
@@ -51,6 +55,7 @@ def details(request, slug):
         # There are apphooks in the pool. Let's see if there is one for the
         # current page
         page = applications_page_check(request, page, slug)
+    # Check if the page has a redirect url defined for this language. 
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
         if settings.i18n_installed and redirect_url[0] == "/":
@@ -58,6 +63,7 @@ def details(request, slug):
         # add language prefix to url
         return HttpResponseRedirect(redirect_url)
     
+    # permission checks
     if page.login_required and not request.user.is_authenticated():
         if settings.i18n_installed:
             path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
@@ -65,8 +71,10 @@ def details(request, slug):
             path = urlquote(request.get_full_path())
         tup = django_settings.LOGIN_URL , "next", path
         return HttpResponseRedirect('%s?%s=%s' % tup)
+    
+    template_name = get_template_from_request(request, page, no_current_page=True)
+    # fill the context 
     context['lang'] = current_language
     context['current_page'] = page
-    template_name = get_template_from_request(request, page, no_current_page=True)
     context['has_change_permissions'] = page.has_change_permission(request)
     return render_to_response(template_name, context)
