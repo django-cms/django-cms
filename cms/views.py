@@ -1,5 +1,5 @@
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check
+from cms.appresolver import applications_page_check, get_app_urls
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page_resolver import get_page_from_request
@@ -67,16 +67,9 @@ def details(request, slug):
         if app_urls:
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
-            for urlconf in app.urls:
-                if isinstance(urlconf, basestring):
-                    mod = import_module(urlconf)
-                    if not hasattr(mod, 'urlpatterns'):
-                        raise ImproperlyConfigured(
-                            "URLConf `%s` has no urlpatterns attribute" % urlconf)
-                    pattern_list += getattr(mod, 'urlpatterns')
-                else:
-                    pattern_list += urlconf
-            urlpatterns = tuple(patterns('', *pattern_list))
+            for urlpatterns in get_app_urls(app.urls):
+                pattern_list += urlpatterns
+            urlpatterns = patterns('', *pattern_list)
             try:
                 view, args, kwargs = resolve('/', urlpatterns)
                 return view(request, *args, **kwargs)
