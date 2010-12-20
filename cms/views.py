@@ -20,12 +20,14 @@ def _handle_no_page(request, slug):
 def details(request, slug):
     # get the right model
     context = RequestContext(request)
+    # Get a Page model object from the request
     page = get_page_from_request(request, use_path=slug)
     if not page:
         _handle_no_page(request, slug)
     
     current_language = get_language_from_request(request)
     
+    # Check that the current page is available in the desired (current) language
     available_languages = page.get_languages()
     if current_language not in available_languages:
         if settings.CMS_LANGUAGE_FALLBACK:
@@ -33,9 +35,15 @@ def details(request, slug):
                 if current_language in available_languages:
                     alt_url = page.get_absolute_url(language=alt_lang, fallback=True)
                     path = '/%s%s' % (alt_lang, alt_url)
+                    # In the case where the page is not available in the
+                    # preferred language, *redirect* to the fallback page. This
+                    # is a design decision (instead of rendering in place)).
                     return HttpResponseRedirect(path)
+        # There is a page object we can't find a proper language to render it 
         _handle_no_page(request, slug)
     if apphook_pool.get_apphooks():
+        # There are apphooks in the pool. Let's see if there is one for the
+        # current page
         page = applications_page_check(request, page, slug)
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
