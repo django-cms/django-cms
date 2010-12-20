@@ -29,7 +29,10 @@ def details(request, slug):
     
     # Check that the current page is available in the desired (current) language
     available_languages = page.get_languages()
-    if current_language not in available_languages:
+    # We resolve an alternate language for the page if it's not available.
+    # Since the "old" details view had an exception for the root page, it is
+    # ported here. So no resolution if the slug is ''.
+    if (current_language not in available_languages) and (slug != ''):
         if settings.CMS_LANGUAGE_FALLBACK:
             # If we didn't find the required page in the requested (current) 
             # language, let's try to find a suitable fallback in the list of 
