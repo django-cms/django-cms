@@ -11,7 +11,7 @@ from django.template.context import RequestContext
 from django.utils.http import urlquote
 
 
-def handle_no_page(request, slug):
+def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         CMS_MEDIA_URL = settings.CMS_MEDIA_URL
         return "cms/new.html", locals()
@@ -22,12 +22,11 @@ def details(request, slug):
     context = RequestContext(request)
     page = get_page_from_request(request, use_path=slug)
     if not page:
-        handle_no_page(request, slug)
+        _handle_no_page(request, slug)
     
     current_language = get_language_from_request(request)
     
     available_languages = page.get_languages()
-    print available_languages, current_language
     if current_language not in available_languages:
         if settings.CMS_LANGUAGE_FALLBACK:
             for alt_lang in get_fallback_languages(current_language):
@@ -35,7 +34,7 @@ def details(request, slug):
                     alt_url = page.get_absolute_url(language=alt_lang, fallback=True)
                     path = '/%s%s' % (alt_lang, alt_url)
                     return HttpResponseRedirect(path)
-        handle_no_page(request, slug)
+        _handle_no_page(request, slug)
     if apphook_pool.get_apphooks():
         page = applications_page_check(request, page, slug)
     redirect_url = page.get_redirect(language=current_language)
