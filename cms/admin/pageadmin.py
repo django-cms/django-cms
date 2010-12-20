@@ -1154,9 +1154,15 @@ class PageAdmin(model_admin):
             plugins = list(placeholder.cmsplugin_set.filter(language=copy_from).order_by('tree_id', '-rght'))
             ptree = []
 
+            plugin_ziplist = []
             for plug in plugins:
-                plug.copy_plugin(placeholder, language, ptree)
-
+                new_plug = plug.copy_plugin(placeholder, language, ptree)
+                plugin_ziplist.append((new_plug, plug))
+            for new_plugin, old_plugin in plugin_ziplist:
+                new_instance = new_plugin.get_plugin_instance()[0]
+                if new_instance:
+                    new_instance.post_copy(old_plugin, plugin_ziplist)
+            
             if page and "reversion" in settings.INSTALLED_APPS:
                 make_revision_with_plugins(page)
                 reversion.revision.user = request.user

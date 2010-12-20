@@ -6,6 +6,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.link.models import Link
 from cms.plugins.text.models import Text
+from cms.plugins.text.utils import plugin_tags_to_id_list, plugin_tags_to_admin_html
 from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.file.models import File
@@ -46,6 +47,9 @@ class PluginsTestBaseCase(CMSTestCase):
         
         self.login_user(self.super_user)
 
+        self.FIRST_LANG = settings.LANGUAGES[0][0]
+        self.SECOND_LANG = settings.LANGUAGES[1][0]
+        
 # REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
     def publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
@@ -368,6 +372,83 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.insert_at(None, position='last-child', commit=True)
         
         self.assertEquals(plugin.get_icon_url().find('jpg') != -1, True)
+
+    def test_11_copy_textplugin(self):
+        """
+        Test that copying of textplugins replaces references to copied plugins
+        """
+        
+        page = self.create_page()
+        
+        placeholder = page.placeholders.get(slot='body')
+        
+        plugin_base = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder, 
+            position=1, 
+            language=self.FIRST_LANG)
+        plugin_base.insert_at(None, position='last-child', commit=False)
+                
+        plugin = Text(body='')
+        plugin_base.set_base_attr(plugin)
+        plugin.save()
+        
+        plugin_ref_1_base = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder, 
+            position=1, 
+            language=self.FIRST_LANG)
+        plugin_ref_1_base.insert_at(plugin_base, position='last-child', commit=False)    
+        
+        plugin_ref_1 = Text(body='')
+        plugin_ref_1_base.set_base_attr(plugin_ref_1)
+        plugin_ref_1.save()
+        
+        plugin_ref_2_base = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder, 
+            position=2, 
+            language=self.FIRST_LANG)
+        plugin_ref_2_base.insert_at(plugin_base, position='last-child', commit=False)    
+        
+        plugin_ref_2 = Text(body='')
+        plugin_ref_2_base.set_base_attr(plugin_ref_2)
+
+        plugin_ref_2.save()
+        
+        plugin.body = plugin_tags_to_admin_html(' {{ plugin_object %s }} {{ plugin_object %s }} ' % (str(plugin_ref_1.pk), str(plugin_ref_2.pk)))
+        plugin.save()
+        self.assertEquals(plugin.pk, 1)
+        page_data = self.get_new_page_data()
+
+        #create 2nd language page
+        page_data.update({
+            'language': self.SECOND_LANG,
+            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+        })
+        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        
+        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
+        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
+        self.assertEquals(CMSPlugin.objects.count(), 3)
+        self.assertEquals(Page.objects.all().count(), 1)
+        
+        copy_data = {
+            'placeholder': placeholder.pk,
+            'language': self.SECOND_LANG,
+            'copy_from': self.FIRST_LANG,
+        }
+        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.content.count('<li '), 3)
+        # assert copy success
+        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
+        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
+        self.assertEquals(CMSPlugin.objects.count(), 6)
+
+        new_plugin = Text.objects.get(pk=6)
+        self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
         
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
@@ -479,23 +560,18 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         
     def test_03_copy_plugin_with_m2m(self):
         
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
+        page = self.create_page()
         
-        placeholder = page.placeholders.all()[1]
+        placeholder = page.placeholders.get(slot='body')
         
-        plugin_data = {
-            'plugin_type': "ArticlePlugin",
-            'language': self.FIRST_LANG,
-            'placeholder': placeholder.pk,
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEquals(response.status_code, 200)
-        plugin_pk = int(response.content)
-        self.assertEquals(plugin_pk, CMSPlugin.objects.all()[0].pk)
-        # now edit the plugin
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        plugin = ArticlePluginModel(
+            plugin_type='ArticlePlugin',
+            placeholder=placeholder, 
+            position=1, 
+            language=self.FIRST_LANG)
+        plugin.insert_at(None, position='last-child', commit=True)
+        
+        edit_url = URL_CMS_PLUGIN_EDIT + str(plugin.pk) + "/"
         
         data = {
             'title': "Articles Plugin 1",
@@ -506,7 +582,9 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         
         self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
-        
+                
+        page_data = self.get_new_page_data()
+
         #create 2nd language page
         page_data.update({
             'language': self.SECOND_LANG,
@@ -535,5 +613,3 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
         
-    
-            

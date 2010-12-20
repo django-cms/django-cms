@@ -195,7 +195,7 @@ class CMSPlugin(Mptt):
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
-
+    
     def copy_plugin(self, target_placeholder, target_language, plugin_tree):
         """
         Copy this plugin and return the new plugin.
@@ -239,6 +239,11 @@ class CMSPlugin(Mptt):
             plugin_instance.copy_relations(old_instance)
         return new_plugin
         
+    def post_copy(self, old_instance, new_old_ziplist):
+        """
+        Handle more advanced cases (textplugins) after the original is copied
+        """ 
+ 
     def copy_relations(self, old_instance):
         """
         Handle copying of any relations attached to this plugin

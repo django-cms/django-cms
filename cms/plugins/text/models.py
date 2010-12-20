@@ -5,10 +5,13 @@ from django.conf import settings
 from django.utils.html import strip_tags
 from django.utils.text import truncate_words
 from cms.plugins.text.utils import plugin_admin_html_to_tags,\
-    plugin_tags_to_admin_html, plugin_tags_to_id_list
+    plugin_tags_to_admin_html, plugin_tags_to_id_list,\
+    replace_plugin_tags
 from cms.models.pluginmodel import PluginModelBase
 from cms.plugin_base import PluginMediaDefiningClass
 from django.db.models.base import ModelBase
+
+_old_tree_cache = {}
 
 class AbstractText(CMSPlugin):
     """Abstract Text Plugin Class"""
@@ -42,13 +45,17 @@ class AbstractText(CMSPlugin):
             if not str(plugin.pk) in ids:
                 plugin.delete() #delete plugins that are not referenced in the text anymore
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_tree, old_plugin_tree):
+    def post_copy(self, old_instance, ziplist):
+        """
+        Fix references to plugins
+        """
+
         replace_ids = {}
-        for idx, plugin in enumerate(old_plugins):
-            replace_ids[plugin.pk] = plugin_tree[idx].pk
-        new_plugin = super(AbstractText, self).copy_plugin(target_placeholder, target_language, plugin_tree, old_plugin_tree)
-        new_plugin.body = replace_tags(self.body, replace_ids)
-        new_plugin.save()
+        for new, old in ziplist:
+            replace_ids[old.pk] = new.pk
+
+        self.body = replace_plugin_tags(old_instance.text.body, replace_ids)
+        self.save()
             
 class Text(AbstractText):
     """

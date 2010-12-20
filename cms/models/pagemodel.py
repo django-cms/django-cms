@@ -244,8 +244,15 @@ class Page(MpttPublisher):
                     ph.save()
                     page.placeholders.add(ph)
                 ptree = []
-                for p in plugins:
-                    p.copy_plugin(ph, p.language, ptree)
+                plugin_ziplist = []
+                for plug in plugins:
+                    new_plug = plug.copy_plugin(ph, plug.language, ptree)
+                    plugin_ziplist.append((new_plug, plug))
+                for new_plugin, old_plugin in plugin_ziplist:
+                    new_instance = new_plugin.get_plugin_instance()[0]
+                    if new_instance:
+                        new_instance.post_copy(old_plugin, plugin_ziplist)
+                    
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
         return page_copy   # return the page_copy or None
