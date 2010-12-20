@@ -31,8 +31,11 @@ def details(request, slug):
     available_languages = page.get_languages()
     if current_language not in available_languages:
         if settings.CMS_LANGUAGE_FALLBACK:
+            # If we didn't find the required page in the requested (current) 
+            # language, let's try to find a suitable fallback in the list of 
+            # fallback languages (CMS_LANGUAGE_CONF)
             for alt_lang in get_fallback_languages(current_language):
-                if current_language in available_languages:
+                if alt_lang in available_languages:
                     alt_url = page.get_absolute_url(language=alt_lang, fallback=True)
                     path = '/%s%s' % (alt_lang, alt_url)
                     # In the case where the page is not available in the
