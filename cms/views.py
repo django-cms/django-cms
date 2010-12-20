@@ -37,6 +37,7 @@ def details(request, slug):
     
     # Check that the current page is available in the desired (current) language
     available_languages = page.get_languages()
+    
     # We resolve an alternate language for the page if it's not available.
     # Since the "old" details view had an exception for the root page, it is
     # ported here. So no resolution if the slug is ''.
@@ -55,6 +56,7 @@ def details(request, slug):
                     return HttpResponseRedirect(path)
         # There is a page object we can't find a proper language to render it 
         _handle_no_page(request, slug)
+    
     if apphook_pool.get_apphooks():
         # There are apphooks in the pool. Let's see if there is one for the
         # current page

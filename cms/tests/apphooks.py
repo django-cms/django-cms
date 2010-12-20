@@ -54,5 +54,6 @@ class ApphooksTestCase(CMSTestCase):
         
         page = self.create_page(user=superuser, published=True)
         page.title_set.all().update(application_urls='SampleApp')
+        self.assertTrue(page.publish())
         response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
