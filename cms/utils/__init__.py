@@ -65,3 +65,12 @@ def get_language_from_request(request, current_page=None):
         language = get_default_language()
 
     return language
+
+
+def get_page_from_request(request):
+    from warnings import warn
+    from cms.utils.page_resolver import get_page_from_request as new
+    warn("'cms.utils.get_page_from_request' is deprecated in favor of "
+         "'cms.utils.page_resolver.get_page_from_request' and will be removed "
+         "in Django-CMS 2.2.", DeprecationWarning)
+    return new(request)
