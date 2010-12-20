@@ -4,11 +4,15 @@ from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings, settings as django_settings
+from django.conf.urls.defaults import patterns, include
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import resolve, Resolver404
 from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.http import urlquote
+from django.utils.importlib import import_module
 
 
 def _handle_no_page(request, slug):
@@ -54,7 +58,31 @@ def details(request, slug):
     if apphook_pool.get_apphooks():
         # There are apphooks in the pool. Let's see if there is one for the
         # current page
-        page = applications_page_check(request, page, slug)
+        # since we always have a page at this point, applications_page_check is
+        # pointless
+        # page = applications_page_check(request, page, slug)
+    
+        # Check for apphooks! This time for real!
+        app_urls = page.get_application_urls(current_language, False)
+        if app_urls:
+            app = apphook_pool.get_apphook(app_urls)
+            pattern_list = []
+            for urlconf in app.urls:
+                if isinstance(urlconf, basestring):
+                    mod = import_module(urlconf)
+                    if not hasattr(mod, 'urlpatterns'):
+                        raise ImproperlyConfigured(
+                            "URLConf `%s` has no urlpatterns attribute" % urlconf)
+                    pattern_list += getattr(mod, 'urlpatterns')
+                else:
+                    pattern_list += urlconf
+            urlpatterns = tuple(patterns('', *pattern_list))
+            try:
+                view, args, kwargs = resolve('/', urlpatterns)
+                return view(request, *args, **kwargs)
+            except Resolver404:
+                pass
+            
     # Check if the page has a redirect url defined for this language. 
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
