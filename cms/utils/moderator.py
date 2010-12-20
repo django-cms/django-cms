@@ -202,6 +202,7 @@ def get_model_queryset(model, request=None):
     """Decision function used in frontend - says which model should be used.
     Public models are used only if CMS_MODERATOR.
     """
+    # TODO: Clean up this unreadable mess
     if not settings.CMS_MODERATOR or \
         (request and (('preview' in request.GET and 
             'draft' in request.GET) or ('edit' in request.GET or request.session.get('cms_edit', False))) and request.user.is_staff):

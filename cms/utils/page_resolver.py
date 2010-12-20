@@ -13,20 +13,40 @@ import urllib
 def get_page_from_request(request, use_path=None):
     """
     Gets the current page from a request object.
+    
+    URLs can be of the following form (this should help understand the code):
+    http://server.whatever.com/<some_path>/"pages-root"/some/page/slug
+    
+    <some_path>: This can be anything, and should be stripped when resolving
+        pages names. This means the CMS is not installed at the root of the 
+        server's URLs.
+    "pages-root" This is the root of Django urls for the CMS. It is, in essence
+        an empty page slug (slug == '')
+        
+    The page slug can then be resolved to a Page model object
+    
     """
     if 'django.contrib.admin' in settings.INSTALLED_APPS:
         admin_base = reverse('admin:index')
     else:
         admin_base = None
+    
     pages_root = urllib.unquote(reverse("pages-root"))
+    
+    # The following is used by cms.middleware.page.CurrentPageMiddleware
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
+    
+    # Get a basic queryset for Page objects, depending on if we use the 
+    # MODERATOR or not.
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
+    
     if 'preview' in request.GET:
         pages = page_queryset.filter(site=site)
     else:
         pages = page_queryset.published().filter(site=site)
+        
     if admin_base and request.path.startswith(admin_base):
         page_id = request.path.split('/')[0]
         try:
