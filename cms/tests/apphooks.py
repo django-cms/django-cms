@@ -5,16 +5,17 @@ Created on Dec 10, 2010
 '''
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
+from cms.tests.base import CMSTestCase
 from cms.tests.util.settings_contextmanager import SettingsOverride
-from django.conf import settings
-from django.test.testcases import TestCase
+from django.contrib.auth.models import User
 import sys
 
 
 APP_NAME = 'SampleApp'
 APP_MODULE = "testapp.sampleapp.cms_app"
 
-class ApphooksTestCase(TestCase):
+
+class ApphooksTestCase(CMSTestCase):
     def test_01_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
@@ -47,4 +48,12 @@ class ApphooksTestCase(TestCase):
             self.assertEqual(len(hooks), 1)
             self.assertEqual(app_names, [APP_NAME])
             apphook_pool.clear()
+    
+    def test_03_apphook_on_root(self):
+        superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         
+        page = self.create_page(user=superuser, published=True)
+        page.title_set.all().update(application_urls='SampleApp')
+        self.assertTrue(page.publish())
+        response = self.client.get(self.get_pages_root())
+        self.assertTemplateUsed(response, 'sampleapp/home.html')

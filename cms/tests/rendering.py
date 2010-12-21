@@ -118,7 +118,7 @@ class RenderingTestCase(CMSTestCase):
         """
         self.init_render_settings()
         from cms.views import details
-        response = details(self.get_request(), page_id=self.test_page.pk)
+        response = details(self.get_request(), slug=self.test_page.get_slug())
         r = self.strip_rendered(response.content)
         self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         
