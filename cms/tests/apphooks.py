@@ -10,7 +10,6 @@ from cms.tests.base import CMSTestCase
 from cms.tests.util.settings_contextmanager import SettingsOverride
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches
-import cms.urls
 import sys
 
 
@@ -65,6 +64,9 @@ class ApphooksTestCase(CMSTestCase):
         self.assertEquals(page.title_set.all()[0].language, 'en')
         self.assertTrue(page.publish())
         # some dark magic to reset urls and fake a server restart
+        if 'cms.urls' in sys.modules:
+            del sys.modules['cms.urls']
+        import cms.urls
         cms.urls.urlpatterns = get_app_patterns() + cms.urls.urlpatterns
         clear_url_caches()
         response = self.client.get(self.get_pages_root())
