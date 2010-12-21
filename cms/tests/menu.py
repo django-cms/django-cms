@@ -219,10 +219,11 @@ class MenusTestCase(CMSTestCase):
         
         
     def test_12_page_language_url(self):
-        context = self.get_context(path=self.page3.get_absolute_url())
+        path = self.page3.get_absolute_url()
+        context = self.get_context(path=path)
         tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
         url = tpl.render(context)
-        self.assertEqual( url, "/%s%s" % (settings.LANGUAGES[0][0], self.page3.get_absolute_url()))
+        self.assertEqual(url, "/%s%s" % (settings.LANGUAGES[0][0], path))
         
     def test_13_show_menu_below_id(self):
         page2 = Page.objects.get(pk=self.page2.pk)

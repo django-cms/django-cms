@@ -1,11 +1,9 @@
 from django.conf import settings 
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, RegexURLPattern
-from django.conf.urls.defaults import *
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.sites.models import Site
 from cms.exceptions import NoHomeFound
-import re
 from cms.apphook_pool import apphook_pool
 
 APP_RESOLVERS = []
@@ -97,6 +95,18 @@ def _flatten_patterns(patterns):
             flat.append(pattern)
     return flat
 
+def get_app_urls(urls):
+    for urlconf in urls:
+        if isinstance(urlconf, basestring):
+            mod = import_module(urlconf)
+            if not hasattr(mod, 'urlpatterns'):
+                raise ImproperlyConfigured(
+                    "URLConf `%s` has no urlpatterns attribute" % urlconf)
+            yield getattr(mod, 'urlpatterns')
+        else:
+            yield urlconf
+    
+
 def get_patterns_for_title(path, title):
     """
     Resolve the urlconf module for a path+title combination
@@ -104,16 +114,7 @@ def get_patterns_for_title(path, title):
     """
     app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
-    for urlconf in app.urls:
-        pattern_list = None
-        if isinstance(urlconf, (str)):
-            mod = import_module(urlconf)
-            if not hasattr(mod, 'urlpatterns'):
-                raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
-                    % urlconf)
-            pattern_list = getattr(mod, 'urlpatterns')
-        else:
-            pattern_list = urlconf
+    for pattern_list in get_app_urls(app.urls):
         if not path.endswith('/'):
             path += '/'
         page_id = title.page.id
