@@ -57,7 +57,7 @@ class MenusTestCase(CMSTestCase):
         
     def test_01_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
-        response = self.client.get(self.get_pages_root())
+        response = self.client.get(self.get_pages_root()) # path = '/'
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
         

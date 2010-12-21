@@ -56,14 +56,13 @@ def details(request, slug):
                     return HttpResponseRedirect(path)
         # There is a page object we can't find a proper language to render it 
         _handle_no_page(request, slug)
-    
+
     if apphook_pool.get_apphooks():
         # There are apphooks in the pool. Let's see if there is one for the
         # current page
         # since we always have a page at this point, applications_page_check is
         # pointless
         # page = applications_page_check(request, page, slug)
-    
         # Check for apphooks! This time for real!
         app_urls = page.get_application_urls(current_language, False)
         if app_urls:
@@ -71,13 +70,14 @@ def details(request, slug):
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
                 pattern_list += urlpatterns
+            assert False, pattern_list
             urlpatterns = patterns('', *pattern_list)
             try:
                 view, args, kwargs = resolve('/', urlpatterns)
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass
-            
+
     # Check if the page has a redirect url defined for this language. 
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
