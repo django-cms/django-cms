@@ -110,9 +110,9 @@ gettext = lambda s: s
 LANGUAGE_CODE = "en"
 
 LANGUAGES = (
+    ('en', gettext('English')),
     ('fr', gettext('French')),
     ('de', gettext('German')),
-    ('en', gettext('English')),
     ('pt-BR', gettext("Brazil")),
 )
 

@@ -70,7 +70,6 @@ def details(request, slug):
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
                 pattern_list += urlpatterns
-            assert False, pattern_list
             urlpatterns = patterns('', *pattern_list)
             try:
                 view, args, kwargs = resolve('/', urlpatterns)
