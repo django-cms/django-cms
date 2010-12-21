@@ -72,7 +72,7 @@ def details(request, slug):
                 pattern_list += urlpatterns
             urlpatterns = patterns('', *pattern_list)
             try:
-                view, args, kwargs = resolve('/', urlpatterns)
+                view, args, kwargs = resolve('/', tuple(urlpatterns))
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass
