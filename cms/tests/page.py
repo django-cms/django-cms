@@ -81,7 +81,7 @@ class PagesTestCase(CMSTestCase):
         self.create_page(title='test page 2', published=True)
         homepage = Page.objects.get_home()
         self.assertTrue(homepage.get_slug(), 'test-page-2')
-        response = self.client.get(self.get_pages_root(), {'ACCEPT_LANGUAGE': 'en'})
+        response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
     def test_05_edit_page(self):
