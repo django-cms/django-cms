@@ -40,6 +40,7 @@ class ApphooksTestCase(CMSTestCase):
         """
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
+            
         apps = ['testapp.sampleapp']
         with SettingsOverride(INSTALLED_APPS=apps):
             apphook_pool.clear()
@@ -50,10 +51,16 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
     
     def test_03_apphook_on_root(self):
-        superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+            
+        apphook_pool.clear()    
+        superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_page(user=superuser, published=True)
         page.title_set.all().update(application_urls='SampleApp')
+        self.assertEquals(page.title_set.all()[0].language, 'fr')
         self.assertTrue(page.publish())
         response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
+        apphook_pool.clear()
