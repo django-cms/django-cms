@@ -1,10 +1,12 @@
-from django.conf import settings 
-from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, RegexURLPattern
-from django.utils.importlib import import_module
-from django.core.exceptions import ImproperlyConfigured
-from django.contrib.sites.models import Site
-from cms.exceptions import NoHomeFound
 from cms.apphook_pool import apphook_pool
+from cms.exceptions import NoHomeFound
+from django.conf import settings
+from django.conf.urls.defaults import patterns
+from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, \
+    RegexURLPattern
+from django.utils.importlib import import_module
 
 APP_RESOLVERS = []
 

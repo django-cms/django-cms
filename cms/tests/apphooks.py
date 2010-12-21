@@ -5,9 +5,12 @@ Created on Dec 10, 2010
 '''
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
+from cms.appresolver import get_app_patterns
 from cms.tests.base import CMSTestCase
 from cms.tests.util.settings_contextmanager import SettingsOverride
 from django.contrib.auth.models import User
+from django.core.urlresolvers import clear_url_caches
+import cms.urls
 import sys
 
 
@@ -61,6 +64,9 @@ class ApphooksTestCase(CMSTestCase):
         page.title_set.all().update(application_urls='SampleApp')
         self.assertEquals(page.title_set.all()[0].language, 'en')
         self.assertTrue(page.publish())
+        # some dark magic to reset urls and fake a server restart
+        cms.urls.urlpatterns = get_app_patterns() + cms.urls.urlpatterns
+        clear_url_caches()
         response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
         apphook_pool.clear()
