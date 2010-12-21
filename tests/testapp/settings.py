@@ -122,8 +122,8 @@ CMS_LANGUAGE_CONF = {
 }
 
 CMS_SITE_LANGUAGES = {
-    1:['fr','de','en','pt-BR'],
-    2:['de','en'],
+    1:['en','de','fr','pt-BR'],
+    2:['de','fr'],
 }
 
 APPEND_SLASH = True

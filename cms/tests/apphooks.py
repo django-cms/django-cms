@@ -59,7 +59,7 @@ class ApphooksTestCase(CMSTestCase):
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_page(user=superuser, published=True)
         page.title_set.all().update(application_urls='SampleApp')
-        self.assertEquals(page.title_set.all()[0].language, 'fr')
+        self.assertEquals(page.title_set.all()[0].language, 'en')
         self.assertTrue(page.publish())
         response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
