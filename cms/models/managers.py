@@ -147,7 +147,7 @@ class TitleManager(PublisherManager):
                 except self.model.DoesNotExist:
                     pass
             else:
-                raise
+                assert False, language
         return None        
     
     def get_page_slug(self, slug, site=None):

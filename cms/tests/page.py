@@ -75,12 +75,13 @@ class PagesTestCase(CMSTestCase):
         """
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
-        self.create_page(title='test page 1', published=False)
+        page = self.create_page(title='test page 1', published=False)
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
-        self.create_page(title='test page 2', published=True)
+        self.assertTrue(page.publish())
+        with_parent = self.create_page(parent_page=page, title='test page 2', published=True)
         homepage = Page.objects.get_home()
-        self.assertTrue(homepage.get_slug(), 'test-page-2')
+        self.assertTrue(homepage.get_slug(), 'test-page-1')
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
