@@ -2,6 +2,7 @@ from cms.exceptions import NoHomeFound
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page import get_available_slug, check_title_slugs
@@ -243,15 +244,9 @@ class Page(MpttPublisher):
                     ph.pk = None # make a new instance
                     ph.save()
                     page.placeholders.add(ph)
-                ptree = []
-                plugin_ziplist = []
-                for plug in plugins:
-                    new_plug = plug.copy_plugin(ph, plug.language, ptree)
-                    plugin_ziplist.append((new_plug, plug))
-                for new_plugin, old_plugin in plugin_ziplist:
-                    new_instance = new_plugin.get_plugin_instance()[0]
-                    if new_instance:
-                        new_instance.post_copy(old_plugin, plugin_ziplist)
+                if plugins:
+                    language = plugins[0].language
+                    copy_plugins_to(plugins, ph, language)
                     
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)

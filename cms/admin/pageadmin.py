@@ -3,7 +3,6 @@ from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
 from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
     PagePermissionInlineAdmin
-from cms.utils.helpers import make_revision_with_plugins
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
@@ -17,6 +16,8 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.admin import render_admin_menu_item
+from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.helpers import make_revision_with_plugins
 from cms.utils.moderator import update_moderation_message, \
     get_test_moderation_level, moderator_should_approve, approve_page, \
     will_require_moderation
@@ -1152,16 +1153,8 @@ class PageAdmin(model_admin):
             if language == copy_from:
                 return HttpResponseBadRequest(_("Language must be different than the copied language!"))
             plugins = list(placeholder.cmsplugin_set.filter(language=copy_from).order_by('tree_id', '-rght'))
-            ptree = []
-
-            plugin_ziplist = []
-            for plug in plugins:
-                new_plug = plug.copy_plugin(placeholder, language, ptree)
-                plugin_ziplist.append((new_plug, plug))
-            for new_plugin, old_plugin in plugin_ziplist:
-                new_instance = new_plugin.get_plugin_instance()[0]
-                if new_instance:
-                    new_instance.post_copy(old_plugin, plugin_ziplist)
+            
+            copy_plugins_to(plugins, placeholder, language)
             
             if page and "reversion" in settings.INSTALLED_APPS:
                 make_revision_with_plugins(page)

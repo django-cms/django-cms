@@ -241,13 +241,17 @@ class CMSPlugin(Mptt):
         
     def post_copy(self, old_instance, new_old_ziplist):
         """
-        Handle more advanced cases (textplugins) after the original is copied
-        """ 
+        Handle more advanced cases (eg Text Plugins) after the original is
+        copied
+        """
+        pass 
  
     def copy_relations(self, old_instance):
         """
-        Handle copying of any relations attached to this plugin
+        Handle copying of any relations attached to this plugin. Custom plugins
+        have to do this themselves!
         """
+        pass
         
     def delete_with_public(self):
         """
