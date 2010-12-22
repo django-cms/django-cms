@@ -6,6 +6,7 @@ Created on Dec 10, 2010
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_patterns
+from cms.models.titlemodels import Title
 from cms.tests.base import CMSTestCase
 from cms.tests.util.settings_contextmanager import SettingsOverride
 from django.contrib.auth.models import User
@@ -60,8 +61,16 @@ class ApphooksTestCase(CMSTestCase):
         apphook_pool.clear()    
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.new_create_page(user=superuser, published=True)
+        english_title = page.title_set.all()[0]
+        self.assertEquals(english_title.language, 'en')
+        Title.objects.create(
+            language='de',
+            title='%s DE' % english_title.title,
+            slug=english_title.slug,
+            path=english_title.path,
+            page=page,
+        )
         page.title_set.all().update(application_urls='SampleApp')
-        self.assertEquals(page.title_set.all()[0].language, 'en')
         self.assertTrue(page.publish())
 
         response = self.client.get(self.get_pages_root())
