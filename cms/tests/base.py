@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
+from menus.menu_pool import menu_pool
 import copy
 import sys
 import urllib
@@ -75,13 +76,14 @@ class CMSTestCase(TestCase):
         # restore original settings after each test
         settings._wrapped = self._original_settings_wrapped
         super(CMSTestCase, self)._post_teardown()
-    
+
+    def tearDown(self):
+        menu_pool.clear()
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
         self.user = user
         self.assertEqual(logged_in, True)
-    
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
