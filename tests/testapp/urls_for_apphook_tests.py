@@ -19,5 +19,5 @@ if settings.DEBUG:
     )
 
 urlpatterns += patterns('',
-    url(r'^', include('cms.urls')),
+    url(r'^', include('testapp.cms_urls_for_apphook_tests')),
 )
