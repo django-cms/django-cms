@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.tests.admin import AdminTestCase
 from cms.tests.apphooks import ApphooksTestCase
+from cms.tests.admin import AdminTestCase
 from cms.tests.docs import DocsTestCase
 from cms.tests.menu import MenusTestCase
 from cms.tests.navextender import NavExtenderTestCase
@@ -19,6 +19,7 @@ import unittest
 
 def suite():
     s = unittest.TestSuite()
+    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ApphooksTestCase))
     s.addTest(doctest.DocTestSuite(urlutils))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PagesTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(SiteTestCase))
@@ -32,6 +33,5 @@ def suite():
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PlaceholderTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocsTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(PluginManyToManyTestCase))
-    s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(ApphooksTestCase))
     s.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(AdminTestCase))
     return s
