@@ -330,7 +330,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test case for InheritPagePlaceholder
         """
-        inheritfrompage = self.create_page(title='page to inherit from')
+        inheritfrompage = self.new_create_page(title='page to inherit from')
         
         body = inheritfrompage.placeholders.get(slot="body")
         
@@ -341,7 +341,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE, lat=1, lng=1)
         plugin.insert_at(None, position='last-child', commit=True)
         
-        page = self.create_page(title='inherit from page')
+        page = self.new_create_page(title='inherit from page')
         
         inherited_body = page.placeholders.get(slot="body")
                 
@@ -360,7 +360,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(unicode(request.placeholder_media).find('maps.google.com') != -1, True)
         
     def test_10_fileplugin_icon_uppercase(self):
-        page = self.create_page(title='testpage')
+        page = self.new_create_page(title='testpage')
         body = page.placeholders.get(slot="body") 
         plugin = File(
             plugin_type='FilePlugin',
@@ -378,7 +378,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         Test that copying of textplugins replaces references to copied plugins
         """
         
-        page = self.create_page()
+        page = self.new_create_page()
         
         placeholder = page.placeholders.get(slot='body')
         
@@ -560,7 +560,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         
     def test_03_copy_plugin_with_m2m(self):
         
-        page = self.create_page()
+        page = self.new_create_page()
         
         placeholder = page.placeholders.get(slot='body')
         

@@ -56,7 +56,7 @@ class AdminTestCase(CMSTestCase):
         admin, normal_guy = self._get_guys()
         
         # The admin creates the page
-        page = self.create_page(None, admin, 1, OLD_PAGE_NAME)
+        page = self.new_create_page(None, admin, 1, OLD_PAGE_NAME)
         page.reverse_id = REVERSE_ID
         page.save()
         title = page.get_title_obj()

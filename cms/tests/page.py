@@ -75,11 +75,11 @@ class PagesTestCase(CMSTestCase):
         """
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
-        page = self.create_page(title='test page 1', published=False)
+        page = self.new_create_page(title='test page 1', published=False)
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
         self.assertTrue(page.publish())
-        with_parent = self.create_page(parent_page=page, title='test page 2', published=True)
+        with_parent = self.new_create_page(parent_page=page, title='test page 2', published=True)
         homepage = Page.objects.get_home()
         self.assertTrue(homepage.get_slug(), 'test-page-1')
         response = self.client.get(self.get_pages_root())
@@ -139,12 +139,12 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = self.create_page()
-        page_a_a = self.create_page(page_a)
-        page_a_a_a = self.create_page(page_a_a)
+        page_a = self.new_create_page()
+        page_a_a = self.new_create_page(page_a)
+        page_a_a_a = self.new_create_page(page_a_a)
         
-        page_b = self.create_page()
-        page_b_a = self.create_page(page_b)
+        page_b = self.new_create_page()
+        page_b_a = self.new_create_page(page_b)
         
         count = Page.objects.drafts().count()
         
@@ -204,7 +204,7 @@ class PagesTestCase(CMSTestCase):
         
     def test_11_add_placeholder(self):
         # create page
-        page = self.create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
+        page = self.new_create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
         page.template = 'add_placeholder.html'
         page.save()
         url = page.get_absolute_url()
@@ -231,7 +231,7 @@ class PagesTestCase(CMSTestCase):
         """
         Test that CMSSitemap object contains only published,public (login_required=False) pages
         """
-        self.create_page(parent_page=None, published=True, in_navigation=True)
+        self.new_create_page(parent_page=None, published=True, in_navigation=True)
         page1 = Page.objects.all()[0]
         page1.login_required = True
         page1.save()

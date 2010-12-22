@@ -33,10 +33,10 @@ class NonRootCase(CMSTestCase):
         | + P5
 
         """
-        self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
-        self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
-        self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
+        self.page1 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.page2 = self.new_create_page(parent_page=self.page1, published=True, in_navigation=True)
+        self.page3 = self.new_create_page(parent_page=self.page2, published=True, in_navigation=True)
+        self.page4 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4]
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]

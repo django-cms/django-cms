@@ -5,7 +5,6 @@ Created on Dec 10, 2010
 '''
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import get_app_patterns
 from cms.models.titlemodels import Title
 from cms.tests.base import CMSTestCase
 from cms.tests.util.settings_contextmanager import SettingsOverride
@@ -19,6 +18,11 @@ APP_MODULE = "testapp.sampleapp.cms_app"
 
 
 class ApphooksTestCase(CMSTestCase):
+    urls = 'testapp.urls_for_apphook_tests'
+    
+    def setUp(self):
+        clear_url_caches()
+    
     def test_01_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
