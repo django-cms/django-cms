@@ -6,4 +6,4 @@ source =
     mptt
     publisher
 omit =
-    *migrations*
+    ../*migrations*
