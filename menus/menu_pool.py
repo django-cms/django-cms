@@ -37,7 +37,6 @@ class MenuPool(object):
         '''
         cache_keys = CacheKey.objects.get_keys(site_id, language)        
         to_be_deleted = [obj.key for obj in cache_keys]
-        print to_be_deleted
         cache.delete_many(to_be_deleted)
         cache_keys.delete()
     
