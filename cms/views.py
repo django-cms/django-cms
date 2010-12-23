@@ -18,7 +18,7 @@ from django.utils.importlib import import_module
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         CMS_MEDIA_URL = settings.CMS_MEDIA_URL
-        return "cms/new.html", locals()
+        return render_to_response("cms/new.html", locals())
     raise Http404('CMS: Page not found for "%s"' % slug)
 
 def details(request, slug):
@@ -31,7 +31,7 @@ def details(request, slug):
     # Get a Page model object from the request
     page = get_page_from_request(request, use_path=slug)
     if not page:
-        _handle_no_page(request, slug)
+        return _handle_no_page(request, slug)
     
     current_language = get_language_from_request(request)
     
