@@ -136,3 +136,12 @@ class PublisherTestCase(CMSTestCase):
         non_draft = Page.objects.public()[0]
         self.assertEquals(non_draft.reverse_id, 'a_test')
         
+    def test_06_unpublish(self):
+        page = self.new_create_page(title="Page", published=True,
+                                    in_navigation=True)
+        page.published = False
+        page.save()
+        self.assertEqual(page.published, False)
+        page.published = True
+        page.save()
+        self.assertEqual(page.published, True)

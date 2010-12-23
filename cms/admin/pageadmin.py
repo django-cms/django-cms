@@ -1049,7 +1049,7 @@ class PageAdmin(model_admin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             page.published = not page.published
-            page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
+            page.save()
             return render_admin_menu_item(request, page)
         else:
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
