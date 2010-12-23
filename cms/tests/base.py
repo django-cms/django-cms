@@ -75,10 +75,9 @@ class CMSTestCase(TestCase):
     def _post_teardown(self):
         # restore original settings after each test
         settings._wrapped = self._original_settings_wrapped
+        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
+        menu_pool.clear()  
         super(CMSTestCase, self)._post_teardown()
-
-    def tearDown(self):
-        menu_pool.clear()
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
