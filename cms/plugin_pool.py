@@ -41,7 +41,7 @@ class PluginPool(object):
                 except ImportError:
                     from reversion.revisions import RegistrationError
                 try:
-                    reversion_register(plugin.model, follow=["cmsplugin_ptr"])
+                    reversion_register(plugin.model)
                 except RegistrationError:
                     pass
 

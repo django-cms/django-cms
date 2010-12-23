@@ -1,6 +1,7 @@
 {% load i18n %}
 <style type="text/css">    
     @import "{{ CMS_MEDIA_URL }}css/toolbar.css";
+    @import "{{ CMS_MEDIA_URL }}css/jquery.dialog.css";
 </style>
 <script type="text/javascript" charset="utf-8">
     //<![CDATA[
@@ -17,6 +18,8 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/tools.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.pack.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script> 
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script> 
 <script type="text/javascript" charset="utf-8">
     //<![CDATA[
     // dynamic variables for the toolbar js file
@@ -34,6 +37,80 @@
         cms_page_remove_plugin: "{% url admin:cms_page_remove_plugin %}",
         cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}"
     }
+    //]]>
+</script>
+<script type="text/javascript">
+    //<![CDATA[ 
+    (function($) {
+        $(document).ready(function() {
+        
+            var submitActor;
+            var forceSubmit = false;
+            var seen = false;
+
+            // change submit states, open dialog
+            $('#cms_toolbar_requestapproval').click(function(event){
+                return showDialog(event);
+            });
+
+            function showDialog(event, actor) {
+                if (forceSubmit) return true; // escape sequence
+
+                if (!seen) {
+                    // show previously posted message if there were an error
+                    //$('#id_df_moderator_message').val($('#id_moderator_message').val());
+                }
+                seen = true
+                event.preventDefault();
+                submitActor = actor;
+                $('#dialog').dialog('open');
+                return false;
+            }
+
+            function dialogSave(){
+                // assign values from dialog form to real form
+                $('#id_moderator_message').val($('#id_df_moderator_message').val());
+                $('#id_moderator_state').val(
+                    $('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
+                );
+                $('#dialog').dialog('close');
+                forceSubmit = true;
+                
+                // we need to post an updated to server-side to send the email!
+                $(submitActor || '#page_form input[name=_save]').click();
+                return false;
+            }
+
+            $('#dialog').dialog({
+                bgiframe: true,
+                autoOpen: false,
+                height: 200,
+                width: 400,
+                modal: true,
+                buttons: {
+                    Cancel: function() {
+                        $(this).dialog('close');
+                    },
+                    Save: function() {
+                        dialogSave();
+                    }
+                },
+                open: function(){
+                    var val = $('#id_moderator_state').val();
+                    $('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
+                    $('#id_df_moderator_message')
+                        .focus()
+                        .keydown(function(event) { if (event.keyCode == 13) dialogSave()});
+
+                    // add default button class to last rendered button (Save)
+                    $(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
+                },
+                close: function(){
+                    forceSubmit = false;
+                }
+            });
+        });
+    })(jQuery);
     //]]>
 </script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/toolbar.js"></script>
@@ -80,11 +157,26 @@
         </form>
         {% endif %}    
     </div>
-    
     <div id="cms_toolbar_col2">
-        {% if moderator_should_approve and has_moderate_permission and auth %}<a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="icon approve cms_toolbar_button" title="{% trans 'Approve directly' %}">
-            <span class="state">{{ page_moderator_state.label }}</span>
-        </a>{% endif %}
+        {% if edit %}
+        {% if auth %}
+            {% if moderator_should_approve and has_moderate_permission %}
+            <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">
+                <span class="state">{{ page_moderator_state.label }}</span>
+            </a>
+            {% else %}
+                {% if has_publish_permission %}
+                <a id="cms_toolbar_publishbutton" href="{% url admin:cms_page_publish_page page.pk %}" class="button blue" title="{% trans 'Publish' %}">
+                    <span class="state">Publish</span>
+                </a>
+                {% else %}
+                    <a id="cms_toolbar_requestapproval" href="{% url admin:cms_page_approve_page page.pk %}" class="button blue" title="{% trans 'Request Approval' %}">
+                        <span class="state">Request Approval</span>
+                    </a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% endif %}
         <!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
         {% if auth and has_change_permission %}
         <div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>        
@@ -146,6 +238,13 @@
         </div>    
     </div>
     <div class="cms_plugin_overlay_bg">&nbsp;</div>
+    
+    <div id="dialog" title="Approve dialog">
+        <p>This page must be moderated at level 0, post a message for moderator.</p>
+        <div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
+        <div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">Request approval</label></div>
+    </div>
+
 </div>
 <div id="cms_plugin_overlay2">
     <div class="cms_plugin_overlay_bg">&nbsp;</div>

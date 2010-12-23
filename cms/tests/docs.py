@@ -5,6 +5,10 @@ from shutil import rmtree as _rmtree
 from sphinx.application import Sphinx
 from tempfile import template, mkdtemp, _exists
 import os
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 ROOT_DIR = os.path.join(settings.PROJECT_DIR, '..', '..')
 DOCS_DIR = os.path.join(ROOT_DIR, 'docs')
@@ -40,6 +44,7 @@ class DocsTestCase(CMSTestCase):
     Test docs building correctly for HTML
     """
     def test_01_html(self):
+        nullout = StringIO()
         with TemporaryDirectory() as OUT_DIR:
             app = Sphinx(
                 DOCS_DIR,
@@ -48,5 +53,10 @@ class DocsTestCase(CMSTestCase):
                 OUT_DIR,
                 "html",
                 warningiserror=True,
+                status=nullout,
             )
-            app.build()
+            try:
+                app.build()
+            except:
+                print nullout.getvalue()
+                raise

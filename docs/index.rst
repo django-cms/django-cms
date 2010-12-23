@@ -44,6 +44,7 @@ Extending the CMS
     app_integration
     plugin_reference
     placeholders
+    searchdocs
     
 Contributing to the CMS
 -----------------------

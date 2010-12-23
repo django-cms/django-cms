@@ -1,6 +1,6 @@
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
-from cms.templatetags.cms_tags import PlaceholderNode
+from cms.templatetags.cms_tags import Placeholder
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
 from django.template import NodeList, TextNode, VariableNode, \
@@ -61,8 +61,8 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
 
     for node in nodelist:
         # check if this is a placeholder first
-        if isinstance(node, PlaceholderNode):
-            placeholders.append(node.name)
+        if isinstance(node, Placeholder):
+            placeholders.append(node.get_name())
         # if it's a Constant Include Node ({% include "template_name.html" %})
         # scan the child template
         elif isinstance(node, ConstantIncludeNode):

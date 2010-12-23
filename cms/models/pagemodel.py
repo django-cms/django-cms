@@ -1,6 +1,8 @@
 from cms.exceptions import NoHomeFound
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
+from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page import get_available_slug, check_title_slugs
@@ -13,20 +15,12 @@ from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, get_language, ugettext
+from menus.menu_pool import menu_pool
+from os.path import join
 from publisher import MpttPublisher, Publisher
 from publisher.errors import PublisherCantPublish
-from cms.utils.urlutils import urljoin
-from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models.placeholdermodel import Placeholder
-from cms.utils.page import get_available_slug, check_title_slugs
-from cms.exceptions import NoHomeFound
-from cms.utils.helpers import reversion_register
-from cms.utils.i18n import get_fallback_languages
-from menus.menu_pool import menu_pool
 import copy
-from os.path import join
 
 
 class Page(MpttPublisher):
@@ -169,7 +163,8 @@ class Page(MpttPublisher):
             page.published = False
             page.publisher_status = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
-            if page.reverse_id in site_reverse_ids:
+            # only set reverse_id on standard copy
+            if not public_copy and page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
             if first:
                 first = False
@@ -249,9 +244,10 @@ class Page(MpttPublisher):
                     ph.pk = None # make a new instance
                     ph.save()
                     page.placeholders.add(ph)
-                ptree = []
-                for p in plugins:
-                    p.copy_plugin(ph, p.language, ptree)
+                if plugins:
+                    language = plugins[0].language
+                    copy_plugins_to(plugins, ph, language)
+                    
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
         return page_copy   # return the page_copy or None
@@ -403,7 +399,7 @@ class Page(MpttPublisher):
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
             page.publish()
-            
+
         # we delete the old public page - this only deletes the public page as we
         # have removed the old_public.publisher_public=None relationship to the draft page above
         if old_public:
@@ -413,16 +409,49 @@ class Page(MpttPublisher):
                     child_page.parent = new_public
                     child_page.save(change_state=False)
             transaction.commit()
+            
+            # delete its placeholders and plugins
+            placeholders = old_public.placeholders.all()
+            for ph in placeholders:
+                plugin = CMSPlugin.objects.filter(placeholder=ph)
+                plugin.delete()
+                ph.delete()
+            # finally delete the old public page    
             old_public.delete()
-
         # manually commit the last transaction batch
         transaction.commit()
-        
+
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
         return published
+        
+    def delete(self):
+        """Mark public instance for deletion and delete draft.
+        """
+        placeholders = self.placeholders.all()
+        
+        for ph in placeholders:
+            plugin = CMSPlugin.objects.filter(placeholder=ph)
+            plugin.delete()
+            ph.delete()
+    
+        super(Page, self).delete()
 
+
+    def delete_with_public(self):
+        
+        placeholders = list(self.placeholders.all())
+        if self.publisher_public_id:
+            placeholders = placeholders + list(self.publisher_public.placeholders.all())
+            
+        for ph in placeholders:
+            plugin = CMSPlugin.objects.filter(placeholder=ph)
+            plugin.delete()
+            ph.delete()
+                               
+        super(Page, self).delete_with_public()        
+                        
     def get_draft_object(self):
         return self
 

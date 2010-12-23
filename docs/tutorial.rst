@@ -4,134 +4,114 @@ Django CMS Tutorial
 Installation
 -------------
 
-I am working on Ubuntu 9.10 here, not windows or mac...sorry, although I don't
-expect things will be much different for mac at least...if I get a chance i'll
-run through this process on windows too and update the article but no
-promises.
+This guide assumes you have the following software installed:
 
-I'm assuming that Python, Django and sqlite3 are installed already. For
-reference, I am currently using Python 2.6.4 and Django (trunk version) 1.2.
+* `Python`_ 2.5 or higher
+* `Django`_ 1.2 or higher
+* `pip`_ 0.8.2 or higher
+* `South`_ 0.7.2 or higher
+* `PIL`_ 1.1.6 or higher
+* `django-classy-tags`_ 0.2.2 or higher
+
+It also assumes you're on a Unix based system.
+
+.. _Python: http://www.python.org
+.. _Django: http://www.djangoproject.com
+.. _pip: http://pip.openplans.org/
+.. _PIL: http://www.pythonware.com/products/pil/
+.. _South: http://south.aeracode.org/
+.. _django-classy-tags: https://github.com/ojii/django-classy-tags
+
+Installing Django CMS
+*********************
+
+While we strongly encourage you to install the Django CMS using `buildout`_ or
+`virtualenv`_, for the sake of simplicity this guide will install Django CMS
+system wide. For a proper installion procedure, please read the documentation of
+those projects.
+
+Install the latest Django CMS package::
+
+    $ sudo pip install django-cms
+
+Or install the latest revision from github::
+
+    $ sudo pip install -e git+git://github.com/divio/django-cms.git#egg=django-cms
+
+To check if you installed Django CMS properly, open a Python shell and type::
+
+    import cms
+
+If this does not return an error, you've successfully installed Django CMS.
+
+.. _buildout: http://www.buildout.org/
+.. _virtualenv: http://virtualenv.openplans.org/
+
 
 Preparing the environment
 *************************
 
-If you don't already have one, create a new folder for your code to live in. My
-folder lives in my home directory and is named "django_apps". This will pop up
-throughout this guide so if you're following along and you call yours
-something else, remember to replace "django_apps" with the name of your own
-folder when the time comes.
+Starting your Django project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In a terminal, move into your code directory::
+The following assumes your project is in ``~/workspace/myproject/``.
 
-	CD ~/django_apps
+Set up your Django project::
 
-Create a new Django project (call this whatever you like but remember to
-change it if you're following along and have called it something else)::
-
-	django-admin.py startproject project-name
-
-No harm in making sure that all is indeed well with Django at this early stage so::
-
-	CD project-name
-
-And... ::
-
+	cd ~/workspace
+	django-admin.py startproject myproject
+	cd myproject
 	python manage.py runserver
 
-Head on over to http://127.0.0.1:8000 and if you see the following "it worked" page then well, its working.
+Open `127.0.0.1:8000 <http://127.0.0.1:8000>`_ in your browser. You should see a
+nice "It Worked" message from Django.
 
 |it-worked|
 
 .. |it-worked| image:: images/it-worked.png
 
-Here comes the science...
-*************************
 
-If you dont happen to know your Python location then issue the following command::
+Installing and configuring Django CMS in Your Django Project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	which python
+Open the file ``~/workspace/myproject/settings.py``.
 
-(my one is "/usr/local/lib/python2.6" for example)
+To make your life easier, add the following at the top of the file::
 
-Go to your Python dist-packages directory "your-python-path/dist-packages"
-
-Download the latest and greatest Django CMS from here: http://www.django-cms.org/en/downloads/
-
-Unzip the downloaded file into the "dist-packages" directory...you will need to do this as "sudo" unless you have your system set up wrongly ;)
-
-Make copies of the following directories like so::
-
-	sudo cp -R divio-django-cms-c0288a1/cms/ cms
-	sudo cp -R divio-django-cms-c0288a1/mptt/ mptt
-	sudo cp -R divio-django-cms-c0288a1/publisher/ publisher
-
-Do a bit of house cleaning to get rid of all the files you don't need::
-
-	sudo rm -rf divio-django-cms-c0288a1.zip
-	sudo rm -rf divio-django-cms-c0288a1/
-	
-To ensure the cms is properly installed, invoke a python shell (just type ``python`` at the prompt), and ensure the following command returns without errors:
-    
-    import cms
-
-
-Make a set of basic project files
-*********************************
-
-Head back to the project you created previously::
-
-	cd ~/django_apps/project-name
-
-In your editor, edit "settings.py" like so:
-
-Insert the following before anything else in the file::
-
+    # -*- coding: utf-8 -*-
 	import os
 	gettext = lambda s: s
-	PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-	
-This will instruct Django to set the root of the project at "the location of settings.py".
-The gettext line is there for transaltion voodoo. Don't pay attention to it yet.
-
-Set up the remainder of the file with the following changes/additions::
-
-    DATABASES = {
-        # There are more fields in the generated settings.py, but they are not used
-        # if one chooses sqlite3. Feel free to keep them.
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': '/path/to/your/data/your-db-name.db/',
-        }
-    }
+	PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-	MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
-	MEDIA_URL = '/media/'
+Add the following apps to your ``INSTALLED_APPS``:
 
-	ADMIN_MEDIA_PREFIX = '/media/admin/'
+* ``'cms'``
+* ``'mptt'``
+* ``'menus'``
+* ``'south'``
 
-	INSTALLED_APPS = (
-	    'django.contrib.auth',
-	    'django.contrib.admin', # Make sure you uncomment this line
-	    'django.contrib.contenttypes',
-	    'django.contrib.sessions',
-	    'django.contrib.sites',
-	    'django.contrib.messages',
-	    'cms',
-	    'cms.plugins.text',
-	    'cms.plugins.picture',
-	    'cms.plugins.link',
-	    'cms.plugins.file',
-	    'cms.plugins.snippet',
-	    'cms.plugins.googlemap',
-	    'mptt',
-	    'publisher',
-		'menus',
-	)
+Also add any (or all) of the following plugins, depending on your needs:
+
+* ``'cms.plugins.text'``
+* ``'cms.plugins.picture'``
+* ``'cms.plugins.link'``
+* ``'cms.plugins.file'``
+* ``'cms.plugins.snippet'``
+* ``'cms.plugins.googlemap'``
+
+If you wish to use the moderation workflow, also add:
+
+* ``'publisher'``
+
+Further, make sure you uncomment ``'django.contrib.admin'``
+
+You need to add the Django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
+right position::
 
 
 	MIDDLEWARE_CLASSES = (
-		'django.middleware.cache.UpdateCacheMiddleware',
+	    'django.middleware.cache.UpdateCacheMiddleware',
 	    'django.contrib.sessions.middleware.SessionMiddleware',
 	    'django.contrib.auth.middleware.AuthenticationMiddleware',
 	    'django.middleware.common.CommonMiddleware',
@@ -139,13 +119,12 @@ Set up the remainder of the file with the following changes/additions::
 	    'django.middleware.csrf.CsrfViewMiddleware',
 	    'cms.middleware.page.CurrentPageMiddleware',
 	    'cms.middleware.user.CurrentUserMiddleware',
-		'cms.middleware.toolbar.ToolbarMiddleware',
-		'cms.middleware.media.PlaceholderMediaMiddleware',
-		'django.middleware.cache.FetchFromCacheMiddleware',
+	    'cms.middleware.toolbar.ToolbarMiddleware',
+	    'cms.middleware.media.PlaceholderMediaMiddleware',
+	    'django.middleware.cache.FetchFromCacheMiddleware',
 	)
 
-	TEMPLATE_DIRS = os.path.join(PROJECT_PATH, 'templates')
-	# (templates being the name of my template dir within project-name)
+You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS``::
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
 	    'django.core.context_processors.auth',
@@ -155,18 +134,26 @@ Set up the remainder of the file with the following changes/additions::
 	    'cms.context_processors.media',
 	)
 
-(I didn't have a ``TEMPLATE_CONTEXT_PROCESSORS`` specified so had to add all of the above anew.)
 
-Set up your available templates (don't worry that they don't actually exist yet)::
+Add at least one template to ``CMS_TEMPLATES``; for example::
 
 	CMS_TEMPLATES = (
-	    ('base.html', gettext('default')),
-	    ('2col.html', gettext('2 Column')),
-	    ('3col.html', gettext('3 Column')),
-	    ('extra.html', gettext('Some extra fancy template')),
+	    ('default.html', gettext('default')),
 	)
 
-Next, Edit your ``urls.py`` file like this::
+
+.. note::
+
+    The templates you define in ``CMS_TEMPLATES`` have to actually exist and
+    contain at least one ``{% placeholder <name> %}`` template tag to be useful
+    for Django CMS. For more details see `Templates`_
+
+
+URL configuration
+*****************
+
+You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
+urlpatterns. We suggest starting with the following ``urls.py``::
 
 	from django.conf.urls.defaults import *
 	from django.contrib import admin
@@ -176,65 +163,79 @@ Next, Edit your ``urls.py`` file like this::
 
 	urlpatterns = patterns('',
 	    (r'^admin/', include(admin.site.urls)),
+        url(r'^', include('cms.urls')),
 	)
 
 	if settings.DEBUG:
-	    urlpatterns += patterns('',
-	        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True})
-	    )
+	    urlpatterns = patterns('',
+	        url(
+	            r'^media/cms/(?P<path>.*)$',
+	            'django.views.static.serve',
+	            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}
+	        )
+	    ) + urlpatterns
 
-	urlpatterns += patterns('',
-	    url(r'^', include('cms.urls')),
-	)
+To have access to app specific media files (javascript, stylesheets, images), we
+recommend you use `django-appmedia`_. After you've installed it, use
+``python manage.py symlinkmedia`` and it will do all the work for you.
 
-Create a folder called 'media' in your project root (that's "project-name" for me), this means you create a symbolic link from the "cms/media/cms" folder in "dist-packages" to your new "media" folder::
-
-	ln -s /usr/local/lib/python2.6/dist-packages/cms/media/cms cms
+.. _django-appmedia: http://pypi.python.org/pypi/django-appmedia
 
 
-Loading up on supplies: preparing the database
-**********************************************
+Initial database setup
+**********************
 
-Now for the magic...if you're not already there::
+This command depends on whether you **upgrade** your installation or do a
+**fresh install**.
 
-	cd ~/django_apps/project-name
+Fresh install
+~~~~~~~~~~~~~
 
-and... ::
+Run::
 
-	python manage.py syncdb
+	python manage.py syncdb --all
+	python manage.py migrate --fake
 
-If all goes well, you'll be asked if you want to set up your superuser account...which of course you do so just follow the instructions in the terminal.
+The first command will prompt you to create a super user; choose 'yes' and enter
+appropriate values.
+
+Upgrade
+~~~~~~~
+
+Run::
+
+    python manage.py syncdb
+    python manage.py migrate
+
 
 Up and running!
 ***************
 
-That should hopefully be that. If your development server is still running in your terminal stop it, then restart it again just to be sure. ::
-
-	cmd c
-	python manage.py runserver
-
-Visit http://127.0.0.1:8000/ to make sure all is well, you'll be greeted with
-appropriate text and if you can see the django-cms logo then your media folder
-is cool also.
+That should be it. Restart your development server and go to
+`127.0.0.1:8000 <http://127.0.0.1:8000>`_ and you should get the Django
+CMS "It Worked" screen.
 
 |it-works-cms|
 
 .. |it-works-cms| image:: images/it-works-cms.png
 
-Now log in via the admin link (http://127.0.0.1:8000/admin/) and enjoy :)
+Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
+the user you created during the database setup.
 
-This is your development enviroment. On how to deploy django projects on real
-webservers you may want to head over to http://www.django-project.com/
+To deploy your Django CMS project on a real webserver, please refer to the
+`Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
 Templates
 ---------
 
-In django-cms you set one template per page. After you have set a template for
-a page you can put plugins into the defined placeholders. Templates in django-cms
-are just django templates. See official documentation `django template language <http://docs.djangoproject.com/en/1.2/topics/templates/>`_
+Django CMS uses templates to define how a page should look and what parts of
+it are editable. Editable areas are called *placeholders*. These templates are
+standard Django templates and you may use them as described in the
+`official documentation`_.
 
-You have to define the templates in ``settings.CMS_TEMPLATES``. ::
+Templates you wish to use on your pages must be declared in the ``CMS_TEMPLATES``
+setting::
 
   CMS_TEMPLATES = (
       ('template_1.html', 'Template One'),
@@ -242,13 +243,7 @@ You have to define the templates in ``settings.CMS_TEMPLATES``. ::
       ...
   )
 
-Each of these templates is now available to be set on a given page in the admin
-backend. When you set a template for a certain page, django-cms will search
-for the placeholders defined in that template and update the page form so you
-can put plugins into them. You can even have a placeholder for all your page
-templates in a base template that the template for a page extends.
-
-For example you have a ``base.html`` like this: ::
+Here is a simple example for a base template called ``base.html``::
 
   {% load cms_tags %}
   <html>
@@ -258,7 +253,7 @@ For example you have a ``base.html`` like this: ::
     </body>
   </html>
 
-And have set ``template_1.html`` to: ::
+Now we can use this base template in our ``template_1.html`` template::
 
   {% extends "base.html" %}
   {% load cms_tags %}
@@ -268,42 +263,44 @@ And have set ``template_1.html`` to: ::
   {% endblock %}
 
 When you set ``template_1.html`` as a template on a page you will get two
-placeholders to put plugins in. One is **template_1_content** from the page
-template ``template_1.html`` and another is **base_content** from extended
+placeholders to put plugins in. One is ``template_1_content`` from the page
+template ``template_1.html`` and another is ``base_content`` from the extended
 ``base.html``.
 
-When working with alot of placeholders, you want to make sure to set proper names
-for your placeholders. These are just spitted out on the page form and it
-can get messy if you have lots of them. Have a look at ``settings.CMS_PLACEHOLDER_CONF``
-to further configure the placeholders.
+When working with a lot of placeholders, make sure to give descriptive
+names for your placeholders, to more easily identify them in the admin panel.
+
+.. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
 
 My First Plugin
 ---------------
 
-There are a few plugins within the CMS that let you put basic content into the
-placeholders of a page. To be able to put custom content into a placeholder,
-you need to write a CMS plugin. A plugin consists of two things. A model that
-holds the actual data you want to store and a plugin class that tells the CMS
-how to render it. Lets write a plugin that displays a title and some text.
+There are a few plugins included with the CMS that let you put basic content
+into a page's placeholders. To put custom content into a placeholder,
+you need to write a CMS plugin. A plugin consists of two things: A model that
+holds the actual data you want to store, and a plugin class that tells the CMS
+how to render the plugin. Let's write a plugin that displays a title & some text.
 
-Create a django application and install it in settings.py. As you want to save
-data to the database you need to write a model in your models.py. ::
+Create a django application and install it in settings.py. If you want to save
+data to the database, you must create a model in the plugin's ``models.py``. ::
 
   from cms.models import CMSPlugin
+  from django.db import models
+
   class TextWithTitle(CMSPlugin):
       title = models.CharField(max_length=50)
       text =  models.TextField()
 
-Note that the model does not inherit from `django.db.models.Model` but from
+NB: the plugin model does not inherit from `django.db.models.Model` but from
 `cms.models.CMSPlugin`.
 
 Run syncdb to create the according database tables. ::
 
   python manage.py syncdb
 
-Now that you have a model that stores your plugin data, you need to tell the CMS
-about your plugin. For that you need to write the plugin class that inherits
-from `CMSPluginBase`. Do this in a file called **cms_plugins.py** in your
+Now you have a model that stores your plugin data, you need to tell the CMS
+about your plugin. Create a plugin class that inherits
+from `CMSPluginBase` in a file called **cms_plugins.py** in your
 application folder. ::
 
   from cms.plugin_base import CMSPluginBase
@@ -321,8 +318,8 @@ application folder. ::
                           'placeholder':placeholder})
           return context
 
-Note that the `TextWithTitlePlugin` class inherits from `CMSPluginBase`. It holds 
-information about its name, the model and the template to render with.
+Note that the `TextWithTitlePlugin` class inherits from `CMSPluginBase`. It
+holds information about its name, the model and the template to render.
 
 Finaly you have to register this plugin (in cms_plugins.py) to actually tell
 the CMS about your plugin. ::
@@ -335,49 +332,48 @@ These are the attributes you have to provide for the plugin to work.
 
 :model:
   Specify the model this plugin uses to save data. You dont have to write a
-  custom model if your plugin just wants to display some HTML for example. If
-  doing so you should just Provide the `CMSPlugin` class as this plugins model.
+  custom model if your plugin just wants to display some HTML. If
+  so, just use the `CMSPlugin` class as this plugin's model.
 
 :name:
   The name of this plugin in the admin.
 
 :render_template:
-  The template that is being use to render this plugin on a page. This is not 
-  the template beeing used to render the plugin in the admin backend or frontend
-  editing parts.
+  The template used to render this plugin on a page, not
+  the template used for admin backend or frontend editing.
 
 **The render Function**
 
-The render Function is called when the plugin is rendered on a page. Modify the
-context given and set the additional data you want while rendering the given
+The render Function is called when the plugin is rendered on a page. It modifies
+the context given and sets any additional data you want while rendering the given
 template. This function is only called when rendering the plugin on a page.
 
 To provide a new change form for this plugin use the **change_form_template**
-attribute. `CMSPluginBase` inherits from `ModelAdmin`. So you can change the
-Plugin as you would with a `ModelAdmin`. See http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
+attribute. `CMSPluginBase` inherits from `ModelAdmin`, so you can change the
+Plugin as you would a `ModelAdmin`. See
+http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
 
 :context:
-  The Context with which the plugin gets rendered.
+  The Context used to render the plugin.
 
 :instance:
-  The instance of the model specified by model.
+  The instance of the plugin specified by model.
 
 :placeholder:
   The placeholder this plugin gets rendered in.
 
-The template for this plugin could look like this: ::
+A template for this plugin could look like::
 
   <h1>{{ instance.title }}</h1>
   <p>{{ instance.text }}</p>
 
-The context while rendering the plugin is the one you returned in the render
-function. In our example we passed 'instance' and now can access all our
+The context while rendering the plugin is the one returned in the render
+function. In our example we passed `instance` and now can access all our
 model's fields through this variable.
 
 You should now be able to select this plugin under its name in any placeholder
-on any page. The template is searched with normal django template lookup 
-mechanisms so you may need to alter the setting of render_template appropriatly
-to meet your needs.
+on any page. The template is searched with normal django template lookup
+mechanisms, so you may need to alter the `render_template` setting appropriately.
 
 My First App
 ------------
@@ -391,27 +387,33 @@ My First Attach Menu
 My First Apphook
 ----------------
 
-What is an apphook you might ask? "Apphooks" are a way to forward all URLs "under" 
+What is an apphook you might ask? "Apphooks" are a way to forward all URLs "under"
 a CMS page to another Django app.
-For the sake of the example, let's assume you have a very fancy "myapp" django application, 
-that you would like to use in your django-CMS project, as the "/myapp/<something>" pages.
+For the sake of the example, let's assume you have a very fancy "myapp" Django
+application, which you want to use in your Django-CMS project, as the
+"/myapp/<something>" pages.
 
 #. Create a ``cms_app.py`` file in your app's module (usually next to ``models.py``)
-#. Paste and adapt the following code to the newly created file, save, restart your server if needed::
+#. Paste and adapt the following code to the newly created file, save, restart
+   your server if needed::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
 
     class MyApphook(CMSApp):
-        name = "My Apphook's name" # This is visible in the CMS admin page - make it readable!
-        urls = ["myapp.blog.urls"] # Your app's urls.py file
-    apphook_pool.register(MyAppHook) # Like in admin.py file, you need to register your apphook with the CMS
-    
+        name = "My Apphook's name" # Visible in the CMS admin page - make it readable!
+        urls = ["myapp.blog.urls"] # Your app's ``urls.py`` file
+    apphook_pool.register(MyAppHook) # As in ``admin.py`` file, you need to register your apphook with the CMS
+
 #. Create a "blog" page in the Django-CMS admin interface.
-#. Still in the admin interface, navigate to your newly create page, edit it, and expand the "Advanced Settings" group
-#. You should see your ``My Apphook's name`` apphook in the "Application" drop-down list.
-#. Once selected, you unfortunately need to restart your django server for the changes to take effect.
-#. Your application is now available at ``http://<your host>/myapp/<your apps urls.py>``!
+#. Still in the admin interface, navigate to your newly created page, edit it,
+   and expand the "Advanced Settings" group.
+#. You should see your ``My Apphook's name`` apphook in the "Application"
+   drop-down list.
+#. Select your apphook & save the page. You must restart your Django server for
+   the changes to take effect (Django caches urls).
+#. Your application is now available at
+   ``http://<your host>/myapp/<your apps urls>``!
 
 
 

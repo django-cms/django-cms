@@ -93,4 +93,4 @@ class Placeholder(models.Model):
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
 
-reversion_register(Placeholder, follow=["cmsplugin_set"])
+reversion_register(Placeholder) # follow=["cmsplugin_set"] not following plugins since they are a spechial case

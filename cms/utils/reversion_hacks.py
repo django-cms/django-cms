@@ -2,7 +2,6 @@ import reversion
 from reversion.revisions import RegistrationError, RegistrationInfo
 from reversion.storage import VersionFileStorageWrapper
 from django.db import models
-from django.db.models.signals import post_save
 
 def register_draft_only(model_class, fields, follow, format):
     """
@@ -10,7 +9,6 @@ def register_draft_only(model_class, fields, follow, format):
     registers drafts and ignores public models
     """
     revision_manager = reversion.revision
-    
     if revision_manager.is_registered(model_class):
         raise RegistrationError, "%r has already been registered with Reversion." % model_class
     # Ensure the parent model of proxy models is registered.
@@ -33,14 +31,4 @@ def register_draft_only(model_class, fields, follow, format):
     follow = tuple(follow)
     registration_info = RegistrationInfo(fields, file_fields, follow, format)
     revision_manager._registry[model_class] = registration_info
-    # Connect to the post save signal of the model.
-    post_save.connect(selective_post_save_receiver, model_class)
-
-def selective_post_save_receiver(instance, sender, **kwargs):
-    """
-    Only add to revision if it is a draft.
-    """
-    revision_manager = reversion.revision
-    if getattr(instance, 'publisher_is_draft', True):
-        if revision_manager.is_active():
-            revision_manager.add(instance)
+    # Do not connect to the post save signal of the model.
