@@ -142,3 +142,6 @@ class PublisherTestCase(CMSTestCase):
         page.published = False
         page.save()
         self.assertEqual(page.published, False)
+        page.published = True
+        page.save()
+        self.assertEqual(page.published, True)

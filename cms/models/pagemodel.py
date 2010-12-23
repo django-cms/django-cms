@@ -319,9 +319,14 @@ class Page(MpttPublisher):
                 super(Page, self).save(**kwargs)
         
         #if commit and (publish_directly or created and not under_moderation):
-        if (self.publisher_is_draft and commit and publish_directly
-            and self.published):
-            self.publish()
+        if self.publisher_is_draft:
+            if self.published:
+                if commit and publish_directly:
+                    self.publish()
+            elif self.publisher_public and self.publisher_public.published:
+                # TODO: Check perms!
+                self.publisher_public.published = False
+                self.publisher_public.save()
 
     @transaction.commit_manually
     def publish(self):
