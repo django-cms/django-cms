@@ -324,7 +324,6 @@ class Page(MpttPublisher):
                 if commit and publish_directly:
                     self.publish()
             elif self.publisher_public and self.publisher_public.published:
-                # TODO: Check perms!
                 self.publisher_public.published = False
                 self.publisher_public.save()
 
