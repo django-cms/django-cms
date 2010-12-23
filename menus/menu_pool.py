@@ -3,8 +3,8 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.utils.importlib import import_module
 from django.utils.translation import get_language
-from menus import settings as menus_settings
 from menus.exceptions import NamespaceAllreadyRegistered
+from menus.models import CacheKey
 import copy
 
 def lex_cache_key(key):
@@ -18,7 +18,6 @@ class MenuPool(object):
         self.menus = {}
         self.modifiers = []
         self.discovered = False
-        self.cache_keys = set()
         
     def discover_menus(self):
         if self.discovered:
@@ -33,21 +32,13 @@ class MenuPool(object):
         self.discovered = True
         
     def clear(self, site_id=None, language=None):
-        def relevance_test(keylang, keysite):
-            site_ok = not site_id
-            language_ok = not language
-            if site_id and (site_id == keysite or site_id == int(keysite)):
-                site_ok = True
-            if language and language == keylang:
-                language_ok = True
-            return language_ok and site_ok
-        to_be_deleted = []
-        for key in self.cache_keys:
-            keylang, keysite = lex_cache_key(key)
-            if relevance_test(keylang, keysite):
-                to_be_deleted.append(key)
+        '''
+        This invalidates the cache for a given menu (site_id and language)
+        '''
+        cache_keys = CacheKey.objects.get_keys(site_id, language)        
+        to_be_deleted = [obj.key for obj in cache_keys]
         cache.delete_many(to_be_deleted)
-        self.cache_keys.difference_update(to_be_deleted)
+        cache_keys.delete()
     
     def register_menu(self, menu):
         from menus.base import Menu
@@ -83,7 +74,6 @@ class MenuPool(object):
         lang = get_language()
         prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
         key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
-        self.cache_keys.add(key)
         
         cached_nodes = cache.get(key, None)
         if cached_nodes:
@@ -97,6 +87,12 @@ class MenuPool(object):
                                                                 menu_class_name)
         duration = getattr(settings, "MENU_CACHE_DURATION", 60*60)
         cache.set(key, final_nodes, duration)
+        # We need to have a list of the cache keys for languages and sites that
+        # span several processes - so we follow the Django way and share through 
+        # the database. It's still cheaper than recomputing every time!
+        # This way we can selectively invalidate per-site and per-language, 
+        # since the cache shared but the keys aren't 
+        CacheKey.objects.create(key=key, language=lang, site=site_id)
         return final_nodes
     
     def _build_nodes_inner_for_one_menu(self, nodes, menu_class_name):
