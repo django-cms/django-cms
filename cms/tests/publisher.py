@@ -3,6 +3,7 @@ Created on Dec 23, 2010
 
 @author: Christopher Glass <christopher.glass@divio.ch>
 '''
+from __future__ import with_statement
 from cms.management.commands import publisher_publish
 from cms.models.pagemodel import Page
 from cms.tests.base import CMSTestCase
