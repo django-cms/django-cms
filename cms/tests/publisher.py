@@ -66,7 +66,6 @@ class PublisherTestCase(CMSTestCase):
                 raised = True
         self.assertTrue(raised)
         
-        
     def test_04_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
@@ -89,29 +88,50 @@ class PublisherTestCase(CMSTestCase):
         self.assertEqual(pages_from_output,0)
         self.assertEqual(published_from_output,0)
         
-#    def test_05_command_line_publishes_one_page(self):
-#        # we need to create a superuser (the db is empty)
-#        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
-#        
-#        # Now, let's create an unpublished page.
-#        page = self.new_create_page(title="I'm unpublished", published= False)
-#        pages_from_output = 0
-#        published_from_output = 0
-#        
-#        with StdoutOverride() as buffer:
-#            # Now we don't expect it to raise, but we need to redirect IO
-#            com = publisher_publish.Command()
-#            com.handle_noargs()
-#            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
-#            
-#        for line in lines:
-#            import ipdb
-#            if 'Total' in line:
-#                ipdb.set_trace()
-#                pages_from_output = int(line.split(':')[1])
-#            elif 'Published' in line:
-#                ipdb.set_trace()
-#                published_from_output = int(line.split(':')[1])
-#                
-#        self.assertEqual(pages_from_output,1)
-#        self.assertEqual(published_from_output,1)
+    def test_05_command_line_publishes_one_page(self):
+        '''
+        Publisher always creates two Page objects for every CMS page,
+        one is_draft and one is_public.
+        
+        The public version of the page can be either published or not.
+        
+        This bit of code uses sometimes manager methods and sometimes manual
+        filters on purpose (this helps test the managers)
+        '''
+        # we need to create a superuser (the db is empty)
+        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        
+        # Now, let's create a page. That actually creates 2 Page objects
+        self.new_create_page(title="The page!", published=True, 
+                                    in_navigation=True)
+        draft = Page.objects.drafts()[0]
+        draft.reverse_id = 'a_test' # we have to change *something*
+        draft.save()
+        
+        pages_from_output = 0
+        published_from_output = 0
+        
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            com = publisher_publish.Command()
+            com.handle_noargs()
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+                
+        self.assertEqual(pages_from_output,1)
+        self.assertEqual(published_from_output,1)
+        # Sanity check the database (we should have one draft and one public)
+        not_drafts = len(Page.objects.filter(publisher_is_draft=False))
+        drafts = len(Page.objects.filter(publisher_is_draft=True))
+        self.assertEquals(not_drafts,1)
+        self.assertEquals(drafts,1)
+        
+        # Now check that the non-draft has the attribute we set to the draft.
+        non_draft = Page.objects.public()[0]
+        self.assertEquals(non_draft.reverse_id, 'a_test')
+        
