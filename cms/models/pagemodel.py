@@ -319,7 +319,8 @@ class Page(MpttPublisher):
                 super(Page, self).save(**kwargs)
         
         #if commit and (publish_directly or created and not under_moderation):
-        if self.publisher_is_draft and commit and publish_directly:
+        if (self.publisher_is_draft and commit and publish_directly
+            and self.published):
             self.publish()
 
     @transaction.commit_manually
@@ -341,12 +342,10 @@ class Page(MpttPublisher):
         # publish, but only if all parents are published!!
         published = None
 
-        try:
-            if not self.pk:
-                self.save()
+        if not self.pk:
+            self.save()
 
-            if not self._publisher_can_publish():
-                raise PublisherCantPublish
+        if self._publisher_can_publish():
 
             ########################################################################
             # delete the existing public page using transaction block to ensure save() and delete() do not conflict
@@ -378,8 +377,7 @@ class Page(MpttPublisher):
             self.publisher_state = Publisher.PUBLISHER_STATE_DEFAULT
             self._publisher_keep_state = True        
             published = True
-            
-        except PublisherCantPublish:
+        else:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
 
         self.save(change_state=False)
