@@ -27,7 +27,7 @@ class Command(NoArgsCommand):
         
         set_current_user(user) # set him as current user
         
-        qs = Page.objects.drafts().filter(published=True).filter(Q(publisher_public__isnull=True) | Q(publisher_public__published=False))
+        qs = Page.objects.drafts().filter(published=True)
         pages_total, pages_published = qs.count(), 0
         
         print "\nPublishing public drafts....\n"
