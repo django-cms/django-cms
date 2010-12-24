@@ -48,7 +48,7 @@ Extending the CMS
 
     custom_plugins
     app_integration
-    plugin_reference
+    api_references
     placeholders
     searchdocs
 
