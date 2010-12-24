@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
-from posixpath import join, basename, splitext, exists
+import os
 from django.conf import settings
 
 class File(CMSPlugin):
@@ -27,24 +27,25 @@ class File(CMSPlugin):
     # CMS_ICON_EXTENSIONS and CMS_ICON_PATH are assumed to be plugin-specific, and not included in cms.settings
     # -- they are therefore imported from django.conf.settings
     ICON_EXTENSIONS = getattr(settings, "CMS_FILE_ICON_EXTENSIONS", ('gif', 'png'))
-    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", join(settings.CMS_MEDIA_PATH, "images", "file_icons"))
-    
+    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(settings.CMS_MEDIA_ROOT, "images", "file_icons"))
+    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/" % (settings.CMS_MEDIA_URL, "images", "file_icons"))
+        
     def get_icon_url(self):
-        base = join(self.ICON_PATH, self.get_ext())
+        path_base = os.path.join(self.ICON_PATH, self.get_ext())
+        url_base = '%s%s' % (self.ICON_URL, self.get_ext())
         for ext in self.ICON_EXTENSIONS:
-            relative = "%s.%s" % (base, ext)
-            if exists(join(settings.MEDIA_ROOT, relative)): 
-                return join(settings.MEDIA_URL, relative)
+            if os.path.exists("%s.%s" % (path_base, ext)): 
+                return "%s.%s" % (url_base, ext)
         return None
         
     def file_exists(self):
-        return exists(self.file.path);
+        return os.path.exists(self.file.path)
         
     def get_file_name(self):
-        return basename(self.file.path)
+        return os.path.basename(self.file.path)
         
     def get_ext(self):
-        return splitext(self.get_file_name())[1][1:]
+        return os.path.splitext(self.get_file_name())[1][1:].lower()
         
     def __unicode__(self):
         if self.title: 

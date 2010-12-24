@@ -2,21 +2,19 @@
 Configuration
 #############
 
-Out of the box django-cms comes not with a lot features. But with some
-settings you can extend it to an enterprise ready solution. All settings
-described here can be found in cms/settings.py or in the plugins folder if
-they have a settings.py.
+The Django-CMS has a lot of settings you can use to customize your installation
+of the CMS to be exactly like you want it to be.
 
-All these settings should be placed in your project settings.py.
-
-
+*****************
 Required Settings
-=================
+*****************
 
 CMS_TEMPLATES
---------------
+=============
 
-A list of the templates you can select for a page.
+Default: ``None`` (Not a valid setting!)
+
+A list of templates you can select for a page.
 
 Example::
 
@@ -26,28 +24,33 @@ Example::
 		('3col.html', gettext('3 Column')),
 		('extra.html', gettext('Some extra fancy template')),
 	)
-	
 
+
+*******************
 Basic Customization
-===================
+*******************
 
 CMS_TEMPLATE_INHERITANCE
-------------------------
+========================
 
-This is optional
+Default: ``True``
 
-Example::
-
-    CMS_TEMPLATE_INHERITANCE = True
+*Optional*
+Enables the inheritance of templates from parent pages.
 
 If this is enabled, pages have the additional template option to inherit their
-template from the nearest ancestor. Adding new pages defaults to this if the
+template from the nearest ancestor. New pages default to this setting if the
 new page is not a root page.
 
-CMS_PLACEHOLDER_CONF
-----------------------
 
-Is used to configure the placeholders. This is optional.
+CMS_PLACEHOLDER_CONF
+====================
+
+Default: ``{}``
+**Optional**
+
+Used to configure placeholders. If not given, all plugins are available in all
+placeholders.
 
 Example::
 
@@ -73,18 +76,18 @@ Example::
 		},
 	}
 
-You can combine template names and placeholder names to granually define the
-plugins like done with ''base.html content''.
+You can combine template names and placeholder names to granually define
+plugins, as shown above with ''base.html content''.
 
 **plugins**
 
-A list of plugins that can be added to this placeholder. If not supplied all
+A list of plugins that can be added to this placeholder. If not supplied, all
 plugins can be selected.
 
 **text_only_plugins**
 
-A list of additional plugins that should only be available to the TextPlugin,
-but can't be added directly to this placeholder.
+A list of additional plugins available only in the TextPlugin,
+these plugins can't be added directly to this placeholder.
 
 **extra_context**
 
@@ -92,76 +95,83 @@ Extra context that plugins in this placeholder receive.
 
 **name**
 
-The name displayed in admin. With the gettext stub it can be
+The name displayed in the Django admin. With the gettext stub, the name can be
 internationalized.
 
 **limits**
 
 Limit the number of plugins that can be placed inside this placeholder.
-Dictionary keys are plugin names; values their respective limits. Special
+Dictionary keys are plugin names; values are their respective limits. Special
 case: "global" - Limit the absolute number of plugins in this placeholder
-regardless of their type (takes precedence over the type-specific limits).
+regardless of type (takes precedence over the type-specific limits).
 
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
------------------------------
+=============================
+
+Default: ``[]``
 
 A list of plugin context processors. Plugin context processors are callables
-that modify all plugin's context before rendering. See "Custom Plugins" for
+that modify all plugin's context before rendering. See :doc:`custom_plugins` for
 more information.
 
 
 CMS_PLUGIN_PROCESSORS
----------------------
+=====================
+
+Default: ``[]``
 
 A list of plugin processors. Plugin processors are callables that modify all
-plugin's output after rendering. See "Custom Plugins" for more information.
-
-
-CMS_TEMPLATE_INHERITANCE
-------------------------
-
-Enables the inheritance of templates from parent pages.
-
-Default: ``True``
+plugin's output after rendering. See :doc:`custom_plugins` for more information.
 
 
 CMS_APPHOOKS
-------------
+============
 
-A tuple with python paths to CMSApp Classes.
+Default: ``()``
 
-Overwrites the auto-discovered list of CMSApp Classes located in applications
-cms_app.py.
+A list of import paths for ``cms.app_base.CMSApp`` subclasses.
 
+Defaults to an empty list which means CMS applications are auto-discovered in
+all ``INSTALLED_APPS`` by trying to import their ``cms_app`` module.
+
+If this setting is set, the auto-discovery is disabled.
 
 Example::
 
-	CMS_APPLICATIONS_URLS = (
+	CMS_APPHOOKS = (
     	'myapp.cms_app.MyApp',
     	'otherapp.cms_app.MyFancyApp',
     	'sampleapp.cms_app.SampleApp',
 	)
 
+PLACEHOLDER_FRONTEND_EDITING
+============================
+
+Default: ``True``
+
+If set to ``False``, frontend editing is not available for models using
+``cms.models.fields.PlaceholderField``.
 
 
+*************
 I18N and L10N
-=============
+*************
 
 CMS_HIDE_UNTRANSLATED
------------------------
+=====================
 
-Example::
+Default: ``True``
 
-	CMS_HIDE_UNTRANSLATED = False
-
-By default django-cms hides the menu items that are not translated yet in the
+By default django-cms hides menu items that are not yet translated into the
 current language. With this setting set to False they will show up anyway.
 
 CMS_LANGUAGES
---------------
+=============
 
-Which language should be used by the cms?
+Default: Value of ``LANGUAGES``
+
+Defines the languages available in the CMS.
 
 Example::
 
@@ -171,26 +181,24 @@ Example::
 	    ('en', gettext('English')),
 	)
 
-Default is LANGUAGES. Be sure that you don't have more languages in here than
-in the LANGUAGES setting.
+.. note:: Make sure you only define languages which are also in ``LANGUAGES``.
 
 
 CMS_LANGUAGE_FALLBACK
------------------------
+=====================
 
-Example::
+Default: ``True``
 
-	CMS_LANGUAGE_FALLBACK = True
-
-This will redirect the browser to the same page in an other language if the
+This will redirect the browser to the same page in another language if the
 page is not available in the current language.
 
 
-
 CMS_LANGUAGE_CONF
------------------
+=================
 
-Configures on how to order the fallbacks for languages.
+Default: ``{}``
+
+Language fallback ordering for each language.
 
 Example::
 
@@ -200,9 +208,11 @@ Example::
 	}
 
 CMS_SITE_LANGUAGES
-------------------
+==================
 
-If you have more then one site and CMS_LANGUAGES differs between the sites you
+Default: ``{}``
+
+If you have more than one site and CMS_LANGUAGES differs between the sites, you
 may want to fill this out so if you switch between the sites in the admin you
 only get the languages available on this site.
 
@@ -216,184 +226,149 @@ Example::
 
 
 CMS_FRONTEND_LANGUAGES
-----------------------
+======================
 
-A list of languages the cms uses in the frontend. This is used for example if
-you decide that you want to add a new language to your page but don't want to
+Default: Value of ``CMS_LANGUAGES``
+
+A list of languages Django CMS uses in the frontend. For example, if
+you decide you want to add a new language to your page but don't want to
 show it to the world yet.
 
 Example::
 
 	CMS_FRONTEND_LANGUAGES = ("de", "en", "pt-BR")
 
-Default is CMS_LANGUAGES
-
 
 CMS_DBGETTEXT
--------------
-
-Enable gettext-based translation of CMS content rather than using the standard
-administration interface. Requires `django-dbgettext
-<http://http://bitbucket.org/drmeers/django-dbgettext>`_.
+=============
 
 Default: ``False`` (unless ``dbgettext`` is in ``settings.INSTALLED_APPS``)
 
-CMS_DBGETTEXT_SLUGS
--------------------
+Enable gettext-based translation of CMS content rather than use the standard
+administration interface. Requires `django-dbgettext
+<http://http://bitbucket.org/drmeers/django-dbgettext>`_.
 
-Enable gettext-based translation of page paths/slugs. Experimental at this
-stage as resulting translations cannot be guaranteed to be unique.
+CMS_DBGETTEXT_SLUGS
+===================
 
 Default: ``False``
+
+Enable gettext-based translation of page paths/slugs. Experimental at this
+stage, as resulting translations cannot be guaranteed to be unique.
 
 For general dbgettext settings, see the `dbgettext documentation
 <http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
 
 
+**************
 Media Settings
-==============
+**************
 
 
 CMS_MEDIA_PATH
---------------
-
-Example::
-
-	CMS_MEDIA_PATH = "cms/"
-
-The path from MEDIA_ROOT to the media files located in ``cms/media/``
+==============
 
 default: ``cms/``
 
+The path from MEDIA_ROOT to the media files located in ``cms/media/``
+
 CMS_MEDIA_ROOT
---------------
-
-Example::
-
-	CMS_MEDIA_ROOT = "settings.MEDIA_ROOT + "/cms/"
-
-The path to the media root of the cms media files.
+==============
 
 Default: ``settings.MEDIA_ROOT + CMS_MEDIA_PATH``
 
+The path to the media root of the cms media files.
+
+
 CMS_MEDIA_URL
--------------
-
-Example::
-
-	CMS_MEDIA_URL = "/media/cms/"
-
-The location of the media files that are located in cms/media/cms/
+=============
 
 default: ``MEDIA_URL + CMS_MEDIA_PATH``
 
-CMS_PAGE_MEDIA_PATH
--------------------
+The location of the media files that are located in cms/media/cms/
 
-By default the cms creates a folder in called 'cms_page_media' in your static
+CMS_PAGE_MEDIA_PATH
+===================
+
+Default: ``'cms_page_media/'``
+
+By default, Django CMS creates a folder called 'cms_page_media' in your static
 files folder where all uploaded media files are stored. The media files are
 stored in subfolders numbered with the id of the page.
 
-Example::
 
-	CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
-	
-	
+****
 URLs
-====
+****
 
 CMS_URL_OVERWRITE
--------------------
+=================
 
-Example::
+Default: ``True``
 
-	CMS_URL_OVERWRITE = True
-
-This adds a new field "url overwrite" in your in the advanced-settings tab of
-the page. With this field you can overwrite the whole relative url of the
-page.
+This adds a new field "url overwrite" to the "advanced settings" tab of your
+page. With this field you can overwrite the whole relative url of the page.
 
 
 CMS_MENU_TITLE_OVERWRITE
----------------------------
+========================
 
-Example::
+Default: ``False``
 
-	CMS_MENU_TITLE_OVERWRITE = True
-
-This adds a new field "menu title" besides the title field.
+This adds a new "menu title" field beside the title field.
 
 With this field you can overwrite the title that is displayed in the menu.
 
-To access the menu title in the template use::
+To access the menu title in the template, use::
 
 	{{ page.get_menu_title }}
 
 CMS_REDIRECTS
---------------
+=============
 
-Example::
+Default: ``False``
 
-	CMS_REDIRECTS = True
+This adds a new "redirect" field to the "advanced settings" tab of the page
 
-This adds a new field "redirect" to the advanced-settings tab of the page
+You can set a url here, which a visitor will be redirected to when the page is
+accessed.
 
-You can enter a url and if someone visits this page he gets redirected to this
-url.
-
-Note: Don't use this too much. There is django.contrib.redirect for this
-purpose
+Note: Don't use this too much. django.contrib.redirect is much more flexible,
+handy, and is designed exactly for this purpose.
 
 
 CMS_FLAT_URLS
----------------
+=============
 
-Example::
-
-	CMS_FLAT_URLS = True
+Default: ``False``
 
 If this is enabled the slugs are not nested in the urls.
 
-So a page with slug "world" will have an url "/world" even it is a child of
-the page "hello" If disabled the page would have an url: "/hello/world/"
+So a page with a "world" slug will have a "/world" url, even it is a child of
+the "hello" page. If disabled the page would have the url: "/hello/world/"
 
-
-CMS_UNIQUE_SLUGS
-------------------
-
-Example::
-
-	CMS_UNIQUE_SLUGS = True
-
-Defines if the slugs should be unique over all sites and languages. This
-setting is changed automatically according to other settings.
-
-Do not set it in your settings.py if you don't know what you are doing.
 
 CMS_SOFTROOT
--------------
+============
 
-Example::
+Default: ``False``
 
-	CMS_SOFTROOT = True
+This adds a new "softroot" field to the "advanced settings" tab of the page. If
+a page is marked as softroot the menu will only display items until it finds
+the softroot.
 
-This adds a new field "softroot" to you advanced-settings tab in the page. If
-a page is marked as softroot the menu will only display the items till the
-softroot.
-
-If you have a huge site you can partition the menu with this.
+If you have a huge site you can easily partition the menu with this.
 
 
+*****************
 Advanced Settings
-=================
+*****************
 
 
 CMS_PERMISSION
---------------
+==============
 
-Example::
-
-	CMS_PERMISSION = True
+Default: ``False``
 
 If this is enabled you get 3 new models in Admin:
 
@@ -406,50 +381,45 @@ permissions. In the global permissions you can set the permissions for users
 globally.
 
 If a user has the right to create new users he can now do so in the "Users -
-page". But he will only see the users he created. The users he created also
-can only have the rights he already has. So if he has only the right to edit a
-certain page all users he created also only can edit this page. Naturally he
-can even more limit the rights of the users he creates.
+page". But he will only see the users he created. The users he created can also
+only inherit the rights he has. So if he only has been granted the right to edit
+a certain page all users he creates can, in turn, only edit this page. Naturally
+he can limit the rights of the users he creates even further, allowing them to see
+only a subset of the pages he's allowed access to, for example.
 
 CMS_MODERATOR
---------------
+=============
+	
+Default: ``False``
 
-Example::
-
-	CMS_MODERATOR = True
-
-If set to true gives you a new column "moderation" in the tree view.
+If set to true, gives you a new "moderation" column in the tree view.
 
 You can select to moderate pages or whole trees. If a page is under moderation
 you will receive an email if somebody changes a page and you will be asked to
-approve the changes. Only after you approved the changes they will be updated
-on the live site. If you change a page you moderate yourself you will need to
-approve it anyway. This allows you change a lot of pages for a new version of
-the site and can go live with all the changes on the same time.
+approve the changes. Only after you approved the changes will they be updated
+on the "live" site. If you make changes to a page you moderate yourself, you
+will need to approve it anyway. This allows you to change a lot of pages for
+a new version of the site, for example, and go live with all the changes at the
+same time.
 
 
 CMS_SHOW_START_DATE & CMS_SHOW_END_DATE
-----------------------------------------------
+=======================================
 
-Example::
-
-	CMS_SHOW_END_DATE = True
-	CMS_SHOW_START_DATE = True
+Default: ``False`` for both
 
 This adds 2 new date-time fields in the advanced-settings tab of the page.
 With this option you can limit the time a page is published.
 
 CMS_SEO_FIELDS
-----------------
+==============
 
-Example::
+Default: ``False``
 
-	CMS_SEO_FIELDS = True
+This adds a new "SEO Fields" fieldset to the page admin. You can set the
+Page Title, Meta Keywords and Meta Description in there.
 
-This adds a new Fieldset "SEO Fields" in the page admin. You can set there the
-Page Title, Meta Keywords and the Meta Description
-
-To access the fields in the template use::
+To access these fields in the template use::
 
 	{% load cms_tags %}
 	<head>
@@ -461,13 +431,23 @@ To access the fields in the template use::
 	</head>
 
 CMS_CONTENT_CACHE_DURATION
---------------------------
+==========================
+
+Default: ``60``
+
+Defines how long page content should be cached, in seconds, including navigation and admin
+menu.
+
+CMS_CACHE_PREFIX
+================
+
+Default: ``None``
+
+
+The CMS will prepend the value associated with this key to every cache access (set and get).
+This is useful when you have several Django-CMS installations, and you don't want them
+to share cache objects.
 
 Example::
 
-	CMS_CONTENT_CACHE_DURATION = 60
-
-Defines how long page content should be cached, including navigation and admin
-menu.
-
-Default is 60
+	CMS_CACHE_PREFIX = 'mysite-live'

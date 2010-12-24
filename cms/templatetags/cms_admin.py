@@ -1,51 +1,70 @@
-from django.conf import settings
-from django import template
-from django.utils.safestring import mark_safe
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext_lazy as _
+from classytags.arguments import Argument
+from classytags.core import Options
+from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from django import template
+from django.conf import settings
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 register = template.Library()
 
-def show_admin_menu(context, page):# , no_children=False):
-    """Render the admin table of pages"""
-    request = context['request']
+
+class ShowAdminMenu(InclusionTag):
+    name = 'show_admin_menu'
+    template = 'admin/cms/page/menu.html'
     
-    if context.has_key("cl"):
-        filtered = context['cl'].is_filtered()
-    elif context.has_key('filtered'):
-        filtered = context['filtered']
+    options = Options(
+        Argument('page')
+    )
     
-    # following function is newly used for getting the context per item (line)
-    # if something more will be required, then get_admin_menu_item_context
-    # function have to be updated. 
-    # This is done because item can be reloaded after some action over ajax.
-    context.update(get_admin_menu_item_context(request, page, filtered))
-    
-    # this here is just context specific for menu rendering - items itself does
-    # not use any of following variables
-    #context.update({
-    #    'no_children': no_children,
-    #})
-    return context
-show_admin_menu = register.inclusion_tag('admin/cms/page/menu.html',
-                                         takes_context=True)(show_admin_menu)
+    def get_context(self, context, page):
+        request = context['request']
+        
+        if context.has_key("cl"):
+            filtered = context['cl'].is_filtered()
+        elif context.has_key('filtered'):
+            filtered = context['filtered']
+        
+        # following function is newly used for getting the context per item (line)
+        # if something more will be required, then get_admin_menu_item_context
+        # function have to be updated. 
+        # This is done because item can be reloaded after some action over ajax.
+        context.update(get_admin_menu_item_context(request, page, filtered))
+        
+        # this here is just context specific for menu rendering - items itself does
+        # not use any of following variables
+        #context.update({
+        #    'no_children': no_children,
+        #})
+        return context
+register.tag(ShowAdminMenu)
 
 
-def clean_admin_list_filter(cl, spec):
+class CleanAdminListFilter(InclusionTag):
     """
-    used in admin to display only these users that have actually edited a page and not everybody
+    used in admin to display only these users that have actually edited a page
+    and not everybody
     """
-    choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
-    query_string = None
-    unique_choices = []
-    for choice in choices:
-        if choice['query_string'] != query_string:
-            unique_choices.append(choice)
-            query_string = choice['query_string']
-    return {'title': spec.title(), 'choices' : unique_choices}
-clean_admin_list_filter = register.inclusion_tag('admin/filter.html')(clean_admin_list_filter)
+    name = 'clean_admin_list_filter'
+    template = 'admin/filter.html'
+    
+    options = Options(
+        Argument('cl'),
+        Argument('spec'),
+    )
+    
+    def get_context(self, context, cl, spec):
+        choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
+        query_string = None
+        unique_choices = []
+        for choice in choices:
+            if choice['query_string'] != query_string:
+                unique_choices.append(choice)
+                query_string = choice['query_string']
+        return {'title': spec.title(), 'choices' : unique_choices}
+register.tag(CleanAdminListFilter)
 
 
 
@@ -92,34 +111,47 @@ def preview_link(page, language):
             return ''
     return page.get_absolute_url(language)
 
-def render_plugin(context, plugin):
-    return {'content': plugin.render_plugin(context, admin=True)}
 
-render_plugin = register.inclusion_tag('cms/content.html', takes_context=True)(render_plugin)
+class RenderPlugin(InclusionTag):
+    template = 'cms/content.html'
+    
+    options = Options(
+        Argument('plugin')
+    )
+    
+    def get_context(self, context, plugin):
+        return {'content': plugin.render_plugin(context, admin=True)}
+register.tag(RenderPlugin)
 
-def page_submit_row(context):
-    opts = context['opts']
-    change = context['change']
-    is_popup = context['is_popup']
-    save_as = context['save_as']
-    show_delete_translation = context.get('show_delete_translation')  
-    language = context['language']
-    return {
-        'onclick_attrib': (opts.get_ordered_objects() and change
-                            and 'onclick="submitOrderForm();"' or ''),
-        'show_delete_link': (not is_popup and context['has_delete_permission']
-                              and (change or context['show_delete'])),
-        'show_save_as_new': not is_popup and change and save_as,
-        'show_save_and_add_another': context['has_add_permission'] and 
-                            not is_popup and (not save_as or context['add']),
-        'show_save_and_continue': not is_popup and context['has_change_permission'],
-        'is_popup': is_popup,
-        'show_save': True,
-        'language': language,
-        'language_name': [name for langcode, name in settings.CMS_LANGUAGES if langcode == language][0],
-        'show_delete_translation': show_delete_translation
-    }
-page_submit_row = register.inclusion_tag('admin/page_submit_line.html', takes_context=True)(page_submit_row)
+
+class PageSubmitRow(InclusionTag):
+    name = 'page_submit_row'
+    template = 'admin/page_submit_line.html'
+    
+    def get_context(self, context):
+        opts = context['opts']
+        change = context['change']
+        is_popup = context['is_popup']
+        save_as = context['save_as']
+        show_delete_translation = context.get('show_delete_translation')  
+        language = context['language']
+        return {
+            'onclick_attrib': (opts.get_ordered_objects() and change
+                                and 'onclick="submitOrderForm();"' or ''),
+            'show_delete_link': (not is_popup and context['has_delete_permission']
+                                  and (change or context['show_delete'])),
+            'show_save_as_new': not is_popup and change and save_as,
+            'show_save_and_add_another': context['has_add_permission'] and 
+                                not is_popup and (not save_as or context['add']),
+            'show_save_and_continue': not is_popup and context['has_change_permission'],
+            'is_popup': is_popup,
+            'show_save': True,
+            'language': language,
+            'language_name': [name for langcode, name in settings.CMS_LANGUAGES if langcode == language][0],
+            'show_delete_translation': show_delete_translation
+        }
+register.tag(PageSubmitRow)
+
 
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]

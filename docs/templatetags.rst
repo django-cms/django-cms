@@ -1,5 +1,6 @@
+############
 Templatetags
-============
+############
 
 .. highlightlang:: html+django
 
@@ -8,8 +9,9 @@ top of your template::
 
     {% load cms_tags menu_tags %}
 
+***********
 placeholder
------------
+***********
 
 The ``placeholder`` templatetag defines a placeholder on a page. All
 placeholders in a template will be auto-detected and can be filled with
@@ -54,8 +56,10 @@ pages have plugins that generate content::
 See also the ``PLACEHOLDER_CONF`` setting where you can also add extra context
 variables and change some other placeholder behavior.
 
+
+****************
 show_placeholder
-----------------
+****************
 
 Displays a specific placeholder from a given page. This is useful if you want
 to have some more or less static content that is shared among many pages, such
@@ -75,7 +79,7 @@ Examples::
     {% show_placeholder "teaser" request.current_page.get_root %}
 
 Page Lookup
-###########
+===========
 
 The ``page_lookup`` argument, passed to several templatetags to retrieve a
 page, can be of any of the following types:
@@ -113,8 +117,10 @@ inherit the content of its root-level ancestor::
         {% show_placeholder "teaser" request.current_page.get_root %}
     {% endplaceholderor %}
 
+
+*************************
 show_uncached_placeholder
--------------------------
+*************************
 
 The same as ``show_placeholder``, but the placeholder contents will not be
 cached.
@@ -130,8 +136,10 @@ Example::
 
     {% show_uncached_placeholder "footer" "footer_container_page" %}
 
+
+*************
 plugins_media
--------------
+*************
 
 Outputs the appropriate tags to include all media that is used by the plugins
 on a page (defined using the ``Media`` class in the plugin class).
@@ -156,8 +164,10 @@ can supply the ``page_lookup`` attribute to indicate the page in question::
 For a reference on what plugin media is required by a specific plugin, look at
 that plugin's reference.
 
+
+********
 page_url
---------
+********
 
 Displays the URL of a page in the current language.
 
@@ -170,8 +180,10 @@ Example::
     <a href="{% page_url "help" %}">Help page</a>
     <a href="{% page_url request.current_page.parent %}">Parent page</a>
 
+
+**************
 page_attribute
---------------
+**************
 
 This templatetag is used to display an attribute of the current page in the
 current language.
@@ -200,8 +212,10 @@ Example::
     {% page_attribute "page_title" request.current_page.parent_id %}
     {% page_attribute "slug" request.current_page.get_root %}
 
+
+*********
 show_menu
----------
+*********
 
 The ``show_menu`` tag renders the navigation of the current page. You can
 overwrite the appearance and the HTML if you add a ``cms/menu.html`` template
@@ -221,12 +235,11 @@ descendant of the current active node.
 Finally, the fourth parameter, ``extra_active`` (default=100), specifies how
 many levels of descendants of the currently active node should be displayed.
 
-Some Examples:
-##############
+Some Examples
+=============
 
 Complete navigation (as a nested list)::
 
-    {% load cache cms_tags %}
     <ul>
         {% show_menu 0 100 100 100 %}
     </ul>
@@ -253,8 +266,10 @@ Navigation with a custom template::
 
     {% show_menu 0 100 100 100 "myapp/menu.html" %}
 
+
+******************
 show_menu_below_id
-------------------
+******************
 
 If you have set an id in the advanced settings of a page, you can display the
 submenu of this page with a template tag. For example, we have a page called
@@ -270,8 +285,10 @@ You can give it the same optional parameters as ``show_menu``::
         {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
     </ul>
 
+
+*************
 show_sub_menu
--------------
+*************
 
 Displays the sub menu of the current page (as a nested list).
 Takes one argument that specifies how many levels deep should the submenu be
@@ -287,8 +304,10 @@ Or with a custom template::
         {% show_sub_menu 1 "myapp/submenu.html" %}
     </ul>
 
+
+***************
 show_breadcrumb
----------------
+***************
 
 Renders the breadcrumb navigation of the current page.
 The template for the HTML can be found at ``cms/breadcrumb.html``::
@@ -326,8 +345,9 @@ And then in your app template::
     {% endblock %}
 
 
+*****************
 page_language_url
------------------
+*****************
 
 Returns the url of the current page in an other language::
 
@@ -339,12 +359,12 @@ If the current url has no cms-page and is handled by a navigation extender and
 the url changes based on the language: You will need to set a language_changer
 function with the set_language_changer function in cms.utils.
 
-For more information have a look in the i18n docs.
+For more information, see :doc:`i18n`.
 
-#TODO: link to i18n
 
+****************
 language_chooser
-----------------
+****************
 
 The ``language_chooser`` template tag will display a language chooser for the
 current page. You can modify the template in ``menu/language_chooser.html`` or
@@ -372,7 +392,4 @@ If the current url has no cms-page and is handled by a navigation extender and
 the url changes based on the language: You will need to set a language_changer
 function with the set_language_changer function in cms.utils.
 
-For more information have a look in the i18n docs.
-
-#TODO: link to i18n
-
+For more information, see :doc:`i18n`.

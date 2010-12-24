@@ -1,6 +1,6 @@
 # Django settings for cms project.
 import os
-PROJECT_DIR = os.path.dirname(__file__)
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -99,6 +99,8 @@ INSTALLED_APPS = (
     'mptt',
     'testapp.sampleapp',
     'testapp.placeholderapp',
+    'testapp.pluginapp',
+    'testapp.pluginapp.plugins.manytomany_rel',
     'south',
     'reversion',
 )
@@ -108,9 +110,9 @@ gettext = lambda s: s
 LANGUAGE_CODE = "en"
 
 LANGUAGES = (
+    ('en', gettext('English')),
     ('fr', gettext('French')),
     ('de', gettext('German')),
-    ('en', gettext('English')),
     ('pt-BR', gettext("Brazil")),
 )
 
@@ -120,8 +122,8 @@ CMS_LANGUAGE_CONF = {
 }
 
 CMS_SITE_LANGUAGES = {
-    1:['fr','de','en','pt-BR'],
-    2:['de','en'],
+    1:['en','de','fr','pt-BR'],
+    2:['de','fr'],
 }
 
 APPEND_SLASH = True
@@ -163,18 +165,13 @@ CMS_URL_OVERWRITE = True
 
 SOUTH_TESTS_MIGRATE = False
 
+CMS_NAVIGATION_EXTENDERS = (
+    ('testapp.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+)
+
 try:
     from local_settings import *
 except ImportError:
     pass
-
-# set xmlrunner as test runner if available
-try:
-    import xmlrunner
-except ImportError:
-    xmlrunner = None
     
-if xmlrunner:
-    TEST_RUNNER = 'testapp.testrunner.DjangoXMLTestRunner'
-else:
-    TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'

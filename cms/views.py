@@ -1,130 +1,102 @@
-from django.conf import settings
-from cms.appresolver import applications_page_check
-from cms.utils import auto_render, get_template_from_request, \
-    get_language_from_request
-from cms.utils.moderator import get_page_queryset
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from cms.apphook_pool import apphook_pool
+from cms.appresolver import applications_page_check, get_app_urls
+from cms.utils import get_template_from_request, get_language_from_request
+from cms.utils.i18n import get_fallback_languages
+from cms.utils.page_resolver import get_page_from_request
+from django.conf import settings, settings as django_settings
+from django.conf.urls.defaults import patterns, include
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import resolve, Resolver404
 from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render_to_response
+from django.template.context import RequestContext
 from django.utils.http import urlquote
-from django.conf import settings as django_settings
-from cms.utils.i18n import get_fallback_languages
-from cms.exceptions import NoHomeFound
-from cms.apphook_pool import apphook_pool
+from django.utils.importlib import import_module
 
-def get_current_page(path, lang, queryset, home_slug=None, home_tree_id=None):
-    """Helper for getting current page from path depending on language
-    
-    returns: (Page, None) or (None, path_to_alternative language)
+
+def _handle_no_page(request, slug):
+    if not slug and settings.DEBUG:
+        CMS_MEDIA_URL = settings.CMS_MEDIA_URL
+        return render_to_response("cms/new.html", locals())
+    raise Http404('CMS: Page not found for "%s"' % slug)
+
+def details(request, slug):
     """
-    try:
-        if settings.CMS_FLAT_URLS:
-            title_q = Q(title_set__slug=path)
-            return queryset.filter(title_q & Q(title_set__language=lang)).distinct().select_related()[0], None
-        else:
-            if home_slug:
-                #queryset = queryset.exclude(Q(title_set__path=home_slug)&Q(tree_id=home_tree_id))
-                home_slug += "/"
-                title_q = Q(title_set__path=path) | (Q(title_set__path=home_slug + path) & Q(tree_id=home_tree_id))
-            else:
-                title_q = Q(title_set__slug=path)
-            if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
-                # ugly hack -- brute force search for reverse path translation:
-                from django.utils.translation import ugettext
-                from cms.models import Title
-                for t in Title.objects.all():
-                    tpath = '/'.join([ugettext(x) for x in t.path.split('/')])
-                    if path == tpath:
-                        title_q = Q(title_set__path=t.path)
-                        break
-            page = queryset.filter(title_q).distinct().select_related()[0]
-            if page:
-                langs = page.get_languages() 
-                if lang in langs or settings.CMS_DBGETTEXT:
-                    return page, None
-                else:
-                    path = None
-                    for alt_lang in get_fallback_languages(lang):
-                        if alt_lang in langs:
-                            path = '/%s%s' % (alt_lang, page.get_absolute_url(language=lang, fallback=True))
-                            return None, path
-                    return None, path
-    except IndexError:
-        return None, None
-
-def details(request, page_id=None, slug=None, template_name=settings.CMS_TEMPLATES[0][0], no404=False):
+    The main view of the Django-CMS! Takes a request and a slug, renders the
+    page.
+    """
     # get the right model
-    page_queryset = get_page_queryset(request)
+    context = RequestContext(request)
+    # Get a Page model object from the request
+    page = get_page_from_request(request, use_path=slug)
+    if not page:
+        return _handle_no_page(request, slug)
     
-    lang = get_language_from_request(request)
-    site = Site.objects.get_current()
-    if 'preview' in request.GET.keys():
-        pages = page_queryset.filter(site=site)
-    else:
-        pages = page_queryset.published().filter(site=site)
+    current_language = get_language_from_request(request)
     
-    current_page, response = None, None
-    if pages.all_root():
-        if page_id:
-            current_page = get_object_or_404(pages, pk=page_id)
-        elif slug != None:
-            if slug == "":
-                current_page = pages.get_home()
-            else:
-                pages_root = reverse('pages-root')
-                path = slug.startswith(pages_root) and slug[len(pages_root):] or slug
+    # Check that the current page is available in the desired (current) language
+    available_languages = page.get_languages()
+    
+    # We resolve an alternate language for the page if it's not available.
+    # Since the "old" details view had an exception for the root page, it is
+    # ported here. So no resolution if the slug is ''.
+    if (current_language not in available_languages) and (slug != ''):
+        if settings.CMS_LANGUAGE_FALLBACK:
+            # If we didn't find the required page in the requested (current) 
+            # language, let's try to find a suitable fallback in the list of 
+            # fallback languages (CMS_LANGUAGE_CONF)
+            for alt_lang in get_fallback_languages(current_language):
+                if alt_lang in available_languages:
+                    alt_url = page.get_absolute_url(language=alt_lang, fallback=True)
+                    path = '/%s%s' % (alt_lang, alt_url)
+                    # In the case where the page is not available in the
+                    # preferred language, *redirect* to the fallback page. This
+                    # is a design decision (instead of rendering in place)).
+                    return HttpResponseRedirect(path)
+        # There is a page object we can't find a proper language to render it 
+        _handle_no_page(request, slug)
 
-                try:
-                    home = pages.get_home()
-                    current_page, alternative = get_current_page(path, lang, pages, home.get_slug(language=lang), home.tree_id)
-                except NoHomeFound:
-                    current_page, alternative = get_current_page(path, lang, pages)
-                     
-                if apphook_pool.get_apphooks():
-                    # check if it shouldn't point to some application, if yes,
-                    # change current page if required
-                    current_page = applications_page_check(request, current_page, path)
-                if not current_page:
-                    if alternative and settings.CMS_LANGUAGE_FALLBACK:
-                        return HttpResponseRedirect(alternative)
-                    if no404:# used for placeholder finder
-                        current_page = None
-                    else:
-                        if not slug and settings.DEBUG:
-                            CMS_MEDIA_URL = settings.CMS_MEDIA_URL
-                            return "cms/new.html", locals()
-                        raise Http404('CMS: Page not found for "%s"' % slug)
-        else:
-            current_page = applications_page_check(request)
-            #current_page = None
-        template_name = get_template_from_request(request, current_page, no_current_page=True)
-    elif not no404:
-        if not slug and settings.DEBUG:
-            CMS_MEDIA_URL = settings.CMS_MEDIA_URL
-            return "cms/new.html", locals()
-        raise Http404("CMS: No page found for site %s" % unicode(site.name))
+    if apphook_pool.get_apphooks():
+        # There are apphooks in the pool. Let's see if there is one for the
+        # current page
+        # since we always have a page at this point, applications_page_check is
+        # pointless
+        # page = applications_page_check(request, page, slug)
+        # Check for apphooks! This time for real!
+        app_urls = page.get_application_urls(current_language, False)
+        if app_urls:
+            app = apphook_pool.get_apphook(app_urls)
+            pattern_list = []
+            for urlpatterns in get_app_urls(app.urls):
+                pattern_list += urlpatterns
+            urlpatterns = patterns('', *pattern_list)
+            try:
+                view, args, kwargs = resolve('/', tuple(urlpatterns))
+                return view(request, *args, **kwargs)
+            except Resolver404:
+                pass
+
+    # Check if the page has a redirect url defined for this language. 
+    redirect_url = page.get_redirect(language=current_language)
+    if redirect_url:
+        if settings.i18n_installed and redirect_url[0] == "/":
+            redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
+        # add language prefix to url
+        return HttpResponseRedirect(redirect_url)
     
-    if current_page:
-        has_change_permissions = current_page.has_change_permission(request)
-        request._current_page_cache = current_page
-        
-        redirect_url = current_page.get_redirect(language=lang)
-        if redirect_url:
-            if settings.i18n_installed and redirect_url[0] == "/":
-                redirect_url = "/%s/%s" % (lang, redirect_url.lstrip("/"))
-            # add language prefix to url
-            return HttpResponseRedirect(redirect_url)
-        
-        if current_page.login_required and not request.user.is_authenticated():
-            if settings.i18n_installed:
-                path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
-            else:
-                path = urlquote(request.get_full_path())
-            tup = django_settings.LOGIN_URL , "next", path
-            return HttpResponseRedirect('%s?%s=%s' % tup)
-    else:
-        has_change_permissions = False
-    return template_name, locals()
-details = auto_render(details)
+    # permission checks
+    if page.login_required and not request.user.is_authenticated():
+        if settings.i18n_installed:
+            path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
+        else:
+            path = urlquote(request.get_full_path())
+        tup = django_settings.LOGIN_URL , "next", path
+        return HttpResponseRedirect('%s?%s=%s' % tup)
+    
+    template_name = get_template_from_request(request, page, no_current_page=True)
+    # fill the context 
+    context['lang'] = current_language
+    context['current_page'] = page
+    context['has_change_permissions'] = page.has_change_permission(request)
+    return render_to_response(template_name, context)

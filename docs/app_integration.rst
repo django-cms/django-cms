@@ -1,5 +1,6 @@
+###############
 App Integration
-===============
+###############
 
 It is pretty easy to integrate your own Django applications with django-cms.
 You have 5 ways of integrating your app:
@@ -24,9 +25,9 @@ You have 5 ways of integrating your app:
 
 	Display your models / content in cms pages
 
-
+*****
 Menus
------
+*****
 
 Create a menu.py in your application and write the following inside::
 
@@ -81,8 +82,10 @@ A NavigationNode takes the following arguments:
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
+
+************
 Attach Menus
-------------
+************
 
 Classes that extend from `Menu` always get attached to the root. But if you
 want the menu be attached to a CMS-page you can do that as well.
@@ -144,10 +147,9 @@ described above.
 A base class for this purpose can be found in ``cms/utils/navigation.py``
 
 
-
-
+*********
 App-Hooks
----------
+*********
 
 With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
@@ -285,9 +287,9 @@ If you add this menu now to your app-hook::
 You get the static entries of MyAppMenu and the dynamic entries of
 CategoryMenu both attached to the same page.
 
-
+********************
 Navigation Modifiers
---------------------
+********************
 
 Navigation Modifiers can add or change properties of NavigationNodes, they
 even can rearrange whole menus. You normally want to create them in your apps
@@ -373,9 +375,9 @@ Here is an example of a build in modifier that marks all nodes level::
 	                child.level = node.level + 1
 	            self.mark_levels(child, post_cut)
 
-
+**************
 Custom Plugins
---------------
+**************
 
 If you want to display content of your apps on other pages custom plugins are
 a great way to accomplish that. For example, if you have a news app and you

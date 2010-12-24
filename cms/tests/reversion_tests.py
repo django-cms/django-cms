@@ -72,10 +72,12 @@ class ReversionTestCase(CMSTestCase):
         self.assertEquals(response.status_code, 200)
         response = self.client.post(revert_url, self.page_data)
         self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
-        self.assertEquals(Page.objects.all()[1].published, False)
+        # test for publisher_is_draft, published is set for both draft and published page
+        self.assertEquals(Page.objects.all()[0].publisher_is_draft, True)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
+        # test that CMSPlugin subclasses are reverted
+        self.assertEquals(Text.objects.all().count(), 2)
         self.assertEquals(Revision.objects.all().count(), 6)
-
     
     def test_02_recover(self):
         """
@@ -88,6 +90,7 @@ class ReversionTestCase(CMSTestCase):
         
         self.assertEquals(Page.objects.all().count(), 2)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
+        self.assertEquals(Text.objects.all().count(), 2)
         
         page = Page.objects.all()[0]
         page_pk = page.pk
@@ -95,7 +98,8 @@ class ReversionTestCase(CMSTestCase):
         
         self.assertEquals(Page.objects.all().count(), 0)
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
-        
+        self.assertEquals(Text.objects.all().count(), 0)
+                
         recover_url = URL_CMS_PAGE + "recover/"
         response = self.client.get(recover_url)
         self.assertEquals(response.status_code, 200)
@@ -106,4 +110,5 @@ class ReversionTestCase(CMSTestCase):
         self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
         self.assertEquals(Page.objects.all().count(), 1)
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
-        
+        # test that CMSPlugin subclasses are recovered
+        self.assertEquals(Text.objects.all().count(), 1)
