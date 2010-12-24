@@ -926,9 +926,6 @@ class PageAdmin(model_admin):
             return HttpResponseRedirect("../../")
 
         response = super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
-        public = page.publisher_public
-        if request.method == 'POST' and response.status_code == 302 and public:
-            public.delete()
         return response
 
     @create_on_success
