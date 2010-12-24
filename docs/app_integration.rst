@@ -191,10 +191,9 @@ a urls.py that looks like this:
 The 'main_view' should now be available at `/hello/world/` and the
 'sample_view' has the url '/hello/world/sublevel/'.
 
-**ATTENTION**
 
-- All views that are attached like this must return a RequestContext instance
-  instead of the default Context instance.
+.. note:: All views that are attached like this must return a RequestContext
+          instance instead of the default Context instance.
 
 **Language Namespaces**
 
