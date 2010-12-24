@@ -174,4 +174,4 @@ Now you can mark a page as "soft root" in the 'Advanced' tab of the page's setti
 Modifying & Extending the menu
 ******************************
 
-Please refer to the app integration documentation
+Please refer to the :doc:`app_integration` documentation

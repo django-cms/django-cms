@@ -193,8 +193,8 @@ The 'main_view' should now be available at `/hello/world/` and the
 
 **ATTENTION**
 
-- All views that are attached like this must return the RequestContext besides
-  the normal Context.
+- All views that are attached like this must return a RequestContext instance
+  instead of the default Context instance.
 
 **Language Namespaces**
 
@@ -385,4 +385,4 @@ want to display the top 10 news entries on your homepage, a custom plugin is
 the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to
-the `plugins <Custom Plugins>`_ section.
+the :doc:`custom_plugins` section.
