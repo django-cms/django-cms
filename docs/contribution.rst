@@ -1,14 +1,16 @@
-###############################
+##########################
 Contributing to Django-CMS
-###############################
+##########################
 
 Like every open-source project, Django-CMS is always looking for motivated
 individuals to contribute to it's source code.
 However, to ensure the highest code quality and keep the repository nice and
 tidy, everybody has to follow a few rules (nothing major, I promise :) )
 
+
+*********
 Community
----------
+*********
 
 People interested in developing for the django-cms should join the
 `django-cms-developers`_ mailing list as well as heading over to #django-cms on
@@ -19,8 +21,9 @@ github commits as well as the hudson build reports. There is also a @djangocms
 account for less technical announcements.
 
 
+*************
 In a nutshell
--------------
+*************
 
 Here's what the contribution process looks like, in a bullet-points fashion, and
 only for the stuff we host on github:
@@ -33,42 +36,14 @@ only for the stuff we host on github:
    request", by using the nice Github web interface.
 
 
+
+*****************
+Contributing Code
+*****************
+
+
 Getting the source code
------------------------
-
-Since we're hosted on github, django-cms uses git as a versioning system.
-
-The `Github help`_ is very well written and will get you started on using git
-and github in a jiffy. It is an invaluable ressource for newbies and old timers
-alike.
-
-Syntax and conventions
-----------------------
-
-We try to conform to `PEP8`_ as much as possible. A few highlights:
-
-- Indentation should be exactly 4 spaces. Not 2, not 6, not 8. **4**. Also, tabs
-  are evil.
-- We try (loosely) to keep the line length at 79 characters. Generally the rule
-  is "it should look good in a terminal-base editor" (eg vim), but we try not be
-  [Godwin's law] about it.
-
-Process
--------
-
-#. `fork`_ us on github.
-#. Checkout your fork
-#. Hack hack hack, test test test, commit commit commit.
-#. Push to your fork
-#. Create a pull request
-
-Once the pull request was created, several things will happend depending on the
-content of said pull request:
-
-Code
-****
-
-The obvious content.
+=======================
 
 If you're interested in developing a new feature for the cms, it is recommended
 that you first discuss it on the `django-cms-developers`_  mailing list so as
@@ -83,8 +58,39 @@ not to do any work that will not get merged in anyway.
 - Usually, if unit tests are written, pass, and your change is relevant, then
   it'll be merged.
 
+Since we're hosted on github, django-cms uses git as a version control system.
+
+The `Github help`_ is very well written and will get you started on using git
+and github in a jiffy. It is an invaluable ressource for newbies and old timers
+alike.
+
+
+Syntax and conventions
+======================
+
+We try to conform to `PEP8`_ as much as possible. A few highlights:
+
+- Indentation should be exactly 4 spaces. Not 2, not 6, not 8. **4**. Also, tabs
+  are evil.
+- We try (loosely) to keep the line length at 79 characters. Generally the rule
+  is "it should look good in a terminal-base editor" (eg vim), but we try not be
+  [Godwin's law] about it.
+
+
+Process
+=======
+
+This is how you fix a bug or add a feature:
+
+#. `fork`_ us on github.
+#. Checkout your fork.
+#. Hack hack hack, test test test, commit commit commit, test again.
+#. Push to your fork.
+#. Open a pull request.
+
+
 Tests
-*****
+=====
 
 Having a wide and comprehensive library of unit-tests and integration tests is
 of exceeding importance. Contributing tests is widely regarded as a very
@@ -116,8 +122,9 @@ flag, but since that makes running the test suite slower, it's disabled by
 default. You can also see all flags using ``--help``.
 
 
-Documentation
-*************
+**************************
+Contributing Documentation
+**************************
 
 Perhaps considered "boring" by hard-core coders, documentation is sometimes even
 more important than code! This is what brings fresh blood to a project, and
@@ -148,9 +155,24 @@ Also, contributing to the documentation will earn you great respect from the
 core developers. You get good karma just like a test contributor, but you get
 double cookie points. Seriously. You rock.
 
+Section style
+=============
 
+We use Python documentation conventions fo section marking:
+
+* ``#`` with overline, for parts
+* ``*`` with overline, for chapters
+* ``=``, for sections
+* ``-``, for subsections
+* ``^``, for subsubsections
+* ``"``, for paragraphs
+
+
+************
 Translations
-------------
+************
+
+
 For translators we have a `transifex account
 <http://www.transifex.net/projects/p/django-cms/>`_ where you can translate
 the .po files and don't need to install git or mercurial to be able to

@@ -1,31 +1,37 @@
+################
 Plugin Reference
-================
+################
 
+*****
 model
------
+*****
 
 Is the CMSPlugin model we created earlier. If you don't need a model because
 you just want to display some template logic, use CMSPlugin from
 ``cms.models`` as the model instead.
 
+****
 name
-----
+****
 
 Will be displayed in the plugin editor.
 
+******
 module
-------
+******
 
 Will be group the plugin in the plugin editor. If module is None, plugin is
 grouped "Generic" group.
 
+***************
 render_template
----------------
+***************
 
 Will be rendered with the context returned by the render function
 
+******
 render
-------
+******
 
 The render function takes 3 arguments:
 
@@ -52,8 +58,10 @@ this simply with::
 Because the request will always be in the context as the requestcontext
 processor is required by the CMS.
 
+
+***********
 PluginMedia
------------
+***********
 
 With a PluginMedia Class you can define a list of javascript and css files
 that should get loaded with the html. You will need to palce a ``{%
@@ -87,33 +95,38 @@ example::
 In this example a Gallery Plugin loads jquery lightbox and jquery cicle plugin
 with some CSS
 
+************
 text_enabled
-------------
+************
 
 *** icon_src ***
 
 *** icon_alt ***
 
+****
 form
-----
+****
 
 The form that will be displayed if you edit the plugin.
 Have a read on django forms for this.
 
+********************
 change_form_template
---------------------
+********************
 
 The template that renders the form.
 
+*************
 admin_preview
--------------
+*************
 
 default = True
 
 Should the plugin be rendered in the admin for a preview?
 
+*************
 render_plugin
--------------
+*************
 
 default = True
 

@@ -1,5 +1,6 @@
+###########################
 Using South with Django-CMS
-===========================
+###########################
 
 South is an incredible piece of software that lets you handle database
 migrations. This document is by no means meant to replace the 
@@ -7,8 +8,9 @@ excellent `documentation`_ available online, but rather to give a quick primer
 on how and why to get started quickly with South.
 
 
+************
 Installation
-------------
+************
 
 Using Django and Python is, as usual, a joy. Installing South should mostly be
 as easy as typing::
@@ -18,10 +20,10 @@ as easy as typing::
 Then, simply add "South" to the list of ``INSTALLED_APPS`` in your
 ``settings.py`` file.
 
-That's it!
 
+***********
 Basic usage
------------
+***********
 
 For a very short crash course:
 
@@ -35,10 +37,10 @@ For a very short crash course:
    ``manage.py schemamigration --auto <app name>`` to create a new migration
    file, then ``manage.py migrate`` to apply the newly created migration!
 
-That's it!
 
+****************************
 More information about South
-----------------------------
+****************************
 
 Obviously, South is a very powerful tool and this simple crash course is only
 the very tip of the iceberg. Readers are highly encouraged to have a quick

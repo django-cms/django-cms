@@ -1,8 +1,10 @@
+###################
 Django CMS Tutorial
-===================
+###################
 
+************
 Installation
--------------
+************
 
 This guide assumes you have the following software installed:
 
@@ -16,7 +18,7 @@ This guide assumes you have the following software installed:
 It also assumes you're on a Unix based system.
 
 Installing Django CMS
-*********************
+=====================
 
 While we strongly encourage you to install the Django CMS using `buildout`_ or
 `virtualenv`_, for the sake of simplicity this guide will install Django CMS
@@ -42,10 +44,10 @@ If this does not return an error, you've successfully installed Django CMS.
 
 
 Preparing the environment
-*************************
+=========================
 
 Starting your Django project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 The following assumes your project is in ``~/workspace/myproject/``.
 
@@ -65,7 +67,7 @@ nice "It Worked" message from Django.
 
 
 Installing and configuring Django CMS in Your Django Project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------------
 
 Open the file ``~/workspace/myproject/settings.py``.
 
@@ -143,7 +145,7 @@ Add at least one template to ``CMS_TEMPLATES``; for example::
 
 
 URL configuration
-*****************
+=================
 
 You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following ``urls.py``::
@@ -176,13 +178,13 @@ recommend you use `django-appmedia`_. After you've installed it, use
 
 
 Initial database setup
-**********************
+======================
 
 This command depends on whether you **upgrade** your installation or do a
 **fresh install**.
 
 Fresh install
-~~~~~~~~~~~~~
+-------------
 
 Run::
 
@@ -193,7 +195,7 @@ The first command will prompt you to create a super user; choose 'yes' and enter
 appropriate values.
 
 Upgrade
-~~~~~~~
+-------
 
 Run::
 
@@ -202,7 +204,7 @@ Run::
 
 
 Up and running!
-***************
+===============
 
 That should be it. Restart your development server and go to
 `127.0.0.1:8000 <http://127.0.0.1:8000>`_ and you should get the Django
@@ -219,8 +221,9 @@ To deploy your Django CMS project on a real webserver, please refer to the
 `Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
+*********
 Templates
----------
+*********
 
 Django CMS uses templates to define how a page should look and what parts of
 it are editable. Editable areas are called *placeholders*. These templates are
@@ -266,8 +269,9 @@ names for your placeholders, to more easily identify them in the admin panel.
 .. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
 
 
+**************************
 Integrating custom content
---------------------------
+**************************
 
 From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
@@ -289,12 +293,12 @@ We assume your main ``urls.py`` looks somewhat like this::
 
 
 My First Plugin
-***************
+===============
 
 A Plugin is a small bit of content you can place on your pages.
 
 The Model
-~~~~~~~~~
+---------
 
 For our polling app we would like to have a small poll plugin, that shows one
 poll and let's the user vote.
@@ -318,7 +322,7 @@ Run ``syncdb`` to create the database tables for this model or see
 
 
 The Plugin Class
-~~~~~~~~~~~~~~~~
+----------------
 
 Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is,
 so following the `Django Tutorial`_, your polls app folder should look like this
@@ -358,7 +362,7 @@ For our poll plugin, write following plugin class::
 
 
 The Template
-~~~~~~~~~~~~
+------------
 
 You probably noticed the ``render_template`` attribute on that plugin class, for
 our plugin to work, that template must exist and is responsible for rendering
@@ -386,7 +390,7 @@ The template could look like this:
 
 
 My First App
-************
+============
 
 Right now, your app is statically hooked into the main ``urls.py``, that is not
 the preferred way in the Django-CMS. Ideally you attach your apps to CMS Pages.
@@ -444,7 +448,7 @@ your polls application.
 
 
 My First Menu
-*************
+=============
 
 Now you might have noticed that the menu tree stops at the CMS Page you created
 in the last step, now let's create a menu that shows a node for each poll you

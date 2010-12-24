@@ -3,13 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+######################################
 Welcome to django cms's documentation!
-======================================
+######################################
 
 This document refers to version |release|
 
+***************
 Getting Started
----------------
+***************
 
 .. toctree::
     :maxdepth: 2
@@ -22,8 +24,10 @@ Getting Started
     navigation
     plugins
     
+
+********
 Advanced
---------
+********
 
 .. toctree::
     :maxdepth: 2
@@ -32,9 +36,11 @@ Advanced
     i18n
     sitemap
     templatetags
-    
+
+
+*****************
 Extending the CMS
------------------
+*****************
 
 .. toctree::
     :maxdepth: 2
@@ -45,9 +51,11 @@ Extending the CMS
     plugin_reference
     placeholders
     searchdocs
-    
+
+
+***********************
 Contributing to the CMS
------------------------
+***********************
 
 .. toctree::
     :maxdepth: 2

@@ -5,11 +5,12 @@ Configuration
 The Django-CMS has a lot of settings you can use to customize your installation
 of the CMS to be exactly like you want it to be.
 
+*****************
 Required Settings
-=================
+*****************
 
 CMS_TEMPLATES
---------------
+=============
 
 Default: ``None`` (Not a valid setting!)
 
@@ -25,11 +26,12 @@ Example::
 	)
 
 
+*******************
 Basic Customization
-===================
+*******************
 
 CMS_TEMPLATE_INHERITANCE
-------------------------
+========================
 
 Default: ``True``
 
@@ -42,7 +44,7 @@ new page is not a root page.
 
 
 CMS_PLACEHOLDER_CONF
-----------------------
+====================
 
 Default: ``{}``
 **Optional**
@@ -105,7 +107,7 @@ regardless of type (takes precedence over the type-specific limits).
 
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
------------------------------
+=============================
 
 Default: ``[]``
 
@@ -115,7 +117,7 @@ more information.
 
 
 CMS_PLUGIN_PROCESSORS
----------------------
+=====================
 
 Default: ``[]``
 
@@ -124,7 +126,7 @@ plugin's output after rendering. See :doc:`custom_plugins` for more information.
 
 
 CMS_APPHOOKS
-------------
+============
 
 Default: ``()``
 
@@ -144,7 +146,7 @@ Example::
 	)
 
 PLACEHOLDER_FRONTEND_EDITING
-----------------------------
+============================
 
 Default: ``True``
 
@@ -152,11 +154,12 @@ If set to ``False``, frontend editing is not available for models using
 ``cms.models.fields.PlaceholderField``.
 
 
+*************
 I18N and L10N
-=============
+*************
 
 CMS_HIDE_UNTRANSLATED
------------------------
+=====================
 
 Default: ``True``
 
@@ -164,7 +167,7 @@ By default django-cms hides menu items that are not yet translated into the
 current language. With this setting set to False they will show up anyway.
 
 CMS_LANGUAGES
---------------
+=============
 
 Default: Value of ``LANGUAGES``
 
@@ -182,7 +185,7 @@ Example::
 
 
 CMS_LANGUAGE_FALLBACK
------------------------
+=====================
 
 Default: ``True``
 
@@ -191,7 +194,7 @@ page is not available in the current language.
 
 
 CMS_LANGUAGE_CONF
------------------
+=================
 
 Default: ``{}``
 
@@ -205,7 +208,7 @@ Example::
 	}
 
 CMS_SITE_LANGUAGES
-------------------
+==================
 
 Default: ``{}``
 
@@ -223,7 +226,7 @@ Example::
 
 
 CMS_FRONTEND_LANGUAGES
-----------------------
+======================
 
 Default: Value of ``CMS_LANGUAGES``
 
@@ -237,7 +240,7 @@ Example::
 
 
 CMS_DBGETTEXT
--------------
+=============
 
 Default: ``False`` (unless ``dbgettext`` is in ``settings.INSTALLED_APPS``)
 
@@ -246,7 +249,7 @@ administration interface. Requires `django-dbgettext
 <http://http://bitbucket.org/drmeers/django-dbgettext>`_.
 
 CMS_DBGETTEXT_SLUGS
--------------------
+===================
 
 Default: ``False``
 
@@ -257,19 +260,20 @@ For general dbgettext settings, see the `dbgettext documentation
 <http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
 
 
+**************
 Media Settings
-==============
+**************
 
 
 CMS_MEDIA_PATH
---------------
+==============
 
 default: ``cms/``
 
 The path from MEDIA_ROOT to the media files located in ``cms/media/``
 
 CMS_MEDIA_ROOT
---------------
+==============
 
 Default: ``settings.MEDIA_ROOT + CMS_MEDIA_PATH``
 
@@ -277,14 +281,14 @@ The path to the media root of the cms media files.
 
 
 CMS_MEDIA_URL
--------------
+=============
 
 default: ``MEDIA_URL + CMS_MEDIA_PATH``
 
 The location of the media files that are located in cms/media/cms/
 
 CMS_PAGE_MEDIA_PATH
--------------------
+===================
 
 Default: ``'cms_page_media/'``
 
@@ -293,11 +297,12 @@ files folder where all uploaded media files are stored. The media files are
 stored in subfolders numbered with the id of the page.
 
 
+****
 URLs
-====
+****
 
 CMS_URL_OVERWRITE
--------------------
+=================
 
 Default: ``True``
 
@@ -306,7 +311,7 @@ page. With this field you can overwrite the whole relative url of the page.
 
 
 CMS_MENU_TITLE_OVERWRITE
----------------------------
+========================
 
 Default: ``False``
 
@@ -319,7 +324,7 @@ To access the menu title in the template, use::
 	{{ page.get_menu_title }}
 
 CMS_REDIRECTS
---------------
+=============
 
 Default: ``False``
 
@@ -333,7 +338,7 @@ handy, and is designed exactly for this purpose.
 
 
 CMS_FLAT_URLS
----------------
+=============
 
 Default: ``False``
 
@@ -344,7 +349,7 @@ the "hello" page. If disabled the page would have the url: "/hello/world/"
 
 
 CMS_SOFTROOT
--------------
+============
 
 Default: ``False``
 
@@ -355,12 +360,13 @@ the softroot.
 If you have a huge site you can easily partition the menu with this.
 
 
+*****************
 Advanced Settings
-=================
+*****************
 
 
 CMS_PERMISSION
---------------
+==============
 
 Default: ``False``
 
@@ -382,7 +388,7 @@ he can limit the rights of the users he creates even further, allowing them to s
 only a subset of the pages he's allowed access to, for example.
 
 CMS_MODERATOR
---------------
+=============
 	
 Default: ``False``
 
@@ -398,7 +404,7 @@ same time.
 
 
 CMS_SHOW_START_DATE & CMS_SHOW_END_DATE
-----------------------------------------------
+=======================================
 
 Default: ``False`` for both
 
@@ -406,7 +412,7 @@ This adds 2 new date-time fields in the advanced-settings tab of the page.
 With this option you can limit the time a page is published.
 
 CMS_SEO_FIELDS
-----------------
+==============
 
 Default: ``False``
 
@@ -425,7 +431,7 @@ To access these fields in the template use::
 	</head>
 
 CMS_CONTENT_CACHE_DURATION
---------------------------
+==========================
 
 Default: ``60``
 
@@ -433,7 +439,7 @@ Defines how long page content should be cached, in seconds, including navigation
 menu.
 
 CMS_CACHE_PREFIX
-----------------
+================
 
 Default: ``None``
 
