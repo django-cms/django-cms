@@ -3,10 +3,11 @@ from cms.models import Page, Title
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.sitemaps import CMSSitemap
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
+from django.utils.translation import activate, get_language
 from django.http import HttpRequest
 import os.path
-
 
 class PagesTestCase(CMSTestCase):
 
@@ -236,3 +237,25 @@ class PagesTestCase(CMSTestCase):
         page1.login_required = True
         page1.save()
         self.assertEqual(CMSSitemap().items().count(),0)
+
+    def test_13_edit_page_other_site_and_language(self):
+        """
+        Test that a page can edited via the admin when your current site is different
+        from the site you are editing and the language isn't available for the current site
+        """
+        Site(id=3, domain='local', name='third site').save()
+        response = self.client.get("/admin/cms/page/?site__exact=3") # Change site
+        page_data = self.get_new_page_data()
+        page_data['site'] = 3
+        page_data['language'] = settings.CMS_SITE_LANGUAGES[page_data['site']][0]
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page =  Page.objects.get(title_set__slug=page_data['slug'])
+        response = self.client.get('/admin/cms/page/%s/' %page.id)
+        self.assertEqual(response.status_code, 200)
+        page_data['title'] = 'changed title'
+        response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        cur = get_language()
+        activate(page_data['language'])
+        self.assertEqual(page.get_title(), 'changed title')
+        activate(cur)

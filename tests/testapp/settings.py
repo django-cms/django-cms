@@ -114,6 +114,7 @@ LANGUAGES = (
     ('fr', gettext('French')),
     ('de', gettext('German')),
     ('pt-BR', gettext("Brazil")),
+    ('nl', gettext("Dutch")),
 )
 
 CMS_LANGUAGE_CONF = {
@@ -124,6 +125,7 @@ CMS_LANGUAGE_CONF = {
 CMS_SITE_LANGUAGES = {
     1:['en','de','fr','pt-BR'],
     2:['de','fr'],
+    3:['nl'],
 }
 
 APPEND_SLASH = True
