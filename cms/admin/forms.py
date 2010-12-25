@@ -67,6 +67,9 @@ class PageAddForm(forms.ModelForm):
         
         page = self.instance
         lang = cleaned_data.get('language', None)
+        # No language, can not go further, but validation failed already
+        if not lang: 
+            return cleaned_data
         
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
@@ -78,8 +81,6 @@ class PageAddForm(forms.ModelForm):
             site = None
             raise ValidationError("No site found for current settings.")
         
-        if lang is None: # No language, can not go further, but validation failed already
-            return cleaned_data
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
