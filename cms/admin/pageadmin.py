@@ -1049,7 +1049,7 @@ class PageAdmin(model_admin):
             page.save()
             return render_admin_menu_item(request, page)
         else:
-            return HttpResponseForbidden(_("You do not have permission to publish this page"))
+            return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
     def change_innavigation(self, request, page_id):
         """
@@ -1110,11 +1110,11 @@ class PageAdmin(model_admin):
                 position = None
                 language = request.POST['language'] or get_language_from_request(request)
             if page and not page.has_change_permission(request):
-                return HttpResponseForbidden(_("You do not have permission to change this page"))
+                return HttpResponseForbidden(unicode(_("You do not have permission to change this page")))
 
             # Sanity check to make sure we're not getting bogus values from JavaScript:
             if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
-                return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+                return HttpResponseBadRequest(unicode(_("Language must be set to a supported language!")))
 
             plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
 
@@ -1126,7 +1126,7 @@ class PageAdmin(model_admin):
                 make_revision_with_plugins(page)
                 reversion.revision.user = request.user
                 plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-                reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
+                reversion.revision.comment = unicode(_(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder})
                 
             return HttpResponse(str(plugin.pk))
         raise Http404

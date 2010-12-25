@@ -338,7 +338,6 @@ class Page(MpttPublisher):
 
         Returns: True if page was successfully published.
         """
-        
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
             return
