@@ -1,18 +1,11 @@
-'''
-Created on Dec 10, 2010
-
-@author: Christopher Glass <christopher.glass@divio.ch>
-'''
-
-
 from __future__ import with_statement
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.tests import base
 from cms.tests.base import CMSTestCase
-from django.conf import settings
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
+
 
 class AdminTestCase(CMSTestCase):
     

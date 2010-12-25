@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
-from menus.menu_pool import menu_pool
+
 
 class NonRootCase(CMSTestCase):
     urls = 'testapp.nonroot_urls'

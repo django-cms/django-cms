@@ -1,11 +1,11 @@
-from django.contrib.auth.models import User
-from django.conf import settings
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE,\
-    URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
-from cms.models import Title, Page, CMSPlugin
+from cms.models import Page, CMSPlugin
+from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS, \
+    ACCESS_DESCENDANTS
 from cms.models.permissionmodels import PagePermission
-from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS,\
-    ACCESS_CHOICES, ACCESS_DESCENDANTS, ACCESS_CHILDREN
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE, \
+    URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+from django.conf import settings
+from django.contrib.auth.models import User
 
 class PermissionModeratorTestCase(CMSTestCase):
     """Permissions and moderator together

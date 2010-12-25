@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE
-from cms.models import Page, Title
+from cms.models import Page
 from cms.plugins.text.models import Text
 from cms.models.pluginmodel import CMSPlugin
 from reversion.models import Revision, Version
