@@ -3,9 +3,9 @@ API References
 ##############
 
 
-*************
-CMSPluginBase
-*************
+***************
+cms.plugin_base
+***************
 
 .. module:: cms.plugin_base
 
@@ -85,3 +85,24 @@ CMSPluginBase
             
             The Javascript files required to render this plugin as a sequence
             of strings.
+
+
+**********
+menus.base
+**********
+
+.. module:: menus.base
+
+.. class:: NavigationNode(title, url, id[, parent_id=None][, parent_namespace=None][, attr=None][, visible=True])
+
+    A navigation node in a menu tree.
+        
+    :param string title: The title to display this menu item with.
+    :param string url: The URL associated with this menu item.
+    :param id: Unique (for the current tree) ID of this item.
+    :param parent_id: Optional, ID of the parent item.
+    :param parent_namespace: Optional, namespace of the parent.
+    :param dict attr: Optional, dictionary of additional information to store on
+                      this node.
+    :param bool visible: Optional, defaults to ``True``, whether this item is
+                         visible or not.

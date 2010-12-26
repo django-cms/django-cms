@@ -161,7 +161,7 @@ urlpatterns. We suggest starting with the following ``urls.py``::
         url(r'^', include('cms.urls')),
 	)
 
-	if settings.DEBUG:
+	if settings.DEBUG: # these lines are just to serve media on local machines.
 	    urlpatterns = patterns('',
 	        url(
 	            r'^media/cms/(?P<path>.*)$',
@@ -347,15 +347,15 @@ For our poll plugin, write following plugin class::
     from django.utils.translation import ugettext as _
     
     class PollPlugin(CMSPluginBase):
-        model = PollPluginModel
-        name = _("Poll Plugin")
-        render_template = "polls/plugin.html"
+        model = PollPluginModel # Model where data about this plugin is saved
+        name = _("Poll Plugin") # Name of the plugin
+        render_template = "polls/plugin.html" # template to render the plugin with
     
         def render(self, context, instance, placeholder):
             context.update({'instance':instance})
             return context
     
-    plugin_pool.register_plugin(TextWithTitlePlugin)
+    plugin_pool.register_plugin(TextWithTitlePlugin) # register the plugin
 
 .. note:: All plugin classes must inherit ``cms.plugin_base.CMSPluginBase``
           and must register themselves with the ``cms.plugin_pool.plugin_pool``.
@@ -416,10 +416,10 @@ In this file, write::
     from django.utils.translation import ugettext_lazy as _
     
     class PollsApp(CMSApp):
-        name = _("Poll App")
-        urls = ["polls.urls"]
+        name = _("Poll App") # give your app a name, this is required
+        urls = ["polls.urls"] # link your app to url configuration(s)
         
-    apphook_pool.register(PollsApp)
+    apphook_pool.register(PollsApp) # register your app
     
 Now remove the inclusion of the polls urls in your main ``urls.py`` so it looks
 like this::
@@ -477,15 +477,26 @@ In your ``menu.py`` write::
     from polls.models import Poll
     
     class PollsMenu(CMSAttachMenu):
-        name = _("Polls Menu")
+        name = _("Polls Menu") # give the menu a name, this is required.
         
         def get_nodes(self, request):
+            """
+            This method is used to build the menu tree.
+            """
             nodes = []
             for poll in Poll.objects.all():
-                node = NavigationNode(poll.question, reverse('polls.views.detail', args=(poll.pk,)))
+                # the menu tree consists of NavigationNode instances
+                # Each NavigationNode takes a label as first argument, a URL as
+                # second argument and a (for this tree) unique id as third
+                # argument.
+                node = NavigationNode(
+                    poll.question,
+                    reverse('polls.views.detail', args=(poll.pk,)),
+                    poll.pk
+                )
                 nodes.append(node)
             return nodes
-    menu_pool.register_menu(PollsMenu)
+    menu_pool.register_menu(PollsMenu) # register the menu.
 
 
 Now this menu alone doesn't do a whole lot yet, we have to attach it to the
@@ -501,7 +512,7 @@ So open your ``cms_apps.py`` and write::
     class PollsApp(CMSApp):
         name = _("Poll App")
         urls = ["polls.urls"]
-        menu = [PollsMenu]
+        menu = [PollsMenu] # attach a CMSAttachMenu to this apphook.
         
     apphook_pool.register(PollsApp)
 
