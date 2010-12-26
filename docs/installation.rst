@@ -1,12 +1,15 @@
+############
 Installation
-============
+############
 
 This document assumes you are familiar with Python and Django.
 
 A more beginner-friendly tutorial can be found :doc:`here <tutorial>`.
 
+
+************
 Requirements
-============
+************
 
 * `Python`_ 2.5 (or a higher release of 2.x). 2.4 might work, but is not
   supported.
@@ -22,11 +25,12 @@ Requirements
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 
+****
 Apps
-----
+****
 
 Required
-~~~~~~~~
+========
 
 * ``django.contrib.auth``
 * ``django.contrib.contenttypes``
@@ -43,7 +47,7 @@ Required
     included with Django CMS.
 
 Optional
-~~~~~~~~
+========
 
 * ``cms.plugins.text``
 * ``cms.plugins.picture``
@@ -54,8 +58,9 @@ Optional
 * ``publisher``
 
 
+***********
 Middlewares
------------
+***********
 
 Note that the order is important:
 
@@ -71,8 +76,10 @@ Note that the order is important:
 .. note:: For non-multilingual sites you may remove the
           `cms.middleware.multilingual.MultilingualURLMiddleware` middleware.
 
+
+***************************
 Template Context Processors
----------------------------
+***************************
 
 * ``django.core.context_processors.auth``
 * ``django.core.context_processors.i18n``
@@ -80,28 +87,36 @@ Template Context Processors
 * ``django.core.context_processors.media``
 * ``cms.context_processors.media``
 
+
+*********
 Templates
----------
+*********
 
 You must define at least one template in ``CMS_TEMPLATES``, which should
 contain at least one ``{% placeholder '<name>' %}`` tag.
 
+
+*******
 urls.py
--------
+*******
 
 Include ``cms.urls`` **at the very end** of your urlpatterns. It **must** be the
 last pattern in the list!
 
+
+***********
 Media Files
------------
+***********
 
 Make sure your Django installation finds the cms media files. We recommend
 using django-appmedia, which will create a symbolic link for you. If
 for whatever reason you are unable to use it, copy the folder ``cms/media/cms``
 into your main media folder.
 
+
+*****
 South
------
+*****
 
 To avoid issues with migrations during the installation process it is currently
 recommended to use ``python manage.py syncdb --all`` and
@@ -109,8 +124,9 @@ recommended to use ``python manage.py syncdb --all`` and
 migrations are not supported with sqlite3.
 
 
+***************
 Troubleshooting
----------------
+***************
 
 If you've created a page & you don't see it in the cms list of the Django admin:
 
@@ -123,15 +139,19 @@ button with a dropdown-list of plugins:
 - Be sure your ``CMS_TEMPLATES`` setting is correct, the templates specified
   exist, and they contain at least one ``{% placeholder %}`` templatetag.
 
+
 Template errors
-~~~~~~~~~~~~~~~
+===============
+
 If your placeholder content isn't displayed when you view a CMS page: change the
 CMS_MODERATOR variable in settings.py to False. This bug has been recently
 fixed, so upgrade to the latest version of Django CMS. See:
 https://github.com/divio/django-cms/issues/issue/430
 
+
 Javascript errors
-~~~~~~~~~~~~~~~~~
+=================
+
 If plugins don't work (e.g.: you add a text plugin, but don't see the Javascript
 text editor in the plugin window), you should use a Javascript inspector in your
 browser to investigate the issue (e.g.: Firebug for Firefox, Web Inspector for
@@ -153,5 +173,3 @@ than the main webserver. In your test environment, you can overcome this issue
 by adding a CMS_MEDIA_URL variable to your settings.py file, and adding a url
 rule in urls.py to make the Django development serve the Django CMS files from
 this location.
-
-

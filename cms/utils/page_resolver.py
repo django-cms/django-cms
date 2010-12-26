@@ -87,8 +87,10 @@ def get_page_from_request(request, use_path=None):
         # home slug that are on the same tree as home, since home isn't ussually
         # called with it's slug, thus it's children don't have the home bit in
         # the request either, thus we need to re-add it.
-        q |= Q(title_set__path='%s/%s' % (home.get_slug(), path))
-        q &= Q(tree_id=home.tree_id)
+        q2 = Q()
+        q2 = Q(title_set__path='%s/%s' % (home.get_slug(), path))
+        q2 &= Q(tree_id=home.tree_id)
+        q |= q2
         
     # TODO: We should probably get rid of this odd DB-Gettext thingy, no idea
     # how and why this should work
