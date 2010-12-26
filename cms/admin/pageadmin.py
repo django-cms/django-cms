@@ -1361,5 +1361,10 @@ class PageAdmin(model_admin):
                 page_moderator.save()
                 return render_admin_menu_item(request, page)
         raise Http404
+    
+    def lookup_allowed(self, key):
+        if key == 'site__exact':
+            return True
+        return super(PageAdmin, self).lookup_allowed(key)
 
 admin.site.register(Page, PageAdmin)

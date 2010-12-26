@@ -81,7 +81,7 @@ class PermissionModeratorTestCase(CMSTestCase):
             'can_delete_pagepermission': can_delete_pagepermission,            
         }
         response = self.client.post('/admin/cms/pageuser/add/', data)
-        self.assertRedirects(response, '/admin/cms/pageuser/')
+        self.assertEqual(response.status_code, 302)
         
         return User.objects.get(username=username)
         
