@@ -7,8 +7,7 @@ from __future__ import with_statement
 from cms.management.commands import publisher_publish
 from cms.models.pagemodel import Page
 from cms.tests.base import CMSTestCase
-from cms.tests.util.settings_contextmanager import SettingsOverride
-from cms.tests.util.standard_out_contextmanager import StdoutOverride
+from cms.tests.util.context_managers import SettingsOverride, StdoutOverride
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 

@@ -361,6 +361,8 @@ class PageAdmin(model_admin):
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             except:
                 title_obj = EmptyTitle()
+            if form.base_fields['site'].initial is None:
+                form.base_fields['site'].initial = obj.site
             for name in ['slug',
                          'title',
                          'application_urls',

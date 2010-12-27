@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.models import Page, Title
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.sitemaps import CMSSitemap
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
+    URL_CMS_PAGE_CHANGE
+from cms.tests.util.context_managers import LanguageOverride
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.http import HttpRequest
 import os.path
-
 
 class PagesTestCase(CMSTestCase):
 
@@ -236,3 +239,22 @@ class PagesTestCase(CMSTestCase):
         page1.login_required = True
         page1.save()
         self.assertEqual(CMSSitemap().items().count(),0)
+
+    def test_13_edit_page_other_site_and_language(self):
+        """
+        Test that a page can edited via the admin when your current site is
+        different from the site you are editing and the language isn't available
+        for the current site.
+        """
+        site = Site.objects.create(domain='otherlang', name='otherlang')
+        # Change site for this session
+        page_data = self.get_new_page_data()
+        page_data['site'] = site.pk
+        page_data['title'] = 'changed title'
+        TESTLANG = settings.CMS_SITE_LANGUAGES[site.pk][0]
+        page_data['language'] = TESTLANG
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        page =  Page.objects.get(title_set__slug=page_data['slug'])
+        with LanguageOverride(TESTLANG):
+            self.assertEqual(page.get_title(), 'changed title')
