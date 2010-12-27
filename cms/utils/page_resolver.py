@@ -81,16 +81,19 @@ def get_page_from_request(request, use_path=None):
     
     # title_set__path=path should be clear, get the pages where the path of the
     # title object is equal to our path.
-    q = Q(title_set__path=path)
-    if home:
-        # if we have a home, also search for all paths prefixed with the
-        # home slug that are on the same tree as home, since home isn't ussually
-        # called with it's slug, thus it's children don't have the home bit in
-        # the request either, thus we need to re-add it.
-        q2 = Q()
-        q2 = Q(title_set__path='%s/%s' % (home.get_slug(), path))
-        q2 &= Q(tree_id=home.tree_id)
-        q |= q2
+    if settings.CMS_FLAT_URLS:
+        q = Q(title_set__slug=path)
+    else:
+        q = Q(title_set__path=path)
+        if home:
+            # if we have a home, also search for all paths prefixed with the
+            # home slug that are on the same tree as home, since home isn't ussually
+            # called with it's slug, thus it's children don't have the home bit in
+            # the request either, thus we need to re-add it.
+            q2 = Q()
+            q2 = Q(title_set__path='%s/%s' % (home.get_slug(), path))
+            q2 &= Q(tree_id=home.tree_id)
+            q |= q2
         
     # TODO: We should probably get rid of this odd DB-Gettext thingy, no idea
     # how and why this should work

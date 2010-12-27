@@ -4,7 +4,7 @@ from cms.models import Page, Title
 from cms.sitemaps import CMSSitemap
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PAGE_CHANGE
-from cms.tests.util.context_managers import LanguageOverride
+from cms.tests.util.context_managers import LanguageOverride, SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -258,3 +258,36 @@ class PagesTestCase(CMSTestCase):
         page =  Page.objects.get(title_set__slug=page_data['slug'])
         with LanguageOverride(TESTLANG):
             self.assertEqual(page.get_title(), 'changed title')
+        
+    def test_14_flat_urls(self):
+        with SettingsOverride(CMS_FLAT_URLS=True):
+            home_slug = "home"
+            child_slug = "child"
+            grandchild_slug = "grandchild"
+            home = self.new_create_page(
+                title=home_slug,
+                published=True,
+                in_navigation=True
+            )
+            home.publish()
+            child = self.new_create_page(
+                parent_page=home,
+                title=child_slug,
+                published=True, 
+                in_navigation=True
+            )
+            child.publish()
+            grandchild = self.new_create_page(
+                parent_page=child,
+                title=grandchild_slug,
+                published=True, 
+                in_navigation=True
+            )
+            grandchild.publish()
+            response = self.client.get(home.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(child.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(grandchild.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(child.get_absolute_url() in grandchild.get_absolute_url())
