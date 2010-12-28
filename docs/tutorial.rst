@@ -324,9 +324,9 @@ Run ``syncdb`` to create the database tables for this model or see
 The Plugin Class
 ----------------
 
-Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is in,
-so following the `Django Tutorial`_, your polls app folder should look like this
-now::
+Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is
+in, so following the `Django Tutorial`_, your polls app folder should look like
+this now::
 
     polls/
         __init__.py
