@@ -15,15 +15,15 @@ This guide assumes you have the following software installed:
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.2.2 or higher
 
-It also assumes you're on a Unix based system.
+It also assumes you're on a Unix-based system.
 
 Installing Django CMS
 =====================
 
 While we strongly encourage you to install the Django CMS using `buildout`_ or
 `virtualenv`_, for the sake of simplicity this guide will install Django CMS
-system wide. For a proper installion procedure, please read the documentation of
-those projects.
+system wide. For a proper installation procedure, please read the documentation
+of those projects.
 
 Install the latest Django CMS package::
 
@@ -49,7 +49,7 @@ Preparing the environment
 Starting your Django project
 ----------------------------
 
-The following assumes your project is in ``~/workspace/myproject/``.
+The following assumes your project will be in ``~/workspace/myproject/``.
 
 Set up your Django project::
 
@@ -66,7 +66,7 @@ nice "It Worked" message from Django.
 .. |it-worked| image:: images/it-worked.png
 
 
-Installing and configuring Django CMS in Your Django Project
+Installing and configuring Django CMS in your Django project
 ------------------------------------------------------------
 
 Open the file ``~/workspace/myproject/settings.py``.
@@ -275,7 +275,7 @@ Integrating custom content
 
 From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
-Django-CMS. If a poll app is mentioned here, we mean the one you get when
+Django CMS. If a poll app is mentioned here, we mean the one you get when
 finishing the `Django Tutorial`_.
 
 We assume your main ``urls.py`` looks somewhat like this::
@@ -308,13 +308,13 @@ In your poll application's ``models.py`` add the following model::
     from cms.models import CMSPlugin
     
     class PollPlugin(CMSPlugin):
-        poll = models.ForeignKex('polls.Poll', related_name='plugins')
+        poll = models.ForeignKey('polls.Poll', related_name='plugins')
         
         def __unicode__(self):
           return self.poll.question
 
 
-.. note:: Django-CMS Plugins must inherit ``cms.models.CMSPlugin`` (or a
+.. note:: Django CMS Plugins must inherit from ``cms.models.CMSPlugin`` (or a
           subclass thereof) and not ``django.db.models.Model``.
 
 Run ``syncdb`` to create the database tables for this model or see
@@ -324,7 +324,7 @@ Run ``syncdb`` to create the database tables for this model or see
 The Plugin Class
 ----------------
 
-Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is,
+Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is in,
 so following the `Django Tutorial`_, your polls app folder should look like this
 now::
 
@@ -336,7 +336,7 @@ now::
         views.py 
 
 
-The plugin class is responsible to provide the Django-CMS with the necessary
+The plugin class is responsible to provide the Django CMS with the necessary
 information to render your Plugin.
 
 For our poll plugin, write following plugin class::
@@ -355,9 +355,9 @@ For our poll plugin, write following plugin class::
             context.update({'instance':instance})
             return context
     
-    plugin_pool.register_plugin(TextWithTitlePlugin) # register the plugin
+    plugin_pool.register_plugin(PollPlugin) # register the plugin
 
-.. note:: All plugin classes must inherit ``cms.plugin_base.CMSPluginBase``
+.. note:: All plugin classes must inherit from ``cms.plugin_base.CMSPluginBase``
           and must register themselves with the ``cms.plugin_pool.plugin_pool``.
 
 
@@ -393,7 +393,7 @@ My First App
 ============
 
 Right now, your app is statically hooked into the main ``urls.py``, that is not
-the preferred way in the Django-CMS. Ideally you attach your apps to CMS Pages.
+the preferred way in the Django CMS. Ideally you attach your apps to CMS Pages.
 
 For that purpose you write CMS Apps. That is just a small class telling the CMS
 how to include that app.
@@ -451,10 +451,10 @@ My First Menu
 =============
 
 Now you might have noticed that the menu tree stops at the CMS Page you created
-in the last step, now let's create a menu that shows a node for each poll you
+in the last step, so let's create a menu that shows a node for each poll you
 have active.
 
-For this we need a file calls ``menu.py``, create it and check your polls app
+For this we need a file called ``menu.py``, create it and check your polls app
 looks like this::
 
     polls/
