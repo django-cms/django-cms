@@ -7,6 +7,7 @@ from models import InheritPagePlaceholder
 from django.conf import settings
 from cms.plugins.inherit.forms import InheritForm
 import copy
+from cms.plugins.utils import get_plugin_media
 
 class InheritPagePlaceholderPlugin(CMSPluginBase):
     """
@@ -25,10 +26,9 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         }
         template_vars['object'] = instance
         lang = instance.from_language
-        request = None
+        request = context.get('request', None)
         if not lang:
             if context.has_key('request'):
-                request = context['request']
                 lang = get_language_from_request(request)
             else:
                 lang = settings.LANGUAGE_CODE
@@ -39,7 +39,12 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         if not instance.page.publisher_is_draft and page.publisher_is_draft:
             page = page.publisher_public
             
-        plugins = get_cmsplugin_queryset(request).filter(page=page, language=lang, placeholder__iexact=placeholder, parent__isnull=True).order_by('position').select_related()
+        plugins = get_cmsplugin_queryset(request).filter(
+            placeholder__page=page,
+            language=lang,
+            placeholder__slot__iexact=placeholder,
+            parent__isnull=True
+        ).order_by('position').select_related()
         plugin_output = []
         template_vars['parent_plugins'] = plugins 
         for plg in plugins:
@@ -48,6 +53,8 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
             inst, name = plg.get_plugin_instance()
             outstr = inst.render_plugin(tmpctx, placeholder)
             plugin_output.append(outstr)
+            if request and hasattr(request, 'placeholder_media'):
+                request.placeholder_media += get_plugin_media(request, context, inst)
         template_vars['parent_output'] = plugin_output
         context.update(template_vars)
         return context

@@ -1,0 +1,22 @@
+{% load menu_tags cache %}
+{% for child in children %}
+				
+<li>
+	<a href="{{ child.get_absolute_url }}" class="menu {% if child.selected %} selected{% endif %}{% if child.ancestor %} ancestor{% endif %}">{% if not child.is_leaf_node %}+{% endif %}{{ child.get_menu_title }}
+	<span>	
+	{% if child.selected %}selected{% endif %}
+	{% if child.ancestor %}ancestor{% endif %}
+	{% if child.sibling %}sibling{% endif %}
+	{% if child.descendant %}descendant{% endif %}
+	{% if child.soft_root %}(softroot){% endif %}
+	(Level: {{ child.menu_level }} {{ child.level }})
+	</span>
+	</a>
+    {% if child.children %}
+    <ul>
+        {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
+    </ul>
+    {% endif %}
+</li>
+				
+{% endfor %}

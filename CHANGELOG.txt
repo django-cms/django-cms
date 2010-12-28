@@ -33,5 +33,5 @@
 - a lot of bugfixes
 - the cms now depends on the cms.middleware.media.PlaceholderMediaMiddleware middleware
 - templatetags refactored: see cms/docs/templatetags.txt for new signatures.
-- placeholder has new option: or and a endbpalceholder templatetag
+- placeholder has new option: or and a endpalceholder templatetag
 

@@ -1,21 +1,69 @@
-from django.contrib.auth.models import User
-from django.core.handlers.wsgi import WSGIRequest
-import copy
-from django.conf import settings
-from django.test.testcases import TestCase
-from django.core.exceptions import ObjectDoesNotExist
-from django.template.defaultfilters import slugify
 from cms.models import Title, Page
+from cms.utils.permissions import _thread_locals
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.handlers.wsgi import WSGIRequest
+from django.core.urlresolvers import reverse
+from django.template.context import Context
+from django.template.defaultfilters import slugify
+from django.test.testcases import TestCase
+from menus.menu_pool import menu_pool
+import copy
+import sys
+import urllib
+import warnings
+
 
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
 URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 
 URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
 URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
+URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE + "remove-plugin/"
+
+class _Warning(object):
+    def __init__(self, message, category, filename, lineno):
+        self.message = message
+        self.category = category
+        self.filename = filename
+        self.lineno = lineno
+
+
+
+def _collectWarnings(observeWarning, f, *args, **kwargs):
+    def showWarning(message, category, filename, lineno, file=None, line=None):
+        assert isinstance(message, Warning)
+        observeWarning(_Warning(
+                message.args[0], category, filename, lineno))
+
+    # Disable the per-module cache for every module otherwise if the warning
+    # which the caller is expecting us to collect was already emitted it won't
+    # be re-emitted by the call to f which happens below.
+    for v in sys.modules.itervalues():
+        if v is not None:
+            try:
+                v.__warningregistry__ = None
+            except:
+                # Don't specify a particular exception type to handle in case
+                # some wacky object raises some wacky exception in response to
+                # the setattr attempt.
+                pass
+
+    origFilters = warnings.filters[:]
+    origShow = warnings.showwarning
+    warnings.simplefilter('always')
+    try:
+        warnings.showwarning = showWarning
+        result = f(*args, **kwargs)
+    finally:
+        warnings.filters[:] = origFilters
+        warnings.showwarning = origShow
+    return result
 
 class CMSTestCase(TestCase):
     counter = 1
-        
+
     def _pre_setup(self):
         """We are doing a lot of setting modifications in our tests, this 
         mechanism will restore to original settings after each test case.
@@ -28,14 +76,14 @@ class CMSTestCase(TestCase):
     def _post_teardown(self):
         # restore original settings after each test
         settings._wrapped = self._original_settings_wrapped
+        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
+        menu_pool.clear()  
         super(CMSTestCase, self)._post_teardown()
-    
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
         self.user = user
         self.assertEqual(logged_in, True)
-    
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
@@ -112,11 +160,58 @@ class CMSTestCase(TestCase):
         # public model shouldn't be available yet, because of the moderation
         self.assertObjectExist(Title.objects, slug=page_data['slug'])
         
+# test case currently failing because Title model is no longer under Publisher
         if settings.CMS_MODERATOR and page.is_under_moderation(): 
             self.assertObjectDoesNotExist(Title.objects.public(), slug=page_data['slug'])
         
         return page
-    
+        
+    def new_create_page(self, parent_page=None, user=None, position="last-child",
+            title=None, site=1, published=False, in_navigation=False, **extra):
+        """
+        Common way for page creation with some checks
+        """
+        _thread_locals.user = user
+        language = settings.LANGUAGES[0][0]
+        if settings.CMS_SITE_LANGUAGES.get(site, False):
+            language = settings.CMS_SITE_LANGUAGES[site][0]
+        site = Site.objects.get(pk=site)
+        
+        page_data = {
+            'site': site,
+            'template': 'nav_playground.html',
+            'published': published,
+            'in_navigation': in_navigation,
+        }
+        if user:
+            page_data['created_by'] = user
+            page_data['changed_by'] = user
+        if parent_page:
+            page_data['parent'] = parent_page
+        page_data.update(**extra)
+
+        page = Page.objects.create(**page_data)
+        if parent_page:
+            page.move_to(parent_page, position)
+            page.save()
+        
+        if settings.CMS_MODERATOR and user:
+            page.pagemoderator_set.create(user=user)
+        
+        title_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': language,
+            'page': page,
+        }
+        self.counter = self.counter + 1
+        if title:
+            title_data['title'] = title
+            title_data['slug'] = slugify(title)
+        Title.objects.create(**title_data)
+            
+        del _thread_locals.user
+        return page    
     
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -158,16 +253,23 @@ class CMSTestCase(TestCase):
         page = self.assertObjectExist(Page.objects, id=page.pk)
         return page 
     
-    
-    def get_context(self, path="/"):
+    def get_pages_root(self):
+        return urllib.unquote(reverse("pages-root"))
+        
+    def get_context(self, path=None):
+        if not path:
+            path = self.get_pages_root()
         context = {}
         request = self.get_request(path)
         
         context['request'] = request
         
-        return context   
+        return Context(context)   
         
-    def get_request(self, path="/"):
+    def get_request(self, path=None):
+        if not path:
+            path = self.get_pages_root()
+
         environ = {
             'HTTP_COOKIE':      self.client.cookies,
             'PATH_INFO':         path,
@@ -190,3 +292,21 @@ class CMSTestCase(TestCase):
         request.user = self.user
         request.LANGUAGE_CODE = settings.LANGUAGES[0][0]
         return request
+        
+        
+    def failUnlessWarns(self, category, message, f, *args, **kwargs):
+        warningsShown = []
+        result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
+
+        if not warningsShown:
+            self.fail("No warnings emitted")
+        first = warningsShown[0]
+        for other in warningsShown[1:]:
+            if ((other.message, other.category)
+                != (first.message, first.category)):
+                self.fail("Can't handle different warnings")
+        self.assertEqual(first.message, message)
+        self.assertTrue(first.category is category)
+
+        return result
+    assertWarns = failUnlessWarns

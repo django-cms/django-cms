@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
+from cms.models import Page, Title
+from cms.sitemaps import CMSSitemap
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
+    URL_CMS_PAGE_CHANGE
+from cms.tests.util.context_managers import LanguageOverride, SettingsOverride
 from django.conf import settings
-from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.models import Page, Title, Placeholder
-
+from django.contrib.sites.models import Site
+from django.http import HttpRequest
+import os.path
 
 class PagesTestCase(CMSTestCase):
 
@@ -72,28 +76,16 @@ class PagesTestCase(CMSTestCase):
         """
         Test the details view
         """
-        try:
-            response = self.client.get('/')
-        except TemplateDoesNotExist, e:
-            if e.args != ('404.html',):
-                raise
-        
-        page_data = self.get_new_page_data()
-        page_data['published'] = False
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        try:
-            response = self.client.get('/')
-        except TemplateDoesNotExist, e:
-            if e.args != ('404.html',):
-                raise
-        page_data = self.get_new_page_data()
-        page_data['published'] = True
-        page_data['slug'] = 'test-page-2'
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        response = self.client.get(URL_CMS_PAGE)
-        
-        response = self.client.get('/')
+        response = self.client.get(self.get_pages_root())
+        self.assertEqual(response.status_code, 404)
+        page = self.new_create_page(title='test page 1', published=False)
+        response = self.client.get(self.get_pages_root())
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(page.publish())
+        with_parent = self.new_create_page(parent_page=page, title='test page 2', published=True)
+        homepage = Page.objects.get_home()
+        self.assertTrue(homepage.get_slug(), 'test-page-1')
+        response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
     def test_05_edit_page(self):
@@ -150,12 +142,12 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = self.create_page()
-        page_a_a = self.create_page(page_a)
-        page_a_a_a = self.create_page(page_a_a)
+        page_a = self.new_create_page()
+        page_a_a = self.new_create_page(page_a)
+        page_a_a_a = self.new_create_page(page_a_a)
         
-        page_b = self.create_page()
-        page_b_a = self.create_page(page_b)
+        page_b = self.new_create_page()
+        page_b_a = self.new_create_page(page_b)
         
         count = Page.objects.drafts().count()
         
@@ -191,20 +183,20 @@ class PagesTestCase(CMSTestCase):
         # check page2 path and url
         page2 = Page.objects.get(pk=page2.pk)
         self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
-        self.assertEqual(page2.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
         # check page3 path and url
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
-        self.assertEqual(page3.get_absolute_url(), "/"+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
         # publish page 1 (becomes home)
         page1 = Page.objects.all()[0]
         page1.published = True
         page1.save()
         # check that page2 and page3 url have changed
         page2 = Page.objects.get(pk=page2.pk)
-        self.assertEqual(page2.get_absolute_url(), "/"+page_data2['slug']+"/")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/")
         page3 = Page.objects.get(pk=page3.pk)
-        self.assertEqual(page3.get_absolute_url(), "/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
         # move page2 back to root and check path of 2 and 3
         response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"left" })
         self.assertEqual(response.status_code, 200)
@@ -213,3 +205,89 @@ class PagesTestCase(CMSTestCase):
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
         
+    def test_11_add_placeholder(self):
+        # create page
+        page = self.new_create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
+        page.template = 'add_placeholder.html'
+        page.save()
+        url = page.get_absolute_url()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        path = os.path.join(settings.PROJECT_DIR, 'templates', 'add_placeholder.html')
+        f = open(path, 'r')
+        old = f.read()
+        f.close()
+        new = old.replace(
+            '<!-- SECOND_PLACEHOLDER -->',
+            '{% placeholder second_placeholder %}'
+        )
+        f = open(path, 'w')
+        f.write(new)
+        f.close()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        f = open(path, 'w')
+        f.write(old)
+        f.close()
+
+    def test_12_sitemap_login_required_pages(self):
+        """
+        Test that CMSSitemap object contains only published,public (login_required=False) pages
+        """
+        self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        page1 = Page.objects.all()[0]
+        page1.login_required = True
+        page1.save()
+        self.assertEqual(CMSSitemap().items().count(),0)
+
+    def test_13_edit_page_other_site_and_language(self):
+        """
+        Test that a page can edited via the admin when your current site is
+        different from the site you are editing and the language isn't available
+        for the current site.
+        """
+        site = Site.objects.create(domain='otherlang', name='otherlang')
+        # Change site for this session
+        page_data = self.get_new_page_data()
+        page_data['site'] = site.pk
+        page_data['title'] = 'changed title'
+        TESTLANG = settings.CMS_SITE_LANGUAGES[site.pk][0]
+        page_data['language'] = TESTLANG
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        page =  Page.objects.get(title_set__slug=page_data['slug'])
+        with LanguageOverride(TESTLANG):
+            self.assertEqual(page.get_title(), 'changed title')
+        
+    def test_14_flat_urls(self):
+        with SettingsOverride(CMS_FLAT_URLS=True):
+            home_slug = "home"
+            child_slug = "child"
+            grandchild_slug = "grandchild"
+            home = self.new_create_page(
+                title=home_slug,
+                published=True,
+                in_navigation=True
+            )
+            home.publish()
+            child = self.new_create_page(
+                parent_page=home,
+                title=child_slug,
+                published=True, 
+                in_navigation=True
+            )
+            child.publish()
+            grandchild = self.new_create_page(
+                parent_page=child,
+                title=grandchild_slug,
+                published=True, 
+                in_navigation=True
+            )
+            grandchild.publish()
+            response = self.client.get(home.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(child.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(grandchild.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(child.get_absolute_url() in grandchild.get_absolute_url())

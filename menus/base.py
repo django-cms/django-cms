@@ -17,7 +17,7 @@ class Menu(object):
     
 class Modifier(object):
     
-    def modify(self, request, nodes, namespace, id,  post_cut, breadcrumb):
+    def modify(self, request, nodes, namespace, root_id,  post_cut, breadcrumb):
         pass
     
 class NavigationNode(object):

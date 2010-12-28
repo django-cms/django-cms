@@ -29,6 +29,7 @@ class SiteTestCase(CMSTestCase):
         page_2a = self.create_page(site=2)
 
         response = self.client.get("/admin/cms/page/?site__exact=3")
+        self.assertEqual(response.status_code, 200)
         page_3b = self.create_page(site=3)
         
         settings.SITE_ID = 3

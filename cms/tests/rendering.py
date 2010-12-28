@@ -3,11 +3,9 @@ from django.conf import settings
 from django.template import Template, RequestContext
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase
-from cms.models import Page, Title, CMSPlugin, Placeholder
+from cms.models import Page, Title, CMSPlugin
 from django.contrib.sites.models import Site
 from cms.plugins.text.models import Text
-from django.http import HttpRequest
-from django.db import connection
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms import plugin_rendering
 from django.forms.widgets import Media
@@ -64,9 +62,9 @@ class RenderingTestCase(CMSTestCase):
         t2 = Title(page=p2, language=settings.LANGUAGES[0][0], slug=self.test_data2['slug'], title=self.test_data2['title'])
         t2.save()
         # Insert some test Text plugins
-        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['main'], position=0, body=self.test_data['text_main'], publisher_state=1, publisher_is_draft=False)
+        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['main'], position=0, body=self.test_data['text_main'])
         pl.insert_at(None, commit=True)
-        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'], publisher_state=1, publisher_is_draft=False)
+        pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'])
         pl.insert_at(None, commit=True)
 
         # Insert another page that is not the home page
@@ -79,7 +77,7 @@ class RenderingTestCase(CMSTestCase):
         for placeholder in p3.placeholders.all():
             self.test_placeholders3[placeholder.slot] = placeholder
         # # Insert some test Text plugins
-        pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'], publisher_state=1, publisher_is_draft=False)
+        pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'])
         pl.insert_at(None, commit=True)
 
         # Reload test pages
@@ -118,7 +116,7 @@ class RenderingTestCase(CMSTestCase):
         """
         self.init_render_settings()
         from cms.views import details
-        response = details(self.get_request(), page_id=self.test_page.pk)
+        response = details(self.get_request(), slug=self.test_page.get_slug())
         r = self.strip_rendered(response.content)
         self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         

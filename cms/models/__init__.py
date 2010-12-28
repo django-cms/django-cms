@@ -1,19 +1,17 @@
+from django.conf import settings as d_settings
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import get_resolver, get_script_prefix, \
+    NoReverseMatch
+from django.utils.encoding import iri_to_uri
 from moderatormodels import *
 from pagemodel import *
 from permissionmodels import *
+from placeholdermodel import *
 from pluginmodel import *
 from titlemodels import *
-from placeholdermodel import *
-
-from django.core.exceptions import ImproperlyConfigured
-from cms import signals as s_import
-
-from django.conf import settings as d_settings
-from django.core.urlresolvers import get_resolver, get_script_prefix,\
-    NoReverseMatch
 import django.core.urlresolvers
-from django.utils.encoding import iri_to_uri
-
+# must be last
+from cms import signals as s_import
 
 
 def validate_settings():
