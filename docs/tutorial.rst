@@ -1,5 +1,5 @@
 ###################
-Django CMS Tutorial
+django CMS Tutorial
 ###################
 
 ************
@@ -17,15 +17,15 @@ This guide assumes you have the following software installed:
 
 It also assumes you're on a Unix-based system.
 
-Installing Django CMS
+Installing django CMS
 =====================
 
-While we strongly encourage you to install the Django CMS using `buildout`_ or
-`virtualenv`_, for the sake of simplicity this guide will install Django CMS
+While we strongly encourage you to install the django CMS using `buildout`_ or
+`virtualenv`_, for the sake of simplicity this guide will install django CMS
 system wide. For a proper installation procedure, please read the documentation
 of those projects.
 
-Install the latest Django CMS package::
+Install the latest django CMS package::
 
     $ sudo pip install django-cms
 
@@ -33,11 +33,11 @@ Or install the latest revision from github::
 
     $ sudo pip install -e git+git://github.com/divio/django-cms.git#egg=django-cms
 
-To check if you installed Django CMS properly, open a Python shell and type::
+To check if you installed django CMS properly, open a Python shell and type::
 
     import cms
 
-If this does not return an error, you've successfully installed Django CMS.
+If this does not return an error, you've successfully installed django CMS.
 
 .. _buildout: http://www.buildout.org/
 .. _virtualenv: http://virtualenv.openplans.org/
@@ -66,7 +66,7 @@ nice "It Worked" message from Django.
 .. |it-worked| image:: images/it-worked.png
 
 
-Installing and configuring Django CMS in your Django project
+Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
 Open the file ``~/workspace/myproject/settings.py``.
@@ -101,7 +101,7 @@ If you wish to use the moderation workflow, also add:
 
 Further, make sure you uncomment ``'django.contrib.admin'``
 
-You need to add the Django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
+You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
 right position::
 
 
@@ -141,7 +141,7 @@ Add at least one template to ``CMS_TEMPLATES``; for example::
 
     The templates you define in ``CMS_TEMPLATES`` have to actually exist and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
-    for Django CMS. For more details see `Templates`_
+    for django CMS. For more details see `Templates`_
 
 
 URL configuration
@@ -217,7 +217,7 @@ CMS "It Worked" screen.
 Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
 
-To deploy your Django CMS project on a real webserver, please refer to the
+To deploy your django CMS project on a real webserver, please refer to the
 `Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
@@ -225,7 +225,7 @@ To deploy your Django CMS project on a real webserver, please refer to the
 Templates
 *********
 
-Django CMS uses templates to define how a page should look and what parts of
+django CMS uses templates to define how a page should look and what parts of
 it are editable. Editable areas are called *placeholders*. These templates are
 standard Django templates and you may use them as described in the
 `official documentation`_.
@@ -275,7 +275,7 @@ Integrating custom content
 
 From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
-Django CMS. If a poll app is mentioned here, we mean the one you get when
+django CMS. If a poll app is mentioned here, we mean the one you get when
 finishing the `Django Tutorial`_.
 
 We assume your main ``urls.py`` looks somewhat like this::
@@ -314,7 +314,7 @@ In your poll application's ``models.py`` add the following model::
           return self.poll.question
 
 
-.. note:: Django CMS Plugins must inherit from ``cms.models.CMSPlugin`` (or a
+.. note:: django CMS Plugins must inherit from ``cms.models.CMSPlugin`` (or a
           subclass thereof) and not ``django.db.models.Model``.
 
 Run ``syncdb`` to create the database tables for this model or see
@@ -336,7 +336,7 @@ now::
         views.py 
 
 
-The plugin class is responsible to provide the Django CMS with the necessary
+The plugin class is responsible to provide the django CMS with the necessary
 information to render your Plugin.
 
 For our poll plugin, write following plugin class::
@@ -393,7 +393,7 @@ My First App
 ============
 
 Right now, your app is statically hooked into the main ``urls.py``, that is not
-the preferred way in the Django CMS. Ideally you attach your apps to CMS Pages.
+the preferred way in the django CMS. Ideally you attach your apps to CMS Pages.
 
 For that purpose you write CMS Apps. That is just a small class telling the CMS
 how to include that app.
