@@ -199,8 +199,8 @@ def get_model_queryset(model, request=None):
     """Decision function used in frontend - says which model should be used.
     Public models are used only if CMS_MODERATOR.
     """
-    # If we don't use moderator, everything is a draft anyway.
     if not settings.CMS_MODERATOR:
+        # We do not use moderator
         return model.objects.drafts()
     # We do use moderator
     if request:
@@ -208,7 +208,7 @@ def get_model_queryset(model, request=None):
         edit_mode = ('edit' in request.GET or request.session.get('cms_edit', False))
         if preview_draft or edit_mode:    
             return model.objects.drafts()
-    # Default case - moderator is used but there is no request
+    # Default case / moderator is used but there is no request
     return model.objects.public()
 
 # queryset helpers for basic models

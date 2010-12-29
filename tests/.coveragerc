@@ -3,7 +3,8 @@ branch = True
 source =
     cms
     menus
-    mptt
     publisher
 omit =
-    *migrations*
+    ../*migrations*
+[report]
+precision = 2

@@ -1,12 +1,18 @@
+##############
+Custom Plugins
+##############
+
+
 You have three options to extend Django CMS: Custom plugins, plugin context
 processors, and plugin processors.
 
-Custom Plugins
-==============
+***********************
+Writing a custom plugin
+***********************
 
 You can use ``python manage.py startapp`` to get some basefiles for your plugin,
-or just add a folder ``gallery`` to your project's root folder, add an empty ``__init__.py``, so that
-the module gets detected.
+or just add a folder ``gallery`` to your project's root folder, add an empty
+``__init__.py``, so that the module gets detected.
 
 Suppose you have the following gallery model::
 
@@ -24,7 +30,7 @@ You can do this with a CMS plugin. To create a CMS plugin you need two
 components: a CMSPlugin model and a cms_plugins.py file.
 
 Plugin Model
-------------
+============
 
 First create a model that links to the gallery via a ForeignKey field::
 
@@ -67,7 +73,7 @@ Now models.py looks like the following::
 
 
 Handling Relations
-~~~~~~~~~~~~~~~~~~
+------------------
 
 If your custom plugin has foreign key or many-to-many relations you are
 responsible for copying those if necessary whenever the CMS copies the plugin.
@@ -103,9 +109,10 @@ Your full model now::
 
 
 cms_plugins.py
---------------
+==============
 
-After that create in the application folder (the same one where models.py is) a cms_plugins.py file.
+After that create in the application folder (the same one where models.py is) a
+cms_plugins.py file.
 
 In there write the following::
 
@@ -130,16 +137,19 @@ In there write the following::
 	plugin_pool.register_plugin(CMSGalleryPlugin)
 
 
-CMSPluginBase itself inherits from ModelAdmin so you can use all the things (inlines for example) you would
-use in a regular admin class.
+CMSPluginBase itself inherits from ModelAdmin so you can use all the things
+(inlines for example) you would use in a regular admin class.
 
 
-For a list of all the options you have on CMSPluginBase have a look at the plugin reference
+For a list of all the options you have on CMSPluginBase have a look at the
+plugin reference
 
 
 Template
---------
-Now create a gallery.html template in ``templates/gallery/`` and write the following in there::
+========
+
+Now create a gallery.html template in ``templates/gallery/`` and write the
+following in there::
 
 	{% for image in gallery.picture_set.all %}
 		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
@@ -160,13 +170,14 @@ Add a file ``admin.py`` in your plugin root-folder and insert the following::
 	admin.site.register(Gallery, GalleryAdmin)
 
 
-Now go into the admin create a gallery and afterwards go into a page and add a gallery plugin and some
-pictures should appear in your page.
+Now go into the admin create a gallery and afterwards go into a page and add a
+gallery plugin and some pictures should appear in your page.
 
 Limiting Plugins per Placeholder
---------------------------------
+================================
 
-You can limit in which placeholder certain plugins can appear. Add a ``CMS_PLACEHOLDER_CONF`` to your ``settings.py``.
+You can limit in which placeholder certain plugins can appear. Add a
+``CMS_PLACEHOLDER_CONF`` to your ``settings.py``.
 
 Example::
 
@@ -198,7 +209,7 @@ of plugins (either total or by type) for each placeholder with the **limits** pa
 
 
 Advanced
---------
+========
 
 CMSGalleryPlugin can be even further customized:
 
@@ -209,11 +220,12 @@ Note: If you want to overwrite the form be sure to extend from ``admin/cms/page/
 to have an unified look across the plugins and to have the preview functionality automatically installed.
 
 
+*************************
 Plugin Context Processors
--------------------------
+*************************
 
-Plugin context processors are callables that modify all plugin's context before rendering. They are enabled
-using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
+Plugin context processors are callables that modify all plugin's context before
+rendering. They are enabled using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
 
 A plugin context processor takes 2 arguments:
 
@@ -225,7 +237,8 @@ The instance of the plugin model
 
 The instance of the placeholder this plugin appears in.
 
-The return value should be a dictionary containing any variables to be added to the context.
+The return value should be a dictionary containing any variables to be added to
+the context.
 
 Example::
 
@@ -241,10 +254,13 @@ Example::
         '''
         return {'verbose_name': instance._meta.verbose_name}
 
-Plugin Processors
------------------
 
-Plugin processors are callables that modify all plugin's output after rendering. They are enabled using
+*****************
+Plugin Processors
+*****************
+
+Plugin processors are callables that modify all plugin's output after rendering. 
+They are enabled using
 the ``CMS_PLUGIN_PROCESSORS`` setting.
 
 A plugin processor takes 4 arguments:
@@ -265,16 +281,18 @@ A string containing the rendered content of the plugin.
 
 The original context for the template used to render the plugin.
 
-Note that plugin processors are also applied to plugins embedded in Text. Depending on what your processor
-does, this might break the output. For example, if your processor wraps the output in a DIV tag, you might
-end up having DIVs inside of P tags, which is invalid. You can prevent such cases by returning
-`rendered_content` unchanged if `instance._render_meta.text_enabled` is True, which is the case when
-rendering an embedded plugin.
+Note that plugin processors are also applied to plugins embedded in Text.
+Depending on what your processor does, this might break the output. For example,
+if your processor wraps the output in a DIV tag, you might end up having DIVs
+inside of P tags, which is invalid. You can prevent such cases by returning
+`rendered_content` unchanged if `instance._render_meta.text_enabled` is True,
+which is the case when rendering an embedded plugin.
 
-Example:
+Example
+=======
 
-Suppose you want to put wrap each plugin in the main placeholder in a colored box, but it would be too
-complicated to edit each individual plugin's template:
+Suppose you want to put wrap each plugin in the main placeholder in a colored
+box, but it would be too complicated to edit each individual plugin's template:
 
 In your settings.py::
 
@@ -306,4 +324,3 @@ In your yourapp.cms_plugin_processors.py::
             })
             # Finally, render the content through that template, and return the output
             return t.render(c)
-

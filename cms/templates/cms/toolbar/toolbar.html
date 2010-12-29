@@ -158,7 +158,7 @@
         {% endif %}    
     </div>
     <div id="cms_toolbar_col2">
-        {% if edit %}
+        {% if edit and page %}
         {% if auth %}
             {% if moderator_should_approve and has_moderate_permission %}
             <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">

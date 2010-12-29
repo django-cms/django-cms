@@ -1,8 +1,10 @@
+#######
 Plugins
-=======
+#######
 
+****
 File
-----
+****
 
 Allows you to upload a file. A filetype icon will be assigned based on the file extension.
 
@@ -15,8 +17,10 @@ in your project's ``settings.py`` file::
 		# ...
 	)
 
+
+*****
 Flash
------
+*****
 
 Allows you to upload and display a Flash SWF file on your page.
 
@@ -30,8 +34,9 @@ setting in your project's ``settings.py`` file::
 	)
 
 
+*********
 GoogleMap
----------
+*********
 
 Displays a map of an address on your page.
 
@@ -48,8 +53,10 @@ The Google Maps API key is also required. You can either put this in a project
 setting called ``GOOGLE_MAPS_API_KEY`` or be sure the template context has a
 variable with the same name.
 
+
+****
 Link
-----
+****
 
 Displays a link to an arbitrary URL or to a page. If a page is moved the URL
 will still be correct.
@@ -63,8 +70,10 @@ setting in your project's ``settings.py`` file::
 		# ...
 	)
 
+
+*******
 Picture
--------
+*******
 
 Displays a picture in a page.
 
@@ -101,8 +110,10 @@ create a file called ``picture.html`` in there. Here is an example
 In this template the picture is scaled differently based on which placeholder
 it was placed in.
 
+
+*******
 Snippet
--------
+*******
 
 Just renders some HTML snippet. Mostly used for development or hackery.
 
@@ -115,8 +126,10 @@ setting in your project's ``settings.py`` file::
 		# ...
 	)
 
+
+******
 Teaser
-------
+******
 
 Displays a teaser box for another page or a URL. A picture and a description
 can be added.
@@ -130,8 +143,10 @@ settings in your project's ``settings.py`` file::
 		# ...
 	)
 
+
+****
 Text
-----
+****
 
 Displays text. If plugins are text-enabled they can be placed inside the
 text-flow. At this moment the following plugins are text-enabled:
@@ -159,8 +174,10 @@ For installation be sure you have the following in your project's
 		# ...
 	)
 
+
+*****
 Video
------
+*****
 
 Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 <http://github.com/FlashJunior/OSFlashVideoPlayer>`_. If you upload a file use
@@ -194,8 +211,9 @@ default behavior:
 - VIDEO_BUTTON_HIGHLIGHT_COLOR default="FFFFFF"
 
 
+*******
 Twitter
--------
+*******
 
 Displays the last number of post of a twitter user.
 
@@ -207,8 +225,10 @@ For installation be sure you have the following in your project's ``INSTALLED_AP
 		# ...
 	)
 
+
+*******
 Inherit
--------
+*******
 
 Displays all plugins of an other page or an other language. Great if you need always the same
 plugins on a lot of pages.

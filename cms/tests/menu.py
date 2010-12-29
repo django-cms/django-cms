@@ -41,14 +41,14 @@ class MenusTestCase(CMSTestCase):
           + P8
           
         """
-        self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
-        self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
-        self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
-        self.page6 = self.create_page(parent_page=None, published=True, in_navigation=False)
-        self.page7 = self.create_page(parent_page=self.page6, published=True, in_navigation=True)
-        self.page8 = self.create_page(parent_page=self.page6, published=True, in_navigation=True)
+        self.page1 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.page2 = self.new_create_page(parent_page=self.page1, published=True, in_navigation=True)
+        self.page3 = self.new_create_page(parent_page=self.page2, published=True, in_navigation=True)
+        self.page4 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.page5 = self.new_create_page(parent_page=self.page4, published=True, in_navigation=True)
+        self.page6 = self.new_create_page(parent_page=None, published=True, in_navigation=False)
+        self.page7 = self.new_create_page(parent_page=self.page6, published=True, in_navigation=True)
+        self.page8 = self.new_create_page(parent_page=self.page6, published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4,
                           self.page5, self.page6, self.page7, self.page8]
         self.top_level_pages = [self.page1, self.page4]
@@ -57,7 +57,7 @@ class MenusTestCase(CMSTestCase):
         
     def test_01_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
-        response = self.client.get(self.get_pages_root())
+        response = self.client.get(self.get_pages_root()) # path = '/'
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
         
@@ -219,10 +219,11 @@ class MenusTestCase(CMSTestCase):
         
         
     def test_12_page_language_url(self):
-        context = self.get_context(path=self.page3.get_absolute_url())
+        path = self.page3.get_absolute_url()
+        context = self.get_context(path=path)
         tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
         url = tpl.render(context)
-        self.assertEqual( url, "/%s%s" % (settings.LANGUAGES[0][0], self.page3.get_absolute_url()))
+        self.assertEqual(url, "/%s%s" % (settings.LANGUAGES[0][0], path))
         
     def test_13_show_menu_below_id(self):
         page2 = Page.objects.get(pk=self.page2.pk)
@@ -366,7 +367,7 @@ class MenusTestCase(CMSTestCase):
         self.assertEqual(len(nodes), number_of_p7_children)
         
     def test_19_show_breadcrumb_invisible(self):
-        invisible_page = self.create_page(parent_page=self.page3, 
+        invisible_page = self.new_create_page(parent_page=self.page3, 
                                           published=True, 
                                           in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())

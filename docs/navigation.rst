@@ -1,11 +1,13 @@
+##########
 Navigation
-==========
+##########
 
 There are four template tags for use in the templates that are connected to the menu:
 ``show_menu``, ``show_menu_below_id``, ``show_sub_menu``, and ``show_breadcrumb``.
 
+*********
 show_menu
----------
+*********
 
 ``{& show_menu %}`` renders the navigation of the current page.
 You can overwrite the appearance and the HTML if you add a ``cms/menu.html``
@@ -23,8 +25,8 @@ if a node is not a direct ancestor or descendant of the current active node.
 Finally, the fourth parameter, ``extra_active`` (default=100), specifies how many levels of
 descendants of the currently active node should be displayed.
 
-Some Examples:
-^^^^^^^^^^^^^^
+Some Examples
+=============
 
 Complete navigation (as a nested list)::
 
@@ -56,9 +58,9 @@ Navigation with a custom template::
 	{% show_menu 0 100 100 100 "myapp/menu.html" %}
 
 
-
+*************
 show_sub_menu
--------------
+*************
 
 Display the sub menu of the current page (as a nested list).
 Takes one argument that specifies how many levels deep should the submenu be displayed.
@@ -74,8 +76,10 @@ Or with a custom template::
 		{% show_sub_menu 1 "myapp/submenu.html" %}
 	</ul>
 
+
+***************
 show_breadcrumb
----------------
+***************
 
 Show the breadcrumb navigation of the current page.
 The template for the HTML can be found at ``cms/breadcrumb.html``.::
@@ -94,8 +98,9 @@ This is mostly needed for pages like login, logout and third-party apps.
 .. _extending_the_menu:
 
 
+*******************************************
 Properties of Navigation Nodes in templates
--------------------------------------------
+*******************************************
 ::
 
 	{{ node.is_leaf_node }}
@@ -150,8 +155,9 @@ If true this node is a descendant of the current selected node.
 
 If true this node is a "soft root".
 
+**********
 Soft Roots
-----------
+**********
 
 "Soft roots" are pages that start a new navigation.
 If you are in a child of a soft root node you can only see the path to the soft root.
@@ -164,8 +170,8 @@ To enable it put the following in your ``settings.py`` file::
 
 Now you can mark a page as "soft root" in the 'Advanced' tab of the page's settings in the admin interface.
 
-
+******************************
 Modifying & Extending the menu
-------------------------------
+******************************
 
-Please refer to the app integration documentation
+Please refer to the :doc:`app_integration` documentation

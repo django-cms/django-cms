@@ -361,6 +361,8 @@ class PageAdmin(model_admin):
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             except:
                 title_obj = EmptyTitle()
+            if form.base_fields['site'].initial is None:
+                form.base_fields['site'].initial = obj.site
             for name in ['slug',
                          'title',
                          'application_urls',
@@ -926,9 +928,6 @@ class PageAdmin(model_admin):
             return HttpResponseRedirect("../../")
 
         response = super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
-        public = page.publisher_public
-        if request.method == 'POST' and response.status_code == 302 and public:
-            public.delete()
         return response
 
     @create_on_success
@@ -1049,7 +1048,7 @@ class PageAdmin(model_admin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             page.published = not page.published
-            page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
+            page.save()
             return render_admin_menu_item(request, page)
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
@@ -1364,5 +1363,10 @@ class PageAdmin(model_admin):
                 page_moderator.save()
                 return render_admin_menu_item(request, page)
         raise Http404
+    
+    def lookup_allowed(self, key):
+        if key == 'site__exact':
+            return True
+        return super(PageAdmin, self).lookup_allowed(key)
 
 admin.site.register(Page, PageAdmin)

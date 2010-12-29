@@ -27,11 +27,11 @@ class NavExtenderTestCase(CMSTestCase):
         menu_pool.menus = self.old_menu
         
     def create_some_nodes(self):
-        self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
-        self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
-        self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
+        self.page1 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.page2 = self.new_create_page(parent_page=self.page1, published=True, in_navigation=True)
+        self.page3 = self.new_create_page(parent_page=self.page2, published=True, in_navigation=True)
+        self.page4 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.page5 = self.new_create_page(parent_page=self.page4, published=True, in_navigation=True)
         
     def test_01_menu_registration(self):
         self.assertEqual(len(menu_pool.menus), 2)

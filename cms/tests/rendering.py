@@ -3,11 +3,9 @@ from django.conf import settings
 from django.template import Template, RequestContext
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase
-from cms.models import Page, Title, CMSPlugin, Placeholder
+from cms.models import Page, Title, CMSPlugin
 from django.contrib.sites.models import Site
 from cms.plugins.text.models import Text
-from django.http import HttpRequest
-from django.db import connection
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms import plugin_rendering
 from django.forms.widgets import Media
@@ -118,7 +116,7 @@ class RenderingTestCase(CMSTestCase):
         """
         self.init_render_settings()
         from cms.views import details
-        response = details(self.get_request(), page_id=self.test_page.pk)
+        response = details(self.get_request(), slug=self.test_page.get_slug())
         r = self.strip_rendered(response.content)
         self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         

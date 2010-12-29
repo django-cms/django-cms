@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
-from menus.menu_pool import menu_pool
+
 
 class NonRootCase(CMSTestCase):
     urls = 'testapp.nonroot_urls'
@@ -33,10 +33,10 @@ class NonRootCase(CMSTestCase):
         | + P5
 
         """
-        self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
-        self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
-        self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
+        self.page1 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.page2 = self.new_create_page(parent_page=self.page1, published=True, in_navigation=True)
+        self.page3 = self.new_create_page(parent_page=self.page2, published=True, in_navigation=True)
+        self.page4 = self.new_create_page(parent_page=None, published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4]
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]

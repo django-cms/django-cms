@@ -8,10 +8,12 @@ from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
+from menus.menu_pool import menu_pool
 import copy
 import sys
 import urllib
 import warnings
+
 
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
@@ -74,14 +76,14 @@ class CMSTestCase(TestCase):
     def _post_teardown(self):
         # restore original settings after each test
         settings._wrapped = self._original_settings_wrapped
+        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
+        menu_pool.clear()  
         super(CMSTestCase, self)._post_teardown()
-    
         
     def login_user(self, user):
         logged_in = self.client.login(username=user.username, password=user.username)
         self.user = user
         self.assertEqual(logged_in, True)
-    
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
@@ -164,7 +166,53 @@ class CMSTestCase(TestCase):
             
         del _thread_locals.user
         return page
-    
+        
+    def new_create_page(self, parent_page=None, user=None, position="last-child",
+            title=None, site=1, published=False, in_navigation=False, **extra):
+        """
+        Common way for page creation with some checks
+        """
+        _thread_locals.user = user
+        language = settings.LANGUAGES[0][0]
+        if settings.CMS_SITE_LANGUAGES.get(site, False):
+            language = settings.CMS_SITE_LANGUAGES[site][0]
+        site = Site.objects.get(pk=site)
+        
+        page_data = {
+            'site': site,
+            'template': 'nav_playground.html',
+            'published': published,
+            'in_navigation': in_navigation,
+        }
+        if user:
+            page_data['created_by'] = user
+            page_data['changed_by'] = user
+        if parent_page:
+            page_data['parent'] = parent_page
+        page_data.update(**extra)
+
+        page = Page.objects.create(**page_data)
+        if parent_page:
+            page.move_to(parent_page, position)
+            page.save()
+        
+        if settings.CMS_MODERATOR and user:
+            page.pagemoderator_set.create(user=user)
+        
+        title_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': language,
+            'page': page,
+        }
+        self.counter = self.counter + 1
+        if title:
+            title_data['title'] = title
+            title_data['slug'] = slugify(title)
+        Title.objects.create(**title_data)
+            
+        del _thread_locals.user
+        return page    
     
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug

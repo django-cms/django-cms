@@ -110,10 +110,11 @@ gettext = lambda s: s
 LANGUAGE_CODE = "en"
 
 LANGUAGES = (
+    ('en', gettext('English')),
     ('fr', gettext('French')),
     ('de', gettext('German')),
-    ('en', gettext('English')),
     ('pt-BR', gettext("Brazil")),
+    ('nl', gettext("Dutch")),
 )
 
 CMS_LANGUAGE_CONF = {
@@ -122,8 +123,9 @@ CMS_LANGUAGE_CONF = {
 }
 
 CMS_SITE_LANGUAGES = {
-    1:['fr','de','en','pt-BR'],
-    2:['de','en'],
+    1:['en','de','fr','pt-BR'],
+    2:['de','fr'],
+    3:['nl'],
 }
 
 APPEND_SLASH = True
