@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy as _, get_language, ugettext
 from menus.menu_pool import menu_pool
 from os.path import join
 from publisher import MpttPublisher
+from publisher.errors import MpttPublisherCantPublish
 import copy
 
 
@@ -967,8 +968,13 @@ class Page(MpttPublisher):
         return self.publisher_is_draft and qs.drafts() or qs.public()
 
     def _publisher_can_publish(self):
-        """Checks if instance can be published.
+        """Is parent of this object already published?
         """
+        if self.parent_id:
+            try:
+                return bool(self.parent.publisher_public_id)
+            except AttributeError:
+                raise MpttPublisherCantPublish
         return True
 
     def _publisher_get_public_copy(self):
