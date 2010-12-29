@@ -59,7 +59,7 @@ class ApphooksTestCase(CMSTestCase):
             
         apphook_pool.clear()    
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        page = self.new_create_page(user=superuser, published=True)
+        page = self.create_page(user=superuser, published=True)
         english_title = page.title_set.all()[0]
         self.assertEquals(english_title.language, 'en')
         Title.objects.create(

@@ -167,7 +167,7 @@ class CMSTestCase(TestCase):
         del _thread_locals.user
         return page
         
-    def new_create_page(self, parent_page=None, user=None, position="last-child",
+    def create_page(self, parent_page=None, user=None, position="last-child",
             title=None, site=1, published=False, in_navigation=False, **extra):
         """
         Common way for page creation with some checks
