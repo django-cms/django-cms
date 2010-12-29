@@ -338,6 +338,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         # publish / approve page by master
         self.login_user(self.user_master)
         
+        from cms.utils.permissions import has_generic_permission
+        self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", 1))
+        
         self.publish_page(page, False, self.user_master, True)
 #        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
 #        self.assertEqual(response.status_code, 200,
