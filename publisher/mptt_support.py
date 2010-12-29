@@ -151,5 +151,3 @@ def finish_mptt(cls):
     from mptt import registry
     if not cls in registry:
         registry.append(cls)
-    
-
