@@ -102,9 +102,7 @@ class MpttMeta:
 def install_mptt(cls, name, bases, attrs):
     """Installs mptt - modifies class attrs, and adds required stuff to them.
     """
-    from publisher.models import MpttPublisher
-    
-    if not Mptt in bases and not MpttPublisher in bases:
+    if not Mptt in bases:
         return attrs 
     
     if 'MpttMeta' in attrs and not issubclass(attrs['MpttMeta'], MpttMeta):
