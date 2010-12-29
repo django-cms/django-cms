@@ -1,6 +1,4 @@
 from django.conf import settings
-from publisher import Publisher
-
 
 # modify reversions to match our needs if required...
 
@@ -25,12 +23,6 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
         fields = [field.name for field in local_fields]
     
     exclude_fields = exclude_fields or []
-    
-    if 'publisher' in settings.INSTALLED_APPS:
-        from publisher import Publisher
-        if issubclass(model_class, Publisher):
-            # auto exclude publisher fields
-            exclude_fields += ['publisher_is_draft', 'publisher_public', 'publisher_state']
     
     fields = filter(lambda name: not name in exclude_fields, fields)        
 

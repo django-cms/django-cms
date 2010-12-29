@@ -371,7 +371,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
         plugin.insert_at(None, position='last-child', commit=True)
         
-        self.assertEquals(plugin.get_icon_url().find('jpg') != -1, True)
+        self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
+        response = self.client.get(plugin.get_icon_url(), follow=True)
+        self.assertEqual(response.status_code, 200)
+        plugin.file.storage.delete(plugin.file.name)
 
     def test_11_copy_textplugin(self):
         """

@@ -294,20 +294,19 @@ class LanguageChooser(InclusionTag):
             template = "menu/language_chooser.html"
         if not i18n_mode in MARKERS:
             i18n_mode = 'raw'
-        try:
+        if 'request' not in context:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
-        except KeyError:
             return {'template': 'cms/content.html'}
         marker = MARKERS[i18n_mode]
         cms_languages = dict(settings.CMS_LANGUAGES)
         current_lang = get_language()
         site = Site.objects.get_current()
+        site_languages = settings.CMS_SITE_LANGUAGES.get(site.pk, cms_languages.keys())
         cache_key = '%s-language-chooser-%s-%s-%s' % (settings.CMS_CACHE_PREFIX, site.pk, current_lang, i18n_mode)
         languages = cache.get(cache_key, [])
         if not languages:
             for lang in settings.CMS_FRONTEND_LANGUAGES:
-                if lang in cms_languages:
+                if lang in cms_languages and lang in site_languages:
                     languages.append((lang, marker(cms_languages[lang], lang)))
             if current_lang != get_language():
                 activate(current_lang)

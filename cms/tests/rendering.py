@@ -3,11 +3,9 @@ from django.conf import settings
 from django.template import Template, RequestContext
 from django.contrib.auth.models import User
 from cms.tests.base import CMSTestCase
-from cms.models import Page, Title, CMSPlugin, Placeholder
+from cms.models import Page, Title, CMSPlugin
 from django.contrib.sites.models import Site
 from cms.plugins.text.models import Text
-from django.http import HttpRequest
-from django.db import connection
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms import plugin_rendering
 from django.forms.widgets import Media

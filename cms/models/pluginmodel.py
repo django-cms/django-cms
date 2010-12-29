@@ -3,10 +3,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, PluginRenderer
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from cms.plugin_rendering import PluginContext, PluginRenderer
-from cms.exceptions import DontUsePageAttributeWarning
-from publisher import MpttPublisher
-from publisher.mptt_support import Mptt
 from datetime import datetime, date
 from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
@@ -16,8 +12,8 @@ from django.db.models.base import ModelBase, model_unpickle, \
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 from os.path import join
+from publisher.mptt_support import Mptt, install_mptt
 import warnings
-from django.db.models import signals
 
 class PluginModelBase(ModelBase):
     """
@@ -27,6 +23,7 @@ class PluginModelBase(ModelBase):
         render_meta = attrs.pop('RenderMeta', None)
         if render_meta is not None:
             attrs['_render_meta'] = render_meta()
+        attrs = install_mptt(cls, name, bases, attrs)
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
         found = False
         bbases = bases

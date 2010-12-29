@@ -1,18 +1,16 @@
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, get_app_urls
+from cms.appresolver import get_app_urls
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings, settings as django_settings
-from django.conf.urls.defaults import patterns, include
-from django.core.exceptions import ImproperlyConfigured
+from django.conf.urls.defaults import patterns
 from django.core.urlresolvers import resolve, Resolver404
 from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.http import urlquote
-from django.utils.importlib import import_module
 
 
 def _handle_no_page(request, slug):

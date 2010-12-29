@@ -361,6 +361,8 @@ class PageAdmin(model_admin):
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             except:
                 title_obj = EmptyTitle()
+            if form.base_fields['site'].initial is None:
+                form.base_fields['site'].initial = obj.site
             for name in ['slug',
                          'title',
                          'application_urls',
@@ -1361,5 +1363,10 @@ class PageAdmin(model_admin):
                 page_moderator.save()
                 return render_admin_menu_item(request, page)
         raise Http404
+    
+    def lookup_allowed(self, key):
+        if key == 'site__exact':
+            return True
+        return super(PageAdmin, self).lookup_allowed(key)
 
 admin.site.register(Page, PageAdmin)

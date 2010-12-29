@@ -14,6 +14,7 @@ import sys
 import urllib
 import warnings
 
+
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
 URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 

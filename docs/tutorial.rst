@@ -1,5 +1,5 @@
 ###################
-Django CMS Tutorial
+django CMS Tutorial
 ###################
 
 ************
@@ -15,17 +15,17 @@ This guide assumes you have the following software installed:
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.2.2 or higher
 
-It also assumes you're on a Unix based system.
+It also assumes you're on a Unix-based system.
 
-Installing Django CMS
+Installing django CMS
 =====================
 
-While we strongly encourage you to install the Django CMS using `buildout`_ or
-`virtualenv`_, for the sake of simplicity this guide will install Django CMS
-system wide. For a proper installion procedure, please read the documentation of
-those projects.
+While we strongly encourage you to install the django CMS using `buildout`_ or
+`virtualenv`_, for the sake of simplicity this guide will install django CMS
+system wide. For a proper installation procedure, please read the documentation
+of those projects.
 
-Install the latest Django CMS package::
+Install the latest django CMS package::
 
     $ sudo pip install django-cms
 
@@ -33,11 +33,11 @@ Or install the latest revision from github::
 
     $ sudo pip install -e git+git://github.com/divio/django-cms.git#egg=django-cms
 
-To check if you installed Django CMS properly, open a Python shell and type::
+To check if you installed django CMS properly, open a Python shell and type::
 
     import cms
 
-If this does not return an error, you've successfully installed Django CMS.
+If this does not return an error, you've successfully installed django CMS.
 
 .. _buildout: http://www.buildout.org/
 .. _virtualenv: http://virtualenv.openplans.org/
@@ -49,7 +49,7 @@ Preparing the environment
 Starting your Django project
 ----------------------------
 
-The following assumes your project is in ``~/workspace/myproject/``.
+The following assumes your project will be in ``~/workspace/myproject/``.
 
 Set up your Django project::
 
@@ -66,7 +66,7 @@ nice "It Worked" message from Django.
 .. |it-worked| image:: images/it-worked.png
 
 
-Installing and configuring Django CMS in Your Django Project
+Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
 Open the file ``~/workspace/myproject/settings.py``.
@@ -101,7 +101,7 @@ If you wish to use the moderation workflow, also add:
 
 Further, make sure you uncomment ``'django.contrib.admin'``
 
-You need to add the Django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
+You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
 right position::
 
 
@@ -141,7 +141,7 @@ Add at least one template to ``CMS_TEMPLATES``; for example::
 
     The templates you define in ``CMS_TEMPLATES`` have to actually exist and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
-    for Django CMS. For more details see `Templates`_
+    for django CMS. For more details see `Templates`_
 
 
 URL configuration
@@ -161,7 +161,7 @@ urlpatterns. We suggest starting with the following ``urls.py``::
         url(r'^', include('cms.urls')),
 	)
 
-	if settings.DEBUG:
+	if settings.DEBUG: # these lines are just to serve media on local machines.
 	    urlpatterns = patterns('',
 	        url(
 	            r'^media/cms/(?P<path>.*)$',
@@ -217,7 +217,7 @@ CMS "It Worked" screen.
 Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
 
-To deploy your Django CMS project on a real webserver, please refer to the
+To deploy your django CMS project on a real webserver, please refer to the
 `Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
@@ -225,7 +225,7 @@ To deploy your Django CMS project on a real webserver, please refer to the
 Templates
 *********
 
-Django CMS uses templates to define how a page should look and what parts of
+django CMS uses templates to define how a page should look and what parts of
 it are editable. Editable areas are called *placeholders*. These templates are
 standard Django templates and you may use them as described in the
 `official documentation`_.
@@ -275,7 +275,7 @@ Integrating custom content
 
 From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
-Django-CMS. If a poll app is mentioned here, we mean the one you get when
+django CMS. If a poll app is mentioned here, we mean the one you get when
 finishing the `Django Tutorial`_.
 
 We assume your main ``urls.py`` looks somewhat like this::
@@ -308,13 +308,13 @@ In your poll application's ``models.py`` add the following model::
     from cms.models import CMSPlugin
     
     class PollPlugin(CMSPlugin):
-        poll = models.ForeignKex('polls.Poll', related_name='plugins')
+        poll = models.ForeignKey('polls.Poll', related_name='plugins')
         
         def __unicode__(self):
           return self.poll.question
 
 
-.. note:: Django-CMS Plugins must inherit ``cms.models.CMSPlugin`` (or a
+.. note:: django CMS Plugins must inherit from ``cms.models.CMSPlugin`` (or a
           subclass thereof) and not ``django.db.models.Model``.
 
 Run ``syncdb`` to create the database tables for this model or see
@@ -324,9 +324,9 @@ Run ``syncdb`` to create the database tables for this model or see
 The Plugin Class
 ----------------
 
-Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is,
-so following the `Django Tutorial`_, your polls app folder should look like this
-now::
+Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is
+in, so following the `Django Tutorial`_, your polls app folder should look like
+this now::
 
     polls/
         __init__.py
@@ -336,7 +336,7 @@ now::
         views.py 
 
 
-The plugin class is responsible to provide the Django-CMS with the necessary
+The plugin class is responsible to provide the django CMS with the necessary
 information to render your Plugin.
 
 For our poll plugin, write following plugin class::
@@ -347,17 +347,17 @@ For our poll plugin, write following plugin class::
     from django.utils.translation import ugettext as _
     
     class PollPlugin(CMSPluginBase):
-        model = PollPluginModel
-        name = _("Poll Plugin")
-        render_template = "polls/plugin.html"
+        model = PollPluginModel # Model where data about this plugin is saved
+        name = _("Poll Plugin") # Name of the plugin
+        render_template = "polls/plugin.html" # template to render the plugin with
     
         def render(self, context, instance, placeholder):
             context.update({'instance':instance})
             return context
     
-    plugin_pool.register_plugin(TextWithTitlePlugin)
+    plugin_pool.register_plugin(PollPlugin) # register the plugin
 
-.. note:: All plugin classes must inherit ``cms.plugin_base.CMSPluginBase``
+.. note:: All plugin classes must inherit from ``cms.plugin_base.CMSPluginBase``
           and must register themselves with the ``cms.plugin_pool.plugin_pool``.
 
 
@@ -393,7 +393,7 @@ My First App
 ============
 
 Right now, your app is statically hooked into the main ``urls.py``, that is not
-the preferred way in the Django-CMS. Ideally you attach your apps to CMS Pages.
+the preferred way in the django CMS. Ideally you attach your apps to CMS Pages.
 
 For that purpose you write CMS Apps. That is just a small class telling the CMS
 how to include that app.
@@ -416,10 +416,10 @@ In this file, write::
     from django.utils.translation import ugettext_lazy as _
     
     class PollsApp(CMSApp):
-        name = _("Poll App")
-        urls = ["polls.urls"]
+        name = _("Poll App") # give your app a name, this is required
+        urls = ["polls.urls"] # link your app to url configuration(s)
         
-    apphook_pool.register(PollsApp)
+    apphook_pool.register(PollsApp) # register your app
     
 Now remove the inclusion of the polls urls in your main ``urls.py`` so it looks
 like this::
@@ -451,10 +451,10 @@ My First Menu
 =============
 
 Now you might have noticed that the menu tree stops at the CMS Page you created
-in the last step, now let's create a menu that shows a node for each poll you
+in the last step, so let's create a menu that shows a node for each poll you
 have active.
 
-For this we need a file calls ``menu.py``, create it and check your polls app
+For this we need a file called ``menu.py``, create it and check your polls app
 looks like this::
 
     polls/
@@ -477,15 +477,26 @@ In your ``menu.py`` write::
     from polls.models import Poll
     
     class PollsMenu(CMSAttachMenu):
-        name = _("Polls Menu")
+        name = _("Polls Menu") # give the menu a name, this is required.
         
         def get_nodes(self, request):
+            """
+            This method is used to build the menu tree.
+            """
             nodes = []
             for poll in Poll.objects.all():
-                node = NavigationNode(poll.question, reverse('polls.views.detail', args=(poll.pk,)))
+                # the menu tree consists of NavigationNode instances
+                # Each NavigationNode takes a label as first argument, a URL as
+                # second argument and a (for this tree) unique id as third
+                # argument.
+                node = NavigationNode(
+                    poll.question,
+                    reverse('polls.views.detail', args=(poll.pk,)),
+                    poll.pk
+                )
                 nodes.append(node)
             return nodes
-    menu_pool.register_menu(PollsMenu)
+    menu_pool.register_menu(PollsMenu) # register the menu.
 
 
 Now this menu alone doesn't do a whole lot yet, we have to attach it to the
@@ -501,7 +512,7 @@ So open your ``cms_apps.py`` and write::
     class PollsApp(CMSApp):
         name = _("Poll App")
         urls = ["polls.urls"]
-        menu = [PollsMenu]
+        menu = [PollsMenu] # attach a CMSAttachMenu to this apphook.
         
     apphook_pool.register(PollsApp)
 

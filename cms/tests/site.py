@@ -26,13 +26,14 @@ class SiteTestCase(CMSTestCase):
     def test_01_site_framework(self):
         #Test the site framework, and test if it's possible to disable it
         settings.SITE_ID = 2
-        page_2a = self.new_create_page(site=2)
+        page_2a = self.create_page(site=2)
 
         response = self.client.get("/admin/cms/page/?site__exact=3")
-        page_3b = self.new_create_page(site=3)
+        self.assertEqual(response.status_code, 200)
+        page_3b = self.create_page(site=3)
         
         settings.SITE_ID = 3
-        page_3a = self.new_create_page(site=3)
+        page_3a = self.create_page(site=3)
         
         
         # with param
