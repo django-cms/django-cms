@@ -714,12 +714,14 @@ class PermissionModeratorTestCase(CMSTestCase):
 
         # there should only be a public plugin - since the draft has been deleted
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
-
+        
         # reload the page as it's moderator value should have been set in pageadmin.remove_plugin
         page = self.reload_page(page)
+        
+        self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
 
         # login as super user and approve/publish the page
-        self.login_user(self.user_master)
+        self.login_user(self.user_super)
         page = self.publish_page(page, approve=True)
 
         # there should now be 0 plugins
