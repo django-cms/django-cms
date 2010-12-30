@@ -121,7 +121,7 @@ class CMSTestCase(TestCase):
         raise self.failureException, "ObjectDoesNotExist not raised"
     
     def create_page(self, parent_page=None, user=None, position="last-child", 
-            title=None, site=1, published=False, in_navigation=False, **extra):
+            title=None, site=1, published=False, in_navigation=False, moderate=False, **extra):
         """
         Common way for page creation with some checks
         """
@@ -144,10 +144,10 @@ class CMSTestCase(TestCase):
             page_data['parent'] = parent_page
         page_data.update(**extra)
 
-        page = Page.objects.create(**page_data)
+        page = Page(**page_data)
+        page.save()
         if parent_page:
             page.move_to(parent_page, position)
-            page.save()
         
         if settings.CMS_MODERATOR and user:
             page.pagemoderator_set.create(user=user)

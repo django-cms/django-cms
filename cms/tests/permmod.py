@@ -237,7 +237,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         self.master_page = self.create_page(title="master")
 
-        
         # create master user
         self.user_master = self.create_page_user("master", grant_all=True)
         
@@ -531,7 +530,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         
         # publish slave page
-        slave_page = self.publish_page(self.slave_page)
+        slave_page = self.publish_page(self.slave_page, published_check=False)
         
         self.assertEqual(not page.publisher_public, True)
         self.assertEqual(not slave_page.publisher_public, True)
@@ -680,6 +679,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # login as slave and create page
         self.login_user(self.user_slave)
         page = self.create_page(self.slave_page)
+        self.assertEqual(page.get_moderator_queryset().count(), 1)
         
         # add plugin
         plugin_id = self.add_plugin(self.user_slave, page)
