@@ -304,11 +304,6 @@ class CMSTestCase(TestCase):
             return self.assign_user_to_page(page, user, grant_on, 
                 True, True, True, True, True, True, True, True)
         
-        # just check if the current logged in user even can change the page and 
-        # see the permission inline
-        response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
-        self.assertEqual(response.status_code, 200)
-        
         data = {
             'can_add': can_add,
             'can_change': can_change,
