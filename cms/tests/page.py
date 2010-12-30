@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.models import Page, Title
+from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
+from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PAGE_CHANGE
@@ -306,3 +309,30 @@ class PagesTestCase(CMSTestCase):
         parent.save()
         self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), settings.CMS_TEMPLATES[0][0])
+        
+    def test_16_delete_with_plugins(self):
+        """
+        Check that plugins and placeholders get correctly deleted when we delete
+        a page!
+        """
+        page = self.new_create_page()
+        page.rescan_placeholders() # create placeholders
+        placeholder = page.placeholders.all()[0]
+        plugin_base = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder, 
+            position=1, 
+            language=settings.LANGUAGES[0][0]
+        )
+        plugin_base.insert_at(None, position='last-child', commit=False)
+                
+        plugin = Text(body='')
+        plugin_base.set_base_attr(plugin)
+        plugin.save()
+        self.assertEqual(CMSPlugin.objects.count(), 1)
+        self.assertEqual(Text.objects.count(), 1)
+        self.assertTrue(Placeholder.objects.count()  > 0)
+        page.delete()
+        self.assertEqual(CMSPlugin.objects.count(), 0)
+        self.assertEqual(Text.objects.count(), 0)
+        self.assertEqual(Placeholder.objects.count(), 0)
