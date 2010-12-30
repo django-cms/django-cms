@@ -421,6 +421,7 @@ class Page(Mptt):
         
         if not published:
             # was not published, escape
+            transaction.commit()
             return
 
         # clean moderation log
