@@ -14,3 +14,4 @@ from cms.tests.reversion_tests import ReversionTestCase
 from cms.tests.site import SiteTestCase
 from cms.tests.urlutils import UrlutilsTestCase
 from cms.tests.publisher import PublisherTestCase
+from cms.tests.multilingual import MultilingualTestCase
