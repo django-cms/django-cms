@@ -319,7 +319,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # moderators and approvement ok?
         self.assertEqual(page.get_moderator_queryset().count(), 1)
-        assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
+        self.assertTrue(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
@@ -341,7 +341,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.create_page(self.slave_page, user=self.user_slave)
         # same as test_05_slave_can_add_page_under_slave_home        
         self.assertEqual(page.get_moderator_queryset().count(), 1)
-        assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
+        self.assertTrue(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
