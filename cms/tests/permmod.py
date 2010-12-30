@@ -1,9 +1,10 @@
 from cms.models import Page, CMSPlugin
-from cms.models.moderatormodels import ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models.moderatormodels import ACCESS_DESCENDANTS, \
+    ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission
-from cms.utils.permissions import has_generic_permission
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE, \
     URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+from cms.utils.permissions import has_generic_permission
 from django.conf import settings
 from django.contrib.auth.models import User
 
@@ -716,11 +717,14 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
 
         # reload the page as it's moderator value should have been set in pageadmin.remove_plugin
+        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
         page = self.reload_page(page)
+        self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
 
         # login as super user and approve/publish the page
         self.login_user(self.user_master)
         page = self.publish_page(page, approve=True)
+        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
 
         # there should now be 0 plugins
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
