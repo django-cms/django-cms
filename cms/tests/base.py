@@ -187,24 +187,15 @@ class CMSTestCase(TestCase):
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
         return copied_page
     
-    
     def move_page(self, page, target_page, position="first-child"):       
-        data = {
-            'position': position,
-            'target': target_page.pk,
-        }
-        response = self.client.post(URL_CMS_PAGE + "%d/move-page/" % page.pk, data)
-        self.assertEqual(response.status_code, 200)        
+        page.move_page(target_page, position)
         return self.reload_page(page)
         
-        
     def reload_page(self, page):
-        """Helper for page reload with check. Usefull, when something on page
-        gets changed because of the previous action, we need to take it again
-        from db, otherwise we just have old version.
         """
-        page = self.assertObjectExist(Page.objects, id=page.pk)
-        return page 
+        Returns a fresh instance of the page from the database
+        """
+        return Page.objects.get(pk=page.pk)
     
     def get_pages_root(self):
         return urllib.unquote(reverse("pages-root"))
