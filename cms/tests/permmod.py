@@ -232,12 +232,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(self.user_super)
         
         self.home_page = self.create_page(title="home", user=self.user_super)
-        self.publish_page(self.home_page )
         
         # master page & master user
         
         self.master_page = self.create_page(title="master")
-        self.publish_page(self.master_page)
+
         
         # create master user
         self.user_master = self.create_page_user("master", grant_all=True)
@@ -264,6 +263,9 @@ class PermissionModeratorTestCase(CMSTestCase):
             can_add=True, can_change=True, can_delete=True, can_publish=True, 
             can_move_page=True, can_moderate=True)
         
+        # publish after creating all drafts
+        self.publish_page(self.home_page)
+        self.publish_page(self.master_page)
         # logg in as master, and request moderation for slave page and descendants
         self.request_moderation(self.slave_page, 7)
         
@@ -345,16 +347,14 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
+                
+        # print ('descendants of master page (%s): ' % self.master_page.pk) + str([(spage, spage.pk) for spage in self.reload_page(self.master_page).get_descendants()])
         
-        print 'pk of created page: ' + str(page.pk)
+        # print ('ancestors of created page (%s): ' % page.pk) +  str([(spage, spage.pk) for spage in page.get_ancestors()])
         
-        print 'descendants of master page: ' + str([(spage, spage.pk) for spage in self.master_page.get_descendants()])
+        # print ('descendants of slave page (%s): ' % self.slave_page.pk) + str([(spage, spage.pk) for spage in self.reload_page(self.slave_page).get_descendants()])
         
-        print 'ancestors of created page: ' +  str([(spage, spage.pk) for spage in page.get_ancestors()])
-        
-        print 'descendants of slave page: ' + str([(spage, spage.pk) for spage in self.slave_page.get_descendants()])
-        
-        print 'ancestors of slave page: ' +  str([(spage, spage.pk) for spage in self.slave_page.get_ancestors()])
+        # print ('ancestors of slave page (%s): ' % self.slave_page.pk)  +  str([(spage, spage.pk) for spage in self.slave_page.get_ancestors()])
 
         self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", 1))
         # should be True user_master should have publish permissions for childred aswell
@@ -506,7 +506,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         """Add page under slave_home and check its flag
         """
         self.login_user(self.user_slave)
-        page = self.create_page(self.slave_page)
+        page = self.create_page(parent_page=self.slave_page)
         
         # moderator_state must be changed
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
