@@ -341,7 +341,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.create_page(self.slave_page, user=self.user_slave)
         # same as test_05_slave_can_add_page_under_slave_home        
         self.assertEqual(page.get_moderator_queryset().count(), 1)
-        self.assertTrue(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
+        self.assertTrue(page.moderator_state == Page.MODERATOR_CHANGED)
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
@@ -683,6 +683,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         # add plugin
         plugin_id = self.add_plugin(self.user_slave, page)
         
+        self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
+
         # publish page
         page = self.publish_page(page, published_check=False)
         

@@ -147,7 +147,6 @@ class CMSTestCase(TestCase):
         page = Page.objects.create(**page_data)
         if parent_page:
             page.move_to(parent_page, position)
-            page.save()
 
         if settings.CMS_MODERATOR and user:
             page.pagemoderator_set.create(user=user)
