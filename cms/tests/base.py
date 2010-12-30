@@ -2,6 +2,9 @@ from cms.models import Title, Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_pool import plugin_pool
+from cms.plugins.text.models import Text
+from cms.utils.helpers import make_revision_with_plugins
 from cms.utils.permissions import _thread_locals
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -314,25 +317,21 @@ class CMSTestCase(TestCase):
         return page_permission
     
     def add_plugin(self, user, page=None):
-        if page:
-            slave_page = page
-        else:
-            slave_page = self.slave_page
-        
-        post_data = {
-            'language': 'en',
-            'placeholder': slave_page.placeholders.get(slot__iexact='Right-Column').pk,
-            'plugin_type': 'TextPlugin'
-        }
-        self.login_user(user)
-        url = URL_CMS_PAGE + "%d/add-plugin/" % slave_page.pk
-        response = self.client.post(url, post_data)
-        
-        cmsplugin_set = CMSPlugin.objects.filter(placeholder__in=slave_page.placeholders.all())
-        self.assertEqual(cmsplugin_set.count(), 1)
-        plugin_id = cmsplugin_set[0].id
-        self.assertEqual(response.content, str(plugin_id))
-        return plugin_id
+        if not page:
+            page = self.slave_page
+        placeholder = page.placeholders.get(slot__iexact='Right-Column')
+        plugin_base = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder, 
+            position=1, 
+            language='en'
+        )
+        plugin_base.insert_at(None, position='last-child', commit=False)
+                
+        plugin = Text(body='')
+        plugin_base.set_base_attr(plugin)
+        plugin.save()
+        return plugin.pk
     
     def publish_page(self, page, approve=False, user=None, published_check=True):
         if user:
