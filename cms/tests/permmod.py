@@ -319,7 +319,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # moderators and approvement ok?
         self.assertEqual(page.get_moderator_queryset().count(), 1)
-        self.assertTrue(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
+        self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
