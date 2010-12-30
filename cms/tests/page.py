@@ -315,7 +315,7 @@ class PagesTestCase(CMSTestCase):
         Check that plugins and placeholders get correctly deleted when we delete
         a page!
         """
-        page = self.new_create_page()
+        page = self.create_page()
         page.rescan_placeholders() # create placeholders
         placeholder = page.placeholders.all()[0]
         plugin_base = CMSPlugin(
