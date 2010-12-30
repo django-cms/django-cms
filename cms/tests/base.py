@@ -1,6 +1,7 @@
+from cms.admin.forms import save_permissions
 from cms.models import Title, Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission
+from cms.models.permissionmodels import PagePermission, PageUser
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.plugins.text.models import Text
@@ -250,7 +251,8 @@ class CMSTestCase(TestCase):
         can_delete_pageuser=True, can_add_pagepermission=True, 
         can_change_pagepermission=True, can_delete_pagepermission=True,
         grant_all=False):
-        """Helper function for creating page user, through form on:
+        """
+        Helper function for creating page user, through form on:
             /admin/cms/pageuser/add/
             
         Returns created user.
@@ -261,11 +263,8 @@ class CMSTestCase(TestCase):
             
         if password is None:
             password=username
-            
+        
         data = {
-            'username': username, 
-            'password1': password,
-            'password2': password, 
             'can_add_page': can_add_page, 
             'can_change_page': can_change_page, 
             'can_delete_page': can_delete_page, 
@@ -273,14 +272,23 @@ class CMSTestCase(TestCase):
             'can_add_pageuser': can_add_pageuser, 
             'can_change_pageuser': can_change_pageuser, 
             'can_delete_pageuser': can_delete_pageuser, 
-            'can_add_pagepermission': can_add_pagepermission, 
-            'can_change_pagepermission': can_change_pagepermission, 
-            'can_delete_pagepermission': can_delete_pagepermission,            
+            'can_add_pagepermission': can_add_pagepermission,
+            'can_change_pagepermission': can_change_pagepermission,
+            'can_delete_pagepermission': can_delete_pagepermission,
         }
-        response = self.client.post('/admin/cms/pageuser/add/', data)
-        self.assertEqual(response.status_code, 302)
-        
-        return User.objects.get(username=username)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = User.objects.create_user(username, 'username@django-cms.org', password)
+            user.is_staff = True
+            user.is_active = True
+        page_user = PageUser(created_by=self.user)
+        for field in [f.name for f in User._meta.local_fields]:
+            setattr(page_user, field, getattr(user, field))
+        user.save()
+        page_user.save()
+        save_permissions(data, page_user)
+        return user
         
     def assign_user_to_page(self, page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         can_add=False, can_change=False, can_delete=False, 

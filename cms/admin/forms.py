@@ -20,7 +20,31 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
 
+def get_permission_acessor(obj):
+    if isinstance(obj, PageUser):
+        rel_name = 'user_permissions' 
+    else:
+        rel_name = 'permissions'
+    return getattr(obj, rel_name)
 
+def save_permissions(data, obj):
+    models = ((Page, 'page'), (PageUser, 'pageuser'), (PageUserGroup, 'pageuser'), (PagePermission, 'pagepermission'))
+    
+    if not obj.pk:
+        # save obj, otherwise we can't assign permissions to him
+        obj.save()
+    permission_acessor = get_permission_acessor(obj)
+    
+    for model, name in models:
+        content_type = ContentType.objects.get_for_model(model)
+        for t in ('add', 'change', 'delete'):
+            # add permission `t` to model `model`
+            codename = getattr(model._meta, 'get_%s_permission' % t)()
+            permission = Permission.objects.get(content_type=content_type, codename=codename)
+            if data.get('can_%s_%s' % (t, name), None):
+                permission_acessor.add(permission)
+            else:
+                permission_acessor.remove(permission)
 
 
 class PageAddForm(forms.ModelForm):
@@ -262,31 +286,8 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 initials['can_%s_%s' % (t, name)] = codename in permissions 
         return initials
     
-    def permission_acessor(self, obj):
-        if isinstance(obj, PageUser):
-            rel_name = 'user_permissions' 
-        else:
-            rel_name = 'permissions'
-        return getattr(obj, rel_name)
-
     def save_permissions(self, obj):
-        models = ((Page, 'page'), (PageUser, 'pageuser'), (PageUserGroup, 'pageuser'), (PagePermission, 'pagepermission'))
-        
-        if not obj.pk:
-            # save obj, otherwise we can't assign permissions to him
-            obj.save()
-        permission_acessor = self.permission_acessor(obj)
-        
-        for model, name in models:
-            content_type = ContentType.objects.get_for_model(model)
-            for t in ('add', 'change', 'delete'):
-                # add permission `t` to model `model`
-                codename = getattr(model._meta, 'get_%s_permission' % t)()
-                permission = Permission.objects.get(content_type=content_type, codename=codename)
-                if self.cleaned_data.get('can_%s_%s' % (t, name), None):
-                    permission_acessor.add(permission)
-                else:
-                    permission_acessor.remove(permission)
+        save_permissions(self.cleaned_data, obj)
         
 
 class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
@@ -357,7 +358,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         if commit:
             user.save()
 
-        self.save_permissions(user)
+        save_permissions(self.cleaned_data, user)
 
         if self.cleaned_data['notify_user']:
             mail_page_user_change(user, created, self.cleaned_data['password1'])
