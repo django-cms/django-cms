@@ -143,7 +143,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         if user:
             self.login_user(user)
         
-        if published_check:
+        if published_check and not approve:
             # must have public object now
             self.assertFalse(page.publisher_public)
             self.assertFalse(page.published)
@@ -163,7 +163,6 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # approve
         page = self.approve_page(page)
-        
         if published_check:
             # must have public object now
             self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)

@@ -144,11 +144,11 @@ class CMSTestCase(TestCase):
             page_data['parent'] = parent_page
         page_data.update(**extra)
 
-        page = Page(**page_data)
-        page.save()
+        page = Page.objects.create(**page_data)
         if parent_page:
             page.move_to(parent_page, position)
-        
+            page.save()
+
         if settings.CMS_MODERATOR and user:
             page.pagemoderator_set.create(user=user)
         
