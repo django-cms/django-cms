@@ -239,7 +239,9 @@ setting::
       ...
   )
 
-Here is a simple example for a base template called ``base.html``::
+Here is a simple example for a base template called ``base.html``:
+
+.. code-block:: html+django
 
   {% load cms_tags %}
   <html>
@@ -249,7 +251,9 @@ Here is a simple example for a base template called ``base.html``::
     </body>
   </html>
 
-Now we can use this base template in our ``template_1.html`` template::
+Now we can use this base template in our ``template_1.html`` template:
+
+.. code-block:: html+django
 
   {% extends "base.html" %}
   {% load cms_tags %}

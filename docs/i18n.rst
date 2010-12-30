@@ -27,7 +27,9 @@ The ``language_chooser`` template tag will display a language chooser for the
 current page. You can modify the template in ``menu/language_chooser.html`` or
 provide your own template if necessary.
 
-Example::
+Example:
+
+.. code-block:: html+django
 
 	{% load menu_tags %}
 	{% language_chooser "myapp/language_chooser.html" %}
