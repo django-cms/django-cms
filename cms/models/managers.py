@@ -146,6 +146,8 @@ class TitleManager(PublisherManager):
                     return None
                 except self.model.DoesNotExist:
                     pass
+            else:
+                raise
         return None        
     
     def get_page_slug(self, slug, site=None):
@@ -455,9 +457,13 @@ class PagePermissionsPermissionManager(models.Manager):
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
         # default is denny...
         page_id_allow_list = []
+        desc_list = []
         for permission in qs:
+            desc_list.append((permission.page.get_descendants(include_self=True), permission.page.pk, 'grant %i' % permission.grant_on))
+
             is_allowed = getattr(permission, attr)
             if is_allowed:
+
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
                     page_id_allow_list.append(permission.page.id)
@@ -465,7 +471,10 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
+                    
+        print 'descendants for pages in permissions for (' + str(user) + ') : ' + str(desc_list) # no pages with permissions has descendants???
         # store value in cache
+
         #set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list
 

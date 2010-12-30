@@ -1,7 +1,7 @@
 from cms.models import Page, CMSPlugin
-from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS, \
-    ACCESS_DESCENDANTS
+from cms.models.moderatormodels import ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission
+from cms.utils.permissions import has_generic_permission
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE, \
     URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
 from django.conf import settings
@@ -57,7 +57,6 @@ class PermissionModeratorTestCase(CMSTestCase):
             
         Returns created user.
         """
-        
         if grant_all:
             return self.create_page_user(username, password, 
                 True, True, True, True, True, True, True, True, True, True)
@@ -220,18 +219,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     ############################################################################
     # page acessors
     
-    @property
-    def home_page(self):
-        return Page.objects.drafts().get(title_set__slug="home")
-    
-    @property
-    def slave_page(self):
-        return Page.objects.drafts().get(title_set__slug="slave-home")
-    
-    @property
-    def master_page(self):
-        return Page.objects.drafts().get(title_set__slug="master")
-    
+
     ############################################################################
     # tests
     
@@ -243,31 +231,31 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_super.save()
         self.login_user(self.user_super)
         
-        home = self.create_page(title="home", user=self.user_super)
-        self.publish_page(home)
+        self.home_page = self.create_page(title="home", user=self.user_super)
+        self.publish_page(self.home_page )
         
         # master page & master user
         
-        master = self.create_page(title="master")
-        self.publish_page(master)
+        self.master_page = self.create_page(title="master")
+        self.publish_page(self.master_page)
         
         # create master user
         self.user_master = self.create_page_user("master", grant_all=True)
         
         # assign master user under home page
-        self.assign_user_to_page(home, self.user_master, grant_on=ACCESS_DESCENDANTS,
+        self.assign_user_to_page(self.home_page, self.user_master, grant_on=ACCESS_DESCENDANTS,
             grant_all=True)
         
         # and to master page
-        self.assign_user_to_page(master, self.user_master, grant_all=True)
+        self.assign_user_to_page(self.master_page, self.user_master, grant_all=True)
         
         # slave page & slave user
         
-        slave = self.create_page(title="slave-home", parent_page=master, user=self.user_super)  
+        self.slave_page = self.create_page(title="slave-home", parent_page=self.master_page, user=self.user_super)  
         self.user_slave = self.create_page_user("slave", 
             can_add_page=True, can_change_page=True, can_delete_page=True)
         
-        self.assign_user_to_page(slave, self.user_slave, grant_all=True)
+        self.assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
         
         # create page_a - sample page from master
         
@@ -277,7 +265,7 @@ class PermissionModeratorTestCase(CMSTestCase):
             can_move_page=True, can_moderate=True)
         
         # logg in as master, and request moderation for slave page and descendants
-        self.request_moderation(slave, 7)
+        self.request_moderation(self.slave_page, 7)
         
         self.client.logout()
          
@@ -313,16 +301,17 @@ class PermissionModeratorTestCase(CMSTestCase):
     
     def test_05_slave_can_add_page_under_slave_home(self):
         self.login_user(self.user_slave)
-        slave_page = self.slave_page
         
-        url = URL_CMS_PAGE_ADD + "?target=%d&position=last-child" % slave_page.pk
+        # move to admin.py?
+        # url = URL_CMS_PAGE_ADD + "?target=%d&position=last-child" % slave_page.pk
         
         # can he even access it over get?
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        # response = self.client.get(url)
+        # self.assertEqual(response.status_code, 200)
         
         # add page
-        page = self.create_page(slave_page, user=self.user_slave)
+        page = self.create_page(self.slave_page, user=self.user_slave)
+        # adds user_slave as page moderator for this page
         # public model shouldn't be available yet, because of the moderation
         # removed test cases since Title object does not inherit from Publisher anymore
         #self.assertObjectExist(Title.objects, slug=page_data['slug'])
@@ -330,38 +319,66 @@ class PermissionModeratorTestCase(CMSTestCase):
         
         # moderators and approvement ok?
         self.assertEqual(page.get_moderator_queryset().count(), 1)
-        #assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
+        self.assertTrue(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
+        
+        # must not have public object yet
+        self.assertFalse(page.publisher_public)
+
+        self.assertTrue(has_generic_permission(page.pk, self.user_slave, "publish", 1))
+
+        # publish as slave, published as user_master before 
+        self.publish_page(page, False, self.user_slave, False)
+        
+        # user_slave is moderator for this page
+        # approve / publish as user_slave
+        # user master should be able to approve aswell
+        page = self.approve_page(page)
+
+    def test_06_page_added_by_slave_can_be_published_approved_by_user_master(self):
+        self.login_user(self.user_master)
+        
+        # add page
+        page = self.create_page(self.slave_page, user=self.user_slave)
+        # same as test_05_slave_can_add_page_under_slave_home        
+        self.assertEqual(page.get_moderator_queryset().count(), 1)
+        self.assertTrue(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
         
-        # publish / approve page by master
-        self.login_user(self.user_master)
+        print 'pk of created page: ' + str(page.pk)
         
-        self.publish_page(page, False, self.user_master, True)
-#        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-#        self.assertEqual(response.status_code, 200,
-#            "Page '%s' could not be approved by '%s', response code was '%s'" % (
-#                page, self.user_master, response.status_code
-#        ))
+        print 'descendants of master page: ' + str([(spage, spage.pk) for spage in self.master_page.get_descendants()])
         
-        # approve / publish
-        page = self.approve_page(page)
-    
+        print 'ancestors of created page: ' +  str([(spage, spage.pk) for spage in page.get_ancestors()])
         
-    def test_06_super_can_add_plugin(self):
+        print 'descendants of slave page: ' + str([(spage, spage.pk) for spage in self.slave_page.get_descendants()])
+        
+        print 'ancestors of slave page: ' +  str([(spage, spage.pk) for spage in self.slave_page.get_ancestors()])
+
+        self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", 1))
+        # should be True user_master should have publish permissions for childred aswell
+        # don't test for published since publishing must be approved
+        self.publish_page(page, False, self.user_master, False)
+        
+        # user_master is moderator for top level page / but can't approve descendants?
+        # approve / publish as user_master
+        # user master should be able to approve descendants
+        page = self.approve_page(page)    
+        
+    def test_07_super_can_add_plugin(self):
         self.add_plugin(self.user_super)
     
     
-    def test_07_master_can_add_plugin(self):
+    def test_08_master_can_add_plugin(self):
         self.add_plugin(self.user_master)
     
     
-    def test_08_slave_can_add_plugin(self):
+    def test_09_slave_can_add_plugin(self):
         self.add_plugin(self.user_slave)
     
     
-    def test_09_same_order(self):
+    def test_10_same_order(self):
         self.login_user(self.user_master)
         
         # create 4 pages
@@ -377,7 +394,7 @@ class PermissionModeratorTestCase(CMSTestCase):
             page = self.publish_page(page, True)
             self.check_published_page_attributes(page)
     
-    def test_10_create_copy_publish(self):
+    def test_11_create_copy_publish(self):
         # create new page to copy
         self.login_user(self.user_master)
         page = self.create_page(self.slave_page)
@@ -389,7 +406,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.check_published_page_attributes(page)
     
     
-    def test_11_create_publish_copy(self):
+    def test_12_create_publish_copy(self):
         # create new page to copy
         self.login_user(self.user_master)
         page = self.create_page(self.home_page)
@@ -404,7 +421,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.check_published_page_attributes(copied_page)
         
         
-    def test_12_subtree_needs_approvement(self):
+    def test_13_subtree_needs_approvement(self):
         self.login_user(self.user_master)
         # create page under slave_page
         page = self.create_page(self.home_page)
@@ -439,7 +456,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.check_published_page_attributes(subpage)
 
 
-    def test_13_subtree_with_super(self):
+    def test_14_subtree_with_super(self):
         self.login_user(self.user_super)
         # create page under root
         page = self.create_page()
@@ -470,7 +487,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.check_published_page_attributes(subpage)
         
         
-    def test_14_super_add_page_to_root(self):
+    def test_15_super_add_page_to_root(self):
         """Create page which is not under moderation in root, and check if 
         some properties are correct.
         """
@@ -485,7 +502,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
     
     
-    def test_15_moderator_flags(self):
+    def test_16_moderator_flags(self):
         """Add page under slave_home and check its flag
         """
         self.login_user(self.user_slave)
@@ -532,7 +549,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
         
         
-    def test_16_patricks_move(self):
+    def test_17_patricks_move(self):
         """Special name, special case..
 
         1. build following tree (master node is approved and published)
@@ -649,7 +666,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(pg.publisher_public.get_absolute_url(), u'%smaster/slave-home/pc/pg/' % self.get_pages_root())
         self.assertEqual(ph.publisher_public.get_absolute_url(), u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root())     
         
-    def test_17_plugins_get_published(self):
+    def test_18_plugins_get_published(self):
         self.login_user(self.user_super)
         # create page under root
         page = self.create_page()
@@ -659,7 +676,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.publish_page(page, True, self.user_super, True)
         self.assertEqual(CMSPlugin.objects.all().count(), 2)
 
-    def test_18_remove_plugin_page_under_moderation(self):
+    def test_19_remove_plugin_page_under_moderation(self):
         # login as slave and create page
         self.login_user(self.user_slave)
         page = self.create_page(self.slave_page)

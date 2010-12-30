@@ -78,11 +78,11 @@ class PagesTestCase(CMSTestCase):
         """
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
-        page = self.new_create_page(title='test page 1', published=False)
+        page = self.create_page(title='test page 1', published=False)
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
         self.assertTrue(page.publish())
-        with_parent = self.new_create_page(parent_page=page, title='test page 2', published=True)
+        with_parent = self.create_page(parent_page=page, title='test page 2', published=True)
         homepage = Page.objects.get_home()
         self.assertTrue(homepage.get_slug(), 'test-page-1')
         response = self.client.get(self.get_pages_root())
@@ -142,12 +142,12 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = self.new_create_page()
-        page_a_a = self.new_create_page(page_a)
-        page_a_a_a = self.new_create_page(page_a_a)
+        page_a = self.create_page()
+        page_a_a = self.create_page(page_a)
+        page_a_a_a = self.create_page(page_a_a)
         
-        page_b = self.new_create_page()
-        page_b_a = self.new_create_page(page_b)
+        page_b = self.create_page()
+        page_b_a = self.create_page(page_b)
         
         count = Page.objects.drafts().count()
         
@@ -207,7 +207,7 @@ class PagesTestCase(CMSTestCase):
         
     def test_11_add_placeholder(self):
         # create page
-        page = self.new_create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
+        page = self.create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
         page.template = 'add_placeholder.html'
         page.save()
         url = page.get_absolute_url()
@@ -234,7 +234,7 @@ class PagesTestCase(CMSTestCase):
         """
         Test that CMSSitemap object contains only published,public (login_required=False) pages
         """
-        self.new_create_page(parent_page=None, published=True, in_navigation=True)
+        self.create_page(parent_page=None, published=True, in_navigation=True)
         page1 = Page.objects.all()[0]
         page1.login_required = True
         page1.save()
@@ -264,20 +264,20 @@ class PagesTestCase(CMSTestCase):
             home_slug = "home"
             child_slug = "child"
             grandchild_slug = "grandchild"
-            home = self.new_create_page(
+            home = self.create_page(
                 title=home_slug,
                 published=True,
                 in_navigation=True
             )
             home.publish()
-            child = self.new_create_page(
+            child = self.create_page(
                 parent_page=home,
                 title=child_slug,
                 published=True, 
                 in_navigation=True
             )
             child.publish()
-            grandchild = self.new_create_page(
+            grandchild = self.create_page(
                 parent_page=child,
                 title=grandchild_slug,
                 published=True, 
@@ -291,3 +291,18 @@ class PagesTestCase(CMSTestCase):
             response = self.client.get(grandchild.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.assertFalse(child.get_absolute_url() in grandchild.get_absolute_url())
+
+    def test_15_templates(self):
+        """
+        Test the inheritance magic for templates
+        """
+        parent = self.new_create_page()
+        child = self.new_create_page(parent)
+        child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        child.save()
+        self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(parent.get_template(), child.get_template())
+        parent.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        parent.save()
+        self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(parent.get_template(), settings.CMS_TEMPLATES[0][0])

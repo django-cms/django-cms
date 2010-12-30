@@ -26,11 +26,11 @@ class PublisherTestCase(CMSTestCase):
               B  C
         '''
         # Create a simple tree of 3 pages
-        pageA = self.new_create_page(title="Page A", published= True, 
+        pageA = self.create_page(title="Page A", published= True, 
                                      in_navigation= True)
-        pageB = self.new_create_page(parent_page=pageA,title="Page B", 
+        pageB = self.create_page(parent_page=pageA,title="Page B", 
                                      published= True, in_navigation= True)
-        pageC = self.new_create_page(parent_page=pageA,title="Page C", 
+        pageC = self.create_page(parent_page=pageA,title="Page C", 
                                      published= False, in_navigation= True)
         # Assert A and B are published, C unpublished
         self.assertTrue(pageA.published)
@@ -102,7 +102,7 @@ class PublisherTestCase(CMSTestCase):
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         
         # Now, let's create a page. That actually creates 2 Page objects
-        self.new_create_page(title="The page!", published=True, 
+        self.create_page(title="The page!", published=True, 
                                     in_navigation=True)
         draft = Page.objects.drafts()[0]
         draft.reverse_id = 'a_test' # we have to change *something*
@@ -136,7 +136,7 @@ class PublisherTestCase(CMSTestCase):
         self.assertEquals(non_draft.reverse_id, 'a_test')
         
     def test_06_unpublish(self):
-        page = self.new_create_page(title="Page", published=True,
+        page = self.create_page(title="Page", published=True,
                                     in_navigation=True)
         page.published = False
         page.save()
