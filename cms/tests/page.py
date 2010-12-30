@@ -296,8 +296,8 @@ class PagesTestCase(CMSTestCase):
         """
         Test the inheritance magic for templates
         """
-        parent = self.new_create_page()
-        child = self.new_create_page(parent)
+        parent = self.create_page()
+        child = self.create_page(parent)
         child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         child.save()
         self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
