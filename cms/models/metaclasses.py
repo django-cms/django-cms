@@ -9,7 +9,10 @@ class PageMetaClass(ModelBase):
     def __new__(cls, name, bases, attrs):
         super_new = super(PageMetaClass, cls).__new__
         if not settings.CMS_MODERATOR:
-            return super_new(cls, name, bases, attrs)
+            attrs = install_mptt(cls, name, bases, attrs)
+            new_class = super_new(cls, name, bases, attrs)
+            finish_mptt(new_class)
+            return new_class
         
         if 'objects' in attrs:
             if not isinstance(attrs['objects'], PublisherManager):

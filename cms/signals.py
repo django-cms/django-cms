@@ -198,17 +198,7 @@ def post_save_page(instance, raw, created, **kwargs):
         page_changed(instance, old_page)
     
 def update_placeholders(instance, **kwargs):
-    from cms.utils.plugins import get_placeholders
-    placeholders = get_placeholders(instance.get_template())
-    found = {}
-    for placeholder in instance.placeholders.all():
-        if placeholder.slot in placeholders:
-            found[placeholder.slot] = placeholder
-    for placeholder_name in placeholders:
-        if not placeholder_name in found:
-            placeholder = Placeholder.objects.create(slot=placeholder_name)
-            instance.placeholders.add(placeholder)
-            found[placeholder_name] = placeholder
+    instance.rescan_placeholders()
 
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)    

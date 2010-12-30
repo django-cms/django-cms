@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models import Page, Title, Placeholder
+from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.plugins.link.models import Link
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import plugin_tags_to_id_list, plugin_tags_to_admin_html
 from cms.plugins.googlemap.models import GoogleMap
@@ -17,8 +16,7 @@ from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpRequest
-from django.template import TemplateDoesNotExist, RequestContext
+from django.template import RequestContext
 from django.forms.widgets import Media
 from django.core.files.uploadedfile import SimpleUploadedFile
 

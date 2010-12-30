@@ -420,6 +420,7 @@ class Page(Mptt):
         
         if not published:
             # was not published, escape
+            transaction.commit()
             return
 
         # clean moderation log
@@ -1081,6 +1082,23 @@ class Page(Mptt):
         # or none structural change, just save
         obj.save()
         return obj
+    
+    def rescan_placeholders(self):
+        """
+        Rescan and if necessary create placeholders in the current template.
+        """
+        # inline import to prevent circular imports
+        from cms.utils.plugins import get_placeholders
+        placeholders = get_placeholders(self.get_template())
+        found = {}
+        for placeholder in self.placeholders.all():
+            if placeholder.slot in placeholders:
+                found[placeholder.slot] = placeholder
+        for placeholder_name in placeholders:
+            if not placeholder_name in found:
+                placeholder = Placeholder.objects.create(slot=placeholder_name)
+                self.placeholders.add(placeholder)
+                found[placeholder_name] = placeholder
 
 def _reversion():
     if 'publisher' in settings.INSTALLED_APPS:
