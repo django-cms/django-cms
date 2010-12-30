@@ -159,20 +159,25 @@ class CMSTestCase(TestCase):
         if settings.CMS_MODERATOR and user:
             page.pagemoderator_set.create(user=user)
         
-        title_data = {
-            'title': 'test page %d' % self.counter,
-            'slug': 'test-page-%d' % self.counter,
-            'language': language,
-            'page': page,
-        }
+        if not title:
+            title = 'test page %d' % self.counter
+            slug = 'test-page-%d' % self.counter
+        else:
+            slug = slugify(title)
         self.counter = self.counter + 1
-        if title:
-            title_data['title'] = title
-            title_data['slug'] = slugify(title)
-        Title.objects.create(**title_data)
+        self.create_title(title=title, slug=slug, language=language, page=page)
             
         del _thread_locals.user
         return page
+    
+    def create_title(self, title, slug, language, page, **extra):
+        return Title.objects.create(
+            title=title,
+            slug=slug,
+            language=language,
+            page=page,
+            **extra
+        )
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -203,7 +208,10 @@ class CMSTestCase(TestCase):
         """
         Returns a fresh instance of the page from the database
         """
-        return Page.objects.get(pk=page.pk)
+        return self.reload(page)
+    
+    def reload(self, obj):
+        return obj.__class__.objects.get(pk=obj.pk)
     
     def get_pages_root(self):
         return urllib.unquote(reverse("pages-root"))
@@ -276,13 +284,17 @@ class CMSTestCase(TestCase):
             'can_change_pagepermission': can_change_pagepermission,
             'can_delete_pagepermission': can_delete_pagepermission,
         }
+        if hasattr(self, 'user'):
+            created_by = self.user
+        else:
+            created_by = User.objects.create_superuser('superuser', 'superuser@django-cms.org', 'superuser')
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             user = User.objects.create_user(username, 'username@django-cms.org', password)
             user.is_staff = True
             user.is_active = True
-        page_user = PageUser(created_by=self.user)
+        page_user = PageUser(created_by=created_by)
         for field in [f.name for f in User._meta.local_fields]:
             setattr(page_user, field, getattr(user, field))
         user.save()
@@ -319,15 +331,20 @@ class CMSTestCase(TestCase):
         page_permission.save()
         return page_permission
     
-    def add_plugin(self, user, page=None):
-        if not page:
+    def add_plugin(self, user=None, page=None, placeholder=None, language='en'):
+        if placeholder:
+            page = placeholder.page_set.all()[0]
+        elif page:
+            placeholder = page.placeholders.get(slot__iexact='Right-Column')
+        else:
             page = self.slave_page
-        placeholder = page.placeholders.get(slot__iexact='Right-Column')
+            placeholder = page.placeholders.get(slot__iexact='Right-Column')
+            
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder, 
             position=1, 
-            language='en'
+            language=language
         )
         plugin_base.insert_at(None, position='last-child', commit=False)
                 

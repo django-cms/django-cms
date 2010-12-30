@@ -260,8 +260,7 @@ class Page(Mptt):
                     ph.save()
                     page.placeholders.add(ph)
                 if plugins:
-                    language = plugins[0].language
-                    copy_plugins_to(plugins, ph, language)
+                    copy_plugins_to(plugins, ph)
                     
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
