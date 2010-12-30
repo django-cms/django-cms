@@ -713,14 +713,14 @@ class Page(Mptt):
         opts = self._meta
         if request.user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) or \
+        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
             self.has_generic_permission(request, "change")
     
     def has_delete_permission(self, request):
         opts = self._meta
         if request.user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) or \
+        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
             self.has_generic_permission(request, "delete")
     
     def has_publish_permission(self, request):
@@ -752,17 +752,17 @@ class Page(Mptt):
             return False
         return self.has_generic_permission(request, "moderate")
     
-    def has_generic_permission(self, request, type):
+    def has_generic_permission(self, request, perm_type):
         """
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        att_name = "permission_%s_cache" % type
+        att_name = "permission_%s_cache" % perm_type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
             or request.user.pk != self.permission_user_cache.pk:
             from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            setattr(self, att_name, has_generic_permission(self.id, request.user, type, self.site_id))
+            setattr(self, att_name, has_generic_permission(self.id, request.user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
                 

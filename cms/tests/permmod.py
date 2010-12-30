@@ -349,7 +349,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_06_page_added_by_slave_can_be_published_approved_by_user_master(self):
         self.login_user(self.user_master)
         slave_page = self.slave_page
-        
+
         # add page
         page = self.create_page(slave_page, user=self.user_slave)
         # same as test_05_slave_can_add_page_under_slave_home        
