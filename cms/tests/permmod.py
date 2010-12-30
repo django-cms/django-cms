@@ -219,18 +219,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     ############################################################################
     # page acessors
     
-    @property
-    def home_page(self):
-        return Page.objects.drafts().get(title_set__slug="home")
-    
-    @property
-    def slave_page(self):
-        return Page.objects.drafts().get(title_set__slug="slave-home")
-    
-    @property
-    def master_page(self):
-        return Page.objects.drafts().get(title_set__slug="master")
-    
+
     ############################################################################
     # tests
     
@@ -242,31 +231,31 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_super.save()
         self.login_user(self.user_super)
         
-        home = self.create_page(title="home", user=self.user_super)
-        self.publish_page(home)
+        self.home_page = self.create_page(title="home", user=self.user_super)
+        self.publish_page(self.home_page )
         
         # master page & master user
         
-        master = self.create_page(title="master")
-        self.publish_page(master)
+        self.master_page = self.create_page(title="master")
+        self.publish_page(self.master_page)
         
         # create master user
         self.user_master = self.create_page_user("master", grant_all=True)
         
         # assign master user under home page
-        self.assign_user_to_page(home, self.user_master, grant_on=ACCESS_DESCENDANTS,
+        self.assign_user_to_page(self.home_page, self.user_master, grant_on=ACCESS_DESCENDANTS,
             grant_all=True)
         
         # and to master page
-        self.assign_user_to_page(master, self.user_master, grant_all=True)
+        self.assign_user_to_page(self.master_page, self.user_master, grant_all=True)
         
         # slave page & slave user
         
-        slave = self.create_page(title="slave-home", parent_page=master, user=self.user_super)  
+        self.slave_page = self.create_page(title="slave-home", parent_page=self.master_page, user=self.user_super)  
         self.user_slave = self.create_page_user("slave", 
             can_add_page=True, can_change_page=True, can_delete_page=True)
         
-        self.assign_user_to_page(slave, self.user_slave, grant_all=True)
+        self.assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
         
         # create page_a - sample page from master
         
@@ -276,7 +265,7 @@ class PermissionModeratorTestCase(CMSTestCase):
             can_move_page=True, can_moderate=True)
         
         # logg in as master, and request moderation for slave page and descendants
-        self.request_moderation(slave, 7)
+        self.request_moderation(self.slave_page, 7)
         
         self.client.logout()
          
@@ -312,7 +301,6 @@ class PermissionModeratorTestCase(CMSTestCase):
     
     def test_05_slave_can_add_page_under_slave_home(self):
         self.login_user(self.user_slave)
-        slave_page = self.slave_page
         
         # move to admin.py?
         # url = URL_CMS_PAGE_ADD + "?target=%d&position=last-child" % slave_page.pk
@@ -322,7 +310,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # self.assertEqual(response.status_code, 200)
         
         # add page
-        page = self.create_page(slave_page, user=self.user_slave)
+        page = self.create_page(self.slave_page, user=self.user_slave)
         # adds user_slave as page moderator for this page
         # public model shouldn't be available yet, because of the moderation
         # removed test cases since Title object does not inherit from Publisher anymore
@@ -348,16 +336,25 @@ class PermissionModeratorTestCase(CMSTestCase):
 
     def test_06_page_added_by_slave_can_be_published_approved_by_user_master(self):
         self.login_user(self.user_master)
-        slave_page = self.slave_page
-
+        
         # add page
-        page = self.create_page(slave_page, user=self.user_slave)
+        page = self.create_page(self.slave_page, user=self.user_slave)
         # same as test_05_slave_can_add_page_under_slave_home        
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         assert(page.moderator_state == Page.MODERATOR_NEED_APPROVEMENT)
         
         # must not have public object yet
         self.assertFalse(page.publisher_public)
+        
+        print 'pk of created page: ' + str(page.pk)
+        
+        print 'descendants of master page: ' + str([(spage, spage.pk) for spage in self.master_page.get_descendants()])
+        
+        print 'ancestors of created page: ' +  str([(spage, spage.pk) for spage in page.get_ancestors()])
+        
+        print 'descendants of slave page: ' + str([(spage, spage.pk) for spage in self.slave_page.get_descendants()])
+        
+        print 'ancestors of slave page: ' +  str([(spage, spage.pk) for spage in self.slave_page.get_ancestors()])
 
         self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", 1))
         # should be True user_master should have publish permissions for childred aswell

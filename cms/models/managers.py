@@ -459,7 +459,7 @@ class PagePermissionsPermissionManager(models.Manager):
         page_id_allow_list = []
         desc_list = []
         for permission in qs:
-            desc_list.append((permission.page.pk, permission.grant_on, permission.page.get_descendants().values_list('id', flat=True)))
+            desc_list.append((permission.page.get_descendants(include_self=True), permission.page.pk, 'grant %i' % permission.grant_on))
 
             is_allowed = getattr(permission, attr)
             if is_allowed:
@@ -472,7 +472,7 @@ class PagePermissionsPermissionManager(models.Manager):
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
                     
-        assert False, str(desc_list) # no pages with permissions has descendants???
+        print 'descendants for pages in permissions for (' + str(user) + ') : ' + str(desc_list) # no pages with permissions has descendants???
         # store value in cache
 
         #set_permission_cache(user, attr, page_id_allow_list)

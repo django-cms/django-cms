@@ -291,3 +291,18 @@ class PagesTestCase(CMSTestCase):
             response = self.client.get(grandchild.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.assertFalse(child.get_absolute_url() in grandchild.get_absolute_url())
+
+    def test_15_templates(self):
+        """
+        Test the inheritance magic for templates
+        """
+        parent = self.new_create_page()
+        child = self.new_create_page(parent)
+        child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        child.save()
+        self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(parent.get_template(), child.get_template())
+        parent.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        parent.save()
+        self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(parent.get_template(), settings.CMS_TEMPLATES[0][0])
