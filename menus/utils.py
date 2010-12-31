@@ -113,14 +113,16 @@ def find_children(target, pages, levels=100, active_levels=0, ancestors=None, se
             if hasattr(page, "selected"):
                 mark_sibling = True
     if target.navigation_extenders and (levels > 0 or target.pk in ancestors) and not no_extended and target.level < to_levels:
-        target.childrens += get_extended_navigation_nodes(request, 
-                                                          levels, 
-                                                          list(target.ancestors_ascending) + [target], 
-                                                          target.level, 
-                                                          to_levels,
-                                                          active_levels,
-                                                          mark_sibling,
-                                                          target.navigation_extenders)
+        target.childrens += get_extended_navigation_nodes(
+          request, 
+          levels, 
+          list(target.ancestors_ascending) + [target], 
+          target.level, 
+          to_levels,
+          active_levels,
+          mark_sibling,
+          target.navigation_extenders
+        )
 
 def cut_levels(nodes, level):
     """
@@ -131,7 +133,7 @@ def cut_levels(nodes, level):
         if nodes[0].level == level:
             return nodes
     for node in nodes:
-        result += cut_levels(node.childrens, level)
+        result += cut_levels(node.children, level)
     return result
 
 def find_selected(nodes):
@@ -142,7 +144,7 @@ def find_selected(nodes):
         if hasattr(node, "selected"):
             return node
         if hasattr(node, "ancestor"):
-            result = find_selected(node.childrens)
+            result = find_selected(node.children)
             if result:
                 return result
             

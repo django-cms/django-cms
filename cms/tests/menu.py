@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.utils import mark_descendants, find_selected
+from menus.utils import mark_descendants, find_selected, cut_levels
 
 class MenusTestCase(CMSTestCase):
     
@@ -488,3 +488,9 @@ class MenusTestCase(CMSTestCase):
         flat_nodes[3].selected = True
         selected = find_selected(tree_nodes)
         self.assertEqual(selected, flat_nodes[3])
+        
+    def test_25_utils_cut_levels(self):
+        request = self.get_request('/')
+        tree_nodes, flat_nodes = self._get_nodes()
+        menu_pool.apply_modifiers(tree_nodes, request)
+        self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
