@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.utils import mark_descendants
+from menus.utils import mark_descendants, find_selected
 
 class MenusTestCase(CMSTestCase):
     
@@ -18,7 +18,7 @@ class MenusTestCase(CMSTestCase):
         node4 = NavigationNode('4', '/4/', 4, 2)
         node5 = NavigationNode('5', '/5/', 5)
         nodes = [node1, node2, node3, node4, node5]
-        tree = _build_nodes_inner_for_one_menu(nodes, "test")
+        tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
         return tree, nodes
 
     def setUp(self):
@@ -482,3 +482,9 @@ class MenusTestCase(CMSTestCase):
         mark_descendants(tree_nodes)
         for node in flat_nodes:
             self.assertTrue(node.descendant, node)
+            
+    def test_24_utils_find_selected(self):
+        tree_nodes, flat_nodes = self._get_nodes()
+        flat_nodes[3].selected = True
+        selected = find_selected(tree_nodes)
+        self.assertEqual(selected, flat_nodes[3])
