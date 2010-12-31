@@ -33,6 +33,8 @@ MEDIA_URL = '/media/'
 
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
 FIXTURE_DIRS = [os.path.join(PROJECT_DIR, 'fixtures')]
 
 SECRET_KEY = '*xq7m@)*f2awoj!spa0(jibsrz9%c0d=e(g)v*!17y(vx0ue_3'
