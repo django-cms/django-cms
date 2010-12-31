@@ -180,15 +180,15 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.approve_page(page)    
         
     def test_07_super_can_add_plugin(self):
-        self.add_plugin(self.user_super)
+        self.add_plugin(self.user_super, page=self.slave_page)
     
     
     def test_08_master_can_add_plugin(self):
-        self.add_plugin(self.user_master)
+        self.add_plugin(self.user_master, page=self.slave_page)
     
     
     def test_09_slave_can_add_plugin(self):
-        self.add_plugin(self.user_slave)
+        self.add_plugin(self.user_slave, page=self.slave_page)
     
     
     def test_10_same_order(self):

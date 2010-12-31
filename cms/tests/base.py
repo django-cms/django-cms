@@ -331,14 +331,12 @@ class CMSTestCase(TestCase):
         page_permission.save()
         return page_permission
     
-    def add_plugin(self, user=None, page=None, placeholder=None, language='en'):
-        if placeholder:
-            page = placeholder.page_set.all()[0]
-        elif page:
-            placeholder = page.placeholders.get(slot__iexact='Right-Column')
-        else:
-            page = self.slave_page
-            placeholder = page.placeholders.get(slot__iexact='Right-Column')
+    def add_plugin(self, user=None, page=None, placeholder=None, language='en', body=''):
+        if not placeholder:
+            if page:
+                placeholder = page.placeholders.get(slot__iexact='Right-Column')
+            else:
+                placeholder = page.placeholders.get(slot__iexact='Right-Column')
             
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
@@ -348,7 +346,7 @@ class CMSTestCase(TestCase):
         )
         plugin_base.insert_at(None, position='last-child', commit=False)
                 
-        plugin = Text(body='')
+        plugin = Text(body=body)
         plugin_base.set_base_attr(plugin)
         plugin.save()
         return plugin.pk

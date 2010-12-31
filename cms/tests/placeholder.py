@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models.placeholdermodel import Placeholder
 from cms.tests.base import CMSTestCase
 from cms.utils.plugins import get_placeholders
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.template import TemplateSyntaxError
+from django.template import TemplateSyntaxError, Template
+from django.template.context import Context, RequestContext
 from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
     Example5
 
@@ -93,3 +96,21 @@ class PlaceholderTestCase(CMSTestCase):
             
     def test_11_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
+
+    def test_12_placeholder_tag(self):
+        template = Template("{% load placeholder_tags %}{% render_placeholder placeholder %}")
+        ctx = Context()
+        self.assertEqual(template.render(ctx), "")
+        request = self.get_request('/')
+        rctx = RequestContext(request)
+        self.assertEqual(template.render(rctx), "")
+        placeholder = Placeholder.objects.create(slot="test")
+        rctx['placeholder'] = placeholder
+        self.assertEqual(template.render(rctx), "")
+        self.assertEqual(placeholder.cmsplugin_set.count(), 0)
+        self.add_plugin(placeholder=placeholder, body="test", language=settings.LANGUAGES[0][0])
+        self.assertEqual(placeholder.cmsplugin_set.count(), 1)
+        rctx = RequestContext(request)
+        placeholder = self.reload(placeholder)
+        rctx['placeholder'] = placeholder
+        self.assertEqual(template.render(rctx).strip(), "test")
