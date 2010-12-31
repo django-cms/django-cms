@@ -1,15 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
-from django.conf import settings
 from django.utils.html import strip_tags
 from django.utils.text import truncate_words
 from cms.plugins.text.utils import plugin_admin_html_to_tags,\
     plugin_tags_to_admin_html, plugin_tags_to_id_list,\
     replace_plugin_tags
-from cms.models.pluginmodel import PluginModelBase
-from cms.plugin_base import PluginMediaDefiningClass
-from django.db.models.base import ModelBase
 
 _old_tree_cache = {}
 
