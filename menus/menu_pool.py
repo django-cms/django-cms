@@ -13,6 +13,60 @@ def lex_cache_key(key):
     """
     return key.rsplit('_', 2)[1:]
 
+def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
+    '''
+    This is an easier to test "inner loop" building the menu tree structure
+    for one menu (one language, one site) 
+    '''
+    done_nodes = {} # Dict of node.id:Node
+    final_nodes = []
+    
+    # This is to prevent infinite loops - we need to compare the number of 
+    # times we see a specific node to "something", and for the time being, 
+    # it's the total number of nodes
+    list_total_length = len(nodes)
+    
+    while nodes:
+        # For when the node has a parent_id but we haven't seen it yet. 
+        # We must not append it to the final list in this case!
+        should_add_to_final_list = True 
+        
+        node = nodes.pop(0)
+        
+        # Increment the "seen" counter for this specific node.
+        node._counter = getattr(node,'_counter',0) + 1  
+        
+        # Implicit namespacing by menu.__name__
+        if not node.namespace:
+            node.namespace = menu_class_name
+        if node.namespace not in done_nodes:
+            # We need to create the namespace dict to avoid KeyErrors
+            done_nodes[node.namespace] = {} 
+        
+        # If we have seen the parent_id already...
+        if node.parent_id in done_nodes[node.namespace] :
+            # Implicit parent namespace by menu.__name__
+            if not node.parent_namespace:
+                node.parent_namespace = menu_class_name
+            parent = done_nodes[node.namespace][node.parent_id]
+            parent.children.append(node)
+            node.parent = parent
+        # If it has a parent_id but we haven't seen it yet...
+        elif node.parent_id:
+            # We check for infinite loops here, by comparing the number of 
+            # times we "saw" this node to the number of nodes in the list
+            if node._counter < list_total_length:
+                nodes.append(node)
+            # Never add this node to the final list until it has a real 
+            # parent (node.parent)
+            should_add_to_final_list = False
+            
+        if should_add_to_final_list:
+            final_nodes.append(node)
+            # add it to the "seen" list
+            done_nodes[node.namespace][node.id] = node
+    return final_nodes
+
 class MenuPool(object):
     def __init__(self):
         self.menus = {}
@@ -83,8 +137,7 @@ class MenuPool(object):
         for menu_class_name in self.menus:
             nodes = self.menus[menu_class_name].get_nodes(request)
             # nodes is a list of navigation nodes (page tree in cms + others)
-            final_nodes += self._build_nodes_inner_for_one_menu(nodes, 
-                                                                menu_class_name)
+            final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
         duration = getattr(settings, "MENU_CACHE_DURATION", 60*60)
         cache.set(key, final_nodes, duration)
         # We need to have a list of the cache keys for languages and sites that
@@ -95,60 +148,6 @@ class MenuPool(object):
         CacheKey.objects.create(key=key, language=lang, site=site_id)
         return final_nodes
     
-    def _build_nodes_inner_for_one_menu(self, nodes, menu_class_name):
-        '''
-        This is an easier to test "inner loop" building the menu tree structure
-        for one menu (one language, one site) 
-        '''
-        done_nodes = {} # Dict of node.id:Node
-        final_nodes = []
-        
-        # This is to prevent infinite loops - we need to compare the number of 
-        # times we see a specific node to "something", and for the time being, 
-        # it's the total number of nodes
-        list_total_length = len(nodes)
-        
-        while nodes:
-            # For when the node has a parent_id but we haven't seen it yet. 
-            # We must not append it to the final list in this case!
-            should_add_to_final_list = True 
-            
-            node = nodes.pop(0)
-            
-            # Increment the "seen" counter for this specific node.
-            node._counter = getattr(node,'_counter',0) + 1  
-            
-            # Implicit namespacing by menu.__name__
-            if not node.namespace:
-                node.namespace = menu_class_name
-            if node.namespace not in done_nodes:
-                # We need to create the namespace dict to avoid KeyErrors
-                done_nodes[node.namespace] = {} 
-            
-            # If we have seen the parent_id already...
-            if node.parent_id in done_nodes[node.namespace] :
-                # Implicit parent namespace by menu.__name__
-                if not node.parent_namespace:
-                    node.parent_namespace = menu_class_name
-                parent = done_nodes[node.namespace][node.parent_id]
-                parent.children.append(node)
-                node.parent = parent
-            # If it has a parent_id but we haven't seen it yet...
-            elif node.parent_id:
-                # We check for infinite loops here, by comparing the number of 
-                # times we "saw" this node to the number of nodes in the list
-                if node._counter < list_total_length:
-                    nodes.append(node)
-                # Never add this node to the final list until it has a real 
-                # parent (node.parent)
-                should_add_to_final_list = False
-                
-            if should_add_to_final_list:
-                final_nodes.append(node)
-                # add it to the "seen" list
-                done_nodes[node.namespace][node.id] = node
-        return final_nodes
-    
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:
             nodes = self._mark_selected(request, nodes)
@@ -156,7 +155,6 @@ class MenuPool(object):
             inst = cls()
             nodes = inst.modify(request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
-            
     
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None, breadcrumb=False):
         self.discover_menus()

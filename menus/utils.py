@@ -5,7 +5,7 @@ from django.conf import settings
 def mark_descendants(nodes):
     for node in nodes:
         node.descendant = True
-        mark_descendants(node.childrens)
+        mark_descendants(node.children)
 
 def make_tree(request, items, levels, url, ancestors, descendants=False, current_level=0, to_levels=100, active_levels=0):
     from cms.models import Page

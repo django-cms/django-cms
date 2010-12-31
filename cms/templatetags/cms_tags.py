@@ -16,6 +16,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from itertools import chain
 import operator
+import re
 
 register = template.Library()
 
@@ -35,11 +36,17 @@ def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
 
+CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
+
+def _clean_key(key):
+    return CLEAN_KEY_PATTERN.sub('-', key)
+
 def _get_cache_key(name, page_lookup, lang, site_id):
     if isinstance(page_lookup, Page):
         page_key = str(page_lookup.pk)
     else:
         page_key = str(page_lookup)
+    page_key = _clean_key(page_key)
     return name+'__page_lookup:'+page_key+'_site:'+str(site_id)+'_lang:'+str(lang)
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):

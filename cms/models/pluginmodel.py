@@ -257,9 +257,10 @@ class CMSPlugin(Mptt):
         """
         position = self.position
         slot = self.placeholder.slot
-        if self.page and getattr(self.page, 'publisher_public'):
+        page = get_page_from_placeholder_if_exists(self.placeholder)
+        if page and getattr(page, 'publisher_public'):
             try:
-                placeholder = Placeholder.objects.get(page=self.page.publisher_public, slot=slot)
+                placeholder = Placeholder.objects.get(page=page.publisher_public, slot=slot)
             except Placeholder.DoesNotExist:
                 pass                
             else:
