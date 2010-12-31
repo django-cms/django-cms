@@ -6,7 +6,8 @@ Plugins
 File
 ****
 
-Allows you to upload a file. A filetype icon will be assigned based on the file extension.
+Allows you to upload a file. A filetype icon will be assigned based on the file
+extension.
 
 For installation be sure you have the following in the ``INSTALLED_APPS`` setting
 in your project's ``settings.py`` file::
@@ -217,7 +218,8 @@ Twitter
 
 Displays the last number of post of a twitter user.
 
-For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
+For installation be sure you have the following in your project's
+``INSTALLED_APPS`` setting::
 
 	INSTALLED_APPS = (
 		# ...
@@ -230,10 +232,11 @@ For installation be sure you have the following in your project's ``INSTALLED_AP
 Inherit
 *******
 
-Displays all plugins of an other page or an other language. Great if you need always the same
-plugins on a lot of pages.
+Displays all plugins of an other page or an other language. Great if you need
+always the same plugins on a lot of pages.
 
-For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
+For installation be sure you have the following in your project's
+``INSTALLED_APPS`` setting::
 
 	INSTALLED_APPS = (
 		# ...
