@@ -11,7 +11,7 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 class MenusTestCase(CMSTestCase):
     
-    def _get_nodes(self):
+    def _get_nodes(self, path='/'):
         node1 = NavigationNode('1', '/1/', 1)
         node2 = NavigationNode('2', '/2/', 2, 1)
         node3 = NavigationNode('3', '/3/', 3, 2)
@@ -19,6 +19,8 @@ class MenusTestCase(CMSTestCase):
         node5 = NavigationNode('5', '/5/', 5)
         nodes = [node1, node2, node3, node4, node5]
         tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
+        request = self.get_request(path)
+        menu_pool.apply_modifiers(tree, request)
         return tree, nodes
 
     def setUp(self):
@@ -485,12 +487,12 @@ class MenusTestCase(CMSTestCase):
             
     def test_24_utils_find_selected(self):
         tree_nodes, flat_nodes = self._get_nodes()
-        flat_nodes[3].selected = True
+        node = flat_nodes[0]
         selected = find_selected(tree_nodes)
-        self.assertEqual(selected, flat_nodes[3])
+        self.assertEqual(selected, node)
+        selected = find_selected([])
+        self.assertEqual(selected, None)
         
     def test_25_utils_cut_levels(self):
-        request = self.get_request('/')
         tree_nodes, flat_nodes = self._get_nodes()
-        menu_pool.apply_modifiers(tree_nodes, request)
         self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
