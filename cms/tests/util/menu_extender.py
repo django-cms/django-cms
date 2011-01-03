@@ -1,4 +1,4 @@
-from menus.base import Menu, NavigationNode
+from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 from cms.menu_bases import CMSAttachMenu
 

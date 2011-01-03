@@ -5,7 +5,7 @@ from cms.utils import get_language_from_request
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from cms.utils.permissions import has_page_add_permission, has_generic_permission
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.models.pagemodel import Page
 

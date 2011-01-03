@@ -1,7 +1,6 @@
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from cms.plugins.teaser.models import Teaser
 
 class TeaserPlugin(CMSPluginBase):

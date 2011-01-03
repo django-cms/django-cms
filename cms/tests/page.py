@@ -5,8 +5,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PAGE_CHANGE
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.tests.util.context_managers import LanguageOverride, SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User

@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User, Group
-from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from cms.models import Page, PagePermission, GlobalPagePermission

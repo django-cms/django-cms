@@ -8,8 +8,7 @@ from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import HttpResponseRedirect
-from django.template.context import Context, RequestContext
+from django.template.context import RequestContext
 from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
 from django.utils import simplejson

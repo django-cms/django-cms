@@ -3,9 +3,7 @@ from cms.models import Title, Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, PageUser
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 from cms.plugins.text.models import Text
-from cms.utils.helpers import make_revision_with_plugins
 from cms.utils.permissions import _thread_locals
 from django.conf import settings
 from django.contrib.auth.models import User

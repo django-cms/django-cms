@@ -1,9 +1,6 @@
 from cms.models import Page, CMSPlugin
-from cms.models.moderatormodels import ACCESS_DESCENDANTS, \
-    ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE, \
-    URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+from cms.models.moderatormodels import ACCESS_DESCENDANTS
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
 from cms.utils.permissions import has_generic_permission
 from django.conf import settings
 from django.contrib.auth.models import User

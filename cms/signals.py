@@ -1,6 +1,6 @@
 from django.db.models import signals
 from django.conf import settings
-from cms.models import Page, Title, CMSPlugin, Placeholder
+from cms.models import Page, Title, CMSPlugin
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import Signal
 from menus.menu_pool import menu_pool
