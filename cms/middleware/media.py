@@ -1,3 +1,4 @@
+import urlparse
 from django.forms.widgets import Media
 from django.utils.encoding import smart_unicode
 from django.conf import settings
