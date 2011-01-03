@@ -24,6 +24,7 @@ import warnings
 URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
 URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 
+URL_CMS_PAGE_DELETE = URL_CMS_PAGE_CHANGE + "delete/" 
 URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
 URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
 URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE + "remove-plugin/"

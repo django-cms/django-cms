@@ -2,17 +2,19 @@ from __future__ import with_statement
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.tests import base
-from cms.tests.base import CMSTestCase
+from cms.tests.base import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 
 
 class AdminTestCase(CMSTestCase):
     
-    def _get_guys(self):
+    def _get_guys(self, admin_only=False):
         admin = User(username="admin", is_staff = True, is_active = True, is_superuser = True)
         admin.set_password("admin")
         admin.save()
+        if admin_only:
+            return admin
         self.login_user(admin)
         USERNAME = 'test'
         
@@ -111,3 +113,14 @@ class AdminTestCase(CMSTestCase):
         self.assertEqual(page.reverse_id, REVERSE_ID)
         title = page.get_title_obj()
         self.assertEqual(title.overwrite_url, None)
+
+    def test_02_delete(self):
+        admin = self._get_guys(True)
+        page = self.create_page(user=admin, title="delete-page", published=True)
+        child = self.create_page(page, user=admin, title="delete-page", published=True)
+        self.login_user(admin)
+        data = {'post': 'yes'}
+        response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        self.assertRaises(Page.DoesNotExist, self.reload, page)
+        self.assertRaises(Page.DoesNotExist, self.reload, child)
