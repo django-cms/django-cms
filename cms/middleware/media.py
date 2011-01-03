@@ -21,7 +21,8 @@ class PlaceholderMediaMiddleware(object):
             return False 
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
-        if request.path.startswith(urlparse.urlparse(settings.MEDIA_URL)[2]):
+        media = urlparse.urlparse(settings.MEDIA_URL)
+        if request.path.startswith(media.path) and request.get_host() == media.netloc:
             return False
         return True
     
