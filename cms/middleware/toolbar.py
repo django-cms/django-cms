@@ -39,7 +39,7 @@ class ToolbarMiddleware(object):
         if request.is_ajax():
             return False
         if response.status_code != 200:
-            return False 
+            return False
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
         try:
@@ -47,7 +47,8 @@ class ToolbarMiddleware(object):
                 return False
         except NoReverseMatch:
             pass
-        if request.path.startswith(urlparse.urlparse(settings.MEDIA_URL)[2]):
+        media = urlparse.urlparse(settings.MEDIA_URL)
+        if request.path.startswith(media.path) and request.get_host() == media.netloc:
             return False
         if "edit" in request.GET:
             return True
@@ -56,7 +57,7 @@ class ToolbarMiddleware(object):
         if not request.user.is_authenticated() or not request.user.is_staff:
             return False
         return True
-    
+
     def process_request(self, request):
         if request.method == "POST":
             if "edit" in request.GET and "cms_username" in request.POST:
@@ -100,7 +101,7 @@ class ToolbarMiddleware(object):
                     name = placeholder
                 d['name'] = title(name)
                 plugins = plugin_pool.get_all_plugins(placeholder, page)
-                d['plugins'] = [] 
+                d['plugins'] = []
                 for p in plugins:
                     d['plugins'].append(p.value)
                 d['type'] = placeholder
@@ -124,4 +125,3 @@ class ToolbarMiddleware(object):
         #from django.core.context_processors import csrf
         #context.update(csrf(request))
         return render_to_string('cms/toolbar/toolbar.html', context, RequestContext(request))
-
