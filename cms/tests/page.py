@@ -303,11 +303,12 @@ class PagesTestCase(CMSTestCase):
         child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         child.save()
         self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
-        self.assertEqual(parent.get_template(), child.get_template())
+        self.assertEqual(parent.get_template_name(), child.get_template_name())
         parent.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         parent.save()
         self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), settings.CMS_TEMPLATES[0][0])
+        self.assertEqual(parent.get_template_name(), settings.CMS_TEMPLATES[0][1])
         
     def test_16_delete_with_plugins(self):
         """
