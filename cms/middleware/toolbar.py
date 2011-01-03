@@ -44,11 +44,11 @@ class ToolbarMiddleware(object):
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
         try:
-            if request.path_info.startswith(reverse("admin:index")):
+            if request.path.startswith(reverse("admin:index")):
                 return False
         except NoReverseMatch:
             pass
-        if request.path_info.startswith(urlparse.urlparse(settings.MEDIA_URL)[2]):
+        if request.path.startswith(urlparse.urlparse(settings.MEDIA_URL)[2]):
             return False
         if "edit" in request.GET:
             return True

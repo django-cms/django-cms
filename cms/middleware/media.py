@@ -20,7 +20,7 @@ class PlaceholderMediaMiddleware(object):
             return False 
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
-        if request.path_info.startswith(settings.MEDIA_URL):
+        if request.path.startswith(settings.MEDIA_URL):
             return False
         return True
     
