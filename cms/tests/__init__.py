@@ -8,6 +8,7 @@ from cms.tests.nonroot import NonRootCase
 from cms.tests.page import PagesTestCase
 from cms.tests.permmod import PermissionModeratorTestCase
 from cms.tests.placeholder import PlaceholderTestCase, PlaceholderActionTests
+from cms.tests.placeholder import PlaceholderModelTests
 from cms.tests.plugins import PluginManyToManyTestCase, PluginsTestCase
 from cms.tests.rendering import RenderingTestCase
 from cms.tests.reversion_tests import ReversionTestCase

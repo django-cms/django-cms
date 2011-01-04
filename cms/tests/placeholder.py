@@ -194,3 +194,43 @@ class PlaceholderActionTests(CMSTestCase):
         
         nl = Translations.objects.get(language_code='nl')
         de = Translations.objects.get(language_code='de')
+        
+
+    
+class PlaceholderModelTests(CMSTestCase):
+    
+    class MockUser():
+        def __init__(self,superuser=True):
+            self.is_superuser = superuser
+        def has_perm(self, string):
+            return False # always return false, for simplicity 
+    
+    class MockRequest():
+        def __init__(self, superuser=True):
+            self.superuser = superuser
+            self.user = PlaceholderModelTests.MockUser(self.superuser)
+    
+    def test_01_check_placeholder_permissions_ok_for_superuser(self):
+        ph = Placeholder.objects.create(slot='test', default_width=300)
+        result = ph.has_change_permission(self.MockRequest())
+        self.assertTrue(result)
+        
+    def test_02_check_placeholder_permissions_nok_for_user(self):
+        ph = Placeholder.objects.create(slot='test', default_width=300)
+        result = ph.has_change_permission(self.MockRequest(False))
+        self.assertFalse(result)
+    
+    def test_03_check_unicode_rendering(self):
+        ph = Placeholder.objects.create(slot='test', default_width=300)
+        result = unicode(ph)
+        self.assertEqual(result,u'test')
+    
+    def test_04_excercise_get_attached_model(self):
+        ph = Placeholder.objects.create(slot='test', default_width=300)
+        result = ph._get_attached_model()
+        self.assertEqual(result, None) # Simple PH - no model
+        
+    def test_04_excercise_get_attached_field_name(self):
+        ph = Placeholder.objects.create(slot='test', default_width=300)
+        result = ph._get_attached_field_name()
+        self.assertEqual(result, None) # Simple PH - no field name
