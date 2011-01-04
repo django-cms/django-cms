@@ -190,11 +190,10 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     name = settings.CMS_PLACEHOLDER_CONF.get(mixed_key, {}).get("name", None)
     if not name:
         name = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("name", None)
-    if not name:
-        name = slot
+    if not name and slot:
+        name = title(slot)
     if not name:
         name = name_fallback
-    name = title(name)
     toolbar = render_to_string("cms/toolbar/add_plugins.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),
