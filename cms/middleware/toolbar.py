@@ -1,11 +1,10 @@
 """
 Edit Toolbar middleware
 """
-import urlparse
 from cms import settings as cms_settings
 from cms.utils import get_template_from_request
 from cms.utils.plugins import get_placeholders
-from django.conf import settings
+from cms.utils.urlutils import is_media_request
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.context import RequestContext
@@ -47,8 +46,7 @@ class ToolbarMiddleware(object):
                 return False
         except NoReverseMatch:
             pass
-        media = urlparse.urlparse(settings.MEDIA_URL)
-        if request.path.startswith(media.path) and request.get_host() == media.netloc:
+        if is_media_request(request):
             return False
         if "edit" in request.GET:
             return True

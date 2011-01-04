@@ -1,8 +1,7 @@
-import urlparse
+from cms.middleware.toolbar import HTML_TYPES
+from cms.utils.urlutils import is_media_request
 from django.forms.widgets import Media
 from django.utils.encoding import smart_unicode
-from django.conf import settings
-from cms.middleware.toolbar import HTML_TYPES
 
 def inster_before_tag(string, tag, insertion):
     no_case = string.lower()
@@ -21,8 +20,7 @@ class PlaceholderMediaMiddleware(object):
             return False 
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
-        media = urlparse.urlparse(settings.MEDIA_URL)
-        if request.path.startswith(media.path) and request.get_host() == media.netloc:
+        if is_media_request(request):
             return False
         return True
     

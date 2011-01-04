@@ -6,7 +6,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.utils.permissions import _thread_locals
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
@@ -248,7 +248,7 @@ class CMSTestCase(TestCase):
         }
         request = WSGIRequest(environ)
         request.session = self.client.session
-        request.user = self.user
+        request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = settings.LANGUAGES[0][0]
         return request
     
