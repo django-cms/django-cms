@@ -103,6 +103,7 @@ INSTALLED_APPS = (
     'testapp.placeholderapp',
     'testapp.pluginapp',
     'testapp.pluginapp.plugins.manytomany_rel',
+    'testapp.fakemlng',
     'south',
     'reversion',
 )
@@ -142,17 +143,20 @@ CMS_TEMPLATES = (
 
 CMS_PLACEHOLDER_CONF = {
     'col_sidebar': {
-        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                    'TextPlugin', 'SnippetPlugin'),
         'name': gettext("sidebar column")
     },                    
                         
     'col_left': {
-        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                    'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("left column")
     },                  
                         
     'col_right': {
-        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                    'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("right column")
     },
 }
