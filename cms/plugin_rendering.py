@@ -9,6 +9,7 @@ from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext
 
 def plugin_meta_context_processor(instance, placeholder):
     return {
@@ -190,7 +191,9 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     name = settings.CMS_PLACEHOLDER_CONF.get(mixed_key, {}).get("name", None)
     if not name:
         name = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("name", None)
-    if not name and slot:
+    if name:
+        name = ugettext(name)
+    elif slot:
         name = title(slot)
     if not name:
         name = name_fallback
