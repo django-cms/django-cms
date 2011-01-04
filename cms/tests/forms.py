@@ -5,7 +5,7 @@ Created on Jan 4, 2011
 '''
 from __future__ import with_statement
 from cms.admin import forms
-from cms.forms.fields import PageSelectFormField
+from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.tests.base import CMSTestCase
 from cms.tests.util.context_managers import SettingsOverride
@@ -86,4 +86,15 @@ class FormsTestCase(CMSTestCase):
         data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEquals(home_page,result)
-            
+        
+    def test_08_superlazy_iterator_behaves_properly_for_sites(self):
+        normal_result = get_site_choices()
+        lazy_result = SuperLazyIterator(get_site_choices)
+        
+        self.assertEquals(normal_result, list(lazy_result))
+        
+    def test_08_superlazy_iterator_behaves_properly_for_pages(self):
+        normal_result = get_page_choices()
+        lazy_result = SuperLazyIterator(get_page_choices)
+        
+        self.assertEquals(normal_result, list(lazy_result))
