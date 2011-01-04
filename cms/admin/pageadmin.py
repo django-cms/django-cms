@@ -899,7 +899,7 @@ class PageAdmin(model_admin):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
         if not page.has_moderate_permission(request):
-            raise HttpResponseForbidden("Denied")
+            return HttpResponseForbidden("Denied")
         page.publish()
         referer = request.META['HTTP_REFERER']
         path = '../../'
