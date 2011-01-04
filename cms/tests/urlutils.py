@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from cms.tests.base import CMSTestCase
 from cms.tests.util.context_managers import SettingsOverride
 from cms.utils import urlutils
