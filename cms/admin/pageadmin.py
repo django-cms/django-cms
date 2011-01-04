@@ -316,6 +316,8 @@ class PageAdmin(model_admin):
                     name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
                 if not name:
                     name = placeholder_name
+                else:
+                    name = _(name)
                 given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):

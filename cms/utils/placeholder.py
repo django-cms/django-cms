@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
+from django.db.models.query_utils import Q
 
 def get_page_from_placeholder_if_exists(placeholder):
     from cms.models.pagemodel import Page
@@ -25,22 +27,21 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
         src = model.objects.get(master=trgt.master, language_code=source_language)
 
         source_placeholder = getattr(src, fieldname, None)
+        if not source_placeholder:
+            return False
         plugins = source_placeholder.get_plugins_list()
-        if source_placeholder:
-            target_placeholder = source_placeholder
-            target_placeholder.pk = None
-            target_placeholder.save()
         ptree = []
         new_plugins = []
         for p in plugins:
             new_plugins.append(p.copy_plugin(target_placeholder, target_language, ptree))
-
-        setattr(trgt, fieldname, target_placeholder)
-        trgt.save()
         return new_plugins
     
     def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
-        from multilingual.languages import get_language_name
-        src = model.objects.get(**{fieldname: placeholder})
-        language_codes = model.objects.exclude(pk=src.pk).filter(master=src.master).exclude(**{'%s__cmsplugin' % fieldname: None}).values_list('language_code', flat=True)
-        return [(lc, get_language_name(lc)) for lc in language_codes]
+        manager = model.objects
+        src = manager.get(**{fieldname: placeholder})
+        q = Q(master=src.master)
+        q &= Q(**{'%s__cmsplugin__isnull' % fieldname: False})
+        q &= ~Q(pk=src.pk)
+        
+        language_codes = manager.filter(q).values_list('language_code', flat=True).distinct()
+        return [(lc, dict(settings.LANGUAGES)[lc]) for lc in language_codes]

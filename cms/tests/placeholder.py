@@ -2,6 +2,7 @@
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.tests.base import CMSTestCase
+from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
@@ -9,6 +10,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
+from testapp.fakemlng.models import Translations
 from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
     Example5
 
@@ -93,7 +95,7 @@ class PlaceholderTestCase(CMSTestCase):
                         self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
                         phfields.remove(field)
             self.assertEqual(phfields, [])
-            
+
     def test_11_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
 
@@ -114,3 +116,81 @@ class PlaceholderTestCase(CMSTestCase):
         placeholder = self.reload(placeholder)
         rctx['placeholder'] = placeholder
         self.assertEqual(template.render(rctx).strip(), "test")
+
+
+class PlaceholderActionTests(CMSTestCase):
+    fixtures = ['fakemlng.json']
+    
+    def test_01_placeholder_no_action(self):
+        actions = PlaceholderNoAction()
+        self.assertEqual(actions.get_copy_languages(), [])
+        self.assertFalse(actions.copy())
+        
+    def test_02_mlng_placeholder_actions_get_copy_languages(self):
+        actions = MLNGPlaceholderActions()
+        fr = Translations.objects.get(language_code='fr')
+        de = Translations.objects.get(language_code='de')
+        en = Translations.objects.get(language_code='en')
+        fieldname = 'placeholder'
+        fr_copy_languages = actions.get_copy_languages(
+            fr.placeholder, Translations, fieldname
+        )
+        de_copy_languages = actions.get_copy_languages(
+            de.placeholder, Translations, fieldname
+        )
+        en_copy_languages = actions.get_copy_languages(
+            en.placeholder, Translations, fieldname
+        )
+        EN = ('en', 'English')
+        FR = ('fr', 'French')
+        self.assertEqual(fr_copy_languages, [EN])
+        self.assertEqual(de_copy_languages, [EN, FR])
+        self.assertEqual(en_copy_languages, [FR])
+        
+    def test_03_mlng_placeholder_actions_copy(self):
+        actions = MLNGPlaceholderActions()
+        fr = Translations.objects.get(language_code='fr')
+        de = Translations.objects.get(language_code='de')
+        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
+        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        
+        new_plugins = actions.copy(de.placeholder, 'fr', 'placeholder', Translations, 'de')
+        self.assertEqual(len(new_plugins), 1)
+        
+        de = self.reload(de)
+        fr = self.reload(fr)
+        
+        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
+        self.assertEqual(de.placeholder.cmsplugin_set.count(), 1)
+        
+    def test_04_mlng_placeholder_actions_empty_copy(self):
+        actions = MLNGPlaceholderActions()
+        fr = Translations.objects.get(language_code='fr')
+        de = Translations.objects.get(language_code='de')
+        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
+        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        
+        new_plugins = actions.copy(fr.placeholder, 'de', 'placeholder', Translations, 'fr')
+        self.assertEqual(len(new_plugins), 0)
+
+        de = self.reload(de)
+        fr = self.reload(fr)
+        
+        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
+        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        
+    def test_05_mlng_placeholder_actions_no_placeholder(self):
+        actions = MLNGPlaceholderActions()
+        nl = Translations.objects.get(language_code='nl')
+        de = Translations.objects.get(language_code='de')
+        self.assertEqual(nl.placeholder, None)
+        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        
+        okay = actions.copy(de.placeholder, 'nl', 'placeholder', Translations, 'de')
+        self.assertEqual(okay, False)
+        
+        de = self.reload(de)
+        nl = self.reload(nl)
+        
+        nl = Translations.objects.get(language_code='nl')
+        de = Translations.objects.get(language_code='de')

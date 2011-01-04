@@ -7,18 +7,18 @@ user-editable content (plugins) in templates. That is, it's the place where a
 user can add text, video or any other plugin to a webpage, using either the
 normal Django admin interface or the so called `frontend editing`.
 
-Placeholders can be viewed as containers of `CMSPlugins`, and can be used
+Placeholders can be viewed as containers of ``CMSPlugins``, and can be used
 outside the CMS in custom applications using the `PlaceholderField`.
 
-By defining one (or serveral) `PlaceholderField` on a custom model you can take
-advantage of the full power of `CMSPlugins`, including frontend editing.
+By defining one (or serveral) ``PlaceholderField`` on a custom model you can take
+advantage of the full power of ``CMSPlugins``, including frontend editing.
 
 
 **********
 Quickstart
 **********
 
-You need to define a `PlaceholderField` on the model you would like to use::
+You need to define a ``PlaceholderField`` on the model you would like to use::
 
 	from django.db import models
 	from cms.models.fields import PlaceholderField
@@ -41,8 +41,8 @@ If you install this model in the admin application, you have to use
 	
 	admin.site.register(MyModel, PlaceholderAdmin)
 	
-Now to render the placeholder in a template you use the `render_placeholder` tag
-from the `placeholder_tags` template tag library::
+Now to render the placeholder in a template you use the ``render_placeholder``
+tag from the ``placeholder_tags`` template tag library::
 
 	{% load placeholder_tags %}
 	
@@ -94,6 +94,6 @@ Fieldsets
 There are some hard restrictions if you want to add custom fieldsets to an admin 
 page with PlaceholderFields:
 
-1. PlacehoderFields *must* be in their own fieldsets, one per fieldset.
-2. You *must* include the following two classes: `plugin-holder` and
-   `plugin-holder-nopage`
+1. PlacehoderFields **must** be in their own fieldsets, one per fieldset.
+2. You **must** include the following two classes: ``'plugin-holder'`` and
+   ``'plugin-holder-nopage'``
