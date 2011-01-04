@@ -188,7 +188,7 @@
         </div>
         {% endif %}
         {% if auth %}
-        <div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Page</strong><em>arrow</em></span>        
+        <div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Page" %}</strong><em>arrow</em></span>        
             <ul id="cms_toolbar_page_menu" class="cms_toolbar_submenu">                
                 <li class="first"><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
                 {% if has_add_page_permission %}
