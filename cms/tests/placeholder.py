@@ -195,8 +195,6 @@ class PlaceholderActionTests(CMSTestCase):
         nl = Translations.objects.get(language_code='nl')
         de = Translations.objects.get(language_code='de')
         
-
-    
 class PlaceholderModelTests(CMSTestCase):
     
     class MockUser():
@@ -230,7 +228,7 @@ class PlaceholderModelTests(CMSTestCase):
         result = ph._get_attached_model()
         self.assertEqual(result, None) # Simple PH - no model
         
-    def test_04_excercise_get_attached_field_name(self):
+    def test_05_excercise_get_attached_field_name(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = ph._get_attached_field_name()
         self.assertEqual(result, None) # Simple PH - no field name
