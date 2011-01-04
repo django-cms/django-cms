@@ -17,3 +17,4 @@ from cms.tests.publisher import PublisherTestCase
 from cms.tests.multilingual import MultilingualTestCase
 from cms.tests.mail import MailTestCase
 from cms.tests.settings import SettingsTests
+from cms.tests.forms import FormsTestCase
