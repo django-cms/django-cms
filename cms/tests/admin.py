@@ -1,10 +1,15 @@
 from __future__ import with_statement
+from cms.admin.dialog.forms import ModeratorForm, PermissionForm, \
+    PermissionAndModeratorForm
+from cms.admin.dialog.views import _form_class_selector
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.tests import base
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE
+from cms.tests.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
+
 
 
 class AdminTestCase(CMSTestCase):
@@ -124,3 +129,23 @@ class AdminTestCase(CMSTestCase):
         self.assertRedirects(response, URL_CMS_PAGE)
         self.assertRaises(Page.DoesNotExist, self.reload, page)
         self.assertRaises(Page.DoesNotExist, self.reload, child)
+        
+    def test_03_admin_dialog_form_no_moderation_or_permissions(self):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            result = _form_class_selector()
+            self.assertEqual(result, None)
+            
+    def test_04_admin_dialog_form_permission_only(self):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
+            result = _form_class_selector()
+            self.assertEqual(result, PermissionForm)
+            
+    def test_05_admin_dialog_form_moderation_only(self):
+        with SettingsOverride(CMS_MODERATOR=True, CMS_PERMISSION=False):
+            result = _form_class_selector()
+            self.assertEqual(result, ModeratorForm)
+            
+    def test_05_admin_dialog_form_moderation_and_permisison(self):
+        with SettingsOverride(CMS_MODERATOR=True, CMS_PERMISSION=True):
+            result = _form_class_selector()
+            self.assertEqual(result, PermissionAndModeratorForm)
