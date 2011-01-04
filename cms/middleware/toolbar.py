@@ -84,7 +84,7 @@ class ToolbarMiddleware(object):
         """
         Renders the Toolbar.
         """
-        auth = request.user.is_authenticated() and request.user.is_staff
+        auth = request.user.is_staff or request.user.is_superuser
         edit = request.session.get('cms_edit', False) and auth
         page = request.current_page
         move_dict = []
