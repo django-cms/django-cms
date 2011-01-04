@@ -1,4 +1,5 @@
 from django.core.exceptions import MultipleObjectsReturned
+from django.db.models.query_utils import Q
 
 def get_page_from_placeholder_if_exists(placeholder):
     from cms.models.pagemodel import Page
@@ -41,6 +42,11 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
     
     def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
         from multilingual.languages import get_language_name
-        src = model.objects.get(**{fieldname: placeholder})
-        language_codes = model.objects.exclude(pk=src.pk).filter(master=src.master).exclude(**{'%s__cmsplugin' % fieldname: None}).values_list('language_code', flat=True)
+        manager = model.objects
+        src = manager.get(**{fieldname: placeholder})
+        q = Q(master=src.master)
+        q &= Q(**{'%s__cmsplugin__isnull' % fieldname: False})
+        q &= ~Q(pk=src.pk)
+        
+        language_codes = manager.filter(q).values_list('language_code', flat=True).distinct()
         return [(lc, get_language_name(lc)) for lc in language_codes]
