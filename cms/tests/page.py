@@ -7,9 +7,11 @@ from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.tests.util.context_managers import LanguageOverride, SettingsOverride
+from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from django.http import HttpRequest
 import os.path
 
@@ -38,7 +40,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         title = Title.objects.get(slug=page_data['slug'])
-        self.assertEqual(title is not None, True)
+        self.assertNotEqual(title, None)
         page = title.page
         page.published = True
         page.save()
@@ -336,3 +338,77 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 0)
         self.assertEqual(Text.objects.count(), 0)
         self.assertEqual(Placeholder.objects.count(), 0)
+        
+    def test_17_get_page_from_request_on_non_cms_admin(self):
+        request = self.get_request(
+            reverse('admin:sampleapp_category_change', args=(1,))
+        )
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+        
+    def test_18_get_page_from_request_on_cms_admin(self):
+        page = self.create_page()
+        request = self.get_request(
+            reverse('admin:cms_page_change', args=(page.pk,))
+        )
+        found_page = get_page_from_request(request)
+        self.assertTrue(found_page)
+        self.assertEqual(found_page.pk, page.pk)
+        
+    def test_19_get_page_from_request_on_cms_admin_nopage(self):
+        request = self.get_request(
+            reverse('admin:cms_page_change', args=(1,))
+        )
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+        
+    def test_20_get_page_from_request_cached(self):
+        mock_page = 'hello world'
+        request = self.get_request(
+            reverse('admin:sampleapp_category_change', args=(1,))
+        )
+        request._current_page_cache = mock_page
+        page = get_page_from_request(request)
+        self.assertEqual(page, mock_page)
+        
+    def test_21_get_page_from_request_nopage(self):
+        request = self.get_request('/')
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+    
+    def test_22_get_page_from_request_with_page_404(self):
+        page = self.create_page(published=True)
+        page.publish()
+        request = self.get_request('/does-not-exist/')
+        found_page = get_page_from_request(request)
+        self.assertEqual(found_page, None)
+    
+    def test_23_get_page_from_request_with_page_preview(self):
+        page = self.create_page()
+        request = self.get_request('%s?preview' % page.get_absolute_url())
+        found_page = get_page_from_request(request)
+        self.assertEqual(found_page, None)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            request = self.get_request('%s?preview&draft' % page.get_absolute_url())
+            found_page = get_page_from_request(request)
+            self.assertTrue(found_page)
+            self.assertEqual(found_page.pk, page.pk)
+
+
+class NoAdminPageTests(CMSTestCase):
+    urls = 'testapp.noadmin_urls'
+    
+    def setUp(self):
+        admin = 'django.contrib.admin'
+        noadmin_apps = [app for app in settings.INSTALLED_APPS if not app == admin]
+        self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
+        self._ctx.__enter__()
+        
+    def tearDown(self):
+        self._ctx.__exit__(None, None, None)
+    
+    def test_01_get_page_from_request_fakeadmin_nopage(self):
+        request = self.get_request('/admin/')
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)

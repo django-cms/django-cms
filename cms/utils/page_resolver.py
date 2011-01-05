@@ -39,22 +39,25 @@ def get_page_from_request(request, use_path=None):
     page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     
+    # Check if this is called from an admin request
+    if admin_base and request.path.startswith(admin_base):
+        # if so, get the page ID to query the page
+        page_id = [bit for bit in request.path.split('/') if bit][-1]
+        if not page_id or not page_id.isdigit():
+            page = None
+        else:
+            try:
+                page = Page.objects.get(pk=page_id)
+            except Page.DoesNotExist:
+                return None
+        request._current_page_cache = page
+        return page
+    
     # TODO: Isn't there a permission check needed here?
     if 'preview' in request.GET:
         pages = page_queryset.filter(site=site)
     else:
         pages = page_queryset.published().filter(site=site)
-    
-    # Check if this is called from an admin request
-    if admin_base and request.path.startswith(admin_base):
-        # if so, get the page ID to query the page
-        page_id = request.path.split('/')[0]
-        try:
-            page = pages.get(pk=page_id)
-        except Page.DoesNotExist:
-            return None
-        request._current_page_cache = page
-        return page
     
     # If use_path is given, someone already did the path cleaning
     if use_path:
@@ -95,10 +98,10 @@ def get_page_from_request(request, use_path=None):
             q2 &= Q(tree_id=home.tree_id)
             q |= q2
         
-    # TODO: We should probably get rid of this odd DB-Gettext thingy, no idea
-    # how and why this should work
-    if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
-        # ugly hack -- brute force search for reverse path translation:
+    if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS: # pragma: no cover
+        #=======================================================================
+        # WARNING: CMS_DBGETTEXT WILL BE DEPRECATED IN 2.2!
+        #=======================================================================
         from django.utils.translation import ugettext
         from cms.models import Title
         for t in Title.objects.all():

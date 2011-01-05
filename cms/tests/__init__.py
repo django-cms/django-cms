@@ -5,7 +5,7 @@ from cms.tests.docs import DocsTestCase
 from cms.tests.menu import MenusTestCase
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.nonroot import NonRootCase
-from cms.tests.page import PagesTestCase
+from cms.tests.page import PagesTestCase, NoAdminPageTests
 from cms.tests.permmod import PermissionModeratorTestCase
 from cms.tests.placeholder import PlaceholderTestCase, PlaceholderActionTests
 from cms.tests.placeholder import PlaceholderModelTests
