@@ -6,29 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 import operator
 
 
-class PlaceholderManager(models.Manager):
-    def _orphans(self):
-        """
-        Private method because it should never actually return anything.
-        """
-        from cms.models import CMSPlugin
-        m2m = self.model._meta.get_all_related_many_to_many_objects()
-        fks = self.model._meta.get_all_related_objects()
-        kwargs = {}
-        for rel in m2m:
-            kwargs[rel.var_name] = None
-        for rel in fks:
-            if rel.model == CMSPlugin:
-                continue
-            kwargs[rel.var_name] = None
-        return self.filter(**kwargs)
- 
-
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
-
-    objects = PlaceholderManager()
 
     def __unicode__(self):
         return self.slot

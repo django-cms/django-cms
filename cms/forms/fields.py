@@ -34,10 +34,8 @@ class PageSelectFormField(forms.MultiValueField):
     
     def compress(self, data_list):
         if data_list:
-            site_id = data_list[0]
             page_id = data_list[1]
-            if site_id in EMPTY_VALUES:
-                pass
+            
             if page_id in EMPTY_VALUES:
                 if not self.required:
                     return None
