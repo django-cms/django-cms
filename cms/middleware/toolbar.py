@@ -13,7 +13,7 @@ from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
 from django.utils import simplejson
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
