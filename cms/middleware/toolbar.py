@@ -12,6 +12,7 @@ from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
 from django.utils import simplejson
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext as _
 
 HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
@@ -96,8 +97,10 @@ class ToolbarMiddleware(object):
                 if not name:
                     name = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("name", None)
                 if not name:
-                    name = placeholder
-                d['name'] = title(name)
+                    name = title(placeholder)
+                else:
+                    name = _(name)
+                d['name'] = name
                 plugins = plugin_pool.get_all_plugins(placeholder, page)
                 d['plugins'] = []
                 for p in plugins:
