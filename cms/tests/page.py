@@ -375,6 +375,25 @@ class PagesTestCase(CMSTestCase):
         request = self.get_request('/')
         page = get_page_from_request(request)
         self.assertEqual(page, None)
+    
+    def test_22_get_page_from_request_with_page_404(self):
+        page = self.create_page(published=True)
+        page.publish()
+        request = self.get_request('/does-not-exist/')
+        found_page = get_page_from_request(request)
+        self.assertEqual(found_page, None)
+    
+    def test_23_get_page_from_request_with_page_preview(self):
+        page = self.create_page()
+        request = self.get_request('%s?preview' % page.get_absolute_url())
+        found_page = get_page_from_request(request)
+        self.assertEqual(found_page, None)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            request = self.get_request('%s?preview&draft' % page.get_absolute_url())
+            found_page = get_page_from_request(request)
+            self.assertTrue(found_page)
+            self.assertEqual(found_page.pk, page.pk)
 
 
 class NoAdminPageTests(CMSTestCase):

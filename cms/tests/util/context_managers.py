@@ -89,3 +89,15 @@ class TemporaryDirectory:
 
     def __exit__(self, exc, value, tb):
         self.cleanup()
+
+class UserLoginContext(object):
+    def __init__(self, testcase, user):
+        self.testcase = testcase
+        self.user = user
+        
+    def __enter__(self):
+        self.testcase.login_user(self.user)
+        
+    def __exit__(self, exc, value, tb):
+        self.testcase.user = None
+        self.testcase.client.logout()

@@ -4,6 +4,7 @@ from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, PageUser
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
+from cms.tests.util.context_managers import UserLoginContext
 from cms.utils.permissions import _thread_locals
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -15,6 +16,7 @@ from django.template.context import Context
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool
+from urlparse import urlparse
 import copy
 import sys
 import urllib
@@ -91,6 +93,15 @@ class CMSTestCase(TestCase):
         logged_in = self.client.login(username=user.username, password=user.username)
         self.user = user
         self.assertEqual(logged_in, True)
+        
+    def login_user_context(self, user):
+        return UserLoginContext(self, user)
+        
+    def get_superuser(self):
+        admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
+        admin.set_password("admin")
+        admin.save()
+        return admin
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
@@ -228,16 +239,22 @@ class CMSTestCase(TestCase):
     def get_request(self, path=None):
         if not path:
             path = self.get_pages_root()
-
+        
+        parsed_path = urlparse(path)
+        host = parsed_path.netloc or 'testserver'
+        port = 80
+        if ':' in host:
+            host, port = host.split(':', 1)
+        
         environ = {
-            'HTTP_COOKIE':      self.client.cookies,
-            'PATH_INFO':         path,
-            'QUERY_STRING':      '',
+            'HTTP_COOKIE':       self.client.cookies,
+            'PATH_INFO':         parsed_path.path,
+            'QUERY_STRING':      parsed_path.query,
             'REMOTE_ADDR':       '127.0.0.1',
             'REQUEST_METHOD':    'GET',
             'SCRIPT_NAME':       '',
-            'SERVER_NAME':       'testserver',
-            'SERVER_PORT':       '80',
+            'SERVER_NAME':       host,
+            'SERVER_PORT':       port,
             'SERVER_PROTOCOL':   'HTTP/1.1',
             'wsgi.version':      (1,0),
             'wsgi.url_scheme':   'http',

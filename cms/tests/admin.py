@@ -15,9 +15,7 @@ from django.contrib.sites.models import Site
 class AdminTestCase(CMSTestCase):
     
     def _get_guys(self, admin_only=False):
-        admin = User(username="admin", is_staff = True, is_active = True, is_superuser = True)
-        admin.set_password("admin")
-        admin.save()
+        admin = self.get_superuser()
         if admin_only:
             return admin
         self.login_user(admin)
