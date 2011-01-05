@@ -15,6 +15,12 @@ from menus.utils import find_children
 COPY_VAR = "copy"
 
 class CMSChangeList(ChangeList):
+    '''
+    Renders a Changelist - In our case it looks like a tree - it's the list of
+    *instances* in the Admin.
+    It is usually responsible for pagination (not here though, we have a 
+    treeview)
+    '''
     real_queryset = False
     
     def __init__(self, request, *args, **kwargs):
