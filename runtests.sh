@@ -68,7 +68,11 @@ if [ $reuse_env == false ]; then
         echo "bootstrap.py failed"
         exit 1
     fi
-    ./bin/buildout
+    if [ $django_trunk ]; then
+        ./bin/buildout -c django-svn.cfg
+    else
+        ./bin/buildout
+    fi
     if [ $? != 0 ]; then
         echo "bin/buildout failed"
         exit 1
