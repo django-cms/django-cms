@@ -18,12 +18,31 @@ Requirements
 * `South`_ 0.7 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.2.2 or higher
+* An installed and working instance of one of the following databases: MySQL, PostgreSQL
 
 .. _Python: http://www.python.org
 .. _Django: http://www.djangoproject.com
 .. _PIL: http://www.pythonware.com/products/pil/
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
+
+On Ubuntu
+=========
+
+If you're using Ubuntu (tested with 10.10), the following should get you started:
+
+``sudo aptitude install python2.6 python-setuptools python-imaging``
+``sudo easy_install pip``
+``sudo pip install django-cms south``
+
+Additionally, you need the python driver for your selected database:
+``sudo aptitude install python-mysql``
+or
+``sudo aptitude python-psycopg2``
+
+This will install PIL and your database's driver globally.
+
+You have now everything that is needed for you to follow the :doc:`tutorial` (ignore the installation part, obviously).
 
 ****
 Apps

@@ -106,20 +106,19 @@ right position::
 
 
 	MIDDLEWARE_CLASSES = (
-	    'django.middleware.cache.UpdateCacheMiddleware',
-	    'django.contrib.sessions.middleware.SessionMiddleware',
-	    'django.contrib.auth.middleware.AuthenticationMiddleware',
 	    'django.middleware.common.CommonMiddleware',
-	    'django.middleware.doc.XViewMiddleware',
+	    'django.contrib.sessions.middleware.SessionMiddleware',
 	    'django.middleware.csrf.CsrfViewMiddleware',
+	    'django.contrib.auth.middleware.AuthenticationMiddleware',
+	    'django.contrib.messages.middleware.MessageMiddleware',
 	    'cms.middleware.page.CurrentPageMiddleware',
 	    'cms.middleware.user.CurrentUserMiddleware',
 	    'cms.middleware.toolbar.ToolbarMiddleware',
 	    'cms.middleware.media.PlaceholderMediaMiddleware',
-	    'django.middleware.cache.FetchFromCacheMiddleware',
 	)
 
-You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS``::
+You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
+settings file will not have any)::
 
 	TEMPLATE_CONTEXT_PROCESSORS = (
 	    'django.core.context_processors.auth',
@@ -129,19 +128,31 @@ You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS``::
 	    'cms.context_processors.media',
 	)
 
+Now add a little magic to the ``TEMPLATE_DIRS`` section of the file::
+
+	TEMPLATE_DIRS = (
+	    # The docs say it should be absolute path: PROJECT_DIR is precisely one.
+	    # Life is wonderful!
+	    PROJECT_DIR + "/templates",
+	)
 
 Add at least one template to ``CMS_TEMPLATES``; for example::
 
 	CMS_TEMPLATES = (
-	    ('default.html', gettext('default')),
+	    ('template_1.html', 'Template One'),
+	    ('template_2.html', 'Template Two'),
 	)
 
+We will create the actual template files at a later step, don't worry about it for 
+now, and simply paste this code in your settings file.
 
 .. note::
 
-    The templates you define in ``CMS_TEMPLATES`` have to actually exist and
+    The templates you define in ``CMS_TEMPLATES`` have to exist at runtime and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
-    for django CMS. For more details see `Templates`_
+    for django CMS. For more details see `Creating templates`_
+
+Finally, setup the ``DATABASES`` part of the file to reflect your database deployement.
 
 
 URL configuration
@@ -206,9 +217,9 @@ Run::
 Up and running!
 ===============
 
-That should be it. Restart your development server and go to
-`127.0.0.1:8000 <http://127.0.0.1:8000>`_ and you should get the Django
-CMS "It Worked" screen.
+That should be it. Restart your development server using ``python manage.py runserver`` 
+and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
+the Django CMS "It Worked" screen.
 
 |it-works-cms|
 
@@ -221,9 +232,9 @@ To deploy your django CMS project on a real webserver, please refer to the
 `Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
-*********
-Templates
-*********
+******************
+Creating templates
+******************
 
 django CMS uses templates to define how a page should look and what parts of
 it are editable. Editable areas are called *placeholders*. These templates are
@@ -236,8 +247,14 @@ setting::
   CMS_TEMPLATES = (
       ('template_1.html', 'Template One'),
       ('template_2.html', 'Template Two'),
-      ...
   )
+
+If you followed this tutorial from the beginning, we already put this code in your settings file.
+
+Now, on with the actual template files!
+
+Fire up your favorite editor and create a file called ``base.html`` in a folder called ``templates``
+in your myproject directory.
 
 Here is a simple example for a base template called ``base.html``:
 
@@ -251,7 +268,8 @@ Here is a simple example for a base template called ``base.html``:
     </body>
   </html>
 
-Now we can use this base template in our ``template_1.html`` template:
+Now, create a file called ``template_1.html`` in the same directory. This will use 
+your base template, and add extra content to it:
 
 .. code-block:: html+django
 
@@ -269,6 +287,8 @@ template ``template_1.html`` and another is ``base_content`` from the extended
 
 When working with a lot of placeholders, make sure to give descriptive
 names for your placeholders, to more easily identify them in the admin panel.
+
+Now, feel free to experiment and make a ``template_2.html`` file!
 
 .. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
 
