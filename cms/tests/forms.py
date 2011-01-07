@@ -5,6 +5,7 @@ Created on Jan 4, 2011
 '''
 from __future__ import with_statement
 from cms.admin import forms
+from cms.admin.forms import PageUserForm
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.tests.base import CMSTestCase
@@ -98,3 +99,13 @@ class FormsTestCase(CMSTestCase):
         lazy_result = SuperLazyIterator(get_page_choices)
         
         self.assertEquals(normal_result, list(lazy_result))
+
+    def test_09_page_user_form_initial(self):
+        user = self.create_page_user('myuser', 'myuser', grant_all=True)
+        puf = PageUserForm(instance=user)
+        names = ['can_add_page', 'can_change_page', 'can_delete_page',
+                 'can_add_pageuser', 'can_change_pageuser',
+                 'can_delete_pageuser', 'can_add_pagepermission',
+                 'can_change_pagepermission', 'can_delete_pagepermission']
+        for name in names:
+            self.assertTrue(puf.initial.get(name, False))

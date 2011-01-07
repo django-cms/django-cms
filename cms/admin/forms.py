@@ -9,7 +9,7 @@ from cms.utils.urlutils import any_path_re
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -21,7 +21,7 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
 
 def get_permission_acessor(obj):
-    if isinstance(obj, PageUser):
+    if isinstance(obj, (PageUser, User,)):
         rel_name = 'user_permissions' 
     else:
         rel_name = 'permissions'
@@ -276,7 +276,7 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 initials['can_%s_%s' % (t, name)] = obj.has_perm('%s.%s' % (model._meta.app_label, codename)) 
         return initials
         """
-        permission_acessor = self.permission_acessor(obj)
+        permission_acessor = get_permission_acessor(obj)
         for model in models:
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
