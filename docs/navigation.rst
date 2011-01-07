@@ -68,6 +68,24 @@ Navigation with a custom template::
 	{% show_menu 0 100 100 100 "myapp/menu.html" %}
 
 
+******************
+show_menu_below_id
+******************
+
+If you have set an id in the advanced settings of a page, you can display the
+submenu of this page with a template tag. For example, we have a page called
+meta that is not displayed in the navigation and that has the id "meta"::
+
+    <ul>
+        {% show_menu_below_id "meta" %}
+    </ul>
+
+You can give it the same optional parameters as ``show_menu``::
+
+    <ul>
+        {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
+    </ul>
+
 *************
 show_sub_menu
 *************
