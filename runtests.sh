@@ -8,6 +8,7 @@ index=0
 reuse_env=true
 disable_coverage=true
 django_trunk=false
+python=`python -c "import sys; print '.'.join([str(x) for x in sys.version_info[:2]])"`
 
 while [ "$index" -lt "$num_args" ]
 do
@@ -27,6 +28,11 @@ do
         "--django-trunk")
             django_trunk=true
             ;;
+        
+        "--python")
+            let "index = $index + 1"
+            python="${args[$index]}"
+            ;;
 
         "--help")
             echo ""
@@ -40,6 +46,7 @@ do
             echo "    --with-coverage - enables coverage"
             echo "    --rebuild-env - run buildout before the tests"
             echo "    --django-trunk - run tests against django trunk"
+            echo "    --python X.X - python version to use to run the tests"
             exit 1
             ;;
 
@@ -50,6 +57,11 @@ do
 done
 
 current_buildout_django=`cat .installed.cfg | grep "^version = " | sed s/'version = '//`
+current_buildout_python=`head -n 1 bin/buildout | sed s/[^0-9\.]//g`
+
+python_path="/usr/bin/python$python"
+
+echo "using python $python"
 
 if [ $reuse_env == true ]; then
     if [[ $django_trunk == true && $current_buildout_django != 'trunk' ]]; then
@@ -58,12 +70,15 @@ if [ $reuse_env == true ]; then
         if [[ $django_trunk == false && $current_buildout_django != '1.2.4' ]]; then
             reuse_env=false
         fi
-    fi 
+    fi
+    if [[ $python != $current_buildout_python ]]; then
+        reuse_env=false
+    fi
 fi
 
 if [ $reuse_env == false ]; then
     echo "setting up test environment (this might take a while)..."
-    python bootstrap.py
+    $python_path bootstrap.py
     if [ $? != 0 ]; then
         echo "bootstrap.py failed"
         exit 1
