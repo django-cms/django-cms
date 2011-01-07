@@ -389,6 +389,12 @@ Go back to your website using the top right-hand "View on site" button. That's i
 
 .. _TinyMCE: http://tinymce.moxiecode.com/
 
+Where to go from here
+=====================
+
+Congratulations, you now have a fully functional CMS! Feel free to play around 
+with the different plugins provided out of the box, and build great websites!
+
 **************************
 Integrating custom content
 **************************
