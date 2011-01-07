@@ -52,10 +52,10 @@ done
 current_buildout_django=`cat .installed.cfg | grep "^version = " | sed s/'version = '//`
 
 if [ $reuse_env == true ]; then
-    if [[ $django_trunk && $current_buildout_django != 'trunk' ]]; then
+    if [[ $django_trunk == true && $current_buildout_django != 'trunk' ]]; then
         reuse_env=false
     else
-        if [[ !$django_trunk && $current_buildout_django != '1.2.4' ]]; then
+        if [[ $django_trunk == false && $current_buildout_django != '1.2.4' ]]; then
             reuse_env=false
         fi
     fi 
