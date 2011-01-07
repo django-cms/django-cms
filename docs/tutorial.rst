@@ -85,6 +85,7 @@ Add the following apps to your ``INSTALLED_APPS``:
 * ``'mptt'``
 * ``'menus'``
 * ``'south'``
+* ``'appmedia'``
 
 Also add any (or all) of the following plugins, depending on your needs:
 
@@ -128,12 +129,20 @@ settings file will not have any)::
 	    'cms.context_processors.media',
 	)
 
+Almost there!
+Point your ``MEDIA_ROOT`` to where the static media should live (that is, your images, 
+CSS files, Javascript files...)::
+
+	MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
+	MEDIA_URL = "/media/"
+	ADMIN_MEDIA_PREFIX="/media/admin/"
+
 Now add a little magic to the ``TEMPLATE_DIRS`` section of the file::
 
 	TEMPLATE_DIRS = (
-	    # The docs say it should be absolute path: PROJECT_DIR is precisely one.
+	    # The docs say it should be absolute path: PROJECT_PATH is precisely one.
 	    # Life is wonderful!
-	    PROJECT_DIR + "/templates",
+	    os.path.join(PROJECT_PATH, "templates")
 	)
 
 Add at least one template to ``CMS_TEMPLATES``; for example::
@@ -172,13 +181,9 @@ urlpatterns. We suggest starting with the following ``urls.py``::
         url(r'^', include('cms.urls')),
 	)
 
-	if settings.DEBUG: # these lines are just to serve media on local machines.
+	if settings.DEBUG:
 	    urlpatterns = patterns('',
-	        url(
-	            r'^media/cms/(?P<path>.*)$',
-	            'django.views.static.serve',
-	            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}
-	        )
+	        (r'^' + settings.MEDIA_URL.lstrip('/'), include('appmedia.urls')),
 	    ) + urlpatterns
 
 To have access to app specific media files (javascript, stylesheets, images), we
@@ -186,6 +191,12 @@ recommend you use `django-appmedia`_. After you've installed it, use
 ``python manage.py symlinkmedia`` and it will do all the work for you.
 
 .. _django-appmedia: http://pypi.python.org/pypi/django-appmedia
+
+.. note::
+
+    The templates you define in ``CMS_TEMPLATES`` have to exist at runtime and
+    contain at least one ``{% placeholder <name> %}`` template tag to be useful
+    for django CMS. For more details see `Creating templates`_
 
 
 Initial database setup
@@ -236,7 +247,7 @@ To deploy your django CMS project on a real webserver, please refer to the
 Creating templates
 ******************
 
-django CMS uses templates to define how a page should look and what parts of
+Django CMS uses templates to define how a page should look and what parts of
 it are editable. Editable areas are called *placeholders*. These templates are
 standard Django templates and you may use them as described in the
 `official documentation`_.
@@ -288,10 +299,25 @@ template ``template_1.html`` and another is ``base_content`` from the extended
 When working with a lot of placeholders, make sure to give descriptive
 names for your placeholders, to more easily identify them in the admin panel.
 
-Now, feel free to experiment and make a ``template_2.html`` file!
+Now, feel free to experiment and make a ``template_2.html`` file! If you don't feel creative, 
+just copy template_1 and name the second placeholder something like "template_2_content".
 
 .. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
 
+***************************
+Create your first CMS page!
+***************************
+
+That's it, now the best part: you can start using the CMS!
+Run your server with ``python manage.py runserver``, then point a web browser to 
+`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super 
+user credentials you defined when you ran ``syncdb`` earlier.
+
+Once in the admin part of your site, you should see smething like the following:
+
+|first-admin|
+
+.. |first-admin| image:: images/first-admin.png
 
 **************************
 Integrating custom content

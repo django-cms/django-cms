@@ -33,7 +33,7 @@ If you're using Ubuntu (tested with 10.10), the following should get you started
 
 ``sudo aptitude install python2.6 python-setuptools python-imaging``
 ``sudo easy_install pip``
-``sudo pip install django-cms south``
+``sudo pip install django-cms south django-appmedia``
 
 Additionally, you need the python driver for your selected database:
 ``sudo aptitude install python-mysql``
