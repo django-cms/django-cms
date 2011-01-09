@@ -104,7 +104,11 @@ class CMSPlugin(Mptt):
         return plugin_pool.get_plugin(self.plugin_type).name
     
     def get_short_description(self):
-        return self.get_plugin_instance()[0].__unicode__()        
+        instance = self.get_plugin_instance()[0]
+        if instance:
+            return instance.__unicode__()
+        else:
+            return _("<Empty>")
     
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
