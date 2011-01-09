@@ -121,6 +121,7 @@ class ToolbarMiddleware(object):
             'auth_error':not auth and 'cms_username' in request.POST,
             'placeholder_data':data,
             'edit':edit,
+            'moderator': cms_settings.CMS_MODERATOR,
             'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
         #from django.core.context_processors import csrf

@@ -157,7 +157,7 @@
     </div>
     <div id="cms_toolbar_col2">
         {% if edit and page %}
-        {% if auth %}
+        {% if auth and moderator %}
             {% if moderator_should_approve and has_moderate_permission %}
             <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">
                 <span class="state">{{ page_moderator_state.label }}</span>
