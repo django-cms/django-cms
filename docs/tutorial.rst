@@ -27,11 +27,12 @@ of those projects.
 
 Install the latest django CMS package::
 
-    $ sudo pip install django-cms
+    $ sudo pip install django-cms south django-appmedia
 
 Or install the latest revision from github::
 
     $ sudo pip install -e git+git://github.com/divio/django-cms.git#egg=django-cms
+    $ sudo pip install south django-appmedia
 
 To check if you installed django CMS properly, open a Python shell and type::
 
@@ -186,24 +187,17 @@ urlpatterns. We suggest starting with the following ``urls.py``::
 	        (r'^' + settings.MEDIA_URL.lstrip('/'), include('appmedia.urls')),
 	    ) + urlpatterns
 
-To have access to app specific media files (javascript, stylesheets, images), we
-recommend you use `django-appmedia`_. After you've installed it, use
-``python manage.py symlinkmedia`` and it will do all the work for you.
+To have access to app specific media files, use ``python manage.py symlinkmedia`` 
+and `django-appmedia`_ will do all the work for you.
 
 .. _django-appmedia: http://pypi.python.org/pypi/django-appmedia
-
-.. note::
-
-    The templates you define in ``CMS_TEMPLATES`` have to exist at runtime and
-    contain at least one ``{% placeholder <name> %}`` template tag to be useful
-    for django CMS. For more details see `Creating templates`_
-
 
 Initial database setup
 ======================
 
 This command depends on whether you **upgrade** your installation or do a
-**fresh install**.
+**fresh install**. We recommend that you get familiar with the way `South`_ works, 
+as it is a very powerful, easy and convenient tool. Django CMS uses it extensively.
 
 Fresh install
 -------------
@@ -239,7 +233,7 @@ the Django CMS "It Worked" screen.
 Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
 
-To deploy your django CMS project on a real webserver, please refer to the
+To deploy your django CMS project on a production webserver, please refer to the
 `Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
