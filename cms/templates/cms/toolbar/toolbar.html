@@ -128,12 +128,10 @@
     <div id="cms_toolbar_col1">
         <a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
         {% if auth %}
-            {% if page %}
             <div id="cms_toolbar_editmode_toggle">
                 <span>{% trans "Edit mode" %}</span>
                 <a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
             </div>
-            {% endif %}
             {% if page.last_page_states %}
             <div id="cms_toolbar_statusbar">
                 <div>
