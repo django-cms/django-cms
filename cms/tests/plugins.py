@@ -4,24 +4,26 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.plugins.text.models import Text
-from cms.plugins.text.utils import plugin_tags_to_id_list, plugin_tags_to_admin_html
+from cms.plugins.file.models import File
 from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.models import InheritPagePlaceholder
-from cms.plugins.file.models import File
-
+from cms.plugins.text.models import Text
+from cms.plugins.text.utils import plugin_tags_to_id_list, \
+    plugin_tags_to_admin_html
 from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
     URL_CMS_PLUGIN_REMOVE
-    
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.template import RequestContext
-from django.forms.widgets import Media
 from django.core.files.uploadedfile import SimpleUploadedFile
-
+from django.forms.widgets import Media
+from django.template import RequestContext
 from testapp.pluginapp.models import Article, Section
 from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+import os
+
+    
+
 
 class DumbFixturePlugin(CMSPluginBase):
     model = CMSPlugin
@@ -372,7 +374,21 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
         response = self.client.get(plugin.get_icon_url(), follow=True)
         self.assertEqual(response.status_code, 200)
-        plugin.file.storage.delete(plugin.file.name)
+        # Nuke everything in the storage location directory (since removing just 
+        # our file would still leave a useless directory structure)
+        #
+        # By the way, plugin.file.storage.delete(plugin.file.name) does not work
+        # since the delete method is a pass... See reversion.storage.delete()
+        storage_location = plugin.file.storage.location # This is ".../media/"
+        for root, dirs, files in os.walk(storage_location, topdown=False):
+            # We need to walk() the directory tree since rmdir() does not allow
+            # to remove non-empty directories...
+            for name in files:
+                # Start by killing all files we walked
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                # Now all directories we walked...
+                os.rmdir(os.path.join(root, name))
 
     def test_11_copy_textplugin(self):
         """
