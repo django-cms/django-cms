@@ -144,3 +144,44 @@ class PublisherTestCase(CMSTestCase):
         page.published = True
         page.save()
         self.assertEqual(page.published, True)
+        
+    def test_07_publish_works_with_descendants(self):
+        home_page = self.create_page(title="home", published=True,
+            in_navigation=False)
+            
+        item1 = self.create_page(title="item1", parent_page=home_page,
+            published=True)
+        item2 = self.create_page(title="item2", parent_page=home_page,
+            published=True)
+            
+        item2 = self.reload_page(item2)    
+
+        subitem1 = self.create_page(title="subitem1", parent_page=item2,
+            published=True)
+        subitem2 = self.create_page(title="subitem2", parent_page=item2,
+            published=True)
+            
+        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
+        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
+        
+        self.assertEquals(len(not_drafts), 5)
+        self.assertEquals(len(drafts), 5)
+        
+        for idx, draft in enumerate(drafts):
+            self.assertEquals(draft.tree_id+1, not_drafts[idx].tree_id)
+            self.assertEquals(draft.lft, not_drafts[idx].lft)
+            self.assertEquals(draft.rght, not_drafts[idx].rght)
+            
+        item2 = self.reload_page(item2)    
+        item2.publish()
+            
+        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
+        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
+        
+        self.assertEquals(len(not_drafts), 5)
+        self.assertEquals(len(drafts), 5)
+        
+        for idx, draft in enumerate(drafts):
+            self.assertEquals(draft.tree_id+1, not_drafts[idx].tree_id)
+            self.assertEquals(draft.lft, not_drafts[idx].lft)
+            self.assertEquals(draft.rght, not_drafts[idx].rght)
