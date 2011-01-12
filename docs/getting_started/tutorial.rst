@@ -51,10 +51,10 @@ The following assumes your project will be in ``~/workspace/myproject/``.
 
 Set up your Django project::
 
-	cd ~/workspace
-	django-admin.py startproject myproject
-	cd myproject
-	python manage.py runserver
+    cd ~/workspace
+    django-admin.py startproject myproject
+    cd myproject
+    python manage.py runserver
 
 Open `127.0.0.1:8000 <http://127.0.0.1:8000>`_ in your browser. You should see a
 nice "It Worked" message from Django.
@@ -72,9 +72,9 @@ Open the file ``~/workspace/myproject/settings.py``.
 To make your life easier, add the following at the top of the file::
 
     # -*- coding: utf-8 -*-
-	import os
-	gettext = lambda s: s
-	PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+    import os
+    gettext = lambda s: s
+    PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
 Add the following apps to your ``INSTALLED_APPS``:
@@ -104,51 +104,51 @@ You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
 right position::
 
 
-	MIDDLEWARE_CLASSES = (
-	    'django.middleware.common.CommonMiddleware',
-	    'django.contrib.sessions.middleware.SessionMiddleware',
-	    'django.middleware.csrf.CsrfViewMiddleware',
-	    'django.contrib.auth.middleware.AuthenticationMiddleware',
-	    'django.contrib.messages.middleware.MessageMiddleware',
-	    'cms.middleware.page.CurrentPageMiddleware',
-	    'cms.middleware.user.CurrentUserMiddleware',
-	    'cms.middleware.toolbar.ToolbarMiddleware',
-	    'cms.middleware.media.PlaceholderMediaMiddleware',
-	)
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.media.PlaceholderMediaMiddleware',
+    )
 
 You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
 settings file will not have any)::
 
-	TEMPLATE_CONTEXT_PROCESSORS = (
-	    'django.core.context_processors.auth',
-	    'django.core.context_processors.i18n',
-	    'django.core.context_processors.request',
-	    'django.core.context_processors.media',
-	    'cms.context_processors.media',
-	)
+    TEMPLATE_CONTEXT_PROCESSORS = (
+        'django.core.context_processors.auth',
+        'django.core.context_processors.i18n',
+        'django.core.context_processors.request',
+        'django.core.context_processors.media',
+        'cms.context_processors.media',
+    )
 
 Almost there!
 Point your ``MEDIA_ROOT`` to where the static media should live (that is, your images, 
 CSS files, Javascript files...)::
 
-	MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
-	MEDIA_URL = "/media/"
-	ADMIN_MEDIA_PREFIX="/media/admin/"
+    MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
+    MEDIA_URL = "/media/"
+    ADMIN_MEDIA_PREFIX="/media/admin/"
 
 Now add a little magic to the ``TEMPLATE_DIRS`` section of the file::
 
-	TEMPLATE_DIRS = (
-	    # The docs say it should be absolute path: PROJECT_PATH is precisely one.
-	    # Life is wonderful!
-	    os.path.join(PROJECT_PATH, "templates")
-	)
+    TEMPLATE_DIRS = (
+        # The docs say it should be absolute path: PROJECT_PATH is precisely one.
+        # Life is wonderful!
+        os.path.join(PROJECT_PATH, "templates")
+    )
 
 Add at least one template to ``CMS_TEMPLATES``; for example::
 
-	CMS_TEMPLATES = (
-	    ('template_1.html', 'Template One'),
-	    ('template_2.html', 'Template Two'),
-	)
+    CMS_TEMPLATES = (
+        ('template_1.html', 'Template One'),
+        ('template_2.html', 'Template Two'),
+    )
 
 We will create the actual template files at a later step, don't worry about it for 
 now, and simply paste this code in your settings file.
@@ -168,21 +168,21 @@ URL configuration
 You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following ``urls.py``::
 
-	from django.conf.urls.defaults import *
-	from django.contrib import admin
-	from django.conf import settings
+    from django.conf.urls.defaults import *
+    from django.contrib import admin
+    from django.conf import settings
 
-	admin.autodiscover()
+    admin.autodiscover()
 
-	urlpatterns = patterns('',
-	    (r'^admin/', include(admin.site.urls)),
+    urlpatterns = patterns('',
+        (r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
-	)
+    )
 
-	if settings.DEBUG:
-	    urlpatterns = patterns('',
-	        (r'^' + settings.MEDIA_URL.lstrip('/'), include('appmedia.urls')),
-	    ) + urlpatterns
+    if settings.DEBUG:
+        urlpatterns = patterns('',
+            (r'^' + settings.MEDIA_URL.lstrip('/'), include('appmedia.urls')),
+        ) + urlpatterns
 
 To have access to app specific media files, use ``python manage.py symlinkmedia`` 
 and `django-appmedia`_ will do all the work for you.
@@ -201,8 +201,8 @@ Fresh install
 
 Run::
 
-	python manage.py syncdb --all
-	python manage.py migrate --fake
+    python manage.py syncdb --all
+    python manage.py migrate --fake
 
 The first command will prompt you to create a super user; choose 'yes' and enter
 appropriate values.
