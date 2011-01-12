@@ -46,6 +46,7 @@ Extending the CMS
     :maxdepth: 2
     :numbered:
 
+    extending_examples
     custom_plugins
     app_integration
     api_references
