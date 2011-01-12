@@ -208,4 +208,4 @@ settings in the admin interface.
 Modifying & Extending the menu
 ******************************
 
-Please refer to the :doc:`app_integration` documentation
+Please refer to the :doc:`../extending_cms/app_integration` documentation
