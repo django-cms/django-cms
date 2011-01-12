@@ -21,11 +21,11 @@ from django.utils.translation import ugettext_lazy as _, get_language, ugettext
 from menus.menu_pool import menu_pool
 from os.path import join
 from publisher.errors import MpttPublisherCantPublish
-from publisher.mptt_support import Mptt
+from mptt.models import MPTTModel
 import copy
 
 
-class Page(Mptt):
+class Page(MPTTModel):
     """
     A simple hierarchical page model
     """
@@ -1050,14 +1050,14 @@ class Page(Mptt):
         if not self.publisher_public_id:
             # is there anybody on left side?
             if prev_sibling:
-                obj.insert_at(prev_sibling.publisher_public, position='right', commit=False)
+                obj.insert_at(prev_sibling.publisher_public, position='right', save=False)
             else:
                 # it is a first time published object, perform insert_at:
                 parent, public_parent = self.parent, None
                 if parent:
                     public_parent = parent.publisher_public
                 if public_parent:
-                    obj.insert_at(public_parent, commit=False)
+                    obj.insert_at(public_parent, save=False)
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_fitlered_sibling()

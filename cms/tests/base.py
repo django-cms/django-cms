@@ -360,7 +360,7 @@ class CMSTestCase(TestCase):
             position=1, 
             language=language
         )
-        plugin_base.insert_at(None, position='last-child', commit=False)
+        plugin_base.insert_at(None, position='last-child', save=False)
                 
         plugin = Text(body=body)
         plugin_base.set_base_attr(plugin)

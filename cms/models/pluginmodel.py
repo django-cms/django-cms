@@ -12,10 +12,10 @@ from django.db.models.base import ModelBase, model_unpickle, \
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 from os.path import join
-from publisher.mptt_support import Mptt, install_mptt
+from mptt.models import MPTTModel, MPTTModelBase
 import warnings
 
-class PluginModelBase(ModelBase):
+class PluginModelBase(MPTTModelBase):
     """
     Metaclass for all plugins.
     """
@@ -23,7 +23,6 @@ class PluginModelBase(ModelBase):
         render_meta = attrs.pop('RenderMeta', None)
         if render_meta is not None:
             attrs['_render_meta'] = render_meta()
-        attrs = install_mptt(cls, name, bases, attrs)
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
         found = False
         bbases = bases
@@ -41,7 +40,7 @@ class PluginModelBase(ModelBase):
         return new_class 
          
     
-class CMSPlugin(Mptt):
+class CMSPlugin(MPTTModel):
     __metaclass__ = PluginModelBase
     
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)

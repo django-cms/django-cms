@@ -326,7 +326,7 @@ class PagesTestCase(CMSTestCase):
             position=1, 
             language=settings.LANGUAGES[0][0]
         )
-        plugin_base.insert_at(None, position='last-child', commit=False)
+        plugin_base.insert_at(None, position='last-child', save=False)
                 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)

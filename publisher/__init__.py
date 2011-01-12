@@ -1,7 +1,6 @@
 from django.conf import settings
-from mptt_support import Mptt
 from manager import PublisherManager
 
-__all__ = ('PublisherManager', 'Mptt', 'VERSION')
+__all__ = ('PublisherManager', 'VERSION')
 
 VERSION = (0, 4, 'sintab')
