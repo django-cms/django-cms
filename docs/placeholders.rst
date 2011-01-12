@@ -1,6 +1,6 @@
-############
-Placeholders
-############
+############################
+Placeholders outside the CMS
+############################
 
 Placeholders are special model fields that DjangoCMS uses to render
 user-editable content (plugins) in templates. That is, it's the place where a
@@ -8,7 +8,7 @@ user can add text, video or any other plugin to a webpage, using either the
 normal Django admin interface or the so called `frontend editing`.
 
 Placeholders can be viewed as containers of ``CMSPlugins``, and can be used
-outside the CMS in custom applications using the `PlaceholderField`.
+outside the CMS in custom applications using the ``PlaceholderField``.
 
 By defining one (or serveral) ``PlaceholderField`` on a custom model you can take
 advantage of the full power of ``CMSPlugins``, including frontend editing.
@@ -28,12 +28,13 @@ You need to define a ``PlaceholderField`` on the model you would like to use::
 		my_placeholder = PlaceholderField('placeholder_name')
 		# your methods
 		
-The `PlaceholderField` takes a string as first argument which will be used to
+The ``PlaceholderField`` takes a string as first argument which will be used to
 configure which plugins can be used in this placeholder. The configuration is
 the same as for placeholders in the CMS.
 
 If you install this model in the admin application, you have to use
-`PlaceholderAdmin` instead of `ModelAdmin` so the interface renders correctly::
+``PlaceholderAdmin`` instead of ``ModelAdmin`` so the interface renders
+correctly::
 
 	from django.contrib import admin
 	from cms.admin.placeholderadmin import PlaceholderAdmin
@@ -48,8 +49,9 @@ tag from the ``placeholder_tags`` template tag library::
 	
 	{% render_placeholder mymodel_instance.my_placeholder "640" %}
 	
-"640" is the width to be used for width-sensitive plugins in this context. This
-argument is optional.
+The ``render_placeholder`` tag takes a ``PlaceholderField`` instance as first
+argument and optionally accepts a width parameter as second argument for context
+sensitive plugins. 
 
 
 *******************************
@@ -92,8 +94,9 @@ Fieldsets
 *********
 
 There are some hard restrictions if you want to add custom fieldsets to an admin 
-page with PlaceholderFields:
+page with at least one ``PlaceholderField``:
 
-1. PlacehoderFields **must** be in their own fieldsets, one per fieldset.
+1. Every ``PlacehoderField`` **must** be in it's own fieldsets, one
+   ``PlaceholderField`` per fieldset.
 2. You **must** include the following two classes: ``'plugin-holder'`` and
    ``'plugin-holder-nopage'``
