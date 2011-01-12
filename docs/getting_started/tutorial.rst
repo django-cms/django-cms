@@ -61,7 +61,7 @@ nice "It Worked" message from Django.
 
 |it-worked|
 
-.. |it-worked| image:: images/it-worked.png
+.. |it-worked| image:: ../images/it-worked.png
 
 
 Installing and configuring django CMS in your Django project
@@ -224,7 +224,7 @@ the Django CMS "It Worked" screen.
 
 |it-works-cms|
 
-.. |it-works-cms| image:: images/it-works-cms.png
+.. |it-works-cms| image:: ../images/it-works-cms.png
 
 Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
@@ -307,7 +307,7 @@ Once in the admin part of your site, you should see something like the following
 
 |first-admin| 
 
-.. |first-admin| image:: images/first-admin.png
+.. |first-admin| image:: ../images/first-admin.png
 
 Adding a page
 =============
@@ -324,7 +324,7 @@ pages.
 
 |my-first-page|
 
-.. |my-first-page| image:: images/my-first-page.png
+.. |my-first-page| image:: ../images/my-first-page.png
 
 Congratulations! You now have a fully functional Django CMS installation!
 
@@ -361,7 +361,7 @@ The admin interfaces shows you theses placeholders as sub menus:
 
 |first-placeholders|
 
-.. |first-placeholders| image:: images/first-placeholders.png
+.. |first-placeholders| image:: ../images/first-placeholders.png
 
 Scroll down the "Available plugins" drop-down list. This displays the plugins you
 added to your INSTALLED_APPS settings. Choose the "text" plugin in the drop-down,
@@ -375,7 +375,7 @@ Go back to your website using the top right-hand "View on site" button. That's i
 
 |hello-cms-world|
 
-.. |hello-cms-world| image:: images/hello-cms-world.png
+.. |hello-cms-world| image:: ../images/hello-cms-world.png
 
 
 Where to go from here

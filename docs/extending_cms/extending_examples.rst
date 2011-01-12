@@ -169,7 +169,7 @@ Settings' tab and choose 'Polls App' for your 'Application'.
 
 |apphooks|
 
-.. |apphooks| image:: images/cmsapphook.png
+.. |apphooks| image:: ../images/cmsapphook.png
 
 Now for those changes to take effect, unfortunately you will have to restart
 your server. So do that and now if you navigate to that CMS Page, you will see

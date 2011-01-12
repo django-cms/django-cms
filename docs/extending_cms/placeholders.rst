@@ -74,7 +74,7 @@ You are now using the so-called *front-end edit mode*:
 
 |edit-banner|
 
-.. |edit-banner| image:: images/edit-banner.png
+.. |edit-banner| image:: ../images/edit-banner.png
 
 Once in Front-end editing mode, your placeholders should display a menu,
 allowing you to add ``plugins`` to them: the following screenshot shows a
@@ -82,7 +82,7 @@ default selection of plugins in an empty placeholder.
 
 |frontend-placeholder-add-plugin|
 
-.. |frontend-placeholder-add-plugin| image:: images/frontend-placeholder-add-plugin.png
+.. |frontend-placeholder-add-plugin| image:: ../images/frontend-placeholder-add-plugin.png
 
 Plugins are rendered at once, so you can have an idea what it will look like
 `in fine`, but to view the final look of a plugin simply leave edit mode by
