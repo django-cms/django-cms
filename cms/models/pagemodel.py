@@ -429,6 +429,23 @@ class Page(Mptt):
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
 
+        # we delete the old public page - this only deletes the public page as we
+        # have removed the old_public.publisher_public=None relationship to the draft page above
+        if old_public:
+            # reparent public child pages before delete so they don't get purged as well
+            for child_page in old_public.children.order_by('lft'):
+                child_page.move_to(new_public, 'last-child')
+                child_page.save(change_state=False)
+            transaction.commit()
+            # reload old_public to get correct tree attrs
+            old_public = Page.objects.get(pk=old_public.pk)
+            old_public.move_to(None, 'last-child')
+            # moving the object out of the way berore deleting works, but why?
+            # finally delete the old public page    
+            old_public.delete()
+        # manually commit the last transaction batch
+        transaction.commit()
+
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
@@ -437,22 +454,6 @@ class Page(Mptt):
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
             page.publish()
-
-        # we delete the old public page - this only deletes the public page as we
-        # have removed the old_public.publisher_public=None relationship to the draft page above
-        if old_public:
-            # reparent public child pages before delete so they don't get purged as well
-            for child_page in old_public.children.all():
-                if child_page.publisher_public:
-                    child_page.parent = new_public
-                    child_page.save(change_state=False)
-            transaction.commit()
-            # reload old_public to get correct tree attrs
-            old_public = Page.objects.get(pk=old_public.pk)
-            # finally delete the old public page    
-            old_public.delete()
-        # manually commit the last transaction batch
-        transaction.commit()
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
