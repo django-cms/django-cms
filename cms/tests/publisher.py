@@ -144,3 +144,81 @@ class PublisherTestCase(CMSTestCase):
         page.published = True
         page.save()
         self.assertEqual(page.published, True)
+
+    def test_07_publish_works_with_descendants(self):
+        '''
+        For help understanding what this tests for, see:
+        http://articles.sitepoint.com/print/hierarchical-data-database
+        '''
+        home_page = self.create_page(title="home", published=True,
+            in_navigation=False)
+            
+        item1 = self.create_page(title="item1", parent_page=home_page,
+            published=True)
+        item2 = self.create_page(title="item2", parent_page=home_page,
+            published=True)
+            
+        item2 = self.reload_page(item2)    
+
+        subitem1 = self.create_page(title="subitem1", parent_page=item2,
+            published=True)
+        subitem2 = self.create_page(title="subitem2", parent_page=item2,
+            published=True)
+            
+        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
+        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
+        
+        self.assertEquals(len(not_drafts), 5)
+        self.assertEquals(len(drafts), 5)
+        
+        for idx, draft in enumerate(drafts):
+            public = not_drafts[idx]
+            # Check that a node doesn't become a root node magically
+            self.assertEqual(bool(public.parent_id), bool(draft.parent_id))
+            if public.parent :
+                # Let's assert the MPTT tree is consistent
+                self.assertTrue(public.lft > public.parent.lft)
+                self.assertTrue(public.rght < public.parent.rght)
+                self.assertEquals(public.tree_id, public.parent.tree_id)
+                self.assertTrue(public.parent in public.get_ancestors())
+                self.assertTrue(public in public.parent.get_descendants())
+                self.assertTrue(public in public.parent.get_children())
+            if draft.parent:
+                # Same principle for the draft tree
+                self.assertTrue(draft.lft > draft.parent.lft)
+                self.assertTrue(draft.rght < draft.parent.rght)
+                self.assertEquals(draft.tree_id, draft.parent.tree_id)
+                self.assertTrue(draft.parent in draft.get_ancestors())
+                self.assertTrue(draft in draft.parent.get_descendants())
+                self.assertTrue(draft in draft.parent.get_children())
+
+            
+        item2 = self.reload_page(item2)    
+        item2.publish()
+            
+        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
+        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
+        
+        self.assertEquals(len(not_drafts), 5)
+        self.assertEquals(len(drafts), 5)
+
+        for idx, draft in enumerate(drafts):
+            public = not_drafts[idx]
+            # Check that a node doesn't become a root node magically
+            self.assertEqual(bool(public.parent_id), bool(draft.parent_id))
+            if public.parent :
+                # Let's assert the MPTT tree is consistent
+                self.assertTrue(public.lft > public.parent.lft)
+                self.assertTrue(public.rght < public.parent.rght)
+                self.assertEquals(public.tree_id, public.parent.tree_id)
+                self.assertTrue(public.parent in public.get_ancestors())
+                self.assertTrue(public in public.parent.get_descendants())
+                self.assertTrue(public in public.parent.get_children())
+            if draft.parent:
+                # Same principle for the draft tree
+                self.assertTrue(draft.lft > draft.parent.lft)
+                self.assertTrue(draft.rght < draft.parent.rght)
+                self.assertEquals(draft.tree_id, draft.parent.tree_id)
+                self.assertTrue(draft.parent in draft.get_ancestors())
+                self.assertTrue(draft in draft.parent.get_descendants())
+                self.assertTrue(draft in draft.parent.get_children())
