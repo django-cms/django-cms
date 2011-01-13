@@ -146,20 +146,21 @@ class Page(Mptt):
         else:
             pages = [self] + list(self.get_descendants().order_by('-rght'))
             
-        site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
+        if not public_copy:    
+            site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
         
-        if target:
-            target.old_pk = -1
-            if position == "first-child":
-                tree = [target]
-            elif target.parent_id:
-                tree = [target.parent]
+            if target:
+                target.old_pk = -1
+                if position == "first-child":
+                    tree = [target]
+                elif target.parent_id:
+                    tree = [target.parent]
+                else:
+                    tree = []
             else:
                 tree = []
-        else:
-            tree = []
-        if tree:
-            tree[0].old_pk = tree[0].pk
+            if tree:
+                tree[0].old_pk = tree[0].pk
             
         first = True
         # loop over all affected pages (self is included in descendants)
@@ -179,28 +180,29 @@ class Page(Mptt):
             page.moderator_state = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
             # only set reverse_id on standard copy
-            if not public_copy and page.reverse_id in site_reverse_ids:
-                page.reverse_id = None
-            if first:
-                first = False
-                if tree:
-                    page.parent = tree[0]
+            if not public_copy:
+                if page.reverse_id in site_reverse_ids:
+                    page.reverse_id = None
+                if first:
+                    first = False
+                    if tree:
+                        page.parent = tree[0]
+                    else:
+                        page.parent = None
+                    page.insert_at(target, position)
                 else:
-                    page.parent = None
-                page.insert_at(target, position)
-            else:
-                count = 1
-                found = False
-                for prnt in tree:
-                    if prnt.old_pk == page.parent_id:
-                        page.parent = prnt
-                        tree = tree[0:count]
-                        found = True
-                        break
-                    count += 1
-                if not found:
-                    page.parent = None
-            tree.append(page)
+                    count = 1
+                    found = False
+                    for prnt in tree:
+                        if prnt.old_pk == page.parent_id:
+                            page.parent = prnt
+                            tree = tree[0:count]
+                            found = True
+                            break
+                        count += 1
+                    if not found:
+                        page.parent = None
+                tree.append(page)
             page.site = site
              
             # override default page settings specific for public copy
@@ -388,6 +390,8 @@ class Page(Mptt):
             try:
                 old_public = self.get_public_object()
                 old_public.publisher_state = self.PUBLISHER_STATE_DELETE
+                # store old public on self, pass around instead
+                self.old_public = old_public
                 old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
                 old_public.save()
             except:
@@ -425,6 +429,23 @@ class Page(Mptt):
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
 
+        # we delete the old public page - this only deletes the public page as we
+        # have removed the old_public.publisher_public=None relationship to the draft page above
+        if old_public:
+            # reparent public child pages before delete so they don't get purged as well
+            for child_page in old_public.children.order_by('lft'):
+                child_page.move_to(new_public, 'last-child')
+                child_page.save(change_state=False)
+            transaction.commit()
+            # reload old_public to get correct tree attrs
+            old_public = Page.objects.get(pk=old_public.pk)
+            old_public.move_to(None, 'last-child')
+            # moving the object out of the way berore deleting works, but why?
+            # finally delete the old public page    
+            old_public.delete()
+        # manually commit the last transaction batch
+        transaction.commit()
+
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
@@ -433,27 +454,6 @@ class Page(Mptt):
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
             page.publish()
-
-        # we delete the old public page - this only deletes the public page as we
-        # have removed the old_public.publisher_public=None relationship to the draft page above
-        if old_public:
-            # reparent public child pages before delete so they don't get purged as well
-            for child_page in old_public.children.all():
-                if child_page.publisher_public:
-                    child_page.parent = new_public
-                    child_page.save(change_state=False)
-            transaction.commit()
-            
-            # delete its placeholders and plugins
-            placeholders = old_public.placeholders.all()
-            for ph in placeholders:
-                plugin = CMSPlugin.objects.filter(placeholder=ph)
-                plugin.delete()
-                ph.delete()
-            # finally delete the old public page    
-            old_public.delete()
-        # manually commit the last transaction batch
-        transaction.commit()
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
@@ -1060,24 +1060,39 @@ class Page(Mptt):
                     obj.insert_at(public_parent, commit=False)
         else:
             # check if object was moved / structural tree change
-            prev_public_sibling = obj.get_previous_fitlered_sibling()
+            prev_public_sibling = self.old_public.get_previous_fitlered_sibling()
 
-            if not self.level == obj.level or \
-                not (self.level > 0 and self.parent.publisher_public == obj.parent) or \
+            if not self.level == self.old_public.level or \
+                not (self.level > 0 and self.parent.publisher_public == self.old_public.parent) or \
                 not prev_sibling == prev_public_sibling == None or \
                 (prev_sibling and prev_sibling.publisher_public_id == prev_public_sibling.id):
 
                 if prev_sibling:
-                    obj.move_to(prev_sibling.publisher_public, position="right")
+                    obj.insert_at(prev_sibling.publisher_public, position="right")
                 elif self.parent:
                     # move as a first child to parent
                     target = self.parent.publisher_public
-                    obj.move_to(target, position='first-child')
+                    obj.insert_at(target, position='first-child')
                 else:
                     # it is a move from the right side or just save
-                    next_sibling = self.get_next_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
+                    next_sibling = self.get_next_filtered_sibling()
                     if next_sibling and next_sibling.publisher_public_id:
-                        obj.move_to(next_sibling.publisher_public, position="left")
+                        obj.insert_at(next_sibling.publisher_public, position="left")
+            else:
+                # insert at last public position
+                prev_sibling = self.old_public.get_previous_fitlered_sibling()
+
+                if prev_sibling:
+                    obj.insert_at(prev_sibling, position="right")
+                elif self.old_public.parent:
+                    # move as a first child to parent
+                    target = self.old_public.parent
+                    obj.insert_at(target, position='first-child')
+                else:
+                    # it is a move from the right side or just save
+                    next_sibling = self.old_public.get_next_filtered_sibling()
+                    if next_sibling and next_sibling.publisher_public_id:
+                        obj.insert_at(next_sibling, position="left")
         # or none structural change, just save
         obj.save()
         return obj
