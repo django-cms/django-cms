@@ -176,7 +176,7 @@ class Page(Mptt):
             page.lft = None
             page.tree_id = None
             page.published = False
-            page.publisher_status = Page.MODERATOR_CHANGED
+            page.moderator_state = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
             # only set reverse_id on standard copy
             if not public_copy and page.reverse_id in site_reverse_ids:
@@ -207,7 +207,7 @@ class Page(Mptt):
             if public_copy:
                 page.published = True
                 page.publisher_is_draft=False
-                page.publisher_status = Page.MODERATOR_APPROVED
+                page.moderator_state = Page.MODERATOR_APPROVED
                 # we need to set relate this new public copy to its draft page (self)
                 page.publisher_public = self
                 
