@@ -214,7 +214,7 @@ Advanced
 CMSGalleryPlugin can be even further customized:
 
 Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use all the things you are used
-to with normal admin classes. You can defined inlines, the form, the form template etc.
+to with normal admin classes. You can define inlines, the form, the form template etc.
 
 Note: If you want to overwrite the form be sure to extend from ``admin/cms/page/plugin_change_form.html``
 to have an unified look across the plugins and to have the preview functionality automatically installed.
