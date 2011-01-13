@@ -18,4 +18,4 @@ app within your project.
 
 Here is an example **untested** and **unsupported** ``search_indexes.py``:
 
-.. literalinclude:: src/haystack.py
+.. literalinclude:: ../src/haystack.py

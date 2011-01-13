@@ -12,6 +12,11 @@ menu:
 * ``show_sub_menu``
 * ``show_breadcrumb``
 
+.. note::
+
+    Please note that menus were originally implemented to be application-independant
+    and as such, live in the ``menus`` application instead of the "normal" ``cms``
+
 *********
 show_menu
 *********
@@ -40,7 +45,7 @@ Some Examples
 
 Complete navigation (as a nested list)::
 
-	{% load cache cms_tags %}
+	{% load cache menu_tags %}
 	<ul>
 		{% show_menu 0 100 100 100 %}
 	</ul>
@@ -203,4 +208,4 @@ settings in the admin interface.
 Modifying & Extending the menu
 ******************************
 
-Please refer to the :doc:`app_integration` documentation
+Please refer to the :doc:`../extending_cms/app_integration` documentation

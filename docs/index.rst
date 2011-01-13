@@ -17,12 +17,12 @@ Getting Started
     :maxdepth: 2
     :numbered:
 
-    installation
-    tutorial
-    using_south
-    configuration
-    navigation
-    plugins
+    getting_started/installation
+    getting_started/tutorial
+    getting_started/using_south
+    getting_started/configuration
+    getting_started/navigation
+    getting_started/plugin_reference
     
 
 ********
@@ -33,9 +33,9 @@ Advanced
     :maxdepth: 2
     :numbered:
        
-    i18n
-    sitemap
-    templatetags
+    advanced/i18n
+    advanced/sitemap
+    advanced/templatetags
 
 
 *****************
@@ -46,11 +46,12 @@ Extending the CMS
     :maxdepth: 2
     :numbered:
 
-    custom_plugins
-    app_integration
-    api_references
-    placeholders
-    searchdocs
+    extending_cms/extending_examples
+    extending_cms/custom_plugins
+    extending_cms/app_integration
+    extending_cms/api_references
+    extending_cms/placeholders
+    extending_cms/searchdocs
 
 
 ***********************
