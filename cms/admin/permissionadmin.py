@@ -84,7 +84,7 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     
     form = GlobalPagePermissionAdminForm
     
-    search_fields = ('user__username', 'user__firstname', 'user__lastname', 'group__name')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'group__name')
     
     exclude = []
     
