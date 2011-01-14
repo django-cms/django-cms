@@ -1,5 +1,5 @@
 from cms.middleware.multilingual import patch_response
-from cms.tests.base import CMSTestCase
+from cms.test.testcases import CMSTestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import urllib

@@ -8,8 +8,8 @@ from cms.admin import forms
 from cms.admin.forms import PageUserForm
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import get_site_choices, get_page_choices
-from cms.tests.base import CMSTestCase
-from cms.tests.util.context_managers import SettingsOverride
+from cms.test.testcases import CMSTestCase
+from cms.test.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.core.cache import cache
 

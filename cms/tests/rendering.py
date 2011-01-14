@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from django.conf import settings
 from django.template import Template, RequestContext
 from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase
+from cms.test.testcases import CMSTestCase
 from cms.models import Page, Title, CMSPlugin
+from cms.test.util.context_managers import SettingsOverride
 from django.contrib.sites.models import Site
 from cms.plugins.text.models import Text
 from cms.plugin_rendering import render_plugins, PluginContext
@@ -95,51 +97,53 @@ class RenderingTestCase(CMSTestCase):
         request.placeholder_media = Media()
         return request
 
-    def init_render_settings(self):
-        settings.CMS_PLUGIN_PROCESSORS = ()
-        settings.CMS_PLUGIN_CONTEXT_PROCESSORS = ()
-        settings.CMS_TEMPLATES = (TEMPLATE_NAME, ''),
+    def render_settings(self):
+        return dict(
+            CMS_TEMPLATES = ((TEMPLATE_NAME, ''),)
+        )
 
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
 
     def render(self, template, context_vars={}):
-        self.init_render_settings()
-        c = self.get_context(context_vars)
-        t = Template(template)
-        r = t.render(c)
-        return self.strip_rendered(r)
+        with SettingsOverride(**self.render_settings()):
+            c = self.get_context(context_vars)
+            t = Template(template)
+            r = t.render(c)
+            return self.strip_rendered(r)
 
     def test_00_details_view(self):
         """
         Tests that the `detail` view is working.
         """
-        self.init_render_settings()
-        from cms.views import details
-        response = details(self.get_request(), slug=self.test_page.get_slug())
-        r = self.strip_rendered(response.content)
-        self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
+        with SettingsOverride(**self.render_settings()):
+            from cms.views import details
+            response = details(self.get_request(), slug=self.test_page.get_slug())
+            r = self.strip_rendered(response.content)
+            self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         
     def test_01_processors(self):
         """
         Tests that default plugin context processors are working, that plugin processors and plugin context processors
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
-        settings.CMS_PLUGIN_PROCESSORS = ('cms.tests.rendering.test_plugin_processor',)
-        settings.CMS_PLUGIN_CONTEXT_PROCESSORS = ('cms.tests.rendering.test_plugin_context_processor',)
-        def test_passed_plugin_context_processor(instance, placeholder):
-            return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
-        t = u'{% load cms_tags %}'+ \
-            u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|{{ test_plugin_context_processor }}'
-        instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
-        instance.render_template = Template(t)
-        context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance, self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
-        plugin_rendering._standard_processors = {}
-        c = render_plugins((instance,), context, self.test_placeholders['main'])
-        r = "".join(c) 
-        self.assertEqual(r, u'1|'+self.test_data['text_main']+'|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|'+self.test_data['text_main']+'|main|test_plugin_processor_ok|'+self.test_data['text_main']+'|main|original_context_var_ok')
-        plugin_rendering._standard_processors = {}
-
+        with SettingsOverride(
+            CMS_PLUGIN_PROCESSORS = ('cms.tests.rendering.test_plugin_processor',),
+            CMS_PLUGIN_CONTEXT_PROCESSORS = ('cms.tests.rendering.test_plugin_context_processor',),
+            ):
+            def test_passed_plugin_context_processor(instance, placeholder):
+                return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
+            t = u'{% load cms_tags %}'+ \
+                u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|{{ test_plugin_context_processor }}'
+            instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
+            instance.render_template = Template(t)
+            context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance, self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
+            plugin_rendering._standard_processors = {}
+            c = render_plugins((instance,), context, self.test_placeholders['main'])
+            r = "".join(c) 
+            self.assertEqual(r, u'1|'+self.test_data['text_main']+'|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|'+self.test_data['text_main']+'|main|test_plugin_processor_ok|'+self.test_data['text_main']+'|main|original_context_var_ok')
+            plugin_rendering._standard_processors = {}
+    
     def test_02_placeholder(self):
         """
         Tests the {% placeholder %} templatetag.

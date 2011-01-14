@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from cms.conf.patch import post_patch
-from cms.tests.base import CMSTestCase
-from cms.tests.util.context_managers import SettingsOverride
+from cms.test.testcases import CMSTestCase
+from cms.test.util.context_managers import SettingsOverride
 
 
 class SettingsTests(CMSTestCase):
