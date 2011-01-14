@@ -10,7 +10,7 @@ from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import plugin_tags_to_id_list, \
     plugin_tags_to_admin_html
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
+from cms.test.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
     URL_CMS_PLUGIN_REMOVE
 from django.conf import settings

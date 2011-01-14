@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.models import Page
-from cms.tests.base import CMSTestCase
+from cms.test.testcases import CMSTestCase
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
+from cms.test.util.context_managers import SettingsOverride
 
 
 class NonRootCase(CMSTestCase):
     urls = 'testapp.nonroot_urls'
 
     def setUp(self):
-        settings.CMS_MODERATOR = False
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
-        self.login_user(u)
-
-        self.create_some_pages()
+        with SettingsOverride(CMS_MODERATOR = False):
+            u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+            u.set_password("test")
+            u.save()
+            self.login_user(u)
+    
+            self.create_some_pages()
         
     # def tearDown(self):
     #     menu_pool.menus = self.old_menu
@@ -44,25 +46,28 @@ class NonRootCase(CMSTestCase):
         
 
     def test_01_basic_cms_menu(self):
-        response = self.client.get(self.get_pages_root())
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(self.get_pages_root(), "/content/")
+        with SettingsOverride(CMS_MODERATOR = False):
+            response = self.client.get(self.get_pages_root())
+            self.assertEquals(response.status_code, 200)
+            self.assertEquals(self.get_pages_root(), "/content/")
 
     def test_02_show_menu(self):
-        context = self.get_context()
-        tpl = Template("{% load menu_tags %}{% show_menu %}")
-        tpl.render(context) 
-        nodes = context['children']
-        self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
-        self.assertEqual(nodes[0].get_absolute_url(), "/content/")
+        with SettingsOverride(CMS_MODERATOR = False):
+            context = self.get_context()
+            tpl = Template("{% load menu_tags %}{% show_menu %}")
+            tpl.render(context) 
+            nodes = context['children']
+            self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
+            self.assertEqual(nodes[0].get_absolute_url(), "/content/")
 
     def test_03_show_breadcrumb(self):
-        page2 = Page.objects.get(pk=self.page2.pk)
-        context = self.get_context(path=self.page2.get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
-        tpl.render(context) 
-        nodes = context['ancestors']
-        self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
-        self.assertEqual(nodes[0].get_absolute_url(), "/content/")
-        self.assertEqual(isinstance(nodes[0], NavigationNode), True)
-        self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
+        with SettingsOverride(CMS_MODERATOR = False):    
+            page2 = Page.objects.get(pk=self.page2.pk)
+            context = self.get_context(path=self.page2.get_absolute_url())
+            tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
+            tpl.render(context) 
+            nodes = context['ancestors']
+            self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
+            self.assertEqual(nodes[0].get_absolute_url(), "/content/")
+            self.assertEqual(isinstance(nodes[0], NavigationNode), True)
+            self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())

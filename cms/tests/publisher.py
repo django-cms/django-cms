@@ -6,8 +6,8 @@ Created on Dec 23, 2010
 from __future__ import with_statement
 from cms.management.commands import publisher_publish
 from cms.models.pagemodel import Page
-from cms.tests.base import CMSTestCase
-from cms.tests.util.context_managers import SettingsOverride, StdoutOverride
+from cms.test.testcases import CMSTestCase
+from cms.test.util.context_managers import SettingsOverride, StdoutOverride
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 

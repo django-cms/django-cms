@@ -1,8 +1,8 @@
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.models.titlemodels import Title
-from cms.tests.base import CMSTestCase
-from cms.tests.util.context_managers import SettingsOverride
+from cms.test.testcases import CMSTestCase
+from cms.test.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches
 import sys

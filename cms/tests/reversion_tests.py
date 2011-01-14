@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
+from cms.test.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE
 from cms.models import Page
 from cms.plugins.text.models import Text
