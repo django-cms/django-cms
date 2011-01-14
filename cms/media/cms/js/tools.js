@@ -34,13 +34,13 @@ function insert_into_url(url, name, value){
 		}
 	}
 	if(dash_splits.length>1){
-		url += dash_splits[1];
+		url += '#' + dash_splits[1];
 	}
 	if(url.substr(url.length-1, url.length)== "&"){
 		url = url.substr(0, url.length-1);
 	}
 	return url;
-}
+};
 
 /* removes a parameter from an url */
 function remove_from_url(url, name){
