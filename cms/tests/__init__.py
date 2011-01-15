@@ -19,3 +19,10 @@ from cms.tests.multilingual import MultilingualTestCase
 from cms.tests.mail import MailTestCase
 from cms.tests.settings import SettingsTests
 from cms.tests.forms import FormsTestCase
+try:
+    from cms.tests.javascript import JavascriptTestCase
+except ImportError:
+    import warnings
+    import traceback
+    exc = traceback.format_exc()
+    warnings.warn("JavascriptTestCase cannot be run: %s" % exc)
