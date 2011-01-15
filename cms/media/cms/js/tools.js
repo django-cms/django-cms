@@ -57,7 +57,7 @@ function remove_from_url(url, name){
 		}
 		if (splits[0].substr(splits[0].length-2, splits[0].length-1)=="?" || !after){
 			url = splits[0] + after;
-		}else if (after){
+		}else{
 			url = splits[0] + "&" + after;
 		}
 	}

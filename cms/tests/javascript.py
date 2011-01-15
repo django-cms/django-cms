@@ -43,9 +43,13 @@ class JavascriptTestCase(BaseJavascriptTestCase):
         base_snippet = "remove_from_url('%s', '%s')"
         tests = [
             ('http://www.mysite.com', 'edit', 'http://www.mysite.com'),
+            ('http://www.mysite.com#edit', 'edit', 'http://www.mysite.com#edit'),
             ('http://www.mysite.com?edit', 'edit', 'http://www.mysite.com'),
+            ('http://www.mysite.com?edit#edit', 'edit', 'http://www.mysite.com#edit'),
             ('http://www.mysite.com?hello=world&edit', 'edit', 
              'http://www.mysite.com?hello=world&'),
+            ('http://www.mysite.com?hello=world&edit#edit', 'edit', 
+             'http://www.mysite.com?hello=world&#edit'),
         ]
         for arg1, arg2, expected in tests:
             output = self._run_javascript(files, base_snippet % (arg1, arg2))
