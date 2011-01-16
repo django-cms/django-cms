@@ -72,6 +72,12 @@ Now models.py looks like the following::
 		gallery = models.ForeignKey(Gallery)
 
 
+.. note::
+
+    Unfortunately `CMSPlugin` subclasses cannot be further subclassed.
+
+
+
 Handling Relations
 ------------------
 
