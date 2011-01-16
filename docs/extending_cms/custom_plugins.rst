@@ -72,9 +72,11 @@ Now models.py looks like the following::
 		gallery = models.ForeignKey(Gallery)
 
 
-.. note::
+.. warning::
 
-    Unfortunately `CMSPlugin` subclasses cannot be further subclassed.
+    Two limitations apply when subclassing the `CMSPlugin` class to use with
+    your custom plugins: the resulting subclass cannot be further subclassed,
+    and subclasses of `CMSPlugin` cannot have a field called "text".
 
 
 

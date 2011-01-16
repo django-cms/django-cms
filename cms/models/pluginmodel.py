@@ -42,6 +42,17 @@ class PluginModelBase(ModelBase):
          
     
 class CMSPlugin(Mptt):
+    '''
+    The base class for a CMS plugin model. When defining a new custom plugin, you should
+    store plugin-instance specific information on a subclass of this class.
+    
+    An example for this would be to store the number of pictures to display in a galery.
+
+    Two restrictions apply when subclassing this to use in your own models:
+    1. Subclasses of CMSPlugin *cannot be further subclassed*
+    2. Subclasses of CMSPlugin cannot define a "text" field.
+
+    '''
     __metaclass__ = PluginModelBase
     
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
