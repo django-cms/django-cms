@@ -7,23 +7,23 @@ You have 5 ways of integrating your app:
 
 1. Menus
 
-	Static extend the menu entries
+    Static extend the menu entries
 
 2. AttachMenus
 
-	Attach your menu to a page.
+    Attach your menu to a page.
 
 3. App-Hooks
 
-	Attach whole apps with optional menu to a page.
+    Attach whole apps with optional menu to a page.
 
 4. Navigation Modifiers
 
-	Modify the whole menu tree
+    Modify the whole menu tree
 
 5. Custom Plugins
 
-	Display your models / content in cms pages
+    Display your models / content in cms pages
 
 *****
 Menus
@@ -31,25 +31,25 @@ Menus
 
 Create a menu.py in your application and write the following inside::
 
-	from menus.base import Menu, NavigationNode
-	from menus.menu_pool import menu_pool
-	from django.utils.translation import ugettext_lazy as _
+    from menus.base import Menu, NavigationNode
+    from menus.menu_pool import menu_pool
+    from django.utils.translation import ugettext_lazy as _
 
-	class TestMenu(Menu):
+    class TestMenu(Menu):
 
-	    def get_nodes(self, request):
-	        nodes = []
-	        n = NavigationNode(_('sample root page'), "/", 1)
-	        n2 = NavigationNode(_('sample settings page'), "/bye/", 2)
-	        n3 = NavigationNode(_('sample account page'), "/hello/", 3)
-	        n4 = NavigationNode(_('sample my profile page'), "/hello/world/", 4, 3)
-	        nodes.append(n)
-	        nodes.append(n2)
-	        nodes.append(n3)
-	        nodes.append(n4)
-	        return nodes
+        def get_nodes(self, request):
+            nodes = []
+            n = NavigationNode(_('sample root page'), "/", 1)
+            n2 = NavigationNode(_('sample settings page'), "/bye/", 2)
+            n3 = NavigationNode(_('sample account page'), "/hello/", 3)
+            n4 = NavigationNode(_('sample my profile page'), "/hello/world/", 4, 3)
+            nodes.append(n)
+            nodes.append(n2)
+            nodes.append(n3)
+            nodes.append(n4)
+            return nodes
 
-	menu_pool.register_menu(TestMenu)
+    menu_pool.register_menu(TestMenu)
 
 If you refresh a page you should now see the menu entries from above.
 The get_nodes function should return a list of NavigationNode instances.
@@ -94,28 +94,28 @@ Instead of extending from `Menu` you need to extend from `CMSAttachMenu` and
 you need to define a name. We will do that with the example from above::
 
 
-	from menus.base import NavigationNode
-	from menus.menu_pool import menu_pool
-	from django.utils.translation import ugettext_lazy as _
-	from cms.menu_bases import CMSAttachMenu
+    from menus.base import NavigationNode
+    from menus.menu_pool import menu_pool
+    from django.utils.translation import ugettext_lazy as _
+    from cms.menu_bases import CMSAttachMenu
 
-	class TestMenu(CMSAttachMenu):
+    class TestMenu(CMSAttachMenu):
 
-		name = _("test menu")
+        name = _("test menu")
 
-	    def get_nodes(self, request):
-	        nodes = []
-	        n = NavigationNode(_('sample root page'), "/", 1)
-	        n2 = NavigationNode(_('sample settings page'), "/bye/", 2)
-	        n3 = NavigationNode(_('sample account page'), "/hello/", 3)
-	        n4 = NavigationNode(_('sample my profile page'), "/hello/world/", 4, 3)
-	        nodes.append(n)
-	        nodes.append(n2)
-	        nodes.append(n3)
-	        nodes.append(n4)
-	        return nodes
+        def get_nodes(self, request):
+            nodes = []
+            n = NavigationNode(_('sample root page'), "/", 1)
+            n2 = NavigationNode(_('sample settings page'), "/bye/", 2)
+            n3 = NavigationNode(_('sample account page'), "/hello/", 3)
+            n4 = NavigationNode(_('sample my profile page'), "/hello/world/", 4, 3)
+            nodes.append(n)
+            nodes.append(n2)
+            nodes.append(n3)
+            nodes.append(n4)
+            return nodes
 
-	menu_pool.register_menu(TestMenu)
+    menu_pool.register_menu(TestMenu)
 
 
 Now you can link this Menu to a page in the 'Advanced' tab of the page
@@ -157,15 +157,15 @@ you have a news app and you want it attached to your news page.
 To create an apphook create a cms_app.py in your application. And in there
 write the following::
 
-	from cms.app_base import CMSApp
-	from cms.apphook_pool import apphook_pool
-	from django.utils.translation import ugettext_lazy as _
+    from cms.app_base import CMSApp
+    from cms.apphook_pool import apphook_pool
+    from django.utils.translation import ugettext_lazy as _
 
-	class MyApphook(CMSApp):
-	    name = _("My Apphook")
-	    urls = ["myapp.urls"]
+    class MyApphook(CMSApp):
+        name = _("My Apphook")
+        urls = ["myapp.urls"]
 
-	apphook_pool.register(MyApphook)
+    apphook_pool.register(MyApphook)
 
 Replace "myapp.urls" with the path to your applications urls.py.
 
@@ -181,12 +181,12 @@ If you attached the app to a page with the url `/hello/world/` and the app has
 a urls.py that looks like this:
 ::
 
-	from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import *
 
-	urlpatterns = patterns('sampleapp.views',
-	    url(r'^$', 'main_view', name='app_main'),
-	    url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
-	)
+    urlpatterns = patterns('sampleapp.views',
+        url(r'^$', 'main_view', name='app_main'),
+        url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
+    )
 
 The 'main_view' should now be available at `/hello/world/` and the
 'sample_view' has the url '/hello/world/sublevel/'.
@@ -205,26 +205,26 @@ What this means:
 To reverse the first url from above you would use something like this in your
 template::
 
-	{% url app_main %}
+    {% url app_main %}
 
 If you want to access the same url but in a different language use a langauge
 namespace::
 
-	{% url de:app_main %}
-	{% url en:app_main %}
-	{% url fr:app_main %}
+    {% url de:app_main %}
+    {% url en:app_main %}
+    {% url fr:app_main %}
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
 
-	from myapp.menu import MyAppMenu
+    from myapp.menu import MyAppMenu
 
-	class MyApphook(CMSApp):
-	    name = _("My Apphook")
-	    urls = ["myapp.urls"]
-	    menus = [MyAppMenu]
+    class MyApphook(CMSApp):
+        name = _("My Apphook")
+        urls = ["myapp.urls"]
+        menus = [MyAppMenu]
 
-	apphook_pool.register(MyApphook)
+    apphook_pool.register(MyApphook)
 
 
 For an example if your app has a Category model and you want this category
@@ -256,32 +256,32 @@ is organized in a tree.
 
 We would now create a menu out of these categories::
 
-	from menus.base import NavigationNode
-	from menus.menu_pool import menu_pool
-	from django.utils.translation import ugettext_lazy as _
-	from cms.menu_bases import CMSAttachMenu
-	from myapp.models import Category
+    from menus.base import NavigationNode
+    from menus.menu_pool import menu_pool
+    from django.utils.translation import ugettext_lazy as _
+    from cms.menu_bases import CMSAttachMenu
+    from myapp.models import Category
 
-	class CategoryMenu(CMSAttachMenu):
+    class CategoryMenu(CMSAttachMenu):
 
-		name = _("test menu")
+        name = _("test menu")
 
-	    def get_nodes(self, request):
-	        nodes = []
-	        for category in Category.objects.all().order_by("tree_id", "lft"):
-	        	nodes.append(NavigationNode(category.name, category.pk, category.parent_id))
-	        return nodes
+        def get_nodes(self, request):
+            nodes = []
+            for category in Category.objects.all().order_by("tree_id", "lft"):
+                nodes.append(NavigationNode(category.name, category.pk, category.parent_id))
+            return nodes
 
-	menu_pool.register_menu(CategoryMenu)
+    menu_pool.register_menu(CategoryMenu)
 
 If you add this menu now to your app-hook::
 
-	from myapp.menus import CategoryMenu
+    from myapp.menus import CategoryMenu
 
-	class MyApphook(CMSApp):
-	    name = _("My Apphook")
-	    urls = ["myapp.urls"]
-	    menus = [MyAppMenu, CategoryMenu]
+    class MyApphook(CMSApp):
+        name = _("My Apphook")
+        urls = ["myapp.urls"]
+        menus = [MyAppMenu, CategoryMenu]
 
 You get the static entries of MyAppMenu and the dynamic entries of
 CategoryMenu both attached to the same page.
@@ -296,21 +296,21 @@ menu.py.
 
 A simple modifier looks something like this::
 
-	from menus.base import Modifier
-	from menus.menu_pool import menu_pool
+    from menus.base import Modifier
+    from menus.menu_pool import menu_pool
 
-	class MyMode(Modifier):
-		"""
+    class MyMode(Modifier):
+        """
 
-		"""
-		def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
-			if post_cut:
-				return nodes
-			count = 0
-	    	for node in nodes:
-				node.counter = count
-				count += 1
-			return nodes
+        """
+        def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+            if post_cut:
+                return nodes
+            count = 0
+            for node in nodes:
+                node.counter = count
+                count += 1
+            return nodes
 
 It has a function modify that should return a list of NavigationNodes. Modify
 should take the following arguments:
@@ -348,31 +348,31 @@ should take the following arguments:
 Here is an example of a build in modifier that marks all nodes level::
 
 
-	class Level(Modifier):
-	    """
-	    marks all node levels
-	    """
-	    post_cut = True
+    class Level(Modifier):
+        """
+        marks all node levels
+        """
+        post_cut = True
 
-	    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
-	        if breadcrumb:
-	            return nodes
-	        for node in nodes:
-	            if not node.parent:
-	                if post_cut:
-	                    node.menu_level = 0
-	                else:
-	                    node.level = 0
-	                self.mark_levels(node, post_cut)
-	        return nodes
+        def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+            if breadcrumb:
+                return nodes
+            for node in nodes:
+                if not node.parent:
+                    if post_cut:
+                        node.menu_level = 0
+                    else:
+                        node.level = 0
+                    self.mark_levels(node, post_cut)
+            return nodes
 
-	    def mark_levels(self, node, post_cut):
-	        for child in node.children:
-	            if post_cut:
-	                child.menu_level = node.menu_level + 1
-	            else:
-	                child.level = node.level + 1
-	            self.mark_levels(child, post_cut)
+        def mark_levels(self, node, post_cut):
+            for child in node.children:
+                if post_cut:
+                    child.menu_level = node.menu_level + 1
+                else:
+                    child.level = node.level + 1
+                self.mark_levels(child, post_cut)
 
 **************
 Custom Plugins

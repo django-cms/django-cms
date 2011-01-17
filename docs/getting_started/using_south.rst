@@ -15,7 +15,7 @@ Installation
 Using Django and Python is, as usual, a joy. Installing South should mostly be
 as easy as typing::
 
-	pip install South
+    pip install South
 
 Then, simply add "South" to the list of ``INSTALLED_APPS`` in your
 ``settings.py`` file.

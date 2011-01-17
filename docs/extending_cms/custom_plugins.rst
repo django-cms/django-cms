@@ -16,13 +16,13 @@ or just add a folder ``gallery`` to your project's root folder, add an empty
 
 Suppose you have the following gallery model::
 
-	class Gallery(models.Model):
-		name = models.CharField(max_length=30)
+    class Gallery(models.Model):
+        name = models.CharField(max_length=30)
 
-	class Picture(models.Model):
-		gallery = models.ForeignKey(Gallery)
-		image = models.ImageField(upload_to="uploads/images/")
-		description = models.CharField(max_length=60)
+    class Picture(models.Model):
+        gallery = models.ForeignKey(Gallery)
+        image = models.ImageField(upload_to="uploads/images/")
+        description = models.CharField(max_length=60)
 
 And that you want to display this gallery between two text blocks.
 
@@ -34,10 +34,10 @@ Plugin Model
 
 First create a model that links to the gallery via a ForeignKey field::
 
-	from cms.models import CMSPlugin
+    from cms.models import CMSPlugin
 
-	class GalleryPlugin(CMSPlugin):
-		gallery = models.ForeignKey(Gallery)
+    class GalleryPlugin(CMSPlugin):
+        gallery = models.ForeignKey(Gallery)
 
 Be sure that your model inherits the CMSPlugin class.
 The plugin model can have any fields it wants. They are the fields that
@@ -45,31 +45,31 @@ get displayed if you edit the plugin.
 
 Now models.py looks like the following::
 
-	from django.db import models
-	from cms.models import CMSPlugin
+    from django.db import models
+    from cms.models import CMSPlugin
 
-	class Gallery(models.Model):
-		parent = models.ForeignKey('self', blank=True, null=True)
-		name = models.CharField(max_length=30)
+    class Gallery(models.Model):
+        parent = models.ForeignKey('self', blank=True, null=True)
+        name = models.CharField(max_length=30)
 
-		def __unicode__(self):
-			return self.name
-    
-		def get_absolute_url(self):
-			return reverse('gallery_view', args=[self.pk])
-    
-		class Meta:
-			verbose_name_plural = 'gallery'
+        def __unicode__(self):
+            return self.name
 
+        def get_absolute_url(self):
+            return reverse('gallery_view', args=[self.pk])
 
-	class Picture(models.Model):
-		gallery = models.ForeignKey(Gallery)
-		image = models.ImageField(upload_to="uploads/images/")
-		description = models.CharField(max_length=60)
+        class Meta:
+            verbose_name_plural = 'gallery'
 
 
-	class GalleryPlugin(CMSPlugin):
-		gallery = models.ForeignKey(Gallery)
+    class Picture(models.Model):
+        gallery = models.ForeignKey(Gallery)
+        image = models.ImageField(upload_to="uploads/images/")
+        description = models.CharField(max_length=60)
+
+
+    class GalleryPlugin(CMSPlugin):
+        gallery = models.ForeignKey(Gallery)
 
 
 .. warning::
@@ -94,24 +94,24 @@ Lets assume this is your plugin::
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
         sections =  models.ManyToManyField(Section)
-        
+
         def __unicode__(self):
             return self.title
-            
+
 Now when the plugin gets copied, you want to make sure the sections stay::
 
         def copy_relations(self, oldinstance):
             self.sections = oldinstance.sections.all()
-            
+
 Your full model now::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
         sections =  models.ManyToManyField(Section)
-        
+
         def __unicode__(self):
             return self.title
-        
+
         def copy_relations(self, oldinstance):
             self.sections = oldinstance.sections.all()
 
@@ -124,25 +124,25 @@ cms_plugins.py file.
 
 In there write the following::
 
-	from cms.plugin_base import CMSPluginBase
-	from cms.plugin_pool import plugin_pool
-	from models import GalleryPlugin
-	from django.utils.translation import ugettext as _
+    from cms.plugin_base import CMSPluginBase
+    from cms.plugin_pool import plugin_pool
+    from models import GalleryPlugin
+    from django.utils.translation import ugettext as _
 
-	class CMSGalleryPlugin(CMSPluginBase):
-		model = GalleryPlugin
-		name = _("Gallery")
-		render_template = "gallery/gallery.html"
+    class CMSGalleryPlugin(CMSPluginBase):
+        model = GalleryPlugin
+        name = _("Gallery")
+        render_template = "gallery/gallery.html"
 
-		def render(self, context, instance, placeholder):
-			context.update({
-				'gallery':instance.gallery,
-				'object':instance,
-				'placeholder':placeholder
-			})
-			return context
+        def render(self, context, instance, placeholder):
+            context.update({
+                'gallery':instance.gallery,
+                'object':instance,
+                'placeholder':placeholder
+            })
+            return context
 
-	plugin_pool.register_plugin(CMSGalleryPlugin)
+    plugin_pool.register_plugin(CMSGalleryPlugin)
 
 
 CMSPluginBase itself inherits from ModelAdmin so you can use all the things
@@ -159,23 +159,23 @@ Template
 Now create a gallery.html template in ``templates/gallery/`` and write the
 following in there::
 
-	{% for image in gallery.picture_set.all %}
-		<img src="{{ image.image.url }}" alt="{{ image.description }}" />
-	{% endfor %}
+    {% for image in gallery.picture_set.all %}
+        <img src="{{ image.image.url }}" alt="{{ image.description }}" />
+    {% endfor %}
 
 Add a file ``admin.py`` in your plugin root-folder and insert the following::
 
-	from django.contrib import admin
-	from cms.admin.placeholderadmin import PlaceholderAdmin
-	from models import Gallery,Picture
+    from django.contrib import admin
+    from cms.admin.placeholderadmin import PlaceholderAdmin
+    from models import Gallery,Picture
 
-	class PictureInline(admin.StackedInline):
-		model = Picture
+    class PictureInline(admin.StackedInline):
+        model = Picture
 
-	class GalleryAdmin(admin.ModelAdmin):
-		inlines = [PictureInline]
+    class GalleryAdmin(admin.ModelAdmin):
+        inlines = [PictureInline]
 
-	admin.site.register(Gallery, GalleryAdmin)
+    admin.site.register(Gallery, GalleryAdmin)
 
 
 Now go into the admin create a gallery and afterwards go into a page and add a
@@ -189,26 +189,26 @@ You can limit in which placeholder certain plugins can appear. Add a
 
 Example::
 
-	CMS_PLACEHOLDER_CONF = {
-	    'col_sidebar': {
-        	'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
-        	'name': gettext("sidebar column")
-    	},                    
-                        
-    	'col_left': {
-	        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','CMSTextWithTitlePlugin','CMSGalleryPlugin'),
-        	'name': gettext("left column")
-    	},                  
-                        
-    	'col_right': {
-	        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
-        	'name': gettext("right column")
-    	},
-	}
+    CMS_PLACEHOLDER_CONF = {
+        'col_sidebar': {
+            'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+            'name': gettext("sidebar column")
+        },
+
+        'col_left': {
+            'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','CMSTextWithTitlePlugin','CMSGalleryPlugin'),
+            'name': gettext("left column")
+        },
+
+        'col_right': {
+            'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+            'name': gettext("right column")
+        },
+    }
 
 "**col_left**" and "**col_right**" are the names of two placeholders. The plugins list are filled with
 Plugin class names you find in the ``cms_plugins.py``. You can add extra context to each placeholder so
-plugin-templates can react to them. 
+plugin-templates can react to them.
 
 You can change the displayed name in the admin with the **name** parameter. In combination with gettext
 you can translate this names according to the language of the user. Additionally you can limit the number
@@ -267,7 +267,7 @@ Example::
 Plugin Processors
 *****************
 
-Plugin processors are callables that modify all plugin's output after rendering. 
+Plugin processors are callables that modify all plugin's output after rendering.
 They are enabled using
 the ``CMS_PLUGIN_PROCESSORS`` setting.
 

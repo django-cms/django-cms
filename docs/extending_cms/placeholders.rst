@@ -20,14 +20,14 @@ Quickstart
 
 You need to define a ``PlaceholderField`` on the model you would like to use::
 
-	from django.db import models
-	from cms.models.fields import PlaceholderField
-	
-	class MyModel(models.Model):
-		# your fields
-		my_placeholder = PlaceholderField('placeholder_name')
-		# your methods
-		
+    from django.db import models
+    from cms.models.fields import PlaceholderField
+
+    class MyModel(models.Model):
+        # your fields
+        my_placeholder = PlaceholderField('placeholder_name')
+        # your methods
+
 The ``PlaceholderField`` takes a string as first argument which will be used to
 configure which plugins can be used in this placeholder. The configuration is
 the same as for placeholders in the CMS.
@@ -36,19 +36,19 @@ If you install this model in the admin application, you have to use
 ``PlaceholderAdmin`` instead of ``ModelAdmin`` so the interface renders
 correctly::
 
-	from django.contrib import admin
-	from cms.admin.placeholderadmin import PlaceholderAdmin
-	from myapp import MyModel
-	
-	admin.site.register(MyModel, PlaceholderAdmin)
-	
+    from django.contrib import admin
+    from cms.admin.placeholderadmin import PlaceholderAdmin
+    from myapp import MyModel
+
+    admin.site.register(MyModel, PlaceholderAdmin)
+
 Now to render the placeholder in a template you use the ``render_placeholder``
 tag from the ``placeholder_tags`` template tag library::
 
-	{% load placeholder_tags %}
-	
-	{% render_placeholder mymodel_instance.my_placeholder "640" %}
-	
+    {% load placeholder_tags %}
+
+    {% render_placeholder mymodel_instance.my_placeholder "640" %}
+
 The ``render_placeholder`` tag takes a ``PlaceholderField`` instance as first
 argument and optionally accepts a width parameter as second argument for context
 sensitive plugins. 

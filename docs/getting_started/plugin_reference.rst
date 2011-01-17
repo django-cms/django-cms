@@ -12,11 +12,11 @@ extension.
 For installation be sure you have the following in the ``INSTALLED_APPS`` setting
 in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.file',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.file',
+        # ...
+    )
 
 
 *****
@@ -28,11 +28,11 @@ Allows you to upload and display a Flash SWF file on your page.
 For installation be sure you have the following in the ``INSTALLED_APPS``
 setting in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.flash',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.flash',
+        # ...
+    )
 
 
 *********
@@ -44,11 +44,11 @@ Displays a map of an address on your page.
 For installation be sure you have the following in the ``INSTALLED_APPS``
 setting in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.googlemap',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.googlemap',
+        # ...
+    )
 
 The Google Maps API key is also required. You can either put this in a project
 setting called ``GOOGLE_MAPS_API_KEY`` or be sure the template context has a
@@ -65,11 +65,11 @@ will still be correct.
 For installation be sure to have the following in the ``INSTALLED_APPS``
 setting in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.link',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.link',
+        # ...
+    )
 
 
 *******
@@ -81,11 +81,11 @@ Displays a picture in a page.
 For installation be sure you have the following in the ``INSTALLED_APPS``
 setting in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.picture',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.picture',
+        # ...
+    )
 
 If you want to resize the picture you can get a thumbnail library. We
 recommend `sorl.thumbnail <http://code.google.com/p/sorl-thumbnail/>`_.
@@ -94,19 +94,19 @@ In your project template directory create a folder called ``cms/plugins`` and
 create a file called ``picture.html`` in there. Here is an example
 ``picture.html`` template::
 
-	{% load i18n thumbnail %}
-	{% spaceless %}
+    {% load i18n thumbnail %}
+    {% spaceless %}
 
-	{% if picture.url %}<a href="{{ picture.url }}">{% endif %}
-	{% ifequal placeholder "content" %}
-		<img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
-	{% endifequal %}
-	{% ifequal placeholder "teaser" %}
-		<img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
-	{% endifequal %}
-	{% if picture.url %}</a>{% endif %}
+    {% if picture.url %}<a href="{{ picture.url }}">{% endif %}
+    {% ifequal placeholder "content" %}
+        <img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
+    {% endifequal %}
+    {% ifequal placeholder "teaser" %}
+        <img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
+    {% endifequal %}
+    {% if picture.url %}</a>{% endif %}
 
-	{% endspaceless %}
+    {% endspaceless %}
 
 In this template the picture is scaled differently based on which placeholder
 it was placed in.
@@ -121,11 +121,11 @@ Just renders some HTML snippet. Mostly used for development or hackery.
 For installation be sure you have the following in the ``INSTALLED_APPS``
 setting in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.snippet',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.snippet',
+        # ...
+    )
 
 
 ******
@@ -138,11 +138,11 @@ can be added.
 For installation be sure you have the following in the ``INSTALLED_APPS``
 settings in your project's ``settings.py`` file::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.teaser',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.teaser',
+        # ...
+    )
 
 
 ****
@@ -164,16 +164,16 @@ use TinyMce you need to install `django-tinymce
 installed but don't want to use it in the cms put the following in your
 ``settings.py``::
 
-	CMS_USE_TINYMCE = False
+    CMS_USE_TINYMCE = False
 
 For installation be sure you have the following in your project's
 ``INSTALLED_APPS`` setting::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.text',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.text',
+        # ...
+    )
 
 
 *****
@@ -186,11 +186,11 @@ Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 
 For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.video',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.video',
+        # ...
+    )
 
 There are some settings you can set in your settings.py to overwrite some
 default behavior:
@@ -221,11 +221,11 @@ Displays the last number of post of a twitter user.
 For installation be sure you have the following in your project's
 ``INSTALLED_APPS`` setting::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.twitter',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.twitter',
+        # ...
+    )
 
 
 *******
@@ -238,11 +238,11 @@ always the same plugins on a lot of pages.
 For installation be sure you have the following in your project's
 ``INSTALLED_APPS`` setting::
 
-	INSTALLED_APPS = (
-		# ...
-		'cms.plugins.inherit',
-		# ...
-	)
+    INSTALLED_APPS = (
+        # ...
+        'cms.plugins.inherit',
+        # ...
+    )
 
 .. warning:: The inherit plugin is currently the only core-plugin which can
-			 **not** be used in non-cms placeholders.
+             **not** be used in non-cms placeholders.

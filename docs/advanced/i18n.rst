@@ -11,8 +11,8 @@ The multilingual URL middleware adds a language prefix to every URL.
 
 Example::
 
-	/de/account/login/
-	/fr/account/login/
+    /de/account/login/
+    /fr/account/login/
 
 It also adds this prefix automatically to every ``href`` and ``form`` tag.
 To install it, include
@@ -31,8 +31,8 @@ Example:
 
 .. code-block:: html+django
 
-	{% load menu_tags %}
-	{% language_chooser "myapp/language_chooser.html" %}
+    {% load menu_tags %}
+    {% language_chooser "myapp/language_chooser.html" %}
 
 If the current URL is not handled by the CMS and you have some i18n slugs in the
 URL you may use the ``set_language_changer`` function in the view that handles
@@ -41,24 +41,24 @@ the current URL.
 In the models of the current object add an optional language parameter to the
 ``get_absolute_url`` function::
 
-	from django.utils.translation import get_language
-	
-	def get_absolute_url(self, language=None):
-		if not language:
-			language = get_language()
-		reverse("product_view", args=[self.get_slug(language=language)])
+    from django.utils.translation import get_language
+
+    def get_absolute_url(self, language=None):
+        if not language:
+            language = get_language()
+        reverse("product_view", args=[self.get_slug(language=language)])
 
 
 In the view pass the ``get_absolute_url`` function to the
 ``set_language_chooser`` function::
 
-	from cms.utils import set_language_changer
-	
-	def get_product(request, slug):
-		item = get_object_or_404(Product, slug=slug, published=True)
-		set_language_changer(request, item.get_absolute_url)
-		# ...
-	
+    from cms.utils import set_language_changer
+
+    def get_product(request, slug):
+        item = get_object_or_404(Product, slug=slug, published=True)
+        set_language_changer(request, item.get_absolute_url)
+        # ...
+
 This allows the language chooser to have another URL then the current one.
 If the current URL is not handled by the CMS and no ``set_language_changer``
 function is provided it will take the exact same URL as the current one and
@@ -76,9 +76,9 @@ This template_tag returns the URL of the current page in another language.
 
 Example::
 
-	{% page_language_url "de" %}
-	
-	
+    {% page_language_url "de" %}
+
+
 *********************
 CMS_HIDE_UNTRANSLATED
 *********************
