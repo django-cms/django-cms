@@ -1,18 +1,22 @@
 {% load i18n %}
-<style type="text/css">    
-    @import "{{ CMS_MEDIA_URL }}css/toolbar.css";
-    @import "{{ CMS_MEDIA_URL }}css/jquery.dialog.css";
-</style>
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript" src="{{ MEDIA_URL }}admin/js/jquery.min.js"></script>
+<script type="text/javascript">
     //<![CDATA[
     // When jQuery is sourced, it's going to overwrite whatever might be in the
     // '$' variable, so store a reference of it in a temporary variable...
     var _$ = window.$;
-    if (typeof jQuery == 'undefined') {
-        var jquery_url = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';
-        document.write(unescape('%3Cscript src="' + jquery_url + '" type="text/javascript"%3E%3C/script%3E'));
-    }
-    //]]>
+    // add stylesheets to head
+    (function ($) {
+		$('<link>').appendTo('head').attr({
+			rel: 'stylesheet', type: 'text/css',
+			href: '{{ CMS_MEDIA_URL }}css/toolbar.css'
+		});
+		$('<link>').appendTo('head').attr({
+			rel: 'stylesheet', type: 'text/css',
+			href: '{{ CMS_MEDIA_URL }}css/jquery.dialog.css'
+		});
+	})(jQuery);
+	//]]>
 </script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.cookie.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
@@ -20,7 +24,7 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.pack.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script> 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
     //<![CDATA[
     // dynamic variables for the toolbar js file
     var placeholder_data = {{ placeholder_data }};
@@ -205,13 +209,15 @@
                 <!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
                 <li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
                 {% endif %}
-                {% endif %}            
+                {% endif %}
             </ul>
         </div>
         {% if auth %}
         <form method="post" action="" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
+            <fieldset>
             <input type="submit" name="logout_submit" value="{% trans "Logout" %}" class="cms_submit" />
             <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
+            </fieldset>
         </form>
         {% endif %}
         <a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
@@ -240,7 +246,7 @@
     <div id="dialog" title="Approve dialog">
         <p>This page must be moderated at level 0, post a message for moderator.</p>
         <div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
-        <div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">Request approval</label></div>
+        <div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_state">Request approval</label></div>
     </div>
 
 </div>
