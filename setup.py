@@ -40,7 +40,7 @@ setup(
     name='django-cms',
     version=cms.__version__,
     description='An Advanced Django CMS',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     url='http://www.django-cms.org/',
     license='BSD License',
     platforms=['OS Independent'],

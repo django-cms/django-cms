@@ -1,6 +1,6 @@
 include AUTHORS
 include LICENSE
-include README.md
+include README.rst
 include CHANGELOG.txt
 recursive-include cms/locale *
 recursive-include cms/templates *
