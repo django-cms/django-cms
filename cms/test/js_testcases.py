@@ -18,10 +18,9 @@ class BaseJavascriptTestCase(unittest.TestCase):
         return os.path.join(MEDIADIR, *bits)
     
     def _run_javascript(self, files, snippet):
-        code = ""
+        ctx = self._get_context()
         for filename in files:
             with open(filename, 'r') as fobj:
-                code += fobj.read()
-        code += snippet
-        ctx = self._get_context()
-        return ctx.execute(code)
+                lib = fobj.read()
+                ctx.execute(lib)
+        return ctx.execute(snippet)
