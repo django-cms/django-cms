@@ -113,9 +113,9 @@ Or, suppose you have a placeholder called ``teaser`` on a page that, unless a
 content editor has filled it with content specific to the current page, should
 inherit the content of its root-level ancestor::
 
-    {% placeholderor "teaser" %}
+    {% placeholder "teaser" or %}
         {% show_placeholder "teaser" request.current_page.get_root %}
-    {% endplaceholderor %}
+    {% endplaceholder %}
 
 
 *************************
