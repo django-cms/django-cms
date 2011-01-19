@@ -22,7 +22,7 @@ show_menu
 *********
 
 ``{% show_menu %}`` renders the navigation of the current page.
-You can overwrite the appearance and the HTML if you add a ``cms/menu.html``
+You can overwrite the appearance and the HTML if you add a ``menu/menu.html``
 template to your project or edit the one provided with django-cms.
 ``show_menu`` takes four optional parameters: ``start_level``, ``end_level``,
 ``extra_inactive``, and ``extra_active``.
@@ -97,7 +97,7 @@ show_sub_menu
 
 Display the sub menu of the current page (as a nested list).
 Takes one argument that specifies how many levels deep should the submenu be
-displayed. The template can be found at ``cms/sub_menu.html``::
+displayed. The template can be found at ``menu/sub_menu.html``::
 
     <ul>
         {% show_sub_menu 1 %}
@@ -115,7 +115,7 @@ show_breadcrumb
 ***************
 
 Show the breadcrumb navigation of the current page.
-The template for the HTML can be found at ``cms/breadcrumb.html``.::
+The template for the HTML can be found at ``menu/breadcrumb.html``.::
 
     {% show_breadcrumb %}
 
