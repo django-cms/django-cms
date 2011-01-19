@@ -1,8 +1,3 @@
-'''
-Created on Jan 4, 2011
-
-@author: Christopher Glass <christopher.glass@divio.ch>
-'''
 from __future__ import with_statement
 from cms.admin import forms
 from cms.admin.forms import PageUserForm
