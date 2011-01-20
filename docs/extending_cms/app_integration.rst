@@ -65,7 +65,7 @@ A NavigationNode takes the following arguments:
 
 - id
 
-  a unique id for this menu
+  A unique id for this menu.
 
 - parent_id=None
 
