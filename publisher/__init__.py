@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from mptt_support import Mptt
 from manager import PublisherManager

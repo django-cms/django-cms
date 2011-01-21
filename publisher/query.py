@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db.models.query import QuerySet
 
 class PublisherQuerySet(QuerySet):
