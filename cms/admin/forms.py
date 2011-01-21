@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, \

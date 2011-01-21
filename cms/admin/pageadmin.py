@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm

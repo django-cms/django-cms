@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.forms.models import BaseInlineFormSet
 
 class BaseInlineFormSetWithQuerySet(BaseInlineFormSet):

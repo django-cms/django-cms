@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
 from cms.models import Title, Page, PageModerator
 from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
     MASK_DESCENDANTS, PageModeratorState
-from cms.utils import get_language_from_request
 from cms.utils.permissions import get_user_sites_queryset
 from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \

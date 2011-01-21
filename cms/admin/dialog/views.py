@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.admin.dialog.forms import PermissionAndModeratorForm, PermissionForm, ModeratorForm
 from cms.models import Page
 from django.conf import settings

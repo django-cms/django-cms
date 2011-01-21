@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
