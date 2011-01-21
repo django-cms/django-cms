@@ -18,6 +18,8 @@ from django.utils.translation import ugettext as _
 HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
 def inster_after_tag(string, tag, insertion):
+    if string == None:
+        return string
     no_case = string.lower()
     index = no_case.find("<%s" % tag.lower())
     if index > -1:
