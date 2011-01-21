@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from patch import pre_patch, post_patch, post_patch_check
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.utils.i18n import get_default_language
 from django.conf import settings
 from django.core.urlresolvers import reverse

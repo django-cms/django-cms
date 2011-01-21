@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class LazyPage(object):
     def __get__(self, request, obj_type=None):
         from cms.utils.page_resolver import get_page_from_request

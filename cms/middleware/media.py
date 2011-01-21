@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.middleware.toolbar import HTML_TYPES
 from cms.utils.urlutils import is_media_request
 from django.forms.widgets import Media

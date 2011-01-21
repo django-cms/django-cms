@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.cache import cache
 from django.db.models.signals import post_save, post_delete
 from django.utils.safestring import mark_safe
