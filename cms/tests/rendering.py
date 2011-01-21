@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.conf import settings
-from django.template import Template, RequestContext
-from django.contrib.auth.models import User
-from cms.test.testcases import CMSTestCase
-from cms.models import Page, Title, CMSPlugin
-from cms.test.util.context_managers import SettingsOverride
-from django.contrib.sites.models import Site
-from cms.plugins.text.models import Text
-from cms.plugin_rendering import render_plugins, PluginContext
 from cms import plugin_rendering
+from cms.models import Page, Title, CMSPlugin
+from cms.plugin_rendering import render_plugins, PluginContext
+from cms.plugins.text.models import Text
+from cms.test.testcases import CMSTestCase
+from cms.test.util.context_managers import SettingsOverride
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.forms.widgets import Media
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
+from django.template import Template, RequestContext
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -257,4 +257,32 @@ class RenderingTestCase(CMSTestCase):
             except Http404:
                 raised = True
             self.assertTrue(raised)
+
+    def test_11_detail_view_fallsback_language(self):
+        '''
+        Ask for a page in elvish (doesn't exist), and assert that it fallsback
+        to English
+        '''
+        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
+                              CMS_LANGUAGE_FALLBACK=True,
+                              CMS_DBGETTEXT=False, 
+                              CMS_LANGUAGE_CONF={
+                                  'elvish': ['klingon', 'en',]
+                              },
+                              CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
+                                          ( 'elvish', 'Elvish' )
+                              ]):
+            from cms.views import details
+            class Mock:
+                pass
+            request = Mock()
+            setattr(request, 'REQUEST',{'language':'elvish'})
+            setattr(request, 'GET',[])
+            setattr(request, 'session',{})
+            setattr(request, 'path','/')
+            setattr(request, 'user',self.user)
+            setattr(request, 'current_page',None)
+
+            response = details(request, slug=self.test_page.get_slug())
+            self.assertTrue(isinstance(response,HttpResponseRedirect))
 
