@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from cms.models import Page

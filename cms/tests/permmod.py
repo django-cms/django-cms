@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import ACCESS_DESCENDANTS
 from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE

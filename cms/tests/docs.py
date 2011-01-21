@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.test.testcases import CMSTestCase
 from cms.test.util.context_managers import TemporaryDirectory

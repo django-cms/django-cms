@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.admin.forms import save_permissions
 from cms.models import Title, Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS

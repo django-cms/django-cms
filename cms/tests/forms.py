@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.admin import forms
 from cms.admin.forms import PageUserForm

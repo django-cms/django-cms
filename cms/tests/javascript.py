@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.test.js_testcases import BaseJavascriptTestCase
 
 
