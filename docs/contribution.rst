@@ -49,7 +49,7 @@ If you're interested in developing a new feature for the cms, it is recommended
 that you first discuss it on the `django-cms-developers`_  mailing list so as
 not to do any work that will not get merged in anyway.
 
-- Code will be reviewed and tested by at least one core developper, preferably
+- Code will be reviewed and tested by at least one core developer, preferably
   by several. Other community members are welcome to give feedback.
 - Code *must* be tested. Your pull request should include unit-tests (that cover
   the piece of code you're submitting, obviously)
@@ -61,7 +61,7 @@ not to do any work that will not get merged in anyway.
 Since we're hosted on github, django-cms uses git as a version control system.
 
 The `Github help`_ is very well written and will get you started on using git
-and github in a jiffy. It is an invaluable ressource for newbies and old timers
+and github in a jiffy. It is an invaluable resource for newbies and old timers
 alike.
 
 
@@ -136,16 +136,16 @@ correctness.
 Documentation should be:
 
 - We use `Sphinx`_/restructuredText. So obviously this is the format you should
-  use :) File extentions should be .rst.
+  use :) File extensions should be .rst.
 - Written in English. We can discuss how it would bring more people to the
   project to have a Klingon translation or anything, but that's a problem we
   will ask ourselves when we already have a good documentation in English.
-- Accessible. You should assume the reader to be moderately familliar with
+- Accessible. You should assume the reader to be moderately familiar with
   Python and Django, but not anything else. Link to documentation of libraries
   you use, for example, even if they are "obvious" to you (South is the first
   example that comes to mind - it's obvious to any Django programmer, but not to
   any newbie at all).
-  A brief description of wht it does is also welcome. 
+  A brief description of what it does is also welcome. 
 
 Pulling of documentation is pretty fast and painless. Usually somebody goes over
 your text and merges it, since there are no "breaks" and that github parses rst
