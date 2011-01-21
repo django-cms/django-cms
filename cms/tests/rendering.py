@@ -11,6 +11,7 @@ from cms.plugins.text.models import Text
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms import plugin_rendering
 from django.forms.widgets import Media
+from django.http import Http404
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -233,4 +234,27 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t)
         self.test_page = self.old_test_page
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|'+self.test_data3['text_sub'])
+        
+    def test_10_detail_view_404_when_no_language_is_found(self):
+        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
+                              CMS_LANGUAGE_FALLBACK=True,
+                              CMS_DBGETTEXT=False, 
+                              CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
+                                          ( 'elvish', 'Elvish' )]):
+            from cms.views import details
+            class Mock:
+                pass
+            request = Mock()
+            setattr(request, 'REQUEST',{'language':'elvish'})
+            setattr(request, 'GET',[])
+            setattr(request, 'session',{})
+            setattr(request, 'path','')
+            setattr(request, 'user',self.user)
+            setattr(request, 'current_page',None)
+            raised = False
+            try:
+                details(request, slug=self.test_page.get_slug())
+            except Http404:
+                raised = True
+            self.assertTrue(raised)
 
