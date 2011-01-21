@@ -19,6 +19,7 @@ from cms.tests.multilingual import MultilingualTestCase
 from cms.tests.mail import MailTestCase
 from cms.tests.settings import SettingsTests
 from cms.tests.forms import FormsTestCase
+from cms.tests.middleware import MiddlewareTestCase
 try:
     from cms.tests.javascript import JavascriptTestCase
 except ImportError:
@@ -26,3 +27,4 @@ except ImportError:
     import traceback
     exc = traceback.format_exc()
     warnings.warn("JavascriptTestCase cannot be run: %s" % exc)
+    
