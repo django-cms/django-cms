@@ -27,7 +27,7 @@ to your urlpatterns.
 Django.contrib.sitemaps
 ***********************
 
-More information about ``djangot.contrib.sitemaps`` can be found in the official
+More information about ``django.contrib.sitemaps`` can be found in the official
 `Django documentation <http://docs.djangoproject.com/en/dev/ref/contrib/sitemaps/>`_.
 
  
