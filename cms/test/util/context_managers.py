@@ -15,18 +15,24 @@ class SettingsOverride(object):
         with SettingsOverride(DEBUG=True):
             # do something
     """
+    class DoesNotExist:
+        pass
+    
     def __init__(self, **overrides):
         self.overrides = overrides
         
     def __enter__(self):
         self.old = {}
         for key, value in self.overrides.items():
-            self.old[key] = getattr(settings, key)
+            self.old[key] = getattr(settings, key, self.DoesNotExist)
             setattr(settings, key, value)
         
     def __exit__(self, type, value, traceback):
         for key, value in self.old.items():
-            setattr(settings, key, value)
+            if value is not self.DoesNotExist:
+                setattr(settings, key, value)
+            else:
+                del settings[key] # do not pollute the context!
 
 
 class StdoutOverride(object):
