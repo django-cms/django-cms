@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db.models import signals
 from django.conf import settings
 from cms.models import Page, Title, CMSPlugin

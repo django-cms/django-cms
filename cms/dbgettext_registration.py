@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from dbgettext.registry import registry, Options
 from models import Page
 from django.conf import settings

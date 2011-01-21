@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import reversion_register

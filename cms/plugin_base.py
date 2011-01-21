@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models import CMSPlugin
 from cms.exceptions import SubClassNeededError
 from django.conf import settings

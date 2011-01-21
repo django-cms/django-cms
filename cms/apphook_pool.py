@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import AppAllreadyRegistered
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured

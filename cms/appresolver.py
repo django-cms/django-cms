@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoHomeFound
 from django.conf import settings

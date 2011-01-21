@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms import settings
 from cms.models.placeholdermodel import Placeholder
 from cms.utils import get_language_from_request

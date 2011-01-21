@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from menus.menu_pool import menu_pool
 from menus.base import Menu, NavigationNode, Modifier
 from cms.utils import get_language_from_request
