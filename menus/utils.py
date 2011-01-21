@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models.titlemodels import Title
 from django.conf import settings
 
