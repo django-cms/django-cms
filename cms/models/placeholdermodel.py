@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import PlaceholderNoAction
 from django.db import models

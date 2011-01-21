@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, PluginRenderer

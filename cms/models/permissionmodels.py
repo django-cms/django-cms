@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models.managers import BasicPagePermissionManager, \
     PagePermissionManager
 from cms.models.moderatormodels import ACCESS_CHOICES, \

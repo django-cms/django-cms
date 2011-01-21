@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings as d_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import get_resolver, get_script_prefix, \

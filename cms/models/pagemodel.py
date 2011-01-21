@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass

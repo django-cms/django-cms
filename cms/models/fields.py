@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.forms.fields import PageSelectFormField, PlaceholderFormField
 from cms.forms.widgets import PlaceholderPluginEditorWidget
 from cms.models.pagemodel import Page
