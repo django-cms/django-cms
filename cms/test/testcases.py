@@ -18,7 +18,6 @@ from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool
 from urlparse import urlparse
-import copy
 import sys
 import urllib
 import warnings

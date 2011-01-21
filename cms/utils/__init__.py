@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from cms.utils.i18n import get_default_language
 from django.conf import settings

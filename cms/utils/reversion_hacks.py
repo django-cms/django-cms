@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import reversion
 from reversion.revisions import RegistrationError, RegistrationInfo
 from reversion.storage import VersionFileStorageWrapper

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django import template
 from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder

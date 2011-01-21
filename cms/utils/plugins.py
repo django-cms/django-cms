@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
 from cms.templatetags.cms_tags import Placeholder

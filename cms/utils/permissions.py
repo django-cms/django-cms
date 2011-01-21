@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _

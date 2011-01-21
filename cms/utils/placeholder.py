@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from django.db.models.query_utils import Q

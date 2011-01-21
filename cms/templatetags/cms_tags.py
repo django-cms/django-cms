@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag

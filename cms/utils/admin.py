@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
 from django.conf import settings
 from cms.utils.moderator import page_moderator_state, I_APPROVE

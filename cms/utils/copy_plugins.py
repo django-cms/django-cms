@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def copy_plugins_to(plugin_list, to_placeholder, to_language = None):
     """
     Copies a list of plugins to a placeholder to a language.

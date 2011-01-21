@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
 from cms.utils.moderator import get_page_queryset
