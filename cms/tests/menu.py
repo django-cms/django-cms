@@ -36,7 +36,6 @@ class MenusTestCase(CMSTestCase):
             self.old_menu = menu_pool.menus
             menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu']}
             menu_pool.clear(settings.SITE_ID)
-            self.create_some_nodes()
         
     def tearDown(self):
         menu_pool.menus = self.old_menu
@@ -73,6 +72,7 @@ class MenusTestCase(CMSTestCase):
             self.level2_pages = [self.page3]
             
     def test_01_basic_cms_menu(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
     
             self.assertEqual(len(menu_pool.menus), 1)
@@ -86,6 +86,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes), len(self.all_pages))
         
     def test_02_show_menu(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):            
             context = self.get_context()
             # test standard show_menu 
@@ -104,6 +105,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(nodes[1].selected, False)
     
     def test_03_only_active_tree(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
     
             context = self.get_context()
@@ -122,6 +124,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes[0].children), 0)
         
     def test_04_only_one_active_level(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             context = self.get_context()
             # test standard show_menu 
@@ -133,6 +136,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes[0].children[0].children), 0)
         
     def test_05_only_level_zero(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             context = self.get_context()
             # test standard show_menu 
@@ -144,6 +148,7 @@ class MenusTestCase(CMSTestCase):
         
     
     def test_06_only_level_one(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):    
             context = self.get_context()
             # test standard show_menu 
@@ -156,6 +161,7 @@ class MenusTestCase(CMSTestCase):
         
     
     def test_07_only_level_one_active(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             context = self.get_context()
             # test standard show_menu 
@@ -167,6 +173,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes[0].children), 0)
         
     def test_08_level_zero_and_one(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             context = self.get_context()
             # test standard show_menu 
@@ -178,6 +185,7 @@ class MenusTestCase(CMSTestCase):
                 self.assertEqual(len(node.children), 1)
             
     def test_09_show_submenu(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
 
             context = self.get_context()
@@ -196,6 +204,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes[0].children), 0)
         
     def test_10_show_breadcrumb(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
 
             context = self.get_context(path=self.page3.get_absolute_url())
@@ -231,6 +240,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
         
     def test_11_language_chooser(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
     
             # test simple language chooser with default args 
@@ -250,6 +260,7 @@ class MenusTestCase(CMSTestCase):
                 self.assertEqual(*lang)
                     
     def test_12_page_language_url(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
     
             path = self.page3.get_absolute_url()
@@ -259,6 +270,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(url, "/%s%s" % (settings.LANGUAGES[0][0], path))
             
     def test_13_show_menu_below_id(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
     
             page2 = Page.objects.get(pk=self.page2.pk)
@@ -282,6 +294,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(nodes[0].get_absolute_url(), self.page3.get_absolute_url())
                     
     def test_14_unpublished(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             page2 = Page.objects.get(pk=self.page2.pk)
             page2.published = False
@@ -294,6 +307,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes[0].children), 0)
         
     def test_15_home_not_in_menu(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
     
             page1 = Page.objects.get(pk=self.page1.pk)
@@ -321,7 +335,6 @@ class MenusTestCase(CMSTestCase):
         
     def test_16_empty_menu(self):
         with SettingsOverride(CMS_MODERATOR=False):
-            Page.objects.all().delete()
             context = self.get_context()
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context) 
@@ -329,6 +342,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes), 0)
         
     def test_17_softroot(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             page2 = Page.objects.get(pk=self.page2.pk)
             page2.soft_root = True
@@ -384,6 +398,7 @@ class MenusTestCase(CMSTestCase):
         When we render P6, there should be a menu entry for P7 and P8 if the
         tag parameters are "1 XXX XXX XXX"
         """
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             page6 = Page.objects.get(pk=self.page6.pk)
             context = self.get_context(page6.get_absolute_url())
@@ -407,6 +422,7 @@ class MenusTestCase(CMSTestCase):
             self.assertEqual(len(nodes), number_of_p7_children)
         
     def test_19_show_breadcrumb_invisible(self):
+        self.create_some_nodes()
         with SettingsOverride(CMS_MODERATOR=False):
             invisible_page = self.create_page(parent_page=self.page3, 
                                               published=True, 
@@ -531,3 +547,55 @@ class MenusTestCase(CMSTestCase):
         with SettingsOverride(CMS_MODERATOR=False):
             tree_nodes, flat_nodes = self._get_nodes()
             self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
+            
+    def test_26_softroot_mixed(self):
+        """
+        Tree (pages):
+            home
+                first
+                    firstchild1
+                        subchild
+                            subsubchild
+                    firstchild2
+                second
+                    secondchild1
+                    secondchild2
+        
+        Case 1:
+        current: first
+        
+        Case 2:
+        home: softroot
+        current: first
+        
+        show_menu 0 100 0 100
+        """
+        def _rec(a, b):
+            msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
+            self.assertEqual(len(a), len(b), msg)
+            for n1, n2 in zip(a,b):
+                msg = '%r != %r with %r, %r' % (n1.title, n2.title, n1, n2)
+                self.assertEqual(n1.title, n2.title, msg)
+                msg = '%r != %r with %r, %r' % (n1.level, n2.level, n1, n2)
+                self.assertEqual(n1.level, n2.level, msg)
+                _rec(n1.children, n2.children)
+        default = {'published': True, 'in_navigation': True}  
+        with SettingsOverride(CMS_MODERATOR=False):
+            home = self.create_page(title="home", soft_root=True, **default)
+            first = self.create_page(home, title="first", **default)
+            second = self.create_page(home, title="second", **default)
+            firstchild1 = self.create_page(first, title="firstchild1", **default)
+            self.create_page(first, title="firstchild2", **default)
+            self.create_page(second, title="secondchild1", **default)
+            self.create_page(second, title="secondchild2", **default)
+            subchild = self.create_page(firstchild1, title="subchild", **default)
+            self.create_page(subchild, title="subsubchild", **default)
+            context = self.get_context()
+            tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+            tpl.render(context) 
+            home_nodes = context['children']
+            context = self.get_context(first.get_absolute_url())
+            tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+            tpl.render(context) 
+            first_nodes = context['children']
+            _rec(home_nodes, first_nodes)
