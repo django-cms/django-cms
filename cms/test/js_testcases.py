@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.test.testcases import TestCase
 from spidermonkey import Runtime
 import os
-import unittest
 
 THISDIR = os.path.abspath(os.path.dirname(__file__))
 MEDIADIR = os.path.join(THISDIR, '../media/cms/')
 
-class BaseJavascriptTestCase(unittest.TestCase):
+class BaseJavascriptTestCase(TestCase):
     def _get_runtime(self):
         return Runtime()
     

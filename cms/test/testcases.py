@@ -5,7 +5,7 @@ from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, PageUser
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
-from cms.test.util.context_managers import UserLoginContext
+from cms.test.util.context_managers import UserLoginContext, SettingsOverride
 from cms.utils.permissions import _thread_locals
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -108,10 +108,18 @@ class CMSTestCase(TestCase):
     def print_page_structure(self, title=None):
         """Just a helper to see the page struct.
         """
-        print "-------------------------- %s --------------------------------" % (title or "page structure")
-        for page in Page.objects.drafts().order_by('tree_id', 'parent', 'lft'):
+        for page in Page.objects.drafts().order_by('tree_id', 'lft'):
             print "%s%s #%d" % ("    " * (page.level), page, page.id)
     
+    def print_node_structure(self, nodes, *extra):
+        def _rec(nodes, level=0):
+            ident = level * '    '
+            for node in nodes:
+                raw_attrs = [(bit, getattr(node, bit, "unknown")) for bit in extra]
+                attrs = ', '.join(['%r: %r' % data for data in raw_attrs])
+                print "%s%s: %s" % (ident, node.title, attrs)
+                _rec(node.children, level+1)
+        _rec(nodes)
     
     def assertObjectExist(self, qs, **filter):
         try:
@@ -448,3 +456,22 @@ class CMSTestCase(TestCase):
 
         return result
     assertWarns = failUnlessWarns
+
+
+class SettingsOverrideTestCase(CMSTestCase):
+    settings_overrides = {}
+    
+    def _pre_setup(self):
+        self._enter_settings_override()
+        super(SettingsOverrideTestCase, self)._pre_setup()
+        
+    def _enter_settings_override(self):
+        self._settings_ctx_manager = SettingsOverride(**self.settings_overrides)
+        self._settings_ctx_manager.__enter__()
+        
+    def _post_teardown(self):
+        super(SettingsOverrideTestCase, self)._post_teardown()
+        self._exit_settings_override()
+        
+    def _exit_settings_override(self):
+        self._settings_ctx_manager.__exit__(None, None, None)

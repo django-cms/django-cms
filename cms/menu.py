@@ -175,14 +175,14 @@ class SoftRootCutter(Modifier):
                 selected.parent = None
                 nodes = [selected] + nodes
             else:
-                nodes = self.find_ancestors(selected, nodes)
-            nodes = self.find_children(selected, nodes)
+                nodes = self.find_ancestors_and_remove_children(selected, nodes)
+            nodes = self.find_and_remove_children(selected, nodes)
         else:
             for node in root_nodes:
-                self.find_children(node, nodes)
+                self.find_and_remove_children(node, nodes)
         return nodes   
     
-    def find_children(self, node, nodes):
+    def find_and_remove_children(self, node, nodes):
         for n in node.children:
             if n.attr.get("soft_root", False):
                 self.remove_children(n, nodes)
@@ -194,7 +194,7 @@ class SoftRootCutter(Modifier):
             self.remove_children(n, nodes)
         node.children = []
     
-    def find_ancestors(self, node, nodes):
+    def find_ancestors_and_remove_children(self, node, nodes):
         is_root = False
         if node.parent:
             if node.parent.attr.get("soft_root", False):
@@ -203,14 +203,14 @@ class SoftRootCutter(Modifier):
                 node.parent.parent = None
                 nodes = [node.parent] + nodes
             else:
-                nodes = self.find_ancestors(node.parent, nodes)
+                nodes = self.find_ancestors_and_remove_children(node.parent, nodes)
         else:
             for n in nodes:
                 if n != node and not n.parent:
-                    self.find_children(n, nodes)
+                    self.find_and_remove_children(n, nodes)
         for n in node.children:
             if n != node:
-                self.find_children(n, nodes)
+                self.find_and_remove_children(n, nodes)
             if is_root:
                 n.parent = None
         return nodes
