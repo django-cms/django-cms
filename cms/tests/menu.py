@@ -3,6 +3,7 @@ from __future__ import with_statement
 from cms.menu import CMSMenu
 from cms.models import Page
 from cms.test.testcases import SettingsOverrideTestCase
+from cms.test.util.mock import AttributeObject
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import Template
@@ -531,6 +532,22 @@ class AdvancedSoftrootTests(BaseMenuTest):
     
     def get_page(self, name):
         return Page.objects.get(title_set__slug=name)
+    
+    def assertTreeQuality(self, a, b, *attrs):
+        """
+        Checks that the node-lists a and b are the same for attrs.
+        
+        This is recursive over the tree
+        """
+        msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
+        self.assertEqual(len(a), len(b), msg)
+        for n1, n2 in zip(a,b):
+            for attr in attrs:
+                a1 = getattr(n1, attr)
+                a2 = getattr(n2, attr)
+                msg = '%r != %r with %r, %r (%s)' % (a1, a2, n1, n2, attr)
+                self.assertEqual(a1, a2, msg)
+                self.assertTreeQuality(n1.children, n2.children)
             
     def test_01_top_not_in_nav(self):
         """
@@ -544,19 +561,6 @@ class AdvancedSoftrootTests(BaseMenuTest):
         
         expected result: the two node-trees should be equal
         """
-        def _rec(a, b):
-            """
-            Checks that the node-lists a and b are the same for title, level
-            and children.
-            """
-            msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
-            self.assertEqual(len(a), len(b), msg)
-            for n1, n2 in zip(a,b):
-                msg = '%r != %r with %r, %r' % (n1.title, n2.title, n1, n2)
-                self.assertEqual(n1.title, n2.title, msg)
-                msg = '%r != %r with %r, %r' % (n1.level, n2.level, n1, n2)
-                self.assertEqual(n1.level, n2.level, msg)
-                _rec(n1.children, n2.children)
         top = self.get_page('top')
         top.in_navigation = False
         top.save()
@@ -566,9 +570,6 @@ class AdvancedSoftrootTests(BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context) 
         hard_root = context['children']
-        print 'hard_root'
-        self.print_node_structure(hard_root, 'level')
-        print
         # root IS a soft root
         root = self.get_page('root')
         root.soft_root = True
@@ -578,10 +579,8 @@ class AdvancedSoftrootTests(BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context) 
         soft_root = context['children']
-        print 'soft_root'
-        self.print_node_structure(soft_root, 'level')
         # assert the two trees are equal in terms of 'level' and 'title'
-        _rec(hard_root, soft_root)
+        self.assertTreeQuality(hard_root, soft_root)
             
     def test_02_top_in_nav(self):
         """
@@ -617,9 +616,22 @@ class AdvancedSoftrootTests(BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context) 
         hard_root = context['children']
-        print 'hard_root'
-        self.print_node_structure(hard_root, 'level')
-        print
+        mock_tree = [
+            AttributeObject(title='top', level=0, children=[
+                AttributeObject(title='root', level=1, children=[
+                    AttributeObject(title='aaa', level=2, children=[
+                        AttributeObject(title='111', level=3, children=[
+                            AttributeObject(title='ccc', level=4, children=[
+                                AttributeObject(title='ddd', level=5, children=[])
+                            ])
+                        ]),
+                        AttributeObject(title='222', level=3, children=[])
+                    ]),
+                    AttributeObject(title='bbb', level=2, children=[])
+                ])
+            ])
+        ]
+        self.assertTreeQuality(hard_root, mock_tree)
         # root IS a soft root
         root = self.get_page('root')
         root.soft_root = True
@@ -629,5 +641,17 @@ class AdvancedSoftrootTests(BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context) 
         soft_root = context['children']
-        print 'soft_root'
-        self.print_node_structure(soft_root, 'level')
+        mock_tree = [
+            AttributeObject(title='root', level=0, children=[
+                AttributeObject(title='aaa', level=1, children=[
+                    AttributeObject(title='111', level=2, children=[
+                        AttributeObject(title='ccc', level=3, children=[
+                            AttributeObject(title='ddd', level=4, children=[])
+                        ])
+                    ]),
+                    AttributeObject(title='222', level=2, children=[])
+                ]),
+                AttributeObject(title='bbb', level=1, children=[])
+            ])
+        ]
+        self.assertTreeQuality(soft_root, mock_tree)

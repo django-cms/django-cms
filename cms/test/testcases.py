@@ -115,8 +115,8 @@ class CMSTestCase(TestCase):
         def _rec(nodes, level=0):
             ident = level * '    '
             for node in nodes:
-                raw_attrs = [(bit, getattr(node, bit, "unknown")) for bit in extra]
-                attrs = ', '.join(['%r: %r' % data for data in raw_attrs])
+                raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
+                attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
                 print "%s%s: %s" % (ident, node.title, attrs)
                 _rec(node.children, level+1)
         _rec(nodes)
