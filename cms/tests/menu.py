@@ -47,6 +47,18 @@ class BaseMenuTest(SettingsOverrideTestCase):
 
 
 class FixturesMenuTests(BaseMenuTest):
+    """
+    Tree from fixture:
+        
+        + P1
+        | + P2
+        |   + P3
+        + P4
+        | + P5
+        + P6 (not in menu)
+          + P7
+          + P8
+    """
     fixtures = ['menus.json']
     
     def get_page(self, num):
@@ -284,44 +296,87 @@ class FixturesMenuTests(BaseMenuTest):
         self.assertEqual(len(nodes), 2)
         
     def test_16_softroot(self):
+        """
+        What is a soft root?
+        
+            If a page is a soft root, it becomes the root page in the menu if
+            we are currently on or under that page.
+            
+            If we are above that page, the children of this page are not shown.
+
+        Tree from fixture:
+            
+            + P1
+            | + P2 <- SOFTROOT
+            |   + P3
+            + P4
+            | + P5
+            + P6 (not in menu)
+              + P7
+              + P8
+        """
         page2 = Page.objects.get(pk=self.get_page(2).pk)
         page2.soft_root = True
         page2.save()
+        # current page: P2
         context = self.get_context(path=page2.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context) 
         nodes = context['children']
+        """
+        Assert that the top level contains only ONE page (P2), not 2: P1 and P4!
+        """
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), page2.get_absolute_url())
+        # current page: P3
         page3 = Page.objects.get(pk=self.get_page(3).pk)
         context = self.get_context(path=page3.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context) 
         nodes = context['children']
+        """
+        Assert that the top level contains only ONE page (P2), not 2: P1 and P4!
+        """
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), page2.get_absolute_url())
         
+        # current page: P1
         page1 = Page.objects.get(pk=self.get_page(1).pk)
         context = self.get_context(path=page1.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context) 
         nodes = context['children']
+        """
+        Assert that we have two pages in root level: P1 and P4, because the
+        softroot is below this level.
+        """
         self.assertEqual(len(nodes), 2)
+        # check that the first page is P1
         self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
+        # check that we don't show the children of P2, which is a soft root!
         self.assertEqual(len(nodes[0].children[0].children), 0)
         
+        # current page: NO PAGE
         context = self.get_context(path="/no/real/path/")
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context) 
+        """
+        Check behavior is the same as on P1
+        """
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
         self.assertEqual(len(nodes[0].children[0].children), 0)
         
+        # current page: P5
         page5 = Page.objects.get(pk=self.get_page(5).pk)
         context = self.get_context(path=page5.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
+        """
+        Again, check the behavior is the same as on P1, because we're not under
+        a soft root! 
+        """
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
@@ -504,6 +559,13 @@ class AdvancedSoftrootTests(BaseMenuTest):
     
     In the fixture, all pages are "in_navigation", "published" and
     NOT-"soft_root".
+    
+    What is a soft root?
+    
+        If a page is a soft root, it becomes the root page in the menu if
+        we are currently on or under that page.
+        
+        If we are above that page, the children of this page are not shown.
     """
     
     def setUp(self):
@@ -547,7 +609,7 @@ class AdvancedSoftrootTests(BaseMenuTest):
                 a2 = getattr(n2, attr)
                 msg = '%r != %r with %r, %r (%s)' % (a1, a2, n1, n2, attr)
                 self.assertEqual(a1, a2, msg)
-                self.assertTreeQuality(n1.children, n2.children)
+            self.assertTreeQuality(n1.children, n2.children)
             
     def test_01_top_not_in_nav(self):
         """
@@ -580,7 +642,7 @@ class AdvancedSoftrootTests(BaseMenuTest):
         tpl.render(context) 
         soft_root = context['children']
         # assert the two trees are equal in terms of 'level' and 'title'
-        self.assertTreeQuality(hard_root, soft_root)
+        self.assertTreeQuality(hard_root, soft_root, 'level', 'title')
             
     def test_02_top_in_nav(self):
         """
@@ -654,4 +716,4 @@ class AdvancedSoftrootTests(BaseMenuTest):
                 AttributeObject(title='bbb', level=1, children=[])
             ])
         ]
-        self.assertTreeQuality(soft_root, mock_tree)
+        self.assertTreeQuality(soft_root, mock_tree, 'title', 'level')

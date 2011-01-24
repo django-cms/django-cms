@@ -67,3 +67,10 @@ class NavigationNode(object):
             nodes.append(node)
             nodes += node.get_descendants()
         return nodes
+
+    def get_ancestors(self):
+        nodes = []
+        if self.parent:
+            nodes.append(self.parent)
+            nodes += self.parent.get_ancestors()
+        return nodes
