@@ -19,6 +19,7 @@ from cms.tests.multilingual import MultilingualTestCase
 from cms.tests.mail import MailTestCase
 from cms.tests.settings import SettingsTests
 from cms.tests.forms import FormsTestCase
+from cms.tests.toolbar import ToolbarTests
 from cms.tests.middleware import MiddlewareTestCase
 try:
     from cms.tests.javascript import JavascriptTestCase

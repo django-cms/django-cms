@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.utils import simplejson
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
+from django.views.static import serve
 
 HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
@@ -39,6 +40,8 @@ class ToolbarMiddleware(object):
     """
 
     def show_toolbar(self, request, response):
+        if getattr(request, 'view_func', None) is serve:
+            return False
         if request.is_ajax():
             return False
         if response.status_code != 200:
@@ -75,6 +78,9 @@ class ToolbarMiddleware(object):
                 request.session['cms_edit'] = False
             if "edit" in request.GET:
                 request.session['cms_edit'] = True
+                
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        request.view_func = view_func
 
     def process_response(self, request, response):
         if self.show_toolbar(request, response):
