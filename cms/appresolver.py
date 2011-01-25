@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoHomeFound
+from cms.utils.moderator import get_page_queryset
+
 from django.conf import settings
 from django.conf.urls.defaults import patterns
 from django.contrib.sites.models import Site
@@ -12,13 +14,13 @@ from django.utils.importlib import import_module
 APP_RESOLVERS = []
 
 def clear_app_resolvers():
+    global APP_RESOLVERS
     APP_RESOLVERS = []
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application. 
     Applications have higher priority than other cms pages. 
     """
-    from cms.utils.moderator import get_page_queryset
     if current_page:
         return current_page
     if path is None:
