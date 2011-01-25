@@ -2,6 +2,7 @@
 from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
 from cms.utils.moderator import get_page_queryset
+from cms.appresolver import applications_page_check
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -113,6 +114,13 @@ def get_page_from_request(request, use_path=None):
     try:
         page = pages.filter(q).distinct().get()
     except Page.DoesNotExist:
-        return None
-    request._current_page_cache = page
+        page = None
+        
+    if not page:
+        # if this is in a apphook
+        # find the page the apphook is attached to
+        page = applications_page_check(request, path=path)
+        
+    if page:
+        request._current_page_cache = page
     return page
