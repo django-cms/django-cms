@@ -436,8 +436,14 @@ CMS_CONTENT_CACHE_DURATION
 
 Default: ``60``
 
-Defines how long page content should be cached, in seconds, including navigation and admin
-menu.
+Cache expiration (in seconds) for ``show_placeholder`` and ``page_url`` template tags.
+
+MENU_CACHE_DURATION
+===================
+
+Default: ``3600``
+
+Cache expiration (in seconds) for the menu tree.
 
 CMS_CACHE_PREFIX
 ================
