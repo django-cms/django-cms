@@ -28,7 +28,7 @@ def applications_page_check(request, current_page=None, path=None):
     # check if application resolver can resolve this
     for resolver in APP_RESOLVERS:
         try:
-            page_id = resolver.resolve_page_id(path+'/')
+            page_id = resolver.resolve_page_id(path)
             # yes, it is application page
             page = get_page_queryset(request).get(id=page_id)
             # If current page was matched, then we have some override for content
