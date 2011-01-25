@@ -97,10 +97,6 @@ class ApphooksTestCase(CMSTestCase):
             self.create_title(child_child_page.get_title(), child_child_page.get_slug(), 'de', child_child_page)
             child_child_page.title_set.all().update(application_urls='SampleApp')
             
-            page.publish()
-            child_page = self.reload(child_page)
-            child_page.publish()
-            child_child_page = self.reload(child_child_page)
             child_child_page.publish()
             
             en_title = child_child_page.get_title('en')
