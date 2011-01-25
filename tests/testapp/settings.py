@@ -159,6 +159,11 @@ CMS_PLACEHOLDER_CONF = {
                     'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("right column")
     },
+    'extra_context': {
+        "plugins": ('TextPlugin',),
+        "extra_context": {"width": 250},
+        "name": "extra context"
+    },
 }
 
 CMS_SOFTROOT = True

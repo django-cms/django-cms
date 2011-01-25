@@ -5,13 +5,14 @@ from cms.models import Page, Title, CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms.plugins.text.models import Text
 from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.test.util.context_managers import SettingsOverride, ChangeModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.forms.widgets import Media
 from django.http import Http404, HttpResponseRedirect
 from django.template import Template, RequestContext
+from django.template.loader import render_to_string
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -285,4 +286,8 @@ class RenderingTestCase(CMSTestCase):
 
             response = details(request, slug=self.test_page.get_slug())
             self.assertTrue(isinstance(response,HttpResponseRedirect))
-
+            
+    def test_12_extra_context_isolation(self):
+        with ChangeModel(self.test_page, template='extra_context.html'):
+            response = self.client.get(self.test_page.get_absolute_url())
+            self.assertTrue('width' not in response.context)
