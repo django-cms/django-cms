@@ -106,7 +106,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
             
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip trailing slash
+            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
             self.assertEquals(attached_to_page.get_title('en'), en_title)
             
             response = self.client.get(path)
@@ -121,7 +121,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
             
-            attached_to_page = applications_page_check(request, path=path[4:]) # strip trailing slash and language prefix
+            attached_to_page = applications_page_check(request, path=path[4:]) # strip leading slash and language prefix
             self.assertEquals(attached_to_page.get_title('de'), de_title)            
             
             response = self.client.get(path)
