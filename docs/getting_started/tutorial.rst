@@ -2,40 +2,12 @@
 Introductory Tutorial
 #####################
 
-************
-Installation
-************
-
 This guide assumes your machine meets the requirements outlined in the
-:doc:`installation` section of this documentation. Please refer to this section for
-more information.
+:doc:`installation` section of this documentation.
 
-Installing Django CMS
-=====================
-
-While we strongly encourage you to install the django CMS using `buildout`_ or
-`virtualenv`_, for the sake of simplicity this guide will install Django CMS
-system wide. For more details about how either of theses projects work please 
-refer to their respective documentation.
-
-Install the latest django CMS package::
-
-    $ sudo pip install django-cms south django-appmedia
-
-Or install the latest revision from github::
-
-    $ sudo pip install -e git+git://github.com/divio/django-cms.git#egg=django-cms
-    $ sudo pip install south django-appmedia
-
-To check if you installed django CMS properly, open a Python shell and type::
-
-    import cms
-
-If this does not return an error, you've successfully installed django CMS.
-
-.. _buildout: http://www.buildout.org/
-.. _virtualenv: http://virtualenv.openplans.org/
-
+***********************
+Configuration and setup
+***********************
 
 Preparing the environment
 =========================
@@ -158,8 +130,26 @@ now, and simply paste this code in your settings file.
     The templates you define in ``CMS_TEMPLATES`` have to exist at runtime and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
     for django CMS. For more details see `Creating templates`_
+    
+The django CMS will allow you to edit all languages which Django has built in
+translations for, this is way too many so we'll limit it to English for now::
 
-Finally, setup the ``DATABASES`` part of the file to reflect your database deployement.
+    LANGUAGES = [
+        ('en', 'English'),
+    ]
+
+Finally, setup the ``DATABASES`` part of the file to reflect your database
+deployement. If you just want to try out things locally, sqlite3 is the easiest
+database to set up, however it should not be used in production. If you still
+wish to use it for now, this is what your ``DATABASES`` setting should look
+like::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(PROJECT_DIR, 'database.sqlite'),
+        }
+    }
 
 
 URL configuration
