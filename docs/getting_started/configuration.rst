@@ -249,6 +249,8 @@ Enable gettext-based translation of CMS content rather than use the standard
 administration interface. Requires `django-dbgettext
 <http://http://bitbucket.org/drmeers/django-dbgettext>`_.
 
+.. warning:: This feature is deprecated and will be removed in 2.2.
+
 CMS_DBGETTEXT_SLUGS
 ===================
 
@@ -259,6 +261,8 @@ stage, as resulting translations cannot be guaranteed to be unique.
 
 For general dbgettext settings, see the `dbgettext documentation
 <http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
+
+.. warning:: This feature is deprecated and will be removed in 2.2.
 
 
 **************
@@ -436,8 +440,14 @@ CMS_CONTENT_CACHE_DURATION
 
 Default: ``60``
 
-Defines how long page content should be cached, in seconds, including navigation and admin
-menu.
+Cache expiration (in seconds) for ``show_placeholder`` and ``page_url`` template tags.
+
+MENU_CACHE_DURATION
+===================
+
+Default: ``3600``
+
+Cache expiration (in seconds) for the menu tree.
 
 CMS_CACHE_PREFIX
 ================
