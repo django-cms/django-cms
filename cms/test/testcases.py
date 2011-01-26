@@ -136,14 +136,16 @@ class CMSTestCase(TestCase):
         raise self.failureException, "ObjectDoesNotExist not raised"
     
     def create_page(self, parent_page=None, user=None, position="last-child", 
-            title=None, site=1, published=False, in_navigation=False, moderate=False, **extra):
+            title=None, site=1, published=False, in_navigation=False,
+            moderate=False, language=None, title_extra=None, **extra):
         """
         Common way for page creation with some checks
         """
         _thread_locals.user = user
-        language = settings.LANGUAGES[0][0]
-        if settings.CMS_SITE_LANGUAGES.get(site, False):
-            language = settings.CMS_SITE_LANGUAGES[site][0]
+        if not language:
+            language = settings.LANGUAGES[0][0]
+            if settings.CMS_SITE_LANGUAGES.get(site, False):
+                language = settings.CMS_SITE_LANGUAGES[site][0]
         site = Site.objects.get(pk=site)
         
         page_data = {
@@ -173,7 +175,15 @@ class CMSTestCase(TestCase):
         else:
             slug = slugify(title)
         self.counter = self.counter + 1
-        self.create_title(title=title, slug=slug, language=language, page=page)
+        if not title_extra:
+            title_extra = {}
+        self.create_title(
+            title=title,
+            slug=slug,
+            language=language,
+            page=page,
+            **title_extra
+        )
             
         del _thread_locals.user
         return page
@@ -234,7 +244,7 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None):
+    def get_request(self, path=None, language=settings.LANGUAGES[0][0]):
         if not path:
             path = self.get_pages_root()
         
@@ -264,7 +274,7 @@ class CMSTestCase(TestCase):
         request = WSGIRequest(environ)
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
-        request.LANGUAGE_CODE = settings.LANGUAGES[0][0]
+        request.LANGUAGE_CODE = language
         return request
     
     def create_page_user(self, username, password=None, 

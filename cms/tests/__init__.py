@@ -21,6 +21,7 @@ from cms.tests.settings import SettingsTests
 from cms.tests.forms import FormsTestCase
 from cms.tests.toolbar import ToolbarTests
 from cms.tests.middleware import MiddlewareTestCase
+from cms.tests.views import ViewTests
 try:
     from cms.tests.javascript import JavascriptTestCase
 except ImportError:

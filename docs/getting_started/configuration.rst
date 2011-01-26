@@ -249,6 +249,8 @@ Enable gettext-based translation of CMS content rather than use the standard
 administration interface. Requires `django-dbgettext
 <http://http://bitbucket.org/drmeers/django-dbgettext>`_.
 
+.. warning:: This feature is deprecated and will be removed in 2.2.
+
 CMS_DBGETTEXT_SLUGS
 ===================
 
@@ -259,6 +261,8 @@ stage, as resulting translations cannot be guaranteed to be unique.
 
 For general dbgettext settings, see the `dbgettext documentation
 <http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
+
+.. warning:: This feature is deprecated and will be removed in 2.2.
 
 
 **************

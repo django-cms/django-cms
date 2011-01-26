@@ -74,9 +74,13 @@ Now models.py looks like the following::
 
 .. warning::
 
-    Two limitations apply when subclassing the `CMSPlugin` class to use with
-    your custom plugins: the resulting subclass cannot be further subclassed,
-    and subclasses of `CMSPlugin` cannot have a field called "text".
+    ``CMSPlugin`` subclasses cannot be further subclassed, if you want to make
+    a reusable plugin model, make an abstract base model which does not extend
+    ``CMSPlugin`` and subclass this abstract model as well as ``CMSPlugin`` in
+    your real plugin model.
+    Further note that you cannot name your model fields the same as any plugin's
+    lowercased model name you use is called, due to the implicit one to one
+    relation Django uses for subclassed models.
 
 
 
