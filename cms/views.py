@@ -4,7 +4,7 @@ from cms.appresolver import get_app_urls
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page_resolver import get_page_from_request
-from django.conf import settings, settings as django_settings
+from django.conf import settings
 from django.conf.urls.defaults import patterns
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import Http404, HttpResponseRedirect
@@ -39,7 +39,7 @@ def details(request, slug):
     # We resolve an alternate language for the page if it's not available.
     # Since the "old" details view had an exception for the root page, it is
     # ported here. So no resolution if the slug is ''.
-    if (current_language not in available_languages) and (slug != ''):
+    if (current_language not in available_languages):
         if settings.CMS_LANGUAGE_FALLBACK:
             # If we didn't find the required page in the requested (current) 
             # language, let's try to find a suitable fallback in the list of 
@@ -78,7 +78,8 @@ def details(request, slug):
     # Check if the page has a redirect url defined for this language. 
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        if settings.i18n_installed and redirect_url[0] == "/":
+        if (settings.i18n_installed and redirect_url[0] == "/"
+            and not redirect_url.startswith('/%s/' % current_language)):
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
         # add language prefix to url
         return HttpResponseRedirect(redirect_url)
@@ -89,7 +90,7 @@ def details(request, slug):
             path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
         else:
             path = urlquote(request.get_full_path())
-        tup = django_settings.LOGIN_URL , "next", path
+        tup = settings.LOGIN_URL , "next", path
         return HttpResponseRedirect('%s?%s=%s' % tup)
     
     template_name = get_template_from_request(request, page, no_current_page=True)
