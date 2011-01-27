@@ -27,7 +27,8 @@ class Placeholder(models.Model):
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
-        context.update({'width': width or self.default_width})
+        if width or self.default_width:
+            context.update({'width': width or self.default_width})
         return render_placeholder(self, context)
 
     def get_media(self, request, context):
