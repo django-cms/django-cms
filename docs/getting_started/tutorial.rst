@@ -139,7 +139,7 @@ translations for, this is way too many so we'll limit it to English for now::
     ]
 
 Finally, setup the ``DATABASES`` part of the file to reflect your database
-deployement. If you just want to try out things locally, sqlite3 is the easiest
+deployment. If you just want to try out things locally, sqlite3 is the easiest
 database to set up, however it should not be used in production. If you still
 wish to use it for now, this is what your ``DATABASES`` setting should look
 like::
@@ -329,14 +329,14 @@ By default, pages are "invisible". To let people access them you should mark the
 
 Menus 
 -----
-Another option this view lets you tweak is wether or not the page should appear in
-your site's navigation (that is, wether there should be a menu entry to reach it
+Another option this view lets you tweak is whether or not the page should appear in
+your site's navigation (that is, whether there should be a menu entry to reach it
 or not)
 
 Adding content to a page
 ========================
 
-So far, our page doesn't do much. Make sure it's marked as "published", the click on the page's 
+So far, our page doesn't do much. Make sure it's marked as "published", then click on the page's 
 "edit" button.
 
 Ignore most of the interface for now, and click the "view on site" button on the 
