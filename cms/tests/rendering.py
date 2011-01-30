@@ -67,9 +67,9 @@ class RenderingTestCase(CMSTestCase):
         t2.save()
         # Insert some test Text plugins
         pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['main'], position=0, body=self.test_data['text_main'])
-        pl.insert_at(None, commit=True)
+        pl.insert_at(None, save=True)
         pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'])
-        pl.insert_at(None, commit=True)
+        pl.insert_at(None, save=True)
 
         # Insert another page that is not the home page
         p3 = Page(parent=p2, site=Site.objects.get_current(), reverse_id=self.test_data3['reverse_id'], template=TEMPLATE_NAME, published=True, publisher_state=1, publisher_is_draft=False)
@@ -82,7 +82,7 @@ class RenderingTestCase(CMSTestCase):
             self.test_placeholders3[placeholder.slot] = placeholder
         # # Insert some test Text plugins
         pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'])
-        pl.insert_at(None, commit=True)
+        pl.insert_at(None, save=True)
 
         # Reload test pages
         self.test_page = Page.objects.get(pk=p.pk)

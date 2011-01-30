@@ -339,7 +339,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=body, 
             position=1, 
             language=settings.LANGUAGE_CODE, lat=1, lng=1)
-        plugin.insert_at(None, position='last-child', commit=True)
+        plugin.insert_at(None, position='last-child', save=True)
         
         page = self.create_page(title='inherit from page')
         
@@ -352,7 +352,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE,
             from_page=inheritfrompage,
             from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.insert_at(None, position='last-child', commit=True)
+        inherit_plugin.insert_at(None, position='last-child', save=True)
         
         request = self.get_request()
         context = RequestContext(request, {})
@@ -369,7 +369,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE,
         )
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
-        plugin.insert_at(None, position='last-child', commit=True)
+        plugin.insert_at(None, position='last-child', save=True)
         
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
         response = self.client.get(plugin.get_icon_url(), follow=True)
@@ -404,7 +404,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder, 
             position=1, 
             language=self.FIRST_LANG)
-        plugin_base.insert_at(None, position='last-child', commit=False)
+        plugin_base.insert_at(None, position='last-child', save=False)
                 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
@@ -415,7 +415,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder, 
             position=1, 
             language=self.FIRST_LANG)
-        plugin_ref_1_base.insert_at(plugin_base, position='last-child', commit=False)    
+        plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)    
         
         plugin_ref_1 = Text(body='')
         plugin_ref_1_base.set_base_attr(plugin_ref_1)
@@ -426,7 +426,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder, 
             position=2, 
             language=self.FIRST_LANG)
-        plugin_ref_2_base.insert_at(plugin_base, position='last-child', commit=False)    
+        plugin_ref_2_base.insert_at(plugin_base, position='last-child', save=False)    
         
         plugin_ref_2 = Text(body='')
         plugin_ref_2_base.set_base_attr(plugin_ref_2)
@@ -586,7 +586,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             placeholder=placeholder, 
             position=1, 
             language=self.FIRST_LANG)
-        plugin.insert_at(None, position='last-child', commit=True)
+        plugin.insert_at(None, position='last-child', save=True)
         
         edit_url = URL_CMS_PLUGIN_EDIT + str(plugin.pk) + "/"
         

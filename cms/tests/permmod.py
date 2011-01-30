@@ -440,6 +440,9 @@ class PermissionModeratorTestCase(CMSTestCase):
         # perform movings under slave...
         self.login_user(self.user_slave)
         pg = self.move_page(pg, pc)
+        # We have to reload pe when using mptt >= 0.4.2, 
+        # so that mptt realized that pg is no longer a child of pe
+        pe = self.reload_page(pe)
         pe = self.move_page(pe, pg)
         
         # reload all - moving has changed some attributes
