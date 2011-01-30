@@ -41,7 +41,7 @@ class PluginModelBase(MPTTModelBase):
         return new_class 
          
     
-class CMSPlugin(MpttModel):
+class CMSPlugin(MPTTModel):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.

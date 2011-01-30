@@ -221,7 +221,7 @@ class PageAdmin(model_admin):
             obj.tree_id = 0
             obj.level = 0
             obj.pk = None
-            obj.insert_at(parent, commit=False)
+            obj.insert_at(parent, save=False)
             obj.pk = pk
             obj.save(no_signals=True)
             obj.save()
