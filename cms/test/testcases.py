@@ -30,6 +30,7 @@ URL_CMS_PAGE_DELETE = URL_CMS_PAGE_CHANGE + "delete/"
 URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
 URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
 URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE + "remove-plugin/"
+URL_CMS_TRANSLATION_DELETE = URL_CMS_PAGE_CHANGE + "delete-translation/"
 
 class _Warning(object):
     def __init__(self, message, category, filename, lineno):
@@ -485,3 +486,4 @@ class SettingsOverrideTestCase(CMSTestCase):
         
     def _exit_settings_override(self):
         self._settings_ctx_manager.__exit__(None, None, None)
+

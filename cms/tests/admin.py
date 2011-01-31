@@ -6,7 +6,7 @@ from cms.admin.dialog.views import _form_class_selector
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.test import testcases as base
-from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE
+from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
@@ -161,3 +161,13 @@ class AdminTestCase(CMSTestCase):
                 response = self.client.get('%s?q=1' % url)
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
+
+    def test_07_delete_translation(self):
+        admin = self._get_guys(True)
+        page = self.create_page(user=admin, title="delete-page-ranslation", published=True)
+        title = self.create_title("delete-page-ranslation-2", "delete-page-ranslation-2", 'nb', page)
+        self.login_user(admin)
+        response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'nb'})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'nb'})
+        self.assertRedirects(response, URL_CMS_PAGE)
