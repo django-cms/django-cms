@@ -88,6 +88,9 @@ else
     echo "Running cms test $suite."
 fi
 
+# Clean the tree for .pyc files
+find . -name '*.pyc' -delete
+
 if [ $disable_coverage == false ]; then
     ./bin/coverage run --rcfile=.coveragerc testapp/manage.py test $suite $failfast
     retcode=$?
