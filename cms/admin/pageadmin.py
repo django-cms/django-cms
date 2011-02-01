@@ -966,9 +966,13 @@ class PageAdmin(model_admin):
 
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
-
-        deleted_objects, perms_needed = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site)
-        to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site)
+        using = []
+        if router:
+            using = [router.db_for_read(self.model)]
+        ret = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, *using)
+        deleted_objects, perms_needed = ret[0], ret[1]
+        ret = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, *using)
+        to_delete_plugins, perms_needed_plugins = ret[0], ret[1]
         deleted_objects.append(to_delete_plugins)
         perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
         
