@@ -548,9 +548,6 @@ class Page(MPTTModel):
                 ancestors = self.get_cached_ancestors(ascending=True)
                 if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
                     path = "/".join(path.split("/")[1:])
-            
-        if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
-            path = '/'.join([ugettext(p) for p in path.split('/')])
 
         return urljoin(reverse('pages-root'), path)
     
@@ -581,11 +578,6 @@ class Page(MPTTModel):
         try:
             attribute = getattr(self.get_title_obj(
                     language, fallback, version_id, force_reload), attrname)
-            if attribute and settings.CMS_DBGETTEXT:
-                if attrname in ('slug', 'path') and \
-                        not settings.CMS_DBGETTEXT_SLUGS:
-                    return attribute
-                return ugettext(attribute)
             return attribute
         except AttributeError:
             return None

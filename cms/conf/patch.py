@@ -27,20 +27,6 @@ def post_patch():
             (settings.CMS_TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')),
         ) 
 
-    if settings.CMS_DBGETTEXT:
-        # untranslated titles are translated using gettext anyway
-        settings.CMS_HIDE_UNTRANSLATED = False
-        settings.dbgettext = _
-    else:
-        # dummy translation
-        settings.dbgettext = lambda x: x
-    if settings.CMS_DBGETTEXT_SLUGS:
-        warn(
-            "CMS_DBGETTEXT_SLUGS (and general support for django-dbggettext "
-            "for CMS contents) will be deprecated in django CMS 2.2.",
-            DeprecationWarning
-        )
-
 
 def post_patch_check():
     """Post patch check, just make sure there isn't any misconfiguration. All
