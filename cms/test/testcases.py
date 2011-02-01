@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 from cms.admin.forms import save_permissions
 from cms.models import Title, Page
@@ -271,6 +272,7 @@ class CMSTestCase(TestCase):
             'wsgi.multiprocess': True,
             'wsgi.multithread':  False,
             'wsgi.run_once':     False,
+            'wsgi.input':        ''
         }
         request = WSGIRequest(environ)
         request.session = self.client.session
@@ -486,4 +488,5 @@ class SettingsOverrideTestCase(CMSTestCase):
         
     def _exit_settings_override(self):
         self._settings_ctx_manager.__exit__(None, None, None)
+
 
