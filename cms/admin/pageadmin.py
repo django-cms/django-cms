@@ -37,10 +37,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import transaction, models
-try:
-    from django.db import router
-except ImportError:
-    router = False
+
 from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404, \
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
@@ -51,6 +48,13 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from menus.menu_pool import menu_pool
 import os
+
+# silly hack to test features/ fixme
+import inspect
+if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
+    from django.db import router
+else:
+    router = False
 
 model_admin = admin.ModelAdmin
 create_on_success = lambda x: x
@@ -966,13 +970,16 @@ class PageAdmin(model_admin):
 
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
+        
         using = []
         if router:
-            using = [router.db_for_read(self.model)]
-        ret = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, *using)
-        deleted_objects, perms_needed = ret[0], ret[1]
-        ret = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, *using)
-        to_delete_plugins, perms_needed_plugins = ret[0], ret[1]
+            using = router.db_for_read(self.model)
+            deleted_objects, perms_needed, protected =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)
+            to_delete_plugins, perms_needed_plugins, protected = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)
+        else:
+            deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, 4)
+            to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, 4)
+            
         deleted_objects.append(to_delete_plugins)
         perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
         

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 from cms.admin.forms import save_permissions
 from cms.models import Title, Page
@@ -488,5 +487,3 @@ class SettingsOverrideTestCase(CMSTestCase):
         
     def _exit_settings_override(self):
         self._settings_ctx_manager.__exit__(None, None, None)
-
-
