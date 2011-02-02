@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool
-from testapp.sampleapp.models import Category
+from cms.test.apps.sampleapp.models import Category
 
 class SampleAppMenu(Menu):
     
