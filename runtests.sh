@@ -37,6 +37,11 @@ case "${args[$index]}" in
             echo "flags:"
             echo " --toxenv [tox-env]"
             echo "    eg. runtests.sh --toxenv py26-1.2.X,py26-trunk"
+            echo "    possible envs:"
+            echo "        py25-1.1.X, py25-1.2.X, py25-1.3.X, py25-trunk"
+            echo "        py26-1.1.X, py26-1.2.X, py26-1.3.X, py26-trunk"
+            echo "        py27-1.1.X, py27-1.2.X, py27-1.3.X"
+            echo ""
             echo " --quicktest - use already built tox env, for running a simple test quickly"
             echo " --failfast - abort at first failing test"
             echo " --with-coverage - enables coverage"
@@ -60,26 +65,21 @@ if [ "$failfast" ]; then
 fi
 
 if [ ! "$suite" ]; then
-    suite="cms"
-    echo "Running complete cms testsuite."
-else
-    echo "Running cms test $suite."
-fi
-
-if [ ! "$suite" ]; then
-    suite="cms"
     echo "Running complete cms testsuite."
 else
     echo "Running cms test $suite."
 fi
 
 if [ $quicktest == true ]; then
-    .tox/$toxenv/bin/python cms/test/run_tests.py --direct $failfast $suite
-    retcode=$?
+    IFS=","
+    tenvs=( $toxenv )
+    for tenv in ${tenvs[@]}; do
+        read -p "Hit any key to run tests in tox env $tenv"
+        .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite
+        retcode=$?
+    done
 else
     tox -e $toxenv
     retcode=$?
 fi
-    
-echo "done"
 exit $retcode
