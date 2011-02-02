@@ -71,7 +71,7 @@ MIDDLEWARE_CLASSES = (
     
 )
 
-ROOT_URLCONF = 'testapp.urls'
+ROOT_URLCONF = 'cms.test.project.urls'
 
 
 TEMPLATE_DIRS = (
@@ -99,11 +99,11 @@ INSTALLED_APPS = (
     'cms.plugins.twitter',
     'cms.plugins.inherit',
     'mptt',
-    'testapp.sampleapp',
-    'testapp.placeholderapp',
-    'testapp.pluginapp',
-    'testapp.pluginapp.plugins.manytomany_rel',
-    'testapp.fakemlng',
+    'cms.test.project.sampleapp',
+    'cms.test.project.placeholderapp',
+    'cms.test.project.pluginapp',
+    'cms.test.project.pluginapp.plugins.manytomany_rel',
+    'cms.test.project.fakemlng',
     'south',
     'reversion',
 )
@@ -183,7 +183,7 @@ CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
 SOUTH_TESTS_MIGRATE = False
 
 CMS_NAVIGATION_EXTENDERS = (
-    ('testapp.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+    ('cms.test.project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
 )
 
 try:
@@ -191,4 +191,4 @@ try:
 except ImportError:
     pass
     
-TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'
+TEST_RUNNER = 'cms.test.project.testrunner.CMSTestSuiteRunner'

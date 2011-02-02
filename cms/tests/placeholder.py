@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
-from testapp.fakemlng.models import Translations
-from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
+from cms.test.apps.fakemlng.models import Translations
+from cms.test.apps.placeholderapp.models import Example1, Example2, Example3, Example4, \
     Example5
 
 

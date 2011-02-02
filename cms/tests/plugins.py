@@ -18,8 +18,8 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.widgets import Media
 from django.template import RequestContext
-from testapp.pluginapp.models import Article, Section
-from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from cms.test.apps.pluginapp.models import Article, Section
+from cms.test.apps.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
 
     
