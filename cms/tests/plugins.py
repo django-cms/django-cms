@@ -370,7 +370,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
         plugin.insert_at(None, position='last-child', save=True)
-        
+        print plugin.get_icon_url()
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
         response = self.client.get(plugin.get_icon_url(), follow=True)
         self.assertEqual(response.status_code, 200)
