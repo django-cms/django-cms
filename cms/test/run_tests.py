@@ -15,6 +15,8 @@ def configure_settings(*test_args):
     TEMPLATE_DIRS = (
         os.path.join(PROJECT_DIR, 'templates'),
     )
+    
+    JUNIT_OUTPUT_DIR = os.path.join(os.path.abspath(os.path.dirname(cms.__file__)), '..')
         
     ADMINS = tuple()
     DEBUG = True
@@ -203,7 +205,8 @@ def configure_settings(*test_args):
             ('cms.test.project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
         ),
             
-        TEST_RUNNER = 'cms.test.project.testrunner.CMSTestSuiteRunner'
+        TEST_RUNNER = 'cms.test.project.testrunner.CMSTestSuiteRunner',
+        JUNIT_OUTPUT_DIR = JUNIT_OUTPUT_DIR
     )
     
     from cms.conf import patch_settings
@@ -236,7 +239,7 @@ def run_tests(*test_args):
     if not test_labels:
         test_labels.append('cms')
                 
-    failures = get_runner(settings)().run_tests(test_labels, verbosity=1, interactive=True, failfast=failfast)
+    failures = get_runner(settings)(verbosity=1, interactive=True, failfast=failfast).run_tests(test_labels)
     sys.exit(failures)
 
 if __name__ == '__main__':
