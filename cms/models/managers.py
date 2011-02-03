@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from cms.exceptions import NoPermissionsException
-from publisher import PublisherManager
+from cms.publisher import PublisherManager
 from cms.models.query import PageQuerySet
 from cms.utils.i18n import get_fallback_languages
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from publisher.query import PublisherQuerySet
+from cms.publisher.query import PublisherQuerySet
 
 class PublisherManager(models.Manager):
     """Manager with some support handling publisher.
