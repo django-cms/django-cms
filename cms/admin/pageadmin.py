@@ -974,8 +974,8 @@ class PageAdmin(model_admin):
         using = []
         if router:
             using = router.db_for_read(self.model)
-            deleted_objects, perms_needed, protected =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)
-            to_delete_plugins, perms_needed_plugins, protected = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)
+            deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)[:2]
+            to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)[:2]
         else:
             deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, 4)
             to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, 4)
