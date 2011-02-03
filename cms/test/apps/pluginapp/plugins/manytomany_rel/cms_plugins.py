@@ -3,8 +3,8 @@ from django.utils.translation import ugettext as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
-from testapp.pluginapp.models import Article
+from cms.test.apps.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from cms.test.apps.pluginapp.models import Article
 
 
 

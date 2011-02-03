@@ -10,7 +10,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-ROOT_DIR = os.path.join(settings.PROJECT_DIR, '..', '..')
+ROOT_DIR = os.path.join(settings.PROJECT_DIR, '..', '..', '..')
 DOCS_DIR = os.path.join(ROOT_DIR, 'docs')
 
 

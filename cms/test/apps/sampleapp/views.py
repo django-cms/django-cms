@@ -2,7 +2,7 @@
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from testapp.sampleapp.models import Category
+from cms.test.apps.sampleapp.models import Category
 
 def sample_view(request, **kw):
     context = RequestContext(request, kw)

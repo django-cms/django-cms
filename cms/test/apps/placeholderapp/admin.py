@@ -1,6 +1,6 @@
 from django.contrib import admin
 from cms.admin.placeholderadmin import PlaceholderAdmin
-from testapp.placeholderapp.models import *
+from cms.test.apps.placeholderapp.models import *
 
 
 class MixinAdmin(admin.ModelAdmin):

@@ -78,5 +78,6 @@ setup(
             'templates/menu/*.html',
         ],
     },
+    test_suite = "cms.test.run_tests.run_tests",
     zip_safe = False
 )

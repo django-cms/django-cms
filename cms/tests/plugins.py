@@ -18,8 +18,8 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.widgets import Media
 from django.template import RequestContext
-from testapp.pluginapp.models import Article, Section
-from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from cms.test.apps.pluginapp.models import Article, Section
+from cms.test.apps.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
 
     
@@ -370,7 +370,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
         plugin.insert_at(None, position='last-child', save=True)
-        
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
         response = self.client.get(plugin.get_icon_url(), follow=True)
         self.assertEqual(response.status_code, 200)

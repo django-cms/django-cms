@@ -10,7 +10,7 @@ from cms.test.util.context_managers import SettingsOverride
 
 
 class NonRootCase(CMSTestCase):
-    urls = 'testapp.nonroot_urls'
+    urls = 'cms.test.project.nonroot_urls'
 
     def setUp(self):
         with SettingsOverride(CMS_MODERATOR = False):

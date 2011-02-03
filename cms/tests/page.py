@@ -397,7 +397,7 @@ class PagesTestCase(CMSTestCase):
 
 
 class NoAdminPageTests(CMSTestCase):
-    urls = 'testapp.noadmin_urls'
+    urls = 'cms.test.project.noadmin_urls'
     
     def setUp(self):
         admin = 'django.contrib.admin'
