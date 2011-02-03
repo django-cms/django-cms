@@ -21,7 +21,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _, get_language, ugettext
 from menus.menu_pool import menu_pool
 from os.path import join
-from publisher.errors import MpttPublisherCantPublish
+from cms.publisher.errors import MpttPublisherCantPublish
 from mptt.models import MPTTModel
 import copy
 
@@ -1117,10 +1117,7 @@ class Page(MPTTModel):
                 found[placeholder_name] = placeholder
 
 def _reversion():
-    if 'publisher' in settings.INSTALLED_APPS:
-        exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
-    else:
-        exclude_fields = [] 
+    exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
             
     reversion_register(
         Page,
