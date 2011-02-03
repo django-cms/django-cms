@@ -13,10 +13,6 @@ case "${args[$index]}" in
         "--failfast")
             failfast="--failfast"
             ;;
-
-        "--with-coverage")
-            disable_coverage=false
-            ;;
          
         "--toxenv")
             let "index = $index + 1"
@@ -54,8 +50,6 @@ case "${args[$index]}" in
 let "index = $index + 1"
 done
 
-echo "using python at: $python"
-
 if [ ! "$toxenv" ]; then
     toxenv='ALL'
 fi
@@ -67,6 +61,10 @@ fi
 if [ ! "$suite" ]; then
     echo "Running complete cms testsuite."
 else
+    if [ $quicktest == false ]; then
+        echo "Can only run specific suite with --quicktesr"
+        exit 1
+    fi
     echo "Running cms test $suite."
 fi
 
