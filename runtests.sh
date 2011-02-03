@@ -85,7 +85,7 @@ if [ ! -f "toxinstall/bin/tox" ]; then
 fi
 
 if [ $quicktest == true ]; then
-    if [ "$toxenv" == "ALL"]; then
+    if [ "$toxenv" == "ALL" ]; then
         echo "Cannot use ALL with --quicktest" 
         exit 1
     fi

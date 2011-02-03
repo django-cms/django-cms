@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -13,6 +14,8 @@ from cms.plugins.text.utils import plugin_tags_to_id_list, \
 from cms.test.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
     URL_CMS_PLUGIN_REMOVE
+from cms.test.util.context_managers import SettingsOverride
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -371,8 +374,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
         plugin.insert_at(None, position='last-child', save=True)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
-        response = self.client.get(plugin.get_icon_url(), follow=True)
-        self.assertEqual(response.status_code, 200)
+        with SettingsOverride(DEBUG=True):
+            response = self.client.get(plugin.get_icon_url(), follow=True)
+            self.assertEqual(response.status_code, 200)
         # Nuke everything in the storage location directory (since removing just 
         # our file would still leave a useless directory structure)
         #
