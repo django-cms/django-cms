@@ -1117,10 +1117,7 @@ class Page(MPTTModel):
                 found[placeholder_name] = placeholder
 
 def _reversion():
-    if 'publisher' in settings.INSTALLED_APPS:
-        exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
-    else:
-        exclude_fields = [] 
+    exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
             
     reversion_register(
         Page,

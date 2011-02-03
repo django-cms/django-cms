@@ -106,9 +106,9 @@ def configure_settings(env_name):
             'django.contrib.sessions',
             'django.contrib.admin',
             'django.contrib.sites',
+            
             'cms',
-            'publisher',
-            'menus',
+            
             'cms.plugins.text',
             'cms.plugins.picture',
             'cms.plugins.file',
@@ -120,13 +120,16 @@ def configure_settings(env_name):
             'cms.plugins.video',
             'cms.plugins.twitter',
             'cms.plugins.inherit',
-            'mptt',
+            
             'cms.test.apps.sampleapp',
             'cms.test.apps.placeholderapp',
             'cms.test.apps.pluginapp',
             'cms.test.apps.pluginapp.plugins.manytomany_rel',
             'cms.test.apps.fakemlng',
-            'reversion',
+            
+            'menus',
+            'mptt',
+            'reversion'
         ),
         
         gettext = lambda s: s,
