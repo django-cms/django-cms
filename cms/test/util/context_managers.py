@@ -34,7 +34,7 @@ class SettingsOverride(object):
             if value is not NULL:
                 setattr(settings, key, value)
             else:
-                del settings[key] # do not pollute the context!
+                delattr(settings,key) # do not pollute the context!
 
 
 class StdoutOverride(object):
