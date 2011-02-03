@@ -1,7 +1,7 @@
 import sys
 import os
 
-def configure_settings(*test_args):
+def configure_settings(env_name):
     from cms.test import project
     import cms
     
@@ -16,7 +16,7 @@ def configure_settings(*test_args):
         os.path.join(PROJECT_DIR, 'templates'),
     )
     
-    JUNIT_OUTPUT_DIR = os.path.join(os.path.abspath(os.path.dirname(cms.__file__)), '..')
+    JUNIT_OUTPUT_DIR = os.path.join(os.path.abspath(os.path.dirname(cms.__file__)), '..', 'junit-%s' % env_name)
         
     ADMINS = tuple()
     DEBUG = True
@@ -220,25 +220,32 @@ def run_tests(*test_args):
         test_args.remove('--direct')
         sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
     
-    settings = configure_settings(*test_args)
-    
-    from django.test.utils import get_runner
-    
     failfast = False
 
     test_labels = []
     
-    if test_args:
-        if '--failfast' in test_args:
-            test_args.remove('--failfast')
-            failfast = True
-        
-        for label in test_args:
-            test_labels.append('cms.%s' % label)
+    test_args_enum = dict([ (val, idx) for idx, val in enumerate(test_args)])
+    
+    env_name = ''
+    if '--env-name' in test_args:
+        env_name = test_args[test_args_enum['--env-name']+1]
+        test_args.remove('--env-name')
+        test_args.remove(env_name)
+    
+    if '--failfast' in test_args:
+        test_args.remove('--failfast')
+        failfast = True
+    
+    for label in test_args:
+        test_labels.append('cms.%s' % label)
             
     if not test_labels:
         test_labels.append('cms')
-                
+        
+    settings = configure_settings(env_name)
+    
+    from django.test.utils import get_runner 
+                   
     failures = get_runner(settings)(verbosity=1, interactive=True, failfast=failfast).run_tests(test_labels)
     sys.exit(failures)
 

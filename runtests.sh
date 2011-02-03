@@ -62,7 +62,7 @@ if [ ! "$suite" ]; then
     echo "Running complete cms testsuite."
 else
     if [ $quicktest == false ]; then
-        echo "Can only run specific suite with --quicktesr"
+        echo "Can only run specific suite with --quicktest"
         exit 1
     fi
     echo "Running cms test $suite."
@@ -72,8 +72,13 @@ if [ $quicktest == true ]; then
     IFS=","
     tenvs=( $toxenv )
     for tenv in ${tenvs[@]}; do
+        if [ ! -d ".tox/$tenv" ]; then
+            echo ".tox/$tenv does not exist, run without --quicktest first"
+            exit 1
+        fi
         read -p "Hit any key to run tests in tox env $tenv"
-        .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite
+        # running tests without invoking tox to save time
+        .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite 
         retcode=$?
     done
 else
