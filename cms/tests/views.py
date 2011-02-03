@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.test.testcases import SettingsOverrideTestCase
 from cms.test.util.context_managers import SettingsOverride
