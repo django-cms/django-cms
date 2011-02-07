@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 17:16+0000\n"
+"PO-Revision-Date: 2011-02-07 17:23+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1708,11 +1708,11 @@ msgstr "オランダ語"
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "二つ列"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "三つ列"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
@@ -1724,11 +1724,11 @@ msgstr ""
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr "左欄"
+msgstr "左列"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr "右欄"
+msgstr "右列"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
