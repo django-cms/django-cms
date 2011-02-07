@@ -1,7 +1,4 @@
 /* javascript for the frontend editing toolbar */
-
-jQuery.noConflict();
-
 function hide_iframe(){
     // needs to be a global function because it gets called 
     // from the iframe as `parent.hide_iframe`
@@ -94,25 +91,12 @@ jQuery(document).ready(function($) {
     }
 
     function edit_plugin(page_id, plugin_id){    
-        $.nyroModalManual({
-            zIndexStart: 80000,
+        $.nyroModalManual($.extend({
             type: 'iframe',
-            modal: false,
             forceType: 'iframe',
             url: urls.cms_page_changelist + page_id + '/edit-plugin/'+ plugin_id+ '/?popup=true&no_preview',
-            padding: 0,
-            minWidth: 800,
-            minHeight: 300,
-            height: 400,
             closeButton: '<a class="cms_toolbar_button cms_toolbar_iconbutton nyroModalClose" href="#" id="closeBut"><span><strong>Close</strong></span></a>'
-        });
-        /*
-            css: {
-                content: {
-                    overflow: 'hidden'
-                }
-            }
-         */
+        }, nyro_modal_defaults));
     }        
 
     function closeCMStoolbar(){

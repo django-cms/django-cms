@@ -2,9 +2,19 @@
 <script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 <script type="text/javascript">
     //<![CDATA[
-    // When jQuery is sourced, it's going to overwrite whatever might be in the
-    // '$' variable, so store a reference of it in a temporary variable...
-    var _$ = window.$;
+    // Save our jquery to cms_jQuery and if jquery was already loaded, discard this one
+    var cms_jQuery = $.noConflict();
+    if (window.jQuery === undefined) { 
+        jQuery = cms_jQuery;
+    } else {
+        delete cms_jQuery;
+    }
+    
+    // Alias jQuery to $
+    var _$ = $;
+    $ = jQuery;
+
+    
     // add stylesheets to head
     (function ($) {
 		$('<link>').appendTo('head').attr({
@@ -21,7 +31,7 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.cookie.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/tools.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.pack.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script> 
 <script type="text/javascript">
@@ -29,6 +39,14 @@
     // dynamic variables for the toolbar js file
     var placeholder_data = {{ placeholder_data }};
     var page_is_defined = {% if page %}true{% else %}false{% endif %};
+    var nyro_modal_defaults = {
+        zIndexStart: 80000,
+        modal: false,
+        padding: 0,
+        minWidth: 800,
+        minHeight: 300,
+        height: 400,
+    };
     var translations = {
         move_slot: "{% trans 'Move to %(name)s' %}",
         question: "{% trans "Are you sure you want to delete this plugin?" %}"
@@ -117,10 +135,10 @@
     })(jQuery);
     //]]>
 </script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/toolbar.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/toolbar.js"></script>
 <script type="text/javascript" charset="utf-8">
     //<![CDATA[
-    // Now that jQuery is done loading, put the '$' variable back to what it was...
+    // Now that we're done messing with jQuery, put the '$' variable back to what it was...
     var $ = _$;
     //]]>
 </script>
