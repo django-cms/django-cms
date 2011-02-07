@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 14:06+0000\n"
+"PO-Revision-Date: 2011-02-07 17:16+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -732,7 +732,7 @@ msgstr ""
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "メニューのタイトルを書き替える"
 
 #: models/titlemodels.py:14
 msgid "Path"
@@ -871,7 +871,7 @@ msgstr ""
 
 #: plugins/link/models.py:13
 msgid "mailto"
-msgstr ""
+msgstr "メール"
 
 #: plugins/link/models.py:13
 msgid "An email adress has priority over a text link."
@@ -930,7 +930,7 @@ msgstr ""
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
@@ -958,7 +958,7 @@ msgstr "もと"
 
 #: plugins/text/cms_plugins.py:15
 msgid "Text"
-msgstr ""
+msgstr "テキスト"
 
 #: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
 msgid "body"
@@ -1012,19 +1012,19 @@ msgstr ""
 
 #: plugins/twitter/cms_plugins.py:10
 msgid "Twitter"
-msgstr ""
+msgstr "TWITTER"
 
 #: plugins/twitter/cms_plugins.py:31
 msgid "Twitter Search"
-msgstr ""
+msgstr "TWITTER検索"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
-msgstr ""
+msgstr "TWITTERのユーザー"
 
 #: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "count"
-msgstr ""
+msgstr "数"
 
 #: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "Number of entries to display"
@@ -1032,7 +1032,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:9
 msgid "link hint"
-msgstr ""
+msgstr "リンクのヒント"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
@@ -1052,27 +1052,27 @@ msgstr "ビデオ"
 
 #: plugins/video/cms_plugins.py:42
 msgid "Color Settings"
-msgstr ""
+msgstr "色設定"
 
 #: plugins/video/models.py:9
 msgid "movie file"
-msgstr ""
+msgstr "ムービーファイル"
 
 #: plugins/video/models.py:9
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
+msgstr "FLVやH264のビデオファイルを使って下さい。"
 
 #: plugins/video/models.py:10
 msgid "movie url"
-msgstr ""
+msgstr "ムービーのURL"
 
 #: plugins/video/models.py:10
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr ""
+msgstr "VIMEOやYOUTUBEのURLを使って下さい。例えば：http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
-msgstr ""
+msgstr "プレビューの絵"
 
 #: plugins/video/models.py:16
 msgid "auto play"
@@ -1142,7 +1142,7 @@ msgstr "セーブして"
 #: templates/admin/page_submit_line.html:7
 #, python-format
 msgid "Delete %(language)s translation"
-msgstr ""
+msgstr "%(language)sをデリートする"
 
 #: templates/admin/page_submit_line.html:11
 msgid "Save as new"
@@ -1166,12 +1166,12 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
 msgid "Last changes"
-msgstr ""
+msgstr "さいごの変更"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "<a href=\"%(login_url)s\">管理ページ</a>.にログインして下さい"
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1235,7 +1235,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:94
 msgid "Preview"
-msgstr ""
+msgstr "プレビュー"
 
 #: templates/admin/cms/page/change_form.html:97
 #: templates/admin/cms/page/revision_form.html:10
@@ -1260,7 +1260,7 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:161
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
-msgstr ""
+msgstr "ちょっと待って下さい"
 
 #: templates/admin/cms/page/change_form.html:160
 msgid "Page states"
@@ -1370,7 +1370,7 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "softroot"
-msgstr ""
+msgstr "ソフトロート"
 
 #: templates/admin/cms/page/menu_item.html:23
 msgid "home"
@@ -1383,11 +1383,11 @@ msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "Cut"
-msgstr ""
+msgstr "カット"
 
 #: templates/admin/cms/page/menu_item.html:33
 msgid "cut"
-msgstr ""
+msgstr "カット"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "Copy"
@@ -1416,7 +1416,7 @@ msgstr ""
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
 msgid "view"
-msgstr ""
+msgstr "見る"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
@@ -1441,11 +1441,11 @@ msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
-msgstr ""
+msgstr "メッセージ"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "グループ"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
@@ -1619,11 +1619,11 @@ msgstr "ページを削除して"
 
 #: templates/cms/toolbar/toolbar.html:206
 msgid "Site Administration"
-msgstr ""
+msgstr "サイト管理"
 
 #: templates/cms/toolbar/toolbar.html:208
 msgid "Page Settings"
-msgstr ""
+msgstr "ページ設定"
 
 #: templates/cms/toolbar/toolbar.html:210
 msgid "history"
@@ -1636,15 +1636,15 @@ msgstr ""
 #: templates/cms/toolbar/toolbar.html:218
 #: templates/cms/toolbar/toolbar.html:219
 msgid "Logout"
-msgstr ""
+msgstr "ログアウト"
 
 #: templates/cms/toolbar/toolbar.html:219
 msgid "Lock"
-msgstr ""
+msgstr "ロック"
 
 #: templates/cms/toolbar/toolbar.html:223
 msgid "Close"
-msgstr ""
+msgstr "閉める"
 
 #: templates/cms/toolbar/toolbar.html:234
 msgid "up"
@@ -1724,11 +1724,11 @@ msgstr ""
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr ""
+msgstr "左欄"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr ""
+msgstr "右欄"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
