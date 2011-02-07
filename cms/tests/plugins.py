@@ -6,7 +6,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
-from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import plugin_tags_to_id_list, \
@@ -24,8 +23,6 @@ from django.template import RequestContext
 from project.pluginapp.models import Article, Section
 from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
-
-    
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -52,40 +49,7 @@ class PluginsTestBaseCase(CMSTestCase):
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
-        
-# REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
-    def publish_page(self, page, approve=False, user=None, published_check=True):
-        if user:
-            self.login_user(user)
 
-        # publish / approve page by master
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        self.assertEqual(response.status_code, 200)
-
-        if not approve:
-            return self.reload_page(page)
-
-        # approve
-        page = self.approve_page(page)
-
-        if published_check:
-            # must have public object now
-            assert(page.publisher_public)
-            # and public object must be published
-            assert(page.publisher_public.published)
-
-        return page
-
-    def approve_page(self, page):
-        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        # reload page
-        return self.reload_page(page)
-        
-    def get_request(self, *args, **kwargs):
-        request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
-        request.placeholder_media = Media()
-        return request
         
 class PluginsTestCase(PluginsTestBaseCase):
 
@@ -329,38 +293,48 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
                 
-    def test_09_iheritplugin_media(self):
+    def test_09_inheritplugin_media(self):
         """
         Test case for InheritPagePlaceholder
         """
-        inheritfrompage = self.create_page(title='page to inherit from')
-        
-        body = inheritfrompage.placeholders.get(slot="body")
-        
-        plugin = GoogleMap(
-            plugin_type='GoogleMapPlugin',
-            placeholder=body, 
-            position=1, 
-            language=settings.LANGUAGE_CODE, lat=1, lng=1)
-        plugin.insert_at(None, position='last-child', save=True)
-        
-        page = self.create_page(title='inherit from page')
-        
-        inherited_body = page.placeholders.get(slot="body")
-                
-        inherit_plugin = InheritPagePlaceholder(
-            plugin_type='InheritPagePlaceholderPlugin',
-            placeholder=inherited_body, 
-            position=1, 
-            language=settings.LANGUAGE_CODE,
-            from_page=inheritfrompage,
-            from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.insert_at(None, position='last-child', save=True)
-        
-        request = self.get_request()
-        context = RequestContext(request, {})
-        inherit_plugin.render_plugin(context, inherited_body)
-        self.assertEquals(unicode(request.placeholder_media).find('maps.google.com') != -1, True)
+        with SettingsOverride(CMS_MODERATOR=False):
+            inheritfrompage = self.create_page(
+                title='page to inherit from',
+                template='media.html'
+            )
+            
+            body = inheritfrompage.placeholders.get(slot="body")
+            
+            plugin = TwitterRecentEntries(
+                plugin_type='TwitterRecentEntriesPlugin',
+                placeholder=body, 
+                position=1, 
+                language=settings.LANGUAGE_CODE,
+                twitter_user='djangocms',
+            )
+            plugin.insert_at(None, position='last-child', save=True)
+            
+            page = self.create_page(
+                title='inherit from page',
+                published=True,
+                template='media.html',
+            )
+            
+            inherited_body = page.placeholders.get(slot="body")
+                    
+            inherit_plugin = InheritPagePlaceholder(
+                plugin_type='InheritPagePlaceholderPlugin',
+                placeholder=inherited_body, 
+                position=1, 
+                language=settings.LANGUAGE_CODE,
+                from_page=inheritfrompage,
+                from_language=settings.LANGUAGE_CODE)
+            inherit_plugin.insert_at(None, position='last-child', save=True)
+            
+            self.client.logout()
+            response = self.client.get(page.get_absolute_url())
+            print response.content
+            self.assertTrue('http://twitter.com/javascripts/blogger.js' in response.content)
         
     def test_10_fileplugin_icon_uppercase(self):
         page = self.create_page(title='testpage')

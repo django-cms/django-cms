@@ -146,13 +146,11 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             continue
         if not get_plugins(request, placeholder):
             continue
-        if hasattr(request, 'placeholder_media'):
-            rendered_contents = render_to_string('cms/plugin_media.html', {
-                'media': placeholder.get_media(request, context),
-                'namespace': CMS_PLUGIN_MEDIA_NAMESPACE,
-            })
-            context[VARNAME][CMS_PLUGIN_MEDIA_NAMESPACE].append(rendered_contents)
-        #request.placeholder_media += placeholder.get_media(request, context)
+        rendered_contents = render_to_string('cms/plugin_media.html', {
+            'media': placeholder.get_media(request, context),
+            'namespace': CMS_PLUGIN_MEDIA_NAMESPACE,
+        })
+        context[VARNAME][CMS_PLUGIN_MEDIA_NAMESPACE].append(rendered_contents)
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
