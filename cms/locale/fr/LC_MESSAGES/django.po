@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 13:37+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-02-07 17:34+0000\n"
+"Last-Translator: chrisglass <tribaal@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -319,11 +319,11 @@ msgstr "Hériter du modèle du parent le plus proche"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "Choisissez un site valide"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "Choisissez une page valide"
 
 #: forms/widgets.py:173
 msgid "Add Another"
@@ -571,11 +571,11 @@ msgstr "Approbation des parents"
 
 #: models/pagemodel.py:50
 msgid "for logged in users only"
-msgstr ""
+msgstr "uniquement acccessible aux utilisateurs enrregistrés"
 
 #: models/pagemodel.py:51
 msgid "for anonymous users only"
-msgstr ""
+msgstr "uniquement accessible aux utilisateurs anonymes"
 
 #: models/pagemodel.py:59
 msgid "created by"
@@ -603,7 +603,7 @@ msgstr "Identifiant unique utilisé par le modèle page_url pour créer un lien 
 
 #: models/pagemodel.py:69
 msgid "attached menu"
-msgstr ""
+msgstr "menu attaché"
 
 #: models/pagemodel.py:70
 msgid "is published"
@@ -627,11 +627,11 @@ msgstr "état du modérateur"
 
 #: models/pagemodel.py:83
 msgid "menu visibility"
-msgstr ""
+msgstr "Visibilité du menu"
 
 #: models/pagemodel.py:83
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "limite quand cette page est visible dans le menu"
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -728,7 +728,7 @@ msgstr "largeur"
 
 #: models/pluginmodel.py:122
 msgid "<Empty>"
-msgstr ""
+msgstr "<Vide>"
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
@@ -826,7 +826,7 @@ msgstr "Carte"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:11
 msgid "Your address: "
-msgstr ""
+msgstr "Votre adresse:"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:13
 msgid "Calculate route"
@@ -842,7 +842,7 @@ msgstr "La langue ou page doivent être renseignés"
 
 #: plugins/inherit/models.py:10
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr ""
+msgstr "Choisissez une page pour inclure ses plugins dans ce placeholder. Ne rien choisir inclus les plugins de la page courante."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1016,7 +1016,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:31
 msgid "Twitter Search"
-msgstr ""
+msgstr "recherche Twitter"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1040,11 +1040,11 @@ msgstr "Si précisé, le lien pointera vers votre profil Twitter."
 
 #: plugins/twitter/models.py:16
 msgid "query"
-msgstr ""
+msgstr "recherche"
 
 #: plugins/twitter/models.py:16
 msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
-msgstr ""
+msgstr "Par example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1176,7 +1176,7 @@ msgstr "<a href=\"%(login_url)s\">Identifiez-vous</a>."
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "URL de login: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1525,7 +1525,7 @@ msgstr "Choisissez les options de copie"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "Générique"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 #: templates/cms/toolbar/add_plugins.html:6
@@ -1554,7 +1554,7 @@ msgstr "Aucun bloc disponible. Veuillez définir des blocs pour cette zone."
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
-msgstr ""
+msgstr "plugins disponibles"
 
 #: templates/cms/toolbar/toolbar.html:33
 #, python-format
@@ -1584,7 +1584,7 @@ msgstr "se connecter"
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
-msgstr ""
+msgstr "Demande d'approbation"
 
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
@@ -1678,90 +1678,90 @@ msgstr "Annuler la modération des descendants"
 #: templatetags/cms_tags.py:78
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Page introuvable sur %(domain)s"
 
 #: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
+msgstr "Un \"template tag\" n'a pas pu trouver la page avec les arguments « %(page_lookup)s ». L'URL de la demande était la suivante: http://%(host)s%(path)s"
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
-msgstr ""
+msgstr "Anglais"
 
 #: test/run_tests.py:138 test/project/settings.py:117
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 #: test/run_tests.py:139 test/project/settings.py:118
 msgid "German"
-msgstr ""
+msgstr "Allemand"
 
 #: test/run_tests.py:140 test/project/settings.py:119
 msgid "Brazil"
-msgstr ""
+msgstr "Brésil"
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
-msgstr ""
+msgstr "Néerlandais"
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "deux colonnes"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "trois colonnes"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
-msgstr ""
+msgstr "Exemples de navigation"
 
 #: test/run_tests.py:167 test/project/settings.py:148
 msgid "sidebar column"
-msgstr ""
+msgstr "barre latérale"
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr ""
+msgstr "colonne de gauche"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr ""
+msgstr "colonne de droite"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "Articles"
 
 #: test/apps/sampleapp/cms_app.py:7
 msgid "Sample App"
-msgstr ""
+msgstr "Application exemple"
 
 #: test/apps/sampleapp/menu.py:17
 msgid "sample root page"
-msgstr ""
+msgstr "page racine d'exemple"
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
-msgstr ""
+msgstr "page de paramètres d'exemple"
 
 #: test/apps/sampleapp/menu.py:19
 msgid "sample account page"
-msgstr ""
+msgstr "page de compte d'exemple"
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "échantilloner de ma page de profil"
 
 #: test/apps/sampleapp/menu.py:32
 msgid "Static Menu"
-msgstr ""
+msgstr "Menu statique"
 
 #: test/apps/sampleapp/menu.py:48
 msgid "Static Menu2"
-msgstr ""
+msgstr "Menu statique 2"
 
 #: utils/moderator.py:83
 msgid "parent first"
