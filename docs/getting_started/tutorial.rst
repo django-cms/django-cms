@@ -147,7 +147,7 @@ like::
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(PROJECT_DIR, 'database.sqlite'),
+            'NAME': os.path.join(PROJECT_PATH, 'database.sqlite'),
         }
     }
 
