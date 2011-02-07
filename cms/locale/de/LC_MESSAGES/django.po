@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 13:37+0000\n"
+"PO-Revision-Date: 2011-02-07 14:16+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -319,11 +319,11 @@ msgstr "Die Vorlage der nächsten übergeordneten Seite verwenden"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "Wähle eine gültige Webseite"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "Wähle eine gültige Seite"
 
 #: forms/widgets.py:173
 msgid "Add Another"
@@ -571,11 +571,11 @@ msgstr "Übergeordnete Seite freigeben"
 
 #: models/pagemodel.py:50
 msgid "for logged in users only"
-msgstr ""
+msgstr "Nur für angemeldete Benutzer"
 
 #: models/pagemodel.py:51
 msgid "for anonymous users only"
-msgstr ""
+msgstr "Nur für nicht angemeldete Benutzer"
 
 #: models/pagemodel.py:59
 msgid "created by"
@@ -627,7 +627,7 @@ msgstr "Status der Moderierung"
 
 #: models/pagemodel.py:83
 msgid "menu visibility"
-msgstr ""
+msgstr "Menu sichtbarkeit"
 
 #: models/pagemodel.py:83
 msgid "limit when this page is visible in the menu"
@@ -728,7 +728,7 @@ msgstr "Breite"
 
 #: models/pluginmodel.py:122
 msgid "<Empty>"
-msgstr ""
+msgstr "<Leer>"
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
@@ -826,7 +826,7 @@ msgstr "Karte"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:11
 msgid "Your address: "
-msgstr ""
+msgstr "Deine Addresse:"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:13
 msgid "Calculate route"
@@ -1016,7 +1016,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:31
 msgid "Twitter Search"
-msgstr ""
+msgstr "Twitter Suche"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1040,7 +1040,7 @@ msgstr "Wenn ausgefüllt, wird der Tipp als Link zu Ihrem Twitter-Profil dargest
 
 #: plugins/twitter/models.py:16
 msgid "query"
-msgstr ""
+msgstr "Abfrage"
 
 #: plugins/twitter/models.py:16
 msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
@@ -1525,7 +1525,7 @@ msgstr "Wählen Sie Kopier-Optionen"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "Generisch"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 #: templates/cms/toolbar/add_plugins.html:6
@@ -1554,7 +1554,7 @@ msgstr "Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter ein
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
-msgstr ""
+msgstr "Verfügbare Plugins"
 
 #: templates/cms/toolbar/toolbar.html:33
 #, python-format
@@ -1584,7 +1584,7 @@ msgstr "einloggen"
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
-msgstr ""
+msgstr "Bestätigung anfordern"
 
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
@@ -1678,7 +1678,7 @@ msgstr "Moderation von Folgeseiten lösen"
 #: templatetags/cms_tags.py:78
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Seite nicht gefunden auf %(domain)s"
 
 #: templatetags/cms_tags.py:79
 #, python-format
@@ -1686,18 +1686,20 @@ msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"Ein Templatetag konnte die Seite `%(page_lookup)s\n"
+"` nicht finden. Die Addresse war: http://%(host)s%(path)s"
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
-msgstr ""
+msgstr "Englisch"
 
 #: test/run_tests.py:138 test/project/settings.py:117
 msgid "French"
-msgstr ""
+msgstr "Französisch"
 
 #: test/run_tests.py:139 test/project/settings.py:118
 msgid "German"
-msgstr ""
+msgstr "Deutsch"
 
 #: test/run_tests.py:140 test/project/settings.py:119
 msgid "Brazil"
@@ -1705,63 +1707,63 @@ msgstr ""
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
-msgstr ""
+msgstr "Holländisch"
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "Zwei Spalten"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "Drei Spalten"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
-msgstr ""
+msgstr "Navigations Beispiel"
 
 #: test/run_tests.py:167 test/project/settings.py:148
 msgid "sidebar column"
-msgstr ""
+msgstr "Seitenspalte"
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr ""
+msgstr "Linke Spalte"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr ""
+msgstr "Rechte Spalte"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "Artikel"
 
 #: test/apps/sampleapp/cms_app.py:7
 msgid "Sample App"
-msgstr ""
+msgstr "Beispiel Applikation"
 
 #: test/apps/sampleapp/menu.py:17
 msgid "sample root page"
-msgstr ""
+msgstr "Beispiel Hauptseite"
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
-msgstr ""
+msgstr "Beispiel Einstellungen"
 
 #: test/apps/sampleapp/menu.py:19
 msgid "sample account page"
-msgstr ""
+msgstr "Beispiel Konto"
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "Beispiel Profil"
 
 #: test/apps/sampleapp/menu.py:32
 msgid "Static Menu"
-msgstr ""
+msgstr "Statisches Menu"
 
 #: test/apps/sampleapp/menu.py:48
 msgid "Static Menu2"
-msgstr ""
+msgstr "Statisches Menu 2"
 
 #: utils/moderator.py:83
 msgid "parent first"
