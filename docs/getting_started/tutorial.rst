@@ -49,28 +49,65 @@ To make your life easier, add the following at the top of the file::
     PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-Add the following apps to your ``INSTALLED_APPS``:
+Add the following apps to your ``INSTALLED_APPS`` which enable django-cms and required or highly recommended applications/libraries):
 
-* ``'cms'``
-* ``'mptt'``
-* ``'menus'``
-* ``'south'``
-* ``'appmedia'``
+* ``'cms'``, django-cms itself
+* ``'mptt'``, utilities for implementing a modified pre-order traversal tree
+* ``'menus'``, helper for model independent hierarchical website navigation
+* ``'south'``, intelligent schema and data migrations
+* ``'appmedia'``, linking application-specific media to project media
 
 Also add any (or all) of the following plugins, depending on your needs:
 
-* ``'cms.plugins.text'``
-* ``'cms.plugins.picture'``
-* ``'cms.plugins.link'``
 * ``'cms.plugins.file'``
-* ``'cms.plugins.snippet'``
+* ``'cms.plugins.flash'``
 * ``'cms.plugins.googlemap'``
+* ``'cms.plugins.link'``
+* ``'cms.plugins.picture'``
+* ``'cms.plugins.snippet'``
+* ``'cms.plugins.teaser'``
+* ``'cms.plugins.text'``
+* ``'cms.plugins.video'``
+* ``'cms.plugins.twitter'``
+
+They are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
+There is even more plugins available on django CMS `extensions page`_.
+
+.. _extensions page: http://www.django-cms.org/en/extensions/
 
 If you wish to use the moderation workflow, also add:
 
 * ``'publisher'``
 
-Further, make sure you uncomment ``'django.contrib.admin'``
+Further, make sure you uncomment (enable) ``'django.contrib.admin'``
+
+You might consider using `django-filer`_ with `django CMS plugin`_ and its
+components instead of ``cms.plugins.file``, ``cms.plugins.picture``, ``cms.plugins.teaser``
+and ``cms.plugins.video`` core plugins. In this case you should not add them to
+``INSTALLED_APPS`` but add those instead:
+
+* ``'filer'``
+* ``'cmsplugin_filer_file'``
+* ``'cmsplugin_filer_folder'``
+* ``'cmsplugin_filer_image'``
+* ``'cmsplugin_filer_teaser'``
+* ``'cmsplugin_filer_video'``
+
+.. _django-filer: https://github.com/stefanfoulis/django-filer
+.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+
+If you opt for core plugins you should take care that directory to which
+``CMS_PAGE_MEDIA_PATH`` setting points (by default ``cms_page_media/`` relative
+to ``MEDIA_ROOT``) is writable by the user under which django will be running.
+If you have opted for django-filer then similar requirement exists based on its
+configuration.
+
+If you want versioning of your content you should also enable `django-reversion`_
+by adding:
+
+* ``'reversion'``
+
+.. _django-reversion: https://github.com/etianen/django-reversion
 
 You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
 right position::

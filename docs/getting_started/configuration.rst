@@ -301,6 +301,9 @@ By default, Django CMS creates a folder called 'cms_page_media' in your static
 files folder where all uploaded media files are stored. The media files are
 stored in subfolders numbered with the id of the page.
 
+You should take care that directory to which it points is writable by the user
+under which django will be running.
+
 
 ****
 URLs

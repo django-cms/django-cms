@@ -26,6 +26,16 @@ Requirements
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 
+Recommended
+===========
+
+* `django-filer`_ with its `django CMS plugin`_, file and image management application to use instead of some core plugins
+* `django-reversion`_, to support versions of your content
+
+.. _django-filer: https://github.com/stefanfoulis/django-filer
+.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django-reversion: https://github.com/etianen/django-reversion
+
 On Ubuntu
 =========
 
