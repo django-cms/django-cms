@@ -51,7 +51,7 @@ To make your life easier, add the following at the top of the file::
 
 Add the following apps to your ``INSTALLED_APPS`` which enable django-cms and required or highly recommended applications/libraries):
 
-* ``'cms'``, django-cms itself
+* ``'cms'``, django CMS itself
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
 * ``'menus'``, helper for model independent hierarchical website navigation
 * ``'south'``, intelligent schema and data migrations
