@@ -14,17 +14,19 @@ Requirements
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.2.2 or higher
+* `django-mptt`_ 0.4.2 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
   
-.. note:: When installing the django CMS using pip, both Django and
-          django-classy-tags will be installed automatically.
+.. note:: When installing the django CMS using pip, both Django, django-mptt
+          django-classy-tags, south and PIL will be installed automatically.
 
 .. _Python: http://www.python.org
 .. _Django: http://www.djangoproject.com
 .. _PIL: http://www.pythonware.com/products/pil/
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
+.. _django-mptt: https://github.com/django-mptt/django-mptt
 
 Recommended
 ===========
