@@ -1382,7 +1382,7 @@ class PageAdmin(model_admin):
                 return render_admin_menu_item(request, page)
         raise Http404
     
-    def lookup_allowed(self, key, *args):
+    def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
             return True
         return super(PageAdmin, self).lookup_allowed(key, *args)
