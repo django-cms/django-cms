@@ -1,7 +1,39 @@
 import sys
 import os
 
-def configure_settings(env_name):
+def configure_settings(is_test, test_args):
+    
+    failfast = False
+    direct = False
+    test_args = list(test_args)
+    if '--direct' in test_args:
+        test_args.remove('--direct')
+        sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
+        
+    if '--manage' in test_args:
+        test_args.remove('--manage')
+
+    test_labels = []
+    
+    test_args_enum = dict([ (val, idx) for idx, val in enumerate(test_args)])
+    
+    env_name = ''
+    if '--toxenv' in test_args:
+        env_name = test_args[test_args_enum['--toxenv']+1]
+        test_args.remove('--toxenv')
+        test_args.remove(env_name)
+    
+    if '--failfast' in test_args:
+        test_args.remove('--failfast')
+        failfast = True
+        
+    if is_test:
+        for label in test_args:
+            test_labels.append('cms.%s' % label)
+                
+        if not test_labels:
+            test_labels.append('cms')
+    
     from cms.test import project
     import cms
     
@@ -214,38 +246,11 @@ def configure_settings(env_name):
     
     from cms.conf import patch_settings
     patch_settings()
-    return settings
+    return test_args, test_labels, failfast, settings
 
 def run_tests(*test_args):
     
-    test_args = list(test_args)
-    if '--direct' in test_args:
-        test_args.remove('--direct')
-        sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
-    
-    failfast = False
-
-    test_labels = []
-    
-    test_args_enum = dict([ (val, idx) for idx, val in enumerate(test_args)])
-    
-    env_name = ''
-    if '--env-name' in test_args:
-        env_name = test_args[test_args_enum['--env-name']+1]
-        test_args.remove('--env-name')
-        test_args.remove(env_name)
-    
-    if '--failfast' in test_args:
-        test_args.remove('--failfast')
-        failfast = True
-    
-    for label in test_args:
-        test_labels.append('cms.%s' % label)
-            
-    if not test_labels:
-        test_labels.append('cms')
-        
-    settings = configure_settings(env_name)
+    test_args, test_labels, failfast, settings = configure_settings(True, test_args)
     
     from django.test.utils import get_runner 
                    
