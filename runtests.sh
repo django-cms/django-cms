@@ -5,7 +5,7 @@ num_args=${#args[@]}
 index=0
 
 quicktest=false
-testshell=false
+manage=false
 
 while [ "$index" -lt "$num_args" ]
 do
@@ -40,12 +40,12 @@ case "${args[$index]}" in
             echo ""
             echo " --quicktest - use already built tox env, for running a simple test quickly"
             echo " --failfast - abort at first failing test"
-            echo " --with-coverage - enables coverage"
+            echo " --manage - run management shell"
             exit 1
             ;;
         
-        "--testshell")
-            testshell=true
+        "--manage")
+            manage=true
             ;;  
         *)
             suite="${args[$index]}"
@@ -66,17 +66,17 @@ tox_envs=( $toxenv )
 tox_len=${#tox_envs[@]}
 IFS=OLD_IFS
 
-if [[ $quicktest == true || $testshell == true ]]; then
-    if [[ $testshell == true ]]; then
+if [[ $quicktest == true || $manage == true ]]; then
+    if [[ $manage == true ]]; then
         if [[ "$tox_len" -gt "1" || "$toxenv" == "ALL" ]]; then
-            echo "Cannot use multiple envs with --testshell" 
+            echo "Cannot use multiple envs with --manage" 
             exit 1
         fi
         if [ ! -d ".tox/$toxenv" ]; then
-            echo ".tox/$toxenv does not exist, run without --testshell first"
+            echo ".tox/$toxenv does not exist, run without --manage first"
             exit 1
         fi
-        .tox/$toxenv/bin/python cms/test/run_shell.py --env-name $toxenv --direct "$@"
+        .tox/$toxenv/bin/python cms/test/run_shell.py --direct "$@"
         exit 1
     fi
     if [ "$toxenv" == "ALL" ]; then
@@ -94,7 +94,7 @@ if [[ $quicktest == true || $testshell == true ]]; then
         if [ "$failfast" ]; then
             echo "--failfast supplied, not using xmlrunner."
         fi
-        .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite 
+        .tox/$tenv/bin/python cms/test/run_tests.py --toxenv $tenv --direct $failfast $suite 
         retcode=$?
     done
 else

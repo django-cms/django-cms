@@ -10,17 +10,17 @@ def configure_settings(is_test, test_args):
         test_args.remove('--direct')
         sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
         
-    if '--testshell' in test_args:
-        test_args.remove('--testshell')
+    if '--manage' in test_args:
+        test_args.remove('--manage')
 
     test_labels = []
     
     test_args_enum = dict([ (val, idx) for idx, val in enumerate(test_args)])
     
     env_name = ''
-    if '--env-name' in test_args:
-        env_name = test_args[test_args_enum['--env-name']+1]
-        test_args.remove('--env-name')
+    if '--toxenv' in test_args:
+        env_name = test_args[test_args_enum['--toxenv']+1]
+        test_args.remove('--toxenv')
         test_args.remove(env_name)
     
     if '--failfast' in test_args:
