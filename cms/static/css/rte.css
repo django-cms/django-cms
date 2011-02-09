@@ -1,0 +1,40 @@
+
+.frameBody {
+    font-family:"Lucida Grande",Verdana,Arial,sans-serif;
+    font-size:11px;
+    font-weight:normal;
+    margin:0;
+    padding:2px 3px; 
+    width:98%;
+    height:98%;
+}
+
+.frameBody p {
+    border-left:1px #bbb solid;
+    padding-left:2px;
+}
+
+iframe.rte {
+    width:100%;
+    border:1px #ccc solid;
+}
+
+.rte-toolbar { 
+    overflow:hidden; 
+    width:100%;
+    clear:both;
+}
+
+.rte-toolbar a, .rte-toolbar a img {
+	border:0;
+}
+
+form .rte-toolbar p {
+    float:left;
+    margin:0;
+    padding:0;
+    padding-right:5px;
+}
+
+
+
