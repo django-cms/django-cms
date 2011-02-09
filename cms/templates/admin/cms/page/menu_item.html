@@ -13,8 +13,8 @@
 			{% if not CMS_PERMISSION or has_add_permission or has_add_page_permission %}
 				{# if permissions not enabled, user user haves global can_add page #}
 					{% if has_add_on_same_level_permission %}
-						<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-up.gif"/></a><span class="line first"> |</span>
-						<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{% admin_media_prefix %}img/admin/arrow-down.gif"/></a><span class="line second"> |</span>
+						<a href="#" class="move-target left" title="{% trans "insert above" %}"><img alt="" src="{{ STATIC_URL }}img/admin/arrow-up.gif"/></a><span class="line first"> |</span>
+						<a href="#" class="move-target right" title="{% trans "insert below" %}"><img alt="" src="{{ STATIC_URL }}img/admin/arrow-down.gif"/></a><span class="line second"> |</span>
 					{% endif %}
 				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">↘</a>
 			{% endif %}
@@ -46,11 +46,11 @@
 		
 		<div class="col-navigation">
 			{% if page.in_navigation %}<label>
-				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>	
+				<img alt="True" src="{{ STATIC_URL }}img/admin/icon-yes.gif"/>	
 				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" checked="checked" value="1" />{% endif %}
 			</label>
 			{% else %}<label>
-				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
+				<img alt="False" src="{{ STATIC_URL }}img/admin/icon-no.gif" />
 				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />{% endif %}
 			</label>{% endif %}				
 		</div>

@@ -1,5 +1,5 @@
 {% load i18n adminmedia %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
 <script type="text/javascript">
     //<![CDATA[
     // When jQuery is sourced, it's going to overwrite whatever might be in the
@@ -9,21 +9,21 @@
     (function ($) {
 		$('<link>').appendTo('head').attr({
 			rel: 'stylesheet', type: 'text/css',
-			href: '{{ CMS_MEDIA_URL }}css/toolbar.css'
+			href: '{{ STATIC_URL }}css/toolbar.css'
 		});
 		$('<link>').appendTo('head').attr({
 			rel: 'stylesheet', type: 'text/css',
-			href: '{{ CMS_MEDIA_URL }}css/jquery.dialog.css'
+			href: '{{ STATIC_URL }}css/jquery.dialog.css'
 		});
 	})(jQuery);
 	//]]>
 </script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.cookie.js"></script> 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/tools.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.cookie.js"></script> 
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.backgroundposition.js"></script> 
+<script type="text/javascript" src="{{ STATIC_URL }}js/tools.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.pack.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script> 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script> 
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/ui.core.js"></script> 
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/ui.dialog.js"></script> 
 <script type="text/javascript">
     //<![CDATA[
     // dynamic variables for the toolbar js file
