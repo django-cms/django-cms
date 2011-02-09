@@ -92,7 +92,8 @@
 		tree.init($("div.tree"), options);
 	};
 	
-	$(document).ready(function() {	
+	$(document).ready(function() {
+		patchCsrf($);
 	    var selected_page = false;
 	    var action = false;
 		

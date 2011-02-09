@@ -11,6 +11,8 @@ function hide_iframe(){
 }
 
 jQuery(document).ready(function($) {
+	
+	patchCsrf(jQuery)
 
     jQuery.fn.swapWith = function(to) {
         return this.each(function() {

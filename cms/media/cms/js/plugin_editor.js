@@ -1,6 +1,7 @@
 (function($) {
     $(document).ready(function() {
         // Add Plugin Handler
+    	patchCsrf(jQuery);
         $('span.add-plugin').click(function(){
          var select = $(this).parent().children("select[name=plugins]");
             var pluginvalue = select.attr('value');

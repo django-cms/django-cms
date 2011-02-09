@@ -4,6 +4,7 @@
 
 {% block extrahead %}
 {{ block.super }}
+{% include "cms/inc/csrf_js.html" %}
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
 
 {% if not add %}
