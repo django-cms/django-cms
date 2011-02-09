@@ -1,15 +1,8 @@
 # -*- coding: utf-8 -*-
-from cms.exceptions import NoHomeFound
-from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models.metaclasses import PageMetaClass
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
-from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
-from cms.utils.i18n import get_fallback_languages
-from cms.utils.page import get_available_slug, check_title_slugs
-from cms.utils.urlutils import urljoin
+import copy
 from datetime import datetime
+from os.path import join
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,11 +12,19 @@ from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _, get_language, ugettext
-from menus.menu_pool import menu_pool
-from os.path import join
+
+from cms.exceptions import NoHomeFound
+from cms.models.managers import PageManager, PagePermissionsPermissionManager
+from cms.models.metaclasses import PageMetaClass
+from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
+from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.helpers import reversion_register
+from cms.utils import i18n, urlutils, page as page_utils
+
+from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
-import copy
 
 
 class Page(MPTTModel):
@@ -47,8 +48,8 @@ class Page(MPTTModel):
     )
     
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
-            (1,_('for logged in users only')),
-            (2,_('for anonymous users only')),
+        (1,_('for logged in users only')),
+        (2,_('for anonymous users only')),
     )
     PUBLISHER_STATE_DEFAULT = 0
     PUBLISHER_STATE_DIRTY = 1
@@ -79,7 +80,7 @@ class Page(MPTTModel):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     
-    login_required = models.BooleanField(_("login required"),default=False)
+    login_required = models.BooleanField(_("login required"), default=False)
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, help_text=_("limit when this page is visible in the menu"))
     
     # Placeholders (plugins)
@@ -96,6 +97,9 @@ class Page(MPTTModel):
     permissions = PagePermissionsPermissionManager()
 
     class Meta:
+        permissions = (
+            ('view_page', 'Can view page'),
+        )
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('site','tree_id', 'lft')
@@ -112,7 +116,7 @@ class Page(MPTTModel):
         if title is None:
             title = u""
         return u'%s' % (title,)
-        
+    
     def move_page(self, target, position='first-child'):
         """Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
@@ -128,7 +132,7 @@ class Page(MPTTModel):
         self.save(change_state=True) # always save the page after move, because of publisher
         
         # check the slugs
-        check_title_slugs(self)
+        page_utils.check_title_slugs(self)
         
     def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, public_copy=False):
         """
@@ -251,7 +255,7 @@ class Page(MPTTModel):
                 
                 # create slug-copy for standard copy
                 if not public_copy:
-                    title.slug = get_available_slug(title)
+                    title.slug = page_utils.get_available_slug(title)
                 title.save()
                 
             # copy the placeholders (and plugins on those placeholders!)
@@ -547,13 +551,15 @@ class Page(MPTTModel):
                 except NoHomeFound:
                     pass
                 ancestors = self.get_cached_ancestors(ascending=True)
-                if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
-                    path = "/".join(path.split("/")[1:])
+                # sometimes there are no ancestors
+                if len(ancestors)!=0:
+                    if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
+                        path = "/".join(path.split("/")[1:])
             
         if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS:
             path = '/'.join([ugettext(p) for p in path.split('/')])
 
-        return urljoin(reverse('pages-root'), path)
+        return urlutils.urljoin(reverse('pages-root'), path)
     
     def get_cached_ancestors(self, ascending=True):
         if ascending:
@@ -660,7 +666,7 @@ class Page(MPTTModel):
             self.title_cache = {}
         elif not language in self.title_cache:
             if fallback:
-                fallback_langs = get_fallback_languages(language)
+                fallback_langs = i18n.get_fallback_languages(language)
                 for lang in fallback_langs:
                     if lang in self.title_cache:
                         return lang    
@@ -698,7 +704,7 @@ class Page(MPTTModel):
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
         return template
-
+    
     def get_template_name(self):
         """
         get the textual name (2nd parameter in settings.CMS_TEMPLATES)
@@ -710,7 +716,31 @@ class Page(MPTTModel):
             if t[0] == template:
                 return t[1] 
         return _("default")
-
+    
+    def has_view_permission(self, request):
+        from cms.models.permissionmodels import PagePermission
+        # staff is allowed to see everything
+        if request.user.is_staff and settings.CMS_PUBLIC_FOR_STAFF:
+            return True
+        # does any restriction exist?
+        restricted = PagePermission.objects.filter(page=self, can_view=True).count()
+        # anonymous user, no restriction saved in database
+        if not request.user.is_authenticated() and not restricted:
+            return True
+        # authenticated user, no restriction and public for all fallback
+        if (request.user.is_authenticated() and not restricted and
+                settings.CMS_PUBLIC_FOR_ALL):
+            return True
+        # anyonymous user, page has restriction, generally false
+        if not request.user.is_authenticated() and restricted:
+            return False
+        # Authenticated user
+        # Django wide auth perms "can_view" or cms auth perms "can_view"
+        opts = self._meta
+        codename = '%s.%s_%s' % (opts.app_label, "view", opts.object_name.lower())
+        return (request.user.has_perm(codename) or
+                self.has_generic_permission(request, "view"))
+    
     def has_change_permission(self, request):
         opts = self._meta
         if request.user.is_superuser:
@@ -732,12 +762,14 @@ class Page(MPTTModel):
         return self.has_generic_permission(request, "advanced_settings")
     
     def has_change_permissions_permission(self, request):
-        """Has user ability to change permissions for current page?
+        """
+        Has user ability to change permissions for current page?
         """
         return self.has_generic_permission(request, "change_permissions")
     
     def has_add_permission(self, request):
-        """Has user ability to add page under current page?
+        """
+        Has user ability to add page under current page?
         """
         return self.has_generic_permission(request, "add")
     
@@ -747,7 +779,8 @@ class Page(MPTTModel):
         return self.has_generic_permission(request, "move_page")
     
     def has_moderate_permission(self, request):
-        """Has user ability to moderate current page? If moderation isn't 
+        """
+        Has user ability to moderate current page? If moderation isn't
         installed, nobody can moderate.
         """
         if not settings.CMS_MODERATOR:
@@ -761,13 +794,13 @@ class Page(MPTTModel):
         """
         att_name = "permission_%s_cache" % perm_type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
-            or request.user.pk != self.permission_user_cache.pk:
+                or request.user.pk != self.permission_user_cache.pk:
             from cms.utils.permissions import has_generic_permission
             self.permission_user_cache = request.user
-            setattr(self, att_name, has_generic_permission(self.id, request.user, perm_type, self.site_id))
+            setattr(self, att_name, has_generic_permission(
+                    self.id, request.user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
-                
         return getattr(self, att_name)
     
     def is_home(self):
@@ -785,7 +818,6 @@ class Page(MPTTModel):
         if not hasattr(self, attr):
             setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
         return getattr(self, attr)
-
     
     def set_home_pk_cache(self, value):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site.pk)
@@ -871,9 +903,8 @@ class Page(MPTTModel):
         
         self._moderation_value_cahce = moderation_value
         self._moderation_value_cache_for_user_id = user
-            
-        return moderation_value 
-
+        
+        return moderation_value
 
     def _collect_delete_marked_sub_objects(self, seen_objs, parent=None, nullable=False, excluded_models=None):
         if excluded_models is None:

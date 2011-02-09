@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
+
+from django.contrib.auth.models import User
+
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import ACCESS_DESCENDANTS
 from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
 from cms.utils.permissions import has_generic_permission
-from django.conf import settings
-from django.contrib.auth.models import User
 
 class PermissionModeratorTestCase(CMSTestCase):
-    """Permissions and moderator together
+    """
+    Permissions and moderator together
     
     Fixtures contains 3 users and 1 published page and some other stuff
     
@@ -36,6 +39,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         4. `pageA`:
             - created by super
             - master can add/change/delete on it and descendants 
+
+        5. `pageB`:
+            - created by super
+            - normal can view on it and descendants
+
     """
     def setUp(self):
         # create super user
@@ -43,7 +51,15 @@ class PermissionModeratorTestCase(CMSTestCase):
             is_superuser=True)
         self.user_super.set_password("super")
         self.user_super.save()
+        
+        # create staff user
+        self.user_staff = User(username="staff", is_staff=True, is_active=True)
+        self.user_staff.set_password("staff")
+        self.user_staff.save()
+        
         self.login_user(self.user_super)
+
+        # create basic structure ...
         
         self.home_page = self.create_page(title="home", user=self.user_super)
         
@@ -55,11 +71,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_master = self.create_page_user("master", grant_all=True)
         
         # assign master user under home page
-        self.assign_user_to_page(self.home_page, self.user_master, grant_on=ACCESS_DESCENDANTS,
+        self.assign_user_to_page(self.user_master, self.home_page, grant_on=ACCESS_DESCENDANTS,
             grant_all=True)
         
         # and to master page
-        self.assign_user_to_page(self.master_page, self.user_master, grant_all=True)
+        self.assign_user_to_page(self.user_master, self.master_page, grant_all=True)
         
         # slave page & slave user
         
@@ -67,12 +83,22 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_slave = self.create_page_user("slave", 
             can_add_page=True, can_change_page=True, can_delete_page=True)
         
-        self.assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
+        self.assign_user_to_page(self.user_slave, self.slave_page, grant_all=True)
         
+        # create page_b
+        
+        page_b = self.create_page(title="pageB", published=True)
+        page_b = self.publish_page(page_b, approve=True)
+
+        # Normal user
+        self.user_normal = self.create_page_user("normal")
+        # it's allowed for the normal user to view the page
+        perm = self.assign_user_to_page(self.user_normal, page_b, can_view=True)
+
         # create page_a - sample page from master
         
         page_a = self.create_page(title="pageA", user=self.user_super)
-        self.assign_user_to_page(page_a, self.user_master, 
+        self.assign_user_to_page(self.user_master, page_a,
             can_add=True, can_change=True, can_delete=True, can_publish=True, 
             can_move_page=True, can_moderate=True)
         
@@ -544,3 +570,55 @@ class PermissionModeratorTestCase(CMSTestCase):
 
         # there should now be 0 plugins
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
+
+    def test_20_superuser_can_view(self):
+        self.login_user(self.user_super)
+        response = self.client.get("/fr/pageb/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_21_superuser_can_view(self):
+        self.login_user(self.user_staff)
+        response = self.client.get("/fr/pageb/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_22_user_normal_can_view(self):
+        self.login_user(self.user_normal)
+        response = self.client.get("/fr/pageb/")
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+        response = self.client.get("/fr/pageb/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_23_user_globalpermission(self):
+        global_page = self.create_page(title="global", published=True)
+        global_page = self.publish_page(global_page, approve=True)
+        
+        # Global user
+        user_global = self.create_page_user("global")
+        user_global.is_staff = False
+        user_global.save() # Preven is_staff permission
+        # it's allowed for the normal user to view the page
+        self.assign_user_to_page(user_global, global_page,
+            global_permission=True, can_view=True)
+
+        self.login_user(user_global)
+        response = self.client.get("/fr/global/")
+        self.assertEqual(response.status_code, 200)
+
+        user_non_global = User(username="nonglobal", is_active=True)
+        user_non_global.set_password("nonglobal")
+        user_non_global.save()
+        self.login_user(user_non_global)
+        response = self.client.get("/fr/global/")
+        self.assertEqual(response.status_code, 404, response.content)
+
+    def test_24_anonymous_user(self):
+        settings.CMS_PUBLIC_FOR_ALL = True
+        response = self.client.get("/fr/pageb/")
+        self.assertEqual(response.status_code, 200)
+
+        # default of when to show pages to anonymous user doesn't take
+        # global permissions into account
+        settings.CMS_PUBLIC_FOR_ALL = False
+        response = self.client.get("/fr/pageb/")
+        self.assertEqual(response.status_code, 200)

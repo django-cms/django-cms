@@ -11,7 +11,6 @@ from django.conf import settings
 # The id of default Site instance to be used for multisite purposes.
 SITE_ID = 1
 
-
 # Which templates should be used for extracting the placeholders?
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
 CMS_TEMPLATES = None
@@ -25,7 +24,16 @@ CMS_PLACEHOLDER_CONF = {}
 
 # Whether to enable permissions.
 CMS_PERMISSION = False
-    
+
+# Decides if pages without any view restrictions are public by default
+CMS_PUBLIC_FOR_ALL = True
+
+# Decides if staff members are allowed to view pages even if they are view restricted
+CMS_PUBLIC_FOR_STAFF = True
+
+# Defines how long user permissions should be cached
+CMS_PERMISSION_CACHE_DURATION = 600
+
 # Show the publication date field in the admin, allows for future dating
 # Changing this from True to False could cause some weirdness.  If that is required,
 # you should update your database to correct any future dated pages

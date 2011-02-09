@@ -2,7 +2,7 @@
 from cms.admin.forms import save_permissions
 from cms.models import Title, Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission, PageUser
+from cms.models.permissionmodels import PagePermission, PageUser, GlobalPagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.test.util.context_managers import UserLoginContext, SettingsOverride
@@ -279,12 +279,12 @@ class CMSTestCase(TestCase):
         request.LANGUAGE_CODE = language
         return request
     
-    def create_page_user(self, username, password=None, 
+    def create_page_user(self, username, password=None,
         can_add_page=True, can_change_page=True, can_delete_page=True, 
         can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, 
         can_delete_pageuser=True, can_add_pagepermission=True, 
         can_change_pagepermission=True, can_delete_pagepermission=True,
-        grant_all=False):
+        grant_all=False, can_view_page=True):
         """
         Helper function for creating page user, through form on:
             /admin/cms/pageuser/add/
@@ -299,13 +299,14 @@ class CMSTestCase(TestCase):
             password=username
         
         data = {
-            'can_add_page': can_add_page, 
+            'can_add_page': can_add_page,
+            'can_view_page': can_view_page,
             'can_change_page': can_change_page, 
-            'can_delete_page': can_delete_page, 
-            'can_recover_page': can_recover_page, 
-            'can_add_pageuser': can_add_pageuser, 
-            'can_change_pageuser': can_change_pageuser, 
-            'can_delete_pageuser': can_delete_pageuser, 
+            'can_delete_page': can_delete_page,
+            'can_recover_page': can_recover_page,
+            'can_add_pageuser': can_add_pageuser,
+            'can_change_pageuser': can_change_pageuser,
+            'can_delete_pageuser': can_delete_pageuser,
             'can_add_pagepermission': can_add_pagepermission,
             'can_change_pagepermission': can_change_pagepermission,
             'can_delete_pagepermission': can_delete_pagepermission,
@@ -328,19 +329,21 @@ class CMSTestCase(TestCase):
         save_permissions(data, page_user)
         return user
         
-    def assign_user_to_page(self, page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+    def assign_user_to_page(self, user, page, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         can_add=False, can_change=False, can_delete=False, 
         can_change_advanced_settings=False, can_publish=False, 
         can_change_permissions=False, can_move_page=False, can_moderate=False, 
-        grant_all=False):
-        """Assigns given user to page, and gives him requested permissions. 
+        can_recover_page=True, can_view=False, grant_all=False,
+        global_permission=False):
+        """
+        Assigns given user to page, and gives him requested permissions. 
         
         Note: this is not happening over frontend, maybe a test for this in 
         future will be nice.
         """
-        if grant_all:
-            return self.assign_user_to_page(page, user, grant_on, 
-                True, True, True, True, True, True, True, True)
+        if grant_all and not global_permission:
+            return self.assign_user_to_page(user, page, grant_on,
+                True, True, True, True, True, True, True, True, False, True)
         
         data = {
             'can_add': can_add,
@@ -350,8 +353,19 @@ class CMSTestCase(TestCase):
             'can_publish': can_publish, 
             'can_change_permissions': can_change_permissions, 
             'can_move_page': can_move_page, 
-            'can_moderate': can_moderate,  
+            'can_moderate': can_moderate,
+            'can_view': can_view,
         }
+        
+        if global_permission:
+            page_permission = GlobalPagePermission(
+                user=user, can_recover_page=can_recover_page, **data)
+            page_permission.save()
+            page_permission.sites.add(Site.objects.get_current())
+        else:
+            page_permission = PagePermission(
+                page=page, user=user, grant_on=grant_on, **data)
+            page_permission.save()
         
         page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
         page_permission.save()
