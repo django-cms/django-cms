@@ -5,7 +5,7 @@ num_args=${#args[@]}
 index=0
 
 quicktest=false
-disable_coverage=true
+testshell=false
 
 while [ "$index" -lt "$num_args" ]
 do
@@ -43,15 +43,10 @@ case "${args[$index]}" in
             echo " --with-coverage - enables coverage"
             exit 1
             ;;
-            
-        "--rebuild-env")
-            # just to make ci run instantly
-            ;;
-            
-        "--with-coverage")
-            # just to make ci run instantly
-            ;;
-            
+        
+        "--testshell")
+            testshell=true
+            ;;  
         *)
             suite="${args[$index]}"
     esac
@@ -64,44 +59,55 @@ if [ ! "$toxenv" ]; then
     toxenv='py26-1.2.X'
 fi
 
-if [ "$failfast" ]; then
-    echo "--failfast supplied, not using xmlrunner."
-fi
 
-if [ ! "$suite" ]; then
-    echo "Running complete cms testsuite."
-else
-    if [ $quicktest == false ]; then
-        echo "Can only run specific suite with --quicktest"
+OLD_IFS=IFS
+IFS=","
+tox_envs=( $toxenv )
+tox_len=${#tox_envs[@]}
+IFS=OLD_IFS
+
+if [[ $quicktest == true || $testshell == true ]]; then
+    if [[ $testshell == true ]]; then
+        if [[ "$tox_len" -gt "1" || "$toxenv" == "ALL" ]]; then
+            echo "Cannot use multiple envs with --testshell" 
+            exit 1
+        fi
+        if [ ! -d ".tox/$toxenv" ]; then
+            echo ".tox/$toxenv does not exist, run without --testshell first"
+            exit 1
+        fi
+        .tox/$toxenv/bin/python cms/test/run_shell.py --env-name $toxenv --direct "$@"
         exit 1
     fi
-    echo "Running cms test $suite."
-fi
-
-if [ ! -f "toxinstall/bin/tox" ]; then
-    echo "Installing tox"
-    virtualenv toxinstall
-    toxinstall/bin/pip install -U tox
-fi
-
-if [ $quicktest == true ]; then
     if [ "$toxenv" == "ALL" ]; then
         echo "Cannot use ALL with --quicktest" 
         exit 1
     fi
-    IFS=","
-    tenvs=( $toxenv )
-    for tenv in ${tenvs[@]}; do
+    for tenv in ${tox_envs[@]}; do
         if [ ! -d ".tox/$tenv" ]; then
             echo ".tox/$tenv does not exist, run without --quicktest first"
             exit 1
         fi
         read -p "Hit any key to run tests in tox env $tenv"
+        echo "Running cms test $suite using $tenv"
         # running tests without invoking tox to save time
+        if [ "$failfast" ]; then
+            echo "--failfast supplied, not using xmlrunner."
+        fi
         .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite 
         retcode=$?
     done
 else
+    if [ "$suite" ]; then
+        echo "Can only run specific suite with --quicktest"
+    fi
+    
+    if [ ! -f "toxinstall/bin/tox" ]; then
+        echo "Installing tox"
+        virtualenv toxinstall
+        toxinstall/bin/pip install -U tox
+    fi
+    echo "Running complete cms testsuite."
     toxinstall/bin/tox -e $toxenv
     retcode=$?
 fi
