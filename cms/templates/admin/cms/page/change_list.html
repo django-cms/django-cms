@@ -12,6 +12,7 @@
 
 {% block coltype %}flex{% endblock %}
 {% block extrahead %}
+{% include "cms/inc/csrf_js.html" %}
 <link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/pages.css"/>
 <link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}jstree/tree_component.css" />
 <link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/jquery.dialog.css" />
