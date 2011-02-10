@@ -163,16 +163,16 @@
         {% if edit and page %}
         {% if auth and moderator %}
             {% if moderator_should_approve and has_moderate_permission %}
-            <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">
+            <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="cms_toolbar_btn cms_toolbar_green" title="{% trans 'Approve directly' %}">
                 <span class="state">{{ page_moderator_state.label }}</span>
             </a>
             {% else %}
                 {% if has_publish_permission %}
-                <a id="cms_toolbar_publishbutton" href="{% url admin:cms_page_publish_page page.pk %}" class="button blue" title="{% trans 'Publish' %}">
+                <a id="cms_toolbar_publishbutton" href="{% url admin:cms_page_publish_page page.pk %}" class="cms_toolbar_btn cms_toolbar_blue" title="{% trans 'Publish' %}">
                     <span class="state">Publish</span>
                 </a>
                 {% else %}
-                    <a id="cms_toolbar_requestapproval" href="{% url admin:cms_page_approve_page page.pk %}" class="button blue" title="{% trans 'Request Approval' %}">
+                    <a id="cms_toolbar_requestapproval" href="{% url admin:cms_page_approve_page page.pk %}" class="cms_toolbar_btn cms_toolbar_blue" title="{% trans 'Request Approval' %}">
                         <span class="state">Request Approval</span>
                     </a>
                 {% endif %}
