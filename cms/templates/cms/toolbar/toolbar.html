@@ -1,11 +1,15 @@
 {% load i18n adminmedia %}
 {% include "cms/inc/csrf_js.html" %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 <script type="text/javascript">
     //<![CDATA[
     // When jQuery is sourced, it's going to overwrite whatever might be in the
-    // '$' variable, so store a reference of it in a temporary variable...
+    // '$' and jQuery variables, so store a reference of them in temporary variables.
     var _$ = window.$;
+    var _jQuery = window.jQuery;
+</script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
     // add stylesheets to head
     (function ($) {
 		$('<link>').appendTo('head').attr({
@@ -121,8 +125,9 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/toolbar.js"></script>
 <script type="text/javascript" charset="utf-8">
     //<![CDATA[
-    // Now that jQuery is done loading, put the '$' variable back to what it was...
+    // Now that jQuery is done loading, put the '$' and jQuery variables back to what they were.
     var $ = _$;
+    var jQuery = _jQuery;
     //]]>
 </script>
 
