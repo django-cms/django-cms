@@ -34,8 +34,10 @@ case "${args[$index]}" in
             echo " --toxenv [tox-env]"
             echo "    eg. runtests.sh --toxenv py26-1.2.X,py26-trunk"
             echo "    possible envs:"
-            echo "        py25-1.2.X, py25-1.3.X, py25-trunk"
-            echo "        py26-1.2.X, py26-1.3.X, py26-trunk"
+            echo "        defaultpython-defaultdjango - runs with default django and installed django version (default)"
+            echo "        defaultpython-1.2.X, defaultpython-1.3.X, defaultpython-trunk,"
+            echo "        py25-1.2.X, py25-1.3.X, py25-trunk,"
+            echo "        py26-1.2.X, py26-1.3.X, py26-trunk,"
             echo "        py27-1.2.X, py27-1.3.X, ALL"
             echo ""
             echo " --quicktest - use already built tox env, for running a simple test quickly"
@@ -56,7 +58,7 @@ done
 
 
 if [ ! "$toxenv" ]; then
-    toxenv='py26-1.2.X'
+    toxenv='defaultpython-defaultdjango'
 fi
 
 
