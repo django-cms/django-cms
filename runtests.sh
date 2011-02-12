@@ -5,7 +5,7 @@ num_args=${#args[@]}
 index=0
 
 quicktest=false
-disable_coverage=true
+manage=false
 
 while [ "$index" -lt "$num_args" ]
 do
@@ -34,24 +34,21 @@ case "${args[$index]}" in
             echo " --toxenv [tox-env]"
             echo "    eg. runtests.sh --toxenv py26-1.2.X,py26-trunk"
             echo "    possible envs:"
-            echo "        py25-1.2.X, py25-1.3.X, py25-trunk"
-            echo "        py26-1.2.X, py26-1.3.X, py26-trunk"
+            echo "        defaultpython-defaultdjango - runs with default django and installed django version (default)"
+            echo "        defaultpython-1.2.X, defaultpython-1.3.X, defaultpython-trunk,"
+            echo "        py25-1.2.X, py25-1.3.X, py25-trunk,"
+            echo "        py26-1.2.X, py26-1.3.X, py26-trunk,"
             echo "        py27-1.2.X, py27-1.3.X, ALL"
             echo ""
             echo " --quicktest - use already built tox env, for running a simple test quickly"
             echo " --failfast - abort at first failing test"
-            echo " --with-coverage - enables coverage"
+            echo " --manage - run management shell"
             exit 1
             ;;
-            
-        "--rebuild-env")
-            # just to make ci run instantly
-            ;;
-            
-        "--with-coverage")
-            # just to make ci run instantly
-            ;;
-            
+        
+        "--manage")
+            manage=true
+            ;;  
         *)
             suite="${args[$index]}"
     esac
@@ -61,47 +58,58 @@ done
 
 
 if [ ! "$toxenv" ]; then
-    toxenv='py26-1.2.X'
+    toxenv='defaultpython-defaultdjango'
 fi
 
-if [ "$failfast" ]; then
-    echo "--failfast supplied, not using xmlrunner."
-fi
 
-if [ ! "$suite" ]; then
-    echo "Running complete cms testsuite."
-else
-    if [ $quicktest == false ]; then
-        echo "Can only run specific suite with --quicktest"
+OLD_IFS=IFS
+IFS=","
+tox_envs=( $toxenv )
+tox_len=${#tox_envs[@]}
+IFS=OLD_IFS
+
+if [[ $quicktest == true || $manage == true ]]; then
+    if [[ $manage == true ]]; then
+        if [[ "$tox_len" -gt "1" || "$toxenv" == "ALL" ]]; then
+            echo "Cannot use multiple envs with --manage" 
+            exit 1
+        fi
+        if [ ! -d ".tox/$toxenv" ]; then
+            echo ".tox/$toxenv does not exist, run without --manage first"
+            exit 1
+        fi
+        .tox/$toxenv/bin/python cms/test/run_shell.py --direct "$@"
         exit 1
     fi
-    echo "Running cms test $suite."
-fi
-
-if [ ! -f "toxinstall/bin/tox" ]; then
-    echo "Installing tox"
-    virtualenv toxinstall
-    toxinstall/bin/pip install -U tox
-fi
-
-if [ $quicktest == true ]; then
     if [ "$toxenv" == "ALL" ]; then
         echo "Cannot use ALL with --quicktest" 
         exit 1
     fi
-    IFS=","
-    tenvs=( $toxenv )
-    for tenv in ${tenvs[@]}; do
+    for tenv in ${tox_envs[@]}; do
         if [ ! -d ".tox/$tenv" ]; then
             echo ".tox/$tenv does not exist, run without --quicktest first"
             exit 1
         fi
         read -p "Hit any key to run tests in tox env $tenv"
+        echo "Running cms test $suite using $tenv"
         # running tests without invoking tox to save time
-        .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite 
+        if [ "$failfast" ]; then
+            echo "--failfast supplied, not using xmlrunner."
+        fi
+        .tox/$tenv/bin/python cms/test/run_tests.py --toxenv $tenv --direct $failfast $suite 
         retcode=$?
     done
 else
+    if [ "$suite" ]; then
+        echo "Can only run specific suite with --quicktest"
+    fi
+    
+    if [ ! -f "toxinstall/bin/tox" ]; then
+        echo "Installing tox"
+        virtualenv toxinstall
+        toxinstall/bin/pip install -U tox
+    fi
+    echo "Running complete cms testsuite."
     toxinstall/bin/tox -e $toxenv
     retcode=$?
 fi
