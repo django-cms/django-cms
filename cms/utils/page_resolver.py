@@ -99,18 +99,6 @@ def get_page_from_request(request, use_path=None):
             q2 = Q(title_set__path='%s/%s' % (home.get_slug(), path))
             q2 &= Q(tree_id=home.tree_id)
             q |= q2
-        
-    if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS: # pragma: no cover
-        #=======================================================================
-        # WARNING: CMS_DBGETTEXT WILL BE DEPRECATED IN 2.2!
-        #=======================================================================
-        from django.utils.translation import ugettext
-        from cms.models import Title
-        for t in Title.objects.all():
-            tpath = '/'.join([ugettext(x) for x in t.path.split('/')])
-            if path == tpath:
-                q = Q(title_set__path=t.path)
-                break
     try:
         page = pages.filter(q).distinct().get()
     except Page.DoesNotExist:

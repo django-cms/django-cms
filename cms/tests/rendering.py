@@ -238,8 +238,6 @@ class RenderingTestCase(CMSTestCase):
         
     def test_10_detail_view_404_when_no_language_is_found(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_FALLBACK=True,
-                              CMS_DBGETTEXT=False, 
                               CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
                                           ( 'elvish', 'Elvish' )]):
             from cms.views import details
@@ -265,8 +263,6 @@ class RenderingTestCase(CMSTestCase):
         to English
         '''
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_FALLBACK=True,
-                              CMS_DBGETTEXT=False, 
                               CMS_LANGUAGE_CONF={
                                   'elvish': ['klingon', 'en',]
                               },
