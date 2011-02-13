@@ -62,3 +62,9 @@ class MultilingualTestCase(CMSTestCase):
         placeholder = public.placeholders.all()[0]
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
+
+    def test_03_multiple_reverse_monkeypatch(self):
+        from cms.models import monkeypatch_reverse
+        monkeypatch_reverse()
+        monkeypatch_reverse()
+
