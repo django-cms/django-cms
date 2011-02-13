@@ -6,7 +6,9 @@ if ("{{ csrf_token }}" && !window.patchCsrf){
 		}
 		jquery.ajaxSetup({
 			beforeSend: function(xhr, settings) {
-				if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+				var base_doc_url = document.URL.match(/^http[s]{0,1}:\/\/[^\/]+\//)[0];
+				var base_settings_url = settings.url.match(/^http[s]{0,1}:\/\/[^\/]+\//)[0];
+				if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)) || base_doc_url == base_settings_url) {
 					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 				}
 			}
