@@ -270,6 +270,7 @@ class CMSTestCase(TestCase):
             'wsgi.multiprocess': True,
             'wsgi.multithread':  False,
             'wsgi.run_once':     False,
+            'wsgi.input': None,
         }
         request = WSGIRequest(environ)
         request.session = self.client.session
