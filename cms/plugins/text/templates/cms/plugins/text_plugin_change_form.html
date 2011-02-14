@@ -1,5 +1,13 @@
 {% extends "admin/cms/page/plugin_change_form.html" %}
 
+{% block extrahead %}
+{{ block.super }}
+{% include "cms/inc/csrf_js.html" %}
+<script type="text/javascript">
+  window.patchCsrf(jQuery);
+</script>
+{% endblock %}
+
 {% block fieldsets %}
 {% for fieldset in adminform %}
   {% include "cms/plugins/text_plugin_fieldset.html" %}

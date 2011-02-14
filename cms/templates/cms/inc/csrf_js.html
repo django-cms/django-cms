@@ -6,13 +6,10 @@ if ("{{ csrf_token }}" && !window.patchCsrf){
 		}
 		jquery.ajaxSetup({
 			beforeSend: function(xhr, settings) {
-				if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-				}
+				xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 			}
 		});
 		window.cmsCsrfPatched = true;
 	}
 }
-
 </script>
