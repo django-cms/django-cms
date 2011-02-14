@@ -5,7 +5,7 @@ from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, PageUser
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
-from cms.test.util.context_managers import UserLoginContext, SettingsOverride
+from cms.test_utils.util.context_managers import UserLoginContext, SettingsOverride
 from cms.utils.permissions import _thread_locals
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser

@@ -1,116 +1,104 @@
 #!/bin/bash
+cd tests
 
 args=("$@")
 num_args=${#args[@]}
 index=0
 
-quicktest=false
-manage=false
-
+reuse_env=true
+disable_coverage=true
+django_trunk=false
+python="python" # to ensure this script works if no python option is specified
 while [ "$index" -lt "$num_args" ]
 do
-case "${args[$index]}" in
+    case "${args[$index]}" in
         "--failfast")
             failfast="--failfast"
             ;;
+
+        "--rebuild-env")
+            reuse_env=false
+            ;;
+
+        "--with-coverage")
+            disable_coverage=false
+            ;;
          
-        "--toxenv")
+        "--django-trunk")
+            django_trunk=true
+            ;;
+        
+        "--python")
             let "index = $index + 1"
-            toxenv="${args[$index]}"
+            python="${args[$index]}"
             ;;
-            
-        "--quicktest")
-            quicktest=true
-            ;;
-            
+
         "--help")
             echo ""
             echo "usage:"
-            echo " runtests.sh"
-            echo " or runtests.sh [testcase]"
-            echo " or runtests.sh [flags] [testcase]"
+            echo "    runtests.sh"
+            echo "    or runtests.sh [testcase]"
+            echo "    or runtests.sh [flags] [testcase]"
             echo ""
             echo "flags:"
-            echo " --toxenv [tox-env]"
-            echo "    eg. runtests.sh --toxenv py26-1.2.X,py26-trunk"
-            echo "    possible envs:"
-            echo "        defaultpython-defaultdjango - runs with default django and installed django version (default)"
-            echo "        defaultpython-1.2.X, defaultpython-1.3.X, defaultpython-trunk,"
-            echo "        py25-1.2.X, py25-1.3.X, py25-trunk,"
-            echo "        py26-1.2.X, py26-1.3.X, py26-trunk,"
-            echo "        py27-1.2.X, py27-1.3.X, ALL"
-            echo ""
-            echo " --quicktest - use already built tox env, for running a simple test quickly"
-            echo " --failfast - abort at first failing test"
-            echo " --manage - run management shell"
+            echo "    --failfast - abort at first failing test"
+            echo "    --with-coverage - enables coverage"
+            echo "    --rebuild-env - run buildout before the tests"
+            echo "    --django-trunk - run tests against django trunk"
+            echo "    --python /path/to/python - python version to use to run the tests"
             exit 1
             ;;
-        
-        "--manage")
-            manage=true
-            ;;  
+
         *)
-            suite="${args[$index]}"
+            suite="cms.${args[$index]}"
     esac
-let "index = $index + 1"
+    let "index = $index + 1"
 done
 
+echo "using python at: $python"
 
-
-if [ ! "$toxenv" ]; then
-    toxenv='defaultpython-defaultdjango'
+if [ $reuse_env == false ]; then
+    echo "setting up test environment (this might take a while)..."
+    $python bootstrap.py
+    if [ $? != 0 ]; then
+        echo "bootstrap.py failed"
+        exit 1
+    fi
+    if [ $django_trunk == true ]; then
+        ./bin/buildout -c django-svn.cfg
+    else
+        ./bin/buildout
+    fi
+    if [ $? != 0 ]; then
+        echo "bin/buildout failed"
+        exit 1
+    fi
+else
+    echo "reusing current buildout environment"
 fi
 
+if [ "$failfast" ]; then
+    echo "--failfast supplied, not using xmlrunner."
+fi
 
-OLD_IFS=IFS
-IFS=","
-tox_envs=( $toxenv )
-tox_len=${#tox_envs[@]}
-IFS=OLD_IFS
-
-if [[ $quicktest == true || $manage == true ]]; then
-    if [[ $manage == true ]]; then
-        if [[ "$tox_len" -gt "1" || "$toxenv" == "ALL" ]]; then
-            echo "Cannot use multiple envs with --manage" 
-            exit 1
-        fi
-        if [ ! -d ".tox/$toxenv" ]; then
-            echo ".tox/$toxenv does not exist, run without --manage first"
-            exit 1
-        fi
-        .tox/$toxenv/bin/python cms/test/run_shell.py --direct "$@"
-        exit 1
-    fi
-    if [ "$toxenv" == "ALL" ]; then
-        echo "Cannot use ALL with --quicktest" 
-        exit 1
-    fi
-    for tenv in ${tox_envs[@]}; do
-        if [ ! -d ".tox/$tenv" ]; then
-            echo ".tox/$tenv does not exist, run without --quicktest first"
-            exit 1
-        fi
-        read -p "Hit any key to run tests in tox env $tenv"
-        echo "Running cms test $suite using $tenv"
-        # running tests without invoking tox to save time
-        if [ "$failfast" ]; then
-            echo "--failfast supplied, not using xmlrunner."
-        fi
-        .tox/$tenv/bin/python cms/test/run_tests.py --toxenv $tenv --direct $failfast $suite 
-        retcode=$?
-    done
-else
-    if [ "$suite" ]; then
-        echo "Can only run specific suite with --quicktest"
-    fi
-    
-    if [ ! -f "toxinstall/bin/tox" ]; then
-        echo "Installing tox"
-        virtualenv toxinstall
-        toxinstall/bin/pip install -U tox
-    fi
+if [ ! "$suite" ]; then
+    suite="cms"
     echo "Running complete cms testsuite."
-    toxinstall/bin/tox -e $toxenv
+else
+    echo "Running cms test $suite."
+fi
+
+if [ $disable_coverage == false ]; then
+    ./bin/coverage run --rcfile=.coveragerc testapp/manage.py test $suite $failfast
+    retcode=$?
+
+    echo "Post test actions..."
+    ./bin/coverage xml
+    ./bin/coverage html
+else
+    ./bin/django test $suite $failfast
     retcode=$?
 fi
+cd ..
+echo "done"
 exit $retcode

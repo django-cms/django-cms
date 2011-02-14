@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.test.js_testcases import BaseJavascriptTestCase
+from cms.test_utils.js_testcases import BaseJavascriptTestCase
 
 
 class JavascriptTestCase(BaseJavascriptTestCase):

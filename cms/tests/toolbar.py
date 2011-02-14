@@ -1,6 +1,6 @@
 from __future__ import with_statement
-from cms.test.testcases import SettingsOverrideTestCase
-from cms.test.util.context_managers import UserLoginContext, SettingsOverride
+from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.util.context_managers import UserLoginContext, SettingsOverride
 from django.conf import settings
 
 

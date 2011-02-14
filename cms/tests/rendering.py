@@ -4,8 +4,8 @@ from cms import plugin_rendering
 from cms.models import Page, Title, CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms.plugins.text.models import Text
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site

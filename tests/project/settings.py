@@ -71,7 +71,7 @@ MIDDLEWARE_CLASSES = (
     
 )
 
-ROOT_URLCONF = 'testapp.urls'
+ROOT_URLCONF = 'project.urls'
 
 
 TEMPLATE_DIRS = (
@@ -85,7 +85,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.sites',
     'cms',
-    'publisher',
     'menus',
     'cms.plugins.text',
     'cms.plugins.picture',
@@ -99,11 +98,11 @@ INSTALLED_APPS = (
     'cms.plugins.twitter',
     'cms.plugins.inherit',
     'mptt',
-    'testapp.sampleapp',
-    'testapp.placeholderapp',
-    'testapp.pluginapp',
-    'testapp.pluginapp.plugins.manytomany_rel',
-    'testapp.fakemlng',
+    'project.sampleapp',
+    'project.placeholderapp',
+    'project.pluginapp',
+    'project.pluginapp.plugins.manytomany_rel',
+    'project.fakemlng',
     'south',
     'reversion',
 )
@@ -183,7 +182,7 @@ CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
 SOUTH_TESTS_MIGRATE = False
 
 CMS_NAVIGATION_EXTENDERS = (
-    ('testapp.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
+    ('project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
 )
 
 try:
@@ -191,4 +190,4 @@ try:
 except ImportError:
     pass
     
-TEST_RUNNER = 'testapp.testrunner.CMSTestSuiteRunner'
+TEST_RUNNER = 'project.testrunner.CMSTestSuiteRunner'

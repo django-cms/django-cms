@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.middleware.multilingual import patch_response
-from cms.test.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import urllib
