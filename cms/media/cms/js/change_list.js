@@ -93,7 +93,7 @@
 	};
 	
 	$(document).ready(function() {
-		patchCsrf($);
+		$.fn.cmsPatchCSRF();
 	    var selected_page = false;
 	    var action = false;
 		

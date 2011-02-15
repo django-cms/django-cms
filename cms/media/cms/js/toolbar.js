@@ -1,6 +1,6 @@
 /* javascript for the frontend editing toolbar */
 
-jQuery.noConflict();
+//jQuery.noConflict();
 
 function hide_iframe(){
     // needs to be a global function because it gets called 
@@ -12,7 +12,7 @@ function hide_iframe(){
 
 jQuery(document).ready(function($) {
 	
-	patchCsrf(jQuery)
+	jQuery.fn.cmsPatchCSRF()
 
     jQuery.fn.swapWith = function(to) {
         return this.each(function() {
