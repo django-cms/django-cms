@@ -2,12 +2,12 @@
 
 jQuery.noConflict();
 
-function hide_iframe(){
+function hide_iframe(id, type, title, msg, url){
     // needs to be a global function because it gets called 
     // from the iframe as `parent.hide_iframe`
     jQuery.nyroModalRemove();
     jQuery("#nyroModalWrapper .wrapperIframe").html("");
-    window.location = window.location.href;
+    window.location = url;
 }
 
 jQuery(document).ready(function($) {

@@ -14,7 +14,7 @@
 //<![CDATA[	
 (function($) {
 	if(parent != self){
-		parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
+		parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}", "{{ page.get_absolute_url }}");
 	}else{
 		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
 	}
