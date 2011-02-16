@@ -1,153 +1,160 @@
-In no particular order:
+Current or previous core committers:
 
+* Chris Glass
+* Eric Robitaille
+* Jonas Obrist
 * Patrick Lauber
 * Peter Ciciman
-* Jonas Obrist
 * Stefan Foulis
-* Chris Glass
-* Eric Robitaille 
-* Simon Meers
-* brightwhitefox
-* Behrooz Nobakht
-* Martin Bommeli
-* Jason Zylks
-* philomat
-* Jannis Leidel
-* Ekrem Seren
-* Chris Adams
-* martinkosir
-* Manolis Stamatogiannakis
-* Ulrich Petri
-* Luke Plant
-* Evandro Miquelito
-* Marco Rimoldi
-* aaloy
-* GaretJax
-* David Jean Louis
-* Pedro Gracia
-* limpbrains :P
-* yohanboniface
-* dstufft
-* Samuel Lüscher
-* Philipp Bosch
-* timesong
-* kunitoki
-* Johannes Bornhold
-* Alberto Paro
-* Yann Malet
-* wildermesser
-* Thomas Parslow
-* Maik Lustenberger
-* Arne Gellhaus
-* pigletto
-* kochin
-* MW
-* Lars van de Kerkhof
-* Jonathan Stoppani
-* Chanita Siridechkun
-* Benjamin Wohlwend
-* Aaron Renner
-* spookylukey
-* hysia
-* aball
-* Yann Malet
-* Mokys
-* George Marshall
-* Diógenes Augusto Fernandes Hermínio
-* zundoya
-* yedpodtrzitko
-* shed
-* izi
-* behrooz
-* angular_circle
-* Robert Pogorzelski
-* Pigletto
-* Petteri
-* Mark Rogers
-* Jason Jenkins
-* Антон Евжаков
 * Øyvind Saltvik
-* wid
-* wangJunjie
-* phuihock
-* pbgc
-* padelt
-* neoprolog
-* mcosta
-* mathijs
-* m000
-* indexofire
-* fcurella
-* f4nt
-* beshrkayali
-* Yosuke Ikeda
-* Steve Steiner
-* Shinya Okano
-* Seyhun Akyurek
-* Peter-Paul van Gemerden
-* Martin Kosír
-* Lucio Asnaghi
-* James Richards
-* Ian Lewis
-* DaNmarner
-* DZ
-* Cheng-Chia Tseng
-* Charpentier Johan
-* Adi Sieker
+
+Contributors (in alphabetical order):
+
 * A. Bram Neijt
-* tiret
-* ssteinerX
-* sleytr
-* sealibora
-* rtpm
-* mrlundis
-* meers
-* mbouchar
-* jordanjambazov
-* eged
-* daniele
-* Yuri van der Meer
-* Wayne Moore
-* Tanel Külaots
-* Stavros Korokithakis
-* Shatalov Vadim
-* Sean Bleier
-* Rodolfo Carvalho
-* Restless Being
-* Remco Wendt
-* Patrick Toal
-* Orne Brocaar
-* MerLex
-* Maxime Haineault
-* Maxim Bodyansky
-* Lucas Vogelsang
-* Lars Smit
-* John-Scott Atlakson
-* Jason Davies
-* Janusz Harkot
-* Ivan Vershigora
-* Gerard Świderski
-* Filip Kazimierczak
-* Egor V. Nazarkin
-* David Thompson
-* Darryl Woods
-* Chris Hughes
-* Bernd Zeimetz
-* Arthur Debert
-* Artem Skoretskiy
+* aaloy
+* Aaron Renner
+* aball
+* Adi Sieker
+* Alberto Paro
 * Alessandro Ronchi
-* Batiste Bieler
+* Angelo Dini
+* angular_circle
 * Antoni Aloy López
-* poweredbypenguins
-* homebrew79
-* Christof Hagedorn
+* Arne Gellhaus
+* Artem Skoretskiy
+* Arthur Debert
+* Batiste Bieler
+* behrooz
+* Behrooz Nobakht
+* Benjamin Wohlwend
+* Bernd Zeimetz
+* beshrkayali
 * Bob Karreman
-* Tino de Bruijn
-* Piotr Kilczuk
-* Pete Loggie
-* Steve R. Jones
-* Paul van der Linden
+* brightwhitefox
+* Chanita Siridechkun
+* Charpentier Johan
+* Cheng-Chia Tseng
+* Chris Adams
+* Chris Hughes
+* Christof Hagedorn
+* daniele
+* DaNmarner
+* Darryl Woods
+* David Jean Louis
+* David Thompson
+* Diógenes Augusto Fernandes Hermínio
+* dstufft
+* DZ
+* eged
+* Egor V. Nazarkin
+* Ekrem Seren
+* Evandro Miquelito
+* f4nt
+* fcurella
+* Filip Kazimierczak
+* GaretJax
+* George Marshall
+* Gerard Świderski
+* homebrew79
+* hysia
+* Ian Lewis
+* indexofire
 * Ionel Maries Cristian
-* Simon Hedberg
+* Ivan Vershigora
+* izi
 * Jameel Al-Aziz
+* James Richards
+* Jannis Leidel
+* Janusz Harkot
+* Jason Davies
+* Jason Jenkins
+* Jason Zylks
 * Javi Nievas
+* Johannes Bornhold
+* John-Scott Atlakson
+* Jonathan Stoppani
+* jordanjambazov
+* kar1m
+* kochin
+* Krzysztof Bandurski
+* kunitoki
+* Lars Smit
+* Lars van de Kerkhof
+* limpbrains :P
+* Lucas Vogelsang
+* Lucio Asnaghi
+* Luke Plant
+* m000
+* Maik Lustenberger
+* Manolis Stamatogiannakis
+* Manuel Schmidt
+* Marco Rimoldi
+* Mark Rogers
+* Martin Bommeli
+* Martin Kosír
+* martinkosir
+* mathijs
+* Maxim Bodyansky
+* Maxime Haineault
+* mbouchar
+* mcosta
+* meers
+* MerLex
+* Mokys
+* mrlundis
+* MW
+* neoprolog
+* Orne Brocaar
+* padelt
+* Patrick Toal
+* Paul van der Linden
+* pbgc
+* Pedro Gracia
+* Pete Loggie
+* Peter-Paul van Gemerden
+* Petteri
+* Philipp Bosch
+* philomat
+* phuihock
+* Pigletto
+* pigletto
+* Piotr Kilczuk
+* poweredbypenguins
+* Remco Wendt
+* Restless Being
+* Robert Pogorzelski
+* Rodolfo Carvalho
+* rtpm
+* Samuel Lüscher
+* sealibora
+* Sean Bleier
+* Seyhun Akyurek
+* Shatalov Vadim
+* shed
+* Shinya Okano
+* Simon Hedberg
+* Simon Meers
+* sleytr
+* spookylukey
+* ssteinerX
+* Stavros Korokithakis
+* Steve R. Jones
+* Steve Steiner
+* Tanel Külaots
+* Thomas Parslow
+* timesong
+* Tino de Bruijn
+* tiret
+* Ulrich Petri
+* wangJunjie
+* Wayne Moore
+* wid
+* wildermesser
+* Yann Malet
+* Yann Malet
+* yedpodtrzitko
+* yohanboniface
+* Yosuke Ikeda
+* Yuri van der Meer
+* zundoya
+* Антон Евжаков

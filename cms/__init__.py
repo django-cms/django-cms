@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-VERSION = (2, 1, 0, 'final')
+VERSION = (2, 1, 2, 'final')
 if VERSION[-1] != "final": # pragma: no cover
     __version__ = '.'.join(map(str, VERSION))
 else: # pragma: no cover
