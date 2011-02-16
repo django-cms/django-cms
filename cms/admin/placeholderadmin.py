@@ -24,7 +24,6 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
-                'css/jquery.dialog.css',
                 'css/plugin_editor.css',
             )]
         }

@@ -159,7 +159,6 @@ class PageAdmin(model_admin):
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
-                'css/jquery.dialog.css',
             )]
         }
         js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
