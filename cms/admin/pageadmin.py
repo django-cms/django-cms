@@ -965,10 +965,24 @@ class PageAdmin(model_admin):
         
         using = router.db_for_write(self.model)
         
-        deleted_objects, perms_needed = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)
-        to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)
+        status = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)
+        if len(status) == 3:
+            deleted_objects, perms_needed, protected = status
+        else:
+            deleted_objects, perms_needed = status
+            protected = None
+            
+        status_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)
+        
+        if len(status_plugins) == 3:
+            to_delete_plugins, perms_needed_plugins, protected_plugins = status_plugins
+        else:
+            to_delete_plugins, perms_needed_plugins = status_plugins
+            protected_plugins = None
+
         deleted_objects.append(to_delete_plugins)
         perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
+        protected = set( list(protected) + list(protected_plugins) )
         
 
         if request.method == 'POST':
@@ -994,13 +1008,19 @@ class PageAdmin(model_admin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
-
+        
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": object_name}
+        else:
+            title = _("Are you sure?")
+            
         context = {
-            "title": _("Are you sure?"),
+            "title": title,
             "object_name": force_unicode(titleopts.verbose_name),
             "object": titleobj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
+            "protected": protected,
             "opts": titleopts,
             "root_path": self.admin_site.root_path,
             "app_label": app_label,
