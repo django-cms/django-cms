@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 13:39+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+<<<<<<< HEAD
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Country: SWITZERLAND\n"
+=======
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
+>>>>>>> hotfix/2.1.2
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -114,8 +124,18 @@ msgid "user"
 msgstr "användare"
 
 #: admin/forms.py:215
+<<<<<<< HEAD
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Tillåtelse att lägga till sida kräver också tillgång till barn eller efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
+=======
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"Tillåtelse att lägga till sida kräver också tillgång till barn eller "
+"efterkommande annars kan inte tillagd sida redigeras av den som skapat"
+" den."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -150,8 +170,17 @@ msgid "Notify user"
 msgstr "Meddela användare"
 
 #: admin/forms.py:296
+<<<<<<< HEAD
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "Skicka e-postmeddelande till användare om användarnamn eller lösenordsförändring. E-postadress på användare krävs."
+=======
+msgid ""
+"Send email notification to user about username or password change. "
+"Requires user email."
+msgstr ""
+"Skicka e-postmeddelande till användare om användarnamn eller "
+"lösenordsförändring. E-postadress på användare krävs."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,12 +195,27 @@ msgid "Email notification requires valid email address."
 msgstr "E-postmeddelande kräver en giltig e-postadress."
 
 #: admin/forms.py:339
+<<<<<<< HEAD
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "Tillåtelse att lägga till sidor kräver tillåtelse att redigera sidor!"
 
 #: admin/forms.py:341
 msgid "The permission to add new users requires the permission to change users!"
 msgstr "Tillåtelse att lägga till användare kröver tillåtelse att redigera användare!"
+=======
+msgid ""
+"The permission to add new pages requires the permission to change "
+"pages!"
+msgstr "Tillåtelse att lägga till sidor kräver tillåtelse att redigera sidor!"
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new users requires the permission to change "
+"users!"
+msgstr ""
+"Tillåtelse att lägga till användare kröver tillåtelse att redigera "
+"användare!"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -269,8 +313,17 @@ msgstr "%(language)s plugin har kopierats till %(placeholder)s"
 
 #: admin/pageadmin.py:1260
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s plugin har redigerats på plats %(position)s i %(placeholder)s"
+=======
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in "
+"%(placeholder)s"
+msgstr ""
+"%(plugin_name)s plugin har redigerats på plats %(position)s i "
+"%(placeholder)s"
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -586,8 +639,17 @@ msgid "changed by"
 msgstr "ändrad av"
 
 #: models/pagemodel.py:64
+<<<<<<< HEAD
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå live."
+=======
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go"
+" live."
+msgstr ""
+"När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan "
+"ska gå live."
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -598,8 +660,17 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
 
 #: models/pagemodel.py:68
+<<<<<<< HEAD
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Ett unikt id som används med mallkommandot page_url för att länka till denna sida"
+=======
+msgid ""
+"An unique identifier that is used with the page_url templatetag for "
+"linking to this page"
+msgstr ""
+"Ett unikt id som används med mallkommandot page_url för att länka till"
+" denna sida"
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -841,8 +912,17 @@ msgid "Language or Page must be filled out"
 msgstr "Språk eller Sida måste vara ifylld"
 
 #: plugins/inherit/models.py:10
+<<<<<<< HEAD
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr "Välj en sida för att inkludera dess plugins till denna platshållare, lämna blankt för nuvarande sida"
+=======
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
+msgstr ""
+"Välj en sida för att inkludera dess plugins till denna platshållare, "
+"lämna blankt för nuvarande sida"
+>>>>>>> hotfix/2.1.2
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -933,8 +1013,17 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
+<<<<<<< HEAD
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "Ange en mall (t.ex. \"snippets/plugin_xy.html\") som kommer att användas."
+=======
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
+"rendered. "
+msgstr ""
+"Ange en mall (t.ex. \"snippets/plugin_xy.html\") som kommer att "
+"användas."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1067,8 +1156,17 @@ msgid "movie url"
 msgstr "film url"
 
 #: plugins/video/models.py:10
+<<<<<<< HEAD
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr "vimeo eller youtube video url. Exampel: http://www.youtube.com/watch?v=YFa59lK-kpo"
+=======
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+msgstr ""
+"vimeo eller youtube video url. Exampel: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+>>>>>>> hotfix/2.1.2
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1130,8 +1228,17 @@ msgid "button highlight color"
 msgstr "knappfärg aktiv"
 
 #: plugins/video/templates/cms/plugins/video.html:3
+<<<<<<< HEAD
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr "Flash-plugin saknas. Ladda ner <a href=\"http://adobe.com/flashplayer\">här</a>"
+=======
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr ""
+"Flash-plugin saknas. Ladda ner <a "
+"href=\"http://adobe.com/flashplayer\">här</a>"
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1160,8 +1267,17 @@ msgstr "Spara och fortsätt redigera"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
+<<<<<<< HEAD
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "Sida <a href=\"%(admin_url)s\">%(page)s</a> kan behöva godkännande av dig."
+=======
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
+"you."
+msgstr ""
+"Sida <a href=\"%(admin_url)s\">%(page)s</a> kan behöva godkännande av "
+"dig."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1269,8 +1385,17 @@ msgstr "Sidstatus"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
+<<<<<<< HEAD
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr "Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett meddelande till moderatorn."
+=======
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a "
+"message for moderator."
+msgstr ""
+"Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett "
+"meddelande till moderatorn."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1513,7 +1638,13 @@ msgstr "Återgå till %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
+<<<<<<< HEAD
 msgstr "Tryck på spara-knappen nedan för att återgå till denna version av objektet."
+=======
+msgstr ""
+"Tryck på spara-knappen nedan för att återgå till denna version av "
+"objektet."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1706,6 +1837,7 @@ msgstr ""
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
 msgstr ""
+<<<<<<< HEAD
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
@@ -1780,6 +1912,82 @@ msgstr "CMS - Sida %s behöver godkännande."
 msgid "CMS - your user account was created."
 msgstr "CMS - ditt användarkonto har skapats."
 
+=======
+
+#: test/run_tests.py:158 test/project/settings.py:137
+msgid "two columns"
+msgstr ""
+
+#: test/run_tests.py:159 test/project/settings.py:138
+msgid "three columns"
+msgstr ""
+
+#: test/run_tests.py:160 test/project/settings.py:139
+msgid "navigation examples"
+msgstr ""
+
+#: test/run_tests.py:167 test/project/settings.py:148
+msgid "sidebar column"
+msgstr ""
+
+#: test/run_tests.py:173 test/project/settings.py:154
+msgid "left column"
+msgstr ""
+
+#: test/run_tests.py:179 test/project/settings.py:160
+msgid "right column"
+msgstr ""
+
+#: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
+msgid "Articles"
+msgstr ""
+
+#: test/apps/sampleapp/cms_app.py:7
+msgid "Sample App"
+msgstr ""
+
+#: test/apps/sampleapp/menu.py:17
+msgid "sample root page"
+msgstr ""
+
+#: test/apps/sampleapp/menu.py:18
+msgid "sample settings page"
+msgstr ""
+
+#: test/apps/sampleapp/menu.py:19
+msgid "sample account page"
+msgstr ""
+
+#: test/apps/sampleapp/menu.py:20
+msgid "sample my profile page"
+msgstr ""
+
+#: test/apps/sampleapp/menu.py:32
+msgid "Static Menu"
+msgstr ""
+
+#: test/apps/sampleapp/menu.py:48
+msgid "Static Menu2"
+msgstr ""
+
+#: utils/moderator.py:83
+msgid "parent first"
+msgstr "förälder först"
+
+#: utils/moderator.py:90
+msgid "approve"
+msgstr "godkänn"
+
+#: utils/moderator.py:251
+#, python-format
+msgid "CMS - Page %s requires approvement."
+msgstr "CMS - Sida %s behöver godkännande."
+
+#: utils/permissions.py:206
+msgid "CMS - your user account was created."
+msgstr "CMS - ditt användarkonto har skapats."
+
+>>>>>>> hotfix/2.1.2
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
 msgstr "CMS - ditt användarkonto har ändrats."

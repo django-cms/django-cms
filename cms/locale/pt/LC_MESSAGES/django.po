@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 13:38+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +20,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+<<<<<<< HEAD
+=======
+"X-Poedit-Country: SWITZERLAND\n"
+>>>>>>> hotfix/2.1.2
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Country: SWITZERLAND\n"
@@ -66,7 +74,13 @@ msgstr "Título da página"
 
 #: admin/forms.py:131
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+<<<<<<< HEAD
 msgstr "Sobrescreva o que será exibido no topo do seu navegador ou nos favoritos"
+=======
+msgstr ""
+"Sobrescreva o que será exibido no topo do seu navegador ou nos "
+"favoritos"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:132
 msgid "Application"
@@ -98,7 +112,13 @@ msgstr "Uma descrição da página por vezes usada pelos motores de pesquisa."
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
+<<<<<<< HEAD
 msgstr "Uma lista de palavras-chave (separadas por vírgulas). Normalmente usadas por mecanismos de pesquisa."
+=======
+msgstr ""
+"Uma lista de palavras-chave (separadas por vírgulas). Normalmente "
+"usadas por mecanismos de pesquisa."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -114,12 +134,28 @@ msgid "user"
 msgstr "utilizador"
 
 #: admin/forms.py:215
+<<<<<<< HEAD
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "A permissão para adicionar páginas requer também acesso aos filhos, ou descendentes, caso contrário a página adicionada não poderá ser modificada pelo seu criador."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
 msgstr "A permissão para adicionar páginas também requer permissão de edição de páginas"
+=======
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"A permissão para adicionar páginas requer também acesso aos filhos, ou"
+" descendentes, caso contrário a página adicionada não poderá ser "
+"modificada pelo seu criador."
+
+#: admin/forms.py:218
+msgid "Add page permission also requires edit page permission."
+msgstr ""
+"A permissão para adicionar páginas também requer permissão de edição "
+"de páginas"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -150,8 +186,17 @@ msgid "Notify user"
 msgstr "Notificar utilizador"
 
 #: admin/forms.py:296
+<<<<<<< HEAD
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "Enviar notificação por e-mail ao utilizador sobre modificação no nome de utilizador ou senha. Requere o e-mail do utilizador"
+=======
+msgid ""
+"Send email notification to user about username or password change. "
+"Requires user email."
+msgstr ""
+"Enviar notificação por e-mail ao utilizador sobre modificação no nome "
+"de utilizador ou senha. Requere o e-mail do utilizador"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,12 +211,29 @@ msgid "Email notification requires valid email address."
 msgstr "Notificações de e-mail requerem um endereço de e-mail válido."
 
 #: admin/forms.py:339
+<<<<<<< HEAD
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "A permissão para adicionar novas páginas requer a permissão para modificar páginas!"
 
 #: admin/forms.py:341
 msgid "The permission to add new users requires the permission to change users!"
 msgstr "A permissão para adicionar utilizadores requer a permissão para modificar utilizadores!"
+=======
+msgid ""
+"The permission to add new pages requires the permission to change "
+"pages!"
+msgstr ""
+"A permissão para adicionar novas páginas requer a permissão para "
+"modificar páginas!"
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new users requires the permission to change "
+"users!"
+msgstr ""
+"A permissão para adicionar utilizadores requer a permissão para "
+"modificar utilizadores!"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -243,7 +305,13 @@ msgstr "Você não tem permissão para publicar esta página"
 
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
+<<<<<<< HEAD
 msgstr "Você não tem permissão para modificar o status de navegação desta página"
+=======
+msgstr ""
+"Você não tem permissão para modificar o status de navegação desta "
+"página"
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1133 admin/pageadmin.py:1167
 msgid "You do not have permission to change this page"
@@ -269,8 +337,17 @@ msgstr ""
 
 #: admin/pageadmin.py:1260
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "Plugin %(plugin_name)s editada na posição %(position)s em %(placeholder)s"
+=======
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in "
+"%(placeholder)s"
+msgstr ""
+"Plugin %(plugin_name)s editada na posição %(position)s em "
+"%(placeholder)s"
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -586,8 +663,17 @@ msgid "changed by"
 msgstr "modificado por"
 
 #: models/pagemodel.py:64
+<<<<<<< HEAD
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Quando a página deve ir para o ar. Status deve ser \"Publicado\" para a página ir para o ar."
+=======
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go"
+" live."
+msgstr ""
+"Quando a página deve ir para o ar. Status deve ser \"Publicado\" para a "
+"página ir para o ar."
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -598,8 +684,17 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Todos os ancestrais não serão exibidos na navegação"
 
 #: models/pagemodel.py:68
+<<<<<<< HEAD
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Um identificador único que é usado com a templatetag page_url, para associar a esta página"
+=======
+msgid ""
+"An unique identifier that is used with the page_url templatetag for "
+"linking to this page"
+msgstr ""
+"Um identificador único que é usado com a templatetag page_url, para "
+"associar a esta página"
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -683,7 +778,13 @@ msgstr "pode recuperar qualquer página excluída"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
+<<<<<<< HEAD
 msgstr "Se nenhum for selecionado, utilizador terá permissões dadas a todos os sites."
+=======
+msgstr ""
+"Se nenhum for selecionado, utilizador terá permissões dadas a todos os"
+" sites."
+>>>>>>> hotfix/2.1.2
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -802,7 +903,13 @@ msgstr "latitude"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
+<<<<<<< HEAD
 msgstr "Use latitude e longitude para ajustar precisamente a sua posição no mapa."
+=======
+msgstr ""
+"Use latitude e longitude para ajustar precisamente a sua posição no "
+"mapa."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -933,8 +1040,17 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
+<<<<<<< HEAD
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "Coloque um template (ex.: \"snippets/plugin_xy.html\") que será renderizado."
+=======
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
+"rendered. "
+msgstr ""
+"Coloque um template (ex.: \"snippets/plugin_xy.html\") que será "
+"renderizado."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1067,7 +1183,13 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:10
+<<<<<<< HEAD
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+=======
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1130,7 +1252,13 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
+<<<<<<< HEAD
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+=======
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1160,8 +1288,17 @@ msgstr "Gravar e continuar a editar"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
+<<<<<<< HEAD
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "Página <a href=\"%(admin_url)s\">%(page)s</a> pode requerer a sua aprovação."
+=======
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
+"you."
+msgstr ""
+"Página <a href=\"%(admin_url)s\">%(page)s</a> pode requerer a sua "
+"aprovação."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1269,8 +1406,17 @@ msgstr "Estados da página"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
+<<<<<<< HEAD
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr "Esta página precisa ser moderada no nível %(moderation_level)s, envie uma mensagem ao moderador."
+=======
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a "
+"message for moderator."
+msgstr ""
+"Esta página precisa ser moderada no nível %(moderation_level)s, envie "
+"uma mensagem ao moderador."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1504,7 +1650,13 @@ msgstr "Recuperar %(verbose_name)s excluído"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
+<<<<<<< HEAD
 msgstr "Pressione o botão 'gravar' abaixo para recuperar esta versão do objecto."
+=======
+msgstr ""
+"Pressione o botão 'gravar' abaixo para recuperar esta versão do "
+"objecto."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1513,7 +1665,13 @@ msgstr "Reverter %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
+<<<<<<< HEAD
 msgstr "Pressione o botão 'gravar' abaixo para reverter para esta versão do objecto."
+=======
+msgstr ""
+"Pressione o botão 'gravar' abaixo para reverter para esta versão do "
+"objecto."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1581,11 +1739,19 @@ msgstr ""
 #: templates/cms/toolbar/toolbar.html:158
 msgid "login"
 msgstr ""
+<<<<<<< HEAD
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
 msgstr ""
 
+=======
+
+#: templates/cms/toolbar/toolbar.html:175
+msgid "Request Approval"
+msgstr ""
+
+>>>>>>> hotfix/2.1.2
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
 msgstr ""
