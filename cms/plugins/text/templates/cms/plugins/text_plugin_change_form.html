@@ -1,7 +1,16 @@
 {% extends "admin/cms/page/plugin_change_form.html" %}
+{% load adminmedia %}
 
 {% block fieldsets %}
 {% for fieldset in adminform %}
   {% include "cms/plugins/text_plugin_fieldset.html" %}
 {% endfor %}
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
+<script type="text/javascript">
+(function ($){
+	$(document).ready(function(){
+	    $.fn.cmsPatchCSRF();
+	});
+})(jQuery);
+</script>
 {% endblock %}

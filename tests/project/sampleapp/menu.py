@@ -11,7 +11,7 @@ class SampleAppMenu(Menu):
     def get_nodes(self, request):
         nodes = []
         for cat in Category.objects.all():
-            n = NavigationNode(cat.name, cat.get_absolute_url(), "sampleapp", cat.pk, cat.parent_id, "sampleapp")
+            n = NavigationNode(cat.name, cat.get_absolute_url(), cat.pk, cat.parent_id, "sampleapp")
             nodes.append(n)
         try:
             n = NavigationNode(_('sample root page'), reverse('sample-root'), 1)
