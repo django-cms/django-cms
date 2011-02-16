@@ -36,7 +36,7 @@ from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import transaction, models
+from django.db import transaction, models, router
 from django.forms import Widget, Textarea, CharField
 from django.http import HttpResponseRedirect, HttpResponse, Http404, \
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
@@ -963,8 +963,10 @@ class PageAdmin(model_admin):
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
-        deleted_objects, perms_needed = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site)
-        to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site)
+        using = router.db_for_write(self.model)
+        
+        deleted_objects, perms_needed = get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)
+        to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)
         deleted_objects.append(to_delete_plugins)
         perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
         
