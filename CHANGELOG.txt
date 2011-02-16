@@ -12,7 +12,7 @@
 - testsuite working again
 - changelog file added
 
-==== 2.1.0 (2010-XX-XX) ====
+==== 2.1.0 (2011-01-26) ====
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to http://github.com/FlashJunior/OSFlashVideoPlayer
@@ -35,3 +35,12 @@
 - templatetags refactored: see cms/docs/templatetags.txt for new signatures.
 - placeholder has new option: or and a endpalceholder templatetag
 
+==== 2.1.1 (2011-02-09) ====
+
+- Fixed CMS AJAX requests not being CSRF protected, thus not working in Django 1.2.5
+- Fixed toolbar CSS issues in Chrome/Firefox
+
+==== 2.1.2 (2011-02-16) ====
+
+- Fixed issues with the CSRF fix from 2.1.1.
+- Updated translation files from transifex.
