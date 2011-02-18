@@ -1,4 +1,6 @@
 #!/bin/bash
+find . -name '*.pyc' -delete
+
 cd tests
 
 sigfile=.buildoutsig
