@@ -18,6 +18,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_AD
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.widgets import Media
 from django.template import RequestContext
@@ -612,4 +613,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 class SekizaiTests(TestCase):
     def test_post_patch_check(self):
-         post_patch_check()
+        post_patch_check()
+         
+    def test_fail(self):
+        with SettingsOverride(CMS_TEMPLATES=[('fail.html', 'fail')]):
+            self.assertRaises(ImproperlyConfigured, post_patch_check)
