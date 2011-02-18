@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.utils.translation import ugettext_lazy  as _
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy  as _
+from sekizai.helpers import validate_template
 from warnings import warn
 
 def pre_patch():
@@ -39,3 +40,12 @@ def post_patch_check():
     if settings.CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in settings.MIDDLEWARE_CLASSES:
         raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
             'Please put it into your MIDDLEWARE_CLASSES in settings file')
+    
+    # check sekizai namespaces
+    for template in settings.CMS_TEMPLATES:
+        if not validate_template(template[0], ['js', 'css']):
+            raise ImproperlyConfigured(
+                "All templates defined in CMS_TEMPLATES must have at least the "
+                "'js' and 'css' sekizai namespaces. The template %r does not. "
+                % template[0]
+            )
