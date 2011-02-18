@@ -395,25 +395,3 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
-
-
-class PluginsMedia(RenderBlock):
-    """
-    This template node is used to output media for plugins.
-
-    eg: {% plugins_media %}
-
-    You can also pass the object a page_lookup arg if you want to output media tags for a specific
-    page other than the current page.
-
-    eg: {% plugins_media "gallery" %}
-    """
-    name = 'plugins_media'
-    
-    options = Options(
-        parser_class=SekizaiParser,
-    )
-    
-    def render_tag(self, context, nodelist):
-        return super(PluginsMedia, self).render_tag(context, CMS_PLUGIN_MEDIA_NAMESPACE, nodelist)
-register.tag(PluginsMedia)

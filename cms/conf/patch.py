@@ -42,7 +42,13 @@ def post_patch_check():
             'Please put it into your MIDDLEWARE_CLASSES in settings file')
     
     # check sekizai namespaces
+    try:
+        from django.template.loaders.app_directories import Loader
+    except ImportError:
+        return # south...
     for template in settings.CMS_TEMPLATES:
+        if template[0] == settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
+            continue
         if not validate_template(template[0], ['js', 'css']):
             raise ImproperlyConfigured(
                 "All templates defined in CMS_TEMPLATES must have at least the "

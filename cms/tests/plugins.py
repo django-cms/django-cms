@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -8,21 +9,23 @@ from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.text.models import Text
-from cms.plugins.text.utils import plugin_tags_to_id_list, \
-    plugin_tags_to_admin_html
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, \
-    URL_CMS_PLUGIN_REMOVE
+from cms.plugins.text.utils import (plugin_tags_to_id_list, 
+    plugin_tags_to_admin_html)
+from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
+    URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.widgets import Media
 from django.template import RequestContext
+from django.test.testcases import TestCase
 from project.pluginapp.models import Article, Section
 from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
+
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -300,7 +303,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with SettingsOverride(CMS_MODERATOR=False):
             inheritfrompage = self.create_page(
                 title='page to inherit from',
-                template='media.html'
+                template='nav_playground.html'
             )
             
             body = inheritfrompage.placeholders.get(slot="body")
@@ -317,7 +320,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             page = self.create_page(
                 title='inherit from page',
                 published=True,
-                template='media.html',
+                template='nav_playground.html',
             )
             
             inherited_body = page.placeholders.get(slot="body")
@@ -333,7 +336,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
-            print response.content
             self.assertTrue('http://twitter.com/javascripts/blogger.js' in response.content)
         
     def test_10_fileplugin_icon_uppercase(self):
@@ -607,3 +609,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
         
+
+class SekizaiTests(TestCase):
+    def test_post_patch_check(self):
+         post_patch_check()
