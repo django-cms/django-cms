@@ -77,7 +77,7 @@ class TinyMCEEditor(TinyMCE):
             }
             c_json = simplejson.dumps(compressor_config)
             html.append(u'<script type="text/javascript">tinyMCE_GZ.init(%s);</script>' % (c_json))
-        html.append(u'<script type="text/javascript">%s;\ntinyMCE.init(%s);</script>' % (self.render_additions(name, value, attrs), json))
+        html.append(u'<script type="text/javascript">//<![CDATA[\n%s;\ntinyMCE.init(%s);\n//]]></script>' % (self.render_additions(name, value, attrs), json))
         return mark_safe(u'\n'.join(html))
     
     
