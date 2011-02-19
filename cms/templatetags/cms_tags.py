@@ -13,16 +13,10 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
-from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from itertools import chain
-from sekizai.settings import VARNAME
-from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
-import operator
 import re
-
-CMS_PLUGIN_MEDIA_NAMESPACE = 'cms-plugins-media'
 
 register = template.Library()
 
@@ -146,11 +140,6 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             continue
         if not get_plugins(request, placeholder):
             continue
-        rendered_contents = render_to_string('cms/plugin_media.html', {
-            'media': placeholder.get_media(request, context),
-            'namespace': CMS_PLUGIN_MEDIA_NAMESPACE,
-        })
-        context[VARNAME][CMS_PLUGIN_MEDIA_NAMESPACE].append(rendered_contents)
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
