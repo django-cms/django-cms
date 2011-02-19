@@ -1,7 +1,0 @@
-{% load sekizai_tags %}
-{% for css in media.render_css %}
-    {% addtoblock namespace %}{{ css|safe }}{% endaddtoblock %}
-{% endfor %}
-{% for js in media.render_js %}
-    {% addtoblock namespace %}{{ js|safe }}{% endaddtoblock %}
-{% endfor %}
