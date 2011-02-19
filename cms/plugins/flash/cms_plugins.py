@@ -10,7 +10,7 @@ class FlashPlugin(CMSPluginBase):
     form = FlashForm
     
     class PluginMedia:
-        js = ('http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js',)
+        js = (,)
     
     render_template = "cms/plugins/flash.html"
     def render(self, context, instance, placeholder):
