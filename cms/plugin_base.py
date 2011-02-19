@@ -4,23 +4,31 @@ from cms.models import CMSPlugin
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.db.models.options import get_verbose_name
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
+    """
+    Ensure the CMSPlugin subclasses have sane values and set some defaults if 
+    they're not given.
+    """
     def __new__(cls, name, bases, attrs):
         super_new = super(CMSPluginBaseMetaclass, cls).__new__
         parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
         if not parents:
+            # If this is CMSPluginBase itself, and not a subclass, don't do anything
             return super_new(cls, name, bases, attrs)
         new_plugin = super_new(cls, name, bases, attrs)
+        # validate model is actually a CMSPlugin subclass.
         if not issubclass(new_plugin.model, CMSPlugin):
             raise SubClassNeededError(
                 "The 'model' attribute on CMSPluginBase subclasses must be "
                 "either 'None' or a subclass of CMSPlugin. %r on %r is not."
                 % (new_plugin.model, new_plugin)
             )
+        # Set the default form
         if not new_plugin.form:
             form_meta_attrs = {
                 'model': new_plugin.model,
@@ -30,6 +38,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 'Meta': type('Meta', (object,), form_meta_attrs)
             }
             new_plugin.form = type('%sForm' % name, (ModelForm,), form_attrs)
+        # Set the default fieldsets
         if not new_plugin.fieldsets:
             basic_fields = []
             advanced_fields = []
@@ -54,6 +63,9 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                         }
                     )
                 ]
+        # Set default name
+        if not new_plugin.name:
+            new_plugin.name = get_verbose_name(new_plugin.__name__)
         return new_plugin
 
 

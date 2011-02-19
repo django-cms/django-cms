@@ -2,30 +2,31 @@
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
-from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
-    PagePermissionInlineAdmin
+from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES, 
+    PagePermissionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
 from cms.forms.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin, PagePermission, \
-    PageModeratorState, EmptyTitle, GlobalPagePermission
+from cms.models import (Page, Title, CMSPlugin, PagePermission, 
+    PageModeratorState, EmptyTitle, GlobalPagePermission)
 from cms.models.managers import PagePermissionsPermissionManager
-from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
-    MASK_DESCENDANTS
+from cms.models.moderatormodels import (MASK_PAGE, MASK_CHILDREN, 
+    MASK_DESCENDANTS)
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.admin import render_admin_menu_item
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import make_revision_with_plugins
-from cms.utils.moderator import update_moderation_message, \
-    get_test_moderation_level, moderator_should_approve, approve_page, \
-    will_require_moderation
-from cms.utils.permissions import has_page_add_permission, \
-    has_page_change_permission, get_user_permission_level, \
-    has_global_change_permissions_permission
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
+from cms.utils.moderator import (update_moderation_message, 
+    get_test_moderation_level, moderator_should_approve, approve_page, 
+    will_require_moderation)
+from cms.utils.permissions import (has_page_add_permission, 
+    has_page_change_permission, get_user_permission_level, 
+    has_global_change_permissions_permission)
+from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
+    get_placeholder_conf)
 from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
 from copy import deepcopy
 from django import template
@@ -37,20 +38,20 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import transaction, models
-
 from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404, \
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from menus.menu_pool import menu_pool
+import inspect
 import os
 
+
 # silly hack to test features/ fixme
-import inspect
 if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
     from django.db import router
 else:
@@ -317,13 +318,8 @@ class PageAdmin(model_admin):
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
             for placeholder_name in sorted(get_placeholders(placeholders_template)):
-                name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
-                if not name:
-                    name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
-                if not name:
-                    name = placeholder_name
-                else:
-                    name = _(name)
+                name = get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
+                name = _(name)
                 given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
@@ -1102,9 +1098,7 @@ class PageAdmin(model_admin):
             if page:
                 language = request.POST['language'] or get_language_from_request(request)
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
-                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder.slot), {}).get('limits', None)
-                if not limits:
-                    limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get('limits', None)
+                limits = get_placeholder_conf(placeholder.slot, page.get_template(), "limits", None)
                 if limits:
                     global_limit = limits.get("global")
                     type_limit = limits.get(plugin_type)

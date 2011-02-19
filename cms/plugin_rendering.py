@@ -2,7 +2,8 @@
 from cms import settings
 from cms.models.placeholdermodel import Placeholder
 from cms.utils import get_language_from_request
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
+from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
+    get_placeholder_conf)
 from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Template, Context
@@ -141,9 +142,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     slot = getattr(placeholder, 'slot', None)
     extra_context = {}
     if slot:
-        extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, slot), {}).get("extra_context", None)
-        if not extra_context:
-            extra_context = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("extra_context", {})
+        extra_context = get_placeholder_conf(slot, template, "extra_context", {})
     for key, value in extra_context.items():
         if not key in context:
             context[key] = value
@@ -188,16 +187,8 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         slot = None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
-    mixed_key = "%s %s" % (template, slot)
-    name = settings.CMS_PLACEHOLDER_CONF.get(mixed_key, {}).get("name", None)
-    if not name:
-        name = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("name", None)
-    if name:
-        name = _(name)
-    elif slot:
-        name = title(slot)
-    if not name:
-        name = name_fallback
+    name = get_placeholder_conf(slot, template, "name", title(slot))
+    name = _(name)
     toolbar = render_to_string("cms/toolbar/add_plugins.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),

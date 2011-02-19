@@ -3,6 +3,20 @@ from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from django.db.models.query_utils import Q
 
+def get_placeholder_conf(key, placeholder, template=None, default=None):
+    keys = []
+    if template:
+        keys.append("%s %s" % (template, placeholder))
+    keys.append(placeholder)
+    for key in keys:
+        conf = settings.CMS_PLACEHOLDER_CONF.get(key)
+        if not conf:
+            continue
+        value = conf.get(key)
+        if value:
+            return value
+    return default
+
 def get_page_from_placeholder_if_exists(placeholder):
     from cms.models.pagemodel import Page
     try:
