@@ -25,6 +25,35 @@ from cms.utils.urlutils import any_path_re
 from menus.menu_pool import menu_pool
 
 
+def get_permission_acessor(obj):
+    if isinstance(obj, (PageUser, User,)):
+        rel_name = 'user_permissions'
+    else:
+        rel_name = 'permissions'
+    return getattr(obj, rel_name)
+
+def save_permissions(data, obj):
+    models = (
+        (Page, 'page'),
+        (PageUser, 'pageuser'),
+        (PageUserGroup, 'pageuser'),
+        (PagePermission, 'pagepermission'),
+    )
+    if not obj.pk:
+        # save obj, otherwise we can't assign permissions to him
+        obj.save()
+    permission_acessor = get_permission_acessor(obj)
+    for model, name in models:
+        content_type = ContentType.objects.get_for_model(model)
+        for t in ('add', 'change', 'delete'):
+            # add permission `t` to model `model`
+            codename = getattr(model._meta, 'get_%s_permission' % t)()
+            permission = Permission.objects.get(content_type=content_type, codename=codename)
+            if data.get('can_%s_%s' % (t, name), None):
+                permission_acessor.add(permission)
+            else:
+                permission_acessor.remove(permission)
+
 class PageAddForm(forms.ModelForm):
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
         help_text=_('The default title'))
@@ -250,7 +279,7 @@ class GenericCmsPermissionForm(forms.ModelForm):
         """Read out permissions from permission system.
         """
         initials = {}
-        permission_acessor = self.permission_acessor(obj)
+        permission_acessor = get_permission_acessor(obj)
         for model in (Page, PageUser, PagePermission):
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
@@ -260,36 +289,6 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 initials['can_%s_%s' % (t, name)] = codename in permissions
         return initials
     
-    def permission_acessor(self, obj):
-        if isinstance(obj, PageUser):
-            rel_name = 'user_permissions'
-        else:
-            rel_name = 'permissions'
-        return getattr(obj, rel_name)
-    
-    def save_permissions(self, obj):
-        models = (
-            (Page, 'page'),
-            (PageUser, 'pageuser'),
-            (PageUserGroup, 'pageuser'),
-            (PagePermission, 'pagepermission')
-        )
-        if not obj.pk:
-            # save obj, otherwise we can't assign permissions to him
-            obj.save()
-        permission_acessor = self.permission_acessor(obj)
-        for model, name in models:
-            content_type = ContentType.objects.get_for_model(model)
-            for method in ('add', 'change', 'delete'):
-                # add permission `t` to model `model`
-                codename = getattr(model._meta, 'get_%s_permission' % method)()
-                permission = Permission.objects.get(content_type=content_type, codename=codename)
-                if self.cleaned_data.get('can_%s_%s' % (method, name), None):
-                    permission_acessor.add(permission)
-                else:
-                    permission_acessor.remove(permission)
-        
-
 class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
     notify_user = forms.BooleanField(label=_('Notify user'), required=False, 
         help_text=_('Send email notification to user about username or password change. Requires user email.'))
@@ -357,7 +356,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
             user.created_by = get_current_user()
         if commit:
             user.save()
-        self.save_permissions(user)
+        save_permissions(self.cleaned_data, user)
         if self.cleaned_data['notify_user']:
             mail_page_user_change(user, created, self.cleaned_data['password1'])
         return user
@@ -391,6 +390,6 @@ class PageUserGroupForm(GenericCmsPermissionForm):
         if commit:
             group.save()
 
-        self.save_permissions(group)
+        save_permissions(self.cleaned_data, group)
 
         return group
