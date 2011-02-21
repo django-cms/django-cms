@@ -102,6 +102,9 @@ class CMSTestCase(TestCase):
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         
         self.counter = self.counter + 1
         return page_data
