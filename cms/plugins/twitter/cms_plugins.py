@@ -16,14 +16,6 @@ class TwitterRecentEntriesPlugin(CMSPluginBase):
         })
         return context
     
-    def get_plugin_media(self, request, context, plugin):
-        return Media(
-            js =(
-                 'http://twitter.com/javascripts/blogger.js',
-                 'http://twitter.com/statuses/user_timeline/%s.json?callback=twitterCallback2&amp;count=%s' % (plugin.twitter_user, plugin.count),
-            )
-        )
-    
 plugin_pool.register_plugin(TwitterRecentEntriesPlugin)
 
 class TwitterSearchPlugin(CMSPluginBase):
@@ -37,7 +29,4 @@ class TwitterSearchPlugin(CMSPluginBase):
             'object': instance,
         })
         return context
-    
-    class PluginMedia:
-        js = ('%splugins/twitter/js/jquery.tweet.js' % settings.CMS_MEDIA_URL,)
 plugin_pool.register_plugin(TwitterSearchPlugin)

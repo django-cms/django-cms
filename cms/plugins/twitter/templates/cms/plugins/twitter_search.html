@@ -1,8 +1,10 @@
-{# uses the http://tweet.seaofclouds.com/ jquery.tweet plugin #}
+{% load sekizai_tags %}
 <div class="plugin_twitter teaser_twitter">
     {% if object.title %}<h3>{{ object.title }}</h3>{% endif %}
     <ul id="twitter_search_update_list_{{ object.id }}"></ul>
 </div>
+{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}plugins/twitter/js/jquery.tweet.js" ></script>{% endaddtoblock %}
+{% addtoblock "js" %}
 <script type='text/javascript'>
     $(document).ready(function(){
         $("#twitter_search_update_list_{{ object.id }}").tweet({
@@ -20,3 +22,4 @@
         });
     });
 </script>
+{% endaddtoblock %}

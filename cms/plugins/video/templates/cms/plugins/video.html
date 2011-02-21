@@ -1,7 +1,10 @@
-{% load i18n js %}
+{% load i18n js sekizai_tags %}
 
 <div id="flash-plugin-{{ object.id }}">{% trans 'Missing flash plugin. Download <a href="http://adobe.com/flashplayer">here</a>' %}</div>
 
+{% addtoblock "js" %}<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js" ></script>{% endaddtoblock %}
+
+{% addtoblock "js" %}
 <script type="text/javascript">
 //<![CDATA[
 	var flashvars = {};
@@ -36,3 +39,4 @@
 	
 	swfobject.embedSWF("{{ CMS_MEDIA_URL }}swf/player.swf", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9.0.45", "{{ CMS_MEDIA_URL }}swf/expressInstall.swf", flashvars, params, attributes);
 //]]></script>
+{% endaddtoblock %}
