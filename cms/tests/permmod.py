@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import ACCESS_DESCENDANTS
-from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
 from cms.utils.permissions import has_generic_permission
 
 class PermissionModeratorTestCase(CMSTestCase):

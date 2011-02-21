@@ -4,8 +4,8 @@ from cms import plugin_rendering
 from cms.models import Page, Title, CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms.plugins.text.models import Text
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -238,8 +238,6 @@ class RenderingTestCase(CMSTestCase):
         
     def test_10_detail_view_404_when_no_language_is_found(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_FALLBACK=True,
-                              CMS_DBGETTEXT=False, 
                               CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
                                           ( 'elvish', 'Elvish' )]):
             from cms.views import details
@@ -265,8 +263,6 @@ class RenderingTestCase(CMSTestCase):
         to English
         '''
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_FALLBACK=True,
-                              CMS_DBGETTEXT=False, 
                               CMS_LANGUAGE_CONF={
                                   'elvish': ['klingon', 'en',]
                               },

@@ -764,7 +764,11 @@ a#closeBut:hover strong
     background-position:-210px -188px;
 }
 
-
+#cms_toolbar_logoutform fieldset {
+   margin: 0;
+   padding: 0;
+   border: none;
+}
 
 /* button 
 ---------------------------------------------- */

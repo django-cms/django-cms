@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 17:34+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cy\n"
 "Plural-Forms: nplurals=4; plural=(n==2) ? 1 : 0\n"
+<<<<<<< HEAD
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Country: SWITZERLAND\n"
+=======
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
+>>>>>>> hotfix/2.1.2
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -114,7 +124,13 @@ msgid "user"
 msgstr ""
 
 #: admin/forms.py:215
+<<<<<<< HEAD
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+=======
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: admin/forms.py:218
@@ -150,7 +166,13 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:296
+<<<<<<< HEAD
 msgid "Send email notification to user about username or password change. Requires user email."
+=======
+msgid ""
+"Send email notification to user about username or password change. "
+"Requires user email."
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: admin/forms.py:316
@@ -166,11 +188,23 @@ msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:339
+<<<<<<< HEAD
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:341
 msgid "The permission to add new users requires the permission to change users!"
+=======
+msgid ""
+"The permission to add new pages requires the permission to change "
+"pages!"
+msgstr ""
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new users requires the permission to change "
+"users!"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: admin/forms.py:343
@@ -269,7 +303,13 @@ msgstr ""
 
 #: admin/pageadmin.py:1260
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+=======
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in "
+"%(placeholder)s"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -586,7 +626,13 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:64
+<<<<<<< HEAD
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
+=======
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go"
+" live."
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -598,7 +644,13 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:68
+<<<<<<< HEAD
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+=======
+msgid ""
+"An unique identifier that is used with the page_url templatetag for "
+"linking to this page"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -933,7 +985,13 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
+<<<<<<< HEAD
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+=======
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
+"rendered. "
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1067,7 +1125,13 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:10
+<<<<<<< HEAD
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+=======
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1130,7 +1194,13 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
+<<<<<<< HEAD
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+=======
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1160,7 +1230,13 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
+<<<<<<< HEAD
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+=======
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
+"you."
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1271,7 +1347,13 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
+<<<<<<< HEAD
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+=======
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a "
+"message for moderator."
+>>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185

@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:22-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 13:37+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,8 +22,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: media/cms/js/change_form.js:31
+<<<<<<< HEAD
 msgid "Are you sure you want to change the %(field_name)s without saving the page first?"
 msgstr "Tem a certeza que quer alterar os %(field_name)s sem gravar a página primeiro?"
+=======
+msgid ""
+"Are you sure you want to change the %(field_name)s without saving the "
+"page first?"
+msgstr ""
+"Tem a certeza que quer alterar os %(field_name)s sem gravar a página "
+"primeiro?"
+>>>>>>> hotfix/2.1.2
 
 #: media/cms/js/change_form.js:69
 msgid ""
@@ -29,7 +42,13 @@ msgstr ""
 
 #: media/cms/js/change_form.js:127
 msgid "Are you sure you want to change tabs without saving the page first?"
+<<<<<<< HEAD
 msgstr "Tem a certeza que quer mudar de separador sem gravar a página primeiro?"
+=======
+msgstr ""
+"Tem a certeza que quer mudar de separador sem gravar a página "
+"primeiro?"
+>>>>>>> hotfix/2.1.2
 
 #: media/cms/js/plugin_editor.js:125
 msgid "Are you sure you want to delete this plugin?"

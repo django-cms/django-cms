@@ -3,8 +3,8 @@ from __future__ import with_statement
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from cms.models import Page
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 
 class SiteTestCase(CMSTestCase):
     """Site framework specific test cases.

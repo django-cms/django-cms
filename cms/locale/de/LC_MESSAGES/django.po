@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 14:16+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +20,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+<<<<<<< HEAD
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
+=======
+>>>>>>> hotfix/2.1.2
 "X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -66,7 +75,13 @@ msgstr "Seitentitel"
 
 #: admin/forms.py:131
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+<<<<<<< HEAD
 msgstr "Überschreiben, was im Titel des Browsers oder in den Lesezeichen erscheint"
+=======
+msgstr ""
+"Überschreiben, was im Titel des Browsers oder in den Lesezeichen "
+"erscheint"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:132
 msgid "Application"
@@ -82,7 +97,13 @@ msgstr "URL-Überschreibung"
 
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
+<<<<<<< HEAD
 msgstr "Lassen Sie dieses Feld leer, wenn der Standardpfad verwendet werden soll."
+=======
+msgstr ""
+"Lassen Sie dieses Feld leer, wenn der Standardpfad verwendet werden "
+"soll."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:142
 msgid "Redirect"
@@ -98,7 +119,13 @@ msgstr "Eine Beschreibung der Seite (wird teilweise von Suchmaschinen genutzt)"
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
+<<<<<<< HEAD
 msgstr "Eine Liste von mit Kommas getrennten Schlüsselwörtern (wird teilweise von Suchmaschinen genutzt)"
+=======
+msgstr ""
+"Eine Liste von mit Kommas getrennten Schlüsselwörtern (wird teilweise "
+"von Suchmaschinen genutzt)"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -114,12 +141,28 @@ msgid "user"
 msgstr "Benutzer"
 
 #: admin/forms.py:215
+<<<<<<< HEAD
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Zum Hinzufügen von Seiten muss der Zugriff auf Unterseiten ebenfalls ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten Speichervorgang nicht mehr bearbeitet werden."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
 msgstr "Die \"Seiten hinzufügen\"-Berechtigung benötigt auch die \"Bearbeiten\"-Berechtigung"
+=======
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"Zum Hinzufügen von Seiten muss der Zugriff auf Unterseiten ebenfalls "
+"ermöglicht werden, sonst können neu erstellte Seiten nach dem ersten "
+"Speichervorgang nicht mehr bearbeitet werden."
+
+#: admin/forms.py:218
+msgid "Add page permission also requires edit page permission."
+msgstr ""
+"Die \"Seiten hinzufügen\"-Berechtigung benötigt auch die "
+"\"Bearbeiten\"-Berechtigung"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -150,8 +193,18 @@ msgid "Notify user"
 msgstr "Benutzer benachrichtigen"
 
 #: admin/forms.py:296
+<<<<<<< HEAD
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "Benachrichtigung über Änderungen von Benutzername oder Passwort per E-Mail an den Benutzer senden. Benötigt die E-Mail-Adresse des Benutzers."
+=======
+msgid ""
+"Send email notification to user about username or password change. "
+"Requires user email."
+msgstr ""
+"Benachrichtigung über Änderungen von Benutzername oder Passwort per "
+"E-Mail an den Benutzer senden. Benötigt die E-Mail-Adresse des "
+"Benutzers."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,12 +219,29 @@ msgid "Email notification requires valid email address."
 msgstr "E-Mail-Benachrichtigung benötigt eine gültige E-Mail-Adresse."
 
 #: admin/forms.py:339
+<<<<<<< HEAD
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "Die Berechtigung neue Seiten hinzuzufügen benötigt die Berechtigung Seiten zu ändern."
 
 #: admin/forms.py:341
 msgid "The permission to add new users requires the permission to change users!"
 msgstr "Die Berechtigung neue Benutzer hinzufügen benötigt die Berechtigung Benutzer zu ändern."
+=======
+msgid ""
+"The permission to add new pages requires the permission to change "
+"pages!"
+msgstr ""
+"Die Berechtigung neue Seiten hinzuzufügen benötigt die Berechtigung "
+"Seiten zu ändern."
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new users requires the permission to change "
+"users!"
+msgstr ""
+"Die Berechtigung neue Benutzer hinzufügen benötigt die Berechtigung "
+"Benutzer zu ändern."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -269,8 +339,17 @@ msgstr "Plugins von %(language)s wurden nach %(placeholder)s kopiert."
 
 #: admin/pageadmin.py:1260
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s-Plugin auf der %(position)s Position in %(placeholder)s wurde geändert."
+=======
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in "
+"%(placeholder)s"
+msgstr ""
+"%(plugin_name)s-Plugin auf der %(position)s Position in "
+"%(placeholder)s wurde geändert."
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -278,8 +357,17 @@ msgstr "Plugins wurden verschoben."
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr "Das %(plugin_name)s-Plugin auf Position %(position)s in %(placeholder)s wurde gelöscht."
+=======
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
+msgstr ""
+"Das %(plugin_name)s-Plugin auf Position %(position)s in "
+"%(placeholder)s wurde gelöscht."
+>>>>>>> hotfix/2.1.2
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -586,8 +674,17 @@ msgid "changed by"
 msgstr "geändert von"
 
 #: models/pagemodel.py:64
+<<<<<<< HEAD
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Ab wann soll die Seite veröffentlicht werden? Der Status der Seite muss dazu auf \"veröffentlicht\" sein. "
+=======
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go"
+" live."
+msgstr ""
+"Ab wann soll die Seite veröffentlicht werden? Der Status der Seite "
+"muss dazu auf \"veröffentlicht\" sein. "
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -598,12 +695,25 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alle übergeordneten Seiten werden nicht im Menü dargestellt."
 
 #: models/pagemodel.py:68
+<<<<<<< HEAD
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Ein einzigartiger Identifikator, der benutzt wird, um mit dem page_url templatetag auf diese Seite zu verlinken."
 
 #: models/pagemodel.py:69
 msgid "attached menu"
 msgstr ""
+=======
+msgid ""
+"An unique identifier that is used with the page_url templatetag for "
+"linking to this page"
+msgstr ""
+"Ein einzigartiger Identifikator, der benutzt wird, um mit dem page_url"
+" templatetag auf diese Seite zu verlinken."
+
+#: models/pagemodel.py:69
+msgid "attached menu"
+msgstr "Angehängtes Menu"
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:70
 msgid "is published"
@@ -631,7 +741,11 @@ msgstr "Menu sichtbarkeit"
 
 #: models/pagemodel.py:83
 msgid "limit when this page is visible in the menu"
+<<<<<<< HEAD
 msgstr ""
+=======
+msgstr "Limitiert wer diese Seite im Menu sehen kann."
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -683,7 +797,13 @@ msgstr "Kann alle gelöschten Seiten wiederherstellen"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
+<<<<<<< HEAD
 msgstr "Falls keine Auswahl erfolgt, hat der Benutzer Berechtigungen auf alle Seiten."
+=======
+msgstr ""
+"Falls keine Auswahl erfolgt, hat der Benutzer Berechtigungen auf alle "
+"Seiten."
+>>>>>>> hotfix/2.1.2
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -841,8 +961,17 @@ msgid "Language or Page must be filled out"
 msgstr "Sprache oder Seite müssen ausgefüllt sein."
 
 #: plugins/inherit/models.py:10
+<<<<<<< HEAD
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr "Wählen Sie eine Seite von der Sie die Plugins erben wollen. Leer wählt die momentane Seite."
+=======
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
+msgstr ""
+"Wählen Sie eine Seite von der Sie die Plugins erben wollen. Leer wählt"
+" die momentane Seite."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -933,8 +1062,17 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
+<<<<<<< HEAD
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "Fügen sie eine Vorlage ein, welche dargestellt werden soll (z.B. \"snippets/plugin_xy.html\")."
+=======
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
+"rendered. "
+msgstr ""
+"Fügen sie eine Vorlage ein, welche dargestellt werden soll (z.B. "
+"\"snippets/plugin_xy.html\")."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1036,7 +1174,13 @@ msgstr "Link Tipp"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
+<<<<<<< HEAD
 msgstr "Wenn ausgefüllt, wird der Tipp als Link zu Ihrem Twitter-Profil dargestellt."
+=======
+msgstr ""
+"Wenn ausgefüllt, wird der Tipp als Link zu Ihrem Twitter-Profil "
+"dargestellt."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1045,6 +1189,9 @@ msgstr "Abfrage"
 #: plugins/twitter/models.py:16
 msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
 msgstr ""
+"Beispiel: \"Gehirne AND Zombies AND from:umbrella AND to:nemesis\": "
+"Tweets vom Benutzer \"umbrella\" an den Benutzer \"nemesis\" mit den "
+"Worten \"Gehirne\" und \"Zombies\"."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1067,8 +1214,17 @@ msgid "movie url"
 msgstr "Film URL"
 
 #: plugins/video/models.py:10
+<<<<<<< HEAD
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr "Vimeo oder Youtube Video URL. Beispiel: http://www.youtube.com/watch?v=YFa59lK-kpo"
+=======
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+msgstr ""
+"Vimeo oder Youtube Video URL. Beispiel: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+>>>>>>> hotfix/2.1.2
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1130,8 +1286,17 @@ msgid "button highlight color"
 msgstr "Schalter Highlight Farbe"
 
 #: plugins/video/templates/cms/plugins/video.html:3
+<<<<<<< HEAD
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr "Das Flash Plugin fehlt. Sie können es <a href=\"http://adobe.com/flashplayer\">hier downloaden</a>."
+=======
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr ""
+"Das Flash Plugin fehlt. Sie können es <a "
+"href=\"http://adobe.com/flashplayer\">hier downloaden</a>."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1160,7 +1325,13 @@ msgstr "Speichern und weiter bearbeiten"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
+<<<<<<< HEAD
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+=======
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
+"you."
+>>>>>>> hotfix/2.1.2
 msgstr "Die Seite <a href=\"%(admin_url)s\">%(page)s</a> benötigt Ihre Freigabe."
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1177,6 +1348,16 @@ msgstr "Sie können sich <a href=\"%(login_url)s\">hier</a> in die Administratio
 #, python-format
 msgid "Login url: %(login_url)s"
 msgstr ""
+<<<<<<< HEAD
+=======
+"Sie können sich <a href=\"%(login_url)s\">hier</a> in die Administration"
+" einloggen."
+
+#: templates/admin/cms/mail/base.txt:8
+#, python-format
+msgid "Login url: %(login_url)s"
+msgstr "Login URL: %(login_url)s"
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1269,8 +1450,17 @@ msgstr "Seitenstatus"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
+<<<<<<< HEAD
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr "Diese Seite muss auf der Ebene %(moderation_level)s moderiert werden. Senden Sie eine Nachricht an den Moderator."
+=======
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a "
+"message for moderator."
+msgstr ""
+"Diese Seite muss auf der Ebene %(moderation_level)s moderiert werden. "
+"Senden Sie eine Nachricht an den Moderator."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1542,7 +1732,13 @@ msgstr "Plugins kopieren"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:12
 msgid "You must save the page first to add plugins."
+<<<<<<< HEAD
 msgstr "Sie müssen die Seite zuerst speichern, um Plugins hinzufügen zu können."
+=======
+msgstr ""
+"Sie müssen die Seite zuerst speichern, um Plugins hinzufügen zu "
+"können."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugin selected. Selected one on the left side"
@@ -1550,7 +1746,13 @@ msgstr "Kein Plugin ausgewählt. Wählen Sie eins auf der linken Seite aus."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
+<<<<<<< HEAD
 msgstr "Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter ein."
+=======
+msgstr ""
+"Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter "
+"ein."
+>>>>>>> hotfix/2.1.2
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
@@ -1620,11 +1822,11 @@ msgstr "Seite löschen"
 
 #: templates/cms/toolbar/toolbar.html:206
 msgid "Site Administration"
-msgstr "Seiten Admininstration"
+msgstr "Administration"
 
 #: templates/cms/toolbar/toolbar.html:208
 msgid "Page Settings"
-msgstr "Grundeinstellungen"
+msgstr "Seite bearbeiten"
 
 #: templates/cms/toolbar/toolbar.html:210
 msgid "history"
@@ -1703,7 +1905,11 @@ msgstr "Deutsch"
 
 #: test/run_tests.py:140 test/project/settings.py:119
 msgid "Brazil"
+<<<<<<< HEAD
 msgstr ""
+=======
+msgstr "Portugisiesch \\(Brasilien\\)"
+>>>>>>> hotfix/2.1.2
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"

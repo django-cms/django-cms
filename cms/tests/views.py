@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
-from cms.test.testcases import SettingsOverrideTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.views import _handle_no_page, details
 from django.conf import settings
 from django.core.urlresolvers import clear_url_caches
@@ -10,11 +10,11 @@ import sys
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "cms.test.apps.sampleapp.cms_app"
+APP_MODULE = "project.sampleapp.cms_app"
 
 
 class ViewTests(SettingsOverrideTestCase):
-    urls = 'cms.test.project.urls_for_apphook_tests'
+    urls = 'project.urls_for_apphook_tests'
     settings_overrides = {'CMS_MODERATOR': False}
     
     def setUp(self):

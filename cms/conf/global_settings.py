@@ -113,15 +113,6 @@ CMS_MODERATOR = False
 # Defines what character will be used for the __unicode__ handling of cms pages
 CMS_TITLE_CHARACTER = '+'
 
-# gettext translation mode -- exports database content for parsing by
-# makemessages, and uses django's normal i18n framework instead of having to
-# create multiple copies of pages for each language.
-# requires 'dbgettext' -- http://bitbucket.org/drmeers/django-dbgettext/
-CMS_DBGETTEXT = 'dbgettext' in settings.INSTALLED_APPS
-
-# Allow gettext translation of slugs (only relevant if CMS_DBGETTEXT used)
-CMS_DBGETTEXT_SLUGS = False # (still experimental)
-
 # Enable non-cms placeholder frontend editing
 PLACEHOLDER_FRONTEND_EDITING = True
 

@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 13:38+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+<<<<<<< HEAD
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Country: SWITZERLAND\n"
+=======
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
+>>>>>>> hotfix/2.1.2
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -114,8 +124,17 @@ msgid "user"
 msgstr "käyttäjä"
 
 #: admin/forms.py:215
+<<<<<<< HEAD
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja ei voi muokata sitä myöhemmin."
+=======
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun "
+"luoja ei voi muokata sitä myöhemmin."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -150,8 +169,17 @@ msgid "Notify user"
 msgstr "Huomauta käyttäjää"
 
 #: admin/forms.py:296
+<<<<<<< HEAD
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. Vaatii käyttäjän sähköpostiosoitteen."
+=======
+msgid ""
+"Send email notification to user about username or password change. "
+"Requires user email."
+msgstr ""
+"Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan "
+"vaihtumisesta. Vaatii käyttäjän sähköpostiosoitteen."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,11 +194,23 @@ msgid "Email notification requires valid email address."
 msgstr "Sähköpostitiedote vaatii kelvollisen sähköpostiosoitteen."
 
 #: admin/forms.py:339
+<<<<<<< HEAD
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "Oikeus luoda sivuja vaatii oikeuden muokata sivuja!"
 
 #: admin/forms.py:341
 msgid "The permission to add new users requires the permission to change users!"
+=======
+msgid ""
+"The permission to add new pages requires the permission to change "
+"pages!"
+msgstr "Oikeus luoda sivuja vaatii oikeuden muokata sivuja!"
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new users requires the permission to change "
+"users!"
+>>>>>>> hotfix/2.1.2
 msgstr "Oikeus luoda käyttäjiä vaatii oikeuden muokata käyttäjä!"
 
 #: admin/forms.py:343
@@ -187,7 +227,13 @@ msgstr "Perusasetukset"
 
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
+<<<<<<< HEAD
 msgstr "Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna ensin."
+=======
+msgstr ""
+"Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. "
+"Tallenna ensin."
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -265,12 +311,27 @@ msgstr "Kopioidun kielen tulee poiketa lähdekielestä!"
 #: admin/pageadmin.py:1179
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
+<<<<<<< HEAD
 msgstr "Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
 
 #: admin/pageadmin.py:1260
 #, python-format
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa %(placeholder)s."
+=======
+msgstr ""
+"Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan "
+"%(placeholder)s."
+
+#: admin/pageadmin.py:1260
+#, python-format
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in "
+"%(placeholder)s"
+msgstr ""
+"Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s "
+"sisältöpaikassa %(placeholder)s."
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -278,8 +339,17 @@ msgstr "Liitännäisiä siirrettiin"
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 msgstr "Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta %(placeholder)s."
+=======
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
+msgstr ""
+"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s "
+"sisältöpaikasta %(placeholder)s."
+>>>>>>> hotfix/2.1.2
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -586,8 +656,17 @@ msgid "changed by"
 msgstr "muokkaaja"
 
 #: models/pagemodel.py:64
+<<<<<<< HEAD
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" jotta se tulee näkyviin. "
+=======
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go"
+" live."
+msgstr ""
+"Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla "
+"\"julkaistu\" jotta se tulee näkyviin. "
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -598,8 +677,17 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Kaikkia vanhempia ei näytetä navigaatiossa"
 
 #: models/pagemodel.py:68
+<<<<<<< HEAD
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa tämän sivun linkittämiseksi asettelutiedostoissa. "
+=======
+msgid ""
+"An unique identifier that is used with the page_url templatetag for "
+"linking to this page"
+msgstr ""
+"Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin "
+"kanssa tämän sivun linkittämiseksi asettelutiedostoissa. "
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -841,8 +929,17 @@ msgid "Language or Page must be filled out"
 msgstr "Kieli tai sivu pitää olla täytettynä"
 
 #: plugins/inherit/models.py:10
+<<<<<<< HEAD
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr "Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä valitsee nykyisen sivun"
+=======
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
+msgstr ""
+"Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, "
+"tyhjä valitsee nykyisen sivun"
+>>>>>>> hotfix/2.1.2
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -933,8 +1030,17 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
+<<<<<<< HEAD
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan ruudulle."
+=======
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
+"rendered. "
+msgstr ""
+"Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka "
+"tulostetaan ruudulle."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1067,8 +1173,17 @@ msgid "movie url"
 msgstr "videon osoite"
 
 #: plugins/video/models.py:10
+<<<<<<< HEAD
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
 msgstr "Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?v=YFa59lK-kpo"
+=======
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+msgstr ""
+"Vimeo tai Youtube videon URL. Esimerkiksi: "
+"http://www.youtube.com/watch?v=YFa59lK-kpo"
+>>>>>>> hotfix/2.1.2
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1130,8 +1245,17 @@ msgid "button highlight color"
 msgstr "napin korostusväri"
 
 #: plugins/video/templates/cms/plugins/video.html:3
+<<<<<<< HEAD
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr "Flash-laajennus puuttuu. <a href=\"http://adobe.com/flashplayer\">Lataa tästä</a>."
+=======
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr ""
+"Flash-laajennus puuttuu. <a href=\"http://adobe.com/flashplayer\">Lataa "
+"tästä</a>."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1160,8 +1284,17 @@ msgstr "Tallenna ja jatka muokkausta"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
+<<<<<<< HEAD
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta hyväksyntää."
+=======
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
+"you."
+msgstr ""
+"Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta "
+"hyväksyntää."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1269,8 +1402,17 @@ msgstr "Sivun tilat"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
+<<<<<<< HEAD
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr "Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti moderaattorille."
+=======
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a "
+"message for moderator."
+msgstr ""
+"Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä "
+"viesti moderaattorille."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"

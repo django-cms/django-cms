@@ -4,15 +4,15 @@ from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers
 
 from cms.models.titlemodels import Title
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches, reverse
 import sys
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "cms.test.apps.sampleapp.cms_app"
+APP_MODULE = "project.sampleapp.cms_app"
 
 
 class ApphooksTestCase(CMSTestCase):
@@ -46,8 +46,8 @@ class ApphooksTestCase(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
             
-        apps = ['cms.test.apps.sampleapp']
-        with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='cms.test.project.urls_for_apphook_tests'):
+        apps = ['project.sampleapp']
+        with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='project.urls_for_apphook_tests'):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()
             app_names = [hook[0] for hook in hooks]
@@ -60,7 +60,7 @@ class ApphooksTestCase(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
             
-        with SettingsOverride(ROOT_URLCONF='cms.test.project.urls_for_apphook_tests'):
+        with SettingsOverride(ROOT_URLCONF='project.urls_for_apphook_tests'):
             apphook_pool.clear()    
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
             page = self.create_page(user=superuser, published=True)
@@ -85,7 +85,7 @@ class ApphooksTestCase(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
             
-        with SettingsOverride(ROOT_URLCONF='cms.test.project.second_urls_for_apphook_tests'):
+        with SettingsOverride(ROOT_URLCONF='project.second_urls_for_apphook_tests'):
     
             apphook_pool.clear()    
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')

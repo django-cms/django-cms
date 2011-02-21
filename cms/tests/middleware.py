@@ -2,8 +2,8 @@
 from __future__ import with_statement
 from cms.middleware.multilingual import MultilingualURLMiddleware
 from cms.middleware.toolbar import inster_after_tag, ToolbarMiddleware
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 
 class MiddlewareTestCase(CMSTestCase):
     

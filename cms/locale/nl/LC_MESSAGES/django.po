@@ -8,7 +8,11 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2011-02-07 13:38+0000\n"
+=======
+"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+>>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+<<<<<<< HEAD
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Country: SWITZERLAND\n"
+=======
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
+>>>>>>> hotfix/2.1.2
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -66,7 +76,13 @@ msgstr "Pagina-titel"
 
 #: admin/forms.py:131
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+<<<<<<< HEAD
 msgstr "Overschrijft wat wordt weergegeven in de titelbalk van de browser of in bladwijzers"
+=======
+msgstr ""
+"Overschrijft wat wordt weergegeven in de titelbalk van de browser of "
+"in bladwijzers"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:132
 msgid "Application"
@@ -94,11 +110,23 @@ msgstr "Stuurt door naar deze URL."
 
 #: admin/forms.py:145
 msgid "A description of the page sometimes used by search engines."
+<<<<<<< HEAD
 msgstr "Een beschrijving van de pagina die soms door zoekmachines wordt gebruikt."
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "Een door komma's gescheiden lijst van trefwoorden die soms door zoekmachines wordt gebruikt."
+=======
+msgstr ""
+"Een beschrijving van de pagina die soms door zoekmachines wordt "
+"gebruikt."
+
+#: admin/forms.py:147
+msgid "A list of comma seperated keywords sometimes used by search engines."
+msgstr ""
+"Een door komma's gescheiden lijst van trefwoorden die soms door "
+"zoekmachines wordt gebruikt."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -114,12 +142,28 @@ msgid "user"
 msgstr "gebruiker"
 
 #: admin/forms.py:215
+<<<<<<< HEAD
 msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Om het recht te hebben pagina's toe te voegen, is ook toegang nodig tot de kinderen (of afstammelingen), anders kan de toegevoegde pagina niet door zijn maker worden aangepast."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
 msgstr "Voor het recht om pagina's toe te voegen is ook het recht nodig pagina's te bewerken."
+=======
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"Om het recht te hebben pagina's toe te voegen, is ook toegang nodig "
+"tot de kinderen (of afstammelingen), anders kan de toegevoegde pagina "
+"niet door zijn maker worden aangepast."
+
+#: admin/forms.py:218
+msgid "Add page permission also requires edit page permission."
+msgstr ""
+"Voor het recht om pagina's toe te voegen is ook het recht nodig "
+"pagina's te bewerken."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -150,8 +194,18 @@ msgid "Notify user"
 msgstr "Licht gebruiker in"
 
 #: admin/forms.py:296
+<<<<<<< HEAD
 msgid "Send email notification to user about username or password change. Requires user email."
 msgstr "Stuur een e-mailnotificatie naar de gebruiker over het aanpassen van de gebruikersnaam of het wachtwoord. Hiervoor is het e-mailadres van de gebruiker nodig."
+=======
+msgid ""
+"Send email notification to user about username or password change. "
+"Requires user email."
+msgstr ""
+"Stuur een e-mailnotificatie naar de gebruiker over het aanpassen van "
+"de gebruikersnaam of het wachtwoord. Hiervoor is het e-mailadres van "
+"de gebruiker nodig."
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,12 +220,29 @@ msgid "Email notification requires valid email address."
 msgstr "Voor e-mailnotificatie is een geldig e-mailadres vereist."
 
 #: admin/forms.py:339
+<<<<<<< HEAD
 msgid "The permission to add new pages requires the permission to change pages!"
 msgstr "Het recht om pagina's toe te voegen vereist het recht pagina's aan te passen!"
 
 #: admin/forms.py:341
 msgid "The permission to add new users requires the permission to change users!"
 msgstr "Het recht om gebruikers toe te voegen vereist het recht om gebruikers aan te passen!"
+=======
+msgid ""
+"The permission to add new pages requires the permission to change "
+"pages!"
+msgstr ""
+"Het recht om pagina's toe te voegen vereist het recht pagina's aan te "
+"passen!"
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new users requires the permission to change "
+"users!"
+msgstr ""
+"Het recht om gebruikers toe te voegen vereist het recht om gebruikers "
+"aan te passen!"
+>>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -187,7 +258,13 @@ msgstr "Basisinstelling"
 
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
+<<<<<<< HEAD
 msgstr "Opmerking: Deze pagina herlaadt wanneer je de selectie verandert. Sla het eerst op."
+=======
+msgstr ""
+"Opmerking: Deze pagina herlaadt wanneer je de selectie verandert. Sla "
+"het eerst op."
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -243,7 +320,13 @@ msgstr "Je bent niet toegestaan deze pagina te publiceren"
 
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
+<<<<<<< HEAD
 msgstr "Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te passen"
+=======
+msgstr ""
+"Je bent niet toegestaan om de in_navigatie toestand van deze pagina "
+"aan te passen"
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1133 admin/pageadmin.py:1167
 msgid "You do not have permission to change this page"
@@ -269,8 +352,17 @@ msgstr "%(language)s plugins zijn gekopieerd naar %(placeholder)s"
 
 #: admin/pageadmin.py:1260
 #, python-format
+<<<<<<< HEAD
 msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s-plugin bewerkt op positie %(position)s in %(placeholder)s"
+=======
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in "
+"%(placeholder)s"
+msgstr ""
+"%(plugin_name)s-plugin bewerkt op positie %(position)s in "
+"%(placeholder)s"
+>>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -586,8 +678,17 @@ msgid "changed by"
 msgstr "bewerkt door"
 
 #: models/pagemodel.py:64
+<<<<<<< HEAD
 msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" staan om publiek te worden."
+=======
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go"
+" live."
+msgstr ""
+"Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" "
+"staan om publiek te worden."
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -598,8 +699,17 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alle ouders zullen niet worden weergegeven in de navigatie"
 
 #: models/pagemodel.py:68
+<<<<<<< HEAD
 msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Een unieke naam die door de 'page_url' sjabloon-tag wordt gebruikt om naar deze pagina te verwijzen."
+=======
+msgid ""
+"An unique identifier that is used with the page_url templatetag for "
+"linking to this page"
+msgstr ""
+"Een unieke naam die door de 'page_url' sjabloon-tag wordt gebruikt om "
+"naar deze pagina te verwijzen."
+>>>>>>> hotfix/2.1.2
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -802,7 +912,13 @@ msgstr "breedtegraad"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
+<<<<<<< HEAD
 msgstr "Gebruik breedtegraad & lengtegraad om de positie op de kaart nauwkeurig in te stellen."
+=======
+msgstr ""
+"Gebruik breedtegraad & lengtegraad om de positie op de kaart "
+"nauwkeurig in te stellen."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -841,8 +957,17 @@ msgid "Language or Page must be filled out"
 msgstr "Taal of Pagina moet ingevuld zijn"
 
 #: plugins/inherit/models.py:10
+<<<<<<< HEAD
 msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
 msgstr "Kies een pagina om diens plugins in de 'placeholder' in te voegen, indien leeggelaten wordt de huidige pagina gekozen"
+=======
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
+msgstr ""
+"Kies een pagina om diens plugins in de 'placeholder' in te voegen, "
+"indien leeggelaten wordt de huidige pagina gekozen"
+>>>>>>> hotfix/2.1.2
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -933,8 +1058,17 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
+<<<<<<< HEAD
 msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "Voer een sjabloon in (bijv. \"knipsels/plugin_xy.html\") dat weergegeven zal worden."
+=======
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
+"rendered. "
+msgstr ""
+"Voer een sjabloon in (bijv. \"knipsels/plugin_xy.html\") dat weergegeven"
+" zal worden."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -983,7 +1117,13 @@ msgstr "Geselecteerde plugin bewerken"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
+<<<<<<< HEAD
 msgstr "Tekst-bewerker biedt geen ondersteuning voor het bewerken van objecten."
+=======
+msgstr ""
+"Tekst-bewerker biedt geen ondersteuning voor het bewerken van "
+"objecten."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
@@ -994,7 +1134,13 @@ msgstr "Geen object geselecteerd."
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
+<<<<<<< HEAD
 msgstr "Tekst-bewerker biedt geen ondersteuning voor het invoegen van objecten."
+=======
+msgstr ""
+"Tekst-bewerker biedt geen ondersteuning voor het invoegen van "
+"objecten."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
@@ -1036,7 +1182,13 @@ msgstr "link hint"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
+<<<<<<< HEAD
 msgstr "Indien opgegeven wordt deze hint weergegeven als een link naar je Twitter-profiel."
+=======
+msgstr ""
+"Indien opgegeven wordt deze hint weergegeven als een link naar je "
+"Twitter-profiel."
+>>>>>>> hotfix/2.1.2
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1067,7 +1219,13 @@ msgid "movie url"
 msgstr "video url"
 
 #: plugins/video/models.py:10
+<<<<<<< HEAD
 msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+=======
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
+>>>>>>> hotfix/2.1.2
 msgstr ""
 "Vimeo of YouTube video url. Voorbeeld:\r\n"
 "http://www.youtube.com/watch?v=YFa59lK-kpo"
@@ -1132,8 +1290,17 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
+<<<<<<< HEAD
 msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr "Flash plugin niet gevonden. Download <a href=\"http://adobe.com/flashplayer\">hier</a>"
+=======
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr ""
+"Flash plugin niet gevonden. Download <a "
+"href=\"http://adobe.com/flashplayer\">hier</a>"
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1162,8 +1329,17 @@ msgstr "Opslaan en opnieuw bewerken"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
+<<<<<<< HEAD
 msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "Pagina <a href=\"%(admin_url)s\">%(page)s</a> moet mogelijk door jou worden goedgekeurd."
+=======
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
+"you."
+msgstr ""
+"Pagina <a href=\"%(admin_url)s\">%(page)s</a> moet mogelijk door jou "
+"worden goedgekeurd."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1271,8 +1447,17 @@ msgstr "Pagina toestanden"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
+<<<<<<< HEAD
 msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
 msgstr "Deze pagina moet gemodereerd worden op %(moderation_level)s-niveau, stuur een bericht naar de moderator."
+=======
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a "
+"message for moderator."
+msgstr ""
+"Deze pagina moet gemodereerd worden op %(moderation_level)s-niveau, "
+"stuur een bericht naar de moderator."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1515,7 +1700,13 @@ msgstr "Stel %(verbose_name)s terug"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
+<<<<<<< HEAD
 msgstr "Druk op de Oplaan-knop hieronder om naa deze versie van het object terug te stellen."
+=======
+msgstr ""
+"Druk op de Oplaan-knop hieronder om naa deze versie van het object "
+"terug te stellen."
+>>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"

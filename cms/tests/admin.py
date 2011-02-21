@@ -5,9 +5,9 @@ from cms.admin.dialog.forms import ModeratorForm, PermissionForm, \
 from cms.admin.dialog.views import _form_class_selector
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
-from cms.test import testcases as base
-from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils import testcases as base
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse

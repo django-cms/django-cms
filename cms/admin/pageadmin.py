@@ -74,9 +74,6 @@ class PageAdmin(ModelAdmin):
     top_fields = []
     general_fields = ['title', 'slug', ('published', 'in_navigation')]
     add_general_fields = ['title', 'slug', 'language', 'template']
-    if settings.CMS_DBGETTEXT:
-        # no need to select language for page
-        add_general_fields.remove('language')
     advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
@@ -439,7 +436,7 @@ class PageAdmin(ModelAdmin):
                             copy_languages[plugin.language] = dict_cms_languages[plugin.language]
 
                 language = get_language_from_request(request, obj)
-                if copy_languages and not settings.CMS_DBGETTEXT and len(settings.CMS_LANGUAGES) > 1:
+                if copy_languages and len(settings.CMS_LANGUAGES) > 1:
                     show_copy = True
                 widget = PluginEditor(attrs={
                     'installed': installed_plugins,
@@ -582,8 +579,7 @@ class PageAdmin(ModelAdmin):
         context.update({
             'language': language,
             'language_tabs': languages,
-            'show_language_tabs': len(languages) > 1 and \
-                not settings.CMS_DBGETTEXT,
+            'show_language_tabs': len(languages) > 1,
         })
         return context
 
@@ -1387,7 +1383,7 @@ class PageAdmin(ModelAdmin):
                 return admin_utils.render_admin_menu_item(request, page)
         raise Http404
     
-    def lookup_allowed(self, key, *args):
+    def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
             return True
         return super(PageAdmin, self).lookup_allowed(key, *args)
