@@ -27,6 +27,10 @@ Example::
         ('extra.html', gettext('Some extra fancy template')),
     )
 
+.. note:: All templates defined in ``CMS_TEMPLATES`` must contain at least the
+          ``js`` and ``css`` sekizai namespaces, for more information, see 
+          :ref:`sekizai-namespaces`.
+
 
 *******************
 Basic Customization
