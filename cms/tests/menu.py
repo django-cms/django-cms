@@ -717,3 +717,28 @@ class AdvancedSoftrootTests(BaseMenuTest):
             ])
         ]
         self.assertTreeQuality(soft_root, mock_tree, 'title', 'level')
+
+
+class ShowSubMenuCheck(BaseMenuTest):
+    """
+    Tree from fixture:
+
+        + P1
+        | + P2
+        |   + P3
+        + P4
+        | + P5
+        + P6
+          + P7 (not in menu)
+          + P8
+    """
+    fixtures = ['menus-sub.json']
+
+    def test_01_show_submenu(self):
+        context = self.get_context('/test-page-6/')
+        # test standard show_menu
+        tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].id, 8)

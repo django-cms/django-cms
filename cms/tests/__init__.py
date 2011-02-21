@@ -2,7 +2,7 @@
 from cms.tests.admin import AdminTestCase
 from cms.tests.apphooks import ApphooksTestCase
 from cms.tests.docs import DocsTestCase
-from cms.tests.menu import FixturesMenuTests, MenuTests, AdvancedSoftrootTests
+from cms.tests.menu import FixturesMenuTests, MenuTests, AdvancedSoftrootTests, ShowSubMenuCheck
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.nonroot import NonRootCase
 from cms.tests.page import PagesTestCase, NoAdminPageTests
