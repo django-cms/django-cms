@@ -66,7 +66,7 @@ class Placeholder(models.Model):
         """
         from cms.models import CMSPlugin
         for rel in self._meta.get_all_related_objects():
-             if isinstance(rel.model, CMSPlugin):
+            if isinstance(rel.model, CMSPlugin):
                 continue
             field = getattr(self, rel.get_accessor_name())
             if field.count():
