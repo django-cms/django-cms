@@ -336,7 +336,7 @@ class CMSTestCase(TestCase):
         save_permissions(data, page_user)
         return user
         
-    def assign_user_to_page(self, user, page, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+    def assign_user_to_page(self, page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         can_add=False, can_change=False, can_delete=False, 
         can_change_advanced_settings=False, can_publish=False, 
         can_change_permissions=False, can_move_page=False, can_moderate=False, 
