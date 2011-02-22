@@ -72,6 +72,6 @@ class MultilingualTestCase(CMSTestCase):
         monkeypatch_reverse()
         monkeypatch_reverse()
         try:
-            reverse('foobar')
+            reverse('pages-root')
         except RuntimeError:
             self.fail('maximum recursion depth exceeded')
