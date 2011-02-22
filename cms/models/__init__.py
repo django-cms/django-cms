@@ -37,6 +37,8 @@ def remove_current_root(url):
     return url
 
 def monkeypatch_reverse():
+    if hasattr(django.core.urlresolvers.reverse, 'cms_monkeypatched'):
+        return
     django.core.urlresolvers.old_reverse = django.core.urlresolvers.reverse
     
     def new_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
@@ -62,13 +64,10 @@ def monkeypatch_reverse():
             raise e
         url = remove_current_root(url)
         return url
-    
+
+    new_reverse.cms_monkeypatched = True
     django.core.urlresolvers.reverse = new_reverse
         
 validate_dependencies()
 validate_settings()
-
-monkeypatched = False
-if not monkeypatched: 
-    monkeypatch_reverse()
-    monkeypatched = True
+monkeypatch_reverse()
