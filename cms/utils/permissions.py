@@ -99,8 +99,8 @@ def has_page_change_permission(request):
 def has_page_view_permission(request):
     """
     Return true if the current user has permission to view any page. This is
-    just used for building the tree - only superuser, or user with can_change in
-    globalpagepermission can change a page.
+    just used for building the tree - only superuser, or user with can_view in
+    globalpagepermission can view a page.
     """
     from cms.utils.plugins import current_site
     opts = self._meta

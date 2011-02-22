@@ -11,7 +11,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _, get_language, ugettext
+from django.utils.translation import ugettext_lazy as _, get_language
 
 from cms.exceptions import NoHomeFound
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
@@ -710,26 +710,35 @@ class Page(MPTTModel):
         return _("default")
     
     def has_view_permission(self, request):
-        from cms.models.permissionmodels import PagePermission
+        from cms.models.permissionmodels import PagePermission, GlobalPagePermission
+        from cms.utils.plugins import current_site
         # staff is allowed to see everything
         if request.user.is_staff and settings.CMS_PUBLIC_FOR_STAFF:
             return True
         # does any restriction exist?
-        restricted = PagePermission.objects.filter(page=self, can_view=True).count()
-        # anonymous user, no restriction saved in database
-        if not request.user.is_authenticated() and not restricted:
-            return True
-        # authenticated user, no restriction and public for all fallback
-        if (request.user.is_authenticated() and not restricted and
-                settings.CMS_PUBLIC_FOR_ALL):
-            return True
-        # anyonymous user, page has restriction, generally false
-        if not request.user.is_authenticated() and restricted:
-            return False
+        restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
+        if request.user.is_authenticated():
+            site = current_site(request)
+            global_view_perms = GlobalPagePermission.objects.with_user(
+                request.user).filter(can_view=True, sites__in=[site]).exists()
+            # a global permission was given to the request's user
+            if global_view_perms:
+                return True
+            # authenticated user, no restriction and public for all fallback
+            if (not restricted and not global_view_perms and
+                    not settings.CMS_PUBLIC_FOR_ALL):
+                return False
+        else:
+            if restricted:
+                # anyonymous user, page has restriction, generally false
+                return False
+            else:
+                # anonymous user, no restriction saved in database
+                return True
         # Authenticated user
         # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
-        codename = '%s.%s_%s' % (opts.app_label, "view", opts.object_name.lower())
+        codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
         return (request.user.has_perm(codename) or
                 self.has_generic_permission(request, "view"))
     

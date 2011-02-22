@@ -94,10 +94,14 @@ class CMSTestCase(TestCase):
         return admin
     
     def get_new_page_data(self, parent_id=''):
-        page_data = {'title':'test page %d' % self.counter, 
-            'slug':'test-page-%d' % self.counter, 'language':settings.LANGUAGES[0][0],
-            'site':1, 'template':'nav_playground.html', 'parent': parent_id}
-        
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0],
+            'template': 'nav_playground.html',
+            'parent': parent_id,
+            'site': 1,
+        }
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0

@@ -573,52 +573,57 @@ class PermissionModeratorTestCase(CMSTestCase):
 
     def test_20_superuser_can_view(self):
         self.login_user(self.user_super)
-        response = self.client.get("/fr/pageb/")
+        response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
 
     def test_21_superuser_can_view(self):
         self.login_user(self.user_staff)
-        response = self.client.get("/fr/pageb/")
+        response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
 
     def test_22_user_normal_can_view(self):
         self.login_user(self.user_normal)
-        response = self.client.get("/fr/pageb/")
+        response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
         self.client.logout()
-        response = self.client.get("/fr/pageb/")
+        response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
 
     def test_23_user_globalpermission(self):
-        global_page = self.create_page(title="global", published=True)
-        global_page = self.publish_page(global_page, approve=True)
-        
         # Global user
+        self.login_user(self.user_super)
         user_global = self.create_page_user("global")
         user_global.is_staff = False
-        user_global.save() # Preven is_staff permission
+        user_global.save() # Prevent is_staff permission
+        global_page = self.create_page(title="global", published=True)
+        global_page = self.publish_page(global_page, approve=True)
         # it's allowed for the normal user to view the page
         self.assign_user_to_page(user_global, global_page,
             global_permission=True, can_view=True)
+        self.client.logout()
 
         self.login_user(user_global)
-        response = self.client.get("/fr/global/")
+        response = self.client.get("/en/global/")
         self.assertEqual(response.status_code, 200)
+        self.client.logout()
 
+        self.login_user(self.user_super)
         user_non_global = User(username="nonglobal", is_active=True)
         user_non_global.set_password("nonglobal")
         user_non_global.save()
+        self.client.logout()
         self.login_user(user_non_global)
-        response = self.client.get("/fr/global/")
+        response = self.client.get("/en/global/")
         self.assertEqual(response.status_code, 404, response.content)
+        self.client.logout()
 
     def test_24_anonymous_user(self):
         settings.CMS_PUBLIC_FOR_ALL = True
-        response = self.client.get("/fr/pageb/")
+        response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
 
         # default of when to show pages to anonymous user doesn't take
         # global permissions into account
         settings.CMS_PUBLIC_FOR_ALL = False
-        response = self.client.get("/fr/pageb/")
+        response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
