@@ -71,11 +71,11 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_master = self.create_page_user("master", grant_all=True)
         
         # assign master user under home page
-        self.assign_user_to_page(self.user_master, self.home_page, grant_on=ACCESS_DESCENDANTS,
+        self.assign_user_to_page(self.home_page, self.user_master, grant_on=ACCESS_DESCENDANTS,
             grant_all=True)
         
         # and to master page
-        self.assign_user_to_page(self.user_master, self.master_page, grant_all=True)
+        self.assign_user_to_page(self.master_page, self.user_master, grant_all=True)
         
         # slave page & slave user
         
@@ -83,7 +83,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_slave = self.create_page_user("slave", 
             can_add_page=True, can_change_page=True, can_delete_page=True)
         
-        self.assign_user_to_page(self.user_slave, self.slave_page, grant_all=True)
+        self.assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
         
         # create page_b
         
@@ -93,12 +93,12 @@ class PermissionModeratorTestCase(CMSTestCase):
         # Normal user
         self.user_normal = self.create_page_user("normal")
         # it's allowed for the normal user to view the page
-        perm = self.assign_user_to_page(self.user_normal, page_b, can_view=True)
+        perm = self.assign_user_to_page(page_b, self.user_normal, can_view=True)
 
         # create page_a - sample page from master
         
         page_a = self.create_page(title="pageA", user=self.user_super)
-        self.assign_user_to_page(self.user_master, page_a,
+        self.assign_user_to_page(page_a, self.user_master,
             can_add=True, can_change=True, can_delete=True, can_publish=True, 
             can_move_page=True, can_moderate=True)
         
@@ -598,7 +598,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         global_page = self.create_page(title="global", published=True)
         global_page = self.publish_page(global_page, approve=True)
         # it's allowed for the normal user to view the page
-        self.assign_user_to_page(user_global, global_page,
+        self.assign_user_to_page(global_page, user_global,
             global_permission=True, can_view=True)
         self.client.logout()
 

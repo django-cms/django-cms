@@ -349,7 +349,7 @@ class CMSTestCase(TestCase):
         future will be nice.
         """
         if grant_all and not global_permission:
-            return self.assign_user_to_page(user, page, grant_on,
+            return self.assign_user_to_page(page, user, grant_on,
                 True, True, True, True, True, True, True, True, False, True)
         
         data = {
@@ -445,18 +445,19 @@ class CMSTestCase(TestCase):
         self.assertEqual(page.level, public_page.level)
         
         # TODO: add check for siblings
-        
-        draft_siblings = list(page.get_siblings(True). \
-            filter(publisher_is_draft=True).order_by('tree_id', 'parent', 'lft'))
-        public_siblings = list(public_page.get_siblings(True). \
-            filter(publisher_is_draft=False).order_by('tree_id', 'parent', 'lft'))
-        
+        draft_siblings = list(page.get_siblings(True).filter(
+                publisher_is_draft=True
+            ).order_by('tree_id', 'parent', 'lft'))
+        public_siblings = list(public_page.get_siblings(True).filter(
+                publisher_is_draft=False
+            ).order_by('tree_id', 'parent', 'lft'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1
                 continue
-            self.assertEqual(sibling.id, public_siblings[i - skip].publisher_draft.id) 
+            self.assertEqual(sibling.id,
+                public_siblings[i-skip].publisher_draft.id)
     
     def request_moderation(self, page, level):
         """Assign current logged in user to the moderators / change moderation
