@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import (SettingsOverride, 
-    UserLoginContext)
+from cms.test.util.context_managers import SettingsOverride, UserLoginContext
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
@@ -12,12 +12,9 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
-from testapp.fakemlng.models import Translations
-from testapp.placeholderapp.models import Example1, Example2, Example3, Example4, \
-    Example5
-from project.fakemlng.models import Translations
-from project.placeholderapp.models import (Example1, Example2, Example3, Example4, 
-    Example5)
+from testapp.fakemlng.models import Translations, Translations
+from testapp.placeholderapp.models import (Example1, Example2, Example3, Example4, 
+    Example5, Example1, Example2, Example3, Example4, Example5)
 
 
 class PlaceholderTestCase(CMSTestCase):
