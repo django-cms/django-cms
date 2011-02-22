@@ -92,6 +92,15 @@ class CMSTestCase(TestCase):
         admin.set_password("admin")
         admin.save()
         return admin
+        
+    def get_staff_user_with_no_permissions(self):
+        """
+        Used in security tests
+        """
+        staff = User(username="staff", is_staff=True, is_active=True)
+        staff.set_password("staff")
+        staff.save()
+        return staff
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
