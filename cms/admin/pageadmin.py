@@ -1074,6 +1074,9 @@ class PageAdmin(model_admin):
 
     @create_on_success
     def add_plugin(self, request):
+        '''
+        Could be either a page or a parent - if it's a parent we get the page via parent.
+        '''
         if 'history' in request.path or 'recover' in request.path:
             return HttpResponse(str("error"))
         if request.method == "POST":
@@ -1108,14 +1111,20 @@ class PageAdmin(model_admin):
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)
                 placeholder = parent.placeholder
                 page = get_page_from_placeholder_if_exists(placeholder)
+                if not page: # Make sure we do have a page
+                    raise Http404
                 language = parent.language
                 position = None
             # placeholder (non-page) add-plugin
             else:
-                position = None
-                language = request.POST['language'] or get_language_from_request(request)
-            if page and not page.has_change_permission(request):
-                return HttpResponseForbidden(unicode(_("You do not have permission to change this page")))
+                # do NOT allow non-page placeholders to use this method, they
+                # should use their respective admin!
+                raise Http404
+            
+            if not page.has_change_permission(request):
+                # we raise a 404 instead of 403 for a slightly improved security
+                # and to be consistent with placeholder admin
+                raise Http404
 
             # Sanity check to make sure we're not getting bogus values from JavaScript:
             if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
@@ -1175,7 +1184,7 @@ class PageAdmin(model_admin):
             page = get_page_from_placeholder_if_exists(cms_plugin.placeholder)
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
             if page and not page.has_change_permission(request):
-                raise PermissionDenied
+                raise Http404
         else:
             # history view with reversion
             from reversion.models import Version
