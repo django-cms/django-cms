@@ -10,10 +10,10 @@ from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
+from cms.test.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
