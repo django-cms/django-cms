@@ -30,6 +30,7 @@ URL_CMS_PAGE_DELETE = URL_CMS_PAGE_CHANGE + "delete/"
 URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
 URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
 URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE + "remove-plugin/"
+URL_CMS_TRANSLATION_DELETE = URL_CMS_PAGE_CHANGE + "delete-translation/"
 
 class _Warning(object):
     def __init__(self, message, category, filename, lineno):
@@ -91,6 +92,15 @@ class CMSTestCase(TestCase):
         admin.set_password("admin")
         admin.save()
         return admin
+        
+    def get_staff_user_with_no_permissions(self):
+        """
+        Used in security tests
+        """
+        staff = User(username="staff", is_staff=True, is_active=True)
+        staff.set_password("staff")
+        staff.save()
+        return staff
     
     def get_new_page_data(self, parent_id=''):
         page_data = {'title':'test page %d' % self.counter, 
@@ -270,6 +280,7 @@ class CMSTestCase(TestCase):
             'wsgi.multiprocess': True,
             'wsgi.multithread':  False,
             'wsgi.run_once':     False,
+            'wsgi.input':        ''
         }
         request = WSGIRequest(environ)
         request.session = self.client.session

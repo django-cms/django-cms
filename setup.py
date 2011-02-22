@@ -48,7 +48,6 @@ setup(
     install_requires=[
         'Django>=1.2',
         'django-classy-tags>=0.2.2',
-        'PIL>=1.1.6',
         'south>=0.7.2',
     ],
     packages=find_packages(exclude=["example", "example.*","testdata","testdata.*"]),

@@ -62,3 +62,16 @@ class MultilingualTestCase(CMSTestCase):
         placeholder = public.placeholders.all()[0]
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
+
+    def test_03_multiple_reverse_monkeypatch(self):
+        """
+        This test is not very well behaved, every following
+        test that uses reverse will fail with a RuntimeException.
+        """
+        from cms.models import monkeypatch_reverse
+        monkeypatch_reverse()
+        monkeypatch_reverse()
+        try:
+            reverse('pages-root')
+        except RuntimeError:
+            self.fail('maximum recursion depth exceeded')
