@@ -101,6 +101,6 @@ def details(request, slug):
     context['has_view_permissions'] = page.has_view_permission(request)
     
     if not context['has_view_permissions']:
-        raise Http404("CMS: No page found for site %s" % unicode(site.name))
+        return _handle_no_page(request, slug)
     
     return render_to_response(template_name, context)
