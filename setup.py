@@ -48,7 +48,6 @@ setup(
     install_requires=[
         'Django>=1.2',
         'django-classy-tags>=0.3.0',
-        'PIL>=1.1.6',
         'south>=0.7.2',
         'django-mptt>=0.4.2',
         'django-sekizai>=0.4.1',

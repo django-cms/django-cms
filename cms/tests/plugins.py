@@ -9,24 +9,24 @@ from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.text.models import Text
-from cms.plugins.text.utils import (plugin_tags_to_id_list, 
-    plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.plugins.text.utils import (plugin_tags_to_id_list, 
+    plugin_tags_to_admin_html)
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 from django.forms.widgets import Media
 from django.template import RequestContext
 from django.test.testcases import TestCase
 from project.pluginapp.models import Article, Section
 from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
-
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -54,8 +54,20 @@ class PluginsTestBaseCase(CMSTestCase):
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
 
+    def approve_page(self, page):
+        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        # reload page
+        return self.reload_page(page)
         
+    def get_request(self, *args, **kwargs):
+        request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
+        request.placeholder_media = Media()
+        return request
+
+
 class PluginsTestCase(PluginsTestBaseCase):
+        
 
     def test_01_add_edit_plugin(self):
         """
@@ -258,12 +270,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             'parent': int(response.content)
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        
-        plugin_data = {
-            'plugin_id': int(response.content)
-        }
-        response = response.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
-        self.assertEquals(response.status_code, 200)
+        # no longer allowed for security reasons
+        self.assertEqual(response.status_code, 404)
         
     def test_07_register_plugin_twice_should_raise(self):
         number_of_plugins_before = len(plugin_pool.get_all_plugins())

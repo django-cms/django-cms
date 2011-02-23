@@ -8,11 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-<<<<<<< HEAD
-"PO-Revision-Date: 2011-02-07 13:38+0000\n"
-=======
 "PO-Revision-Date: 2011-02-16 17:11+0000\n"
->>>>>>> hotfix/2.1.2
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -20,15 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: bg\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-<<<<<<< HEAD
-"X-Poedit-Language: English\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Country: SWITZERLAND\n"
-=======
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
->>>>>>> hotfix/2.1.2
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -75,7 +65,8 @@ msgid "Page Title"
 msgstr "Заглавие на страницата"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Напишете показаното отгоре във Вашия браузър или бележки"
 
 #: admin/forms.py:132
@@ -92,13 +83,8 @@ msgstr "Напиши адрес"
 
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
-<<<<<<< HEAD
-msgstr "Оставете това поле празно, ако трябва да бъде използван стандартен път."
-=======
 msgstr ""
-"Оставете това поле празно, ако трябва да бъде използван стандартен "
-"път."
->>>>>>> hotfix/2.1.2
+"Оставете това поле празно, ако трябва да бъде използван стандартен път."
 
 #: admin/forms.py:142
 msgid "Redirect"
@@ -130,17 +116,12 @@ msgid "user"
 msgstr "потребител"
 
 #: admin/forms.py:215
-<<<<<<< HEAD
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-=======
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
->>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -175,17 +156,12 @@ msgid "Notify user"
 msgstr "Предопреди потребителя"
 
 #: admin/forms.py:296
-<<<<<<< HEAD
-msgid "Send email notification to user about username or password change. Requires user email."
-msgstr "Изпращането на имейл предупреждение на потребителя изисква неговото добавяне."
-=======
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 "Изпращането на имейл предупреждение на потребителя изисква неговото "
 "добавяне."
->>>>>>> hotfix/2.1.2
 
 #: admin/forms.py:316
 msgid "New password"
@@ -200,27 +176,15 @@ msgid "Email notification requires valid email address."
 msgstr "И-мейл потвърждението изисква валиден имейл адрес."
 
 #: admin/forms.py:339
-<<<<<<< HEAD
-msgid "The permission to add new pages requires the permission to change pages!"
-msgstr "Правото за добавяне изисква и право за редактиране."
-
-#: admin/forms.py:341
-msgid "The permission to add new users requires the permission to change users!"
-msgstr "Правото за добавяне на потребители изисква и правото за тяхното редактиране."
-=======
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Правото за добавяне изисква и право за редактиране."
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"Правото за добавяне на потребители изисква и правото за тяхното "
-"редактиране."
->>>>>>> hotfix/2.1.2
+"Правото за добавяне на потребители изисква и правото за тяхното редактиране."
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -236,7 +200,9 @@ msgstr "Основни настройки"
 
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Забележка: страницата презарежда ако промените значението. Запазете промените първо."
+msgstr ""
+"Забележка: страницата презарежда ако промените значението. Запазете "
+"промените първо."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -318,17 +284,11 @@ msgstr ""
 
 #: admin/pageadmin.py:1260
 #, python-format
-<<<<<<< HEAD
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "%(plugin_name)s плъгин беше редактиран в позиция %(position)s на %(placeholder)s"
-=======
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 "%(plugin_name)s плъгин беше редактиран в позиция %(position)s на "
 "%(placeholder)s"
->>>>>>> hotfix/2.1.2
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -336,17 +296,12 @@ msgstr "Плъгините бяха преместени"
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
-<<<<<<< HEAD
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr "%(plugin_name)s плъгин в позиция %(position)s на %(placeholder)s беше изтрит."
-=======
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
 "%(plugin_name)s плъгин в позиция %(position)s на %(placeholder)s беше "
 "изтрит."
->>>>>>> hotfix/2.1.2
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -653,13 +608,9 @@ msgid "changed by"
 msgstr "променена от"
 
 #: models/pagemodel.py:64
-<<<<<<< HEAD
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
-=======
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
->>>>>>> hotfix/2.1.2
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "За да се вижда страницата статуса трябва да е \"Публикувана\""
 
 #: models/pagemodel.py:65
@@ -671,17 +622,12 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Всички прародители няма да бъдат показвани в навигацията"
 
 #: models/pagemodel.py:68
-<<<<<<< HEAD
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr "Уникален идентификатор, използван с page_url темплейт тага за създаване на връзка до тази страница."
-=======
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Уникален идентификатор, използван с page_url темплейт тага за "
-"създаване на връзка до тази страница."
->>>>>>> hotfix/2.1.2
+"Уникален идентификатор, използван с page_url темплейт тага за създаване на "
+"връзка до тази страница."
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -884,13 +830,8 @@ msgstr "ширина"
 
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
-<<<<<<< HEAD
-msgstr "Използвайте latitude & longitude за да определите позицията на картата."
-=======
 msgstr ""
-"Използвайте latitude & longitude за да определите позицията на "
-"картата."
->>>>>>> hotfix/2.1.2
+"Използвайте latitude & longitude за да определите позицията на картата."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -929,7 +870,9 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1021,13 +964,8 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
-<<<<<<< HEAD
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-=======
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
->>>>>>> hotfix/2.1.2
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1130,20 +1068,19 @@ msgstr "подсказка на връзката"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-<<<<<<< HEAD
-msgstr "Ако бъде предоставено, подсказката ще бъде показана като линк до Вашия Twitter профил."
-=======
 msgstr ""
-"Ако бъде предоставено, подсказката ще бъде показана като линк до Вашия"
-" Twitter профил."
->>>>>>> hotfix/2.1.2
+"Ако бъде предоставено, подсказката ще бъде показана като линк до Вашия "
+"Twitter профил."
 
 #: plugins/twitter/models.py:16
 msgid "query"
 msgstr ""
 
 #: plugins/twitter/models.py:16
-msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 msgstr ""
 
 #: plugins/video/cms_plugins.py:10
@@ -1167,13 +1104,9 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:10
-<<<<<<< HEAD
-msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-=======
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
->>>>>>> hotfix/2.1.2
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1236,13 +1169,9 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-<<<<<<< HEAD
-msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-=======
 msgid ""
 "Missing flash plugin. Download <a "
 "href=\"http://adobe.com/flashplayer\">here</a>"
->>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1272,17 +1201,11 @@ msgstr "Запази и продължи да редактираш"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
-<<<<<<< HEAD
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr "Страницата <a href=\"%(admin_url)s\">%(page)s</a> може да изисква потвърждение от Вас."
-=======
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 "Страницата <a href=\"%(admin_url)s\">%(page)s</a> може да изисква "
 "потвърждение от Вас."
->>>>>>> hotfix/2.1.2
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1390,13 +1313,9 @@ msgstr "Статуси на страниците"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-<<<<<<< HEAD
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-=======
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
->>>>>>> hotfix/2.1.2
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1708,19 +1627,11 @@ msgstr "Потребителско име"
 #: templates/cms/toolbar/toolbar.html:158
 msgid "login"
 msgstr "влез"
-<<<<<<< HEAD
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
 msgstr ""
 
-=======
-
-#: templates/cms/toolbar/toolbar.html:175
-msgid "Request Approval"
-msgstr ""
-
->>>>>>> hotfix/2.1.2
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
 msgstr ""
@@ -1845,7 +1756,6 @@ msgstr ""
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
 msgstr ""
-<<<<<<< HEAD
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
@@ -1916,78 +1826,6 @@ msgstr "CMS - Страницата %s изисква одобряване."
 msgid "CMS - your user account was created."
 msgstr "CMS — Вашия потребителски профил беше създаден."
 
-=======
-
-#: test/run_tests.py:159 test/project/settings.py:138
-msgid "three columns"
-msgstr ""
-
-#: test/run_tests.py:160 test/project/settings.py:139
-msgid "navigation examples"
-msgstr ""
-
-#: test/run_tests.py:167 test/project/settings.py:148
-msgid "sidebar column"
-msgstr ""
-
-#: test/run_tests.py:173 test/project/settings.py:154
-msgid "left column"
-msgstr ""
-
-#: test/run_tests.py:179 test/project/settings.py:160
-msgid "right column"
-msgstr ""
-
-#: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
-msgid "Articles"
-msgstr ""
-
-#: test/apps/sampleapp/cms_app.py:7
-msgid "Sample App"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:17
-msgid "sample root page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:18
-msgid "sample settings page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:19
-msgid "sample account page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:20
-msgid "sample my profile page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:32
-msgid "Static Menu"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:48
-msgid "Static Menu2"
-msgstr ""
-
-#: utils/moderator.py:83
-msgid "parent first"
-msgstr "първо родителите"
-
-#: utils/moderator.py:90
-msgid "approve"
-msgstr "потвърди"
-
-#: utils/moderator.py:251
-#, python-format
-msgid "CMS - Page %s requires approvement."
-msgstr "CMS - Страницата %s изисква одобряване."
-
-#: utils/permissions.py:206
-msgid "CMS - your user account was created."
-msgstr "CMS — Вашия потребителски профил беше създаден."
-
->>>>>>> hotfix/2.1.2
 #: utils/permissions.py:208
 msgid "CMS - your user account was changed."
 msgstr "CMS — Вашия потребителски профил беше променен."
