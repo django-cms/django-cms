@@ -194,3 +194,4 @@ except ImportError:
     pass
     
 TEST_RUNNER = 'project.testrunner.CMSTestSuiteRunner'
+TEST_OUTPUT_VERBOSE = True
