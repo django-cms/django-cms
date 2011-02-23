@@ -1,0 +1,105 @@
+@charset "utf-8";
+/**
+ * @author		Angelo Dini
+ * @copyright	http://www.divio.ch under the BSD Licence
+ * @extends		base.css
+ */
+
+#cms_toolbar { margin-top:100px !important; top:100px !important; }
+/*##################################################|*/
+/* #TOOLBAR# */
+#cms_toolbar-wrapper { position:fixed; left:0; top:0; z-index:99999; width:100%; } /* needs ie fix for pos fixed */
+#cms_toolbar-toolbar { width:100%; height:42px; border-bottom:1px solid #ddd !important;
+	position:relative; left:0; top:0; z-index:999999; min-width:960px;
+	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
+
+.cms_toolbar-left { float:left; min-width:480px; }
+.cms_toolbar-right { float:right; min-width:435px; padding-right:45px !important; }
+
+/* #TOOLBAR/reset# */
+#cms_toolbar-wrapper div,
+#cms_toolbar-wrapper a, #cms_toolbar-wrapper form, #cms_toolbar-wrapper fieldset, #cms_toolbar-wrapper label, #cms_toolbar-wrapper input,
+#cms_toolbar-wrapper textarea, #cms_toolbar-wrapper select {
+	font:normal 13px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif; color:#666; font-weight:normal; text-decoration:none; border:none; padding:0; margin:0; }
+
+/* #TOOLBAR/supportive# */
+.cms_toolbar-boxbg_left { background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -42px; }
+.cms_toolbar-boxbg_right { background:url('../../images/toolbar/sprite_toolbar.png') no-repeat right -68px; }
+.cms_toolbar-boxbg_left:hover { background-position:left -94px; }
+.cms_toolbar-boxbg_right:hover { color:#385e92 !important; background-position:right -120px; }
+
+.cms_toolbar_icon { background:no-repeat left top; }
+.cms_toolbar_icon-toggle { background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -146px; }
+.cms_toolbar_icon-toggle:hover { background-position:left -172px; }
+
+/* #TOOLBAR/toggle# */
+#cms_toolbar-toggle { cursor:pointer; position:absolute; right:10px; top:0; z-index:9999999; padding-top:8px !important; }
+#cms_toolbar-toggle .cms_toolbar-boxbg_left { float:left; }
+#cms_toolbar-toggle .cms_toolbar-boxbg_right { float:left; padding:0 5px; }
+#cms_toolbar-toggle .cms_toolbar-boxbg_right span { float:left; height:26px; width:18px; text-indent:-1000px; overflow:hidden; }
+#cms_toolbar-toggle .cms_toolbar-boxbg_right .cms_toolbar-boxbg_inner { display:none; }
+.cms_toolbar-collapsed .cms_toolbar_icon-toggle { background-position:-18px -146px; }
+.cms_toolbar-collapsed .cms_toolbar_icon-toggle:hover { background-position:-18px -172px; }
+
+/* #TOOLBAR/toggle# */
+#cms_toolbar-dim { display:none; position:absolute; left:0; top:0; z-index:99999; background:#000; width:100%; height:100%; opacity:0.6; }
+
+/* #TOOLBAR/items# */
+.cms_toolbar-item { float:left; display:none; padding:0 5px 0 10px !important; }
+
+/* #TOOLBAR/items/logo# */
+#cms_toolbar-item_logo {}
+#cms_toolbar-item_logo .cms_toolbar-item_logo-link { float:left; cursor:pointer; text-indent:-1000px; overflow:hidden;
+	width:105px; height:42px; background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left top; }
+#cms_toolbar-item_logo .cms_toolbar-item_logo-link:hover { background-position:-120px top; }
+
+/* #TOOLBAR/items/login# */
+#cms_toolbar-item_login { padding-top:8px !important; }
+#cms_toolbar-item_login label { float:left; cursor:pointer; padding:4px 10px 0 0; }
+#cms_toolbar-item_login div { float:left; }
+#cms_toolbar-item_login div input { color:#000; width:150px; border:1px solid #ddd; padding:4px 5px; margin-right:10px;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
+#cms_toolbar-item_login div input:hover { border:1px solid #999; }
+.cms_toolbar_error input[type=text], .cms_toolbar_error input[type=password] { border:1px solid #f99 !important; }
+
+.cms_toolbar-btn { color:#5b80b2; float:left; height:26px; overflow:hidden; }
+.cms_toolbar-btn input, .cms_toolbar-btn span { float:left; color:#5b80b2 !important; cursor:pointer;
+	padding:4px 6px 4px !important; margin-right:0 !important; }
+.cms_toolbar-btn span { padding:4px 8px 4px !important; }
+
+/* #TOOLBAR/items/switcher# */
+.cms_toolbar-item_switcher { padding-top:9px !important; }
+.cms_toolbar-item_switcher-label { float:left; padding-top:3px; padding-right:10px; }
+.cms_toolbar-item_switcher-link { float:left; width:80px; height:24px; text-indent:-1000px; overflow:hidden; outline:none; }
+.cms_toolbar-item_switcher-link span { float:left; width:80px; height:24px;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;
+	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -198px; }
+
+/* #TOOLBAR/items/logout# */
+#cms_toolbar-item_logout { float:right; padding-top:8px !important; }
+
+/* #TOOLBAR/items/settings# */
+#cms_toolbar-item_settings { padding-top:8px !important; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

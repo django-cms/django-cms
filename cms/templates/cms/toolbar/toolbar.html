@@ -1,11 +1,189 @@
-{% load i18n adminmedia %}
+{% load i18n %}
 {% include "cms/inc/csrf_js.html" %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+{% include "cms/inc/jquery.html" %}
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy-1.3.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.cookie.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.toolbar.js"></script>
 <script type="text/javascript">
-    //<![CDATA[
-    // When jQuery is sourced, it's going to overwrite whatever might be in the
+//<![CDATA[
+jQuery(document).ready(function ($) {
+	// load css file
+	$('<link>').appendTo('head').attr({
+		rel: 'stylesheet', type: 'text/css',
+		href: '{{ CMS_MEDIA_URL }}css/plugins/cms.toolbar.css'
+	});
+	
+	// save options
+	var options = {
+		'placeholder_data': '{{ placeholder_data }}',
+		'urls': {
+			cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}",
+			cms_page_changelist: "{% url admin:cms_page_changelist %}",              
+			cms_page_change_template: {% if page %}"{% url admin:cms_page_change_template page.pk %}"{% else %}null{% endif %},
+			cms_page_add_plugin: "{% url admin:cms_page_add_plugin %}",
+			cms_page_remove_plugin: "{% url admin:cms_page_remove_plugin %}",
+			cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}"
+		},
+		'lang': {
+			move_slot: "{% trans 'Move to %(name)s' %}",
+			question: "{% trans 'Are you sure you want to delete this plugin?' %}"
+		},
+		{% if page %}
+		'page_is_defined': true
+		{% endif %}
+	};
+	
+	// initialize toolbar and pass all the variables, use same namespace to trigger
+	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar-wrapper', options);
+
+	// dummy JSON: {'action_items': [{name: 'edit', icon:'link/zum/zahnrad.jpg', submenu:[{'name': 'Grundeinstellungen', 'action': 'open_url', 'url': 'http:/ksdjagklajsdlkjaskdjf/'}]}]}
+	
+	// add logo
+	CMS.Toolbar.registerItems([
+		{
+			el: '#cms_toolbar-item_logo',
+			dir: 'left',
+			type: 'anchor',
+			order: 1
+		},
+		// when you are logged in
+		{% if auth %}
+		{
+			el: '#cms_toolbar-item_editmode',
+			dir: 'left',
+			type: 'switcher',
+			addParameter: 'edit',
+			removeParameter: 'edit-off',
+			state: '{% if edit %}on{% else %}off{% endif %}',
+			order: 10
+		},
+		{
+			el: '#cms_toolbar-item_compactmode',
+			dir: 'left',
+			type: 'switcher',
+			addParameter: 'compact',
+			removeParameter: 'compact-off',
+			state: 'off',
+			order: 20
+		},
+		
+		{
+			el: '#cms_toolbar-item_settings',
+			dir: 'left',
+			type: 'button',
+			order: 30
+		},
+		
+		{
+			el: '#cms_toolbar-item_logout',
+			dir: 'right',
+			type: 'button',
+			order: 100
+		},
+		
+		// when you are logged off
+		{% else %}
+		{
+			el: '#cms_toolbar-item_login',
+			dir: 'left',
+			type: 'anchor',
+			order: 10
+		}
+		{% endif %}
+		
+	]);
+	// or register only one item
+	// CMS.Toolbar.registerItem({ options }, 10);
+});
+//]]>
+</script>
+
+<!-- start: toolbar -->
+<div id="cms_toolbar-wrapper">
+	<div id="cms_toolbar-toggle">
+		<a href="#" class="cms_toolbar-boxbg_left">
+			<span class="cms_toolbar-boxbg_right">
+				<span class="cms_toolbar_icon cms_toolbar_icon-toggle">&nbsp;</span>
+				<span class="cms_toolbar-boxbg_inner">{% trans "Show/Hide toolbar" %}</span>
+			</span>
+		</a>
+	</div>
+	<div id="cms_toolbar-toolbar">
+		<div class="cms_toolbar-left"></div>
+		<div class="cms_toolbar-right"></div>
+	</div>
+	<div id="cms_toolbar-edit"></div>
+	<div id="cms_toolbar-dim"></div>
+</div>
+<!-- end: toolbar -->
+
+<!-- item: logo -->
+<div id="cms_toolbar-item_logo" class="cms_toolbar-item">
+	<a href="/" class="cms_toolbar-item_logo-link">django CMS</a>
+</div>
+
+<!-- item: login -->
+<form action="" method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
+	<fieldset>
+		<label for="cms_toolbar-item_login-username">{% trans "Username" %}</label>
+		<div><input type="text" name="cms_username" id="cms_toolbar-item_login-username" /></div>
+		<label for="cms_toolbar-item_login-password">{% trans "Password" %}</label>
+		<div><input type="password" name="cms_password" id="cms_toolbar-item_login-password" /></div>
+		{% csrf_token %}
+		<span class="cms_toolbar-btn cms_toolbar-boxbg_left"><input type="submit" value="{% trans 'Login' %}" class="cms_toolbar-boxbg_right" /></span>
+	</fieldset>
+</form>
+
+<!-- item: edit mode -->
+<div id="cms_toolbar-item_editmode" class="cms_toolbar-item cms_toolbar-item_switcher">
+	<span class="cms_toolbar-item_switcher-label">{% trans "Edit" %}</span> 
+	<a href="/" class="cms_toolbar-item_switcher-link"><span>{% trans "Switch on/off" %}</span></a>
+</div>
+
+<!-- item: compat mode -->
+<div id="cms_toolbar-item_compactmode" class="cms_toolbar-item cms_toolbar-item_switcher">
+	<span class="cms_toolbar-item_switcher-label">{% trans "Compact" %}</span> 
+	<a href="/" class="cms_toolbar-item_switcher-link"><span>{% trans "Switch on/off" %}</span></a>
+</div>
+
+<!-- item: settings -->
+<div id="cms_toolbar-item_settings" class="cms_toolbar-item">
+	<a href="#" class="cms_toolbar-btn cms_toolbar-boxbg_left"><span class="cms_toolbar-boxbg_right">{% trans "Page settings" %}</span></a>
+</div>
+
+<!-- item: logout -->
+<form action="" method="post" id="cms_toolbar-item_logout" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
+	<fieldset>
+		<input type="hidden" name="logout_submit" />
+		{% csrf_token %}
+		<span class="cms_toolbar-btn cms_toolbar-boxbg_left"><input type="submit" value="{% trans 'Logout' %}" class="cms_toolbar-boxbg_right" /></span>
+	</fieldset>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+	// When jQuery is sourced, it's going to overwrite whatever might be in the
     // '$' variable, so store a reference of it in a temporary variable...
     var _$ = window.$;
+
     // add stylesheets to head
     (function ($) {
 		$('<link>').appendTo('head').attr({
@@ -17,8 +195,9 @@
 			href: '{{ CMS_MEDIA_URL }}css/jquery.dialog.css'
 		});
 	})(jQuery);
-	//]]>
+//]]>
 </script>
+
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.cookie.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/tools.js"></script>
@@ -151,9 +330,9 @@
             {% endif %}
         {% else %}
         <form method="post" action="" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
-            <label for="cms_username">{% trans "Username" %}</label>
+            <label>{% trans "Username" %}</label>
             <input type="text" name="cms_username" class="cms_textinput"></input>
-            <label for="cms_password">{% trans "Password" %}</label>
+            <label>{% trans "Password" %}</label>
             <input type="password" name="cms_password" class="cms_textinput"></input>
             <input type="submit" name="submit" value="{% trans "login" %}" class="cms_submit"></input>
             <a href="#" class="cms_toolbar_button"><span>{% trans "login" %}</span></a>        
