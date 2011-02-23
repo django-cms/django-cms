@@ -70,6 +70,11 @@ class PermissionModeratorTestCase(CMSTestCase):
 
         # create master user
         self.user_master = self.create_page_user("master", grant_all=True)
+
+        # create non global, non staff user
+        self.user_non_global = User(username="nonglobal", is_active=True)
+        self.user_non_global.set_password("nonglobal")
+        self.user_non_global.save()
         
         # assign master user under home page
         self.assign_user_to_page(self.home_page, self.user_master, grant_on=ACCESS_DESCENDANTS,
@@ -588,6 +593,10 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.client.logout()
         response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
+        self.login_user(self.user_non_global)
+        response = self.client.get("/en/pageb/")
+        self.assertEqual(response.status_code, 404)
+        self.client.logout()
 
     def test_23_user_globalpermission(self):
         # Global user
@@ -607,12 +616,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.client.logout()
 
-        self.login_user(self.user_super)
-        user_non_global = User(username="nonglobal", is_active=True)
-        user_non_global.set_password("nonglobal")
-        user_non_global.save()
-        self.client.logout()
-        self.login_user(user_non_global)
+        self.login_user(self.user_non_global)
         response = self.client.get("/en/global/")
         self.assertEqual(response.status_code, 404, response.content)
         self.client.logout()
