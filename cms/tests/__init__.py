@@ -23,6 +23,8 @@ from cms.tests.toolbar import ToolbarTests
 from cms.tests.urlutils import UrlutilsTestCase
 from cms.tests.views import ViewTests
 from cms.tests.security import SecurityTests
+from cms.tests.po import PoTest
+
 try:
     from cms.tests.javascript import JavascriptTestCase
 except ImportError:
