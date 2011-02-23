@@ -6,5 +6,6 @@ source =
     publisher
 omit =
     ../*migrations*
+    ../*tests*
 [report]
 precision = 2
