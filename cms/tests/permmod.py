@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import ACCESS_DESCENDANTS
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.permissions import has_generic_permission
 
 class PermissionModeratorTestCase(CMSTestCase):
@@ -618,12 +619,12 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.client.logout()
 
     def test_24_anonymous_user(self):
-        settings.CMS_PUBLIC_FOR_ALL = True
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
+        with SettingsOverride(CMS_PUBLIC_FOR_ALL=True):
+            response = self.client.get("/en/pageb/")
+            self.assertEqual(response.status_code, 200)
 
         # default of when to show pages to anonymous user doesn't take
         # global permissions into account
-        settings.CMS_PUBLIC_FOR_ALL = False
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
+        with SettingsOverride(CMS_PUBLIC_FOR_ALL=False):
+            response = self.client.get("/en/pageb/")
+            self.assertEqual(response.status_code, 200)
