@@ -576,7 +576,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
 
-    def test_21_superuser_can_view(self):
+    def test_21_staff_can_view(self):
         self.login_user(self.user_staff)
         response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
