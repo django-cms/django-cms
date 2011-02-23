@@ -87,9 +87,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
         
         # create page_b
-        
-        page_b = self.create_page(title="pageB", published=True)
-        page_b = self.publish_page(page_b, approve=True)
+        page_b = self.create_page(title="pageB", user=self.user_super)
 
         # Normal user
         self.user_normal = self.create_page_user("normal")
@@ -106,6 +104,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         # publish after creating all drafts
         self.publish_page(self.home_page)
         self.publish_page(self.master_page)
+        self.publish_page(page_b)
         # logg in as master, and request moderation for slave page and descendants
         self.request_moderation(self.slave_page, 7)
         
