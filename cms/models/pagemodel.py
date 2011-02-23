@@ -716,7 +716,7 @@ class Page(MPTTModel):
         if request.user.is_staff and settings.CMS_PUBLIC_FOR_STAFF:
             return True
         # does any restriction exist?
-        restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
+        is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
         if request.user.is_authenticated():
             site = current_site(request)
             global_view_perms = GlobalPagePermission.objects.with_user(
@@ -725,12 +725,12 @@ class Page(MPTTModel):
             if global_view_perms:
                 return True
             # authenticated user, no restriction and public for all fallback
-            if (not restricted and not global_view_perms and
+            if (not is_restricted and not global_view_perms and
                     not settings.CMS_PUBLIC_FOR_ALL):
                 return False
         else:
-            if restricted:
-                # anyonymous user, page has restriction, generally false
+            if is_restricted or not settings.CMS_PUBLIC_FOR_ALL:
+                # anyonymous user, page has restriction and global access is permitted
                 return False
             else:
                 # anonymous user, no restriction saved in database

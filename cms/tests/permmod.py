@@ -622,6 +622,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.client.logout()
 
     def test_24_anonymous_user(self):
+        self.client.logout()
         with SettingsOverride(CMS_PUBLIC_FOR_ALL=True):
             response = self.client.get("/en/pageb/")
             self.assertEqual(response.status_code, 200)
@@ -630,4 +631,4 @@ class PermissionModeratorTestCase(CMSTestCase):
         # global permissions into account
         with SettingsOverride(CMS_PUBLIC_FOR_ALL=False):
             response = self.client.get("/en/pageb/")
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 404)
