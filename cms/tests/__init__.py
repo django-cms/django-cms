@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.tests.admin import AdminTestCase
+from cms.tests.admin import AdminTestCase, AdminFieldsetTests, AdminListFilterTests
 from cms.tests.apphooks import ApphooksTestCase
 from cms.tests.docs import DocsTestCase
 from cms.tests.forms import FormsTestCase

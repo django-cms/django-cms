@@ -62,29 +62,20 @@ else: # pragma: no cover
     model_admin = admin.ModelAdmin
     create_on_success = lambda x: x
 
-class PageAdmin(model_admin):
-    form = PageForm
-    list_filter = ['published', 'in_navigation', 'template', 'changed_by']
-    # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
-    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
-    revision_form_template = "admin/cms/page/revision_form.html"
-    recover_form_template = "admin/cms/page/recover_form.html"
 
-    exclude = []
-    mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
-    top_fields = []
-    general_fields = ['title', 'slug', ('published', 'in_navigation')]
-    add_general_fields = ['title', 'slug', 'language', 'template']
+def contribute_fieldsets(cls):
+    if settings.CMS_MENU_TITLE_OVERWRITE:
+        general_fields = [('title', 'menu_title')]
+    else:
+        general_fields = ['title']
+    general_fields += ['slug', ('published', 'in_navigation')]
+    additional_hidden_fields = []
     advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
-    change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
-    additional_hidden_fields = []
-    if settings.CMS_MODERATOR:
-        list_filter.append('moderator_state')
+    seo_fields = []
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
-        list_filter.append('soft_root')
     if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
         general_fields.append(('publication_date', 'publication_end_date'))
     elif settings.CMS_SHOW_START_DATE:
@@ -92,11 +83,9 @@ class PageAdmin(model_admin):
     elif settings.CMS_SHOW_END_DATE:
         general_fields.append( 'publication_end_date')
     if settings.CMS_MODERATOR:
-        additional_hidden_fields.extend(('moderator_state', 'moderator_message'))
+        additional_hidden_fields += ['moderator_state', 'moderator_message']
     if settings.CMS_SEO_FIELDS:
-        seo_fields = ('page_title', 'meta_description', 'meta_keywords')
-    if settings.CMS_MENU_TITLE_OVERWRITE:
-        general_fields[0] = ('title', 'menu_title')
+        seo_fields = ['page_title', 'meta_description', 'meta_keywords']
     if not settings.CMS_URL_OVERWRITE:
         advanced_fields.remove("overwrite_url")
     if not settings.CMS_REDIRECTS:
@@ -106,26 +95,13 @@ class PageAdmin(model_admin):
     if apphook_pool.get_apphooks():
         advanced_fields.append("application_urls")
 
-    # take care with changing fieldsets, get_fieldsets() method removes some
-    # fields depending on permissions, but its very static!!
-    add_fieldsets = [
-        (None, {
-            'fields': add_general_fields,
-            'classes': ('general',),
-        }),
-        (_('Hidden'), {
-            'fields': hidden_fields,
-            'classes': ('hidden',),
-        }),
-    ]
-
     fieldsets = [
         (None, {
             'fields': general_fields,
             'classes': ('general',),
         }),
         (_('Basic Settings'), {
-            'fields': top_fields + template_fields,
+            'fields': template_fields,
             'classes': ('low',),
             'description': _('Note: This page reloads if you change the selection. Save it first.'),
         }),
@@ -143,9 +119,50 @@ class PageAdmin(model_admin):
 
     if settings.CMS_SEO_FIELDS:
         fieldsets.append((_("SEO Settings"), {
-                          'fields':seo_fields,
+                          'fields': seo_fields,
                           'classes': ('collapse',),
                         }))
+    setattr(cls, 'fieldsets', fieldsets)
+    setattr(cls, 'advanced_fields', advanced_fields)
+    setattr(cls, 'hidden_fields', hidden_fields)
+    setattr(cls, 'general_fields', general_fields)
+    setattr(cls, 'template_fields', template_fields)
+    setattr(cls, 'additional_hidden_fields', additional_hidden_fields)
+    setattr(cls, 'seo_fields', seo_fields)
+
+
+def contribute_list_filter(cls):
+    list_filter = ['published', 'in_navigation', 'template', 'changed_by']
+    if settings.CMS_MODERATOR:
+        list_filter.append('moderator_state')
+    if settings.CMS_SOFTROOT:
+        list_filter.append('soft_root')
+    setattr(cls, 'list_filter', list_filter)
+
+class PageAdmin(model_admin):
+    form = PageForm
+    # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
+    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
+    revision_form_template = "admin/cms/page/revision_form.html"
+    recover_form_template = "admin/cms/page/recover_form.html"
+
+    exclude = []
+    mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
+    add_general_fields = ['title', 'slug', 'language', 'template']
+    change_list_template = "admin/cms/page/change_list.html"
+
+    # take care with changing fieldsets, get_fieldsets() method removes some
+    # fields depending on permissions, but its very static!!
+    add_fieldsets = [
+        (None, {
+            'fields': add_general_fields,
+            'classes': ('general',),
+        }),
+        (_('Hidden'), {
+            'fields': ['site', 'parent'],
+            'classes': ('hidden',),
+        }),
+    ]
 
     inlines = PAGE_ADMIN_INLINES
 
@@ -1403,5 +1420,8 @@ class PageAdmin(model_admin):
         if key == 'site__exact':
             return True
         return super(PageAdmin, self).lookup_allowed(key, *args)
+
+contribute_fieldsets(PageAdmin)
+contribute_list_filter(PageAdmin)
 
 admin.site.register(Page, PageAdmin)
