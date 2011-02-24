@@ -2,29 +2,29 @@
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
-from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
-    PagePermissionInlineAdmin
+from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES, 
+    PagePermissionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
 from cms.forms.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin, PagePermission, \
-    PageModeratorState, EmptyTitle, GlobalPagePermission
+from cms.models import (Page, Title, CMSPlugin, PagePermission, 
+    PageModeratorState, EmptyTitle, GlobalPagePermission)
 from cms.models.managers import PagePermissionsPermissionManager
-from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
-    MASK_DESCENDANTS
+from cms.models.moderatormodels import (MASK_PAGE, MASK_CHILDREN, 
+    MASK_DESCENDANTS)
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.admin import render_admin_menu_item
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import make_revision_with_plugins
-from cms.utils.moderator import update_moderation_message, \
-    get_test_moderation_level, moderator_should_approve, approve_page, \
-    will_require_moderation
-from cms.utils.permissions import has_page_add_permission, \
-    has_page_change_permission, get_user_permission_level, \
-    has_global_change_permissions_permission
+from cms.utils.moderator import (update_moderation_message, 
+    get_test_moderation_level, moderator_should_approve, approve_page, 
+    will_require_moderation)
+from cms.utils.permissions import (has_page_add_permission, 
+    has_page_change_permission, get_user_permission_level, 
+    has_global_change_permissions_permission)
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
 from copy import deepcopy
@@ -36,28 +36,20 @@ from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import transaction, models
-
+from django.db import transaction, models, router
 from django.forms import Widget, Textarea, CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404, \
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from menus.menu_pool import menu_pool
+import django
 import os
 
-# silly hack to test features/ fixme
-import inspect
-if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
-    from django.db import router
-else:
-    router = False
 
-model_admin = admin.ModelAdmin
-create_on_success = lambda x: x
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -65,6 +57,10 @@ if 'reversion' in settings.INSTALLED_APPS:
     model_admin = VersionAdmin
 
     create_on_success = reversion.revision.create_on_success
+
+else: # pragma: no cover
+    model_admin = admin.ModelAdmin
+    create_on_success = lambda x: x
 
 class PageAdmin(model_admin):
     form = PageForm
@@ -967,14 +963,30 @@ class PageAdmin(model_admin):
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
-        using = []
-        if router:
+        if django.VERSION[1] > 2: # pragma: no cover
+            # WARNING: Django 1.3 is not officially supported yet!
             using = router.db_for_read(self.model)
-            deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)[:2]
-            to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)[:2]
+            kwargs = {
+                'admin_site': self.admin_site,
+                'user': request.user,
+                'using': using
+            }
         else:
-            deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, 4)
-            to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, 4)
+            kwargs = {
+                'admin_site': self.admin_site,
+                'user': request.user,
+            }
+        deleted_objects, perms_needed =  get_deleted_objects(
+            [titleobj],
+            titleopts,
+            **kwargs
+        )[:2]
+        to_delete_plugins, perms_needed_plugins = get_deleted_objects(
+            plugins,
+            pluginopts,
+            **kwargs
+        )[:2]
+        
             
         deleted_objects.append(to_delete_plugins)
         perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
