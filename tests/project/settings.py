@@ -168,8 +168,12 @@ CMS_PLACEHOLDER_CONF = {
 CMS_SOFTROOT = True
 CMS_MODERATOR = True
 CMS_PERMISSION = True
-CMS_PERMISSION_CACHE_DURATION = 0
 CMS_PUBLIC_FOR = 'all'
+CMS_CACHE_DURATIONS = {
+    'menus': 0,
+    'content': 0,
+    'permissions': 0,
+}
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_FLAT_URLS = False

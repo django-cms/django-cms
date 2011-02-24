@@ -25,11 +25,17 @@ CMS_PLACEHOLDER_CONF = {}
 # Whether to enable permissions.
 CMS_PERMISSION = False
 
-# Defines how long user permissions should be cached
-CMS_PERMISSION_CACHE_DURATION = 600
 # Decides if pages without any view restrictions are public by default, or staff only
 CMS_PUBLIC_FOR = 'all' # or 'staff'
 
+CMS_CACHE_DURATIONS = {
+     # Menu cache duration
+    'menus': getattr(settings, 'MENU_CACHE_DURATION', 60 * 60),
+    # Defines how long page content should be cached
+    'content': getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60),
+    # Defines how long user permissions should be cached
+    'permissions': 60 * 60,
+}
 
 # Show the publication date field in the admin, allows for future dating
 # Changing this from True to False could cause some weirdness.  If that is required,
@@ -85,9 +91,6 @@ CMS_LANGUAGES = settings.LANGUAGES
 #           3:['en'],}
 CMS_SITE_LANGUAGES = {}
 
-# Defines how long page content should be cached, including navigation
-CMS_CONTENT_CACHE_DURATION = 60
-
 CMS_SITE_CHOICES_CACHE_KEY = 'CMS:site_choices'
 CMS_PAGE_CHOICES_CACHE_KEY = 'CMS:page_choices'
 
@@ -115,6 +118,3 @@ PLACEHOLDER_FRONTEND_EDITING = True
 
 # Cache prefix so one can deploy several sites on one cache server
 CMS_CACHE_PREFIX = 'cms-'
-
-# Menu cache duration
-MENU_CACHE_DURATION = 60 * 60

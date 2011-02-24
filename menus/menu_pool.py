@@ -146,8 +146,7 @@ class MenuPool(object):
             nodes = self.menus[menu_class_name].get_nodes(request)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
-        duration = getattr(settings, "MENU_CACHE_DURATION", 60*60)
-        cache.set(key, final_nodes, duration)
+        cache.set(key, final_nodes, settings.CMS_CACHE_DURATIONS['menus'])
         # We need to have a list of the cache keys for languages and sites that
         # span several processes - so we follow the Django way and share through 
         # the database. It's still cheaper than recomputing every time!

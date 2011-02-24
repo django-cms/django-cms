@@ -27,7 +27,7 @@ def set_permission_cache(user, key, value):
         all_keys.append(cache_key)
     if not key in permission_cache_keys:
         permission_cache_keys.append(key)
-    cache.set(cache_key, value, settings.CMS_PERMISSION_CACHE_DURATION)
+    cache.set(cache_key, value, settings.CMS_CACHE_DURATIONS['permissions'])
 
 def clear_user_permission_cache(user):
     """
