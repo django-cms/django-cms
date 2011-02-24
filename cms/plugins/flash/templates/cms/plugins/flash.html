@@ -5,14 +5,14 @@
 //<![CDATA[
 (function () {
 	// save settings
-	var flashvars = { lang: "{{ LANGUAGE_CODE }}" };
-	var params = { menu: "false", wmode: "opaque" };
+	var flashvars = { lang: '{{ LANGUAGE_CODE }}' };
+	var params = { menu: 'false', wmode: 'opaque' };
 	var attributes = {
-		id: "flash-plugin-swf-{{ object.id }}",
-		name: "flash-plugin-name-{{ object.id }}"
+		id: 'flash-plugin-swf-{{ object.id }}',
+		name: 'flash-plugin-name-{{ object.id }}'
 	};
 	// replace flash_plugin object through swfobject
-	swfobject.embedSWF("{{ object.file.url }}", "flash-plugin-{{ object.id }}", "{{ object.get_width }}", "{{ object.get_height }}", "9", "{{ CMS_MEDIA_URL }}swf/expressInstall.swf", flashvars, params, attributes);
+	swfobject.embedSWF('{{ object.file.url }}', 'flash-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ CMS_MEDIA_URL }}swf/expressInstall.swf', flashvars, params, attributes);
 })();
 //]]>
 </script>
