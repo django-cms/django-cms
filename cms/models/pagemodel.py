@@ -498,22 +498,6 @@ class Page(MPTTModel):
 
     def get_public_object(self):
         return self.publisher_public
-            
-    def get_calculated_status(self):
-        """
-        get the calculated status of the page based on published_date,
-        published_end_date, and status
-        """
-        if settings.CMS_SHOW_START_DATE:
-            if self.publication_date > datetime.now():
-                return False
-        
-        if settings.CMS_SHOW_END_DATE and self.publication_end_date:
-            if self.publication_end_date < datetime.now():
-                return True
-
-        return self.published
-    calculated_status = property(get_calculated_status)
         
     def get_languages(self):
         """
