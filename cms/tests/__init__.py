@@ -24,6 +24,7 @@ from cms.tests.urlutils import UrlutilsTestCase
 from cms.tests.views import ViewTests
 from cms.tests.security import SecurityTests
 from cms.tests.po import PoTest
+from cms.tests.menu_utils import MenuUtilsTests
 
 try:
     from cms.tests.javascript import JavascriptTestCase
