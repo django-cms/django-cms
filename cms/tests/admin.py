@@ -12,9 +12,13 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE,
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
+from django.conf import settings
+from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.http import Http404
+from django.test.client import Client
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
@@ -179,6 +183,34 @@ class AdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'nb'})
         self.assertRedirects(response, URL_CMS_PAGE)
+    
+    def test_08_change_template(self):
+        request = self.get_request('/admin/cms/page/1/', 'en')
+        pageadmin = site._registry[Page]
+        self.assertRaises(Http404, pageadmin.change_template, request, 1)
+        page = self.create_page()
+        response = pageadmin.change_template(request, page.pk)
+        self.assertEqual(response.status_code, 403)
+        admin = self._get_guys(True)
+        url = reverse('admin:cms_page_change_template', args=(page.pk,))
+        with self.login_user_context(admin):
+            response = self.client.post(url, {'template': 'doesntexist'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.content, "template not valid")
+            response = self.client.post(url, {'template': settings.CMS_TEMPLATES[0][0]})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, 'ok')
+            
+    def test_09_get_permissions(self):
+        page = self.create_page()
+        url = reverse('admin:cms_page_get_permissions', args=(page.pk,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/login.html')
+        admin = self._get_guys(True)
+        with self.login_user_context(admin):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
 
 class AdminFieldsetTests(TestCase):

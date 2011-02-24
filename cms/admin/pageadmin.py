@@ -305,17 +305,6 @@ class PageAdmin(model_admin):
         else:
             return HttpResponseForbidden()
 
-    def get_parent(self, request):
-        target = request.GET.get('target', None)
-        position = request.GET.get('position', None)
-        parent = None
-        if target:
-            if position == "first_child":
-                parent = Page.objects.get(pk=target)
-            else:
-                parent = Page.objects.get(pk=target).parent
-        return parent
-
     def get_fieldsets(self, request, obj=None):
         """
         Add fieldsets of placeholders to the list of already existing
@@ -493,17 +482,6 @@ class PageAdmin(model_admin):
                         except NoPermissionsException:
                             continue
                 yield inline.get_formset(request, obj)
-
-
-    def get_widget(self, request, page, lang, name):
-        """
-        Given the request and name of a placeholder return a PluginEditor Widget
-        """
-        installed_plugins = plugin_pool.get_all_plugins(name, page)
-        widget = PluginEditor(installed=installed_plugins)
-        if not isinstance(widget(), Widget):
-            widget = Textarea
-        return widget
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -765,24 +743,6 @@ class PageAdmin(model_admin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    def list_pages(self, request, template_name=None, extra_context=None):
-        """
-        List root pages
-        """
-        # HACK: overrides the changelist template and later resets it to None
-
-        if template_name:
-            self.change_list_template = template_name
-        context = {
-            'name': _("page"),
-
-            'pages': Page.objects.all_root().order_by("tree_id"),
-        }
-        context.update(extra_context or {})
-        change_list = self.changelist_view(request, context)
-        self.change_list_template = None
-        return change_list
-
     @transaction.commit_on_success
     def move_page(self, request, page_id, extra_context=None):
         """
@@ -871,8 +831,6 @@ class PageAdmin(model_admin):
                 }
                 page.copy_page(target, site, position, **kwargs)
                 return HttpResponse("ok")
-                #return self.list_pages(request,
-                #    template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
