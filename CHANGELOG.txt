@@ -51,3 +51,9 @@
 - Fixed bug with submenus showing pages that are not 'in_navigation' (#716, thanks to Iacopo Spalletti for the patch)
 - Fixed PlaceholderField not respecting limits in CMS_PLACEHOLDER_CONF (thanks to Ben Hockey for reporting this)
 - Fixed the double-monkeypatch check for url reversing (thanks to Benjamin Wohlwend for the patch)
+
+==== 2.2.0 (In Development) ====
+
+- Replaced the old plugin media framework with django-sekizai. (This changed some plugin templates which might cause problems with your CSS styling).
+- Made django-mptt a proper dependency
+- Removed support for django-dbgettext
