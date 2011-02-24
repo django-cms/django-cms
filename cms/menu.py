@@ -80,7 +80,7 @@ class CMSMenu(Menu):
             page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
-            elif not settings.CMS_PUBLIC_FOR_ALL:
+            elif not settings.CMS_PUBLIC_FOR == 'all':
                 continue
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
                 page.home_cut_cache = True 

@@ -713,7 +713,7 @@ class Page(MPTTModel):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
         from cms.utils.plugins import current_site
         # staff is allowed to see everything
-        if request.user.is_staff and settings.CMS_PUBLIC_FOR_STAFF:
+        if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
             return True
         # does any restriction exist?
         is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
@@ -726,10 +726,10 @@ class Page(MPTTModel):
                 return True
             # authenticated user, no restriction and public for all fallback
             if (not is_restricted and not global_view_perms and
-                    not settings.CMS_PUBLIC_FOR_ALL):
+                    not settings.CMS_PUBLIC_FOR == 'all'):
                 return False
         else:
-            if is_restricted or not settings.CMS_PUBLIC_FOR_ALL:
+            if is_restricted or not settings.CMS_PUBLIC_FOR == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
             else:

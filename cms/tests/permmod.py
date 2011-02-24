@@ -623,12 +623,12 @@ class PermissionModeratorTestCase(CMSTestCase):
 
     def test_24_anonymous_user(self):
         self.client.logout()
-        with SettingsOverride(CMS_PUBLIC_FOR_ALL=True):
+        with SettingsOverride(CMS_PUBLIC_FOR='all'):
             response = self.client.get("/en/pageb/")
             self.assertEqual(response.status_code, 200)
 
         # default of when to show pages to anonymous user doesn't take
         # global permissions into account
-        with SettingsOverride(CMS_PUBLIC_FOR_ALL=False):
+        with SettingsOverride(CMS_PUBLIC_FOR=None):
             response = self.client.get("/en/pageb/")
             self.assertEqual(response.status_code, 404)

@@ -110,7 +110,7 @@ def has_page_view_permission(request):
             GlobalPagePermission.objects.with_user(request.user).filter(
                 can_view=True, sites__in=[current_site(request)]
             ).exists()) or (
-                settings.CMS_PUBLIC_FOR_STAFF and request.user.is_staff)):
+                settings.CMS_PUBLIC_FOR == 'staff' and request.user.is_staff)):
         return True
     return False
 
