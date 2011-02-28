@@ -5,31 +5,6 @@
  * @version: 0.2.0
  */
 (function($) {
-	// tweet meme plugin
-	$.fn.tweetme = function(options) {
-		return this.each(function () {
-			// save options
-			var options = $.extend({
-				url: $(this).text(),
-				source: 'username',
-				style: 'normal',
-				service: 'retwt.me',
-				width: 50,
-				height: 61
-			}, options);
-			// create start url
-			var url = 'http://api.tweetmeme.com/button.js?';
-			// serialize options
-			$.each(options, function (key, value) {
-				url += key + '=' + value + '&';
-			});
-			// save iframe
-			var iframe = '<iframe src="' + url + '" width="' + options.width + '" height="' + options.height + '" scrolling="no" frameborder="0"></iframe>';
-			// add iframe
-			$(this).html(iframe);
-		});
-	};
-	
 	// official twitter button
 	$.fn.twitter = function (options) {
 		return this.each(function () {

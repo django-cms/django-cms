@@ -4,6 +4,7 @@ from cms.models import CMSPlugin
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models.options import get_verbose_name
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
@@ -27,6 +28,11 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 "The 'model' attribute on CMSPluginBase subclasses must be "
                 "either 'None' or a subclass of CMSPlugin. %r on %r is not."
                 % (new_plugin.model, new_plugin)
+            )
+        # validate the template:
+        if not hasattr(new_plugin, 'render_template'):
+            raise ImproperlyConfigured(
+                "CMSPluginBase subclasses must have a render_template attribute"
             )
         # Set the default form
         if not new_plugin.form:

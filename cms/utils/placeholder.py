@@ -4,6 +4,15 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.db.models.query_utils import Q
 
 def get_placeholder_conf(key, placeholder, template=None, default=None):
+    """
+    Returns the placeholder configuration for a given key. The key would for
+    example be 'plugins'  or 'name'.
+    
+    If a template is given, it will try
+    CMS_PLACEHOLDER_CONF['template placeholder'] and
+    CMS_PLACEHOLDER_CONF['placeholder'], if no template is given only the latter
+    is checked.
+    """
     keys = []
     if template:
         keys.append("%s %s" % (template, placeholder))

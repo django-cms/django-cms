@@ -6,7 +6,7 @@
 jQuery(document).ready(function ($) {
 	$('#twitter-container-{{ object.pk }}').tweet({
 		username: '{{ object.twitter_user }}',
-		avatar_size: 32,
+		avatar_size: {% if request.is_secure %}null{% else %}32{% endif %},
 		count: {{ object.count }},
 		join_text: 'auto',
 		auto_join_text_default: '{% trans "we said," %}',

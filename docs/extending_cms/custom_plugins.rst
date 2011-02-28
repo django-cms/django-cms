@@ -290,7 +290,7 @@ A **bad** example:
     
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myjsfile.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myotherfile.js"></script>{% endaddtoblock %}
-    {% addtoblock "css" %
+    {% addtoblock "css" %}
         <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}myplugin/css/astylesheet.css"></script>
     {% endaddtoblock %}
     {% addtoblock "js" %}<script type="text/javascript">
