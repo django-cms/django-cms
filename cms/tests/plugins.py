@@ -345,7 +345,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
-            self.assertTrue('http://twitter.com/javascripts/blogger.js' in response.content)
+            self.assertTrue('%sjs/plugins/jquery.tweet.js' % settings.CMS_MEDIA_URL in response.content, response.content)
         
     def test_10_fileplugin_icon_uppercase(self):
         page = self.create_page(title='testpage')
