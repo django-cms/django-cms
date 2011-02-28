@@ -144,68 +144,6 @@ class CMSTestCase(TestCase):
         except ObjectDoesNotExist:
             return
         raise self.failureException, "ObjectDoesNotExist not raised"
-    
-    def create_page(self, parent_page=None, user=None, position="last-child", 
-            title=None, site=1, published=False, in_navigation=False,
-            moderate=False, language=None, title_extra=None, **extra):
-        """
-        Common way for page creation with some checks
-        """
-        _thread_locals.user = user
-        if not language:
-            language = settings.LANGUAGES[0][0]
-            if settings.CMS_SITE_LANGUAGES.get(site, False):
-                language = settings.CMS_SITE_LANGUAGES[site][0]
-        site = Site.objects.get(pk=site)
-        
-        page_data = {
-            'site': site,
-            'template': 'nav_playground.html',
-            'published': published,
-            'in_navigation': in_navigation,
-        }
-        if user:
-            page_data['created_by'] = user
-            page_data['changed_by'] = user
-        if parent_page:
-            page_data['parent'] = parent_page
-        page_data.update(extra)
-
-        page = Page(**page_data)
-        if parent_page:
-            page.insert_at(self.reload(parent_page), position)
-        page.save()
-
-        if settings.CMS_MODERATOR and user:
-            page.pagemoderator_set.create(user=user)
-        
-        if not title:
-            title = 'test page %d' % self.counter
-            slug = 'test-page-%d' % self.counter
-        else:
-            slug = slugify(title)
-        self.counter = self.counter + 1
-        if not title_extra:
-            title_extra = {}
-        self.create_title(
-            title=title,
-            slug=slug,
-            language=language,
-            page=page,
-            **title_extra
-        )
-            
-        del _thread_locals.user
-        return page
-    
-    def create_title(self, title, slug, language, page, **extra):
-        return Title.objects.create(
-            title=title,
-            slug=slug,
-            language=language,
-            page=page,
-            **extra
-        )
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug

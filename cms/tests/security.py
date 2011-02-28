@@ -1,3 +1,4 @@
+from cms.api import create_page
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 
@@ -12,7 +13,7 @@ class SecurityTests(CMSTestCase):
     Test security issues by trying some naive requests to add/alter/delete data.
     """
     def get_data(self):
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         placeholder = page.placeholders.get(slot='body')
         superuser = self.get_superuser()
         staff = self.get_staff_user_with_no_permissions()

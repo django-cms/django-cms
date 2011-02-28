@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.api import create_page
 from cms.menu import CMSMenu
 from cms.models import Page
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -415,9 +416,8 @@ class FixturesMenuTests(BaseMenuTest):
         self.assertEqual(len(nodes), number_of_p7_children)
         
     def test_18_show_breadcrumb_invisible(self):
-        invisible_page = self.create_page(parent_page=self.get_page(3), 
-                                          published=True, 
-                                          in_navigation=False)
+        invisible_page = create_page("invisible" "nav_playground.html", "en",
+            parent_page=self.get_page(3), published=True, in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context) 
@@ -575,7 +575,8 @@ class AdvancedSoftrootTests(BaseMenuTest):
         """
         super(AdvancedSoftrootTests, self).setUp()
         def mkpage(title, parent=None):
-            page = self.create_page(parent, title=title, published=True, in_navigation=True)
+            page = create_page(title, "nav_playground.html", "en",
+                               parent=parent, published=True, in_navigation=True)
             def mkchild(title):
                 return mkpage(title, page)
             page.mkchild = mkchild

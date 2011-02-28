@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from cms.api import create_page, create_page_user, assign_user_to_page
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import ACCESS_DESCENDANTS
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_ADD, 
+    URL_CMS_PLUGIN_REMOVE)
 from cms.utils.permissions import has_generic_permission
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -45,34 +47,39 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.user_super.save()
         self.login_user(self.user_super)
         
-        self.home_page = self.create_page(title="home", user=self.user_super)
+        self.home_page = create_page("home", "nav_playground.html", "en",
+                                     created_by=self.user_super)
         
         # master page & master user
         
-        self.master_page = self.create_page(title="master")
+        self.master_page = create_page("master", "nav_playground.html", "en")
 
         # create master user
-        self.user_master = self.create_page_user("master", grant_all=True)
+        master = User.objects.create(username="master", email="master@django-cms.org", password="master")
+        self.user_master = create_page_user(master, grant_all=True)
         
         # assign master user under home page
-        self.assign_user_to_page(self.home_page, self.user_master, grant_on=ACCESS_DESCENDANTS,
-            grant_all=True)
+        assign_user_to_page(self.home_page, self.user_master,
+                            grant_on=ACCESS_DESCENDANTS, grant_all=True)
         
         # and to master page
-        self.assign_user_to_page(self.master_page, self.user_master, grant_all=True)
+        assign_user_to_page(self.master_page, self.user_master, grant_all=True)
         
         # slave page & slave user
         
-        self.slave_page = self.create_page(title="slave-home", parent_page=self.master_page, user=self.user_super)  
-        self.user_slave = self.create_page_user("slave", 
-            can_add_page=True, can_change_page=True, can_delete_page=True)
+        self.slave_page = create_page("slave-home", "nav_playground.html", "en",
+                          parent=self.master_page, created_by=self.user_super)
+        slave = User.objects.create(username='slave', email='slave@django-cms.org', password='slave')
+        self.user_slave = create_page_user(slave,  can_add_page=True,
+                                    can_change_page=True, can_delete_page=True)
         
-        self.assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
+        assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
         
         # create page_a - sample page from master
         
-        page_a = self.create_page(title="pageA", user=self.user_super)
-        self.assign_user_to_page(page_a, self.user_master, 
+        page_a = create_page("pageA", "nav_playground.html", "en",
+                             created_by=self.user_super)
+        assign_user_to_page(page_a, self.user_master, 
             can_add=True, can_change=True, can_delete=True, can_publish=True, 
             can_move_page=True, can_moderate=True)
         
@@ -123,7 +130,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         # self.assertEqual(response.status_code, 200)
         
         # add page
-        page = self.create_page(self.slave_page, user=self.user_slave)
+        page = create_page("page", "nav_playground.html", "en",
+                           parent=self.slave_page, created_by=self.user_slave)
         # adds user_slave as page moderator for this page
         # public model shouldn't be available yet, because of the moderation
         # removed test cases since Title object does not inherit from Publisher anymore
@@ -151,7 +159,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(self.user_master)
         
         # add page
-        page = self.create_page(self.slave_page, user=self.user_slave)
+        page = create_page("page", "nav_playground.html", "en",
+                           parent=self.slave_page, created_by=self.user_slave)
         # same as test_05_slave_can_add_page_under_slave_home        
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         self.assertTrue(page.moderator_state == Page.MODERATOR_CHANGED)
@@ -195,7 +204,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         # create 4 pages
         slugs = []
         for i in range(0, 4):
-            page = self.create_page(self.home_page)
+            page = create_page("page", "nav_playground.html", "en",
+                               parent=self.home_page)
             slug = page.title_set.drafts()[0].slug
             slugs.append(slug)
         
@@ -208,7 +218,8 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_11_create_copy_publish(self):
         # create new page to copy
         self.login_user(self.user_master)
-        page = self.create_page(self.slave_page)
+        page = create_page("page", "nav_playground.html", "en",
+                           parent=self.slave_page)
         
         # copy it under home page...
         copied_page = self.copy_page(page, self.home_page)
@@ -220,7 +231,8 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_12_create_publish_copy(self):
         # create new page to copy
         self.login_user(self.user_master)
-        page = self.create_page(self.home_page)
+        page = create_page("page", "nav_playground.html", "en",
+                           parent=self.home_page)
         
         page = self.publish_page(page, True)
         
@@ -235,11 +247,12 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_13_subtree_needs_approvement(self):
         self.login_user(self.user_master)
         # create page under slave_page
-        page = self.create_page(self.home_page)
+        page = create_page("parent", "nav_playground.html", "en",
+                           parent=self.home_page)
         self.assertEqual(not page.publisher_public, True)
         
         # create subpage uner page
-        subpage = self.create_page(page)
+        subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
         self.assertEqual(not subpage.publisher_public, True)
         
         # publish both of them in reverse order 
@@ -270,11 +283,11 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_14_subtree_with_super(self):
         self.login_user(self.user_super)
         # create page under root
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         self.assertEqual(not page.publisher_public, True)
         
         # create subpage under page
-        subpage = self.create_page(page)
+        subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
         self.assertEqual(not subpage.publisher_public, True)
         
         # tree id must be the same
@@ -304,7 +317,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         """
         self.login_user(self.user_super)
         # create page under root
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         
         # public must not exist
         self.assertFalse(page.publisher_public)
@@ -317,7 +330,8 @@ class PermissionModeratorTestCase(CMSTestCase):
         """Add page under slave_home and check its flag
         """
         self.login_user(self.user_slave)
-        page = self.create_page(parent_page=self.slave_page)
+        page = create_page("page", "nav_playground.html", "en",
+                           parent=self.slave_page)
         
         # moderator_state must be changed
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
@@ -396,16 +410,16 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.login_user(self.user_slave)
         
         # all of them are under moderation... 
-        pa = self.create_page(self.slave_page, title="pa")
-        pb = self.create_page(pa, position="right", title="pb")
-        pc = self.create_page(pb, position="right", title="pc")
+        pa = create_page("pa", "nav_playground.html", "en", parent=self.slave_page)
+        pb = create_page("pb", "nav_playground.html", "en", parent=pa, position="right")
+        pc = create_page("pc", "nav_playground.html", "en", parent=pb, position="right")
         
-        pd = self.create_page(pb, title="pd")
-        pe = self.create_page(pd, position="right", title="pe")
+        pd = create_page("pd", "nav_playground.html", "en", parent=pb)
+        pe = create_page("pe", "nav_playground.html", "en", parent=pd, position="right")
         
-        pf = self.create_page(pe, title="pf")
-        pg = self.create_page(pf, position="right", title="pg")
-        ph = self.create_page(pf, position="right", title="ph")
+        pf = create_page("pf", "nav_playground.html", "en", parent=pe)
+        pg = create_page("pg", "nav_playground.html", "en", parent=pf, position="right")
+        ph = create_page("ph", "nav_playground.html", "en", parent=pf, position="right")
         
         self.assertEqual(not pg.publisher_public, True)
         
@@ -483,7 +497,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_18_plugins_get_published(self):
         self.login_user(self.user_super)
         # create page under root
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         self.add_plugin(self.user_super, page)
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
@@ -493,7 +507,7 @@ class PermissionModeratorTestCase(CMSTestCase):
     def test_19_remove_plugin_page_under_moderation(self):
         # login as slave and create page
         self.login_user(self.user_slave)
-        page = self.create_page(self.slave_page)
+        page = create_page("page", "nav_playground.html", "en", parent=self.slave_page)
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         
         # add plugin

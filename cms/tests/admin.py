@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.admin.dialog.forms import ModeratorForm, PermissionForm, \
-    PermissionAndModeratorForm
+from cms.admin.dialog.forms import (ModeratorForm, PermissionForm, 
+    PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
+from cms.api import create_page, create_title
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils import testcases as base
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
+    URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
@@ -53,8 +55,11 @@ class AdminTestCase(CMSTestCase):
         
         admin, normal_guy = self._get_guys()
         
+        site = Site.objects.get(pk=1)
+    
         # The admin creates the page
-        page = self.create_page(None, admin, 1, OLD_PAGE_NAME)
+        page = create_page(OLD_PAGE_NAME, "nav_playground.html", "en",
+                           site=site, created_by=admin)
         page.reverse_id = REVERSE_ID
         page.save()
         title = page.get_title_obj()
@@ -119,8 +124,10 @@ class AdminTestCase(CMSTestCase):
 
     def test_02_delete(self):
         admin = self._get_guys(True)
-        page = self.create_page(user=admin, title="delete-page", published=True)
-        child = self.create_page(page, user=admin, title="delete-page", published=True)
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin, published=True)
+        child = create_page('child-page', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent=page)
         self.login_user(admin)
         data = {'post': 'yes'}
         response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
@@ -164,8 +171,9 @@ class AdminTestCase(CMSTestCase):
 
     def test_07_delete_translation(self):
         admin = self._get_guys(True)
-        page = self.create_page(user=admin, title="delete-page-ranslation", published=True)
-        title = self.create_title("delete-page-ranslation-2", "delete-page-ranslation-2", 'nb', page)
+        page = create_page("delete-page-ranslation", "nav_playground.html", "en",
+                           created_by=admin, published=True)
+        create_title("nb", "delete-page-ranslation-2", page, slug="delete-page-ranslation-2")
         self.login_user(admin)
         response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'nb'})
         self.assertEqual(response.status_code, 200)

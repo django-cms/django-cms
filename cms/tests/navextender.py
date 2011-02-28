@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.menu_pool import menu_pool
-from cms.test_utils.util.context_managers import SettingsOverride
 
 class NavExtenderTestCase(CMSTestCase):
 
@@ -29,12 +30,20 @@ class NavExtenderTestCase(CMSTestCase):
         menu_pool.menus = self.old_menu
         
     def create_some_nodes(self):
-        with SettingsOverride(CMS_MODERATOR = False):    
-            self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
-            self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
-            self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
-            self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
-            self.page5 = self.create_page(parent_page=self.page4, published=True, in_navigation=True)
+        with SettingsOverride(CMS_MODERATOR = False):
+            self.page1 = create_page("page1", "nav_playground.html", "en",
+                                     published=True, in_navigation=True)
+            self.page2 = create_page("page2", "nav_playground.html", "en",
+                                     parent=self.page1, published=True,
+                                     in_navigation=True)
+            self.page3 = create_page("page3", "nav_playground.html", "en",
+                                     parent=self.page2, published=True,
+                                     in_navigation=True)
+            self.page4 = create_page("page4", "nav_playground.html", "en",
+                                     published=True, in_navigation=True)
+            self.page2 = create_page("page5", "nav_playground.html", "en",
+                                     parent=self.page4, published=True,
+                                     in_navigation=True)
         
     def test_01_menu_registration(self):
         with SettingsOverride(CMS_MODERATOR = False):
