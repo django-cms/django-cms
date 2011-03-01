@@ -40,71 +40,78 @@ jQuery(document).ready(function ($) {
 	
 	// add logo
 	CMS.Toolbar.registerItems([
-		{
-			el: '#cms_toolbar-item_logo',
-			dir: 'left',
-			type: 'anchor',
-			order: 1
+		{	dir: 'left', type: 'anchor', order: 1, class: 'cms_toolbar-item_logo',
+			title: '{% trans "django CMS" %}',
+			url: 'http://www.django-cms.org/'
 		},
 		// when you are logged in
 		{% if auth %}
-		{
-			el: '#cms_toolbar-item_editmode',
-			dir: 'left',
-			type: 'switcher',
-			addParameter: 'edit',
-			removeParameter: 'edit-off',
+		{	dir: 'left', type: 'switcher', order: 10, class: 'cms_toolbar-item_editmode',
+			addParameter: 'edit', removeParameter: 'edit-off',
 			state: '{% if edit %}on{% else %}off{% endif %}',
-			order: 10
+			title: '{% trans "Edit mode" %}',
+			url: '/'
 		},
-		{
-			el: '#cms_toolbar-item_compactmode',
-			dir: 'left',
-			type: 'switcher',
-			addParameter: 'compact',
-			removeParameter: 'compact-off',
+		{% if page.last_page_states %}
+		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_status',
+			html: '<div class="cms_toolbar-item"><p>{% trans "Status" %}: <em>{% for state in page.last_page_states %}{{ state.get_action_display }} {% endfor %}</em></p></div>', htmlElement: ''
+		},
+		{% endif %}
+		/*{ dir: 'left', type: 'switcher', order: 20, class: 'cms_toolbar-item_compactmode',
+			addParameter: 'compact', removeParameter: 'compact-off',
 			state: 'off',
-			order: 20
+			title: '{% trans "Compact mode" %}',
+			url: '/'
+		},*/
+		{ dir: 'right', type: 'button', order: 30, class: 'cms_toolbar-item_page',
+			title: '{% trans "Page" %}',
+			icon: 'cms_toolbar_icon-edit',
+			action: '', hidden: '', token: '',
+			redirect: '{% url admin:cms_page_change page.pk %}'
 		},
-		
-		{
-			el: '#cms_toolbar-item_settings',
-			dir: 'left',
-			type: 'button',
-			order: 30
+		{ dir: 'right', type: 'list', order: 40, class: 'cms_toolbar-item_admin',
+			title: '{% trans "Admin" %}',
+			icon: 'cms_toolbar_icon-settings',
+			items: [
+				{ title: '{% trans "Site Administration" %}', url: '{% url admin:index %}', icon: '' }
+				{% if has_change_permission %},
+				{ title: '{% trans "Page Settings" %}', url: '{% url admin:cms_page_change page.pk %}', icon: '' },
+				{ title: '{% trans "View History" %}', url: '{% url admin:cms_page_history page.pk %}', icon: '' }
+				{% endif %}
+			]
 		},
-		
-		{
-			el: '#cms_toolbar-item_logout',
-			dir: 'right',
-			type: 'button',
-			order: 100
-		},
-		
+		{	
+			dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout',
+			title: '{% trans "Logout" %}',
+			icon: 'cms_toolbar_icon-lock',
+			action: '', hidden: '<input type="hidden" name="logout_submit" />',
+			token: "{% csrf_token %}" }
 		// when you are logged off
 		{% else %}
-		{
-			el: '#cms_toolbar-item_login',
-			dir: 'left',
-			type: 'anchor',
-			order: 10
+		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_login',
+			html: '', htmlElement: '#cms_toolbar-item_login'
+		},
+		{ dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin',
+			title: '{% trans "Admin" %}',
+			icon: 'cms_toolbar_icon-settings',
+			action: '', hidden: '', token: '',
+			redirect: '{% url admin:index %}'
 		}
 		{% endif %}
-		
 	]);
 	// or register only one item
-	// CMS.Toolbar.registerItem({ options }, 10);
+	// CMS.Toolbar.registerItem({ item });
 });
 //]]>
 </script>
 
-<!-- start: toolbar -->
 <div id="cms_toolbar-wrapper">
+	<!-- start: toolbar -->
 	<div id="cms_toolbar-toggle">
-		<a href="#" class="cms_toolbar-boxbg_left">
-			<span class="cms_toolbar-boxbg_right">
-				<span class="cms_toolbar_icon cms_toolbar_icon-toggle">&nbsp;</span>
-				<span class="cms_toolbar-boxbg_inner">{% trans "Show/Hide toolbar" %}</span>
+		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
+			<span class="cms_toolbar-btn_right cms_toolbar_icon-toggle">
+				<span class="cms_toolbar_icon">&nbsp;</span>
+				<span class="cms_toolbar_icon-hide">{% trans "Show/Hide toolbar" %}</span>
 			</span>
 		</a>
 	</div>
@@ -112,62 +119,63 @@ jQuery(document).ready(function ($) {
 		<div class="cms_toolbar-left"></div>
 		<div class="cms_toolbar-right"></div>
 	</div>
-	<div id="cms_toolbar-edit"></div>
+	<div id="cms_toolbar-panel"></div>
 	<div id="cms_toolbar-dim"></div>
+	<!-- end: toolbar -->
+	
+	<!-- template: anchor -->
+	<div id="cms_toolbar-item_anchor" class="cms_toolbar-item">
+		<a href="[url]" class="cms_toolbar-item_logo-link">[title]</a>
+	</div>
+	
+	<!-- template: switcher -->
+	<div id="cms_toolbar-item_switcher" class="cms_toolbar-item cms_toolbar-item_switcher">
+		<span class="cms_toolbar-item_switcher-label">[title]</span> 
+		<a href="[url]" class="cms_toolbar-item_switcher-link"><span>{% trans "Switch on/off" %}</span></a>
+	</div>
+	
+	<!-- template: button -->
+	<form id="cms_toolbar-item_button" action="[action]" method="post" class="cms_toolbar-item">
+		<fieldset>
+			[hidden]
+			[token]
+			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left cms_toolbar-btn">
+				<span class="cms_toolbar-btn_right">
+					<span class="cms_toolbar_icon">&nbsp;</span>
+					<span>&nbsp;[title]</span>
+				</span>
+			</a>
+		</fieldset>
+	</form>
+	
+	<!-- template: list -->
+	<div id="cms_toolbar-item_list" class="cms_toolbar-item">
+		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left cms_toolbar-btn">
+			<span class="cms_toolbar-btn_right">
+				<span class="cms_toolbar_icon">&nbsp;</span>
+				<span>&nbsp;[title]</span>
+				<span class="cms_toolbar_icon cms_toolbar_icon-more">-</span>
+			</span>
+		</a>
+		<ul class="cms_toolbar-item_list">
+			<li><a href="[list_url]">[list_title]</a></li>
+		</ul>
+	</form>
+	
+	<!-- item: html - login -->
+	<form action="" method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
+		<fieldset>
+			<label for="cms_toolbar-item_login-username">{% trans "Username" %}</label>
+			<div><input type="text" name="cms_username" id="cms_toolbar-item_login-username" /></div>
+			<label for="cms_toolbar-item_login-password">{% trans "Password" %}</label>
+			<div><input type="password" name="cms_password" id="cms_toolbar-item_login-password" /></div>
+			{% csrf_token %}
+			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
+				<span class="cms_toolbar-btn_right">{% trans "Login" %}</span>
+			</a>
+		</fieldset>
+	</form>
 </div>
-<!-- end: toolbar -->
-
-<!-- item: logo -->
-<div id="cms_toolbar-item_logo" class="cms_toolbar-item">
-	<a href="/" class="cms_toolbar-item_logo-link">django CMS</a>
-</div>
-
-<!-- item: login -->
-<form action="" method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
-	<fieldset>
-		<label for="cms_toolbar-item_login-username">{% trans "Username" %}</label>
-		<div><input type="text" name="cms_username" id="cms_toolbar-item_login-username" /></div>
-		<label for="cms_toolbar-item_login-password">{% trans "Password" %}</label>
-		<div><input type="password" name="cms_password" id="cms_toolbar-item_login-password" /></div>
-		{% csrf_token %}
-		<span class="cms_toolbar-btn cms_toolbar-boxbg_left"><input type="submit" value="{% trans 'Login' %}" class="cms_toolbar-boxbg_right" /></span>
-	</fieldset>
-</form>
-
-<!-- item: edit mode -->
-<div id="cms_toolbar-item_editmode" class="cms_toolbar-item cms_toolbar-item_switcher">
-	<span class="cms_toolbar-item_switcher-label">{% trans "Edit" %}</span> 
-	<a href="/" class="cms_toolbar-item_switcher-link"><span>{% trans "Switch on/off" %}</span></a>
-</div>
-
-<!-- item: compat mode -->
-<div id="cms_toolbar-item_compactmode" class="cms_toolbar-item cms_toolbar-item_switcher">
-	<span class="cms_toolbar-item_switcher-label">{% trans "Compact" %}</span> 
-	<a href="/" class="cms_toolbar-item_switcher-link"><span>{% trans "Switch on/off" %}</span></a>
-</div>
-
-<!-- item: settings -->
-<div id="cms_toolbar-item_settings" class="cms_toolbar-item">
-	<a href="#" class="cms_toolbar-btn cms_toolbar-boxbg_left"><span class="cms_toolbar-boxbg_right">{% trans "Page settings" %}</span></a>
-</div>
-
-<!-- item: logout -->
-<form action="" method="post" id="cms_toolbar-item_logout" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
-	<fieldset>
-		<input type="hidden" name="logout_submit" />
-		{% csrf_token %}
-		<span class="cms_toolbar-btn cms_toolbar-boxbg_left"><input type="submit" value="{% trans 'Logout' %}" class="cms_toolbar-boxbg_right" /></span>
-	</fieldset>
-</form>
-
-
-
-
-
-
-
-
-
 
 
 
@@ -310,8 +318,9 @@ jQuery(document).ready(function ($) {
 </div>
 <div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
     <div id="cms_toolbar_col1">
-        <a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
+        <!-- implemented <a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a> -->
         {% if auth %}
+<!-- IMPLEMENTED
             <div id="cms_toolbar_editmode_toggle">
                 <span>{% trans "Edit mode" %}</span>
                 <a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
@@ -328,7 +337,9 @@ jQuery(document).ready(function ($) {
                 </div>
             </div>        
             {% endif %}
+-->
         {% else %}
+<!-- IMPLEMENTED
         <form method="post" action="" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
             <label>{% trans "Username" %}</label>
             <input type="text" name="cms_username" class="cms_textinput"></input>
@@ -337,9 +348,11 @@ jQuery(document).ready(function ($) {
             <input type="submit" name="submit" value="{% trans "login" %}" class="cms_submit"></input>
             <a href="#" class="cms_toolbar_button"><span>{% trans "login" %}</span></a>        
         </form>
+-->
         {% endif %}    
     </div>
     <div id="cms_toolbar_col2">
+        
         {% if edit and page %}
         {% if auth and moderator %}
             {% if moderator_should_approve and has_moderate_permission %}
@@ -360,6 +373,7 @@ jQuery(document).ready(function ($) {
         {% endif %}
         {% endif %}
         <!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
+        
         {% if auth and has_change_permission %}
         <div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>        
             <ul id="cms_toolbar_template_menu" class="cms_toolbar_submenu">
@@ -369,6 +383,7 @@ jQuery(document).ready(function ($) {
             </ul>
         </div>
         {% endif %}
+        
         {% if auth %}
         <div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Page" %}</strong><em>arrow</em></span>        
             <ul id="cms_toolbar_page_menu" class="cms_toolbar_submenu">                
@@ -381,26 +396,34 @@ jQuery(document).ready(function ($) {
             </ul>
         </div>
         {% endif %}
+        <!-- IMPLEMENTED
         <div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>        
             <ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">                
                 <li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">{% trans "edit" %}</span>{% trans "Site Administration" %}</a></li>
                 {% if auth %}
+                
                 {% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
                 <!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
-                <li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
+                <!--<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
                 {% endif %}
+                
                 {% endif %}
             </ul>
-        </div>
+        </div>-->
+        -->
         {% if auth %}
+        <!-- IMPLEMENTED
         <form method="post" action="" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
             <fieldset>
             <input type="submit" name="logout_submit" value="{% trans "Logout" %}" class="cms_submit" />
             <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
             </fieldset>
         </form>
+        -->
         {% endif %}
+        <!-- IMPLEMENTED
         <a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
+    	-->
     </div>
 
 </div>

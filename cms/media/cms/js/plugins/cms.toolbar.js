@@ -20,16 +20,16 @@
 			'edit_mode': false
 		},
 
-		initialize: function (el, options) {
+		initialize: function (container, options) {
 			// save reference to this class
 			var classy = this;
 			// check if only one element is found
-			if($(el).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
+			if($(container).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
 			// merge argument options with internal options
 			this.options = $.extend(this.options, options);
 			
 			// save toolbar elements
-			this.wrapper = $(el);
+			this.wrapper = $(container);
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.toolbar.left = this.toolbar.find('.cms_toolbar-left');
 			this.toolbar.right = this.toolbar.find('.cms_toolbar-right');
@@ -55,7 +55,6 @@
 			
 			// init scripts
 			this.toggleToolbar();
-			//this.toggleDim();
 		},
 		
 		toggleToolbar: function () {
@@ -65,10 +64,10 @@
 		_showToolbar: function () {
 			var classy = this;
 			// add toolbar padding
-			var padding = parseInt($(document.body).css('padding-top'));
+			var padding = parseInt($(document.body).css('margin-top'));
 				setTimeout(function () {
-					$(document.body).css('padding-top', (padding+classy.toolbar.height()));
-				}, 50);
+					$(document.body).css('margin-top', (padding+classy.toolbar.height()));
+				}, 10);
 			// show toolbar
 			this.toolbar.show();
 			// change data information
@@ -81,8 +80,8 @@
 		
 		_hideToolbar: function () {
 			// remove toolbar padding
-			var padding = parseInt($(document.body).css('padding-top'));
-				$(document.body).css('padding-top', (padding-this.toolbar.height()));
+			var padding = parseInt($(document.body).css('margin-top'));
+				$(document.body).css('margin-top', (padding-this.toolbar.height()));
 			// hide toolbar
 			this.toolbar.hide();
 			// change data information
@@ -100,19 +99,16 @@
 		_showDim: function () {
 			var classy = this;
 			// stop window from scrolling
-			$(document.body).css('overflow', 'hidden');
-			// init dim resize
-			this.dim.css({
-				'width': $(window).width(),
-				'height': $(window).height(),
-			});
+			// $(document.body).css('overflow', 'hidden');
 			// attach resize event to window
 			$(window).bind('resize', function () {
 				classy.dim.css({
-					'width': $(window).width(),
-					'height': $(window).height(),
+					'width': $(document).width(),
+					'height': $(document).height(),
 				});
 			});
+			// init dim resize
+			$(window).resize();
 			// change data information
 			this.toolbar.data('dimmed', false);
 			// show dim
@@ -121,7 +117,7 @@
 		
 		_hideDim: function () {
 			// retain window from scrolling
-			$(document.body).css('overflow', 'auto');
+			// $(document.body).css('overflow', 'auto');
 			// unbind resize event
 			$(window).unbind('resize');
 			// change data information
@@ -130,26 +126,29 @@
 			this.dim.css('opcaity', 0.6).stop().fadeOut();
 		},
 		
-		registerItem: function (item, order) {
-			// save vars with fallbacks
-			var el = $(item.el);
-				if(!el.length) return false;
-			var dir = (item.dir) ? item.dir : 'right';
-			var order = (order) ? parseInt(order) : 0;
+		registerItem: function (obj) {
+			// error handling
+			if(!obj.order) obj.dir = 0;
 			
 			// check for internal types
-			switch(item.type) {
+			switch(obj.type) {
 				case 'anchor':
-					this._registerAnchor(el, dir, order);
+					this._registerAnchor(obj);
+					break;
+				case 'html':
+					this._registerHtml(obj);
 					break;
 				case 'switcher':
-					this._registerSwitcher(el, dir, order, item);
+					this._registerSwitcher(obj);
 					break;
 				case 'button':
-					this._registerButton(el, dir, order, item);
+					this._registerButton(obj);
+					break;
+				case 'list':
+					this._registerList(obj);
 					break;
 				default:
-					this.registerType(item, order);
+					this.registerType(obj);
 			}
 		},
 		
@@ -159,9 +158,8 @@
 			// save reference to this class
 			var classy = this;
 			// loopp through all items and pass them to single function
-			$(items).each(function (index, item) {
-				if(item.order) index = item.order;
-				classy.registerItem(item, index);
+			$(items).each(function (index, value) {
+				classy.registerItem(value);
 			});
 		},
 		
@@ -169,62 +167,108 @@
 			log('you want new type?');
 		},
 		
-		_registerAnchor: function (el, dir, order) {
-			// save and show element data
-			el.data('order', order)
-			  .css('display', 'block');
-			
-			// append item
-			this._injectItem(el, dir, order);
+		_registerAnchor: function (obj) {
+			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			var template = this._processTemplate('#cms_toolbar-item_anchor', obj);
+			this._injectItem(template, obj.dir, obj.order);
 		},
 		
-		_registerSwitcher: function (el, dir, order, opt) {
+		_registerHtml: function (obj) {
+			// here we dont need processTemplate cause we create the template
+			var template = (obj.html) ? $(obj.html) : $(obj.htmlElement);
+			// add order, show item
+			template.data('order', obj.order).css('display', 'block');
+			// add class if neccessary
+			if(obj.class) template.addClass(obj.class);
+			// add events
+			template.find('.cms_toolbar-btn').bind('click', function (e) {
+				e.preventDefault();
+				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+			});
+			// append item
+			this._injectItem(template, obj.dir, obj.order);
+		},
+		
+		_registerSwitcher: function (obj) {
 			// save reference to this class
 			var classy = this;
-			// save and show element data
-			el.data('order', order)
-			  .css('display', 'block')
-			
+			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			var template = this._processTemplate('#cms_toolbar-item_switcher', obj);
 			// should btn be shown?
-			var btn = el.find('.cms_toolbar-item_switcher-link span');
+			var btn = template.find('.cms_toolbar-item_switcher-link span');
 			
 			// initial setup
-			if(opt.state == 'on') {
+			if(obj.state == 'on') {
 				btn.data('state', 'on').css('backgroundPosition', '0px -198px');
 			} else {
 				btn.data('state', 'off').css('backgroundPosition', '-40px -198px');
 			}
 			
-			el.find('.cms_toolbar-item_switcher-link').bind('click', function (e) {
+			// add events
+			template.find('.cms_toolbar-item_switcher-link').bind('click', function (e) {
 				e.preventDefault();
 				
 				// animate toggle effect and trigger handler
 				if(btn.data('state') == 'on') {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = classy._removeUrl(window.location.href, opt.addParameter);
-						window.location = classy._insertUrl(url, opt.removeParameter, "")
+						var url = classy._removeUrl(window.location.href, obj.addParameter);
+						window.location = classy._insertUrl(url, obj.removeParameter, "")
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = classy._insertUrl(location.href, opt.addParameter, "");
+						window.location = classy._insertUrl(location.href, obj.addParameter, "");
 					});
 				}
-				
 			});
-			
 			// append item
-			this._injectItem(el, dir, order);
+			this._injectItem(template, obj.dir, obj.order);
 		},
 		
-		_registerButton: function (el, dir, order, opt) {
-			// save and show element data
-			el.data('order', order)
-			  .css('display', 'block');
+		_registerButton: function (obj) {
+			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			var template = this._processTemplate('#cms_toolbar-item_button', obj);
+			// append item
+			this._injectItem(template, obj.dir, obj.order);
+		},
+		
+		_registerList: function (obj) {
+			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			var template = this._processTemplate('#cms_toolbar-item_list', obj);
+			
+			// here i have to do some crazy shit
+			
+			
 			
 			// append item
-			this._injectItem(el, dir, order);
+			this._injectItem(template, obj.dir, obj.order);
+		},
+		
+		_processTemplate: function (class, obj) {
+			var template = this.wrapper.find(class).clone();
+				template = $('<div>').append(template).clone().remove().html();
+			// replace placeholders
+			if(obj.title) template = template.replace('[title]', obj.title);
+			if(obj.url) template = template.replace('[url]', obj.url);
+			template = (obj.token) ? template.replace('[token]', obj.token) : template.replace('[token]', '');
+			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
+			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
+			// back to jquery object
+			template = $(template);
+			if(obj.class) template.addClass(obj.class);
+			if(obj.icon) template.find('.cms_toolbar-btn_right').addClass(obj.icon);
+			// add events
+			template.find('.cms_toolbar-btn').bind('click', function (e) {
+				e.preventDefault();
+				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+			});
+			// save order remove id and show element
+			template.data('order', obj.order)
+					.attr('id', '')
+					.css('display', 'block');
+			
+			return template;
 		},
 		
 		_injectItem: function (el, dir, order) {
