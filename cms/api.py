@@ -61,10 +61,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
     
     # validate template
-    assert template in [template[0] for template in settings.CMS_TEMPLATES]
+    assert template in [tpl[0] for tpl in settings.CMS_TEMPLATES]
     
     # validate language:
-    assert language in [language[0] for language in settings.CMS_LANGUAGES]
+    assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
     
     # set default slug:
     if not slug:
@@ -140,7 +140,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         title=title,
         menu_title=menu_title,
         slug=slug,
-        application_urls=application_urls,
+        apphook=application_urls,
         redirect=redirect,
         meta_description=meta_description,
         meta_keywords=meta_keywords,
@@ -159,7 +159,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     Parent is only used if slug=None.
     """
     # validate language:
-    assert language in [language[0] for language in settings.CMS_LANGUAGES]
+    assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
     
     # validate page
     assert isinstance(page, Page)

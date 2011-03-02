@@ -56,7 +56,7 @@ class PermissionModeratorTestCase(CMSTestCase):
 
         # create master user
         master = User.objects.create(username="master", email="master@django-cms.org", password="master")
-        self.user_master = create_page_user(master, grant_all=True)
+        self.user_master = create_page_user(self.user_super, master, grant_all=True)
         
         # assign master user under home page
         assign_user_to_page(self.home_page, self.user_master,
@@ -70,7 +70,7 @@ class PermissionModeratorTestCase(CMSTestCase):
         self.slave_page = create_page("slave-home", "nav_playground.html", "en",
                           parent=self.master_page, created_by=self.user_super)
         slave = User.objects.create(username='slave', email='slave@django-cms.org', password='slave')
-        self.user_slave = create_page_user(slave,  can_add_page=True,
+        self.user_slave = create_page_user(self.user_super, slave,  can_add_page=True,
                                     can_change_page=True, can_delete_page=True)
         
         assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)

@@ -417,7 +417,7 @@ class FixturesMenuTests(BaseMenuTest):
         
     def test_18_show_breadcrumb_invisible(self):
         invisible_page = create_page("invisible" "nav_playground.html", "en",
-            parent_page=self.get_page(3), published=True, in_navigation=False)
+            parent=self.get_page(3), published=True, in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context) 

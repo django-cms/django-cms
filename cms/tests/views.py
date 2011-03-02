@@ -78,7 +78,7 @@ class ViewTests(SettingsOverrideTestCase):
         
         # test internal language neutral redirect
         two = create_page("two", "nav_playground.html"," en", parent=one,
-                          published=true, redirect=redirect_two)
+                          published=True, redirect=redirect_two)
         url = two.get_absolute_url()
         request = self.get_request(url)
         response = details(request, url.strip('/'))

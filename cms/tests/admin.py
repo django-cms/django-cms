@@ -171,11 +171,11 @@ class AdminTestCase(CMSTestCase):
 
     def test_07_delete_translation(self):
         admin = self._get_guys(True)
-        page = create_page("delete-page-ranslation", "nav_playground.html", "en",
+        page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin, published=True)
-        create_title("nb", "delete-page-ranslation-2", page, slug="delete-page-ranslation-2")
+        create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         self.login_user(admin)
-        response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'nb'})
+        response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'nb'})
+        response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
         self.assertRedirects(response, URL_CMS_PAGE)
