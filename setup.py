@@ -47,10 +47,10 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Django>=1.2',
-        'django-classy-tags>=0.3.0',
+        'django-classy-tags>=0.3.2',
         'south>=0.7.2',
         'django-mptt>=0.4.2',
-        'django-sekizai>=0.4.1',
+        'django-sekizai>=0.4.2',
     ],
     packages=find_packages(exclude=["example", "example.*","testdata","testdata.*"]),
     package_data={
