@@ -52,7 +52,7 @@ In the models of the current object add an optional language parameter to the
 In the view pass the ``get_absolute_url`` function to the
 ``set_language_chooser`` function::
 
-    from cms.utils import set_language_changer
+    from menus.utils import set_language_changer
 
     def get_product(request, slug):
         item = get_object_or_404(Product, slug=slug, published=True)
