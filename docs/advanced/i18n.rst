@@ -46,7 +46,7 @@ In the models of the current object add an optional language parameter to the
     def get_absolute_url(self, language=None):
         if not language:
             language = get_language()
-        reverse("product_view", args=[self.get_slug(language=language)])
+        return reverse("product_view", args=[self.get_slug(language=language)])
 
 
 In the view pass the ``get_absolute_url`` function to the
