@@ -42,8 +42,8 @@ class PageModerator(models.Model):
     
     MAX_MODERATION_LEVEL = sys.maxint # just an number
     
-    page = models.ForeignKey(Page, verbose_name=_('Page')) 
-    user = models.ForeignKey(User, verbose_name=_('User'))
+    page = models.ForeignKey(Page, verbose_name=_('page')) 
+    user = models.ForeignKey(User, verbose_name=_('user'))
     
     # TODO: permission stuff could be changed to this structure also, this gives
     # better querying performance
@@ -52,8 +52,8 @@ class PageModerator(models.Model):
     moderate_descendants = models.BooleanField(_('Moderate descendants'), blank=True)
     
     class Meta:
-        verbose_name=_('PageModerator')
-        verbose_name_plural=_('PageModerator')
+        verbose_name=_('page moderator')
+        verbose_name_plural=_('page moderators')
         app_label = 'cms'
 
     def set_decimal(self, state):
@@ -113,8 +113,8 @@ class PageModeratorState(models.Model):
     objects = PageModeratorStateManager()
     
     class Meta:
-        verbose_name=_('Page moderator state')
-        verbose_name_plural=_('Page moderator states')
+        verbose_name=_('page moderator state')
+        verbose_name_plural=_('page moderator states')
         ordering = ('page', 'action', '-created') # newer first
         app_label = 'cms'
     

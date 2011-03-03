@@ -21,15 +21,15 @@ class Snippet(models.Model):
 
     class Meta:
         ordering = ['name']
-        verbose_name = _("Snippet")
-        verbose_name_plural = _("Snippets")
+        verbose_name = _("snippet")
+        verbose_name_plural = _("snippets")
 
 # Plugin model - just a pointer to Snippet
 class SnippetPtr(CMSPlugin):
     snippet = models.ForeignKey(Snippet)
 
     class Meta:
-        verbose_name = _("Snippet")
+        verbose_name = _("snippet")
 
     search_fields = ('snippet__html',)
 

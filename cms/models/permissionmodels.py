@@ -55,8 +55,8 @@ class GlobalPagePermission(AbstractPagePermission):
     objects = BasicPagePermissionManager()
     
     class Meta:
-        verbose_name = _('Page global permission')
-        verbose_name_plural = _('Pages global permissions')
+        verbose_name = _('page global permission')
+        verbose_name_plural = _('page global permissions')
         app_label = 'cms'
     
     __unicode__ = lambda self: "%s :: GLOBAL" % self.audience
@@ -71,8 +71,8 @@ class PagePermission(AbstractPagePermission):
     objects = PagePermissionManager()
     
     class Meta:
-        verbose_name = _('Page permission')
-        verbose_name_plural = _('Page permissions')
+        verbose_name = _('page permission')
+        verbose_name_plural = _('page permissions')
         app_label = 'cms'
         
     def __unicode__(self):
@@ -85,8 +85,8 @@ class PageUser(User):
     created_by = models.ForeignKey(User, related_name="created_users")
     
     class Meta:
-        verbose_name = _('User (page)')
-        verbose_name_plural = _('Users (page)')
+        verbose_name = _('user (page)')
+        verbose_name_plural = _('users (page)')
         app_label = 'cms'
     
     #__unicode__ = lambda self: unicode(self.user)
@@ -98,8 +98,8 @@ class PageUserGroup(Group):
     created_by = models.ForeignKey(User, related_name="created_usergroups")
     
     class Meta:
-        verbose_name = _('User group (page)')
-        verbose_name_plural = _('User groups (page)')
+        verbose_name = _('user group (page)')
+        verbose_name_plural = _('user groups (page)')
         app_label = 'cms'
         
     #__unicode__ = lambda self: unicode(self.group)
