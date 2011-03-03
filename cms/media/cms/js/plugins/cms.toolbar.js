@@ -55,6 +55,9 @@
 			
 			// init scripts
 			this.toggleToolbar();
+			
+			// show toolbar
+			this.wrapper.show();
 		},
 		
 		toggleToolbar: function () {
@@ -152,6 +155,11 @@
 			}
 		},
 		
+		removeItem: function (index) {
+			// function to remove an item
+			if(index) $($('.cms_toolbar-item:visible')[index]).remove();
+		},
+		
 		registerItems: function (items) {
 			// make sure an array is passed
 			if(typeof(items) != 'object') return false;
@@ -237,9 +245,44 @@
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_list', obj);
 			
-			// here i have to do some crazy shit
+			// item injection logic
+			var list = template.find('.cms_toolbar-item_list').html().trim();
+			var tmp = '';
+			// lets loop through the items
+			$(obj.items).each(function (index, value) {
+				// add icon if available
+				var icon = (value.icon) ? 'cms_toolbar_icon ' : '';
+				// replace attributes
+				tmp += list.replace('[list_title]', value.title).replace('[list_url]', value.url).replace('<span>', '<span class="'+icon+value.icon+'">');
+			});
+			// add items
+			template.find('.cms_toolbar-item_list').html($(tmp));
 			
+			// add events
+			var container = template.find('.cms_toolbar-item_list'); 
+			var btn = template.find('.cms_toolbar-btn');
+				btn.data('collapsed', true).bind('click', function (e) {
+					e.preventDefault();
+					($(this).data('collapsed')) ? show_list() : hide_list();
+			});
 			
+			function show_list() {
+				// add event to body to hide the list needs a timout for late trigger
+				setTimeout(function () {
+					$(window).bind('click', hide_list);
+				}, 100);
+				
+				// show element and save data
+				container.show();
+				btn.addClass('cms_toolbar-btn-active').data('collapsed', false);
+			}
+			function hide_list() {
+				// remove the body event
+				$(window).unbind('click');
+				// show element and save data
+				container.hide();
+				btn.removeClass('cms_toolbar-btn-active').data('collapsed', true);
+			}
 			
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
@@ -251,6 +294,7 @@
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
 			if(obj.url) template = template.replace('[url]', obj.url);
+			if(!obj.icon && obj.type == 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
 			template = (obj.token) ? template.replace('[token]', obj.token) : template.replace('[token]', '');
 			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
@@ -280,6 +324,9 @@
 				var leftContent = left.find('> *');
 					if(!leftContent.length) { left.append(el); return false; }
 				
+				// first insert it at start position
+				el.insertBefore($(leftContent[0]));
+				
 				// and what happens if there is already an element?
 				leftContent.each(function (index, item) {
 					// sava data from element
@@ -292,6 +339,9 @@
 			if(dir == 'right') {
 				var rightContent = right.find('> *');
 					if(!rightContent.length) { right.append(el); return false; }
+				
+				// first insert it at start position
+				el.insertBefore($(rightContent[0]));
 				
 				rightContent.each(function (index, item) {
 					// save data from element
@@ -347,9 +397,4 @@
 		}
 
 	});
-	
-	//CMS.Collapse
-	// need some awesome show hide effects
-	
-	// new Toolbar();
 })(jQuery, Class);

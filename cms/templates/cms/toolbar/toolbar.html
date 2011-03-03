@@ -4,6 +4,7 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy-1.3.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.cookie.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.toolbar.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.placeholders.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
@@ -34,7 +35,7 @@ jQuery(document).ready(function ($) {
 	};
 	
 	// initialize toolbar and pass all the variables, use same namespace to trigger
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar-wrapper', options);
+	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', options);
 
 	// dummy JSON: {'action_items': [{name: 'edit', icon:'link/zum/zahnrad.jpg', submenu:[{'name': 'Grundeinstellungen', 'action': 'open_url', 'url': 'http:/ksdjagklajsdlkjaskdjf/'}]}]}
 	
@@ -44,6 +45,7 @@ jQuery(document).ready(function ($) {
 			title: '{% trans "django CMS" %}',
 			url: 'http://www.django-cms.org/'
 		},
+		
 		// when you are logged in
 		{% if auth %}
 		{	dir: 'left', type: 'switcher', order: 10, class: 'cms_toolbar-item_editmode',
@@ -52,6 +54,7 @@ jQuery(document).ready(function ($) {
 			title: '{% trans "Edit mode" %}',
 			url: '/'
 		},
+		// show status when edit mode is off
 		{% if page.last_page_states %}
 		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_status',
 			html: '<div class="cms_toolbar-item"><p>{% trans "Status" %}: <em>{% for state in page.last_page_states %}{{ state.get_action_display }} {% endfor %}</em></p></div>', htmlElement: ''
@@ -63,35 +66,68 @@ jQuery(document).ready(function ($) {
 			title: '{% trans "Compact mode" %}',
 			url: '/'
 		},*/
-		{ dir: 'right', type: 'button', order: 30, class: 'cms_toolbar-item_page',
+		{	dir: 'right', type: 'list', order: 30, class: 'cms_toolbar-item_page',
 			title: '{% trans "Page" %}',
 			icon: 'cms_toolbar_icon-edit',
-			action: '', hidden: '', token: '',
-			redirect: '{% url admin:cms_page_change page.pk %}'
-		},
-		{ dir: 'right', type: 'list', order: 40, class: 'cms_toolbar-item_admin',
-			title: '{% trans "Admin" %}',
-			icon: 'cms_toolbar_icon-settings',
 			items: [
-				{ title: '{% trans "Site Administration" %}', url: '{% url admin:index %}', icon: '' }
-				{% if has_change_permission %},
-				{ title: '{% trans "Page Settings" %}', url: '{% url admin:cms_page_change page.pk %}', icon: '' },
-				{ title: '{% trans "View History" %}', url: '{% url admin:cms_page_history page.pk %}', icon: '' }
+				{ title: '{% trans "Move/add Pages" %}', url: '{% url admin:cms_page_changelist %}', icon: 'cms_toolbar_icon-sitemap' }
+				{% if has_add_page_permission %},
+				{ title: '{% trans "Add child page" %}', url: '{% url admin:cms_page_add %}?target={{ page.pk }}&amp;position=last-child', icon: 'cms_toolbar_icon-child' },
+				{ title: '{% trans "Add sibling page" %}', url: '{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&amp;position=last-child{% endif %}', icon: 'cms_toolbar_icon-sibling' }
+				{% endif %}
+				{% if has_delete_permission %},
+				{ title: '{% trans "Delete" %}', url: '{% url admin:cms_page_delete page.pk %}', icon: 'cms_toolbar_icon-delete' },
 				{% endif %}
 			]
 		},
-		{	
-			dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout',
+		{	dir: 'right', type: 'list', order: 40, class: 'cms_toolbar-item_admin',
+			title: '{% trans "Admin" %}',
+			icon: 'cms_toolbar_icon-settings',
+			items: [
+				{ title: '{% trans "Administration" %}', url: '{% url admin:index %}', icon: 'cms_toolbar_icon-admin' }
+				{% if has_change_permission %},
+				{ title: '{% trans "Page Settings" %}', url: '{% url admin:cms_page_change page.pk %}', icon: 'cms_toolbar_icon-edit' },
+				{ title: '{% trans "Page History" %}', url: '{% url admin:cms_page_history page.pk %}', icon: 'cms_toolbar_icon-history' }
+				{% endif %}
+			]
+		},
+		{	dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout',
 			title: '{% trans "Logout" %}',
 			icon: 'cms_toolbar_icon-lock',
 			action: '', hidden: '<input type="hidden" name="logout_submit" />',
-			token: "{% csrf_token %}" }
+			token: "{% csrf_token %}"
+		}
+		// show moderator buttons
+		{% if edit and page %},
+		{% if moderator_should_approve and has_moderate_permission %}
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator',
+			title: '{{ page_moderator_state.label }}', icon: '',
+			action: '', hidden: '', token: '',
+			redirect: '{% url admin:cms_page_approve_page page.pk %}'
+		}
+		{% else %}
+		{% if has_publish_permission %}
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator',
+			title: '{% trans "Publish" %}', icon: '',
+			action: '', hidden: '', token: '',
+			redirect: '{% url admin:cms_page_publish_page page.pk %}'
+		}
+		{% else %}
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator',
+			title: '{% trans "Request Approval" %}', icon: '',
+			action: '', hidden: '', token: '',
+			redirect: '{% url admin:cms_page_approve_page page.pk %}'
+		}
+		{% endif %}
+		{% endif %}
+		{% endif %}
+		
 		// when you are logged off
 		{% else %}
 		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_login',
 			html: '', htmlElement: '#cms_toolbar-item_login'
 		},
-		{ dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin',
+		{	dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin',
 			title: '{% trans "Admin" %}',
 			icon: 'cms_toolbar_icon-settings',
 			action: '', hidden: '', token: '',
@@ -105,7 +141,7 @@ jQuery(document).ready(function ($) {
 //]]>
 </script>
 
-<div id="cms_toolbar-wrapper">
+<div id="cms_toolbar" style="display:none;">
 	<!-- start: toolbar -->
 	<div id="cms_toolbar-toggle">
 		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
@@ -158,9 +194,9 @@ jQuery(document).ready(function ($) {
 			</span>
 		</a>
 		<ul class="cms_toolbar-item_list">
-			<li><a href="[list_url]">[list_title]</a></li>
+			<li><a href="[list_url]"><span>&nbsp;</span>[list_title]</a></li>
 		</ul>
-	</form>
+	</div>
 	
 	<!-- item: html - login -->
 	<form action="" method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
@@ -206,9 +242,11 @@ jQuery(document).ready(function ($) {
 //]]>
 </script>
 
+<!--
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.cookie.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/tools.js"></script>
+-->
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.pack.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script> 
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script> 
@@ -313,121 +351,9 @@ jQuery(document).ready(function ($) {
     //]]>
 </script>
 
-<div id="cms_toolbar_mini">
-    <a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
-</div>
-<div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
-    <div id="cms_toolbar_col1">
-        <!-- implemented <a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a> -->
-        {% if auth %}
-<!-- IMPLEMENTED
-            <div id="cms_toolbar_editmode_toggle">
-                <span>{% trans "Edit mode" %}</span>
-                <a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
-            </div>
-            {% if page.last_page_states %}
-            <div id="cms_toolbar_statusbar">
-                <div>
-                    <span>{% trans "Status" %}:</span>
-                    <em>
-                        {% for state in page.last_page_states %}                    
-                            {{ state.get_action_display }}    
-                        {% endfor %}                
-                    </em>
-                </div>
-            </div>        
-            {% endif %}
--->
-        {% else %}
-<!-- IMPLEMENTED
-        <form method="post" action="" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
-            <label>{% trans "Username" %}</label>
-            <input type="text" name="cms_username" class="cms_textinput"></input>
-            <label>{% trans "Password" %}</label>
-            <input type="password" name="cms_password" class="cms_textinput"></input>
-            <input type="submit" name="submit" value="{% trans "login" %}" class="cms_submit"></input>
-            <a href="#" class="cms_toolbar_button"><span>{% trans "login" %}</span></a>        
-        </form>
--->
-        {% endif %}    
-    </div>
-    <div id="cms_toolbar_col2">
-        
-        {% if edit and page %}
-        {% if auth and moderator %}
-            {% if moderator_should_approve and has_moderate_permission %}
-            <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">
-                <span class="state">{{ page_moderator_state.label }}</span>
-            </a>
-            {% else %}
-                {% if has_publish_permission %}
-                <a id="cms_toolbar_publishbutton" href="{% url admin:cms_page_publish_page page.pk %}" class="button blue" title="{% trans 'Publish' %}">
-                    <span class="state">Publish</span>
-                </a>
-                {% else %}
-                    <a id="cms_toolbar_requestapproval" href="{% url admin:cms_page_approve_page page.pk %}" class="button blue" title="{% trans 'Request Approval' %}">
-                        <span class="state">Request Approval</span>
-                    </a>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-        {% endif %}
-        <!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
-        
-        {% if auth and has_change_permission %}
-        <div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_template_menu" class="cms_toolbar_submenu">
-                {% for template in templates %}
-                <li class="{% ifequal template.0 page.template %}selected {% endifequal %}{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}"><a href="#{{ template.0 }}">{{ template.1 }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-        
-        {% if auth %}
-        <div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Page" %}</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_page_menu" class="cms_toolbar_submenu">                
-                <li class="first"><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
-                {% if has_add_page_permission %}
-                <li><a href="{% url admin:cms_page_add %}?target={{ page.pk }}&amp;position=last-child"><span class="cms_toolbar_icon_add_child">{% trans "add child" %}</span>{% trans "Add child page" %}</a></li>
-                <li><a href="{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&amp;position=last-child{% endif %}"><span class="cms_toolbar_icon_add_sibling">{% trans "add sibling" %}</span>{% trans "Add sibling page" %}</a></li>
-                {% endif %}
-                {% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
-            </ul>
-        </div>
-        {% endif %}
-        <!-- IMPLEMENTED
-        <div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">                
-                <li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">{% trans "edit" %}</span>{% trans "Site Administration" %}</a></li>
-                {% if auth %}
-                
-                {% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
-                <!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
-                <!--<li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
-                {% endif %}
-                
-                {% endif %}
-            </ul>
-        </div>-->
-        -->
-        {% if auth %}
-        <!-- IMPLEMENTED
-        <form method="post" action="" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
-            <fieldset>
-            <input type="submit" name="logout_submit" value="{% trans "Logout" %}" class="cms_submit" />
-            <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
-            </fieldset>
-        </form>
-        -->
-        {% endif %}
-        <!-- IMPLEMENTED
-        <a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
-    	-->
-    </div>
 
-</div>
-<div id="cms_toolbar_spacer">&nbsp;</div>
+
+
 
 <div id="cms_plugin_overlay">
     <div class="cms_toolbar_plugintools cms_toolbar">

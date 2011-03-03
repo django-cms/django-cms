@@ -5,10 +5,9 @@
  * @extends		base.css
  */
 
-#cms_toolbar { margin-top:100px !important; top:100px !important; }
 /*##################################################|*/
 /* #TOOLBAR# */
-#cms_toolbar-wrapper { position:fixed; left:0; top:0; z-index:99999; width:100%; } /* needs ie fix for pos fixed */
+#cms_toolbar { position:fixed; left:0; top:0; z-index:99999; width:100%; } /* needs ie fix for pos fixed */
 #cms_toolbar-toolbar { width:100%; height:42px; border-bottom:1px solid #ddd !important;
 	position:relative; left:0; top:0; z-index:999999; min-width:960px;
 	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
@@ -17,18 +16,48 @@
 .cms_toolbar-right { float:right; padding-right:48px !important; }
 
 /* #TOOLBAR/reset# */
-#cms_toolbar-wrapper div,
-#cms_toolbar-wrapper a, #cms_toolbar-wrapper form, #cms_toolbar-wrapper fieldset, #cms_toolbar-wrapper label, #cms_toolbar-wrapper input,
-#cms_toolbar-wrapper textarea, #cms_toolbar-wrapper select {
+#cms_toolbar div, #cms_toolbar p, #cms_toolbar a, #cms_toolbar a:hover, #cms_toolbar a:active, #cms_toolbar a:focus, 
+#cms_toolbar form, #cms_toolbar fieldset, #cms_toolbar label, #cms_toolbar input, #cms_toolbar textarea, #cms_toolbar select {
 	font:normal 13px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif; color:#666; font-weight:normal; text-decoration:none;
-	border:none; padding:0; margin:0; }
+	text-align:left; border:none; padding:0; margin:0; }
 
 /* #TOOLBAR/toggle# */
-#cms_toolbar-toggle { cursor:pointer; position:absolute; right:10px; top:0; z-index:9999999; padding-top:8px !important; }
+#cms_toolbar-toggle { cursor:pointer; position:absolute; width:20px; right:18px; top:0; z-index:9999999; padding-top:8px !important; }
 
 /* #TOOLBAR/toggle# */
 #cms_toolbar-dim { display:none; position:absolute; left:0; top:0; z-index:99999; background:#000; width:100%; height:100%; opacity:0.6; }
 
+/* #TOOLBAR/buttons# */
+.cms_toolbar-btn_left { color:#5b80b2; float:left; height:26px; overflow:hidden;
+	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -42px; }
+.cms_toolbar-btn_right { float:left; color:#5b80b2 !important; cursor:pointer;
+	padding:4px 8px 4px !important; margin-right:0 !important;
+	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat right -68px; }
+.cms_toolbar-btn_left:hover, .cms_toolbar-btn-active { background-position:left -94px !important; }
+.cms_toolbar-btn_right:hover, .cms_toolbar-btn-active .cms_toolbar-btn_right { color:#385e92 !important; background-position:right -120px !important; }
+
+.cms_toolbar_icon { float:left; text-indent:-1000px; overflow:hidden; background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left top; }
+.cms_toolbar_icon-hide { display:none; float:left; text-indent:-1000px; overflow:hidden; }
+
+/* #TOOLBAR/buttons/icons# */
+.cms_toolbar_icon-toggle .cms_toolbar_icon { width:12px; background-position:-3px -149px; }
+.cms_toolbar_icon-toggle:hover .cms_toolbar_icon { background-position:-3px -175px; }
+.cms_toolbar-collapsed .cms_toolbar_icon-toggle .cms_toolbar_icon { background-position:-21px -149px; }
+.cms_toolbar-collapsed .cms_toolbar_icon-toggle:hover .cms_toolbar_icon { background-position:-21px -175px; }
+
+.cms_toolbar_icon-edit .cms_toolbar_icon { width:12px; background-position:-111px -150px; }
+.cms_toolbar_icon-edit:hover .cms_toolbar_icon { background-position:-111px -176px; }
+
+.cms_toolbar_icon-lock .cms_toolbar_icon { width:14px; background-position:-37px -150px; }
+.cms_toolbar_icon-lock:hover .cms_toolbar_icon { background-position:-37px -176px; }
+
+.cms_toolbar_icon-settings .cms_toolbar_icon { width:17px; background-position:-92px -150px; }
+.cms_toolbar_icon-settings:hover .cms_toolbar_icon { background-position:-92px -176px; }
+
+.cms_toolbar-btn_right .cms_toolbar_icon-more { float:right; width:14px; text-indent:-1000px; overflow:hidden; background-position:-72px -149px; }
+.cms_toolbar-btn_right:hover .cms_toolbar_icon-more { background-position:-72px -175px; }
+
+/*##################################################|*/
 /* #TOOLBAR/items# */
 .cms_toolbar-item { float:left; display:none; padding:0 0 0 10px !important; position:relative; left:0; top:0; z-index:999; }
 .cms_toolbar-item_logout, .cms_toolbar-item_page, .cms_toolbar-item_admin, #cms_toolbar-item_login { padding-top:8px !important; }
@@ -50,54 +79,52 @@
 /* #TOOLBAR/items/switcher# */
 .cms_toolbar-item_switcher { padding-top:9px !important; }
 .cms_toolbar-item_switcher-label { float:left; padding-top:3px; padding-right:10px; }
-.cms_toolbar-item_switcher-link { float:left; width:80px; height:24px; text-indent:-1000px; overflow:hidden; outline:none; }
+.cms_toolbar-item_switcher-link { float:left; width:80px; height:24px; text-indent:-1000px; overflow:hidden; }
 .cms_toolbar-item_switcher-link span { float:left; width:80px; height:24px;
 	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;
 	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -198px; }
 
-/* #TOOLBAR/buttons# */
-.cms_toolbar-btn_left { color:#5b80b2; float:left; height:26px; overflow:hidden;
-	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -42px; }
-.cms_toolbar-btn_right { float:left; color:#5b80b2 !important; cursor:pointer;
-	padding:4px 8px 4px !important; margin-right:0 !important;
-	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat right -68px; }
-.cms_toolbar-btn_left:hover { background-position:left -94px; }
-.cms_toolbar-btn_right:hover { color:#385e92 !important; background-position:right -120px; }
+/* #TOOLBAR/items/custom# */
+.cms_toolbar-item_page .cms_toolbar-item_list li { min-width:300px; }
+.cms_toolbar-item_moderator { padding-top:8px !important; }
+.cms_toolbar-item_moderator a span { color:#f00 !important; }
 
-.cms_toolbar_icon { float:left; text-indent:-1000px; overflow:hidden; background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left top; }
-.cms_toolbar_icon-hide { float:left; text-indent:-1000px; overflow:hidden; }
+/* #TOOLBAR/list# */
+.cms_toolbar-item_list { display:none; list-style:none; padding:0; margin:0; position:absolute; top:35px; z-index:100; border:1px solid #ddd; background:#fff;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
+.cms_toolbar-left .cms_toolbar-item_list { left:0; }
+.cms_toolbar-right .cms_toolbar-item_list { right:0; }
+.cms_toolbar-item_list li { padding:0; zoom:1; min-width:200px; }
+.cms_toolbar-item_list li a { display:block; padding:4px 10px !important; zoom:1; white-space:nowrap; }
+.cms_toolbar-item_list li a span { float:left; text-indent:-1000px; overflow:hidden; }
+.cms_toolbar-item_list li a:hover { color:#fff !important; background:#5b80b2; }
+.cms_toolbar-item_list li:first-child a { -webkit-border-radius:4px 4px 0 0; -moz-border-radius:4px 4px 0 0; border-radius:4px 4px 0 0; }
+.cms_toolbar-item_list li:last-child a { -webkit-border-radius:0 0 4px 4px; -moz-border-radius:0 0 4px 4px; border-radius:0 0 4px 4px; }
+.cms_toolbar-item_list li:only-child a { -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; }
 
-.cms_toolbar_icon-toggle .cms_toolbar_icon { width:12px; background-position:-3px -149px; }
-.cms_toolbar_icon-toggle:hover .cms_toolbar_icon { background-position:-3px -175px; }
-.cms_toolbar-collapsed .cms_toolbar_icon-toggle .cms_toolbar_icon { background-position:-21px -149px; }
-.cms_toolbar-collapsed .cms_toolbar_icon-toggle:hover .cms_toolbar_icon { background-position:-21px -175px; }
+/* #TOOLBAR/list/icons# */
+.cms_toolbar-item_list .cms_toolbar_icon { width:18px; margin-right:4px; }
+.cms_toolbar-item_list .cms_toolbar_icon-admin { background-position:-92px -150px; }
+.cms_toolbar-item_list .cms_toolbar_icon-edit { background-position:-56px -149px; }
+.cms_toolbar-item_list .cms_toolbar_icon-delete { background-position:-164px -150px; }
+.cms_toolbar-item_list .cms_toolbar_icon-sitemap { background-position:-128px -150px; }
+.cms_toolbar-item_list .cms_toolbar_icon-history { background-position:-146px -149px; }
+.cms_toolbar-item_list .cms_toolbar_icon-child { background-position:-200px -149px; }
+.cms_toolbar-item_list .cms_toolbar_icon-sibling { background-position:-218px -149px; }
 
-.cms_toolbar_icon-edit .cms_toolbar_icon { width:12px; background-position:-57px -149px; }
-.cms_toolbar_icon-edit:hover .cms_toolbar_icon { background-position:-57px -175px; }
-
-.cms_toolbar_icon-lock .cms_toolbar_icon { width:14px; background-position:-37px -150px; }
-.cms_toolbar_icon-lock:hover .cms_toolbar_icon { background-position:-37px -176px; }
-
-.cms_toolbar_icon-settings .cms_toolbar_icon { width:17px; background-position:-92px -150px; }
-.cms_toolbar_icon-settings:hover .cms_toolbar_icon { background-position:-92px -176px; }
-
-.cms_toolbar-btn_right .cms_toolbar_icon-more { float:right; width:14px; text-indent:-1000px; overflow:hidden; background-position:-72px -149px; }
-.cms_toolbar-btn_right:hover .cms_toolbar_icon-more { background-position:-72px -175px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-admin { background-position:-92px -176px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-edit { background-position:-56px -175px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-delete { background-position:-164px -176px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-sitemap { background-position:-128px -176px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-history { background-position:-146px -175px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-child { background-position:-200px -175px; }
+.cms_toolbar-item_list a:hover .cms_toolbar_icon-sibling { background-position:-218px -175px; }
 
 /* #TOOLBAR/status# */
 .cms_toolbar-item_status { padding-top:8px !important; }
-.cms_toolbar-item_status p { color:#5b80b2; margin:0; padding:3px 10px; border:1px solid #ddd; background:#fff;
+.cms_toolbar-item_status p { color:#5b80b2 !important; margin:0; padding:3px 10px !important; border:1px solid #ddd !important; background:#fff;
 	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
 .cms_toolbar-item_status em { color:#000; }
-
-/* #TOOLBAR/list# */
-.cms_toolbar-item_list { list-style:none; padding:0; margin:0; position:absolute; right:0; top:35px; z-index:100; border:1px solid #ddd; background:#fff;
-	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; min-width:200px; }
-.cms_toolbar-item_list li { padding:0; zoom:1; }
-.cms_toolbar-item_list li a { display:block; padding:4px 10px !important; zoom:1; }
-
-
-
 
 
 
