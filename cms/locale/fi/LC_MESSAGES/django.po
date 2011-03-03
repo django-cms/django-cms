@@ -2,19 +2,19 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2011-02-07 07:20-0600\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-03 15:59-0600\n"
 "PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -65,8 +65,7 @@ msgid "Page Title"
 msgstr "Sivun otsikko"
 
 #: admin/forms.py:131
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Yliajaa selaimen ylälaidassa ja kirjanmerkeissä näytettävän tekstin"
 
 #: admin/forms.py:132
@@ -110,7 +109,7 @@ msgid "Invalid URL, use /my/url format."
 msgstr "Epäkelpo URL. Ole hyvä ja käytä muotoa /minun/url/"
 
 #: admin/forms.py:182 admin/forms.py:183 migrations/0001_initial.py:41
-#: models/permissionmodels.py:17
+#: models/moderatormodels.py:46 models/permissionmodels.py:17
 msgid "user"
 msgstr "käyttäjä"
 
@@ -131,7 +130,7 @@ msgid "Please select user or group first."
 msgstr "Valitse ensin käyttäjä tai käyttäjäryhmä."
 
 #: admin/forms.py:252 admin/forms.py:259 admin/forms.py:263
-#: templates/admin/cms/page/change_form.html:65
+#: templates/admin/cms/page/change_form.html:66
 #: templates/admin/cms/page/plugin_change_form.html:70
 msgid "Add"
 msgstr "Lisää"
@@ -188,101 +187,101 @@ msgstr "Oikeus luoda käyttäjiä vaatii oikeuden muokata käyttäjä!"
 msgid "To add permissions you also need to edit them!"
 msgstr "Luodaksesi käyttöoikeuksia sinun täytyy myös muokata niitä!"
 
-#: admin/pageadmin.py:123 admin/pageadmin.py:139
+#: admin/pageadmin.py:120 admin/pageadmin.py:136
 msgid "Hidden"
 msgstr "Piilotettu"
 
-#: admin/pageadmin.py:134
+#: admin/pageadmin.py:131
 msgid "Basic Settings"
 msgstr "Perusasetukset"
 
-#: admin/pageadmin.py:137
+#: admin/pageadmin.py:134
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna "
 "ensin."
 
-#: admin/pageadmin.py:143
+#: admin/pageadmin.py:140
 msgid "Advanced Settings"
 msgstr "Edistyneet asetukset"
 
-#: admin/pageadmin.py:152
+#: admin/pageadmin.py:149
 msgid "SEO Settings"
 msgstr "Hakukoneiden optimointiasetukset (SEO)"
 
-#: admin/pageadmin.py:504
+#: admin/pageadmin.py:501
 msgid "higher"
 msgstr "korkeammalle"
 
-#: admin/pageadmin.py:676
+#: admin/pageadmin.py:672
 msgid "Database error"
 msgstr "Tietokantavirhe"
 
-#: admin/pageadmin.py:768 migrations/0001_initial.py:13
+#: admin/pageadmin.py:764 migrations/0001_initial.py:13
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:40
 #: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
-#: models/pagemodel.py:99 models/permissionmodels.py:69
-#: models/titlemodels.py:21 plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: models/moderatormodels.py:45 models/pagemodel.py:99
+#: models/permissionmodels.py:69 models/titlemodels.py:21
+#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
 #: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
 #: plugins/picture/models.py:20 plugins/teaser/models.py:13
 msgid "page"
 msgstr "sivu"
 
-#: admin/pageadmin.py:896
+#: admin/pageadmin.py:892
 msgid "Page was successfully approved."
 msgstr "Sivu hyväksytty."
 
-#: admin/pageadmin.py:966
+#: admin/pageadmin.py:962
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Olio %(name)s perusavaimella %(key)r ei ole olemassa"
 
-#: admin/pageadmin.py:969
+#: admin/pageadmin.py:965
 msgid "There only exists one translation for this page"
 msgstr "Tälle sivulle on vain yksi käännös"
 
-#: admin/pageadmin.py:991
+#: admin/pageadmin.py:987
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Otsikko ja liitännäiset kielelle %(language)s poistettu"
 
-#: admin/pageadmin.py:1012
+#: admin/pageadmin.py:1008
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
-#: admin/pageadmin.py:1072
+#: admin/pageadmin.py:1068
 msgid "You do not have permission to publish this page"
 msgstr "Sinulla ei ole oikeutta julkaista tätä sivua"
 
-#: admin/pageadmin.py:1088
+#: admin/pageadmin.py:1084
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Sinulla ei ole oikeutta vaihtaa tämän sivun valikkonäkyvyyttä"
 
-#: admin/pageadmin.py:1133 admin/pageadmin.py:1167
-msgid "You do not have permission to change this page"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
-
-#: admin/pageadmin.py:1137 admin/pageadmin.py:1169
+#: admin/pageadmin.py:1142 admin/pageadmin.py:1174
 msgid "Language must be set to a supported language!"
 msgstr "Kielen tulee olla tuettu!"
 
-#: admin/pageadmin.py:1149
+#: admin/pageadmin.py:1154
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
-"Liitännäinen %(plugin_name)s lisätty sisältöpaikkaan  %(placeholder)s."
+msgstr "Liitännäinen %(plugin_name)s lisätty sisältöpaikkaan  %(placeholder)s."
 
-#: admin/pageadmin.py:1171
+#: admin/pageadmin.py:1172
+msgid "You do not have permission to change this page"
+msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+
+#: admin/pageadmin.py:1176
 msgid "Language must be different than the copied language!"
 msgstr "Kopioidun kielen tulee poiketa lähdekielestä!"
 
-#: admin/pageadmin.py:1179
+#: admin/pageadmin.py:1184
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 "Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
 
-#: admin/pageadmin.py:1260
+#: admin/pageadmin.py:1265
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
@@ -290,20 +289,20 @@ msgstr ""
 "Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa "
 "%(placeholder)s."
 
-#: admin/pageadmin.py:1318
+#: admin/pageadmin.py:1323
 msgid "Plugins where moved"
 msgstr "Liitännäisiä siirrettiin"
 
-#: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
+#: admin/pageadmin.py:1350 admin/placeholderadmin.py:275
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
-"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta"
-" %(placeholder)s."
+"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta "
+"%(placeholder)s."
 
-#: admin/permissionadmin.py:114 models/permissionmodels.py:75
+#: admin/permissionadmin.py:114
 msgid "Page permissions"
 msgstr "Sivun oikeudet"
 
@@ -323,7 +322,7 @@ msgstr "Käyttäjätiedot"
 msgid "Groups"
 msgstr "Ryhmät"
 
-#: admin/useradmin.py:34 templates/cms/toolbar/toolbar.html:155
+#: admin/useradmin.py:34 templates/cms/toolbar/toolbar.html:156
 msgid "Password"
 msgstr "Salasana"
 
@@ -347,7 +346,7 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:173
+#: forms/widgets.py:174
 msgid "Add Another"
 msgstr "Lisää uusi"
 
@@ -514,17 +513,6 @@ msgstr "Sivun jälkeläiset"
 msgid "Page and descendants"
 msgstr "Sivu ja jälkeläiset"
 
-#: models/moderatormodels.py:45 templates/admin/cms/page/permissions.html:5
-#: templates/cms/toolbar/toolbar.html:193
-msgid "Page"
-msgstr "Sivu"
-
-#: models/moderatormodels.py:46
-#: templates/admin/cms/page/moderation_messages.html:6
-#: templates/admin/cms/page/permissions.html:6
-msgid "User"
-msgstr "Käyttäjä"
-
 #: models/moderatormodels.py:50 templatetags/cms_admin.py:85
 msgid "Moderate page"
 msgstr "Moderoi sivua"
@@ -537,9 +525,15 @@ msgstr "Moderoi sivun lapsia"
 msgid "Moderate descendants"
 msgstr "Moderoi sivun jälkeläisiä"
 
-#: models/moderatormodels.py:55 models/moderatormodels.py:56
-msgid "PageModerator"
+#: models/moderatormodels.py:55
+#, fuzzy
+msgid "page moderator"
 msgstr "Sivumoderaattori"
+
+#: models/moderatormodels.py:56
+#, fuzzy
+msgid "page moderators"
+msgstr "Sivun moderointitila"
 
 #: models/moderatormodels.py:98
 msgid "created"
@@ -570,11 +564,13 @@ msgid "approved"
 msgstr "hyväksytty"
 
 #: models/moderatormodels.py:116
-msgid "Page moderator state"
+#, fuzzy
+msgid "page moderator state"
 msgstr "Sivun moderointitila"
 
 #: models/moderatormodels.py:117
-msgid "Page moderator states"
+#, fuzzy
+msgid "page moderator states"
 msgstr "Sivun moderointitilat"
 
 #: models/pagemodel.py:43
@@ -582,8 +578,8 @@ msgid "req. app."
 msgstr "Hyväksyntäpyyntö"
 
 #: models/pagemodel.py:44 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:200
-#: templates/cms/toolbar/toolbar.html:239 utils/moderator.py:90
+#: templates/cms/toolbar/toolbar.html:201
+#: templates/cms/toolbar/toolbar.html:240 utils/moderator.py:90
 msgid "delete"
 msgstr "poista"
 
@@ -671,7 +667,7 @@ msgstr "sivut"
 msgid "Page was copied."
 msgstr "Sivu kopioitiin."
 
-#: models/pagemodel.py:712
+#: models/pagemodel.py:704
 msgid "default"
 msgstr "oletus"
 
@@ -722,11 +718,13 @@ msgid "sites"
 msgstr "sivustot"
 
 #: models/permissionmodels.py:58
-msgid "Page global permission"
+#, fuzzy
+msgid "page global permission"
 msgstr "Sivun globaali käyttöoikeus"
 
 #: models/permissionmodels.py:59
-msgid "Pages global permissions"
+#, fuzzy
+msgid "page global permissions"
 msgstr "Sivujen globaalit käyttöoikeudet"
 
 #: models/permissionmodels.py:68 templates/admin/cms/page/permissions.html:14
@@ -734,23 +732,33 @@ msgid "Grant on"
 msgstr "Myönnä oikeus"
 
 #: models/permissionmodels.py:74
-msgid "Page permission"
+#, fuzzy
+msgid "page permission"
 msgstr "Sivun käyttöoikeus"
 
+#: models/permissionmodels.py:75
+#, fuzzy
+msgid "page permissions"
+msgstr "Sivun oikeudet"
+
 #: models/permissionmodels.py:88
-msgid "User (page)"
+#, fuzzy
+msgid "user (page)"
 msgstr "Käyttäjä (sivu)"
 
 #: models/permissionmodels.py:89
-msgid "Users (page)"
+#, fuzzy
+msgid "users (page)"
 msgstr "Käyttäjät (sivu)"
 
 #: models/permissionmodels.py:101
-msgid "User group (page)"
+#, fuzzy
+msgid "user group (page)"
 msgstr "Käyttäjäryhmä (sivu)"
 
 #: models/permissionmodels.py:102
-msgid "User groups (page)"
+#, fuzzy
+msgid "user groups (page)"
 msgstr "Käyttäjäryhmät (sivu)"
 
 #: models/placeholdermodel.py:12 plugins/flash/models.py:9
@@ -954,8 +962,7 @@ msgstr "laajempi kuvaus kuvasta"
 msgid "side"
 msgstr "sivu"
 
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
-#: plugins/snippet/models.py:32
+#: plugins/snippet/cms_plugins.py:12
 msgid "Snippet"
 msgstr "Snippet"
 
@@ -975,8 +982,14 @@ msgstr ""
 "Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan "
 "ruudulle."
 
+#: plugins/snippet/models.py:24 plugins/snippet/models.py:32
+#, fuzzy
+msgid "snippet"
+msgstr "Snippet"
+
 #: plugins/snippet/models.py:25
-msgid "Snippets"
+#, fuzzy
+msgid "snippets"
 msgstr "Snippet"
 
 #: plugins/teaser/cms_plugins.py:8
@@ -1113,8 +1126,8 @@ msgid ""
 "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
 "kpo"
 msgstr ""
-"Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?"
+"v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1177,14 +1190,14 @@ msgstr "napin korostusväri"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid ""
-"Missing flash plugin. Download <a "
-"href=\"http://adobe.com/flashplayer\">here</a>"
+"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
+"\">here</a>"
 msgstr ""
 "Flash-laajennus puuttuu. <a href=\"http://adobe.com/flashplayer\">Lataa "
 "tästä</a>."
 
 #: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:273
+#: templates/admin/cms/page/change_form.html:274
 #: templates/admin/cms/page/plugin_change_form.html:112
 msgid "Save"
 msgstr "Tallenna"
@@ -1203,12 +1216,11 @@ msgid "Save and add another"
 msgstr "Tallenna ja lisää uusi"
 
 #: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:274
+#: templates/admin/cms/page/change_form.html:275
 msgid "Save and continue editing"
 msgstr "Tallenna ja jatka muokkausta"
 
 #: templates/admin/cms/mail/approvement_required.html:5
-#: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
@@ -1217,7 +1229,6 @@ msgstr ""
 "hyväksyntää."
 
 #: templates/admin/cms/mail/approvement_required.html:8
-#: templates/admin/cms/mail/approvement_required.txt:7
 msgid "Last changes"
 msgstr "Viime muutokset"
 
@@ -1226,18 +1237,11 @@ msgstr "Viime muutokset"
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
 msgstr "<a href=\"%(login_url)s\">Kirjaudu</a> hallintapaneeliin."
 
-#: templates/admin/cms/mail/base.txt:8
-#, python-format
-msgid "Login url: %(login_url)s"
-msgstr ""
-
 #: templates/admin/cms/mail/page_user_change.html:7
-#: templates/admin/cms/mail/page_user_change.txt:5
 msgid "Username:"
 msgstr "Käyttäjänimi:"
 
 #: templates/admin/cms/mail/page_user_change.html:11
-#: templates/admin/cms/mail/page_user_change.txt:6
 msgid "Password:"
 msgstr "Salasana:"
 
@@ -1247,7 +1251,7 @@ msgstr "Salasana:"
 msgid "Change a page"
 msgstr "Muuta sivua"
 
-#: templates/admin/cms/page/change_form.html:62
+#: templates/admin/cms/page/change_form.html:63
 #: templates/admin/cms/page/change_list.html:8
 #: templates/admin/cms/page/plugin_change_form.html:67
 #: templates/admin/cms/page/recover_form.html:14
@@ -1255,72 +1259,72 @@ msgstr "Muuta sivua"
 msgid "Home"
 msgstr "Koti"
 
-#: templates/admin/cms/page/change_form.html:71
+#: templates/admin/cms/page/change_form.html:72
 msgid "Approve page deletion"
 msgstr "Hyväksy sivun poisto"
 
-#: templates/admin/cms/page/change_form.html:77
+#: templates/admin/cms/page/change_form.html:78
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
 msgstr "(vaatii hyväksynnän moderointitasolla %(moderation_level)s)"
 
-#: templates/admin/cms/page/change_form.html:78
+#: templates/admin/cms/page/change_form.html:79
 msgid "(you can perform actions on this page directly)"
 msgstr "(voit suorittaa toimintoja suoraan tällä sivulla)"
 
-#: templates/admin/cms/page/change_form.html:91
+#: templates/admin/cms/page/change_form.html:92
 msgid "Remove delete request"
 msgstr "Hylkää poistopyyntö"
 
-#: templates/admin/cms/page/change_form.html:93
+#: templates/admin/cms/page/change_form.html:94
 msgid "Approve delete"
 msgstr "Hyväksy poisto"
 
-#: templates/admin/cms/page/change_form.html:93
+#: templates/admin/cms/page/change_form.html:94
 msgid "Approve"
 msgstr "Hyväksy"
 
-#: templates/admin/cms/page/change_form.html:93
 #: templates/admin/cms/page/change_form.html:94
+#: templates/admin/cms/page/change_form.html:95
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "draft"
 msgstr "vedos"
 
-#: templates/admin/cms/page/change_form.html:94
+#: templates/admin/cms/page/change_form.html:95
 msgid "Preview"
 msgstr "Esikatselu"
 
-#: templates/admin/cms/page/change_form.html:97
+#: templates/admin/cms/page/change_form.html:98
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
 msgstr "Historia"
 
-#: templates/admin/cms/page/change_form.html:98
+#: templates/admin/cms/page/change_form.html:99
 msgid "View on site"
 msgstr "Näytä sivustolla"
 
-#: templates/admin/cms/page/change_form.html:128
+#: templates/admin/cms/page/change_form.html:129
 #: templates/admin/cms/page/plugin_change_form.html:84
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Korjaa allaoleva virhe."
 msgstr[1] "Korjaa allaolevat virheet."
 
-#: templates/admin/cms/page/change_form.html:148
+#: templates/admin/cms/page/change_form.html:149
 msgid "All permissions"
 msgstr "Kaikki oikeudet"
 
-#: templates/admin/cms/page/change_form.html:149
-#: templates/admin/cms/page/change_form.html:161
+#: templates/admin/cms/page/change_form.html:150
+#: templates/admin/cms/page/change_form.html:162
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
 msgstr "Ladataan…"
 
-#: templates/admin/cms/page/change_form.html:160
+#: templates/admin/cms/page/change_form.html:161
 msgid "Page states"
 msgstr "Sivun tilat"
 
-#: templates/admin/cms/page/change_form.html:183
+#: templates/admin/cms/page/change_form.html:184
 #, python-format
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
@@ -1329,7 +1333,7 @@ msgstr ""
 "Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti "
 "moderaattorille."
 
-#: templates/admin/cms/page/change_form.html:185
+#: templates/admin/cms/page/change_form.html:186
 msgid "Request approvemet"
 msgstr "Hyväksy pyyntö"
 
@@ -1337,41 +1341,41 @@ msgstr "Hyväksy pyyntö"
 msgid "List of pages"
 msgstr "Sivulistaus"
 
-#: templates/admin/cms/page/change_list.html:56
+#: templates/admin/cms/page/change_list.html:57
 msgid "Successfully moved"
 msgstr "Siirretty onnistuneesti"
 
-#: templates/admin/cms/page/change_list.html:61
+#: templates/admin/cms/page/change_list.html:62
 msgid "An error occured. Please reload the page"
 msgstr "Virhe tapahtui. Ole hyvä ja lataa sivu uudestaan."
 
-#: templates/admin/cms/page/change_list.html:82
+#: templates/admin/cms/page/change_list.html:83
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "Palauta poistetut %(name)s"
 
-#: templates/admin/cms/page/change_list.html:85
+#: templates/admin/cms/page/change_list.html:86
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lisää %(name)s"
 
-#: templates/admin/cms/page/change_list.html:97
+#: templates/admin/cms/page/change_list.html:98
 msgid "Pages on:"
 msgstr "Sivut:"
 
-#: templates/admin/cms/page/change_list.html:114
+#: templates/admin/cms/page/change_list.html:115
 msgid "Filter:"
 msgstr "Rajaus:"
 
-#: templates/admin/cms/page/change_list.html:114
+#: templates/admin/cms/page/change_list.html:115
 msgid "on"
 msgstr "päällä"
 
-#: templates/admin/cms/page/change_list.html:114
+#: templates/admin/cms/page/change_list.html:115
 msgid "off"
 msgstr "pois"
 
-#: templates/admin/cms/page/change_list.html:116
+#: templates/admin/cms/page/change_list.html:117
 msgid "Filter"
 msgstr "Rajaus"
 
@@ -1409,8 +1413,8 @@ msgid "edit this page"
 msgstr "muokkaa tätä sivua"
 
 #: templates/admin/cms/page/menu_item.html:6
-#: templates/cms/toolbar/toolbar.html:206
-#: templates/cms/toolbar/toolbar.html:232
+#: templates/cms/toolbar/toolbar.html:207
+#: templates/cms/toolbar/toolbar.html:233
 msgid "edit"
 msgstr "muokkaa"
 
@@ -1466,7 +1470,7 @@ msgid "add"
 msgstr "lisää"
 
 #: templates/admin/cms/page/menu_item.html:65
-#: templates/cms/toolbar/toolbar.html:166
+#: templates/cms/toolbar/toolbar.html:167
 msgid "Approve directly"
 msgstr "Hyväksy suoraan"
 
@@ -1481,7 +1485,7 @@ msgid "Unpublish"
 msgstr "Piilota"
 
 #: templates/admin/cms/page/menu_item.html:73
-#: templates/cms/toolbar/toolbar.html:171
+#: templates/cms/toolbar/toolbar.html:172
 msgid "Publish"
 msgstr "Julkaise"
 
@@ -1497,9 +1501,19 @@ msgstr "Toiminta"
 msgid "Created"
 msgstr "Luotu"
 
+#: templates/admin/cms/page/moderation_messages.html:6
+#: templates/admin/cms/page/permissions.html:6
+msgid "User"
+msgstr "Käyttäjä"
+
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
 msgstr "Viesti"
+
+#: templates/admin/cms/page/permissions.html:5
+#: templates/cms/toolbar/toolbar.html:194
+msgid "Page"
+msgstr "Sivu"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
@@ -1615,110 +1629,110 @@ msgstr ""
 msgid "Available plugins"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:33
+#: templates/cms/toolbar/toolbar.html:34
 #, python-format
 msgid "Move to %(name)s"
 msgstr "Siirrä kohtaan %(name)s"
 
-#: templates/cms/toolbar/toolbar.html:34
+#: templates/cms/toolbar/toolbar.html:35
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Haluatko varmasti poistaa tämän liitännäisen?"
 
-#: templates/cms/toolbar/toolbar.html:136
+#: templates/cms/toolbar/toolbar.html:137
 msgid "Edit mode"
 msgstr "Muokkaustila"
 
-#: templates/cms/toolbar/toolbar.html:142
+#: templates/cms/toolbar/toolbar.html:143
 msgid "Status"
 msgstr "Tila"
 
-#: templates/cms/toolbar/toolbar.html:153
+#: templates/cms/toolbar/toolbar.html:154
 msgid "Username"
 msgstr "Käyttäjänimi"
 
-#: templates/cms/toolbar/toolbar.html:157
 #: templates/cms/toolbar/toolbar.html:158
+#: templates/cms/toolbar/toolbar.html:159
 msgid "login"
 msgstr "kirjaudu sisään"
 
-#: templates/cms/toolbar/toolbar.html:175
+#: templates/cms/toolbar/toolbar.html:176
 msgid "Request Approval"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:184
+#: templates/cms/toolbar/toolbar.html:185
 msgid "Template"
 msgstr "Asettelutiedosto"
 
-#: templates/cms/toolbar/toolbar.html:195
+#: templates/cms/toolbar/toolbar.html:196
 msgid "move"
 msgstr "siirrä"
 
-#: templates/cms/toolbar/toolbar.html:195
+#: templates/cms/toolbar/toolbar.html:196
 msgid "Move/add Pages"
 msgstr "Siirrä/lisää sivuja"
 
-#: templates/cms/toolbar/toolbar.html:197
+#: templates/cms/toolbar/toolbar.html:198
 msgid "add child"
 msgstr "lisää lapsi"
 
-#: templates/cms/toolbar/toolbar.html:197
+#: templates/cms/toolbar/toolbar.html:198
 msgid "Add child page"
 msgstr "lisää lapsisivu"
 
-#: templates/cms/toolbar/toolbar.html:198
+#: templates/cms/toolbar/toolbar.html:199
 msgid "add sibling"
 msgstr "lisää sisar"
 
-#: templates/cms/toolbar/toolbar.html:198
+#: templates/cms/toolbar/toolbar.html:199
 msgid "Add sibling page"
 msgstr "Lisää sisarsivu"
 
-#: templates/cms/toolbar/toolbar.html:200
+#: templates/cms/toolbar/toolbar.html:201
 msgid "Delete Page"
 msgstr "Poista sivu"
 
-#: templates/cms/toolbar/toolbar.html:206
+#: templates/cms/toolbar/toolbar.html:207
 msgid "Site Administration"
 msgstr "Sivuston hallinta"
 
-#: templates/cms/toolbar/toolbar.html:208
+#: templates/cms/toolbar/toolbar.html:209
 msgid "Page Settings"
 msgstr "Sivun asetukset"
 
-#: templates/cms/toolbar/toolbar.html:210
+#: templates/cms/toolbar/toolbar.html:211
 msgid "history"
 msgstr "historia"
 
-#: templates/cms/toolbar/toolbar.html:210
+#: templates/cms/toolbar/toolbar.html:211
 msgid "View History"
 msgstr "Näytä historia"
 
-#: templates/cms/toolbar/toolbar.html:218
 #: templates/cms/toolbar/toolbar.html:219
+#: templates/cms/toolbar/toolbar.html:220
 msgid "Logout"
 msgstr "Kirjaudu ulos"
 
-#: templates/cms/toolbar/toolbar.html:219
+#: templates/cms/toolbar/toolbar.html:220
 msgid "Lock"
 msgstr "Lukitse"
 
-#: templates/cms/toolbar/toolbar.html:223
+#: templates/cms/toolbar/toolbar.html:224
 msgid "Close"
 msgstr "Sulje"
 
-#: templates/cms/toolbar/toolbar.html:234
+#: templates/cms/toolbar/toolbar.html:235
 msgid "up"
 msgstr "ylös"
 
-#: templates/cms/toolbar/toolbar.html:235
+#: templates/cms/toolbar/toolbar.html:236
 msgid "down"
 msgstr "alas"
 
-#: templates/cms/toolbar/toolbar.html:237
+#: templates/cms/toolbar/toolbar.html:238
 msgid "Settings"
 msgstr "Asetukset"
 
-#: templates/cms/toolbar/toolbar.html:239
+#: templates/cms/toolbar/toolbar.html:240
 msgid "Delete Plugin"
 msgstr "Poista liitännäinen"
 
@@ -1742,84 +1756,9 @@ msgstr ""
 #: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-
-#: test/run_tests.py:137 test/project/settings.py:116
-msgid "English"
-msgstr ""
-
-#: test/run_tests.py:138 test/project/settings.py:117
-msgid "French"
-msgstr ""
-
-#: test/run_tests.py:139 test/project/settings.py:118
-msgid "German"
-msgstr ""
-
-#: test/run_tests.py:140 test/project/settings.py:119
-msgid "Brazil"
-msgstr ""
-
-#: test/run_tests.py:141 test/project/settings.py:120
-msgid "Dutch"
-msgstr ""
-
-#: test/run_tests.py:158 test/project/settings.py:137
-msgid "two columns"
-msgstr ""
-
-#: test/run_tests.py:159 test/project/settings.py:138
-msgid "three columns"
-msgstr ""
-
-#: test/run_tests.py:160 test/project/settings.py:139
-msgid "navigation examples"
-msgstr ""
-
-#: test/run_tests.py:167 test/project/settings.py:148
-msgid "sidebar column"
-msgstr ""
-
-#: test/run_tests.py:173 test/project/settings.py:154
-msgid "left column"
-msgstr ""
-
-#: test/run_tests.py:179 test/project/settings.py:160
-msgid "right column"
-msgstr ""
-
-#: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
-msgid "Articles"
-msgstr ""
-
-#: test/apps/sampleapp/cms_app.py:7
-msgid "Sample App"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:17
-msgid "sample root page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:18
-msgid "sample settings page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:19
-msgid "sample account page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:20
-msgid "sample my profile page"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:32
-msgid "Static Menu"
-msgstr ""
-
-#: test/apps/sampleapp/menu.py:48
-msgid "Static Menu2"
 msgstr ""
 
 #: utils/moderator.py:83
