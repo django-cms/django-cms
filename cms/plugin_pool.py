@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
+from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
 
 class PluginPool(object):
     def __init__(self):
@@ -16,11 +16,7 @@ class PluginPool(object):
         if self.discovered:
             return
         self.discovered = True
-        for app in settings.INSTALLED_APPS:
-            try:
-                import_module('.cms_plugins', app)
-            except ImportError:
-                pass
+        load('cms_plugins')
 
     def register_plugin(self, plugin):
         """

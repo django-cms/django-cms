@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import AppAllreadyRegistered
+from cms.utils.django_load import load, iterload_objects
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
 
 class ApphookPool(object):
     def __init__(self):
@@ -15,26 +15,14 @@ class ApphookPool(object):
             return
         #import all the modules
         if settings.CMS_APPHOOKS:
-            
-            for app in settings.CMS_APPHOOKS:
-                self.block_register = True
-                path = ".".join(app.split(".")[:-1])
-                class_name = app.split(".")[-1]
-                module = import_module(path)
-                cls = getattr(module, class_name, None)
-                if cls is None:
-                    raise ImproperlyConfigured(
-                        "Cannot find class %s" % app
-                    )
+            self.block_register = True
+            for cls in iterload_objects(settings.CMS_APPHOOKS):
                 self.block_register = False
                 self.register(cls)
+                self.block_register = True
+            self.block_register = False
         else:
-            for app in settings.INSTALLED_APPS:
-                cms_app = '%s.cms_app' % app
-                try:
-                    import_module(cms_app)
-                except ImportError:
-                    pass
+            load('cms_app')
         self.discovered = True
         
     def clear(self):
