@@ -18,6 +18,7 @@ Getting Started
     :numbered:
 
     getting_started/installation
+    upgrade/index
     getting_started/tutorial
     getting_started/using_south
     getting_started/configuration

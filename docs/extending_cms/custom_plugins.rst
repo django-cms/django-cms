@@ -240,6 +240,7 @@ Note: If you want to overwrite the form be sure to extend from
 ``admin/cms/page/plugin_change_form.html`` to have an unified look across the
 plugins and to have the preview functionality automatically installed.
 
+.. _customp-plugins-handling-media:
 
 Handling media
 ==============
