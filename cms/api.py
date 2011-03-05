@@ -75,6 +75,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         if isinstance(apphook, CMSApp):
             application_urls = apphook.__name__
         elif isinstance(apphook, basestring):
+            apphook_pool.discover_apps()
             assert apphook in apphook_pool.apps
             application_urls = apphook
         else:
@@ -110,7 +111,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     assert limit_visibility_in_menu in (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
     
     # validate position
-    assert position in ('last-child', 'first-child', 'left', 'rigth')
+    assert position in ('last-child', 'first-child', 'left', 'right')
     
     page = Page(
         created_by=created_by,

@@ -77,7 +77,7 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertEqual(response['Location'], redirect_one)
         
         # test internal language neutral redirect
-        two = create_page("two", "nav_playground.html"," en", parent=one,
+        two = create_page("two", "nav_playground.html", "en", parent=one,
                           published=True, redirect=redirect_two)
         url = two.get_absolute_url()
         request = self.get_request(url)

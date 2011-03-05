@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 from cms.admin.forms import save_permissions
-from cms.models import Title, Page
+from cms.models import Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, PageUser
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
-from cms.test_utils.util.context_managers import UserLoginContext, SettingsOverride
-from cms.utils.permissions import _thread_locals
+from cms.test_utils.util.context_managers import (UserLoginContext, 
+    SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
+from django.db.models.signals import pre_save, post_save
 from django.template.context import Context
-from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool
 from urlparse import urlparse
@@ -73,7 +72,16 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 
 class CMSTestCase(TestCase):
     counter = 1
-        
+    
+    def _fixture_setup(self):
+        pre_save_receivers = pre_save.receivers
+        pre_save.receivers = []
+        post_save_receivers = post_save.receivers
+        post_save.receivers = []
+        super(CMSTestCase, self)._fixture_setup()
+        pre_save.receivers = pre_save_receivers
+        post_save.receivers = post_save_receivers
+            
     def _post_teardown(self):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
