@@ -211,6 +211,17 @@ class CMSPluginBase(admin.ModelAdmin):
         the plugin object in a text editor.
         """
         return "%s - %s" % (unicode(self.name), unicode(instance))
+
+    def get_plugin_urls(self):
+        """
+        Return URL patterns for which the plugin wants to register
+        views for.
+        """
+        return []
+
+    def plugin_urls(self):
+        return self.get_plugin_urls()
+    plugin_urls = property(plugin_urls)
     
     def __repr__(self):
         return smart_str(self.name)

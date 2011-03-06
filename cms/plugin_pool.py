@@ -3,7 +3,11 @@ from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import reversion_register
 from django.conf import settings
+from django.conf.urls.defaults import url, patterns, include
+from django.template.defaultfilters import slugify
+from django.utils.encoding import force_unicode
 from django.utils.importlib import import_module
+from django.utils.translation import get_language, deactivate_all, activate
 
 class PluginPool(object):
     def __init__(self):
@@ -95,7 +99,24 @@ class PluginPool(object):
         """
         self.discover_plugins()
         return self.plugins[name]
+    
+    def get_patterns(self):
+        # We want untranslated name of the plugin for its slug so we deactivate translation
+        lang = get_language()
+        deactivate_all()
 
+        url_patterns = []
+        for plugin in self.get_all_plugins():
+            p = plugin()
+            slug = slugify(force_unicode(p.name))
+            url_patterns += patterns('',
+                url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+            )
+        
+        # Reactivate translation
+        activate(lang)
+
+        return url_patterns
 
 plugin_pool = PluginPool()
 

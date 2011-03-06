@@ -201,6 +201,9 @@ class PageAdmin(model_admin):
             pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
+        if plugin_pool.get_all_plugins():
+            url_patterns += plugin_pool.get_patterns()
+
         url_patterns = url_patterns + super(PageAdmin, self).get_urls()
         return url_patterns
 
