@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.api import create_page, create_title, publish_page
+from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.middleware.multilingual import patch_response
 from cms.test_utils.testcases import CMSTestCase
 from django.contrib.auth.models import User
@@ -48,8 +48,8 @@ class MultilingualTestCase(CMSTestCase):
         page.rescan_placeholders()
         page = self.reload(page)
         placeholder = page.placeholders.all()[0]
-        self.add_plugin(placeholder=placeholder, language='de')
-        self.add_plugin(placeholder=placeholder, language='en')
+        add_plugin(placeholder, "TextPlugin", 'de', body="test")
+        add_plugin(placeholder, "TextPlugin", 'en', body="test")
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
         user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')

@@ -76,7 +76,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
     # validate and normalize apphook 
     if apphook:
-        if isinstance(apphook, CMSApp):
+        if hasattr(apphook, '__module__') and  issubclass(apphook, CMSApp):
             application_urls = apphook.__name__
         elif isinstance(apphook, basestring):
             apphook_pool.discover_apps()
@@ -175,7 +175,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         
     # validate and normalize apphook 
     if apphook:
-        if isinstance(apphook, CMSApp):
+        if hasattr(apphook, '__module__') and isinstance(apphook, CMSApp):
             application_urls = apphook.__name__
         elif isinstance(apphook, basestring):
             assert apphook in apphook_pool.apps
@@ -206,7 +206,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child', **data
     assert isinstance(placeholder, Placeholder)
     
     # validate and normalize plugin type
-    if issubclass(plugin_type, CMSPluginBase):
+    if hasattr(plugin_type, '__module__') and  issubclass(plugin_type, CMSPluginBase):
         plugin_type = plugin_type.__name__
         plugin_model = plugin_type.model
     elif isinstance(plugin_type, basestring):

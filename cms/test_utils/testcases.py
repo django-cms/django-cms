@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.admin.forms import save_permissions
-from cms.api import publish_page, approve_page
 from cms.models import Page
-from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission, PageUser
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugins.text.models import Text
 from cms.test_utils.util.context_managers import (UserLoginContext, 
     SettingsOverride)
 from django.conf import settings
@@ -27,9 +21,9 @@ URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
 URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 
 URL_CMS_PAGE_DELETE = URL_CMS_PAGE_CHANGE + "delete/" 
-URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
-URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
-URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE + "remove-plugin/"
+URL_CMS_PLUGIN_ADD = URL_CMS_PAGE_CHANGE + "add-plugin/"
+URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE_CHANGE + "edit-plugin/"
+URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE_CHANGE + "remove-plugin/"
 URL_CMS_TRANSLATION_DELETE = URL_CMS_PAGE_CHANGE + "delete-translation/"
 
 class _Warning(object):
@@ -237,104 +231,6 @@ class CMSTestCase(TestCase):
         request.LANGUAGE_CODE = language
         return request
     
-    def create_page_user(self, username, password=None, 
-        can_add_page=True, can_change_page=True, can_delete_page=True, 
-        can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, 
-        can_delete_pageuser=True, can_add_pagepermission=True, 
-        can_change_pagepermission=True, can_delete_pagepermission=True,
-        grant_all=False):
-        """
-        Helper function for creating page user, through form on:
-            /admin/cms/pageuser/add/
-            
-        Returns created user.
-        """
-        if grant_all:
-            return self.create_page_user(username, password, 
-                True, True, True, True, True, True, True, True, True, True)
-            
-        if password is None:
-            password=username
-        
-        data = {
-            'can_add_page': can_add_page, 
-            'can_change_page': can_change_page, 
-            'can_delete_page': can_delete_page, 
-            'can_recover_page': can_recover_page, 
-            'can_add_pageuser': can_add_pageuser, 
-            'can_change_pageuser': can_change_pageuser, 
-            'can_delete_pageuser': can_delete_pageuser, 
-            'can_add_pagepermission': can_add_pagepermission,
-            'can_change_pagepermission': can_change_pagepermission,
-            'can_delete_pagepermission': can_delete_pagepermission,
-        }
-        if hasattr(self, 'user'):
-            created_by = self.user
-        else:
-            created_by = User.objects.create_superuser('superuser', 'superuser@django-cms.org', 'superuser')
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User.objects.create_user(username, 'username@django-cms.org', password)
-            user.is_staff = True
-            user.is_active = True
-        page_user = PageUser(created_by=created_by)
-        for field in [f.name for f in User._meta.local_fields]:
-            setattr(page_user, field, getattr(user, field))
-        user.save()
-        page_user.save()
-        save_permissions(data, page_user)
-        return user
-        
-    def assign_user_to_page(self, page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
-        can_add=False, can_change=False, can_delete=False, 
-        can_change_advanced_settings=False, can_publish=False, 
-        can_change_permissions=False, can_move_page=False, can_moderate=False, 
-        grant_all=False):
-        """Assigns given user to page, and gives him requested permissions. 
-        
-        Note: this is not happening over frontend, maybe a test for this in 
-        future will be nice.
-        """
-        if grant_all:
-            return self.assign_user_to_page(page, user, grant_on, 
-                True, True, True, True, True, True, True, True)
-        
-        data = {
-            'can_add': can_add,
-            'can_change': can_change,
-            'can_delete': can_delete, 
-            'can_change_advanced_settings': can_change_advanced_settings,
-            'can_publish': can_publish, 
-            'can_change_permissions': can_change_permissions, 
-            'can_move_page': can_move_page, 
-            'can_moderate': can_moderate,  
-        }
-        
-        page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
-        page_permission.save()
-        return page_permission
-    
-    def add_plugin(self, user=None, page=None, placeholder=None, language='en', body=''):
-        if not placeholder:
-            if page:
-                placeholder = page.placeholders.get(slot__iexact='Right-Column')
-            else:
-                placeholder = page.placeholders.get(slot__iexact='Right-Column')
-            
-        plugin_base = CMSPlugin(
-            plugin_type='TextPlugin',
-            placeholder=placeholder, 
-            position=1, 
-            language=language
-        )
-        plugin_base.insert_at(None, position='last-child', save=False)
-                
-        plugin = Text(body=body)
-        plugin_base.set_base_attr(plugin)
-        plugin.save()
-        return plugin.pk
-    
     def check_published_page_attributes(self, page):
         public_page = page.publisher_public
         
@@ -367,7 +263,7 @@ class CMSTestCase(TestCase):
                 1 - moderate page
                 2 - moderate children
                 4 - moderate descendants
-                + conbinations
+                + combinations
         """
         response = self.client.post("/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
         self.assertEquals(response.status_code, 200)

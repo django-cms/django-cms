@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from cms.api import create_page, publish_page, approve_page
+from cms.api import create_page, publish_page, approve_page, add_plugin
 from cms.models import Page, CMSPlugin
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
-    SettingsOverrideTestCase)
+    SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD)
 from cms.utils.permissions import has_generic_permission
 from django.contrib.auth.models import User
 
@@ -48,6 +48,24 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         'master': 2,
         'slave': 3,
     }
+    
+    def _add_plugin(self, user, page):
+        """
+        Add a plugin using the test client to check for permissions.
+        """
+        with self.login_user_context(user):
+            placeholder = page.placeholders.all()[0]
+            post_data = {
+                'language': 'en',
+                'page_id': page.pk,
+                'placeholder': placeholder.pk,
+                'plugin_type': 'TextPlugin'
+            }
+            url = URL_CMS_PLUGIN_ADD % page.pk
+            response = self.client.post(url, post_data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.content.isdigit())
+            return response.content
 
     def test_01_super_can_add_page_to_root(self, status_code=200):
         self.login_user(User.objects.get(username='super'))
@@ -134,17 +152,17 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
     def test_07_super_can_add_plugin(self):
         user_super = User.objects.get(username='super')
         slave_page = Page.objects.get(pk=self.pages['slave'])
-        self.add_plugin(user_super, page=slave_page)
+        self._add_plugin(user_super, page=slave_page)
     
     def test_08_master_can_add_plugin(self):
         user_master = User.objects.get(username='master')
         slave_page = Page.objects.get(pk=self.pages['slave'])
-        self.add_plugin(user_master, page=slave_page)
+        self._add_plugin(user_master, page=slave_page)
     
     def test_09_slave_can_add_plugin(self):
         user_slave = User.objects.get(username='slave')
         slave_page = Page.objects.get(pk=self.pages['slave'])
-        self.add_plugin(user_slave, page=slave_page)
+        self._add_plugin(user_slave, page=slave_page)
     
     def test_10_same_order(self):
         user_master = User.objects.get(username='master')
@@ -337,7 +355,8 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         user_super = User.objects.get(username='super')
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
-        self.add_plugin(user_super, page)
+        placeholder = page.placeholders.all()[0]
+        add_plugin(placeholder, "TextPlugin", "en", body="test")
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         publish_page(page, user_super, True)
@@ -353,7 +372,8 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         
         # add plugin
-        plugin_id = self.add_plugin(user_slave, page)
+        placeholder = page.placeholders.all()[0]
+        plugin = add_plugin(placeholder, "TextPlugin", "en", body="test")
         
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
 
@@ -380,7 +400,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # login as slave and delete the plugin - should require moderation
         self.login_user(user_slave)
         plugin_data = {
-            'plugin_id': plugin_id
+            'plugin_id': plugin.pk
         }
         remove_url = URL_CMS_PLUGIN_REMOVE
         response = self.client.post(remove_url, plugin_data)
@@ -488,7 +508,6 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         pf = pages['pf']
         pg = pages['pg']
         ph = pages['ph']
-        user_slave = User.objects.get(username='slave')
         user_master = User.objects.get(username='master')
         pg = self.move_page(pg, pc)
         # We have to reload pe when using mptt >= 0.4.2, 
