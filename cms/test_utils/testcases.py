@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.admin.forms import save_permissions
+from cms.api import publish_page, approve_page
 from cms.models import Page
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, PageUser
@@ -333,44 +334,6 @@ class CMSTestCase(TestCase):
         plugin_base.set_base_attr(plugin)
         plugin.save()
         return plugin.pk
-    
-    def publish_page(self, page, approve=False, user=None, published_check=True):
-        if user:
-            self.login_user(user)
-        
-        if published_check and not approve:
-            # must have public object now
-            self.assertFalse(page.publisher_public)
-            self.assertFalse(page.published)
-            
-        # publish / approve page by master
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        self.assertEqual(response.status_code, 200)
-        
-        if not approve:
-            page = self.reload_page(page)
-            if published_check:
-                # must have public object now
-                self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)
-                # and public object must be published
-                self.assertTrue(page.publisher_public.published)
-            return page
-        
-        # approve
-        page = self.approve_page(page)
-        if published_check:
-            # must have public object now
-            self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)
-            # and public object must be published
-            self.assertTrue(page.publisher_public.published)
-        
-        return page
-    
-    def approve_page(self, page):
-        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        # reload page
-        return self.reload_page(page)
     
     def check_published_page_attributes(self, page):
         public_page = page.publisher_public

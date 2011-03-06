@@ -18,7 +18,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _, get_language, ugettext
+from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
 from os.path import join
 from cms.publisher.errors import MpttPublisherCantPublish

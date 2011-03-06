@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.api import create_page
+from cms.api import create_page, publish_page, approve_page
 from cms.models import Page, CMSPlugin
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
     SettingsOverrideTestCase)
@@ -99,17 +99,16 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertTrue(has_generic_permission(page.pk, user_slave, "publish", 1))
 
         # publish as slave, published as user_master before 
-        self.publish_page(page, False, user_slave, False)
+        publish_page(page, user_slave)
         
         # user_slave is moderator for this page
         # approve / publish as user_slave
         # user master should be able to approve aswell
-        page = self.approve_page(page)
+        page = approve_page(page, user_slave)
 
     def test_06_page_added_by_slave_can_be_published_approved_by_user_master(self):
         user_master = User.objects.get(username='master')
         user_slave = User.objects.get(username='slave')
-        self.login_user(user_master)
         slave_page = Page.objects.get(pk=self.pages['slave'])
         
         # add page
@@ -122,23 +121,15 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # must not have public object yet
         self.assertFalse(page.publisher_public)
                 
-        # print ('descendants of master page (%s): ' % self.master_page.pk) + str([(spage, spage.pk) for spage in self.reload_page(self.master_page).get_descendants()])
-        
-        # print ('ancestors of created page (%s): ' % page.pk) +  str([(spage, spage.pk) for spage in page.get_ancestors()])
-        
-        # print ('descendants of slave page (%s): ' % self.slave_page.pk) + str([(spage, spage.pk) for spage in self.reload_page(self.slave_page).get_descendants()])
-        
-        # print ('ancestors of slave page (%s): ' % self.slave_page.pk)  +  str([(spage, spage.pk) for spage in self.slave_page.get_ancestors()])
-
         self.assertTrue(has_generic_permission(page.pk, user_master, "publish", 1))
         # should be True user_master should have publish permissions for childred aswell
         # don't test for published since publishing must be approved
-        self.publish_page(page, False, user_master, False)
+        publish_page(page, user_master)
         
         # user_master is moderator for top level page / but can't approve descendants?
         # approve / publish as user_master
         # user master should be able to approve descendants
-        page = self.approve_page(page)    
+        page = approve_page(page, user_master)    
         
     def test_07_super_can_add_plugin(self):
         user_super = User.objects.get(username='super')
@@ -158,7 +149,6 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
     def test_10_same_order(self):
         user_master = User.objects.get(username='master')
         home_page = Page.objects.get(pk=self.pages['home'])
-        self.login_user(user_master)
         
         # create 4 pages
         slugs = []
@@ -171,7 +161,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # approve last 2 pages in reverse order
         for slug in reversed(slugs[2:]):
             page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)
-            page = self.publish_page(page, True)
+            page = publish_page(page, user_master, True)
             self.check_published_page_attributes(page)
     
     def test_11_create_copy_publish(self):
@@ -179,14 +169,15 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         home_page = Page.objects.get(pk=self.pages['home'])
         slave_page = Page.objects.get(pk=self.pages['slave'])
         # create new page to copy
-        self.login_user(user_master)
         page = create_page("page", "nav_playground.html", "en",
                            parent=slave_page)
         
         # copy it under home page...
-        copied_page = self.copy_page(page, home_page)
+        # TODO: Use page.copy_page here
+        with self.login_user_context(user_master):
+            copied_page = self.copy_page(page, home_page)
         
-        page = self.publish_page(copied_page, True)
+        page = publish_page(copied_page, user_master, True)
         self.check_published_page_attributes(page)
     
     
@@ -195,52 +186,52 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         home_page = Page.objects.get(pk=self.pages['home'])
         master_page = Page.objects.get(pk=self.pages['master'])
         # create new page to copy
-        self.login_user(user_master)
         page = create_page("page", "nav_playground.html", "en",
                            parent=home_page)
         
-        page = self.publish_page(page, True)
+        page = publish_page(page, user_master, True)
         
         # copy it under master page...
-        copied_page = self.copy_page(page, master_page)
+        # TODO: Use page.copy_page here
+        with self.login_user_context(user_master):
+            copied_page = self.copy_page(page, master_page)
         
         self.check_published_page_attributes(page)
-        copied_page = self.publish_page(copied_page, True)
+        copied_page = publish_page(copied_page, user_master, True)
         self.check_published_page_attributes(copied_page)
         
         
     def test_13_subtree_needs_approvement(self):
         user_master = User.objects.get(username='master')
         home_page = Page.objects.get(pk=self.pages['home'])
-        self.login_user(user_master)
         # create page under slave_page
         page = create_page("parent", "nav_playground.html", "en",
                            parent=home_page)
-        self.assertEqual(not page.publisher_public, True)
+        self.assertFalse(page.publisher_public)
         
         # create subpage uner page
         subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
-        self.assertEqual(not subpage.publisher_public, True)
+        self.assertFalse(subpage.publisher_public)
         
         # publish both of them in reverse order 
-        subpage = self.publish_page(subpage, True, published_check=False) 
+        subpage = publish_page(subpage, user_master, True) 
         
         # subpage should not be published, because parent is not published 
         # yet, should be marked as `publish when parent`
-        self.assertEqual(not subpage.publisher_public, True) 
+        self.assertFalse(subpage.publisher_public) 
         
         # pagemoderator state must be set
         self.assertEqual(subpage.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         
         # publish page (parent of subage), so subpage must be published also
-        page = self.publish_page(page, True)
-        self.assertEqual(page.publisher_public != None, True)
+        page = publish_page(page, user_master, True)
+        self.assertNotEqual(page.publisher_public, None)
         
         # reload subpage, it was probably changed
         subpage = self.reload_page(subpage)
         
         # parent was published, so subpage must be also published..
-        self.assertEqual(subpage.publisher_public != None, True) 
+        self.assertNotEqual(subpage.publisher_public, None) 
         
         #check attributes
         self.check_published_page_attributes(page)
@@ -249,25 +240,26 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
 
     def test_14_subtree_with_super(self):
         user_super = User.objects.get(username='super')
-        self.login_user(user_super)
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
-        self.assertEqual(not page.publisher_public, True)
+        self.assertFalse(page.publisher_public)
         
         # create subpage under page
-        subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
-        self.assertEqual(not subpage.publisher_public, True)
+        subpage = create_page("subpage", "nav_playground.html", "en",
+                              parent=page)
+        self.assertFalse(subpage.publisher_public)
         
         # tree id must be the same
         self.assertEqual(page.tree_id, subpage.tree_id)
         
         # publish both of them  
-        page = self.publish_page(page, True)
+        page = self.reload(page)
+        page = publish_page(page, user_super, True)
         # reload subpage, there were an tree_id change
         subpage = self.reload_page(subpage)
         self.assertEqual(page.tree_id, subpage.tree_id)
         
-        subpage = self.publish_page(subpage, True)
+        subpage = publish_page(subpage, user_super, True)
         # tree id must stay the same
         self.assertEqual(page.tree_id, subpage.tree_id)
         
@@ -283,8 +275,6 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         """Create page which is not under moderation in root, and check if 
         some properties are correct.
         """
-        user_super = User.objects.get(username='super')
-        self.login_user(user_super)
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
         
@@ -301,7 +291,6 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         user_slave = User.objects.get(username='slave')
         slave_page = Page.objects.get(pk=self.pages['slave'])
         user_master = User.objects.get(username='master')
-        self.login_user(user_slave)
         page = create_page("page", "nav_playground.html", "en",
                            parent=slave_page)
         
@@ -309,32 +298,31 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
         
         # check publish box
-        page = self.publish_page(page, published_check=False)
+        page = publish_page(page, user_slave)
         
         # page should request approvement now
         self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
         
         # approve it by master
-        self.login_user(user_master)
 
         # approve this page - but it doesn't get published yet, because 
         # slave home is not published
-        page = self.approve_page(page)
+        page = approve_page(page, user_master)
         
         # public page must not exist because of parent
-        self.assertEqual(not page.publisher_public, True)
+        self.assertFalse(page.publisher_public)
         
         # waiting for parents
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         
         # publish slave page
-        slave_page = self.publish_page(slave_page, published_check=False)
+        slave_page = publish_page(slave_page, user_master)
         
-        self.assertEqual(not page.publisher_public, True)
-        self.assertEqual(not slave_page.publisher_public, True)
+        self.assertFalse(page.publisher_public)
+        self.assertFalse(slave_page.publisher_public)
         
         # they must be approved first
-        slave_page = self.approve_page(slave_page)
+        slave_page = approve_page(slave_page, user_master)
         
         # master is approved
         self.assertEqual(slave_page.moderator_state, Page.MODERATOR_APPROVED)
@@ -345,24 +333,22 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # page must be approved also now
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
         
-    def test_18_plugins_get_published(self):
+    def test_17_plugins_get_published(self):
         user_super = User.objects.get(username='super')
-        self.login_user(user_super)
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
         self.add_plugin(user_super, page)
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        self.publish_page(page, True, user_super, True)
+        publish_page(page, user_super, True)
         self.assertEqual(CMSPlugin.objects.all().count(), 2)
 
-    def test_19_remove_plugin_page_under_moderation(self):
+    def test_18_remove_plugin_page_under_moderation(self):
         # login as slave and create page
         user_slave = User.objects.get(username='slave')
         user_master = User.objects.get(username='master')
         user_super = User.objects.get(username='super')
         slave_page = Page.objects.get(pk=self.pages['slave'])
-        self.login_user(user_slave)
         page = create_page("page", "nav_playground.html", "en", parent=slave_page)
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         
@@ -372,7 +358,8 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
 
         # publish page
-        page = self.publish_page(page, published_check=False)
+        page = self.reload(page)
+        page = publish_page(page, user_slave)
         
         # only the draft plugin should exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
@@ -381,10 +368,11 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
         
         # master approves and publishes the page
-        self.login_user(user_master)
         # first approve slave-home
-        self.publish_page(slave_page, approve=True)
-        page = self.publish_page(page, approve=True)
+        slave_page = self.reload(slave_page)
+        publish_page(slave_page, user_master, approve=True)
+        page = self.reload(page)
+        page = publish_page(page, user_master, approve=True)
         
         # draft and public plugins should now exist
         self.assertEqual(CMSPlugin.objects.all().count(), 2)
@@ -408,8 +396,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
 
         # login as super user and approve/publish the page
-        self.login_user(user_super)
-        page = self.publish_page(page, approve=True)
+        page = publish_page(page, user_super, approve=True)
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
 
         # there should now be 0 plugins
@@ -503,7 +490,6 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         ph = pages['ph']
         user_slave = User.objects.get(username='slave')
         user_master = User.objects.get(username='master')
-        self.login_user(user_slave)
         pg = self.move_page(pg, pc)
         # We have to reload pe when using mptt >= 0.4.2, 
         # so that mptt realized that pg is no longer a child of pe
@@ -536,11 +522,10 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         self.assertEqual(ph.requires_approvement(), False)
         
         # login as master, and approve moves
-        self.login_user(user_master)
-        pg = self.approve_page(pg)
-        pe = self.approve_page(pe)
-        ph = self.approve_page(ph)
-        pf = self.approve_page(pf)
+        pg = approve_page(pg, user_master)
+        pe = approve_page(pe, user_master)
+        ph = approve_page(ph, user_master)
+        pf = approve_page(pf, user_master)
         
         # public parent check after move
         self.assertEqual(pg.publisher_public.parent.pk, pc.publisher_public_id)

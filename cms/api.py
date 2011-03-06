@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+import datetime
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.db.models.expressions import F
+from django.template.defaultfilters import slugify
+from menus.menu_pool import menu_pool
+
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -10,13 +19,8 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.utils import moderator
 from cms.utils.permissions import _thread_locals
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
-from django.template.defaultfilters import slugify
-from menus.menu_pool import menu_pool
-import datetime
 
 
 VISIBILITY_ALL = None
@@ -297,7 +301,23 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     return page_permission
     
 def publish_page(page, user, approve=False):
-    raise NotImplementedError
+    # approve
+    # we can't use
+    # Page.objects.filter(pk=page.pk).update(published=(F('published') + 1) % 2)
+    # here because of the post save signals.
+    page.published = not page.published
+    page.save()
+    # reload page
+    page = Page.objects.get(pk=page.pk)
+    # approve page if requested
+    if approve:
+        return approve_page(page, user)
+    return page
     
 def approve_page(page, user):
-    raise NotImplementedError
+    class FakeRequest(object):
+        def __init__(self, user):
+            self.user = user
+    request = FakeRequest(user)
+    moderator.approve_page(request, page)
+    return Page.objects.get(pk=page.pk)
