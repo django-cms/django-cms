@@ -566,31 +566,7 @@ class AdvancedSoftrootTests(SettingsOverrideTestCase):
         'CMS_MODERATOR': False,
         'CMS_PERMISSIONS': False
     }
-    
-    def setUp(self):
-        """
-        For some reason turning this into a fixture just won't work (thanks to
-        our dear friend, publisher).
-        """
-        super(AdvancedSoftrootTests, self).setUp()
-        def mkpage(title, parent=None):
-            page = create_page(title, "nav_playground.html", "en",
-                               parent=parent, published=True, in_navigation=True,
-                               position='last-child')
-            def mkchild(title):
-                return mkpage(title, Page.objects.get(pk=page.pk))
-            page.mkchild = mkchild
-            return page
-        top = mkpage('top')
-        root = top.mkchild('root')
-        aaa = root.mkchild('aaa')
-        oneoneone = aaa.mkchild('111')
-        ccc = oneoneone.mkchild('ccc')
-        ccc.mkchild('ddd')
-        aaa.mkchild('222')
-        bbb = root.mkchild('bbb')
-        bbb.mkchild('333')
-        bbb.mkchild('444')
+    fixtures = ['advanced_softroot.json']
         
     def tearDown(self):
         Page.objects.all().delete()
