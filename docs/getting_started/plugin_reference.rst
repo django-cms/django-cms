@@ -81,6 +81,9 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
+.. note:: As of version 2.2, the link plugin no longer verifies the existance of
+          link targets.
+
 
 *******
 Picture
