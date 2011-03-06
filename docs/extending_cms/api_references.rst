@@ -71,20 +71,6 @@ cms.plugin_base
         :param instance: Plugin instance that is being rendered.
         :param placeholder: Name of the placeholder the plugin is in.
         :rtype: ``dict``
-        
-    .. class:: PluginMedia
-        
-        Defines media which is required to render this plugin.
-        
-        .. attribute:: css
-            
-            The CSS files required to render this plugin as a dictionary with
-            the display type as keys and a sequence of strings as values.
-            
-        .. attribute:: js
-            
-            The Javascript files required to render this plugin as a sequence
-            of strings.
 
 
 **********
