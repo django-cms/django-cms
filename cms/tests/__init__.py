@@ -11,9 +11,13 @@ from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.nonroot import NonRootCase
 from cms.tests.page import PagesTestCase, NoAdminPageTests
 from cms.tests.permmod import PermissionModeratorTestCase
-from cms.tests.placeholder import (PlaceholderModelTests, PlaceholderAdminTest, 
+from cms.tests.placeholder import (PlaceholderModelTests, PlaceholderAdminTest,
     PlaceholderTestCase, PlaceholderActionTests)
-from cms.tests.plugins import PluginManyToManyTestCase, PluginsTestCase
+from cms.tests.plugins import (
+    LinkPluginTestCase,
+    PluginManyToManyTestCase,
+    PluginsTestCase,
+)
 from cms.tests.publisher import PublisherTestCase
 from cms.tests.rendering import RenderingTestCase
 from cms.tests.reversion_tests import ReversionTestCase
@@ -33,4 +37,4 @@ except ImportError:
     import traceback
     exc = traceback.format_exc()
     warnings.warn("JavascriptTestCase cannot be run: %s" % exc)
-    
+
