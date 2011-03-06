@@ -25,6 +25,13 @@ cms.plugin_base
     
         Custom form class to be used to edit this plugin.
 
+    .. method:: get_plugin_urls(instance)
+
+        Returns URL patterns for which the plugin wants to register views for.
+        They are included under Django CMS admin (probably ``/admin/cms/page/``)
+        and further under ``/plugin/<plugin name>/``. Useful if your plugin
+        needs to asynchronously talk to the admin.
+
     .. attribute:: model
 
         Is the CMSPlugin model we created earlier. If you don't need a model
