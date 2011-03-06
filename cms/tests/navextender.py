@@ -6,19 +6,13 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.template import Template
 from menus.menu_pool import menu_pool
 
 class NavExtenderTestCase(CMSTestCase):
-
     def setUp(self):
         
         with SettingsOverride(CMS_MODERATOR = False):
-            u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-            u.set_password("test")
-            u.save()
-            self.login_user(u)
             menu_pool.clear(settings.SITE_ID)
             
             if not menu_pool.discovered:
@@ -30,20 +24,29 @@ class NavExtenderTestCase(CMSTestCase):
         menu_pool.menus = self.old_menu
         
     def create_some_nodes(self):
+        """
+        Build the following tree:
+        
+        page1
+            page2
+                page3
+        page4
+            page5
+        """
         with SettingsOverride(CMS_MODERATOR = False):
             self.page1 = create_page("page1", "nav_playground.html", "en",
                                      published=True, in_navigation=True)
             self.page2 = create_page("page2", "nav_playground.html", "en",
-                                     parent=self.page1, published=True,
-                                     in_navigation=True)
+                                     parent=Page.objects.get(pk=self.page1.pk),
+                                     published=True, in_navigation=True)
             self.page3 = create_page("page3", "nav_playground.html", "en",
-                                     parent=self.page2, published=True,
-                                     in_navigation=True)
+                                     parent=Page.objects.get(pk=self.page2.pk),
+                                     published=True, in_navigation=True)
             self.page4 = create_page("page4", "nav_playground.html", "en",
                                      published=True, in_navigation=True)
-            self.page2 = create_page("page5", "nav_playground.html", "en",
-                                     parent=self.page4, published=True,
-                                     in_navigation=True)
+            self.page5 = create_page("page5", "nav_playground.html", "en",
+                                     parent=Page.objects.get(pk=self.page4.pk),
+                                     published=True, in_navigation=True)
         
     def test_01_menu_registration(self):
         with SettingsOverride(CMS_MODERATOR = False):
@@ -85,6 +88,9 @@ class NavExtenderTestCase(CMSTestCase):
             self.assertEqual(len(nodes[1].children), 4)
         
     def test_04_extenders_on_child(self):
+        """
+        TestMenu has 4 flat nodes
+        """
         with SettingsOverride(CMS_MODERATOR = False):
             self.create_some_nodes()
             page1 = Page.objects.get(pk=self.page1.pk)
@@ -93,6 +99,7 @@ class NavExtenderTestCase(CMSTestCase):
             page2 = Page.objects.get(pk=self.page2.pk)
             page2.navigation_extenders = "TestMenu"
             page2.save()
+            menu_pool.clear(settings.SITE_ID)
             context = self.get_context()
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context) 
@@ -112,5 +119,3 @@ class NavExtenderTestCase(CMSTestCase):
             tpl.render(context) 
             nodes = context['children']
             self.assertEqual(len(nodes), 2)
-            
-            

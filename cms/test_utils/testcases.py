@@ -127,11 +127,13 @@ class CMSTestCase(TestCase):
         """Just a helper to see the page struct.
         """
         for page in Page.objects.drafts().order_by('tree_id', 'lft'):
-            print "%s%s #%d" % ("    " * (page.level), page, page.id)
+            ident = "  " * page.level
+            
+            print "%s%s, lft: %s, rght: %s" % (ident, page, page.lft, page.rght)
     
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
-            ident = level * '    '
+            ident = level * '  '
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
