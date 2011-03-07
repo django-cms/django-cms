@@ -1,15 +1,26 @@
-from cms.api import _generate_valid_slug, create_page, _verify_plugin_type
+from cms.api import (_generate_valid_slug, create_page, _verify_plugin_type, 
+    assign_user_to_page)
 from cms.apphook_pool import apphook_pool
+from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
 from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
+from cms.test_utils.util.mock import AttributeObject
 from cms.tests.apphooks import APP_MODULE, APP_NAME
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool
 import sys
 
+
+def _grant_page_permission(user, codename):
+    content_type = ContentType.objects.get_by_natural_key('cms', 'page')
+    perm = Permission.objects.get_or_create(codename='%s_page' % codename,
+                                            content_type=content_type)[0]
+    user.user_permissions.add(perm)
 
 class PythonAPITests(TestCase):
     def _get_default_create_page_arguments(self):
@@ -89,7 +100,8 @@ class PythonAPITests(TestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {}
-        self.assertRaises(AssertionError, create_page, navigation_extenders=TestMenu,
+        self.assertRaises(AssertionError, create_page,
+                          navigation_extenders=TestMenu,
                           **self._get_default_create_page_arguments())
         menu_pool.menus = self.old_menu
         
@@ -123,3 +135,41 @@ class PythonAPITests(TestCase):
         class InvalidPlugin(CMSPluginBase):
             model = Text
         self.assertRaises(AssertionError, _verify_plugin_type, InvalidPlugin)
+    
+    def test_assign_user_to_page_nothing(self):
+        page = create_page(**self._get_default_create_page_arguments())
+        user = User.objects.create(username='user', email='user@django-cms.org',
+                                   is_staff=True, is_active=True)
+        request = AttributeObject(user=user)
+        self.assertFalse(page.has_change_permission(request))
+    
+    def test_assign_user_to_page_single(self):
+        page = create_page(**self._get_default_create_page_arguments())
+        user = User.objects.create(username='user', email='user@django-cms.org',
+                                   is_staff=True, is_active=True)
+        request = AttributeObject(user=user)
+        assign_user_to_page(page, user, can_change=True)
+        self.assertFalse(page.has_change_permission(request))
+        self.assertFalse(page.has_add_permission(request))
+        _grant_page_permission(user, 'change')
+        page = Page.objects.get(pk=page.pk)
+        user = User.objects.get(pk=user.pk)
+        request = AttributeObject(user=user)
+        self.assertTrue(page.has_change_permission(request))
+        self.assertFalse(page.has_add_permission(request))
+    
+    def test_assign_user_to_page_all(self):
+        page = create_page(**self._get_default_create_page_arguments())
+        user = User.objects.create(username='user', email='user@django-cms.org',
+                                   is_staff=True, is_active=True)
+        request = AttributeObject(user=user)
+        assign_user_to_page(page, user, grant_all=True)
+        self.assertFalse(page.has_change_permission(request))
+        self.assertTrue(page.has_add_permission(request))
+        _grant_page_permission(user, 'change')
+        _grant_page_permission(user, 'add')
+        page = Page.objects.get(pk=page.pk)
+        user = User.objects.get(pk=user.pk)
+        request = AttributeObject(user=user)
+        self.assertTrue(page.has_change_permission(request))
+        self.assertTrue(page.has_add_permission(request))

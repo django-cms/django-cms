@@ -51,7 +51,7 @@ def _verify_apphook(apphook):
     """
     if hasattr(apphook, '__module__') and  issubclass(apphook, CMSApp):
         apphook_pool.discover_apps()
-        assert apphook in apphook_pool.apps.values(), '%r %r' % (apphook, apphook_pool.apps.values())
+        assert apphook in apphook_pool.apps.values()
         return apphook.__name__
     elif isinstance(apphook, basestring):
         apphook_pool.discover_apps()
@@ -65,7 +65,8 @@ def _verify_plugin_type(plugin_type):
     Verifies the given plugin_type is valid and returns a tuple of
     (plugin_model, plugin_type)
     """
-    if hasattr(plugin_type, '__module__') and  issubclass(plugin_type, CMSPluginBase):
+    if (hasattr(plugin_type, '__module__') and
+        issubclass(plugin_type, CMSPluginBase)):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -73,7 +74,9 @@ def _verify_plugin_type(plugin_type):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:
-            raise TypeError('plugin_type must be CMSPluginBase subclass or string')
+            raise TypeError(
+                'plugin_type must be CMSPluginBase subclass or string'
+            )
     else:
         raise TypeError('plugin_type must be CMSPluginBase subclass or string')
     return plugin_model, plugin_type
@@ -219,7 +222,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
         page=page,
     )
 
-def add_plugin(placeholder, plugin_type, language, position='last-child', **data):
+def add_plugin(placeholder, plugin_type, language, position='last-child',
+               **data):
     """
     Add a plugin to a placeholder
     """
@@ -235,7 +239,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child', **data
         position=1, 
         language=language
     )
-    plugin_base.insert_at(None, position=position, save=False)  # save is causing trouble but it might be because I have tested with an older version of django-cms
+    plugin_base.insert_at(None, position=position, save=False)
             
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
@@ -307,7 +311,8 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         'can_moderate': can_moderate,  
     }
     
-    page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
+    page_permission = PagePermission(page=page, user=user, grant_on=grant_on,
+                                     **data)
     page_permission.save()
     return page_permission
     
