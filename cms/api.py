@@ -4,7 +4,6 @@ import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.db.models.expressions import F
 from django.template.defaultfilters import slugify
 from menus.menu_pool import menu_pool
 
@@ -44,7 +43,40 @@ def _generate_valid_slug(source, parent, language):
     while slug in used:
         slug = '%s-%s' % (baseslug, i)
         i += 1
-    return slug 
+    return slug
+
+def _verify_apphook(apphook):
+    """
+    Verifies the apphook given is valid and returns the normalized form (name)
+    """
+    if hasattr(apphook, '__module__') and  issubclass(apphook, CMSApp):
+        apphook_pool.discover_apps()
+        assert apphook in apphook_pool.apps.values(), '%r %r' % (apphook, apphook_pool.apps.values())
+        return apphook.__name__
+    elif isinstance(apphook, basestring):
+        apphook_pool.discover_apps()
+        assert apphook in apphook_pool.apps
+        return apphook
+    else:
+        raise TypeError("apphook must be string or CMSApp instance")
+
+def _verify_plugin_type(plugin_type):
+    """
+    Verifies the given plugin_type is valid and returns a tuple of
+    (plugin_model, plugin_type)
+    """
+    if hasattr(plugin_type, '__module__') and  issubclass(plugin_type, CMSPluginBase):
+        plugin_model = plugin_type.model
+        assert plugin_type in plugin_pool.plugins.values()
+        plugin_type = plugin_type.__name__
+    elif isinstance(plugin_type, basestring):
+        try:
+            plugin_model = plugin_pool.get_plugin(plugin_type).model
+        except KeyError:
+            raise TypeError('plugin_type must be CMSPluginBase subclass or string')
+    else:
+        raise TypeError('plugin_type must be CMSPluginBase subclass or string')
+    return plugin_model, plugin_type
     
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, redirect=None, meta_description=None,
@@ -76,14 +108,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
     # validate and normalize apphook 
     if apphook:
-        if hasattr(apphook, '__module__') and  issubclass(apphook, CMSApp):
-            application_urls = apphook.__name__
-        elif isinstance(apphook, basestring):
-            apphook_pool.discover_apps()
-            assert apphook in apphook_pool.apps
-            application_urls = apphook
-        else:
-            raise TypeError("apphook must be string or CMSApp instance")
+        application_urls = _verify_apphook(apphook)
     else:
         application_urls = None
     
@@ -109,10 +134,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert isinstance(site, Site)
         
     if navigation_extenders:
-        assert navigation_extenders in [menu[0] for menu in menu_pool.get_menus_by_attribute("cms_enabled", True)]
+        raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
+        menus = [menu[0] for menu in raw_menus]
+        assert navigation_extenders in menus
         
     # validate menu visibility
-    assert limit_visibility_in_menu in (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
+    accepted_limitations = (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
+    assert limit_visibility_in_menu in accepted_limitations
     
     # validate position
     assert position in ('last-child', 'first-child')
@@ -175,16 +203,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
         
     # validate and normalize apphook 
     if apphook:
-        if hasattr(apphook, '__module__') and isinstance(apphook, CMSApp):
-            application_urls = apphook.__name__
-        elif isinstance(apphook, basestring):
-            assert apphook in apphook_pool.apps
-            application_urls = apphook
-        else:
-            raise TypeError("apphook must be string or CMSApp instance")
+        application_urls = _verify_apphook(apphook)
     else:
         application_urls = None
-    
     
     return Title.objects.create(
         language=language,
@@ -206,17 +227,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child', **data
     assert isinstance(placeholder, Placeholder)
     
     # validate and normalize plugin type
-    if hasattr(plugin_type, '__module__') and  issubclass(plugin_type, CMSPluginBase):
-        plugin_model = plugin_type.model
-        plugin_type = plugin_type.__name__
-    elif isinstance(plugin_type, basestring):
-        try:
-            plugin_model = plugin_pool.get_plugin(plugin_type).model
-        except KeyError:
-            raise TypeError('plugin_type must be CMSPluginBase subclass or string')
-    else:
-        raise TypeError('plugin_type must be CMSPluginBase subclass or string')
-        
+    plugin_model, plugin_type = _verify_plugin_type(plugin_type)
         
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
