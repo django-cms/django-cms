@@ -207,8 +207,8 @@ def add_plugin(placeholder, plugin_type, language, position='last-child', **data
     
     # validate and normalize plugin type
     if hasattr(plugin_type, '__module__') and  issubclass(plugin_type, CMSPluginBase):
-        plugin_type = plugin_type.__name__
         plugin_model = plugin_type.model
+        plugin_type = plugin_type.__name__
     elif isinstance(plugin_type, basestring):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
@@ -219,12 +219,12 @@ def add_plugin(placeholder, plugin_type, language, position='last-child', **data
         
         
     plugin_base = CMSPlugin(
-        plugin_type='TextPlugin',
+        plugin_type=plugin_type,
         placeholder=placeholder, 
         position=1, 
         language=language
     )
-    plugin_base.insert_at(None, position=position, save=False)
+    plugin_base.insert_at(None, position=position, save=False)  # save is causing trouble but it might be because I have tested with an older version of django-cms
             
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
