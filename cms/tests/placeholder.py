@@ -3,7 +3,7 @@ from __future__ import with_statement
 from cms.api import add_plugin
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
-from cms.test_utils.testcases import CMSTestCase, CMSTestCase
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions

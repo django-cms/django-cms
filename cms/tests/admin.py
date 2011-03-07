@@ -5,42 +5,22 @@ from cms.admin.dialog.forms import (ModeratorForm, PermissionForm,
 from cms.admin.dialog.views import _form_class_selector
 from cms.api import create_page, create_title
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
 class AdminTestCase(CMSTestCase):
+    fixtures = ['admin_guys.json']
     
     def _get_guys(self, admin_only=False):
-        admin = self.get_superuser()
+        admin = User.objects.get(username="admin")
         if admin_only:
             return admin
-        self.login_user(admin)
-        USERNAME = 'test'
-        
-        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
-        normal_guy.is_staff = True
-        normal_guy.is_active = True
-        normal_guy.save()
-        normal_guy.user_permissions = Permission.objects.filter(
-            codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
-        )
-        gpp = GlobalPagePermission.objects.create(
-            user=normal_guy,
-            can_change=True,
-            can_delete=True,
-            can_change_advanced_settings=False,
-            can_publish=True,
-            can_change_permissions=False,
-            can_move_page=True,
-            can_moderate=True,
-        )
-        gpp.sites = Site.objects.all()
+        normal_guy = User.objects.get(username="test")
         return admin, normal_guy
     
     def test_01_edit_does_not_reset_page_adv_fields(self):

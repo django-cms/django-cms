@@ -4,7 +4,6 @@ from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode

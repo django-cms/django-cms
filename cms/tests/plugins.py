@@ -19,7 +19,6 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.forms.widgets import Media
 from django.template import RequestContext
 from project.pluginapp.models import Article, Section

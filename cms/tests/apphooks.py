@@ -3,7 +3,6 @@ from __future__ import with_statement
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers
-from cms.models.titlemodels import Title
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
