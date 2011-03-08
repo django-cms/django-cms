@@ -21,10 +21,17 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import moderator
 from cms.utils.permissions import _thread_locals
 
+#===============================================================================
+# Constants 
+#===============================================================================
 
 VISIBILITY_ALL = None
 VISIBILITY_USERS = 1
 VISIBILITY_STAFF = 2
+
+#===============================================================================
+# Helpers/Internals
+#===============================================================================
 
 def _generate_valid_slug(source, parent, language):
     """
@@ -80,7 +87,11 @@ def _verify_plugin_type(plugin_type):
     else:
         raise TypeError('plugin_type must be CMSPluginBase subclass or string')
     return plugin_model, plugin_type
-    
+
+#===============================================================================
+# Public API 
+#===============================================================================
+
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, redirect=None, meta_description=None,
                 meta_keywords=None, created_by='python-api', parent=None,
@@ -291,12 +302,11 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     can_change_advanced_settings=False, can_publish=False, 
     can_change_permissions=False, can_move_page=False, can_moderate=False, 
     grant_all=False):
-    """Assigns given user to page, and gives him requested permissions. 
-    
-    Note: this is not happening over frontend, maybe a test for this in 
-    future will be nice.
+    """
+    Assigns given user to page, and gives him requested permissions.
     """
     if grant_all:
+        # shortcut to grant all permissions
         return assign_user_to_page(page, user, grant_on, True, True, True, True,
                                    True, True, True, True)
     
@@ -317,11 +327,15 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     return page_permission
     
 def publish_page(page, user, approve=False):
-    # approve
+    """
+    Publish a page. This sets `page.published` to `True` and saves it, which
+    triggers `cms.utils.moderator.page_changed` which does the actual moderation
+    and publishing action.
+    """
     # we can't use
     # Page.objects.filter(pk=page.pk).update(published=(F('published') + 1) % 2)
     # here because of the post save signals.
-    page.published = not page.published
+    page.published = True
     page.save()
     # reload page
     page = Page.objects.get(pk=page.pk)
@@ -331,6 +345,9 @@ def publish_page(page, user, approve=False):
     return page
     
 def approve_page(page, user):
+    """
+    Approve a page version.
+    """
     class FakeRequest(object):
         def __init__(self, user):
             self.user = user

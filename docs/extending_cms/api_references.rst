@@ -6,12 +6,19 @@ API References
 cms.api
 *******
 
-APIs for easy creation of CMS contents.
+Python APIs for creating CMS contents. This is done in :mod:`cms.api` and not
+on the models and managers, because the direct API via models and managers is
+slightly counterintuitive for developers. Also the functions defined in this
+module do sanity checks on arguments.
     
 .. warning:: None of the functions in this modules do any security or permission
              checks. They verify their input values to be sane wherever
-             possible, however permission checks must be done before calling
-             these functions.
+             possible, however permission checks should be implemented manually
+             before calling any of these functions.
+
+
+Functions and constants
+=======================
 
 .. module:: cms.api
 
@@ -147,6 +154,19 @@ APIs for easy creation of CMS contents.
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
+
+
+Example workflows
+=================
+
+Create a page called ``'My Page`` using the template ``'my_template.html'`` and
+add a text plugin with the content ``'hello world'``. This is done in English::
+
+    from cms.api import create_page, add_plugin
+    
+    page = create_page('My Page', 'my_template.html', 'en')
+    placeholder = page.placeholders.get(slot='body')
+    add_plugin(placeholder, 'TextPlugin', 'en', body='hello world')
 
 
 ***************
