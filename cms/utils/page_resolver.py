@@ -36,9 +36,6 @@ def get_page_from_request(request, use_path=None):
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
     
-    # Get a basic queryset for Page objects, depending on if we use the 
-    # MODERATOR or not.
-    page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     
     # Check if this is called from an admin request
@@ -55,11 +52,15 @@ def get_page_from_request(request, use_path=None):
         request._current_page_cache = page
         return page
     
+    # Get a basic queryset for Page objects, depending on if we use the
+    # MODERATOR or not.
+    pages = get_page_queryset(request)
+
     # TODO: Isn't there a permission check needed here?
-    if 'preview' in request.GET:
-        pages = page_queryset.filter(site=site)
-    else:
-        pages = page_queryset.published().filter(site=site)
+    if not 'preview' in request.GET:
+        pages = pages.published()
+
+    pages = pages.filter(site=site)
     
     # If use_path is given, someone already did the path cleaning
     if use_path:
