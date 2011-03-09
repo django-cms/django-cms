@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+Public Python API to create CMS contents.
+
+WARNING: None of the functions defined in this module checks for permissions.
+You must implement the necessary permission checks in your own code before
+calling these methods!
+"""
 import datetime
 
 from django.conf import settings
@@ -20,6 +27,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import moderator
 from cms.utils.permissions import _thread_locals
+
 
 #===============================================================================
 # Constants 
@@ -102,6 +110,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child"):
     """
     Create a CMS Page and it's title for the given language
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     # ugly permissions hack
     if created_by and isinstance(created_by, User):
@@ -204,6 +214,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
     Create a title.
     
     Parent is only used if slug=None.
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     # validate language:
     assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
@@ -237,6 +249,8 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
                **data):
     """
     Add a plugin to a placeholder
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     # validate placeholder
     assert isinstance(placeholder, Placeholder)
@@ -266,6 +280,8 @@ def create_page_user(created_by, user, can_add_page=True,
                      can_delete_pagepermission=True, grant_all=False):
     """
     Creates a page user.
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     if grant_all:
         # just be lazy
@@ -304,6 +320,8 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     grant_all=False):
     """
     Assigns given user to page, and gives him requested permissions.
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     if grant_all:
         # shortcut to grant all permissions
@@ -331,6 +349,8 @@ def publish_page(page, user, approve=False):
     Publish a page. This sets `page.published` to `True` and saves it, which
     triggers `cms.utils.moderator.page_changed` which does the actual moderation
     and publishing action.
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     # we can't use
     # Page.objects.filter(pk=page.pk).update(published=(F('published') + 1) % 2)
@@ -347,6 +367,8 @@ def publish_page(page, user, approve=False):
 def approve_page(page, user):
     """
     Approve a page version.
+    
+    See docs/extending_cms/api_reference.rst for more info
     """
     class FakeRequest(object):
         def __init__(self, user):
