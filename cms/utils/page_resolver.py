@@ -51,7 +51,7 @@ def get_page_from_request(request, use_path=None):
             try:
                 page = Page.objects.get(pk=page_id)
             except Page.DoesNotExist:
-                return None
+                page = None
         request._current_page_cache = page
         return page
     
