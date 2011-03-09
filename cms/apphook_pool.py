@@ -49,6 +49,7 @@ class ApphookPool(object):
         return hooks
     
     def get_apphook(self, app_name):
+        self.discover_apps()
         try:
             return self.apps[app_name]
         except KeyError:
