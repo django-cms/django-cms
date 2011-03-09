@@ -1,11 +1,11 @@
-from cms.test_utils.util.context_managers import SettingsOverride
-from django.conf import settings
-from django.core.management import call_command
-from django.db import connections
-import os
+from cms.test_utils.util.context_managers import SettingsOverride # pragma: no cover
+from django.conf import settings # pragma: no cover
+from django.core.management import call_command # pragma: no cover
+from django.db import connections # pragma: no cover
+import os # pragma: no cover
 
 
-class Fixture(object):
+class Fixture(object): # pragma: no cover
     DB_OVERRIDE = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:'
