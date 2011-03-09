@@ -18,7 +18,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _, get_language, ugettext
+from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
 from os.path import join
 from cms.publisher.errors import MpttPublisherCantPublish
@@ -130,7 +130,9 @@ class Page(MPTTModel):
         # check the slugs
         check_title_slugs(self)
         
-    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, public_copy=False):
+    def copy_page(self, target, site, position='first-child',
+                  copy_permissions=True, copy_moderation=True,
+                  public_copy=False):
         """
         copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
@@ -664,13 +666,14 @@ class Page(MPTTModel):
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
         template = None
-        if self.template and len(self.template)>0 and \
-            self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
-            template = self.template
-        else:
-            for p in self.get_ancestors(ascending=True):
-                template = p.get_template()
-                break
+        if self.template:
+            if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
+                template = self.template
+            else:
+                for p in self.get_ancestors(ascending=True):
+                    template = p.get_template()
+                    if template:
+                        break
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
         return template

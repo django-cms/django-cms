@@ -25,8 +25,8 @@ def get_site_id(site):
     if site:
         if isinstance(site, Site):
             site_id = site.id
-        elif isinstance(site, int):
-            site_id = site
+        elif isinstance(site, int) or (isinstance(site, basestring) and site.isdigit()):
+            site_id = int(site)
         else:
             site_id = settings.SITE_ID
     else:
