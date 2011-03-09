@@ -45,7 +45,7 @@ def get_page_from_request(request, use_path=None):
     if admin_base and request.path.startswith(admin_base):
         # if so, get the page ID to query the page
         page_id = [bit for bit in request.path.split('/') if bit][-1]
-        if not page_id or not page_id.isdigit():
+        if not page_id.isdigit():
             page = None
         else:
             try:
