@@ -357,7 +357,7 @@ class PageLanguageUrl(InclusionTag):
         else:
             page = request.current_page
             if page == "dummy":
-                return ''
+                return {'content': ''}
             try:
                 url = page.get_absolute_url(language=lang, fallback=False)
                 url = "/" + lang + url

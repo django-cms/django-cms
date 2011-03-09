@@ -1,4 +1,27 @@
 # -*- coding: utf-8 -*-
+import inspect
+import os
+from copy import deepcopy
+
+import django
+from django import template
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import unquote, get_deleted_objects
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.db import transaction, models
+from django.forms import CharField
+from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title, escape, force_escape, escapejs
+from django.utils.encoding import force_unicode
+from django.utils.translation import ugettext_lazy as _
+
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
@@ -28,28 +51,7 @@ from cms.utils.permissions import (has_page_add_permission,
 from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
     get_placeholder_conf)
 from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
-from copy import deepcopy
-from django import template
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote, get_deleted_objects
-from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.core.urlresolvers import reverse
-from django.db import transaction, models
-from django.forms import Widget, Textarea, CharField
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import title, escape, force_escape, escapejs
-from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
 from menus.menu_pool import menu_pool
-import inspect
-import os
-
 
 # silly hack to test features/ fixme
 if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
@@ -57,8 +59,6 @@ if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
 else:
     router = False
 
-model_admin = admin.ModelAdmin
-create_on_success = lambda x: x
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -67,29 +67,24 @@ if 'reversion' in settings.INSTALLED_APPS:
 
     create_on_success = reversion.revision.create_on_success
 
-class PageAdmin(model_admin):
-    form = PageForm
-    list_filter = ['published', 'in_navigation', 'template', 'changed_by']
-    # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
-    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
-    revision_form_template = "admin/cms/page/revision_form.html"
-    recover_form_template = "admin/cms/page/recover_form.html"
+else: # pragma: no cover
+    model_admin = admin.ModelAdmin
+    create_on_success = lambda x: x
 
-    exclude = []
-    mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
-    top_fields = []
-    general_fields = ['title', 'slug', ('published', 'in_navigation')]
-    add_general_fields = ['title', 'slug', 'language', 'template']
+
+def contribute_fieldsets(cls):
+    if settings.CMS_MENU_TITLE_OVERWRITE:
+        general_fields = [('title', 'menu_title')]
+    else:
+        general_fields = ['title']
+    general_fields += ['slug', ('published', 'in_navigation')]
+    additional_hidden_fields = []
     advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
-    change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
-    additional_hidden_fields = []
-    if settings.CMS_MODERATOR:
-        list_filter.append('moderator_state')
+    seo_fields = []
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
-        list_filter.append('soft_root')
     if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
         general_fields.append(('publication_date', 'publication_end_date'))
     elif settings.CMS_SHOW_START_DATE:
@@ -97,11 +92,9 @@ class PageAdmin(model_admin):
     elif settings.CMS_SHOW_END_DATE:
         general_fields.append( 'publication_end_date')
     if settings.CMS_MODERATOR:
-        additional_hidden_fields.extend(('moderator_state', 'moderator_message'))
+        additional_hidden_fields += ['moderator_state', 'moderator_message']
     if settings.CMS_SEO_FIELDS:
-        seo_fields = ('page_title', 'meta_description', 'meta_keywords')
-    if settings.CMS_MENU_TITLE_OVERWRITE:
-        general_fields[0] = ('title', 'menu_title')
+        seo_fields = ['page_title', 'meta_description', 'meta_keywords']
     if not settings.CMS_URL_OVERWRITE:
         advanced_fields.remove("overwrite_url")
     if not settings.CMS_REDIRECTS:
@@ -111,26 +104,13 @@ class PageAdmin(model_admin):
     if apphook_pool.get_apphooks():
         advanced_fields.append("application_urls")
 
-    # take care with changing fieldsets, get_fieldsets() method removes some
-    # fields depending on permissions, but its very static!!
-    add_fieldsets = [
-        (None, {
-            'fields': add_general_fields,
-            'classes': ('general',),
-        }),
-        (_('Hidden'), {
-            'fields': hidden_fields,
-            'classes': ('hidden',),
-        }),
-    ]
-
     fieldsets = [
         (None, {
             'fields': general_fields,
             'classes': ('general',),
         }),
         (_('Basic Settings'), {
-            'fields': top_fields + template_fields,
+            'fields': template_fields,
             'classes': ('low',),
             'description': _('Note: This page reloads if you change the selection. Save it first.'),
         }),
@@ -148,9 +128,50 @@ class PageAdmin(model_admin):
 
     if settings.CMS_SEO_FIELDS:
         fieldsets.append((_("SEO Settings"), {
-                          'fields':seo_fields,
+                          'fields': seo_fields,
                           'classes': ('collapse',),
                         }))
+    setattr(cls, 'fieldsets', fieldsets)
+    setattr(cls, 'advanced_fields', advanced_fields)
+    setattr(cls, 'hidden_fields', hidden_fields)
+    setattr(cls, 'general_fields', general_fields)
+    setattr(cls, 'template_fields', template_fields)
+    setattr(cls, 'additional_hidden_fields', additional_hidden_fields)
+    setattr(cls, 'seo_fields', seo_fields)
+
+
+def contribute_list_filter(cls):
+    list_filter = ['published', 'in_navigation', 'template', 'changed_by']
+    if settings.CMS_MODERATOR:
+        list_filter.append('moderator_state')
+    if settings.CMS_SOFTROOT:
+        list_filter.append('soft_root')
+    setattr(cls, 'list_filter', list_filter)
+
+class PageAdmin(model_admin):
+    form = PageForm
+    # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
+    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
+    revision_form_template = "admin/cms/page/revision_form.html"
+    recover_form_template = "admin/cms/page/recover_form.html"
+
+    exclude = []
+    mandatory_placeholders = ('title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
+    add_general_fields = ['title', 'slug', 'language', 'template']
+    change_list_template = "admin/cms/page/change_list.html"
+
+    # take care with changing fieldsets, get_fieldsets() method removes some
+    # fields depending on permissions, but its very static!!
+    add_fieldsets = [
+        (None, {
+            'fields': add_general_fields,
+            'classes': ('general',),
+        }),
+        (_('Hidden'), {
+            'fields': ['site', 'parent'],
+            'classes': ('hidden',),
+        }),
+    ]
 
     inlines = PAGE_ADMIN_INLINES
 
@@ -292,17 +313,6 @@ class PageAdmin(model_admin):
                 return HttpResponseBadRequest("template not valid")
         else:
             return HttpResponseForbidden()
-
-    def get_parent(self, request):
-        target = request.GET.get('target', None)
-        position = request.GET.get('position', None)
-        parent = None
-        if target:
-            if position == "first_child":
-                parent = Page.objects.get(pk=target)
-            else:
-                parent = Page.objects.get(pk=target).parent
-        return parent
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -476,17 +486,6 @@ class PageAdmin(model_admin):
                         except NoPermissionsException:
                             continue
                 yield inline.get_formset(request, obj)
-
-
-    def get_widget(self, request, page, lang, name):
-        """
-        Given the request and name of a placeholder return a PluginEditor Widget
-        """
-        installed_plugins = plugin_pool.get_all_plugins(name, page)
-        widget = PluginEditor(installed=installed_plugins)
-        if not isinstance(widget(), Widget):
-            widget = Textarea
-        return widget
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -748,24 +747,6 @@ class PageAdmin(model_admin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    def list_pages(self, request, template_name=None, extra_context=None):
-        """
-        List root pages
-        """
-        # HACK: overrides the changelist template and later resets it to None
-
-        if template_name:
-            self.change_list_template = template_name
-        context = {
-            'name': _("page"),
-
-            'pages': Page.objects.all_root().order_by("tree_id"),
-        }
-        context.update(extra_context or {})
-        change_list = self.changelist_view(request, context)
-        self.change_list_template = None
-        return change_list
-
     @transaction.commit_on_success
     def move_page(self, request, page_id, extra_context=None):
         """
@@ -854,8 +835,6 @@ class PageAdmin(model_admin):
                 }
                 page.copy_page(target, site, position, **kwargs)
                 return HttpResponse("ok")
-                #return self.list_pages(request,
-                #    template_name='admin/cms/page/change_list_tree.html')
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
@@ -963,14 +942,30 @@ class PageAdmin(model_admin):
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
-        using = []
-        if router:
+        if django.VERSION[1] > 2: # pragma: no cover
+            # WARNING: Django 1.3 is not officially supported yet!
             using = router.db_for_read(self.model)
-            deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, using)[:2]
-            to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, using)[:2]
+            kwargs = {
+                'admin_site': self.admin_site,
+                'user': request.user,
+                'using': using
+            }
         else:
-            deleted_objects, perms_needed =  get_deleted_objects([titleobj], titleopts, request.user, self.admin_site, 4)
-            to_delete_plugins, perms_needed_plugins = get_deleted_objects(plugins, pluginopts, request.user, self.admin_site, 4)
+            kwargs = {
+                'admin_site': self.admin_site,
+                'user': request.user,
+            }
+        deleted_objects, perms_needed =  get_deleted_objects(
+            [titleobj],
+            titleopts,
+            **kwargs
+        )[:2]
+        to_delete_plugins, perms_needed_plugins = get_deleted_objects(
+            plugins,
+            pluginopts,
+            **kwargs
+        )[:2]
+        
             
         deleted_objects.append(to_delete_plugins)
         perms_needed = set( list(perms_needed) + list(perms_needed_plugins) )
@@ -1385,5 +1380,8 @@ class PageAdmin(model_admin):
         if key == 'site__exact':
             return True
         return super(PageAdmin, self).lookup_allowed(key, *args)
+
+contribute_fieldsets(PageAdmin)
+contribute_list_filter(PageAdmin)
 
 admin.site.register(Page, PageAdmin)

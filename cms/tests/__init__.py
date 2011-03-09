@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.tests.admin import AdminTestCase
+from cms.tests.admin import AdminTestCase, AdminFieldsetTests, AdminListFilterTests
 from cms.tests.apphooks import ApphooksTestCase
 from cms.tests.api import PythonAPITests
 from cms.tests.docs import DocsTestCase
@@ -27,6 +27,7 @@ from cms.tests.urlutils import UrlutilsTestCase
 from cms.tests.views import ViewTests
 from cms.tests.security import SecurityTests
 from cms.tests.po import PoTest
+from cms.tests.menu_utils import MenuUtilsTests
 
 try:
     from cms.tests.javascript import JavascriptTestCase
