@@ -1279,6 +1279,8 @@ class PageAdmin(model_admin):
             if 'plugin_id' in request.POST:
                 plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
                 page = get_page_from_plugin_or_404(plugin)
+                if not page.has_change_permission(request):
+                    raise Http404
                 placeholder_slot = request.POST['placeholder']
                 placeholders = get_placeholders(page.get_template())
                 if not placeholder_slot in placeholders:
@@ -1294,8 +1296,9 @@ class PageAdmin(model_admin):
                 for plugin_id in request.POST['ids'].split("_"):
                     plugin = CMSPlugin.objects.get(pk=plugin_id)
                     page = get_page_from_placeholder_if_exists(plugin.placeholder)
-
-                    if page and not page.has_change_permission(request):
+                    if not page: # use placeholderadmin instead!
+                        raise Http404
+                    if not page.has_change_permission(request):
                         raise Http404
 
                     if plugin.position != pos:

@@ -503,9 +503,67 @@ class AdminTests(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "error")
     
-    def test_move_plugin_needs_page(self):
+    def test_move_plugin_by_id_needs_page(self):
         ph = Placeholder.objects.create(slot='test')
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
-        with self.login_user_context(self.get_permless()):
+        with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'plugin_id': plugin.pk})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
+    
+    def test_move_plugin_by_ids_needs_page(self):
+        ph = Placeholder.objects.create(slot='test')
+        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'ids': plugin.pk})
+            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+    
+    def test_move_plugin_needs_valid_target(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        source = page.placeholders.all()[0]
+        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'plugin_id': plugin.pk,
+                                                  'placeholder': 'invalid-placeholder'})
+            response = self.admin_class.move_plugin(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, "error")
+    
+    def test_move_plugin_by_id_requires_perms(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        source, target = list(page.placeholders.all())[:2]
+        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'plugin_id': plugin.pk,
+                                                  'placeholder': target.slot})
+            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+    
+    def test_move_plugin_by_id(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        source, target = list(page.placeholders.all())[:2]
+        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'plugin_id': plugin.pk,
+                                                  'placeholder': target.slot})
+            response = self.admin_class.move_plugin(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, "ok")
+    
+    def test_move_plugin_by_ids_requires_perms(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        source, target = list(page.placeholders.all())[:2]
+        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'ids': plugin.pk,
+                                                  'placeholder': target.slot})
+            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+    
+    def test_move_plugin_by_ids(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        source, target = list(page.placeholders.all())[:2]
+        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'ids': plugin.pk,
+                                                  'placeholder': target.slot})
+            response = self.admin_class.move_plugin(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, "ok")
