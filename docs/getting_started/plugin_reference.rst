@@ -64,6 +64,8 @@ The Google Maps API key is also required. You can either put this in a project
 setting called ``GOOGLE_MAPS_API_KEY`` or be sure the template context has a
 variable with the same name.
 
+.. warning:: The GoogleMap plugin does not support SSL (HTTPS) unless you have a
+             Google Maps API Premier account.
 
 ****
 Link
