@@ -1304,7 +1304,7 @@ class PageAdmin(model_admin):
                     pos += 1
                 success = True
             if not success:
-                HttpResponse(str("error"))
+                return HttpResponse(str("error"))
                 
             if page and 'reversion' in settings.INSTALLED_APPS:
                 make_revision_with_plugins(page)
@@ -1379,7 +1379,7 @@ class PageAdmin(model_admin):
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
             return True
-        return super(PageAdmin, self).lookup_allowed(key, *args)
+        return super(PageAdmin, self).lookup_allowed(key, *args, **kwargs)
 
 contribute_fieldsets(PageAdmin)
 contribute_list_filter(PageAdmin)

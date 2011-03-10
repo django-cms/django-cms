@@ -4,10 +4,11 @@ from cms.admin.dialog.forms import (ModeratorForm, PermissionForm,
     PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
-from cms.api import create_page, create_title
+from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
+from cms.models.placeholdermodel import Placeholder
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
@@ -435,6 +436,36 @@ class AdminTests(CMSTestCase):
             response = self.admin_class.change_moderation(request, 1)
             self.assertEqual(response.status_code, 405)
 
+    def test_change_moderation_requires_post_argument(self):
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'wrongarg': 'blah'})
+            self.assertRaises(Http404, self.admin_class.change_moderation,
+                              request, 1)
+
+    def test_change_moderation_moderate_zero(self):
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'moderate': '0'})
+            response = self.admin_class.change_moderation(request, 1)
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_moderation_moderate_invalidzero(self):
+        # TODO: Shouldn't this raise 404?
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'moderate': 'zero'})
+            response = self.admin_class.change_moderation(request, 1)
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_moderation_moderate_one(self):
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'moderate': '1'})
+            response = self.admin_class.change_moderation(request, 1)
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_moderation_moderate_ten(self):
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'moderate': '10'})
+            self.assertRaises(Http404, self.admin_class.change_moderation, request, 1)
+
     def test_approve_page_requires_perms(self):
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
@@ -446,3 +477,35 @@ class AdminTests(CMSTestCase):
             request = self.get_request()
             response = self.admin_class.publish_page(request, 1)
             self.assertEqual(response.status_code, 403)
+    
+    def test_remove_plugin_requires_post(self):
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request()
+            self.assertRaises(Http404, self.admin_class.remove_plugin, request)
+            
+    def test_lookup_allowed_site__exact(self):
+        self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
+            
+    def test_lookup_allowed_published(self):
+        self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))
+    
+    def test_move_plugin_requires_post(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            response = self.admin_class.move_plugin(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, "error")
+    
+    def test_move_plugin_requires_usable_post_data(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'not_usable': '1'})
+            response = self.admin_class.move_plugin(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, "error")
+    
+    def test_move_plugin_needs_page(self):
+        ph = Placeholder.objects.create(slot='test')
+        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'plugin_id': plugin.pk})
+            self.assertRaises(Http404, self.admin_class.move_plugin, request)
