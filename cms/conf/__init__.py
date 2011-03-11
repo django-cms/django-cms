@@ -2,7 +2,7 @@
 from django.conf import settings
 from patch import pre_patch, post_patch, post_patch_check
 
-ALREADY_PATCHED = False
+
 
 def patch_settings():
     """Merge settings with global cms settings, so all required attributes
@@ -10,13 +10,9 @@ def patch_settings():
     
     Also check for setting inconstistence if settings.DEBUG
     """
-    global ALREADY_PATCHED
-    
-    # do this just once
-    if ALREADY_PATCHED:
+    if patch_settings.ALREADY_PATCHED:
         return
-    
-    ALREADY_PATCHED = True
+    patch_settings.ALREADY_PATCHED = True
     
     from cms.conf import global_settings
     # patch settings
@@ -34,12 +30,4 @@ def patch_settings():
     if settings.DEBUG:
         # check if settings are correct, call this only if debugging is enabled
         post_patch_check()
-    
-    
-
-
-
-"""
-    removed CMS_UNIQUE_SLUGS setting
-    
-"""
+patch_settings.ALREADY_PATCHED = False

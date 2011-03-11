@@ -197,9 +197,12 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None, language=settings.LANGUAGES[0][0]):
+    def get_request(self, path=None, language=None):
         if not path:
             path = self.get_pages_root()
+        
+        if not language:
+            language = settings.LANGUAGES[0][0]
         
         parsed_path = urlparse(path)
         host = parsed_path.netloc or 'testserver'

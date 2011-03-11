@@ -1,4 +1,27 @@
 # -*- coding: utf-8 -*-
+import inspect
+import os
+from copy import deepcopy
+
+import django
+from django import template
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import unquote, get_deleted_objects
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.db import transaction, models
+from django.forms import CharField
+from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import title, escape, force_escape, escapejs
+from django.utils.encoding import force_unicode
+from django.utils.translation import ugettext_lazy as _
+
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
@@ -25,30 +48,16 @@ from cms.utils.moderator import (update_moderation_message,
 from cms.utils.permissions import (has_page_add_permission, 
     has_page_change_permission, get_user_permission_level, 
     has_global_change_permissions_permission)
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
+from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
+    get_placeholder_conf)
 from cms.utils.plugins import get_placeholders, get_page_from_plugin_or_404
-from copy import deepcopy
-from django import template
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote, get_deleted_objects
-from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.core.urlresolvers import reverse
-from django.db import transaction, models, router
-from django.forms import Widget, Textarea, CharField
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import title, escape, force_escape, escapejs
-from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
 from menus.menu_pool import menu_pool
-import django
-import os
 
+# silly hack to test features/ fixme
+if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
+    from django.db import router
+else:
+    router = False
 
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -319,13 +328,8 @@ class PageAdmin(model_admin):
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
             for placeholder_name in sorted(get_placeholders(placeholders_template)):
-                name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (obj.template, placeholder_name), {}).get("name", None)
-                if not name:
-                    name = settings.CMS_PLACEHOLDER_CONF.get(placeholder_name, {}).get("name", None)
-                if not name:
-                    name = placeholder_name
-                else:
-                    name = _(name)
+                name = get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
+                name = _(name)
                 given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
@@ -1092,9 +1096,7 @@ class PageAdmin(model_admin):
             if page:
                 language = request.POST['language'] or get_language_from_request(request)
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
-                limits = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder.slot), {}).get('limits', None)
-                if not limits:
-                    limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get('limits', None)
+                limits = get_placeholder_conf(placeholder.slot, page.get_template(), "limits", None)
                 if limits:
                     global_limit = limits.get("global")
                     type_limit = limits.get(plugin_type)

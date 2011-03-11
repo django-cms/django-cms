@@ -6,6 +6,7 @@ from cms.admin.dialog.views import _form_class_selector
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool, ApphookPool
+from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
@@ -13,9 +14,11 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE,
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from menus.menu_pool import menu_pool
@@ -355,3 +358,91 @@ class AdminListFilterTests(TestCase):
             contribute_list_filter(experiment)
         self.assertTrue('soft_root' in control.list_filter, control.list_filter)
         self.assertFalse('soft_root' in experiment.list_filter, experiment.list_filter)
+
+
+class AdminTests(CMSTestCase):
+    # TODO: needs tests for actual permissions, not only superuser/normaluser
+    
+    fixtures = ['admin_guys.json', 'singlepage.json', 'permlessadmin.json']
+    
+    @property
+    def admin_class(self):
+        return admin.site._registry[Page]
+    
+    def get_admin(self):
+        return User.objects.get(username="admin")
+    
+    def get_staff(self):
+        return User.objects.get(username="test")
+    
+    def get_permless(self):
+        return User.objects.get(username="permless")
+    
+    def get_page(self):
+        return Page.objects.get(pk=1)
+    
+    def test_get_moderation_state_requires_perms(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            self.assertRaises(Http404, self.admin_class.get_moderation_states,
+                              request, 1)
+    
+    def test_get_moderation_state(self):
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request()
+            response = self.admin_class.get_moderation_states(request, 1)
+            self.assertEqual(response.status_code, 200)
+            
+    def test_remove_delete_state_requires_perms(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            self.assertRaises(PermissionDenied, self.admin_class.remove_delete_state,
+                              request, 1)
+            
+    def test_remove_delete_states(self):
+        page = self.get_page()
+        admin = self.get_admin()
+        PageModeratorState.objects.create(page=page, user=admin, action="DEL")
+        with self.login_user_context(admin):
+            self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 1)
+            request = self.get_request()
+            response = self.admin_class.remove_delete_state(request, 1)
+            self.assertEqual(response.status_code, 302)
+            page = self.reload(page)
+            self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 0)
+    
+    def test_change_status_requires_post(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            response = self.admin_class.change_status(request, 1)
+            self.assertEqual(response.status_code, 405)
+    
+    def test_change_status_requires_perms(self):
+        with self.login_user_context(self.get_permless()):
+            url = reverse('admin:cms_page_change_status', args=(1,))
+            response = self.client.post(url, {})
+            self.assertEqual(response.status_code, 403)
+    
+    def test_change_innavigation_requires_post(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            response = self.admin_class.change_innavigation(request, 1)
+            self.assertEqual(response.status_code, 405)
+
+    def test_change_moderation_requires_post(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            response = self.admin_class.change_moderation(request, 1)
+            self.assertEqual(response.status_code, 405)
+
+    def test_approve_page_requires_perms(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            self.assertRaises(Http404, self.admin_class.approve_page,
+                              request, 1)
+
+    def test_publish_page_requires_perms(self):
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request()
+            response = self.admin_class.publish_page(request, 1)
+            self.assertEqual(response.status_code, 403)

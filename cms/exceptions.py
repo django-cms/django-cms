@@ -29,6 +29,8 @@ class NoPermissionsException(PermissionsException):
     """Can be fired when some violate action is performed on permission system. 
     """
     
+class Deprecated(Exception): pass
+    
 class DuplicatePlaceholderWarning(Warning): pass
 
 class DontUsePageAttributeWarning(Warning): pass

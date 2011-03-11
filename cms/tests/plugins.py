@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import create_page
+from cms.api import create_page, publish_page
+from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
-from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
+from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.widgets import Media
-from django.template import RequestContext
+from django.test.testcases import TestCase
 from project.pluginapp.models import Article, Section
 from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
-
-
-
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -54,29 +53,6 @@ class PluginsTestBaseCase(CMSTestCase):
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
-
-# REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
-    def publish_page(self, page, approve=False, user=None, published_check=True):
-        if user:
-            self.login_user(user)
-
-        # publish / approve page by master
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        self.assertEqual(response.status_code, 200)
-
-        if not approve:
-            return self.reload_page(page)
-
-        # approve
-        page = self.approve_page(page)
-
-        if published_check:
-            # must have public object now
-            assert(page.publisher_public)
-            # and public object must be published
-            assert(page.publisher_public.published)
-
-        return page
 
     def approve_page(self, page):
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
@@ -328,40 +304,47 @@ class PluginsTestCase(PluginsTestBaseCase):
         # Let's count, to make sure we didn't remove a plugin accidentally.
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
-
-    def test_09_iheritplugin_media(self):
+                
+    def test_09_inheritplugin_media(self):
         """
         Test case for InheritPagePlaceholder
         """
-        inheritfrompage = create_page('page to inherit from', "nav_playground.html", "en")
+        with SettingsOverride(CMS_MODERATOR=False):
+            inheritfrompage = create_page('page to inherit from',
+                                          'nav_playground.html',
+                                          'en')
+            
+            body = inheritfrompage.placeholders.get(slot="body")
+            
+            plugin = TwitterRecentEntries(
+                plugin_type='TwitterRecentEntriesPlugin',
+                placeholder=body, 
+                position=1, 
+                language=settings.LANGUAGE_CODE,
+                twitter_user='djangocms',
+            )
+            plugin.insert_at(None, position='last-child', save=True)
+            
+            page = create_page('inherit from page',
+                               'nav_playground.html',
+                               'en',
+                               published=True)
+            
+            inherited_body = page.placeholders.get(slot="body")
+                    
+            inherit_plugin = InheritPagePlaceholder(
+                plugin_type='InheritPagePlaceholderPlugin',
+                placeholder=inherited_body, 
+                position=1, 
+                language=settings.LANGUAGE_CODE,
+                from_page=inheritfrompage,
+                from_language=settings.LANGUAGE_CODE)
+            inherit_plugin.insert_at(None, position='last-child', save=True)
+            
+            self.client.logout()
+            response = self.client.get(page.get_absolute_url())
+            self.assertTrue('%sjs/plugins/jquery.tweet.js' % settings.CMS_MEDIA_URL in response.content, response.content)
         
-        body = inheritfrompage.placeholders.get(slot="body")
-
-        plugin = GoogleMap(
-            plugin_type='GoogleMapPlugin',
-            placeholder=body,
-            position=1,
-            language=settings.LANGUAGE_CODE, lat=1, lng=1)
-        plugin.insert_at(None, position='last-child', save=True)
-        
-        page = create_page('inherit from page', "nav_playground.html", "en")
-        
-        inherited_body = page.placeholders.get(slot="body")
-
-        inherit_plugin = InheritPagePlaceholder(
-            plugin_type='InheritPagePlaceholderPlugin',
-            placeholder=inherited_body,
-            position=1,
-            language=settings.LANGUAGE_CODE,
-            from_page=inheritfrompage,
-            from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.insert_at(None, position='last-child', save=True)
-
-        request = self.get_request()
-        context = RequestContext(request, {})
-        inherit_plugin.render_plugin(context, inherited_body)
-        self.assertEquals(unicode(request.placeholder_media).find('maps.google.com') != -1, True)
-
     def test_10_fileplugin_icon_uppercase(self):
         page = create_page('testpage', 'nav_playground.html', 'en')
         body = page.placeholders.get(slot="body") 
@@ -567,7 +550,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 
         # check publish box
-        page = self.publish_page(page)
+        page = publish_page(page, self.super_user)
 
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(2, ArticlePluginModel.objects.all().count())
@@ -630,6 +613,15 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
+        
+
+class SekizaiTests(TestCase):
+    def test_post_patch_check(self):
+        post_patch_check()
+         
+    def test_fail(self):
+        with SettingsOverride(CMS_TEMPLATES=[('fail.html', 'fail')]):
+            self.assertRaises(ImproperlyConfigured, post_patch_check)
 
 
 class LinkPluginTestCase(PluginsTestBaseCase):
