@@ -361,14 +361,16 @@ class AdminListFilterTests(TestCase):
         self.assertFalse('soft_root' in experiment.list_filter, experiment.list_filter)
 
 
-class AdminTests(CMSTestCase):
-    # TODO: needs tests for actual permissions, not only superuser/normaluser
-    
-    fixtures = ['admin_guys.json', 'singlepage.json', 'permlessadmin.json']
-    
+class AdminTestsBase(object):
     @property
     def admin_class(self):
         return admin.site._registry[Page]
+
+
+class AdminTests(CMSTestCase, AdminTestsBase):
+    # TODO: needs tests for actual permissions, not only superuser/normaluser
+    
+    fixtures = ['admin_guys.json', 'singlepage.json', 'permlessadmin.json']
     
     def get_admin(self):
         return User.objects.get(username="admin")
@@ -382,89 +384,93 @@ class AdminTests(CMSTestCase):
     def get_page(self):
         return Page.objects.get(pk=1)
     
-    def test_get_moderation_state_requires_perms(self):
+    def test_get_moderation_state(self):
+        page = self.get_page()
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
             self.assertRaises(Http404, self.admin_class.get_moderation_states,
-                              request, 1)
-    
-    def test_get_moderation_state(self):
+                              request, page.pk)
         with self.login_user_context(self.get_admin()):
             request = self.get_request()
-            response = self.admin_class.get_moderation_states(request, 1)
+            response = self.admin_class.get_moderation_states(request, page.pk)
             self.assertEqual(response.status_code, 200)
             
-    def test_remove_delete_state_requires_perms(self):
+    def test_remove_delete(self):
+        page = self.get_page()
+        admin = self.get_admin()
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
             self.assertRaises(PermissionDenied, self.admin_class.remove_delete_state,
-                              request, 1)
-            
-    def test_remove_delete_states(self):
-        page = self.get_page()
-        admin = self.get_admin()
+                              request, page.pk)
         PageModeratorState.objects.create(page=page, user=admin, action="DEL")
         with self.login_user_context(admin):
             self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 1)
             request = self.get_request()
-            response = self.admin_class.remove_delete_state(request, 1)
+            response = self.admin_class.remove_delete_state(request, page.pk)
             self.assertEqual(response.status_code, 302)
             page = self.reload(page)
             self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 0)
     
-    def test_change_status_requires_post(self):
+    def test_change_status(self):
+        page = self.get_page()
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
             response = self.admin_class.change_status(request, 1)
             self.assertEqual(response.status_code, 405)
-    
-    def test_change_status_requires_perms(self):
         with self.login_user_context(self.get_permless()):
-            url = reverse('admin:cms_page_change_status', args=(1,))
-            response = self.client.post(url, {})
+            request = self.get_request(post_data={'no': 'data'})
+            response = self.admin_class.change_status(request, page.pk)
             self.assertEqual(response.status_code, 403)
     
-    def test_change_innavigation_requires_post(self):
+    def test_change_innavigation(self):
+        page = self.get_page()
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
-            response = self.admin_class.change_innavigation(request, 1)
+            response = self.admin_class.change_innavigation(request, page.pk)
             self.assertEqual(response.status_code, 405)
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'no':'data'})
+            self.assertRaises(Http404, self.admin_class.change_innavigation,
+                              request, page.pk + 100)
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'no':'data'})
+            response = self.admin_class.change_innavigation(request, page.pk)
+            self.assertEqual(response.status_code, 403)
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'no':'data'})
+            old = page.in_navigation
+            response = self.admin_class.change_innavigation(request, page.pk)
+            self.assertEqual(response.status_code, 200)
+            page = self.reload(page)
+            self.assertEqual(old, not page.in_navigation)
 
-    def test_change_moderation_requires_post(self):
+    def test_change_moderation(self):
+        page = self.get_page()
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
-            response = self.admin_class.change_moderation(request, 1)
+            response = self.admin_class.change_moderation(request, page.pk)
             self.assertEqual(response.status_code, 405)
-
-    def test_change_moderation_requires_post_argument(self):
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'wrongarg': 'blah'})
             self.assertRaises(Http404, self.admin_class.change_moderation,
                               request, 1)
-
-    def test_change_moderation_moderate_zero(self):
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'moderate': '0'})
-            response = self.admin_class.change_moderation(request, 1)
+            response = self.admin_class.change_moderation(request, page.pk)
             self.assertEqual(response.status_code, 200)
-
-    def test_change_moderation_moderate_invalidzero(self):
         # TODO: Shouldn't this raise 404?
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'moderate': 'zero'})
-            response = self.admin_class.change_moderation(request, 1)
+            response = self.admin_class.change_moderation(request, page.pk)
             self.assertEqual(response.status_code, 200)
-
-    def test_change_moderation_moderate_one(self):
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'moderate': '1'})
-            response = self.admin_class.change_moderation(request, 1)
+            response = self.admin_class.change_moderation(request, page.pk)
             self.assertEqual(response.status_code, 200)
-
-    def test_change_moderation_moderate_ten(self):
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'moderate': '10'})
-            self.assertRaises(Http404, self.admin_class.change_moderation, request, 1)
+            self.assertRaises(Http404, self.admin_class.change_moderation,
+                              request, page.pk)
 
     def test_approve_page_requires_perms(self):
         with self.login_user_context(self.get_permless()):
@@ -482,88 +488,92 @@ class AdminTests(CMSTestCase):
         with self.login_user_context(self.get_admin()):
             request = self.get_request()
             self.assertRaises(Http404, self.admin_class.remove_plugin, request)
-            
-    def test_lookup_allowed_site__exact(self):
-        self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
-            
-    def test_lookup_allowed_published(self):
-        self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))
     
-    def test_move_plugin_requires_post(self):
+    def test_move_plugin(self):
+        ph = Placeholder.objects.create(slot='test')
+        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
+        page = self.get_page()
+        source, target = list(page.placeholders.all())[:2]
+        pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
         with self.login_user_context(self.get_permless()):
             request = self.get_request()
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "error")
-    
-    def test_move_plugin_requires_usable_post_data(self):
-        with self.login_user_context(self.get_permless()):
             request = self.get_request(post_data={'not_usable': '1'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "error")
-    
-    def test_move_plugin_by_id_needs_page(self):
-        ph = Placeholder.objects.create(slot='test')
-        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'plugin_id': plugin.pk})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
-    
-    def test_move_plugin_by_ids_needs_page(self):
-        ph = Placeholder.objects.create(slot='test')
-        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         with self.login_user_context(self.get_admin()):
             request = self.get_request(post_data={'ids': plugin.pk})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
-    
-    def test_move_plugin_needs_valid_target(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        source = page.placeholders.all()[0]
-        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
         with self.login_user_context(self.get_admin()):
-            request = self.get_request(post_data={'plugin_id': plugin.pk,
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': 'invalid-placeholder'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "error")
-    
-    def test_move_plugin_by_id_requires_perms(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        source, target = list(page.placeholders.all())[:2]
-        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
         with self.login_user_context(self.get_permless()):
-            request = self.get_request(post_data={'plugin_id': plugin.pk,
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': target.slot})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
-    
-    def test_move_plugin_by_id(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        source, target = list(page.placeholders.all())[:2]
-        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
         with self.login_user_context(self.get_admin()):
-            request = self.get_request(post_data={'plugin_id': plugin.pk,
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
+                                                  'placeholder': target.slot})
+            response = self.admin_class.move_plugin(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, "ok")
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request(post_data={'ids': pageplugin.pk,
+                                                  'placeholder': target.slot})
+            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+        with self.login_user_context(self.get_admin()):
+            request = self.get_request(post_data={'ids': pageplugin.pk,
                                                   'placeholder': target.slot})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
     
-    def test_move_plugin_by_ids_requires_perms(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        source, target = list(page.placeholders.all())[:2]
-        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+    def test_preview_page(self):
         with self.login_user_context(self.get_permless()):
-            request = self.get_request(post_data={'ids': plugin.pk,
-                                                  'placeholder': target.slot})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
-    
-    def test_move_plugin_by_ids(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        source, target = list(page.placeholders.all())[:2]
-        plugin = add_plugin(source, 'TextPlugin', 'en', body='test')
-        with self.login_user_context(self.get_admin()):
-            request = self.get_request(post_data={'ids': plugin.pk,
-                                                  'placeholder': target.slot})
-            response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            request = self.get_request()
+            self.assertRaises(Http404, self.admin_class.preview_page, request,
+                              404)
+        page = self.get_page()
+        page.publisher_public_id = None
+        page.save()
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request('/?public=true')
+            self.assertRaises(Http404, self.admin_class.preview_page, request,
+                              page.pk)
+        page = self.get_page()
+        page.publisher_public = page
+        page.save()
+        base_url = page.get_absolute_url()
+        with self.login_user_context(self.get_permless()):
+            request = self.get_request('/?public=true')
+            response = self.admin_class.preview_page(request, page.pk)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response['Location'], '%s?preview=1' % base_url)
+            request = self.get_request()
+            response = self.admin_class.preview_page(request, page.pk)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response['Location'], '%s?preview=1&draft=1' % base_url)
+            site = Site.objects.create(domain='django-cms.org', name='django-cms')
+            page.site = site
+            page.save()
+            response = self.admin_class.preview_page(request, page.pk)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response['Location'],
+                        'http://django-cms.org%s?preview=1&draft=1' % base_url)
+
+
+class NoDBAdminTests(TestCase, AdminTestsBase):
+    def test_lookup_allowed_site__exact(self):
+        self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
+            
+    def test_lookup_allowed_published(self):
+        self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))

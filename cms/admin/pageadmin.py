@@ -1027,21 +1027,21 @@ class PageAdmin(model_admin):
     def preview_page(self, request, object_id):
         """Redirecting preview function based on draft_id
         """
-        instance = page = get_object_or_404(Page, id=object_id)
+        page = get_object_or_404(Page, id=object_id)
         attrs = "?preview=1"
         if request.REQUEST.get('public', None):
             if not page.publisher_public_id:
                 raise Http404
-            instance = page.publisher_public
+            page = page.publisher_public
         else:
             attrs += "&draft=1"
 
-        url = instance.get_absolute_url() + attrs
+        url = page.get_absolute_url() + attrs
 
         site = Site.objects.get_current()
 
-        if not site == instance.site:
-            url = "http://%s%s" % (instance.site.domain, url)
+        if not site == page.site:
+            url = "http://%s%s" % (page.site.domain, url)
         return HttpResponseRedirect(url)
 
     def change_status(self, request, page_id):
@@ -1062,14 +1062,12 @@ class PageAdmin(model_admin):
         """
         Switch the in_navigation of a page
         """
+        # why require post and still have page id in the URL???
         if request.method != 'POST':
             return HttpResponseNotAllowed
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
-            if page.in_navigation:
-                page.in_navigation = False
-            else:
-                page.in_navigation = True
+            page.in_navigation = not page.in_navigation
             page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
             return render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))

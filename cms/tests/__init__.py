@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.tests.admin import (AdminTestCase, AdminFieldsetTests, 
-    AdminListFilterTests, AdminTests)
+    AdminListFilterTests, AdminTests, NoDBAdminTests)
 from cms.tests.api import PythonAPITests
 from cms.tests.apphooks import ApphooksTestCase
 from cms.tests.docs import DocsTestCase
