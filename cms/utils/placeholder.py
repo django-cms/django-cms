@@ -3,9 +3,9 @@ from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from django.db.models.query_utils import Q
 
-def get_placeholder_conf(key, placeholder, template=None, default=None):
+def get_placeholder_conf(setting, placeholder, template=None, default=None):
     """
-    Returns the placeholder configuration for a given key. The key would for
+    Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins'  or 'name'.
     
     If a template is given, it will try
@@ -21,7 +21,7 @@ def get_placeholder_conf(key, placeholder, template=None, default=None):
         conf = settings.CMS_PLACEHOLDER_CONF.get(key)
         if not conf:
             continue
-        value = conf.get(key)
+        value = conf.get(setting)
         if value:
             return value
     return default

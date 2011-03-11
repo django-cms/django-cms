@@ -104,7 +104,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     slot = getattr(placeholder, 'slot', None)
     extra_context = {}
     if slot:
-        extra_context = get_placeholder_conf(slot, template, "extra_context", {})
+        extra_context = get_placeholder_conf("extra_context", slot, template, {})
     for key, value in extra_context.items():
         if not key in context:
             context[key] = value

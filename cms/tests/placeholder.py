@@ -3,6 +3,7 @@ from __future__ import with_statement
 from cms.api import add_plugin
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import render_placeholder
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
@@ -120,6 +121,23 @@ class PlaceholderTestCase(CMSTestCase):
         placeholder = self.reload(placeholder)
         rctx['placeholder'] = placeholder
         self.assertEqual(template.render(rctx).strip(), "test")
+    
+    def test_13_placeholder_context_leaking(self):
+        TEST_CONF = {'test': {'extra_context': {'width': 10}}}
+        ph = Placeholder.objects.create(slot='test')
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+            pop = push
+        context = NoPushPopContext()
+        context['request'] = self.get_request()
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+            render_placeholder(ph, context)
+            self.assertTrue('width' in context)
+            self.assertEqual(context['width'], 10)
+            ph.render(context, None)
+            self.assertTrue('width' in context)
+            self.assertEqual(context['width'], 10)
 
 
 class PlaceholderActionTests(CMSTestCase):
