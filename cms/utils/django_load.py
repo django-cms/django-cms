@@ -5,6 +5,9 @@ https://github.com/ojii/django-load.
 
 ANY changes to this file, be it upstream fixes or changes for the cms *must* be
 documentet clearly within this file with comments.
+
+For documentation on how to use the functions described in this file, please
+refer to http://django-load.readthedocs.org/en/latest/index.html.
 """
 from django.conf import settings
 from django.utils.importlib import import_module
