@@ -98,4 +98,6 @@ def details(request, slug):
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
+    from cms.cms_toolbar import test
+    context['toolbar_config'] = test(request, context, page)
     return render_to_response(template_name, context)

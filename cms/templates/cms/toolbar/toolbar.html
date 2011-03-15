@@ -39,7 +39,8 @@ jQuery(document).ready(function ($) {
 	// dummy JSON: {'action_items': [{name: 'edit', icon:'link/zum/zahnrad.jpg', submenu:[{'name': 'Grundeinstellungen', 'action': 'open_url', 'url': 'http:/ksdjagklajsdlkjaskdjf/'}]}]}
 	
 	// add logo
-	CMS.Toolbar.registerItems([
+	CMS.Toolbar.registerItems({{ toolbarconfig|safe }});
+	/*CMS.Toolbar.registerItems([
 		{	dir: 'left', type: 'anchor', order: 1, class: 'cms_toolbar-item_logo',
 			title: '{% trans "django CMS" %}',
 			url: 'http://www.django-cms.org/'
@@ -57,12 +58,6 @@ jQuery(document).ready(function ($) {
 			html: '<div class="cms_toolbar-item"><p>{% trans "Status" %}: <em>{% for state in page.last_page_states %}{{ state.get_action_display }} {% endfor %}</em></p></div>', htmlElement: ''
 		},
 		{% endif %}
-		/*{ dir: 'left', type: 'switcher', order: 20, class: 'cms_toolbar-item_compactmode',
-			addParameter: 'compact', removeParameter: 'compact-off',
-			state: 'off',
-			title: '{% trans "Compact mode" %}',
-			url: '/'
-		},*/
 		{ dir: 'right', type: 'button', order: 30, class: 'cms_toolbar-item_page',
 			title: '{% trans "Page" %}',
 			icon: 'cms_toolbar_icon-edit',
@@ -98,7 +93,7 @@ jQuery(document).ready(function ($) {
 			redirect: '{% url admin:index %}'
 		}
 		{% endif %}
-	]);
+	]);*/
 	// or register only one item
 	// CMS.Toolbar.registerItem({ item });
 });
