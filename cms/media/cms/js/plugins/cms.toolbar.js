@@ -16,8 +16,11 @@
 	CMS.Toolbar = Class.$extend({
 
 		options: {
-			csrf_token: '',
 			// not integrated yet
+			debug: false,
+			items: [],
+			csrf_token: '',
+			// experimental - does nothing yet
 			types: [
 				'anchor', this._registerAnchor,
 				'html', this._reigsterHtml
@@ -61,9 +64,13 @@
 			
 			// show toolbar
 			this.wrapper.show();
+			
 			// make sure toolbar is shown
 			var classy = this;
 			setTimeout(function () { classy.wrapper.show(); }, 50);
+			
+			// register all the items
+			if(this.options.items.length) this.registerItems(this.options.items);
 		},
 		
 		toggleToolbar: function () {
@@ -124,7 +131,7 @@
 					this._registerList(obj);
 					break;
 				default:
-					this.registerType(obj);
+					// this.registerType(obj);
 			}
 		},
 		

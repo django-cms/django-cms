@@ -32,6 +32,7 @@
 			this.dim = this.wrapper.find('#cms_placeholder-dim');
 			this.frame = this.wrapper.find('#cms_placeholder-content');
 			this.timer = function () {};
+			this.overlay = this.wrapper.find('#cms_placeholder-overlay');
 			
 			// save placeholder elements
 			if(this.options.editmode) {
@@ -113,7 +114,12 @@
 					slot: values[3]
 				};
 			
-			//log(values);
+			log(this.overlay);
+			// lets place the overlay
+			this.overlay.css({
+				width: holder.width(),
+				height: holder.height()
+			});
 		},
 		
 		_hideOverlay: function (holder) {
