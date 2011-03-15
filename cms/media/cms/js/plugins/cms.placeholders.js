@@ -98,7 +98,8 @@
 			var classy = this;
 			var holder = $(el);
 				holder.bind('mouseenter mouseleave', function (e) {
-					(e.type == 'mouseenter') ? classy._showOverlay.call(classy, holder) : classy._hideOverlay.call(classy, holder);
+					//(e.type == 'mouseenter') ? classy._showOverlay.call(classy, holder) : classy._hideOverlay.call(classy, holder);
+					if(e.type == 'mouseenter') classy._showOverlay.call(classy, holder);
 				});
 		},
 		
@@ -129,7 +130,7 @@
 			//log('hide');
 			
 			// hide overlay again
-			this.overlay.hide();
+			//this.overlay.hide();
 		},
 		
 		_showPluginList: function (el) {
