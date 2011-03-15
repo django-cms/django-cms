@@ -84,6 +84,11 @@ class BaseItem(Serializable):
 
 class Switcher(BaseItem):
     item_type = 'switcher'
+    extra_attributes = [
+        ('add_parameter', 'addParameter'),
+        ('remove_parameter', 'removeParameter'),
+        ('title', 'title'),
+    ]
     
     def __init__(self, alignment, css_class_suffix, add_parameter,
                  remove_parameter, title):

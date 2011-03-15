@@ -52,7 +52,7 @@ class CMSToolbar(Toolbar):
                 PostButton('right', 'logout', _('Logout'),
                        'cms/img/toolbar/icons/logout.png', '', 'logout')
             )
-        else:
+        elif not request.user.is_authenticated:
             items.append(
                 TemplateHTML('right', 'login', 'cms/toolbar/items/login.html')
             )

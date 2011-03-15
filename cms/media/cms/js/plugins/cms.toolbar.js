@@ -16,8 +16,11 @@
 	CMS.Toolbar = Class.$extend({
 
 		options: {
-			csrf_token: '',
 			// not integrated yet
+			debug: false,
+			items: [],
+			csrf_token: '',
+			// experimental - does nothing yet
 			types: [
 				'anchor', this._registerAnchor,
 				'html', this._reigsterHtml
@@ -61,9 +64,13 @@
 			
 			// show toolbar
 			this.wrapper.show();
+			
 			// make sure toolbar is shown
 			var classy = this;
 			setTimeout(function () { classy.wrapper.show(); }, 50);
+			
+			// register all the items
+			if(this.options.items.length) this.registerItems(this.options.items);
 		},
 		
 		toggleToolbar: function () {
@@ -104,7 +111,7 @@
 		registerItem: function (obj) {
 			// error handling
 			if(!obj.order) obj.dir = 0;
-
+			
 			// check for internal types
 			// jonas wants some refactoring here
 			switch(obj.type) {
@@ -124,7 +131,7 @@
 					this._registerList(obj);
 					break;
 				default:
-					throw obj.type + " is not an accepted toolbar type";
+					throw obj.type + " is not a valid toolbar item type";
 			}
 		},
 		
@@ -143,10 +150,6 @@
 			$(items).each(function (index, value) {
 				classy.registerItem(value);
 			});
-		},
-		
-		registerType: function () {
-			log('you want new type?');
 		},
 		
 		_registerAnchor: function (obj) {
