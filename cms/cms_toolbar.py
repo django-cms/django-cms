@@ -57,9 +57,3 @@ class CMSToolbar(Toolbar):
                 TemplateHTML('right', 'login', 'cms/toolbar/items/login.html')
             )
         return items
-
-
-def test(request, context, page):
-    toolbar = CMSToolbar()
-    request.current_page = page
-    return toolbar.as_json(context, request)

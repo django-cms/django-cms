@@ -3,21 +3,36 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.middleware.csrf import get_token
 from django.template.context import Context
+from django.template.defaultfilters import escape
 from django.template.loader import render_to_string
 from django.utils import simplejson
 from django.utils.encoding import force_unicode
 from django.utils.functional import Promise
+from django.utils.html import strip_spaces_between_tags
 
 
 class Serializable(object):
+    """
+    Base class for objects used in the toolbar. Abstracts the serialization and
+    conversion to JSON.
+    """
+    # attributes that this type and all subclasses of this type should serialize
     base_attributes = []
+    # additional attributes to serialize only on this type
     extra_attributes = []
     
     def as_json(self, context, request, **kwargs):
+        """
+        Converts the (serialized) data to JSON
+        """
         data = self.serialize(context, request, **kwargs)
         return simplejson.dumps(data)
         
     def serialize(self, context, request, **kwargs):
+        """
+        Serializes it's data. Uses self.base_attributes, self.extra_attributes
+        and self.get_extra_data to 
+        """
         data = {}
         for python, javascript in self.base_attributes:
             self._populate(data, python, javascript, context, request, **kwargs)
@@ -75,7 +90,7 @@ class BaseItem(Serializable):
     
     def serialize(self, context, request, toolbar, **kwargs):
         counter_attr = 'counter_%s' % self.alignment
-        current = getattr(toolbar, counter_attr, -1)
+        current = getattr(toolbar, counter_attr, 0)
         this = current + 1
         self.order = this * 10
         setattr(toolbar, counter_attr, this)
@@ -128,7 +143,7 @@ class HTML(BaseItem):
     
     def __init__(self, alignment, css_class_suffix, html):
         super(Anchor, self).__init__(alignment, css_class_suffix)
-        self.html = html
+        self.html = escape(html)
 
 
 class TemplateHTML(BaseItem):
@@ -144,8 +159,9 @@ class TemplateHTML(BaseItem):
         new_context['request'] = request
         new_context.update(kwargs)
         rendered = render_to_string(self.template, new_context)
+        stripped = strip_spaces_between_tags(rendered.strip())
         return {
-            'html': rendered
+            'html': escape(stripped),
         }
 
 
