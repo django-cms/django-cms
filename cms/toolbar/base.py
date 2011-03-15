@@ -98,7 +98,7 @@ class Switcher(BaseItem):
         self.title = title
         
     def get_extra_data(self, context, request, **kwargs):
-        state = bool(request.GET.get(self.add_parameter))
+        state = self.add_parameter in request.GET
         return {
             'state': state
         }
