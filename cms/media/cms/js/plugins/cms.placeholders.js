@@ -120,10 +120,16 @@
 				width: holder.width(),
 				height: holder.height()
 			});
+			
+			// and now show it
+			this.overlay.show();
 		},
 		
 		_hideOverlay: function (holder) {
 			//log('hide');
+			
+			// hide overlay again
+			this.overlay.hide();
 		},
 		
 		_showPluginList: function (el) {

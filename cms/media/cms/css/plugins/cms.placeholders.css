@@ -35,4 +35,4 @@
 .cms_placeholder-content_inner { padding:25px !important; }
 .cms_placeholder-content_loader { min-height:50px; background:url('../../images/toolbar/loader.gif') no-repeat center center; }
 
-.cms_placeholder-overlay { background:red; }
+#cms_placeholder-overlay { display:none; position:absolute; left:0; top:0; z-index:9999; border:1px solid #5b80b2; background:#5b80b2 !important; }

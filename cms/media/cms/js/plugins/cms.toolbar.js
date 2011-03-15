@@ -182,10 +182,10 @@
 			var btn = template.find('.cms_toolbar-item_switcher-link span');
 			
 			// initial setup
-			if(obj.state == 'on') {
-				btn.data('state', 'on').css('backgroundPosition', '0px -198px');
+			if(obj.state == true) {
+				btn.data('state', true).css('backgroundPosition', '0px -198px');
 			} else {
-				btn.data('state', 'off').css('backgroundPosition', '-40px -198px');
+				btn.data('state', false).css('backgroundPosition', '-40px -198px');
 			}
 			
 			// add events
@@ -193,7 +193,7 @@
 				e.preventDefault();
 				
 				// animate toggle effect and trigger handler
-				if(btn.data('state') == 'on') {
+				if(btn.data('state') == true) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
 						var url = classy._removeUrl(window.location.href, obj.addParameter);
