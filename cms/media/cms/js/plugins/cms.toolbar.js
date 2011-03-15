@@ -11,13 +11,16 @@
 (function ($, Class) {
 	/**
 	 * Toolbar
-	 * @version: 0.0.1
+	 * @version: 0.0.2
 	 */
 	CMS.Toolbar = Class.$extend({
 
 		options: {
-			'page_is_defined': false,
-			'edit_mode': false
+			// not integrated yet
+			types: [
+				'anchor', this._registerAnchor,
+				'html', this._reigsterHtml
+			]
 		},
 
 		initialize: function (container, options) {
@@ -33,7 +36,6 @@
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.toolbar.left = this.toolbar.find('.cms_toolbar-left');
 			this.toolbar.right = this.toolbar.find('.cms_toolbar-right');
-			this.dim = this.wrapper.find('#cms_toolbar-dim');
 			
 			// bind event to toggle button
 			this.toggle = this.wrapper.find('#cms_toolbar-toggle');
@@ -58,6 +60,12 @@
 			
 			// init scripts
 			this.toggleToolbar();
+			
+			// show toolbar
+			this.wrapper.show();
+			// make sure toolbar is shown
+			var classy = this;
+			setTimeout(function () { classy.wrapper.show(); }, 50);
 		},
 		
 		toggleToolbar: function () {
@@ -94,46 +102,13 @@
 			// save as cookie
 			$.cookie('CMS_toolbar-collapsed', true, { path:'/', expires:7 });
 		},
-		
-		toggleDim: function () {
-			(this.toolbar.data('dimmed')) ? this._showDim() : this._hideDim();
-		},
-		
-		_showDim: function () {
-			var classy = this;
-			// stop window from scrolling
-			// $(document.body).css('overflow', 'hidden');
-			// attach resize event to window
-			$(window).bind('resize', function () {
-				classy.dim.css({
-					'width': $(document).width(),
-					'height': $(document).height(),
-				});
-			});
-			// init dim resize
-			$(window).resize();
-			// change data information
-			this.toolbar.data('dimmed', false);
-			// show dim
-			this.dim.stop().fadeIn();
-		},
-		
-		_hideDim: function () {
-			// retain window from scrolling
-			// $(document.body).css('overflow', 'auto');
-			// unbind resize event
-			$(window).unbind('resize');
-			// change data information
-			this.toolbar.data('dimmed', true);
-			// hide dim
-			this.dim.css('opcaity', 0.6).stop().fadeOut();
-		},
-		
+
 		registerItem: function (obj) {
 			// error handling
 			if(!obj.order) obj.dir = 0;
 
 			// check for internal types
+			// jonas wants some refactoring here
 			switch(obj.type) {
 				case 'anchor':
 					this._registerAnchor(obj);
@@ -154,6 +129,11 @@
 					// if debug: FAIL LOUD
 					// else: fail silently
 			}
+		},
+		
+		removeItem: function (index) {
+			// function to remove an item
+			if(index) $($('.cms_toolbar-item:visible')[index]).remove();
 		},
 		
 		registerItems: function (items) {
@@ -241,9 +221,44 @@
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_list', obj);
 			
-			// here i have to do some crazy shit
+			// item injection logic
+			var list = template.find('.cms_toolbar-item_list').html().trim();
+			var tmp = '';
+			// lets loop through the items
+			$(obj.items).each(function (index, value) {
+				// add icon if available
+				var icon = (value.icon) ? 'cms_toolbar_icon ' : '';
+				// replace attributes
+				tmp += list.replace('[list_title]', value.title).replace('[list_url]', value.url).replace('<span>', '<span class="'+icon+value.icon+'">');
+			});
+			// add items
+			template.find('.cms_toolbar-item_list').html($(tmp));
 			
+			// add events
+			var container = template.find('.cms_toolbar-item_list'); 
+			var btn = template.find('.cms_toolbar-btn');
+				btn.data('collapsed', true).bind('click', function (e) {
+					e.preventDefault();
+					($(this).data('collapsed')) ? show_list() : hide_list();
+			});
 			
+			function show_list() {
+				// add event to body to hide the list needs a timout for late trigger
+				setTimeout(function () {
+					$(window).bind('click', hide_list);
+				}, 100);
+				
+				// show element and save data
+				container.show();
+				btn.addClass('cms_toolbar-btn-active').data('collapsed', false);
+			}
+			function hide_list() {
+				// remove the body event
+				$(window).unbind('click');
+				// show element and save data
+				container.hide();
+				btn.removeClass('cms_toolbar-btn-active').data('collapsed', true);
+			}
 			
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
@@ -255,6 +270,7 @@
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
 			if(obj.url) template = template.replace('[url]', obj.url);
+			if(!obj.icon && obj.type == 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
 			template = (obj.token) ? template.replace('[token]', obj.token) : template.replace('[token]', '');
 			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
@@ -284,6 +300,9 @@
 				var leftContent = left.find('> *');
 					if(!leftContent.length) { left.append(el); return false; }
 				
+				// first insert it at start position
+				el.insertBefore($(leftContent[0]));
+				
 				// and what happens if there is already an element?
 				leftContent.each(function (index, item) {
 					// sava data from element
@@ -296,6 +315,9 @@
 			if(dir == 'right') {
 				var rightContent = right.find('> *');
 					if(!rightContent.length) { right.append(el); return false; }
+				
+				// first insert it at start position
+				el.insertBefore($(rightContent[0]));
 				
 				rightContent.each(function (index, item) {
 					// save data from element
@@ -351,9 +373,4 @@
 		}
 
 	});
-	
-	//CMS.Collapse
-	// need some awesome show hide effects
-	
-	// new Toolbar();
 })(jQuery, Class);
