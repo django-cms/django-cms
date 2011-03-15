@@ -11,13 +11,16 @@
 (function ($, Class) {
 	/**
 	 * Toolbar
-	 * @version: 0.0.1
+	 * @version: 0.0.2
 	 */
 	CMS.Toolbar = Class.$extend({
 
 		options: {
-			'page_is_defined': false,
-			'edit_mode': false
+			// not integrated yet
+			types: [
+				'anchor', this._registerAnchor,
+				'html', this._reigsterHtml
+			]
 		},
 
 		initialize: function (container, options) {
@@ -33,7 +36,6 @@
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.toolbar.left = this.toolbar.find('.cms_toolbar-left');
 			this.toolbar.right = this.toolbar.find('.cms_toolbar-right');
-			this.dim = this.wrapper.find('#cms_toolbar-dim');
 			
 			// bind event to toggle button
 			this.toggle = this.wrapper.find('#cms_toolbar-toggle');
@@ -58,6 +60,9 @@
 			
 			// show toolbar
 			this.wrapper.show();
+			// make sure toolbar is shown
+			var classy = this;
+			setTimeout(function () { classy.wrapper.show(); }, 50);
 		},
 		
 		toggleToolbar: function () {
@@ -94,46 +99,13 @@
 			// save as cookie
 			$.cookie('CMS_toolbar-collapsed', true, { path:'/', expires:7 });
 		},
-		
-		toggleDim: function () {
-			(this.toolbar.data('dimmed')) ? this._showDim() : this._hideDim();
-		},
-		
-		_showDim: function () {
-			var classy = this;
-			// stop window from scrolling
-			// $(document.body).css('overflow', 'hidden');
-			// attach resize event to window
-			$(window).bind('resize', function () {
-				classy.dim.css({
-					'width': $(document).width(),
-					'height': $(document).height(),
-				});
-			});
-			// init dim resize
-			$(window).resize();
-			// change data information
-			this.toolbar.data('dimmed', false);
-			// show dim
-			this.dim.stop().fadeIn();
-		},
-		
-		_hideDim: function () {
-			// retain window from scrolling
-			// $(document.body).css('overflow', 'auto');
-			// unbind resize event
-			$(window).unbind('resize');
-			// change data information
-			this.toolbar.data('dimmed', true);
-			// hide dim
-			this.dim.css('opcaity', 0.6).stop().fadeOut();
-		},
-		
+
 		registerItem: function (obj) {
 			// error handling
 			if(!obj.order) obj.dir = 0;
 			
 			// check for internal types
+			// jonas wants some refactoring here
 			switch(obj.type) {
 				case 'anchor':
 					this._registerAnchor(obj);

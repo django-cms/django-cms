@@ -198,7 +198,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         name = title(slot)
     if not name:
         name = name_fallback
-    toolbar = render_to_string("cms/toolbar/add_plugins.html", {
+    toolbar = render_to_string("cms/toolbar/placeholder.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),
         'placeholder_label': name,

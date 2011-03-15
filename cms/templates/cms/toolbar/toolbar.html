@@ -13,59 +13,25 @@ jQuery(document).ready(function ($) {
 		rel: 'stylesheet', type: 'text/css',
 		href: '{{ CMS_MEDIA_URL }}css/plugins/cms.toolbar.css'
 	});
-	
-	// save options
-	var options = {
-		'placeholder_data': '{{ placeholder_data }}',
-		'urls': {
-			cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}",
-			cms_page_changelist: "{% url admin:cms_page_changelist %}",              
-			cms_page_change_template: {% if page %}"{% url admin:cms_page_change_template page.pk %}"{% else %}null{% endif %},
-			cms_page_add_plugin: "{% url admin:cms_page_add_plugin %}",
-			cms_page_remove_plugin: "{% url admin:cms_page_remove_plugin %}",
-			cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}"
-		},
-		'lang': {
-			move_slot: "{% trans 'Move to %(name)s' %}",
-			question: "{% trans 'Are you sure you want to delete this plugin?' %}"
-		},
-		{% if page %}
-		'page_is_defined': true
-		{% endif %}
-	};
+	$('<link>').appendTo('head').attr({
+		rel: 'stylesheet', type: 'text/css',
+		href: '{{ CMS_MEDIA_URL }}css/plugins/cms.placeholders.css'
+	});
 	
 	// initialize toolbar and pass all the variables, use same namespace to trigger
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', options);
-
-	// dummy JSON: {'action_items': [{name: 'edit', icon:'link/zum/zahnrad.jpg', submenu:[{'name': 'Grundeinstellungen', 'action': 'open_url', 'url': 'http:/ksdjagklajsdlkjaskdjf/'}]}]}
+	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {});
 	
 	// add logo
 	CMS.Toolbar.registerItems([
-		{	dir: 'left', type: 'anchor', order: 1, class: 'cms_toolbar-item_logo',
-			title: '{% trans "django CMS" %}',
-			url: 'http://www.django-cms.org/'
-		},
-		
+		{	dir: 'left', type: 'anchor', order: 1, class: 'cms_toolbar-item_logo', title: '{% trans "django CMS" %}', url: 'http://www.django-cms.org/' },
 		// when you are logged in
 		{% if auth %}
-		{	dir: 'left', type: 'switcher', order: 10, class: 'cms_toolbar-item_editmode',
-			addParameter: 'edit', removeParameter: 'edit-off',
-			state: '{% if edit %}on{% else %}off{% endif %}',
-			title: '{% trans "Edit mode" %}',
-			url: '/'
-		},
+		{	dir: 'left', type: 'switcher', order: 10, class: 'cms_toolbar-item_editmode', addParameter: 'edit', removeParameter: 'edit-off', state: '{% if edit %}on{% else %}off{% endif %}', title: '{% trans "Edit mode" %}', url: '/' },
 		// show status when edit mode is off
 		{% if page.last_page_states %}
-		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_status',
-			html: '<div class="cms_toolbar-item"><p>{% trans "Status" %}: <em>{% for state in page.last_page_states %}{{ state.get_action_display }} {% endfor %}</em></p></div>', htmlElement: ''
-		},
+		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_status', html: '<div class="cms_toolbar-item"><p>{% trans "Status" %}: <em>{% for state in page.last_page_states %}{{ state.get_action_display }} {% endfor %}</em></p></div>', htmlElement: '' },
 		{% endif %}
-		/*{ dir: 'left', type: 'switcher', order: 20, class: 'cms_toolbar-item_compactmode',
-			addParameter: 'compact', removeParameter: 'compact-off',
-			state: 'off',
-			title: '{% trans "Compact mode" %}',
-			url: '/'
-		},*/
+		/*{ dir: 'left', type: 'switcher', order: 20, class: 'cms_toolbar-item_compactmode', addParameter: 'compact', removeParameter: 'compact-off', state: 'off', title: '{% trans "Compact mode" %}', url: '/' },*/
 		{	dir: 'right', type: 'list', order: 30, class: 'cms_toolbar-item_page',
 			title: '{% trans "Page" %}',
 			icon: 'cms_toolbar_icon-edit',
@@ -91,73 +57,70 @@ jQuery(document).ready(function ($) {
 				{% endif %}
 			]
 		},
-		{	dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout',
-			title: '{% trans "Logout" %}',
-			icon: 'cms_toolbar_icon-lock',
-			action: '', hidden: '<input type="hidden" name="logout_submit" />',
-			token: "{% csrf_token %}"
-		}
+		{	dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout', title: '{% trans "Logout" %}', icon: 'cms_toolbar_icon-lock', action: '', hidden: '<input type="hidden" name="logout_submit" />', token: "{% csrf_token %}" }
 		// show moderator buttons
 		{% if edit and page %},
 		{% if moderator_should_approve and has_moderate_permission %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator',
-			title: '{{ page_moderator_state.label }}', icon: '',
-			action: '', hidden: '', token: '',
-			redirect: '{% url admin:cms_page_approve_page page.pk %}'
-		}
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{{ page_moderator_state.label }}', icon: '', action: '', hidden: '', token: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
 		{% else %}
 		{% if has_publish_permission %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator',
-			title: '{% trans "Publish" %}', icon: '',
-			action: '', hidden: '', token: '',
-			redirect: '{% url admin:cms_page_publish_page page.pk %}'
-		}
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Publish" %}', icon: '', action: '', hidden: '', token: '', redirect: '{% url admin:cms_page_publish_page page.pk %}' }
 		{% else %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator',
-			title: '{% trans "Request Approval" %}', icon: '',
-			action: '', hidden: '', token: '',
-			redirect: '{% url admin:cms_page_approve_page page.pk %}'
-		}
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Request Approval" %}', icon: '', action: '', hidden: '', token: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
 		{% endif %}
 		{% endif %}
 		{% endif %}
-		
 		// when you are logged off
 		{% else %}
-		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_login',
-			html: '', htmlElement: '#cms_toolbar-item_login'
-		},
-		{	dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin',
-			title: '{% trans "Admin" %}',
-			icon: 'cms_toolbar_icon-settings',
-			action: '', hidden: '', token: '',
-			redirect: '{% url admin:index %}'
-		}
+		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_login', html: '', htmlElement: '#cms_toolbar-item_login' },
+		{	dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin', title: '{% trans "Admin" %}', icon: 'cms_toolbar_icon-settings', action: '', hidden: '', token: '', redirect: '{% url admin:index %}' }
 		{% endif %}
 	]);
-	// or register only one item
-	// CMS.Toolbar.registerItem({ item });
+	
+	// initialize placeholders
+	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
+		data: '{{ placeholder_data }}',
+		urls: {
+			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}',
+			cms_page_changelist: '{% url admin:cms_page_changelist %}',              
+			cms_page_change_template: {% if page %}'{% url admin:cms_page_change_template page.pk %}'{% else %}null{% endif %},
+			cms_page_add_plugin: '{% url admin:cms_page_add_plugin %}',
+			cms_page_remove_plugin: '{% url admin:cms_page_remove_plugin %}',
+			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}'
+		},
+		lang: {
+			move_slot: "{% trans 'Move to %(name)s' %}",
+			question: "{% trans 'Are you sure you want to delete this plugin?' %}"
+		}
+		{% if page %},
+		page_is_defined: true
+		{% endif %}
+	});
 });
 //]]>
 </script>
 
-<div id="cms_toolbar" style="display:none;">
+<div id="cms_toolbar" class="cms_reset" style="display:none;">
 	<!-- start: toolbar -->
-	<div id="cms_toolbar-toggle">
-		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
-			<span class="cms_toolbar-btn_right cms_toolbar_icon-toggle">
-				<span class="cms_toolbar_icon">&nbsp;</span>
-				<span class="cms_toolbar_icon-hide">{% trans "Show/Hide toolbar" %}</span>
-			</span>
-		</a>
+	<div class="cms_toolbar">
+		<div id="cms_toolbar-toggle">
+			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
+				<span class="cms_toolbar-btn_right cms_toolbar_icon-toggle">
+					<span class="cms_toolbar_icon">&nbsp;</span>
+					<span class="cms_toolbar_icon-hide">{% trans "Show/Hide toolbar" %}</span>
+				</span>
+			</a>
+		</div>
+		<div id="cms_toolbar-toolbar">
+			<div class="cms_toolbar-left"></div>
+			<div class="cms_toolbar-right"></div>
+		</div>
 	</div>
-	<div id="cms_toolbar-toolbar">
-		<div class="cms_toolbar-left"></div>
-		<div class="cms_toolbar-right"></div>
-	</div>
-	<div id="cms_toolbar-panel"></div>
-	<div id="cms_toolbar-dim"></div>
 	<!-- end: toolbar -->
+
+	<!-- placeholder dimmer and loader -->
+	<div id="cms_placeholder-dim"></div>
+	<div id="cms_placeholder-content"><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
 	
 	<!-- template: anchor -->
 	<div id="cms_toolbar-item_anchor" class="cms_toolbar-item">
@@ -175,10 +138,10 @@ jQuery(document).ready(function ($) {
 		<fieldset>
 			[hidden]
 			[token]
-			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left cms_toolbar-btn">
+			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
 				<span class="cms_toolbar-btn_right">
 					<span class="cms_toolbar_icon">&nbsp;</span>
-					<span>&nbsp;[title]</span>
+					<span class="cms_toolbar_title">&nbsp;[title]</span>
 				</span>
 			</a>
 		</fieldset>
@@ -186,10 +149,10 @@ jQuery(document).ready(function ($) {
 	
 	<!-- template: list -->
 	<div id="cms_toolbar-item_list" class="cms_toolbar-item">
-		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left cms_toolbar-btn">
+		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
 			<span class="cms_toolbar-btn_right">
 				<span class="cms_toolbar_icon">&nbsp;</span>
-				<span>&nbsp;[title]</span>
+				<span class="cms_toolbar_title">&nbsp;[title]</span>
 				<span class="cms_toolbar_icon cms_toolbar_icon-more">-</span>
 			</span>
 		</a>
@@ -209,6 +172,7 @@ jQuery(document).ready(function ($) {
 			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
 				<span class="cms_toolbar-btn_right">{% trans "Login" %}</span>
 			</a>
+			<input type="submit" value="{% trans 'Login' %}" style="display:none;" />
 		</fieldset>
 	</form>
 </div>
