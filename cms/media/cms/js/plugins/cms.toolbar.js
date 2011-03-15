@@ -141,7 +141,6 @@
 		},
 		
 		registerItems: function (items) {
-			var items = items.items;
 			// make sure an array is passed
 			if(typeof(items) != 'object') return false;
 			// save reference to this class

@@ -34,3 +34,5 @@
 	-webkit-box-shadow:#000 -5px 0px 5px; -moz-box-shadow:#000 -5px 0px 5px; box-shadow:#000 -5px 0px 5px; }
 .cms_placeholder-content_inner { padding:25px !important; }
 .cms_placeholder-content_loader { min-height:50px; background:url('../../images/toolbar/loader.gif') no-repeat center center; }
+
+.cms_placeholder-overlay { background:red; }

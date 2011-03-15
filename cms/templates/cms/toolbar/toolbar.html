@@ -19,90 +19,26 @@ jQuery(document).ready(function ($) {
 	});
 	
 	// initialize toolbar and pass all the variables, use same namespace to trigger
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', { csrf_token: "{% csrf_token %}" });
-	
-	// add logo
-	CMS.Toolbar.registerItems({{ toolbarconfig|safe }});
-	/*CMS.Toolbar.registerItems([
-		{	dir: 'left', type: 'anchor', order: 1, class: 'cms_toolbar-item_logo',
-			title: '{% trans "django CMS" %}',
-			url: 'http://www.django-cms.org/'
-		},
-		// when you are logged in
-		{% if auth %}
-		{	dir: 'left', type: 'switcher', order: 10, class: 'cms_toolbar-item_editmode', addParameter: 'edit', removeParameter: 'edit-off', state: '{% if edit %}on{% else %}off{% endif %}', title: '{% trans "Edit mode" %}', url: '/' },
-		// show status when edit mode is off
-		{% if page.last_page_states %}
-		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_status', html: '<div class="cms_toolbar-item"><p>{% trans "Status" %}: <em>{% for state in page.last_page_states %}{{ state.get_action_display }} {% endfor %}</em></p></div>', htmlElement: '' },
-		{% endif %}
-		//{ dir: 'left', type: 'switcher', order: 20, class: 'cms_toolbar-item_compactmode', addParameter: 'compact', removeParameter: 'compact-off', state: 'off', title: '{% trans "Compact mode" %}', url: '/' },
-		{	dir: 'right', type: 'list', order: 30, class: 'cms_toolbar-item_page',
-			title: '{% trans "Page" %}',
-			icon: 'cms_toolbar_icon-edit',
-			items: [
-				{ title: '{% trans "Move/add Pages" %}', url: '{% url admin:cms_page_changelist %}', icon: 'cms_toolbar_icon-sitemap' }
-				{% if has_add_page_permission %},
-				{ title: '{% trans "Add child page" %}', url: '{% url admin:cms_page_add %}?target={{ page.pk }}&amp;position=last-child', icon: 'cms_toolbar_icon-child' },
-				{ title: '{% trans "Add sibling page" %}', url: '{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&amp;position=last-child{% endif %}', icon: 'cms_toolbar_icon-sibling' }
-				{% endif %}
-				{% if has_delete_permission %},
-				{ title: '{% trans "Delete" %}', url: '{% url admin:cms_page_delete page.pk %}', icon: 'cms_toolbar_icon-delete' },
-				{% endif %}
-			]
-		},
-		{	dir: 'right', type: 'list', order: 40, class: 'cms_toolbar-item_admin',
-			title: '{% trans "Admin" %}',
-			icon: 'cms_toolbar_icon-settings',
-			items: [
-				{ title: '{% trans "Administration" %}', url: '{% url admin:index %}', icon: 'cms_toolbar_icon-admin' }
-				{% if has_change_permission %},
-				{ title: '{% trans "Page Settings" %}', url: '{% url admin:cms_page_change page.pk %}', icon: 'cms_toolbar_icon-edit' },
-				{ title: '{% trans "Page History" %}', url: '{% url admin:cms_page_history page.pk %}', icon: 'cms_toolbar_icon-history' }
-				{% endif %}
-			]
-		},
-		{	dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout', title: '{% trans "Logout" %}', icon: 'cms_toolbar_icon-lock', action: '', hidden: '<input type="hidden" name="logout_submit" />' }
-		// show moderator buttons
-		{% if edit and page %},
-		{% if moderator_should_approve and has_moderate_permission %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{{ page_moderator_state.label }}', icon: '', action: '', hidden: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
-		{% else %}
-		{% if has_publish_permission %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Publish" %}', icon: '', action: '', hidden: '', redirect: '{% url admin:cms_page_publish_page page.pk %}' }
-		{% else %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Request Approval" %}', icon: '', action: '', hidden: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
-		{% endif %}
-		{% endif %}
-		{% endif %}
-		// when you are logged off
-		{% else %}
-		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_login', html: '', htmlElement: '#cms_toolbar-item_login' },
-		{	dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin', title: '{% trans "Admin" %}', icon: 'cms_toolbar_icon-settings', action: '', hidden: '', redirect: '{% url admin:index %}' }
-		{% endif %}
-	]);
-	
-	// initialize placeholders
-	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
-		{% if edit %}editmode: true,{% endif %}
-		data: '{{ placeholder_data }}',
-		urls: {
-			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}',
-			cms_page_changelist: '{% url admin:cms_page_changelist %}',              
-			cms_page_change_template: {% if page %}'{% url admin:cms_page_change_template page.pk %}'{% else %}null{% endif %},
-			cms_page_add_plugin: '{% url admin:cms_page_add_plugin %}',
-			cms_page_remove_plugin: '{% url admin:cms_page_remove_plugin %}',
-			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}'
-		},
-		lang: {
-			move_slot: "{% trans 'Move to %(name)s' %}",
-			question: "{% trans 'Are you sure you want to delete this plugin?' %}"
-		}
-		{% if page %},
-		page_is_defined: true
-		{% endif %}
-	]);*/
-	// or register only one item
-	// CMS.Toolbar.registerItem({ item });
+	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ toolbarconfig|safe }});
+    CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
+        {% if edit %}editmode: true,{% endif %}
+        data: '{{ placeholder_data }}',
+        urls: {
+            cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}',
+            cms_page_changelist: '{% url admin:cms_page_changelist %}',              
+            cms_page_change_template: {% if page %}'{% url admin:cms_page_change_template page.pk %}'{% else %}null{% endif %},
+            cms_page_add_plugin: '{% url admin:cms_page_add_plugin %}',
+            cms_page_remove_plugin: '{% url admin:cms_page_remove_plugin %}',
+            cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}'
+        },
+        lang: {
+            move_slot: "{% trans 'Move to %(name)s' %}",
+            question: "{% trans 'Are you sure you want to delete this plugin?' %}"
+        }
+        {% if page %},
+        page_is_defined: true
+        {% endif %}
+    });
 });
 //]]>
 </script>
