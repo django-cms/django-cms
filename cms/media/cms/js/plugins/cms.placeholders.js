@@ -16,8 +16,8 @@
 	CMS.Placeholders = Class.$extend({
 
 		options: {
-			'page_is_defined': false,
-			'edit_mode': false
+			'edit_mode': false,
+			'page_is_defined': false
 		},
 
 		initialize: function (container, options) {
@@ -32,28 +32,48 @@
 			this.dim = this.wrapper.find('#cms_placeholder-dim');
 			this.frame = this.wrapper.find('#cms_placeholder-content');
 			this.timer = function () {};
+			
 			// save placeholder elements
-			this.placeholders = $('.cms_placeholder');
-			this.placeholders.each(function (index, item) {
-				classy._setup.call(classy, item);
-			});
+			if(this.options.editmode) {
+				this.bars = $('.cms_placeholder-bar');
+				this.bars.each(function (index, item) {
+					classy._bars.call(classy, item);
+				});
+				
+				// enable dom traversal for cms_placeholder
+				this.holders = $('.cms_placeholder');
+				this.holders.each(function (index, item) {
+					classy._holder.call(classy, item);
+				});
+			}
+			
+			// setup everything
+			this._setup();
 		},
 		
-		_setup: function (el) {
+		_setup: function () {
+			// set default dimm value to false
+			this.toolbar.data('dimmed', false)
+			
+			// set defailt frame value to true
+			this.frame.data('collapsed', true);
+		},
+		
+		_bars: function (el) {
 			// save reference to this class
 			var classy = this;
-			var placeholder = $(el);
+			var bar = $(el);
 			
 			// attach button event
-			var placeholderButton = placeholder.find('.cms_toolbar-btn');
-				placeholderButton.data('collapsed', true).bind('click', function (e) {
+			var barButton = bar.find('.cms_toolbar-btn');
+				barButton.data('collapsed', true).bind('click', function (e) {
 					e.preventDefault();
 					
 					($(this).data('collapsed')) ? classy._showPluginList.call(classy, $(e.currentTarget)) : classy._hidePluginList.call(classy, $(e.currentTarget));
 				});
 			
-			// read and save placeholder variables
-			var values = placeholder.attr('class');
+			// read and save placeholder bar variables
+			var values = bar.attr('class');
 				values = values.split('::');
 				values.shift(); // remove classes
 				values = {
@@ -63,20 +83,41 @@
 				};
 			
 			// attach events to placeholder plugins
-			placeholder.find('.cms_placeholder-subnav li a').bind('click', function (e) {
+			bar.find('.cms_placeholder-subnav li a').bind('click', function (e) {
 				e.preventDefault();
 				// add type to values
 				values.plugin_type = $(this).attr('rel').split('::')[1];
 				// try to add a new plugin
 				classy.addPlugin.call(classy, classy.options.urls.cms_page_add_plugin, values);
 			});
-
-						
-			// set default dimm value to false
-			this.toolbar.data('dimmed', false)
+		},
+		
+		_holder: function (el) {
+			// save reference to this class
+			var classy = this;
+			var holder = $(el);
+				holder.bind('mouseenter mouseleave', function (e) {
+					(e.type == 'mouseenter') ? classy._showOverlay.call(classy, holder) : classy._hideOverlay.call(classy, holder);
+				});
+		},
+		
+		_showOverlay: function (holder) {
+			// get al the variables from holder
+			var values = holder.attr('class');
+				values = values.split('::');
+				values.shift(); // remove classes
+				values = {
+					plugin_id: values[0],
+					placeholder: values[1],
+					type: values[2],
+					slot: values[3]
+				};
 			
-			// set defailt frame value to true
-			this.frame.data('collapsed', true);
+			//log(values);
+		},
+		
+		_hideOverlay: function (holder) {
+			//log('hide');
 		},
 		
 		_showPluginList: function (el) {

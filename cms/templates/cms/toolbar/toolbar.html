@@ -19,7 +19,7 @@ jQuery(document).ready(function ($) {
 	});
 	
 	// initialize toolbar and pass all the variables, use same namespace to trigger
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {});
+	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', { csrf_token: "{% csrf_token %}" });
 	
 	// add logo
 	CMS.Toolbar.registerItems([
@@ -57,28 +57,29 @@ jQuery(document).ready(function ($) {
 				{% endif %}
 			]
 		},
-		{	dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout', title: '{% trans "Logout" %}', icon: 'cms_toolbar_icon-lock', action: '', hidden: '<input type="hidden" name="logout_submit" />', token: "{% csrf_token %}" }
+		{	dir: 'right', type: 'button', order: 50, class: 'cms_toolbar-item_logout', title: '{% trans "Logout" %}', icon: 'cms_toolbar_icon-lock', action: '', hidden: '<input type="hidden" name="logout_submit" />' }
 		// show moderator buttons
 		{% if edit and page %},
 		{% if moderator_should_approve and has_moderate_permission %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{{ page_moderator_state.label }}', icon: '', action: '', hidden: '', token: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{{ page_moderator_state.label }}', icon: '', action: '', hidden: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
 		{% else %}
 		{% if has_publish_permission %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Publish" %}', icon: '', action: '', hidden: '', token: '', redirect: '{% url admin:cms_page_publish_page page.pk %}' }
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Publish" %}', icon: '', action: '', hidden: '', redirect: '{% url admin:cms_page_publish_page page.pk %}' }
 		{% else %}
-		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Request Approval" %}', icon: '', action: '', hidden: '', token: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
+		{	dir: 'right', type: 'button', order: 25, class: 'cms_toolbar-item_moderator', title: '{% trans "Request Approval" %}', icon: '', action: '', hidden: '', redirect: '{% url admin:cms_page_approve_page page.pk %}' }
 		{% endif %}
 		{% endif %}
 		{% endif %}
 		// when you are logged off
 		{% else %}
 		{	dir: 'left', type: 'html', order: 20, class: 'cms_toolbar-item_login', html: '', htmlElement: '#cms_toolbar-item_login' },
-		{	dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin', title: '{% trans "Admin" %}', icon: 'cms_toolbar_icon-settings', action: '', hidden: '', token: '', redirect: '{% url admin:index %}' }
+		{	dir: 'right', type: 'button', order: 20, class: 'cms_toolbar-item_admin', title: '{% trans "Admin" %}', icon: 'cms_toolbar_icon-settings', action: '', hidden: '', redirect: '{% url admin:index %}' }
 		{% endif %}
 	]);
 	
 	// initialize placeholders
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
+		{% if edit %}editmode: true,{% endif %}
 		data: '{{ placeholder_data }}',
 		urls: {
 			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}',
@@ -118,9 +119,12 @@ jQuery(document).ready(function ($) {
 	</div>
 	<!-- end: toolbar -->
 
-	<!-- placeholder dimmer and loader -->
+	<!-- placeholder dimmer, loader and overlay -->
 	<div id="cms_placeholder-dim"></div>
 	<div id="cms_placeholder-content"><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
+	<div id="cms_placeholder-overlay">
+		test
+	</div>
 	
 	<!-- template: anchor -->
 	<div id="cms_toolbar-item_anchor" class="cms_toolbar-item">
