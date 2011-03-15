@@ -45,6 +45,9 @@
 			// csrf security patch
 			patchCsrf(jQuery);
 			
+			this.types = {};
+			this.types['anchor'] = function_that_handles_anchors_inserted_into()
+			
 			// initial setups
 			this._setup();
 		},
@@ -129,7 +132,7 @@
 		registerItem: function (obj) {
 			// error handling
 			if(!obj.order) obj.dir = 0;
-			
+
 			// check for internal types
 			switch(obj.type) {
 				case 'anchor':
@@ -148,7 +151,8 @@
 					this._registerList(obj);
 					break;
 				default:
-					this.registerType(obj);
+					// if debug: FAIL LOUD
+					// else: fail silently
 			}
 		},
 		
