@@ -7,7 +7,7 @@
 
 /*##################################################|*/
 /* #PLACEHOLDERS# */
-.cms_placeholder { height:36px; border:1px solid #ddd !important;
+.cms_placeholder-bar { height:36px; border:1px solid #ddd !important;
 	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
 
 .cms_placeholder-title { float:left; font-weight:bold !important; padding:7px 15px 0 15px !important; }

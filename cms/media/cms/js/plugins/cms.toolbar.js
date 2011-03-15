@@ -16,6 +16,7 @@
 	CMS.Toolbar = Class.$extend({
 
 		options: {
+			csrf_token: '',
 			// not integrated yet
 			types: [
 				'anchor', this._registerAnchor,
@@ -271,7 +272,7 @@
 			if(obj.title) template = template.replace('[title]', obj.title);
 			if(obj.url) template = template.replace('[url]', obj.url);
 			if(!obj.icon && obj.type == 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
-			template = (obj.token) ? template.replace('[token]', obj.token) : template.replace('[token]', '');
+			template = (obj.token) ? template.replace('[token]', this.options.csrf_token) : template.replace('[token]', '');
 			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
 			// back to jquery object
