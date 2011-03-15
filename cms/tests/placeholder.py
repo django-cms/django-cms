@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
+from cms.api import add_plugin
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import render_placeholder
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import (SettingsOverride, 
+    UserLoginContext)
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
@@ -11,8 +16,8 @@ from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from project.fakemlng.models import Translations
-from project.placeholderapp.models import Example1, Example2, Example3, Example4, \
-    Example5
+from project.placeholderapp.models import (Example1, Example2, Example3, Example4, 
+    Example5)
 
 
 class PlaceholderTestCase(CMSTestCase):
@@ -110,12 +115,29 @@ class PlaceholderTestCase(CMSTestCase):
         rctx['placeholder'] = placeholder
         self.assertEqual(template.render(rctx), "")
         self.assertEqual(placeholder.cmsplugin_set.count(), 0)
-        self.add_plugin(placeholder=placeholder, body="test", language=settings.LANGUAGES[0][0])
+        add_plugin(placeholder, "TextPlugin", settings.LANGUAGES[0][0], body="test")
         self.assertEqual(placeholder.cmsplugin_set.count(), 1)
         rctx = RequestContext(request)
         placeholder = self.reload(placeholder)
         rctx['placeholder'] = placeholder
         self.assertEqual(template.render(rctx).strip(), "test")
+    
+    def test_13_placeholder_context_leaking(self):
+        TEST_CONF = {'test': {'extra_context': {'width': 10}}}
+        ph = Placeholder.objects.create(slot='test')
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+            pop = push
+        context = NoPushPopContext()
+        context['request'] = self.get_request()
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+            render_placeholder(ph, context)
+            self.assertTrue('width' in context)
+            self.assertEqual(context['width'], 10)
+            ph.render(context, None)
+            self.assertTrue('width' in context)
+            self.assertEqual(context['width'], 10)
 
 
 class PlaceholderActionTests(CMSTestCase):
@@ -232,3 +254,66 @@ class PlaceholderModelTests(CMSTestCase):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = ph._get_attached_field_name()
         self.assertEqual(result, None) # Simple PH - no field name
+
+
+class PlaceholderAdminTest(CMSTestCase):
+    placeholderconf = {'test': {
+            'limits': {
+                'global': 2,
+                'TextPlugin': 1,
+            }
+        }
+    }
+    def get_placeholder(self):
+        return Placeholder.objects.create(slot='test')
+    
+    def get_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[Example1]
+    
+    def get_post_request(self, data):
+        request = self.get_request()
+        request.POST._mutable = True
+        request.POST.update(data)
+        request.POST._mutable = False
+        request.method = 'POST'
+        request.environ['METHOD'] = 'POST'
+        return request
+    
+    def test_01_test_global_limit(self):
+        placeholder = self.get_placeholder()
+        admin = self.get_admin()
+        data = {
+            'plugin_type': 'LinkPlugin',
+            'placeholder': placeholder.pk,
+            'language': 'en',
+        }
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(data)
+                response = admin.add_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                response = admin.add_plugin(request) # second
+                self.assertEqual(response.status_code, 200)
+                response = admin.add_plugin(request) # third
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins.")
+
+    def test_02_test_type_limit(self):
+        placeholder = self.get_placeholder()
+        admin = self.get_admin()
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': placeholder.pk,
+            'language': 'en',
+        }
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(data)
+                response = admin.add_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                response = admin.add_plugin(request) # second
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")

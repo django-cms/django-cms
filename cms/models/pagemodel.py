@@ -18,7 +18,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _, get_language, ugettext
+from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
 from os.path import join
 from cms.publisher.errors import MpttPublisherCantPublish
@@ -130,7 +130,9 @@ class Page(MPTTModel):
         # check the slugs
         check_title_slugs(self)
         
-    def copy_page(self, target, site, position='first-child', copy_permissions=True, copy_moderation=True, public_copy=False):
+    def copy_page(self, target, site, position='first-child',
+                  copy_permissions=True, copy_moderation=True,
+                  public_copy=False):
         """
         copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
@@ -498,22 +500,6 @@ class Page(MPTTModel):
 
     def get_public_object(self):
         return self.publisher_public
-            
-    def get_calculated_status(self):
-        """
-        get the calculated status of the page based on published_date,
-        published_end_date, and status
-        """
-        if settings.CMS_SHOW_START_DATE:
-            if self.publication_date > datetime.now():
-                return False
-        
-        if settings.CMS_SHOW_END_DATE and self.publication_end_date:
-            if self.publication_end_date < datetime.now():
-                return True
-
-        return self.published
-    calculated_status = property(get_calculated_status)
         
     def get_languages(self):
         """
@@ -680,13 +666,14 @@ class Page(MPTTModel):
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
         template = None
-        if self.template and len(self.template)>0 and \
-            self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
-            template = self.template
-        else:
-            for p in self.get_ancestors(ascending=True):
-                template = p.get_template()
-                break
+        if self.template:
+            if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
+                template = self.template
+            else:
+                for p in self.get_ancestors(ascending=True):
+                    template = p.get_template()
+                    if template:
+                        break
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
         return template

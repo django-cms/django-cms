@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.api import create_page
 from cms.management.commands import publisher_publish
 from cms.models.pagemodel import Page
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride, StdoutOverride
+from cms.test_utils.util.context_managers import (SettingsOverride, 
+    StdoutOverride)
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 
@@ -22,12 +24,12 @@ class PublisherTestCase(CMSTestCase):
               B  C
         '''
         # Create a simple tree of 3 pages
-        pageA = self.create_page(title="Page A", published= True, 
-                                     in_navigation= True)
-        pageB = self.create_page(parent_page=pageA,title="Page B", 
-                                     published= True, in_navigation= True)
-        pageC = self.create_page(parent_page=pageA,title="Page C", 
-                                     published= False, in_navigation= True)
+        pageA = create_page("Page A", "nav_playground.html", "en",
+                            published= True, in_navigation= True)
+        pageB = create_page("Page B", "nav_playground.html", "en", 
+                            parent=pageA, published=True, in_navigation=True)
+        pageC = create_page("Page C", "nav_playground.html", "en",
+                            parent=pageA, published=False, in_navigation=True)
         # Assert A and B are published, C unpublished
         self.assertTrue(pageA.published)
         self.assertTrue(pageB.published)
@@ -98,8 +100,8 @@ class PublisherTestCase(CMSTestCase):
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         
         # Now, let's create a page. That actually creates 2 Page objects
-        self.create_page(title="The page!", published=True, 
-                                    in_navigation=True)
+        create_page("The page!", "nav_playground.html", "en", published=True, 
+                    in_navigation=True)
         draft = Page.objects.drafts()[0]
         draft.reverse_id = 'a_test' # we have to change *something*
         draft.save()
@@ -132,8 +134,8 @@ class PublisherTestCase(CMSTestCase):
         self.assertEquals(non_draft.reverse_id, 'a_test')
         
     def test_06_unpublish(self):
-        page = self.create_page(title="Page", published=True,
-                                    in_navigation=True)
+        page = create_page("Page", "nav_playground.html", "en", published=True,
+                           in_navigation=True)
         page.published = False
         page.save()
         self.assertEqual(page.published, False)
@@ -146,20 +148,20 @@ class PublisherTestCase(CMSTestCase):
         For help understanding what this tests for, see:
         http://articles.sitepoint.com/print/hierarchical-data-database
         '''
-        home_page = self.create_page(title="home", published=True,
-            in_navigation=False)
+        home_page = create_page("home", "nav_playground.html", "en",
+                                published=True, in_navigation=False)
             
-        item1 = self.create_page(title="item1", parent_page=home_page,
-            published=True)
-        item2 = self.create_page(title="item2", parent_page=home_page,
-            published=True)
+        create_page("item1", "nav_playground.html", "en", parent=home_page,
+                    published=True)
+        item2 = create_page("item2", "nav_playground.html", "en", parent=home_page,
+                            published=True)
             
         item2 = self.reload_page(item2)    
 
-        subitem1 = self.create_page(title="subitem1", parent_page=item2,
-            published=True)
-        subitem2 = self.create_page(title="subitem2", parent_page=item2,
-            published=True)
+        create_page("subitem1", "nav_playground.html", "en", parent=item2,
+                    published=True)
+        create_page("subitem2", "nav_playground.html", "en", parent=item2,
+                    published=True)
             
         not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
         drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))

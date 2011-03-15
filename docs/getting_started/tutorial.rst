@@ -288,11 +288,15 @@ Here is a simple example for a base template called ``base.html``:
 
 .. code-block:: html+django
 
-  {% load cms_tags %}
+  {% load cms_tags sekizai_tags %}
   <html>
+    <head>
+        {% render_block "css" %}
+    </head>
     <body>
-     {% placeholder base_content %}
-     {% block base_content%}{% endblock %}
+        {% placeholder base_content %}
+        {% block base_content%}{% endblock %}
+        {% render_block "js" %}
     </body>
   </html>
 
@@ -320,6 +324,23 @@ Now, feel free to experiment and make a ``template_2.html`` file! If you don't f
 just copy template_1 and name the second placeholder something like "template_2_content".
 
 .. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
+
+.. _sekizai-namespaces:
+
+Media handling with sekizai
+===========================
+
+The django CMS handles media files (css stylesheets and javascript files)
+required by CMS plugins using `django-sekizai`_. This requires you to define at
+least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
+so using the ``render_block`` template tag from the ``sekizai_tags`` template
+tag libary. It is highly recommended to put the ``{% render_block "css" %}`` tag
+as last thing before the closing ``</head>`` HTML tag and the
+``{% render_block "js" %}`` tag as the last thing before the closing ``</body>``
+HTML tag.
+
+.. _django-sekizai: https://github.com/ojii/django-sekizai 
+
 
 *****************************
 Creating your first CMS page!

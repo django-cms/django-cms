@@ -1,4 +1,6 @@
 #!/bin/bash
+find . -name '*.pyc' -delete
+
 cd tests
 
 sigfile=.buildoutsig
@@ -15,29 +17,29 @@ python="python" # to ensure this script works if no python option is specified
 while [ "$index" -lt "$num_args" ]
 do
     case "${args[$index]}" in
-        "--failfast")
+        "-f"|"--failfast")
             failfast="--failfast"
             ;;
 
-        "--rebuild-env")
+        "-r"|"--rebuild-env")
             reuse_env=false
             ;;
 
-        "--with-coverage")
+        "-c"|"--with-coverage")
             disable_coverage=false
             ;;
          
-        "--django")
+        "-d"|"--django")
             let "index = $index + 1"
             django="${args[$index]}"
             ;;
         
-        "--python")
+        "-p"|"--python")
             let "index = $index + 1"
             python="${args[$index]}"
             ;;
 
-        "--help")
+        "-h"|"--help")
             echo ""
             echo "usage:"
             echo "    runtests.sh"
@@ -45,11 +47,12 @@ do
             echo "    or runtests.sh [flags] [testcase]"
             echo ""
             echo "flags:"
-            echo "    --failfast - abort at first failing test"
-            echo "    --with-coverage - enables coverage"
-            echo "    --rebuild-env - run buildout before the tests"
-            echo "    --django <version> - run tests against a django version, options: 12, 13 or trunk"
-            echo "    --python /path/to/python - python version to use to run the tests"
+            echo "    -f, --failfast - abort at first failing test"
+            echo "    -c, --with-coverage - enables coverage"
+            echo "    -r, --rebuild-env - run buildout before the tests"
+            echo "    -d, --django <version> - run tests against a django version, options: 12, 13 or trunk"
+            echo "    -p, --python /path/to/python - python version to use to run the tests"
+            echo "    -h, --help - display this help"
             exit 1
             ;;
 

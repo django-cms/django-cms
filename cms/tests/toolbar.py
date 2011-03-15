@@ -1,6 +1,8 @@
 from __future__ import with_statement
+from cms.api import create_page
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import UserLoginContext, SettingsOverride
+from cms.test_utils.util.context_managers import (UserLoginContext, 
+    SettingsOverride)
 from django.conf import settings
 
 
@@ -8,7 +10,7 @@ class ToolbarTests(SettingsOverrideTestCase):
     settings_overrides = {'CMS_MODERATOR': False}
     
     def test_01_static_html(self):
-        page = self.create_page(published=True)
+        page = create_page("page", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()
         with SettingsOverride(DEBUG=True):
             with UserLoginContext(self, superuser):

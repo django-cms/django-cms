@@ -22,8 +22,15 @@ def cut_after(node, levels, removed):
         removed.extend(node.children)
         node.children = []
     else:
+        removed_local = []
         for n in node.children:
-            cut_after(n, levels - 1, removed)
+            if n.visible:
+                cut_after(n, levels - 1, removed)
+            else:
+                removed_local.append(n)
+        for n in removed_local:
+            node.children.remove(n)
+        removed.extend(removed_local)
 
 def remove(node, removed):
     removed.append(node)
@@ -350,7 +357,7 @@ class PageLanguageUrl(InclusionTag):
         else:
             page = request.current_page
             if page == "dummy":
-                return ''
+                return {'content': ''}
             try:
                 url = page.get_absolute_url(language=lang, fallback=False)
                 url = "/" + lang + url

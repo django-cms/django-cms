@@ -49,7 +49,7 @@
 			});
 			
 			// csrf security patch
-			patchCsrf(jQuery);
+			$(document).cmsPatchCSRF();
 			
 			// initial setups
 			this._setup();
@@ -131,7 +131,7 @@
 					this._registerList(obj);
 					break;
 				default:
-					// this.registerType(obj);
+					throw obj.type + " is not a valid toolbar item type";
 			}
 		},
 		
@@ -149,10 +149,6 @@
 			$(items).each(function (index, value) {
 				classy.registerItem(value);
 			});
-		},
-		
-		registerType: function () {
-			log('you want new type?');
 		},
 		
 		_registerAnchor: function (obj) {

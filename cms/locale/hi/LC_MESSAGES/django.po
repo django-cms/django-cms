@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 13:38+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: Hindi <None>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Country: SWITZERLAND\n"
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -65,8 +65,10 @@ msgid "Page Title"
 msgstr "पृष्ठ शीर्षक"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Overwrites आपके ब्राउज़र या बुकमार्क में के शीर्ष पर प्रदर्शित होता है क्या"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr ""
+"Overwrites आपके ब्राउज़र या बुकमार्क में के शीर्ष पर प्रदर्शित होता है क्या"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -114,12 +116,17 @@ msgid "user"
 msgstr "उपयोगकर्ता"
 
 #: admin/forms.py:215
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr "पृष्ठ अनुमति जोड़ें भी बच्चों, या वंश का उपयोग करने की आवश्यकता है, अन्यथा पृष्ठ जोड़े अपने निर्माता से नहीं बदला जा सकता है."
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"पृष्ठ अनुमति जोड़ें भी बच्चों, या वंश का उपयोग करने की आवश्यकता है, अन्यथा "
+"पृष्ठ जोड़े अपने निर्माता से नहीं बदला जा सकता है."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
-msgstr "पृष्ठ जोड़ें अनुमति भी पृष्ठ को संपादित करने की अनुमति की आवश्यकता है."
+msgstr ""
+"पृष्ठ जोड़ें अनुमति भी पृष्ठ को संपादित करने की अनुमति की आवश्यकता है."
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -150,8 +157,12 @@ msgid "Notify user"
 msgstr "सूचित उपयोगकर्ता"
 
 #: admin/forms.py:296
-msgid "Send email notification to user about username or password change. Requires user email."
-msgstr "उपयोगकर्ता नाम या पासवर्ड को बदलने के बारे में उपयोगकर्ता के लिए ईमेल सूचना भेजें. उपयोगकर्ता ईमेल आवश्यक है."
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
+msgstr ""
+"उपयोगकर्ता नाम या पासवर्ड को बदलने के बारे में उपयोगकर्ता के लिए ईमेल सूचना "
+"भेजें. उपयोगकर्ता ईमेल आवश्यक है."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,12 +177,17 @@ msgid "Email notification requires valid email address."
 msgstr "ईमेल अधिसूचना मान्य ईमेल पते की आवश्यकता है."
 
 #: admin/forms.py:339
-msgid "The permission to add new pages requires the permission to change pages!"
-msgstr "नए पृष्ठ जोड़ने की अनुमति के पन्नों को बदलने की अनुमति की आवश्यकता है!"
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
+msgstr ""
+"नए पृष्ठ जोड़ने की अनुमति के पन्नों को बदलने की अनुमति की आवश्यकता है!"
 
 #: admin/forms.py:341
-msgid "The permission to add new users requires the permission to change users!"
-msgstr "नए उपयोगकर्ताओं को जोड़ने की अनुमति उपयोगकर्ताओं को बदलने की अनुमति की आवश्यकता है!"
+msgid ""
+"The permission to add new users requires the permission to change users!"
+msgstr ""
+"नए उपयोगकर्ताओं को जोड़ने की अनुमति उपयोगकर्ताओं को बदलने की अनुमति की "
+"आवश्यकता है!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -269,8 +285,11 @@ msgstr "नकल %(language)s के लिए plugins %(placeholder)s"
 
 #: admin/pageadmin.py:1260
 #, python-format
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "%(plugin_name)s  स्थिति %(position)s में संपादित प्लगइन (%(placeholder)s में "
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr ""
+"%(plugin_name)s  स्थिति %(position)s में संपादित प्लगइन (%(placeholder)s में"
+" "
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -278,8 +297,12 @@ msgstr "कहाँ चला गया प्लगइन्स"
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
-msgstr "%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट किया गया."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
+msgstr ""
+"%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट "
+"किया गया."
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -586,7 +609,9 @@ msgid "changed by"
 msgstr "बदल द्वारा"
 
 #: models/pagemodel.py:64
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "जब पृष्ठ रह जाना चाहिए. दर्जा \\ \"प्रकाशन चाहिए \" पेज के लिए जीना जाओ."
 
 #: models/pagemodel.py:65
@@ -598,8 +623,12 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "सभी पूर्वजों नेविगेशन में प्रदर्शित नहीं किया जाएगा"
 
 #: models/pagemodel.py:68
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-msgstr "एक अद्वितीय पहचानकर्ता है कि इस पृष्ठ पर जोड़ने के लिए page_url templatetag के साथ प्रयोग किया जाता है"
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
+msgstr ""
+"एक अद्वितीय पहचानकर्ता है कि इस पृष्ठ पर जोड़ने के लिए page_url templatetag "
+"के साथ प्रयोग किया जाता है"
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -841,8 +870,12 @@ msgid "Language or Page must be filled out"
 msgstr "भाषा या पृष्ठ से भरा जाना चाहिए"
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
-msgstr "एक पृष्ठ का चयन इस placeholder में अपनी plugins शामिल करने के लिए, खाली वर्तमान पृष्ठ का चयन होगा"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
+msgstr ""
+"एक पृष्ठ का चयन इस placeholder में अपनी plugins शामिल करने के लिए, खाली "
+"वर्तमान पृष्ठ का चयन होगा"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -933,8 +966,11 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr "दर्ज करें एक टेम्पलेट (यानी. \"snippets/plugin_xy.html\"), जो प्रदान किया जाएगा."
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr ""
+"दर्ज करें एक टेम्पलेट (यानी. \"snippets/plugin_xy.html\"), जो प्रदान किया "
+"जाएगा."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1036,14 +1072,18 @@ msgstr "लिंक संकेत"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr "अगर दी, इशारा आपके Twitter प्रोफ़ाइल की कड़ी के रूप में प्रदर्शित होता है."
+msgstr ""
+"अगर दी, इशारा आपके Twitter प्रोफ़ाइल की कड़ी के रूप में प्रदर्शित होता है."
 
 #: plugins/twitter/models.py:16
 msgid "query"
 msgstr ""
 
 #: plugins/twitter/models.py:16
-msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 msgstr ""
 
 #: plugins/video/cms_plugins.py:10
@@ -1067,8 +1107,12 @@ msgid "movie url"
 msgstr "फिल्म url"
 
 #: plugins/video/models.py:10
-msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr "vimeo या YouTube वीडियो URL. उदाहरण: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
+msgstr ""
+"vimeo या YouTube वीडियो URL. उदाहरण: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1130,8 +1174,12 @@ msgid "button highlight color"
 msgstr " button highlight color"
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-msgstr "फ़्लैश प्लगइन गुम. <a href=\"http://adobe.com/flashplayer\">यहाँ</a> डाउनलोड करें"
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
+msgstr ""
+"फ़्लैश प्लगइन गुम. <a href=\"http://adobe.com/flashplayer\">यहाँ</a> डाउनलोड"
+" करें"
 
 #: templates/admin/page_submit_line.html:3
 #: templates/admin/cms/page/change_form.html:273
@@ -1160,8 +1208,11 @@ msgstr "Save और संपादन जारी"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr "(पृष्ठ) <a href=\"%(admin_url)s\">%(page)s</a> आपके द्वारा approvement आवश्यकता हो सकती है."
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgstr ""
+"(पृष्ठ) <a href=\"%(admin_url)s\">%(page)s</a> आपके द्वारा approvement "
+"आवश्यकता हो सकती है."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1269,8 +1320,12 @@ msgstr "पृष्ठ राज्यों"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-msgstr "इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
+msgstr ""
+"इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश"
+" पोस्ट."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"

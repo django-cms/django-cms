@@ -4,6 +4,7 @@ Edit Toolbar middleware
 """
 from cms import settings as cms_settings
 from cms.utils import get_template_from_request
+from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.plugins import get_placeholders
 from cms.utils.urlutils import is_media_request
 from django.contrib.auth import authenticate, login, logout
@@ -105,13 +106,8 @@ class ToolbarMiddleware(object):
             placeholders = get_placeholders(template)
             for placeholder in placeholders:
                 d = {}
-                name = cms_settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (page.get_template(), placeholder), {}).get("name", None)
-                if not name:
-                    name = cms_settings.CMS_PLACEHOLDER_CONF.get(placeholder, {}).get("name", None)
-                if not name:
-                    name = title(placeholder)
-                else:
-                    name = _(name)
+                name = get_placeholder_conf(placeholder, page.get_template(), "name", title(placeholder))
+                name = _(name)
                 d['name'] = name
                 plugins = plugin_pool.get_all_plugins(placeholder, page)
                 d['plugins'] = []
@@ -138,4 +134,5 @@ class ToolbarMiddleware(object):
         })
         #from django.core.context_processors import csrf
         #context.update(csrf(request))
+        context['toolbarconfig'] = request.toolbar.as_json(context, request)
         return render_to_string('cms/toolbar/toolbar.html', context, RequestContext(request))
