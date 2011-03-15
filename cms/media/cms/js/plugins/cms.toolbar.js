@@ -46,10 +46,7 @@
 			});
 			
 			// csrf security patch
-			patchCsrf(jQuery);
-			
-			this.types = {};
-			this.types['anchor'] = function_that_handles_anchors_inserted_into()
+			$(document).cmsPatchCSRF();
 			
 			// initial setups
 			this._setup();
@@ -127,8 +124,7 @@
 					this._registerList(obj);
 					break;
 				default:
-					// if debug: FAIL LOUD
-					// else: fail silently
+					throw obj.type + " is not an accepted toolbar type";
 			}
 		},
 		
@@ -138,6 +134,7 @@
 		},
 		
 		registerItems: function (items) {
+			var items = items.items;
 			// make sure an array is passed
 			if(typeof(items) != 'object') return false;
 			// save reference to this class

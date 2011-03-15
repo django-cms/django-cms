@@ -134,4 +134,5 @@ class ToolbarMiddleware(object):
         })
         #from django.core.context_processors import csrf
         #context.update(csrf(request))
+        context['toolbarconfig'] = request.toolbar.as_json(context, request)
         return render_to_string('cms/toolbar/toolbar.html', context, RequestContext(request))
