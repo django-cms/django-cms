@@ -124,7 +124,6 @@ right position::
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
-        'cms.middleware.media.PlaceholderMediaMiddleware',
     )
 
 You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
@@ -136,6 +135,7 @@ settings file will not have any)::
         'django.core.context_processors.request',
         'django.core.context_processors.media',
         'cms.context_processors.media',
+        'sekizai.context_processors.sekizai',
     )
 
 Almost there!
