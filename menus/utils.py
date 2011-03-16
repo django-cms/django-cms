@@ -146,7 +146,7 @@ def find_selected(nodes):
     for node in nodes:
         if hasattr(node, "selected"):
             return node
-        if hasattr(node, "ancestor"):
+        elif hasattr(node, "ancestor"):
             result = find_selected(node.children)
             if result:
                 return result
@@ -205,12 +205,11 @@ class _SimpleLanguageChanger(object):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
     
     def get_page_path(self, lang):
-        if getattr(self.request, 'current_page'):
+        if getattr(self.request, 'current_page', None):
             try:
                 return self.request.current_page.get_absolute_url(language=lang, fallback=False)
             except Title.DoesNotExist:
                 return self.request.current_page.get_absolute_url(language=lang, fallback=True)
-            return self.request.current_page.get_absolute_url(language=lang)
         else:
             return ''
 
@@ -221,13 +220,3 @@ def simple_language_changer(func):
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__
     return _wrapped
-
-    
-
-def handle_navigation_manipulators(navigation_tree, request):
-    for handler_function_name, name in settings.CMS_NAVIGATION_MODIFIERS:
-        func_name = handler_function_name.split(".")[-1]
-        modifier = __import__(".".join(handler_function_name.split(".")[:-1]),(),(),(func_name,))
-        handler_func = getattr(modifier, func_name)  
-        handler_func(navigation_tree, request)
-    return navigation_tree

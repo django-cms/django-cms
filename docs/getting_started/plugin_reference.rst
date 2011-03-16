@@ -60,10 +60,6 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
-The Google Maps API key is also required. You can either put this in a project
-setting called ``GOOGLE_MAPS_API_KEY`` or be sure the template context has a
-variable with the same name.
-
 
 ****
 Link
@@ -80,6 +76,9 @@ setting in your project's ``settings.py`` file::
         'cms.plugins.link',
         # ...
     )
+
+.. note:: As of version 2.2, the link plugin no longer verifies the existance of
+          link targets.
 
 
 *******
@@ -125,8 +124,12 @@ You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
 points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
 by the user under which django will be running.
 
-You might consider using `django-filer`_ with `django CMS plugin`_ and its
-``cmsplugin_filer_image`` component instead.
+
+
+.. note:: For more advanced use cases where you would like to upload your media
+          to a central location, consider using  `django-filer`_ with
+          `django CMS plugin`_ and its ``cmsplugin_filer_video`` component
+          instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
@@ -136,7 +139,8 @@ You might consider using `django-filer`_ with `django CMS plugin`_ and its
 Snippet
 *******
 
-Just renders some HTML snippet. Mostly used for development or hackery.
+Renders a HTML snippet from a HTML file in your templates directories or a
+snippet given via direct input.
 
 For installation be sure you have the following in the ``INSTALLED_APPS``
 setting in your project's ``settings.py`` file::
@@ -146,6 +150,9 @@ setting in your project's ``settings.py`` file::
         'cms.plugins.snippet',
         # ...
     )
+
+.. note:: This plugin should mainly be used during development to quickly test
+          HTML snippets.
 
 
 ******
@@ -168,8 +175,12 @@ You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
 points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
 by the user under which django will be running.
 
-You might consider using `django-filer`_ with `django CMS plugin`_ and its
-``cmsplugin_filer_teaser`` component instead.
+
+
+.. note:: For more advanced use cases where you would like to upload your media
+          to a central location, consider using  `django-filer`_ with
+          `django CMS plugin`_ and its ``cmsplugin_filer_video`` component
+          instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
@@ -225,28 +236,28 @@ For installation be sure you have the following in your project's ``INSTALLED_AP
 There are some settings you can set in your settings.py to overwrite some
 default behavior:
 
-- VIDEO_AUTOPLAY default=False
-- VIDEO_AUTOHIDE default=False
-- VIDEO_FULLSCREEN default=True
-- VIDEO_LOOP default=False
-- VIDEO_AUTOPLAY default=False
-- VIDEO_AUTOPLAY default=False
-
-- VIDEO_BG_COLOR default="000000"
-- VIDEO_TEXT_COLOR default="FFFFFF"
-- VIDEO_SEEKBAR_COLOR default="13ABEC"
-- VIDEO_SEEKBARBG_COLOR default="333333"
-- VIDEO_LOADINGBAR_COLOR default="828282"
-- VIDEO_BUTTON_OUT_COLOR default="333333"
-- VIDEO_BUTTON_OVER_COLOR default="000000"
-- VIDEO_BUTTON_HIGHLIGHT_COLOR default="FFFFFF"
+* ``VIDEO_AUTOPLAY`` ((default: ``False``)
+* ``VIDEO_AUTOHIDE`` (default: ``False``)
+* ``VIDEO_FULLSCREEN`` (default: ``True``)
+* ``VIDEO_LOOP`` (default: ``False``)
+* ``VIDEO_AUTOPLAY`` (default: ``False``)
+* ``VIDEO_BG_COLOR`` (default: ``"000000"``)
+* ``VIDEO_TEXT_COLOR`` (default: ``"FFFFFF"``)
+* ``VIDEO_SEEKBAR_COLOR`` (default: ``"13ABEC"``)
+* ``VIDEO_SEEKBARBG_COLOR`` (default: ``"333333"``)
+* ``VIDEO_LOADINGBAR_COLOR`` (default: ``"828282"``)
+* ``VIDEO_BUTTON_OUT_COLOR`` (default: ``"333333"``)
+* ``VIDEO_BUTTON_OVER_COLOR`` (default: ``"000000"``)
+* ``VIDEO_BUTTON_HIGHLIGHT_COLOR`` (default: ``"FFFFFF"``)
 
 You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
 points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
 by the user under which django will be running.
 
-You might consider using `django-filer`_ with `django CMS plugin`_ and its
-``cmsplugin_filer_video`` component instead.
+.. note:: For more advanced use cases where you would like to upload your media
+          to a central location, consider using  `django-filer`_ with
+          `django CMS plugin`_ and its ``cmsplugin_filer_video`` component
+          instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
@@ -266,6 +277,9 @@ For installation be sure you have the following in your project's
         'cms.plugins.twitter',
         # ...
     )
+
+.. note:: Since avatars are not guaranteed to be available over SSL (HTTPS), by
+          default the Twitter plugin does not use avatars on secure sites.
 
 
 *******

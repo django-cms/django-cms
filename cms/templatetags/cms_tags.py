@@ -16,7 +16,6 @@ from django.core.mail import mail_managers
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from itertools import chain
-import operator
 import re
 
 register = template.Library()
@@ -25,8 +24,8 @@ def get_site_id(site):
     if site:
         if isinstance(site, Site):
             site_id = site.id
-        elif isinstance(site, int):
-            site_id = site
+        elif isinstance(site, int) or (isinstance(site, basestring) and site.isdigit()):
+            site_id = int(site)
         else:
             site_id = settings.SITE_ID
     else:
@@ -141,9 +140,6 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             continue
         if not get_plugins(request, placeholder):
             continue
-        if hasattr(request, 'placeholder_media'):
-            request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
-        #request.placeholder_media += placeholder.get_media(request, context)
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
@@ -388,44 +384,3 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
-
-
-class PluginsMedia(Tag):
-    """
-    This template node is used to output media for plugins.
-
-    eg: {% plugins_media %}
-
-    You can also pass the object a page_lookup arg if you want to output media tags for a specific
-    page other than the current page.
-
-    eg: {% plugins_media "gallery" %}
-    """
-    name = 'plugins_media'
-    options = Options(
-        Argument('page_lookup', required=False, default=None),
-    )
-    
-    def render_tag(self, context, page_lookup):
-        if not 'request' in context:
-            return ''
-        request = context['request']
-        from cms.plugins.utils import get_plugins_media
-        plugins_media = None
-        if page_lookup:
-            page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-            plugins_media = get_plugins_media(request, context, page)
-        else:
-            page = request.current_page
-            if page == "dummy":
-                return ''
-            # make sure the plugin cache is filled
-            plugins_media = get_plugins_media(request, context, request._current_page_cache)
-        if plugins_media:
-            return plugins_media.render()
-        else:
-            return u''
-
-    def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % getattr(self, 'name', '')
-register.tag(PluginsMedia)

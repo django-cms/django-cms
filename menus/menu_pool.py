@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+from cms.utils.django_load import load
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.utils.importlib import import_module
 from django.utils.translation import get_language
 from menus.exceptions import NamespaceAllreadyRegistered
 from menus.models import CacheKey
@@ -76,12 +76,8 @@ class MenuPool(object):
         
     def discover_menus(self):
         if self.discovered:
-            return    
-        for app in settings.INSTALLED_APPS:
-            try:
-                import_module('.menu', app)
-            except ImportError:
-                pass
+            return
+        load('menu')
         from menus.modifiers import register
         register()
         self.discovered = True
