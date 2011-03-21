@@ -15,7 +15,7 @@
 .cms_placeholder-btn .cms_toolbar_title { padding-right:5px; border-right:1px solid #ddd !important; }
 
 .cms_placeholder-subnav { display:none; list-style:none; padding:0; margin:0; min-width:200px;
-	position:absolute; right:5px; top:32px; z-index:9999; border:1px solid #ddd; background:#fff;
+	position:absolute; right:5px; top:32px; z-index:99999; border:1px solid #ddd; background:#fff;
 	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; max-height:205px; overflow:auto; }
 .cms_placeholder-subnav ul { list-style:none; padding:0; margin:0; }
 .cms_placeholder-subnav ul li { padding-left:0; }
@@ -35,4 +35,15 @@
 .cms_placeholder-content_inner { padding:25px !important; }
 .cms_placeholder-content_loader { min-height:50px; background:url('../../images/toolbar/loader.gif') no-repeat center center; }
 
-#cms_placeholder-overlay { display:none; position:absolute; left:0; top:0; z-index:9999; border:1px solid #5b80b2; background:#5b80b2 !important; }
+/* #TOOLBAR/overlay# */
+#cms_placeholder-overlay { display:none; position:absolute; left:0; top:0; z-index:9999;
+	border:1px solid #5b80b2; }
+.cms_placeholder-overlay_bg { position:relative; left:0; top:0; z-index:9999; width:100%; height:100%; opacity:0.5; background:#5b80b2 !important; }
+
+/* #TOOLBAR/overlay/list# */
+.cms_placeholder-options { list-style:none; padding:0; margin:0; position:absolute; right:0; top:0; z-index:10000;
+	border:1px solid #e8e8e8; background:#fff;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
+.cms_placeholder-options li { float:left; padding:0; color:#5b80b2; zoom:1; line-height:1; }
+.cms_placeholder-options li a { float:left; color:#5b80b2; line-height:1; padding:5px 10px 8px !important; }
+.cms_placeholder-options li a:hover { line-height:1; }

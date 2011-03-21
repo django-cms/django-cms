@@ -20,10 +20,13 @@
 			debug: false,
 			items: [],
 			csrf_token: '',
-			// experimental - does nothing yet
+			// type definitions used in registerItem()
 			types: [
-				'anchor', this._registerAnchor,
-				'html', this._reigsterHtml
+				{ 'anchor': this._registerAnchor },
+				{ 'html': this._reigsterHtml },
+				{ 'switcher': this._reigsterSwitcher },
+				{ 'button': this._reigsterButton },
+				{ 'list': this._reigsterList }
 			]
 		},
 
@@ -112,6 +115,14 @@
 			// error handling
 			if(!obj.order) obj.dir = 0;
 			
+			/*$(this.options.types).each(function (index, type) {
+				//log(type.key);
+				if(type == obj.type) {
+					
+					return false;
+				}
+			});*/
+			
 			// check for internal types
 			// jonas wants some refactoring here
 			switch(obj.type) {
@@ -131,7 +142,7 @@
 					this._registerList(obj);
 					break;
 				default:
-					throw obj.type + " is not a valid toolbar item type";
+					this.registerType(obj);
 			}
 		},
 		
@@ -149,6 +160,13 @@
 			$(items).each(function (index, value) {
 				classy.registerItem(value);
 			});
+		},
+		
+		registerType: function (ob) {
+			log('can haz new type?');
+			/* you should be able to register a new type, either through
+				the current concept or through json matches as defined
+				in the options (see types) */
 		},
 		
 		_registerAnchor: function (obj) {
@@ -255,6 +273,7 @@
 			function hide_list() {
 				// remove the body event
 				$(window).unbind('click');
+				
 				// show element and save data
 				container.hide();
 				btn.removeClass('cms_toolbar-btn-active').data('collapsed', true);
@@ -271,7 +290,7 @@
 			if(obj.title) template = template.replace('[title]', obj.title);
 			if(obj.url) template = template.replace('[url]', obj.url);
 			if(!obj.icon && obj.type == 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
-			template = (obj.token) ? template.replace('[token]', this.options.csrf_token) : template.replace('[token]', '');
+			template = template.replace('[token]', this.options.csrf_token);
 			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
 			// back to jquery object

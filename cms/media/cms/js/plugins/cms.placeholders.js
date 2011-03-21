@@ -53,11 +53,23 @@
 		},
 		
 		_setup: function () {
+			// save reference to this class
+			var classy = this;
+			
 			// set default dimm value to false
 			this.toolbar.data('dimmed', false)
 			
 			// set defailt frame value to true
 			this.frame.data('collapsed', true);
+			
+			// bind overlay event
+			this.overlay.bind('mouseleave', function () {
+				classy._hideOverlay();
+			});
+			// this is for testing
+			this.overlay.bind('click', function () {
+				classy._hideOverlay();
+			});
 		},
 		
 		_bars: function (el) {
@@ -97,13 +109,16 @@
 			// save reference to this class
 			var classy = this;
 			var holder = $(el);
-				holder.bind('mouseenter mouseleave', function (e) {
-					//(e.type == 'mouseenter') ? classy._showOverlay.call(classy, holder) : classy._hideOverlay.call(classy, holder);
-					if(e.type == 'mouseenter') classy._showOverlay.call(classy, holder);
+				holder.bind('mouseenter', function (e) {
+					classy._showOverlay.call(classy, holder);
 				});
+			// we need to add the events for the different buttons
+			// this will take some time to configure -.-
 		},
 		
 		_showOverlay: function (holder) {
+			var classy = this;
+			
 			// get al the variables from holder
 			var values = holder.attr('class');
 				values = values.split('::');
@@ -115,22 +130,33 @@
 					slot: values[3]
 				};
 			
-			log(this.overlay);
+			// attach events to buttons
+			var buttons = this.overlay.find('.cms_placeholder-options li a');
+				buttons.each(function (index, item) {
+					if($(item).attr('rel') == 'edit') {
+						$(item).bind('click', function (e) {
+							e.preventDefault();
+							
+							classy.editPlugin(values.placeholder, values.plugin_id);
+						});
+					}
+				});
+			
 			// lets place the overlay
 			this.overlay.css({
-				width: holder.width(),
-				height: holder.height()
+				width: holder.width()-2,
+				height: holder.height()-2,
+				left: holder.offset().left,
+				top: holder.offset().top
 			});
 			
 			// and now show it
 			this.overlay.show();
 		},
 		
-		_hideOverlay: function (holder) {
-			//log('hide');
-			
+		_hideOverlay: function () {
 			// hide overlay again
-			//this.overlay.hide();
+			this.overlay.hide();
 		},
 		
 		_showPluginList: function (el) {
@@ -290,6 +316,10 @@
 			
 			// we need to set the body min height to the frame height
 			$(document.body).css('min-height', this.frame.outerHeight(true));
+		},
+		
+		movePlugin: function (page_id, plugin_id, placeholder_id) {
+			// move plugin to certain position - will also be used for dragNdrop
 		}
 
 	});
