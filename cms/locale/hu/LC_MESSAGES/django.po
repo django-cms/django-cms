@@ -8,11 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-<<<<<<< HEAD
-"PO-Revision-Date: 2011-02-07 17:34+0000\n"
-=======
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
->>>>>>> hotfix/2.1.2
+"PO-Revision-Date: 2011-02-23 14:45+0000\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -20,15 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-<<<<<<< HEAD
-"X-Poedit-Language: English\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Country: SWITZERLAND\n"
-=======
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
->>>>>>> hotfix/2.1.2
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -75,7 +65,8 @@ msgid "Page Title"
 msgstr ""
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 
 #: admin/forms.py:132
@@ -124,13 +115,9 @@ msgid "user"
 msgstr ""
 
 #: admin/forms.py:215
-<<<<<<< HEAD
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-=======
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
->>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: admin/forms.py:218
@@ -166,13 +153,9 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:296
-<<<<<<< HEAD
-msgid "Send email notification to user about username or password change. Requires user email."
-=======
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
->>>>>>> hotfix/2.1.2
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 
 #: admin/forms.py:316
@@ -188,23 +171,13 @@ msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:339
-<<<<<<< HEAD
-msgid "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-
-#: admin/forms.py:341
-msgid "The permission to add new users requires the permission to change users!"
-=======
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
->>>>>>> hotfix/2.1.2
+"The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:343
@@ -303,13 +276,8 @@ msgstr ""
 
 #: admin/pageadmin.py:1260
 #, python-format
-<<<<<<< HEAD
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-=======
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
->>>>>>> hotfix/2.1.2
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -318,7 +286,9 @@ msgstr ""
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
@@ -626,13 +596,9 @@ msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:64
-<<<<<<< HEAD
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
-=======
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
->>>>>>> hotfix/2.1.2
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -644,13 +610,9 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:68
-<<<<<<< HEAD
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
-=======
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
->>>>>>> hotfix/2.1.2
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -893,7 +855,9 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -985,13 +949,8 @@ msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-<<<<<<< HEAD
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-=======
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
->>>>>>> hotfix/2.1.2
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1101,7 +1060,10 @@ msgid "query"
 msgstr ""
 
 #: plugins/twitter/models.py:16
-msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 msgstr ""
 
 #: plugins/video/cms_plugins.py:10
@@ -1125,13 +1087,9 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:10
-<<<<<<< HEAD
-msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-=======
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
->>>>>>> hotfix/2.1.2
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1194,13 +1152,9 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-<<<<<<< HEAD
-msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
-=======
 msgid ""
 "Missing flash plugin. Download <a "
 "href=\"http://adobe.com/flashplayer\">here</a>"
->>>>>>> hotfix/2.1.2
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1230,13 +1184,8 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
-<<<<<<< HEAD
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-=======
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
->>>>>>> hotfix/2.1.2
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1345,13 +1294,9 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-<<<<<<< HEAD
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
-=======
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
->>>>>>> hotfix/2.1.2
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185

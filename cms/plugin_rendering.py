@@ -1,35 +1,16 @@
 # -*- coding: utf-8 -*-
-from cms import settings
 from cms.models.placeholdermodel import Placeholder
+from cms.plugin_processors import (plugin_meta_context_processor, 
+    mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from django.conf import settings as django_settings
-from django.core.exceptions import ImproperlyConfigured
+from cms.utils.django_load import iterload_objects
+from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
+    get_placeholder_conf)
+from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
-from django.utils.importlib import import_module
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-
-def plugin_meta_context_processor(instance, placeholder):
-    return {
-        'plugin_index': instance._render_meta.index, # deprecated template variable
-        'plugin': {
-            'counter': instance._render_meta.index + 1,
-            'counter0': instance._render_meta.index,
-            'revcounter': instance._render_meta.total - instance._render_meta.index,
-            'revcounter0': instance._render_meta.total - instance._render_meta.index - 1,
-            'first': instance._render_meta.index == 0,
-            'last': instance._render_meta.index == instance._render_meta.total - 1,
-            'total': instance._render_meta.total,
-            'id_attr': 'plugin_%i_%i' % (instance.placeholder.pk, instance.pk),
-            'instance': instance,
-        }
-    }
-
-def mark_safe_plugin_processor(instance, placeholder, rendered_content, original_context):
-    return mark_safe(rendered_content)
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -41,27 +22,6 @@ DEFAULT_PLUGIN_PROCESSORS = (
     mark_safe_plugin_processor,
 )
 
-_standard_processors = {}
-
-def get_standard_processors(settings_attr):
-    global _standard_processors
-    if not _standard_processors.has_key(settings_attr):
-        processors = []
-        if hasattr(django_settings, settings_attr):
-            for path in getattr(django_settings, settings_attr):
-                i = path.rfind('.')
-                module, attr = path[:i], path[i+1:]
-                try:
-                    mod = import_module(module)
-                except ImportError, e:
-                    raise ImproperlyConfigured('Error importing plugin context processor module %s: "%s"' % (module, e))
-                try:
-                    func = getattr(mod, attr)
-                except AttributeError:
-                    raise ImproperlyConfigured('Module "%s" does not define a "%s" callable plugin context processor' % (module, attr))
-                processors.append(func)
-        _standard_processors[settings_attr] = tuple(processors)
-    return _standard_processors[settings_attr]
 
 class PluginContext(Context):
     """
@@ -71,34 +31,37 @@ class PluginContext(Context):
     using the "processors" keyword argument.
     """
     def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
-        Context.__init__(self, dict, current_app=current_app)
-        if processors is None:
-            processors = ()
-        else:
-            processors = tuple(processors)
-        for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS + get_standard_processors('CMS_PLUGIN_CONTEXT_PROCESSORS') + processors:
+        super(PluginContext, self).__init__(dict, current_app=current_app)
+        if not processors:
+            processors = []
+        for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
             self.update(processor(instance, placeholder))
-
-class PluginRenderer(object):
+        for processor in iterload_objects(settings.CMS_PLUGIN_CONTEXT_PROCESSORS):
+            self.update(processor(instance, placeholder))
+        for processor in processors:
+            self.update(processor(instance, placeholder))
+            
+def render_plugin(context, instance, placeholder, template, processors=None,
+                  current_app=None):
     """
-    This class renders the context to a string using the supplied template.
-    It then passes the rendered content to all processors defined in 
-    CMS_PLUGIN_PROCESSORS. Additional processors can be specified as a list
-    of callables using the "processors" keyword argument.
+    Renders a single plugin and applies the post processors to it's rendered
+    content.
     """
-    def __init__(self, context, instance, placeholder, template, processors=None, current_app=None):
-        if isinstance(template, basestring):
-            self.content = render_to_string(template, context)
-        elif isinstance(template, Template):
-            self.content = template.render(context)
-        else:
-            self.content = ''
-        if processors is None:
-            processors = ()
-        else:
-            processors = tuple(processors)
-        for processor in get_standard_processors('CMS_PLUGIN_PROCESSORS') + processors + DEFAULT_PLUGIN_PROCESSORS:
-            self.content = processor(instance, placeholder, self.content, context)
+    if not processors:
+        processors = []
+    if isinstance(template, basestring):
+        content = render_to_string(template, context)
+    elif isinstance(template, Template):
+        content = template.render(context)
+    else:
+        content = ''
+    for processor in iterload_objects(settings.CMS_PLUGIN_PROCESSORS):
+        content = processor(instance, placeholder, content, context)
+    for processor in processors:
+        content = processor(instance, placeholder, content, context)
+    for processor in DEFAULT_PLUGIN_PROCESSORS:
+        content = processor(instance, placeholder, content, context)
+    return content
 
 def render_plugins(plugins, context, placeholder, processors=None):
     """
@@ -141,9 +104,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     slot = getattr(placeholder, 'slot', None)
     extra_context = {}
     if slot:
-        extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, slot), {}).get("extra_context", None)
-        if not extra_context:
-            extra_context = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("extra_context", {})
+        extra_context = get_placeholder_conf("extra_context", slot, template, {})
     for key, value in extra_context.items():
         if not key in context:
             context[key] = value
@@ -152,10 +113,13 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     # Prepend frontedit toolbar output if applicable
     edit = False
-    if ("edit" in request.GET or request.session.get("cms_edit", False)) and \
-        'cms.middleware.toolbar.ToolbarMiddleware' in django_settings.MIDDLEWARE_CLASSES and \
-        request.user.is_staff and request.user.is_authenticated() and \
-        (not page or page.has_change_permission(request)):
+    if (
+        ("edit" in request.GET
+         or request.session.get("cms_edit", False)
+        )
+        and 'cms.middleware.toolbar.ToolbarMiddleware' in settings.MIDDLEWARE_CLASSES
+        and request.user.is_staff and request.user.is_authenticated()
+        and (not page or page.has_change_permission(request))):
             edit = True
     if edit:
         from cms.middleware.toolbar import toolbar_plugin_processor
@@ -188,16 +152,8 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         slot = None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
-    mixed_key = "%s %s" % (template, slot)
-    name = settings.CMS_PLACEHOLDER_CONF.get(mixed_key, {}).get("name", None)
-    if not name:
-        name = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("name", None)
-    if name:
-        name = _(name)
-    elif slot:
-        name = title(slot)
-    if not name:
-        name = name_fallback
+    name = get_placeholder_conf(slot, template, "name", title(slot))
+    name = _(name)
     toolbar = render_to_string("cms/toolbar/add_plugins.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),

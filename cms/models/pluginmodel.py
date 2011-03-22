@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
-import os, warnings
+import os
+import warnings
 from datetime import datetime, date
 
 from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import (ModelBase, model_unpickle,
-    simple_class_factory)
+from django.db.models.base import (model_unpickle, simple_class_factory)
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
-from cms.plugin_rendering import PluginContext, PluginRenderer
+from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 
 from mptt.models import MPTTModel, MPTTModelBase
+
 
 class PluginModelBase(MPTTModelBase):
     """
@@ -160,8 +161,7 @@ class CMSPlugin(MPTTModel):
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            renderer = PluginRenderer(context, instance, placeholder, template, processors)
-            return renderer.content
+            return render_plugin(context, instance, placeholder, template, processors)
         return ""
             
     def get_media_path(self, filename):

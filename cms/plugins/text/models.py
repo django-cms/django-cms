@@ -50,7 +50,7 @@ class AbstractText(CMSPlugin):
         for new, old in ziplist:
             replace_ids[old.pk] = new.pk
 
-        self.body = replace_plugin_tags(old_instance.text.body, replace_ids)
+        self.body = replace_plugin_tags(old_instance.get_plugin_instance()[0].body, replace_ids)
         self.save()
             
 class Text(AbstractText):

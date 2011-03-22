@@ -2,6 +2,7 @@
 from __future__ import with_statement
 from cms.admin import forms
 from cms.admin.forms import PageUserForm
+from cms.api import create_page, create_page_user
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.test_utils.testcases import CMSTestCase
@@ -42,7 +43,7 @@ class FormsTestCase(CMSTestCase):
             user_super.set_password("super")
             user_super.save()
             self.login_user(user_super)
-            self.create_page(title="home", user=user_super)
+            create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The proper test
             result = get_site_choices()
             self.assertEquals(result, [(1,'example.com')])
@@ -77,7 +78,7 @@ class FormsTestCase(CMSTestCase):
         user_super.set_password("super")
         user_super.save()
         self.login_user(user_super)
-        home_page = self.create_page(title="home", user=user_super)
+        home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
         # The actual test
         fake_field = Mock_PageSelectFormField()
         data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
@@ -97,7 +98,8 @@ class FormsTestCase(CMSTestCase):
         self.assertEquals(normal_result, list(lazy_result))
 
     def test_09_page_user_form_initial(self):
-        user = self.create_page_user('myuser', 'myuser', grant_all=True)
+        myuser = User.objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
+        user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',
                  'can_add_pageuser', 'can_change_pageuser',

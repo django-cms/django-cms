@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.api import create_page
 from cms.menu import CMSMenu
 from cms.models import Page
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
@@ -31,10 +31,6 @@ class BaseMenuTest(SettingsOverrideTestCase):
 
     def setUp(self):
         super(BaseMenuTest, self).setUp()
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
-        self.login_user(u)
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
@@ -415,9 +411,8 @@ class FixturesMenuTests(BaseMenuTest):
         self.assertEqual(len(nodes), number_of_p7_children)
         
     def test_18_show_breadcrumb_invisible(self):
-        invisible_page = self.create_page(parent_page=self.get_page(3), 
-                                          published=True, 
-                                          in_navigation=False)
+        invisible_page = create_page("invisible", "nav_playground.html", "en",
+            parent=self.get_page(3), published=True, in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context) 
@@ -542,7 +537,7 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(len(nodes), 0)
 
 
-class AdvancedSoftrootTests(BaseMenuTest):
+class AdvancedSoftrootTests(SettingsOverrideTestCase):
     """
     Tree in fixture (as taken from issue 662):
     
@@ -567,30 +562,14 @@ class AdvancedSoftrootTests(BaseMenuTest):
         
         If we are above that page, the children of this page are not shown.
     """
-    
-    def setUp(self):
-        """
-        For some reason turning this into a fixture just won't work (thanks to
-        our dear friend, publisher).
-        """
-        super(AdvancedSoftrootTests, self).setUp()
-        def mkpage(title, parent=None):
-            page = self.create_page(parent, title=title, published=True, in_navigation=True)
-            def mkchild(title):
-                return mkpage(title, page)
-            page.mkchild = mkchild
-            return page
-                
-        top = mkpage('top')
-        root = top.mkchild('root')
-        aaa = root.mkchild('aaa')
-        oneoneone = aaa.mkchild('111')
-        ccc = oneoneone.mkchild('ccc')
-        ccc.mkchild('ddd')
-        aaa.mkchild('222')
-        bbb = root.mkchild('bbb')
-        bbb.mkchild('333')
-        bbb.mkchild('444')
+    settings_overrides = {
+        'CMS_MODERATOR': False,
+        'CMS_PERMISSIONS': False
+    }
+    fixtures = ['advanced_softroot.json']
+        
+    def tearDown(self):
+        Page.objects.all().delete()
     
     def get_page(self, name):
         return Page.objects.get(title_set__slug=name)
@@ -717,3 +696,28 @@ class AdvancedSoftrootTests(BaseMenuTest):
             ])
         ]
         self.assertTreeQuality(soft_root, mock_tree, 'title', 'level')
+
+
+class ShowSubMenuCheck(BaseMenuTest):
+    """
+    Tree from fixture:
+
+        + P1
+        | + P2
+        |   + P3
+        + P4
+        | + P5
+        + P6
+          + P7 (not in menu)
+          + P8
+    """
+    fixtures = ['menus-sub.json']
+
+    def test_01_show_submenu(self):
+        context = self.get_context('/test-page-6/')
+        # test standard show_menu
+        tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].id, 8)

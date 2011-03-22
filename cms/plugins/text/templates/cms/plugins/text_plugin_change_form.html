@@ -3,14 +3,16 @@
 
 {% block fieldsets %}
 {% for fieldset in adminform %}
-  {% include "cms/plugins/text_plugin_fieldset.html" %}
+	{% include "cms/plugins/text_plugin_fieldset.html" %}
 {% endfor %}
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
 <script type="text/javascript">
+//<![CDATA[
 (function ($){
-	$(document).ready(function(){
-	    $.fn.cmsPatchCSRF();
+	$(document).ready(function () {
+		$.fn.cmsPatchCSRF();
 	});
 })(jQuery);
+})();
 </script>
 {% endblock %}

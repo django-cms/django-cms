@@ -53,6 +53,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     'django.core.context_processors.csrf',
     "cms.context_processors.media",
+    "sekizai.context_processors.sekizai",
 )
 
 INTERNAL_IPS = ('127.0.0.1',)
@@ -64,7 +65,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'cms.middleware.media.PlaceholderMediaMiddleware', 
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'project.fakemlng',
     'south',
     'reversion',
+    'sekizai',
 )
 
 gettext = lambda s: s

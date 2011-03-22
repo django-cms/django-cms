@@ -37,9 +37,21 @@ class SettingsOverride(object):
                 delattr(settings,key) # do not pollute the context!
 
 
-class StdoutOverride(object):
+class StdOverride(object):
+    def __init__(self, std='out', buffer=None):
+        self.std = std
+        self.buffer = buffer or StringIO.StringIO()
+        
+    def __enter__(self):
+        setattr(sys, 'std%s' % self.std, self.buffer)
+        return self.buffer
+        
+    def __exit__(self, type, value, traceback):
+        setattr(sys, 'std%s' % self.std, getattr(sys, '__std%s__' % self.std))
+
+class StdoutOverride(StdOverride):
     """
-    This overrides Python's the standard output and redirrects it to a StringIO
+    This overrides Python's the standard output and redirects it to a StringIO
     object, so that on can test the output of the program.
     
     example:
@@ -48,16 +60,8 @@ class StdoutOverride(object):
         # print stuff
         lines = buffer.getvalue()
     """
-    def __enter__(self):
-        self.buffer = StringIO.StringIO()
-        sys.stdout = self.buffer
-        return self.buffer
-        
-    def __exit__(self, type, value, traceback):
-        self.buffer.close()
-        # Revert the stdout to the real one
-        sys.stdout = sys.__stdout__
-
+    def __init__(self, buffer=None):
+        super(StdoutOverride, self).__init__('out', buffer)
 
 
 class LanguageOverride(object):

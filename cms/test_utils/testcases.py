@@ -1,20 +1,14 @@
 # -*- coding: utf-8 -*-
-from cms.admin.forms import save_permissions
-from cms.models import Title, Page
-from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission, PageUser, GlobalPagePermission
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugins.text.models import Text
-from cms.test_utils.util.context_managers import UserLoginContext, SettingsOverride
-from cms.utils.permissions import _thread_locals
+from cms.models import Page
+from cms.test_utils.util.context_managers import (UserLoginContext, 
+    SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
+from django.db.models.signals import pre_save, post_save
 from django.template.context import Context
-from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool
 from urlparse import urlparse
@@ -27,9 +21,9 @@ URL_CMS_PAGE = "/admin/cms/page/"
 URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
 URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 
 URL_CMS_PAGE_DELETE = URL_CMS_PAGE_CHANGE + "delete/" 
-URL_CMS_PLUGIN_ADD = URL_CMS_PAGE + "add-plugin/"
-URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE + "edit-plugin/"
-URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE + "remove-plugin/"
+URL_CMS_PLUGIN_ADD = URL_CMS_PAGE_CHANGE + "add-plugin/"
+URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE_CHANGE + "edit-plugin/"
+URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE_CHANGE + "remove-plugin/"
 URL_CMS_TRANSLATION_DELETE = URL_CMS_PAGE_CHANGE + "delete-translation/"
 
 class _Warning(object):
@@ -73,7 +67,16 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 
 class CMSTestCase(TestCase):
     counter = 1
-        
+    
+    def _fixture_setup(self):
+        pre_save_receivers = pre_save.receivers
+        pre_save.receivers = []
+        post_save_receivers = post_save.receivers
+        post_save.receivers = []
+        super(CMSTestCase, self)._fixture_setup()
+        pre_save.receivers = pre_save_receivers
+        post_save.receivers = post_save_receivers
+            
     def _post_teardown(self):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
@@ -92,6 +95,15 @@ class CMSTestCase(TestCase):
         admin.set_password("admin")
         admin.save()
         return admin
+        
+    def get_staff_user_with_no_permissions(self):
+        """
+        Used in security tests
+        """
+        staff = User(username="staff", is_staff=True, is_active=True)
+        staff.set_password("staff")
+        staff.save()
+        return staff
     
     def get_new_page_data(self, parent_id=''):
         page_data = {
@@ -117,11 +129,13 @@ class CMSTestCase(TestCase):
         """Just a helper to see the page struct.
         """
         for page in Page.objects.drafts().order_by('tree_id', 'lft'):
-            print "%s%s #%d" % ("    " * (page.level), page, page.id)
+            ident = "  " * page.level
+            
+            print "%s%s, lft: %s, rght: %s" % (ident, page, page.lft, page.rght)
     
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
-            ident = level * '    '
+            ident = level * '  '
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
@@ -142,68 +156,6 @@ class CMSTestCase(TestCase):
         except ObjectDoesNotExist:
             return
         raise self.failureException, "ObjectDoesNotExist not raised"
-    
-    def create_page(self, parent_page=None, user=None, position="last-child", 
-            title=None, site=1, published=False, in_navigation=False,
-            moderate=False, language=None, title_extra=None, **extra):
-        """
-        Common way for page creation with some checks
-        """
-        _thread_locals.user = user
-        if not language:
-            language = settings.LANGUAGES[0][0]
-            if settings.CMS_SITE_LANGUAGES.get(site, False):
-                language = settings.CMS_SITE_LANGUAGES[site][0]
-        site = Site.objects.get(pk=site)
-        
-        page_data = {
-            'site': site,
-            'template': 'nav_playground.html',
-            'published': published,
-            'in_navigation': in_navigation,
-        }
-        if user:
-            page_data['created_by'] = user
-            page_data['changed_by'] = user
-        if parent_page:
-            page_data['parent'] = parent_page
-        page_data.update(extra)
-
-        page = Page(**page_data)
-        if parent_page:
-            page.insert_at(self.reload(parent_page), position)
-        page.save()
-
-        if settings.CMS_MODERATOR and user:
-            page.pagemoderator_set.create(user=user)
-        
-        if not title:
-            title = 'test page %d' % self.counter
-            slug = 'test-page-%d' % self.counter
-        else:
-            slug = slugify(title)
-        self.counter = self.counter + 1
-        if not title_extra:
-            title_extra = {}
-        self.create_title(
-            title=title,
-            slug=slug,
-            language=language,
-            page=page,
-            **title_extra
-        )
-            
-        del _thread_locals.user
-        return page
-    
-    def create_title(self, title, slug, language, page, **extra):
-        return Title.objects.create(
-            title=title,
-            slug=slug,
-            language=language,
-            page=page,
-            **extra
-        )
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -252,9 +204,12 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None, language=settings.LANGUAGES[0][0]):
+    def get_request(self, path=None, language=None):
         if not path:
             path = self.get_pages_root()
+        
+        if not language:
+            language = settings.LANGUAGES[0][0]
         
         parsed_path = urlparse(path)
         host = parsed_path.netloc or 'testserver'
@@ -285,156 +240,6 @@ class CMSTestCase(TestCase):
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
         return request
-    
-    def create_page_user(self, username, password=None,
-        can_add_page=True, can_change_page=True, can_delete_page=True, 
-        can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, 
-        can_delete_pageuser=True, can_add_pagepermission=True, 
-        can_change_pagepermission=True, can_delete_pagepermission=True,
-        grant_all=False, can_view_page=True):
-        """
-        Helper function for creating page user, through form on:
-            /admin/cms/pageuser/add/
-            
-        Returns created user.
-        """
-        if grant_all:
-            return self.create_page_user(username, password, 
-                True, True, True, True, True, True, True, True, True, True)
-            
-        if password is None:
-            password=username
-        
-        data = {
-            'can_add_page': can_add_page,
-            'can_view_page': can_view_page,
-            'can_change_page': can_change_page, 
-            'can_delete_page': can_delete_page,
-            'can_recover_page': can_recover_page,
-            'can_add_pageuser': can_add_pageuser,
-            'can_change_pageuser': can_change_pageuser,
-            'can_delete_pageuser': can_delete_pageuser,
-            'can_add_pagepermission': can_add_pagepermission,
-            'can_change_pagepermission': can_change_pagepermission,
-            'can_delete_pagepermission': can_delete_pagepermission,
-        }
-        if hasattr(self, 'user'):
-            created_by = self.user
-        else:
-            created_by = User.objects.create_superuser('superuser', 'superuser@django-cms.org', 'superuser')
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User.objects.create_user(username, 'username@django-cms.org', password)
-            user.is_staff = True
-            user.is_active = True
-        page_user = PageUser(created_by=created_by)
-        for field in [f.name for f in User._meta.local_fields]:
-            setattr(page_user, field, getattr(user, field))
-        user.save()
-        page_user.save()
-        save_permissions(data, page_user)
-        return user
-        
-    def assign_user_to_page(self, page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
-        can_add=False, can_change=False, can_delete=False, 
-        can_change_advanced_settings=False, can_publish=False, 
-        can_change_permissions=False, can_move_page=False, can_moderate=False, 
-        can_recover_page=True, can_view=False, grant_all=False,
-        global_permission=False):
-        """
-        Assigns given user to page, and gives him requested permissions. 
-        
-        Note: this is not happening over frontend, maybe a test for this in 
-        future will be nice.
-        """
-        if grant_all and not global_permission:
-            return self.assign_user_to_page(page, user, grant_on,
-                True, True, True, True, True, True, True, True, False, True)
-        
-        data = {
-            'can_add': can_add,
-            'can_change': can_change,
-            'can_delete': can_delete, 
-            'can_change_advanced_settings': can_change_advanced_settings,
-            'can_publish': can_publish, 
-            'can_change_permissions': can_change_permissions, 
-            'can_move_page': can_move_page, 
-            'can_moderate': can_moderate,
-            'can_view': can_view,
-        }
-        
-        if global_permission:
-            page_permission = GlobalPagePermission(
-                user=user, can_recover_page=can_recover_page, **data)
-            page_permission.save()
-            page_permission.sites.add(Site.objects.get_current())
-        else:
-            page_permission = PagePermission(
-                page=page, user=user, grant_on=grant_on, **data)
-            page_permission.save()
-        
-        page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
-        page_permission.save()
-        return page_permission
-    
-    def add_plugin(self, user=None, page=None, placeholder=None, language='en', body=''):
-        if not placeholder:
-            if page:
-                placeholder = page.placeholders.get(slot__iexact='Right-Column')
-            else:
-                placeholder = page.placeholders.get(slot__iexact='Right-Column')
-            
-        plugin_base = CMSPlugin(
-            plugin_type='TextPlugin',
-            placeholder=placeholder, 
-            position=1, 
-            language=language
-        )
-        plugin_base.insert_at(None, position='last-child', save=False)
-                
-        plugin = Text(body=body)
-        plugin_base.set_base_attr(plugin)
-        plugin.save()
-        return plugin.pk
-    
-    def publish_page(self, page, approve=False, user=None, published_check=True):
-        if user:
-            self.login_user(user)
-        
-        if published_check and not approve:
-            # must have public object now
-            self.assertFalse(page.publisher_public)
-            self.assertFalse(page.published)
-            
-        # publish / approve page by master
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        self.assertEqual(response.status_code, 200)
-        
-        if not approve:
-            page = self.reload_page(page)
-            if published_check:
-                # must have public object now
-                self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)
-                # and public object must be published
-                self.assertTrue(page.publisher_public.published)
-            return page
-        
-        # approve
-        page = self.approve_page(page)
-        if published_check:
-            # must have public object now
-            self.assertTrue(page.publisher_public, "Page '%s' has no publisher_public" % page)
-            # and public object must be published
-            self.assertTrue(page.publisher_public.published)
-        
-        return page
-    
-    def approve_page(self, page):
-        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        # reload page
-        return self.reload_page(page)
     
     def check_published_page_attributes(self, page):
         public_page = page.publisher_public
@@ -469,7 +274,7 @@ class CMSTestCase(TestCase):
                 1 - moderate page
                 2 - moderate children
                 4 - moderate descendants
-                + conbinations
+                + combinations
         """
         response = self.client.post("/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
         self.assertEquals(response.status_code, 200)
