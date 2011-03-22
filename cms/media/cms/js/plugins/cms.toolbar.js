@@ -12,6 +12,7 @@
 	/**
 	 * Toolbar
 	 * @version: 0.0.2
+	 * @description: Implements and controls toolbar
 	 */
 	CMS.Toolbar = Class.$extend({
 
@@ -59,20 +60,20 @@
 		},
 		
 		_setup: function () {
-			// set if toolbar is visible or not
-			($.cookie('CMS_toolbar-collapsed') == 'false') ? this.toolbar.data('collapsed', true) : this.toolbar.data('collapsed', false);
+			// save reference to this class
+			var classy = this;
 			
-			// init scripts
+			// scheck if toolbar should be shown or hidden
+			($.cookie('CMS_toolbar-collapsed') == 'false') ? this.toolbar.data('collapsed', true) : this.toolbar.data('collapsed', false);
+			// follow up script to set the current state
 			this.toggleToolbar();
 			
-			// show toolbar
+			// set toolbar to visible
 			this.wrapper.show();
-			
-			// make sure toolbar is shown
-			var classy = this;
+			// some browsers have problem showing it directly (loading css...)
 			setTimeout(function () { classy.wrapper.show(); }, 50);
 			
-			// register all the items
+			// start register items if any given
 			if(this.options.items.length) this.registerItems(this.options.items);
 		},
 		
@@ -84,9 +85,7 @@
 			var classy = this;
 			// add toolbar padding
 			var padding = parseInt($(document.body).css('margin-top'));
-				setTimeout(function () {
-					$(document.body).css('margin-top', (padding+classy.toolbar.height()));
-				}, 10);
+				$(document.body).css('margin-top', (padding+43)); // 43 = height of toolbar
 			// show toolbar
 			this.toolbar.show();
 			// change data information
@@ -100,7 +99,7 @@
 		_hideToolbar: function () {
 			// remove toolbar padding
 			var padding = parseInt($(document.body).css('margin-top'));
-				$(document.body).css('margin-top', (padding-this.toolbar.height()));
+				$(document.body).css('margin-top', (padding-this.toolbar.height()-1)); // substract 1 cause of the border
 			// hide toolbar
 			this.toolbar.hide();
 			// change data information
@@ -146,11 +145,6 @@
 			}
 		},
 		
-		removeItem: function (index) {
-			// function to remove an item
-			if(index) $($('.cms_toolbar-item:visible')[index]).remove();
-		},
-		
 		registerItems: function (items) {
 			// make sure an array is passed
 			if(typeof(items) != 'object') return false;
@@ -161,14 +155,13 @@
 				classy.registerItem(value);
 			});
 		},
-		
-		registerType: function (ob) {
-			log('can haz new type?');
-			/* you should be able to register a new type, either through
-				the current concept or through json matches as defined
-				in the options (see types) */
+
+		removeItem: function (index) {
+			// function to remove an item
+			if(index) $($('.cms_toolbar-item:visible')[index]).remove();
 		},
 		
+		/* the following private methods are reserved for registring each itemtype */
 		_registerAnchor: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_anchor', obj);
@@ -283,7 +276,16 @@
 			this._injectItem(template, obj.dir, obj.order);
 		},
 		
+		registerType: function (ob) {
+			log('can haz new type?');
+			/* you should be able to register a new type, either through
+				the current concept or through json matches as defined
+				in the options (see types) */
+		},
+		
+		/* this private function processes each template and replaces the placeholders with the passed values */
 		_processTemplate: function (class, obj) {
+			// lets find the template and clone it
 			var template = this.wrapper.find(class).clone();
 				template = $('<div>').append(template).clone().remove().html();
 			// replace placeholders
@@ -348,6 +350,7 @@
 		},
 		
 		_insertUrl: function (url, name, value) {
+			// this is a one to one copy from the old toolbar
 			if(url.substr(url.length-1, url.length)== "&") url = url.substr(0, url.length-1); 
 			dash_splits = url.split("#");
 			url = dash_splits[0];
@@ -372,6 +375,7 @@
 		},
 		
 		_removeUrl: function (url, name) {
+			// this is a one to one copy from the old toolbar
 			var dash_splits = url.split("#");
 			url = dash_splits[0];
 			var splits = url.split(name + "=");

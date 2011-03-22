@@ -29,10 +29,10 @@
 
 /* #TOOLBAR/loader# */
 #cms_placeholder-dim { display:none; position:absolute; left:0; top:0; z-index:99997; background:#000; width:100%; height:100%; opacity:0.6; }
-#cms_placeholder-content { display:none; position:absolute; left:0; top:43px; z-index:99998; width:100%; background:#5a7fb0 url('../../images/toolbar/frame_shadow.gif') repeat-x left top;
-	color:#fff;
+#cms_placeholder-content { display:none; position:fixed; left:0; top:43px; z-index:99998; width:100%; color:#fff;
+	background:#5a7fb0 url('../../images/toolbar/frame_shadow.gif') repeat-x left top; /* might need some ie fixing */
 	-webkit-box-shadow:#000 -5px 0px 5px; -moz-box-shadow:#000 -5px 0px 5px; box-shadow:#000 -5px 0px 5px; }
-.cms_placeholder-content_inner { padding:25px !important; }
+.cms_placeholder-content_inner { padding:25px !important; overflow:hidden; }
 .cms_placeholder-content_loader { min-height:50px; background:url('../../images/toolbar/loader.gif') no-repeat center center; }
 
 /* #TOOLBAR/overlay# */
