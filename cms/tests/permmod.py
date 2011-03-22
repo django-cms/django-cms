@@ -64,7 +64,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.user_staff.set_password("staff")
         self.user_staff.save()
 
-        self.login_user(self.user_super)
+        self.login_user(User.objects.get(username='super'))
         
         # create non global, non staff user
         self.user_non_global = User(username="nonglobal", is_active=True)
@@ -72,7 +72,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.user_non_global.save()
         
         # create page_b
-        page_b = self.create_page(title="pageB", user=self.user_super)
+        page_b = self.create_page(title="pageB", user=User.objects.get(username='super'))
 
         # Normal user
         self.user_normal = self.create_page_user("normal")
