@@ -11,12 +11,11 @@ function hide_iframe() { CMS.Placeholders.toggleFrame(); CMS.Placeholders.reload
 
 /*##################################################|*/
 /* #CUSTOM APP# */
-(function ($, Class) {
+jQuery(document).ready(function ($) {
 	/**
 	 * Toolbar
 	 * @version: 0.0.1
-	 * @description: Handles placeholders when in editmode
-	 	and adds "lightbox" to toolbar
+	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 */
 	CMS.Placeholders = Class.$extend({
 
@@ -62,7 +61,7 @@ function hide_iframe() { CMS.Placeholders.toggleFrame(); CMS.Placeholders.reload
 			var classy = this;
 			
 			// set default dimm value to false
-			this.toolbar.data('dimmed', false)
+			this.toolbar.data('dimmed', false);
 			
 			// set defailt frame value to true
 			this.frame.data('collapsed', true);
@@ -159,7 +158,7 @@ function hide_iframe() { CMS.Placeholders.toggleFrame(); CMS.Placeholders.reload
 					var index = holder.parent().find('.cms_placeholder').index(holder);
 					
 					// if there is no other element on top cancel the move event
-					if(index == 0) { alert(classy.options.lang.move_warning); return false; }
+					if(index === 0) { alert(classy.options.lang.move_warning); return false; }
 					
 					// now we passed so lets get the data for the element next to it
 					var target = $(holder.parent().find('.cms_placeholder')[index-1]).attr('class').split('::');
@@ -360,7 +359,7 @@ function hide_iframe() { CMS.Placeholders.toggleFrame(); CMS.Placeholders.reload
 			$(window).bind('resize', function () {
 				classy.dim.css({
 					'width': $(window).width(),
-					'height': $(window).height(),
+					'height': $(window).height()
 				});
 				classy.frame.css('width', $(window).width());
 				// adjust after resizing
@@ -400,4 +399,4 @@ function hide_iframe() { CMS.Placeholders.toggleFrame(); CMS.Placeholders.reload
 		}
 		
 	});
-})(jQuery, Class);
+});

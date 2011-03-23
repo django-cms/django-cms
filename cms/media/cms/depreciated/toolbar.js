@@ -2,6 +2,7 @@
 
 //jQuery.noConflict();
 
+/* DONE REMOVES IFRAME
 function hide_iframe(){
     // needs to be a global function because it gets called 
     // from the iframe as `parent.hide_iframe`
@@ -9,11 +10,13 @@ function hide_iframe(){
     jQuery("#nyroModalWrapper .wrapperIframe").html("");
     window.location = window.location.href;
 }
+*/
 
-jQuery(document).ready(function($) {
+//jQuery(document).ready(function($) {
 	
-	jQuery.fn.cmsPatchCSRF()
+	// DONE jQuery.fn.cmsPatchCSRF()
 
+	// this function copys the element for further replacement in another location
     jQuery.fn.swapWith = function(to) {
         return this.each(function() {
             var copy_to = $(to).clone(true);
@@ -24,6 +27,7 @@ jQuery(document).ready(function($) {
     };
         
 
+    /* DONE INITIAL VARS
     var page_id = -1;
     var plugin_id = -1;
     var placeholder = "";
@@ -33,7 +37,7 @@ jQuery(document).ready(function($) {
     var bodyBackgroundPosYFull;
     var bodyBackgroundPosY;
     var bodyBackgroundPosUnit;
-
+*/
 
     function move(direction){
         var result = new Array();
@@ -95,6 +99,7 @@ jQuery(document).ready(function($) {
         $("#cms_plugin_"+page_id+"_"+plugin_id).makeoverlay("#cms_plugin_overlay2");
     }
 
+    /* DONE THIS IS FOR EDITING THE PLUGIN
     function edit_plugin(page_id, plugin_id){    
         $.nyroModalManual({
             zIndexStart: 80000,
@@ -108,15 +113,16 @@ jQuery(document).ready(function($) {
             height: 400,
             closeButton: '<a class="cms_toolbar_button cms_toolbar_iconbutton nyroModalClose" href="#" id="closeBut"><span><strong>Close</strong></span></a>'
         });
-        /*
+        *//*
             css: {
                 content: {
                     overflow: 'hidden'
                 }
             }
          */
-    }        
+    //}        
 
+    /* DONE
     function closeCMStoolbar(){
         $("#cms_toolbar").slideUp();                
         $("#cms_toolbar_mini").show();
@@ -146,7 +152,9 @@ jQuery(document).ready(function($) {
         $("#cms_toolbar_spacer").show();        
         initBodyBackgroundPos(0);                        
     }
+    */
 
+    /* DONE NOT REQUIRED ANYMORE
     function initBodyBackgroundPos(s){
         if(bodyBackgroundPosUnit=="px"){
             if(s==undefined){s=400;}
@@ -178,12 +186,16 @@ jQuery(document).ready(function($) {
             }                                
         }
     }
+    */
 
+    /* DONE
     function hideCMStoolbarSubmenus(){            
         $(".cms_toolbar_submenubutton").removeClass("open");
     }
+    */
 
-    $(document).ready(function () {
+    //$(document).ready(function () {
+        /* DONE NOT REQUIRED ANYMORE
         bodyBackgroundPos = $("body").css("background-position");            
         if (bodyBackgroundPos == 'undefined' || bodyBackgroundPos == null) {
             //for IE
@@ -207,13 +219,15 @@ jQuery(document).ready(function($) {
             bodyBackgroundPosUnit = "px";
             bodyBackgroundPosY = 0;
         }
-    
+    */
+    /* READ THE COOKIE
         if ($.cookie("CMStoolbarColsed") == "true") {
             hideCMSToolbar();
         }else{
             showCMSToolbar();
         }            
-    
+    */
+         /* DONE CALCS DROPDOWN SIZES AND SHOWS TOOLBAR
           $(document).bind('click', function(e){     
             var cmsClicked = $(e.target);
             var cmsSubmenuHit = false;
@@ -248,24 +262,27 @@ jQuery(document).ready(function($) {
                     }
                 
                 }
-            }
-            if(cmsSubmenuHit == false){
+            }*/
+            /*if(cmsSubmenuHit == false){
                 hideCMStoolbarSubmenus();
-            }
-        });    
+            }*/
+       // });    
 
+		/* TRIGGER EDIT MODE
         $("#cms_toolbar_edit_button_on").click(function(){
             var url = remove_from_url(window.location.href, "edit");
             url = insert_into_url(url, "edit-off", "");
             window.location = url;
             return false;
         });
-
+*/
+/* DISABLE EDIT MODE
         $("#cms_toolbar_edit_button_off").click(function(){
             window.location = insert_into_url(window.location.href, "edit", "");
             return false;
         });
-    
+    */
+    /* DONE SHOW AND HIDE THE TOOLBAR
         $("#cms_toolbar_closebutton").click(function () {
             closeCMStoolbar();        
             return false; 
@@ -275,12 +292,13 @@ jQuery(document).ready(function($) {
             openCMStoolbar();            
             return false; 
         });            
-    
+    */
+    /* EDIT PLUGIN LINK
         $("a.cms_toolbar_plugin_edit").click(function () {
             edit_plugin(page_id, plugin_id);
             return false;
         });
-
+*/
         $("a.cms_toolbar_downbutton").click(function () {
             move(1);
             return false;
@@ -289,7 +307,8 @@ jQuery(document).ready(function($) {
         $("a.cms_toolbar_upbutton").click(function () {
             move(-1);
             return false;
-        });        
+        });    
+        /* ADDSTROGGGER EVENTS TO SUBMIT BUTTONS    
         $("#cms_toolbar_loginform a.cms_toolbar_button").click(function () {                
             $("#cms_toolbar_loginform .cms_submit").trigger("click");
             return false;
@@ -297,9 +316,10 @@ jQuery(document).ready(function($) {
         $("#cms_toolbar_logoutform a.cms_toolbar_button").click(function () {                
             $("#cms_toolbar_logoutform .cms_submit").trigger("click");
             return false;
-        });
+        });*/
     
     
+        /* NOT SO SURE; GUESS GETS THE FIRST HOLDER AND SETS CSS
         $(".cms_plugin_holder").each(function (i) {                
             var cmsPluginHolderFirstObj = $(this).children().eq(0)                
             $(this).css({
@@ -307,7 +327,11 @@ jQuery(document).ready(function($) {
                 clear:cmsPluginHolderFirstObj.css("clear")
             })
           });    
+*/
 
+
+/* NOT IMPLEMENTED YET :: THIS CHANGES THE SET OF TEMPLATES AVAILABLE ON THE TOOLBAR
+-------------------------------------------------------------------------------------
         if (page_is_defined) {
              $("#cms_toolbar_templatebutton li a").click(function(){
                  template = $(this).attr("href").split("#")[1];
@@ -318,7 +342,7 @@ jQuery(document).ready(function($) {
                  return false;
              });        
         }
-    
+    */
         /* PLUGIN */            
         $("a.cms_toolbar_move_slot").live("click", function(){
             var target = $(this).attr("rel")
@@ -331,6 +355,7 @@ jQuery(document).ready(function($) {
             return false;
         });
     
+        /* SET OVERLAY HEIGHT AND SIZE
         $.fn.makeoverlay = function(options){
             var pluginH = $(this).height();
             var pluginHmin = 10;                
@@ -348,7 +373,10 @@ jQuery(document).ready(function($) {
                     $(options).hide();
                 })
             }
-        }
+        }*/
+            
+            // THIS ADDS THE DROPDOWN TO SWITCH BETWEEN PLACEHOLDERS (DROPDOWN MENU)
+            
             
         $(".cms_plugin_holder").live("mouseover", function(){    
             var splits = $(this).attr("id").split("_");
@@ -388,12 +416,15 @@ jQuery(document).ready(function($) {
         
         });            
     
+        /* SHOW AND HIDE OVERLAY
         $("#cms_plugin_overlay").mouseenter(function(){
             $("#cms_plugin_overlay").show();
         }).mouseleave(function(){
             $("#cms_plugin_overlay").hide();
             hideCMStoolbarSubmenus();
-        });
+        });*/
+    
+    /* THIS ADDS A NEW PLUGIN WITH THE GIVEN ATTRIBUTES
     
         $("div.cms_toolbar_placeholder_plugins li a").click(function(e){
             var select = $(this);
@@ -417,7 +448,8 @@ jQuery(document).ready(function($) {
             hideCMStoolbarSubmenus();
             return false;
         });
-    
+    */
+        /* DONE DELETE FUNCTION
         $("a.cms_toolbar_plugin_delete").click(function(){
             var question = translations.question; 
             var answer = confirm(question, true);
@@ -430,4 +462,4 @@ jQuery(document).ready(function($) {
             return false;
         });
     });
-});
+});*/

@@ -8,7 +8,7 @@
 
 /*##################################################|*/
 /* #CUSTOM APP# */
-(function ($, Class) {
+jQuery(document).ready(function ($) {
 	/**
 	 * Toolbar
 	 * @version: 0.0.2
@@ -23,42 +23,40 @@
 			csrf_token: '',
 			// type definitions used in registerItem()
 			types: [
-				{ 'anchor': this._registerAnchor },
-				{ 'html': this._reigsterHtml },
-				{ 'switcher': this._reigsterSwitcher },
-				{ 'button': this._reigsterButton },
-				{ 'list': this._reigsterList }
+				{ 'anchor': '_registerAnchor' },
+				{ 'html': '_reigsterHtml' },
+				{ 'switcher': '_reigsterSwitcher' },
+				{ 'button': '_reigsterButton' },
+				{ 'list': '_reigsterList' }
 			]
 		},
 
 		initialize: function (container, options) {
 			// save reference to this class
 			var classy = this;
-			// check if only one element is found
+			// check if only one element is given
 			if($(container).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
-			// merge argument options with internal options
+			// merge passed argument options with internal options
 			this.options = $.extend(this.options, options);
 			
-			// save toolbar elements
+			// set initial variables
 			this.wrapper = $(container);
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.toolbar.left = this.toolbar.find('.cms_toolbar-left');
 			this.toolbar.right = this.toolbar.find('.cms_toolbar-right');
 			
-			// bind event to toggle button
+			// bind event to toggle button so toolbar can be shown/hidden
 			this.toggle = this.wrapper.find('#cms_toolbar-toggle');
 			this.toggle.bind('click', function (e) {
 				e.preventDefault();
 				classy.toggleToolbar();
 			});
 			
-			// csrf security patch
-			$(document).cmsPatchCSRF();
-			
 			// initial setups
 			this._setup();
 		},
 		
+		/* set some basic settings */
 		_setup: function () {
 			// save reference to this class
 			var classy = this;
@@ -81,6 +79,7 @@
 			(this.toolbar.data('collapsed')) ? this._showToolbar() : this._hideToolbar();
 		},
 		
+		/* always use toggleToolbar to set the current state */
 		_showToolbar: function () {
 			var classy = this;
 			// add toolbar padding
@@ -113,14 +112,6 @@
 		registerItem: function (obj) {
 			// error handling
 			if(!obj.order) obj.dir = 0;
-			
-			/*$(this.options.types).each(function (index, type) {
-				//log(type.key);
-				if(type == obj.type) {
-					
-					return false;
-				}
-			});*/
 			
 			// check for internal types
 			// jonas wants some refactoring here
@@ -207,13 +198,13 @@
 				if(btn.data('state') == true) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = classy._removeUrl(window.location.href, obj.addParameter);
-						window.location = classy._insertUrl(url, obj.removeParameter, "")
+						var url = CMS.Helpers.removeUrl(window.location.href, obj.addParameter);
+						window.location = CMS.Helpers.insertUrl(url, obj.removeParameter, "")
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = classy._insertUrl(location.href, obj.addParameter, "");
+						window.location = CMS.Helpers.insertUrl(location.href, obj.addParameter, "");
 					});
 				}
 			});
@@ -280,10 +271,10 @@
 			log('can haz new type?');
 			/* you should be able to register a new type, either through
 				the current concept or through json matches as defined
-				in the options (see types) */
+				in the options (see types - not implemented yet) */
 		},
 		
-		/* this private function processes each template and replaces the placeholders with the passed values */
+		/* this private method processes each template and replaces the placeholders with the passed values */
 		_processTemplate: function (class, obj) {
 			// lets find the template and clone it
 			var template = this.wrapper.find(class).clone();
@@ -312,6 +303,7 @@
 			return template;
 		},
 		
+		/* handles item injections and places them in the correct order */
 		_injectItem: function (el, dir, order) {
 			// save some vars
 			var left = this.toolbar.left;
@@ -347,53 +339,7 @@
 					if(order >= current || order == current) el.insertAfter($(item));
 				});
 			}
-		},
-		
-		_insertUrl: function (url, name, value) {
-			// this is a one to one copy from the old toolbar
-			if(url.substr(url.length-1, url.length)== "&") url = url.substr(0, url.length-1); 
-			dash_splits = url.split("#");
-			url = dash_splits[0];
-			var splits = url.split(name + "=");
-			if(splits.length == 1) splits = url.split(name);
-			var get_args = false;
-			if(url.split("?").length>1) get_args = true;
-			if(splits.length > 1){
-				var after = "";
-				if(splits[1].split("&").length > 1) after = splits[1].split("&")[1];
-				url = splits[0] + name;
-				if(value) url += "=" + value
-				url += "&" + after;
-			} else {
-				if(get_args) { url = url + "&" + name; } else { url = url + "?" + name; }
-				if(value) url += "=" + value;
-			}
-			if(dash_splits.length>1) url += '#' + dash_splits[1];
-			if(url.substr(url.length-1, url.length)== "&") url = url.substr(0, url.length-1);
-			
-			return url;
-		},
-		
-		_removeUrl: function (url, name) {
-			// this is a one to one copy from the old toolbar
-			var dash_splits = url.split("#");
-			url = dash_splits[0];
-			var splits = url.split(name + "=");
-			if(splits.length == 1) splits = url.split(name);
-			if(splits.length > 1){
-				var after = "";
-				if (splits[1].split("&").length > 1) after = splits[1].split("&")[1];
-				if (splits[0].substr(splits[0].length-2, splits[0].length-1)=="?" || !after) {
-					url = splits[0] + after;
-				} else {
-					url = splits[0] + "&" + after;
-				}
-			}
-			if(url.substr(url.length-1,1) == "?") url = url.substr(0, url.length-1);
-			if(dash_splits.length > 1 && dash_splits[1]) url += "#" + dash_splits[1];
-			
-			return url;
 		}
-
+		
 	});
-})(jQuery, Class);
+});
