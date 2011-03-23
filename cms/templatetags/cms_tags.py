@@ -380,7 +380,7 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
-        kwargs['cache_result'] = True
+        kwargs['cache_result'] = False
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
