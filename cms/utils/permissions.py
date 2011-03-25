@@ -188,8 +188,8 @@ def get_subordinate_users(user):
     if user.is_superuser or \
             GlobalPagePermission.objects.with_can_change_permissions(user):
         return User.objects.all() 
-    
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+    site = Site.objects.get_current()
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
     
     user_level = get_user_permission_level(user)
     
@@ -211,7 +211,8 @@ def get_subordinate_groups(user):
         return Group.objects.all()
     
     page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
-    user_level = get_user_permission_level(user)
+    site = Site.objects.get_current()
+    user_level = get_user_permission_level(user,site)
     
     qs = Group.objects.distinct().filter(
          (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 

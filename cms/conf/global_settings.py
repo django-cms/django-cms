@@ -118,3 +118,7 @@ PLACEHOLDER_FRONTEND_EDITING = True
 
 # Cache prefix so one can deploy several sites on one cache server
 CMS_CACHE_PREFIX = 'cms-'
+
+# they are missing in the permission-merge2 branch
+CMS_PLUGIN_PROCESSORS = tuple()
+CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
