@@ -30,8 +30,13 @@ class PagePermissionInlineAdmin(admin.TabularInline):
         this will lead to violation, when he can add more power to itself)
         """
         # can see only permissions for users which are under him in tree
-        qs = PagePermission.objects.subordinate_to_user(request.user)
-        return qs.filter(can_view=False)
+
+        ### here a exception can be thrown
+        try:
+            user_id_set = PagePermission.objects.get_subordinate_users(request.user)
+            return qs.filter(can_view=False)
+        except NoPermissionsException:
+            return self.objects.get_empty_query_set()
     
     def get_formset(self, request, obj=None, **kwargs):
         """
