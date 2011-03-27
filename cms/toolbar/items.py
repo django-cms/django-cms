@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from cms.toolbar.base import BaseItem, Serializable
 from django.core.exceptions import ImproperlyConfigured
-from django.template.context import RequestContext
+from django.middleware.csrf import get_token
+from django.template.context import RequestContext, Context
 from django.template.loader import render_to_string
 from django.utils.html import strip_spaces_between_tags
 
@@ -91,15 +92,25 @@ class PostButton(BaseItem):
         ('title', 'title'),
         ('icon', 'icon'),
         ('action', 'action'),
-        ('name', 'name'),
     ]
     
-    def __init__(self, alignment, css_class_suffix, title, icon, action, name):
+    def __init__(self, alignment, css_class_suffix, title, icon, action, *args, **kwargs):
         super(PostButton, self).__init__(alignment, css_class_suffix)
         self.title = title
         self.icon = icon
         self.action = action
-        self.name = name
+        self.args = args
+        self.kwargs = kwargs
+        
+    def get_extra_data(self, context, request, **kwargs):
+        double = self.kwargs.copy()
+        double['csrfmiddlewaretoken'] = get_token(request)
+        hidden = render_to_string('cms/toolbar/items/_post_button_hidden.html',
+                                  Context({'single': self.args,
+                                           'double': double}))
+        return {
+            'hidden': hidden,
+        }
 
 
 class ListItem(Serializable):

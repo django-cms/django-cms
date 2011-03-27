@@ -5,8 +5,9 @@ from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List,
     PostButton)
 from django import forms
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -59,8 +60,7 @@ class CMSToolbar(Toolbar):
                      'cms/img/toolbar/icons/admin.png', items=admin_items)
             )
             items.append(
-                PostButton(RIGHT, 'logout', _('Logout'),
-                       'cms/img/toolbar/icons/logout.png', '', 'logout')
+                Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
             )
         elif not request.user.is_authenticated():
             items.append(
@@ -68,14 +68,22 @@ class CMSToolbar(Toolbar):
             )
         else:
             items.append(
-                PostButton(RIGHT, 'logout', _('Logout'),
-                       'cms/img/toolbar/icons/logout.png', '', 'logout')
+                Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
             )
         return items
     
     def request_hook(self, request):
         if request.method != 'POST':
-            return None
+            return self._request_hook_get(request)
+        else:
+            return self._request_hook_post(request)
+        
+    def _request_hook_get(self, request):
+        if 'cms-toolbar-logout' in request.GET:
+            logout(request)
+            return HttpResponseRedirect(request.path)
+        
+    def _request_hook_post(self, request):
         # login hook
         login_form = CMSToolbarLoginForm(request.POST)
         if login_form.is_valid():
@@ -84,4 +92,3 @@ class CMSToolbar(Toolbar):
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
-        return None
