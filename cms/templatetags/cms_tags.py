@@ -227,7 +227,6 @@ class Placeholder(Tag):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 register.tag(Placeholder)
 
-
 class PageAttribute(Tag):
     """
     This template node is used to output attribute from a page such
@@ -235,7 +234,9 @@ class PageAttribute(Tag):
 
     Synopsis
          {% page_attribute "field-name" %}
+         {% page_attribute "field-name" as varname %}
          {% page_attribute "field-name" page_lookup %}
+         {% page_attribute "field-name" page_lookup as varname %}
 
     Example
          {# Output current page's page_title attribute: #}
@@ -244,6 +245,9 @@ class PageAttribute(Tag):
          {% page_attribute "page_title" "the_page" %}
          {# Output slug attribute of the page with pk 10: #}
          {% page_attribute "slug" 10 %}
+         {# Assign page_description attribute specifying the name of the output variable: #}
+         {% page_attribute "meta_description" as page_description %}
+         {% if page_description %} {{ page_description }} {% else %} Another description {% endif %}
 
     Keyword arguments:
     field-name -- the name of the field to output. Use one of:
@@ -257,11 +261,15 @@ class PageAttribute(Tag):
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
+    
+    varname -- name for the context output variable, need to be prefixed by the "as" keyword if used.
     """
     name = 'page_attribute'
     options = Options(
         Argument('name', resolve=False),
-        Argument('page_lookup', required=False, default=None)
+        Argument('page_lookup', required=False, default=None),
+        'as',
+        Argument('varname', required=False, resolve=False)
     )
     
     valid_attributes = [
@@ -273,7 +281,7 @@ class PageAttribute(Tag):
         "menu_title"
     ]
     
-    def render_tag(self, context, name, page_lookup):
+    def render_tag(self, context, name, page_lookup, varname):
         if not 'request' in context:
             return ''
         name = name.lower()
@@ -284,7 +292,11 @@ class PageAttribute(Tag):
             return ''
         if page and name in self.valid_attributes:
             f = getattr(page, "get_%s" % name)
-            return f(language=lang, fallback=True)
+            output = f(language=lang, fallback=True)
+            if varname:
+                context[varname] = output
+            else:
+                return output
         return ''
 register.tag(PageAttribute)
 
