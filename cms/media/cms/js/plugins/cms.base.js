@@ -1,18 +1,21 @@
 /**
- * @author		Angelo Dini
- * @copyright	http://www.divio.ch under the BSD Licence
- * @requires	Classy, jQuery
+ * @author:		Angelo Dini
+ * @copyright:	http://www.divio.ch under the BSD Licence
+ * @requires:	Classy, jQuery
  *
- * check if classy.js exists */
- if(window['Class'] === undefined) log('classy.js is required!');
+ * assign Class and CMS namespace */
+ var Class = Class || {};
+ var CMS = CMS || {};
 
 /*##################################################|*/
 /* #CUSTOM APP# */
 jQuery(document).ready(function ($) {
 	/**
 	 * Security
-	 * @version: 0.0.1
+	 * @version: 0.1.0
 	 * @description: Adds security layer to CMS namespace
+	 * @public_methods:
+	 *	- CMS.Security.csrf();
 	 */
 	CMS.Security = Class.$extend({
 	
@@ -24,7 +27,7 @@ jQuery(document).ready(function ($) {
 					// get cookies without jquery.cookie.js
 					function getCookie(name) {
 						var cookieValue = null;
-						if(document.cookie && document.cookie != '') {
+						if(document.cookie && (document.cookie != '')) {
 							var cookies = document.cookie.split(';');
 							for (var i = 0; i < cookies.length; i++) {
 								var cookie = $.trim(cookies[i]);
@@ -49,23 +52,31 @@ jQuery(document).ready(function ($) {
 					}
 				}
 			});
-		},
-			
+		}
+	
 	});
 	
 	/**
 	 * Helpers
-	 * @version: 0.0.1
+	 * @version: 0.1.0
 	 * @description: Adds helper methods to be invoked
+	 * @public_methods:
+	 *	- CMS.Helpers.reloadBrowser();
+	 *	- CMS.Helpers.insertUrl(url, name, value);
+	 *	- CMS.Helpers.removeUrl(url, name);
 	 */
 	CMS.Helpers = Class.$extend({
 	
 		initialize: function () {},
 		
+		reloadBrowser: function () {
+			window.location.reload();
+		},
+		
 		insertUrl: function (url, name, value) {
 			// this is a one to one copy from the old toolbar
 			if(url.substr(url.length-1, url.length)== "&") url = url.substr(0, url.length-1); 
-			dash_splits = url.split("#");
+			var dash_splits = url.split("#");
 			url = dash_splits[0];
 			var splits = url.split(name + "=");
 			if(splits.length == 1) splits = url.split(name);
@@ -75,7 +86,7 @@ jQuery(document).ready(function ($) {
 				var after = "";
 				if(splits[1].split("&").length > 1) after = splits[1].split("&")[1];
 				url = splits[0] + name;
-				if(value) url += "=" + value
+				if(value) url += "=" + value;
 				url += "&" + after;
 			} else {
 				if(get_args) { url = url + "&" + name; } else { url = url + "?" + name; }

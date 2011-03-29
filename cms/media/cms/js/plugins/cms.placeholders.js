@@ -1,27 +1,45 @@
 /**
- * @author		Angelo Dini
- * @copyright	http://www.divio.ch under the BSD Licence
- * @requires	Classy, jQuery
+ * @author:		Angelo Dini
+ * @copyright:	http://www.divio.ch under the BSD Licence
+ * @requires:	Classy, jQuery, jQuery.ui.core, jQuery.ui.draggable, jQuery.ui.droppable
  *
- * check if classy.js exists */
- if(window['Class'] === undefined) log('classy.js is required!');
-
-/* needs to be rewritten */
-function hide_iframe() { CMS.Placeholders.toggleFrame(); CMS.Placeholders.reloadBrowser(); }
+ * assign Class and CMS namespace */
+ var Class = Class || {};
+ var CMS = CMS || {};
 
 /*##################################################|*/
 /* #CUSTOM APP# */
 jQuery(document).ready(function ($) {
 	/**
-	 * Toolbar
-	 * @version: 0.0.1
+	 * Placeholders
+	 * @version: 0.1.0
 	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
+	 * @public_methods:
+	 *	- CMS.Placeholder.addPlugin(url, obj);
+	 *	- CMS.Placeholder.editPlugin(placeholder_id, plugin_id);
+	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id);
+	 *	- CMS.Placeholder.movePlugin(plugin, target);
+	 *	- CMS.Placeholder.toggleFrame();
+	 *	- CMS.Placeholder.toggleDim();
 	 */
 	CMS.Placeholders = Class.$extend({
 
 		options: {
 			'edit_mode': false,
-			'page_is_defined': false
+			'compact_mode': false,
+			'page_is_defined': false, // TODO: figure out why thats needed
+			'lang': {
+				'move_slot': '',
+				'move_warning': '',
+				'delete_request': ''
+			},
+			'urls': {
+				'cms_page_move_plugin': '',
+				'cms_page_changelist': '',
+				'cms_page_change_template': '',
+				'cms_page_add_plugin': '',
+				'cms_page_remove_plugin': ''
+			}
 		},
 
 		initialize: function (container, options) {
@@ -30,16 +48,17 @@ jQuery(document).ready(function ($) {
 			// merge argument options with internal options
 			this.options = $.extend(this.options, options);
 			
-			// save toolbar elements
+			// save placeholder elements
 			this.wrapper = $(container);
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.dim = this.wrapper.find('#cms_placeholder-dim');
 			this.frame = this.wrapper.find('#cms_placeholder-content');
 			this.timer = function () {};
 			this.overlay = this.wrapper.find('#cms_placeholder-overlay');
+			this.overlayIsHidden = false;
 			
-			// save placeholder elements
-			if(this.options.editmode) {
+			// attach event handling to placeholder buttons and overlay if editmode is active
+			if(this.options.edit_mode) {
 				this.bars = $('.cms_placeholder-bar');
 				this.bars.each(function (index, item) {
 					classy._bars.call(classy, item);
@@ -50,6 +69,8 @@ jQuery(document).ready(function ($) {
 				this.holders.bind('mouseenter', function (e) {
 					classy._holder.call(classy, e.currentTarget);
 				});
+				
+				this._initDrag();
 			}
 			
 			// setup everything
@@ -61,7 +82,7 @@ jQuery(document).ready(function ($) {
 			var classy = this;
 			
 			// set default dimm value to false
-			this.toolbar.data('dimmed', false);
+			this.dim.data('dimmed', false);
 			
 			// set defailt frame value to true
 			this.frame.data('collapsed', true);
@@ -74,8 +95,13 @@ jQuery(document).ready(function ($) {
 			this.overlay.bind('click', function () {
 				classy._hideOverlay();
 				
-				// when clicking the mouseenter event should be canceled until
-				// you enter the event again (outbound)
+				// we need to hide the oberlay and stop the event for a while
+				classy.overlay.css('visibility', 'hidden');
+				
+				// add timer to show element after second mouseenter
+				setTimeout(function () {
+					classy.overlayIsHidden = true;
+				}, 100);
 			});
 		},
 		
@@ -94,12 +120,12 @@ jQuery(document).ready(function ($) {
 				});
 			
 			// read and save placeholder bar variables
-			var values = bar.attr('class').split('::');
-				values.shift(); // remove classes
-				values = {
-					'language': values[0],
-					'placeholder_id': values[1],
-					'placeholder': values[2]
+			var split = bar.attr('class').split('::');
+				split.shift(); // remove classes
+			var values = {
+					'language': split[0],
+					'placeholder_id': split[1],
+					'placeholder': split[2]
 				};
 			
 			// attach events to placeholder plugins
@@ -121,16 +147,23 @@ jQuery(document).ready(function ($) {
 			// show overlay
 			this._showOverlay.call(classy, holder);
 			
-			// get values
-			var values = holder.attr('class').split('::');
-				values.shift(); // remove classes
-				values = {
-					'plugin_id': values[0],
-					'placeholder': values[1],
-					'type': values[2],
-					'slot': values[3]
-				};
+			// set overlay to visible
+			if(this.overlayIsHidden === true) {
+				this.overlay.css('visibility', 'visible');
+				this.overlayIsHidden = false;
+			}
 			
+			// get values
+			var split = holder.attr('class').split('::');
+				split.shift(); // remove classes
+			var values = {
+					'plugin_id': split[0],
+					'placeholder': split[1],
+					'type': split[2],
+					'slot': split[3]
+				};
+
+			// TODO: find better way to implement this
 			var buttons = this.overlay.find('.cms_placeholder-options li');
 				// unbind all button events
 				buttons.find('a').unbind('click');
@@ -150,7 +183,8 @@ jQuery(document).ready(function ($) {
 				// attach move event
 				buttons.find('a[rel^=moveup]').bind('click', function (e) {
 					e.preventDefault();
-					
+
+					// TODO: add less docs to this description
 					// wee need to somehow determine if we can move the selected plugin up
 					// so how the fuck are we gonna do that...
 					// so holder is the current holder. lets check if we find any other placeholders
@@ -174,7 +208,28 @@ jQuery(document).ready(function ($) {
 						'slot_id': target[3]
 					});
 				});
-			},
+		},
+		
+		_initDrag: function () {
+			// TODO: when dragging disable the overlay
+
+			// we need to active the drag and drop somehwere using jquery ui
+			// so lets get all the containers and containing elements
+			
+			
+			// al the items should be draggable
+			var items = $('.cms_placeholder');
+			// the placeholders define the header (containing container)
+			// we probably need to add a wrapping div there to define the boundary
+			//var placeholders = $('.cms_placeholder-bar');
+
+            //log(placeholder);
+			
+			// lets add the drag event
+			items.draggable({
+				
+			});
+		},
 		
 		addPlugin: function (url, data) {
 			var classy = this;
@@ -199,6 +254,7 @@ jQuery(document).ready(function ($) {
 			
 			// show framebox
 			CMS.Placeholders.toggleFrame();
+			CMS.Placeholders.toggleDim();
 			
 			// load the template through the data id
 			// for that we create an iframe with the specific url
@@ -215,10 +271,7 @@ jQuery(document).ready(function ($) {
 			frame.html(iframe);
 			
 			// bind load event to injected iframe
-			// lets set the correct height for the frame
 			$('#cms_placeholder-iframe').load(function () {
-				//$(document.body).css('overflow', 'hidden');
-				
 				// set new height and animate
 				var height = $('#cms_placeholder-iframe').contents().find('body').outerHeight(true);
 				$('#cms_placeholder-iframe').animate({ 'height': height }, 500);
@@ -226,7 +279,6 @@ jQuery(document).ready(function ($) {
 				// resize window after animation
 				setTimeout(function () {
 					$(window).resize();
-					//$(document.body).css('overflow', 'auto');
 				}, 501);
 				
 				// remove loader class
@@ -238,7 +290,6 @@ jQuery(document).ready(function ($) {
 		},
 		
 		deletePlugin: function (placeholder_id, plugin_id) {
-			var classy = this;
 			// lets ask if you are sure
 			var message = this.options.lang.delete_request;
 			var confirmed = confirm(message, true);
@@ -249,9 +300,9 @@ jQuery(document).ready(function ($) {
 					'type': 'POST',
 					'url': this.options.urls.cms_page_remove_plugin,
 					'data': { 'plugin_id': plugin_id },
-					'success': function (response) {
+					'success': function () {
 						// refresh
-						classy.reloadBrowser();
+						CMS.Helpers.reloadBrowser();
 					},
 					'error': function () {
 						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
@@ -261,6 +312,7 @@ jQuery(document).ready(function ($) {
 		},
 		
 		movePlugin: function (plugin, target) {
+			// TODO: this method does not work yet
 			// move plugin to certain position - will also be used for dragNdrop
 			
 			// jonas should do some shit here cause the implementation works with arrays at the moment
@@ -322,11 +374,6 @@ jQuery(document).ready(function ($) {
 		
 		toggleFrame: function () {
 			(this.frame.data('collapsed')) ? this._showFrame() : this._hideFrame();
-			
-			// show dimmer
-			this.toggleDim();
-			
-			// we need to make sure that the toolbar is visible when showing the frame
 		},
 		
 		_showFrame: function () {
@@ -335,6 +382,14 @@ jQuery(document).ready(function ($) {
 			this.frame.fadeIn();
 			// change data information
 			this.frame.data('collapsed', false);
+			// frame should always have space on top
+			this.frame.css('top', 43);
+			// make sure that toolbar is visible
+			if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
+			// listen to toolbar events
+			this.toolbar.bind('cms.toolbar.show cms.toolbar.hide', function (e) {
+				(e.handleObj.namespace === 'show.toolbar') ? classy.frame.css('top', 43) : classy.frame.css('top', 0);
+			});
 		},
 		
 		_hideFrame: function () {
@@ -346,10 +401,12 @@ jQuery(document).ready(function ($) {
 			this.frame.find('.cms_placeholder-content_inner')
 				.addClass('cms_placeholder-content_loader')
 				.html('');
+			// remove toolbar events
+			this.toolbar.unbind('cms.toolbar.show cms.toolbar.hide');
 		},
 
 		toggleDim: function () {
-			(this.toolbar.data('dimmed')) ? this._hideDim() : this._showDim();
+			(this.dim.data('dimmed')) ? this._hideDim() : this._showDim();
 		},
 		
 		_showDim: function () {
@@ -374,12 +431,13 @@ jQuery(document).ready(function ($) {
 			// init dim resize
 			$(window).resize();
 			// change data information
-			this.toolbar.data('dimmed', true);
+			this.dim.data('dimmed', true);
 			// show dim
 			this.dim.stop().fadeIn();
 			// add event to dim to hide
-			this.dim.bind('click', function (e) {
+			this.dim.bind('click', function () {
 				classy.toggleFrame.call(classy);
+				classy.toggleDim.call(classy);
 			});
 		},
 		
@@ -387,16 +445,19 @@ jQuery(document).ready(function ($) {
 			// unbind resize event
 			$(window).unbind('resize');
 			// change data information
-			this.toolbar.data('dimmed', false);
+			this.dim.data('dimmed', false);
 			// hide dim
 			this.dim.css('opcaity', 0.6).stop().fadeOut();
 			// remove dim event
 			this.dim.unbind('click');
-		},
-		
-		reloadBrowser: function () {
-			window.location.reload();
 		}
 		
 	});
 });
+
+/* needs to be changed to CMS namespace */
+function hide_iframe() {
+	CMS.Placeholders.toggleFrame();
+	CMS.Placeholders.toggleDim();
+	CMS.Helpers.reloadBrowser();
+}
