@@ -203,16 +203,14 @@ class RenderingTestCase(CMSTestCase):
                               CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
                                           ( 'elvish', 'Elvish' )]):
             from cms.views import details
-            class Mock:
-                pass
-            
             request = AttributeObject(
                 REQUEST={'language': 'elvish'},
                 GET=[],
                 session={},
                 path='/',
                 user=self.test_user,
-                current_page=None
+                current_page=None,
+                method='GET',
             )
             self.assertRaises(Http404, details, request, slug=self.test_page.get_slug())
 
@@ -235,7 +233,8 @@ class RenderingTestCase(CMSTestCase):
                 session={},
                 path='/',
                 user=self.test_user,
-                current_page=None
+                current_page=None,
+                method='GET',
             )
 
             response = details(request, slug=self.test_page.get_slug())

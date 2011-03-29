@@ -32,7 +32,6 @@ class CMSToolbar(Toolbar):
             Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
         ]
         if is_staff:
-            print "user is staff"
             items.append(
                 Switcher(LEFT, 'editmode', 'edit', 'edit-off', _('Edit mode'))
             )
