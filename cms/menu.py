@@ -10,37 +10,60 @@ from cms.apphook_pool import apphook_pool
 from cms.models.titlemodels import Title
 
 def page_to_node(page, home, cut):
-    parent_id = page.parent_id
-    if home and page.parent_id == home.pk and cut:
-        parent_id = None
-    # possible fix for a possible problem
-    #if parent_id and not page.parent.get_calculated_status():
-    #    parent_id = None # ????
+    '''
+    Transform a CMS page into a navigation node.
+    
+    page: the page you wish to transform
+    home: a reference to the "home" page (the page with tree_id=1)
+    cut: Should we cut page from it's parent pages? This means the node will not
+         have a parent anymore.
+    '''
+    # Theses are simple to port over, since they are not calculated.
+    # Other attributes will be added conditionnally later.
     attr = {'soft_root':page.soft_root,
             'auth_required':page.login_required,
             'reverse_id':page.reverse_id,}
+    
+    parent_id = page.parent_id
+    # Should we cut the Node from its parents?
+    if home and page.parent_id == home.pk and cut:
+        parent_id = None
+    
+    # possible fix for a possible problem
+    #if parent_id and not page.parent.get_calculated_status():
+    #    parent_id = None # ????
+    
     if page.limit_visibility_in_menu == None:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
         attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
         attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
+        
     if page.pk == home.pk:
         attr['is_home'] = True
-    extenders = []
+
+    # Extenders can be either navigation extenders or from apphooks.
+    extenders = [] 
     if page.navigation_extenders:
         extenders.append(page.navigation_extenders)
+    # Is this page an apphook? If so, we need to handle the apphooks's nodes
     try:
         app_name = page.get_application_urls(fallback=False)
     except Title.DoesNotExist:
         app_name = None
-    if app_name:
+    if app_name: # it means it is an apphook
         app = apphook_pool.get_apphook(app_name)
         for menu in app.menus:
             extenders.append(menu.__name__)
-    attr['redirect_url'] = page.get_redirect()  # save redirect URL is any
+    
     if extenders:
         attr['navigation_extenders'] = extenders
+    
+    # Do we have a redirectURL?
+    attr['redirect_url'] = page.get_redirect()  # save redirect URL if any
+    
+    # Now finally, build the NavigationNode object and return it.
     ret_node = NavigationNode(
         page.get_menu_title(), 
         page.get_absolute_url(), 
@@ -57,12 +80,16 @@ class CMSMenu(Menu):
         page_queryset = get_page_queryset(request)
         site = Site.objects.get_current()
         lang = get_language_from_request(request)
+        
         filters = {
             'site':site,
         }
+        
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
+            
         pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+        
         ids = []
         nodes = []
         first = True
@@ -70,6 +97,8 @@ class CMSMenu(Menu):
         home_children = []
         home = None
         for page in pages:
+            # Pages are ordered by tree_id, therefore the first page is the root
+            # of the page tree (a.k.a "home")
             if not home:
                 home = page
             
@@ -82,7 +111,9 @@ class CMSMenu(Menu):
             if (page.pk == home.pk and home.in_navigation) or page.pk != home.pk:
                 first = False
             ids.append(page.id)
+            
         titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
+        
         for page in pages:# add the title and slugs and some meta data
             for title in titles:
                 if title.page_id == page.pk:
