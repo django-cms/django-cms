@@ -178,7 +178,7 @@ jQuery(document).ready(function ($) {
 			// add order, show item
 			template.data('order', obj.order).css('display', 'block');
 			// add class if neccessary
-			if(obj.class) template.addClass(obj.class);
+			if(obj.cls) template.addClass(obj.cls);
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
@@ -291,9 +291,9 @@ jQuery(document).ready(function ($) {
 		},
 
 		/* this private method processes each template and replaces the placeholders with the passed values */
-		_processTemplate: function (class, obj) {
+		_processTemplate: function (cls, obj) {
 			// lets find the template and clone it
-			var template = this.wrapper.find(class).clone();
+			var template = this.wrapper.find(cls).clone();
 				template = $('<div>').append(template).clone().remove().html();
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
@@ -304,7 +304,7 @@ jQuery(document).ready(function ($) {
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
 			// back to jquery object
 			template = $(template);
-			if(obj.class) template.addClass(obj.class);
+			if(obj.cls) template.addClass(obj.cls);
 			if(obj.icon) template.find('.cms_toolbar-btn_right .toolbar_icon-prefix')
 								 .addClass('cms_toolbar_icon-enabled')
 								 .css('background-image', 'url('+obj.icon+')');

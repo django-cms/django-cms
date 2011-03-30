@@ -92,7 +92,7 @@ class BaseItem(Serializable):
         ('order', 'order'), # automatically set
         ('alignment', 'dir'),
         ('item_type', 'type'),
-        ('css_class', 'class'),
+        ('css_class', 'cls'),
     ]
     extra_attributes = []
     alignment = 'left'
