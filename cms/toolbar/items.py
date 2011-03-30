@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.toolbar.base import BaseItem, Serializable
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.middleware.csrf import get_token
 from django.template.context import RequestContext, Context
@@ -118,13 +119,15 @@ class ListItem(Serializable):
         ('css_class', 'class'),
         ('title', 'title'),
         ('url', 'url'),
+        ('icon', 'icon'),
     ]
     extra_attributes = []
     
-    def __init__(self, css_class_suffix, title, url):
+    def __init__(self, css_class_suffix, title, url, icon):
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
         self.title = title
+        self.icon = icon
         if callable(url):
             self.serialize_url = url
         else:
@@ -141,7 +144,7 @@ class List(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, icon, items):
         super(List, self).__init__(alignment, css_class_suffix)
         self.title = title
-        self.icon = icon
+        self.icon = '%s%s' % (settings.MEDIA_URL, icon)
         self.validate_items(items)
         self.raw_items = items
         

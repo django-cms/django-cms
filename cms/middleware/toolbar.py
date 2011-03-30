@@ -2,34 +2,24 @@
 """
 Edit Toolbar middleware
 """
-from cms import settings as cms_settings
-from cms.utils import get_template_from_request
-from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.plugins import get_placeholders
+from cms.cms_toolbar import CMSToolbar
 from cms.utils.urlutils import is_media_request
-from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.http import HttpResponse
 from django.template.context import RequestContext
-from django.template.defaultfilters import title, safe
 from django.template.loader import render_to_string
-from django.utils import simplejson
-from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext as _
 from django.views.static import serve
+import re
+import warnings
 
 HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
-def inster_after_tag(string, tag, insertion):
-    if string == None:
-        return string
-    no_case = string.lower()
-    index = no_case.find("<%s" % tag.lower())
-    if index > -1:
-        start_tag = index
-        end_tag = start_tag + no_case[start_tag:].find(">") + 1
-        return string[:end_tag] + insertion + string[end_tag:]
-    else:
-        return string
+try:
+    ADMIN_BASE = reverse("admin:index")
+except NoReverseMatch:
+    ADMIN_BASE = None
+
+BODY_RE = re.compile(r'<body.*?>', re.IGNORECASE)
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
     data = {
@@ -38,101 +28,52 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     }
     return render_to_string('cms/toolbar/placeholder_wrapper.html', data)
 
+def _patch(data, request):
+    match = BODY_RE.search(data)
+    if not match:
+        return data
+    warnings.warn("You have to use the {% cms_toolbar %} tag in your templates "
+                  "if you use the cms.middleware.toolbar.ToolbarMiddleware.",
+                  DeprecationWarning)
+    end = match.end()
+    ctx = RequestContext(request)
+    ctx['CMS_TOOLBAR_CONFIG'] = request.toolbar.as_json({}, request)
+    toolbar = render_to_string('cms/toolbar/toolbar.html', ctx)
+    return u'%s%s%s' % (data[:end], toolbar, data[end:])
+
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
     """
 
-    def show_toolbar(self, request, response):
-        if getattr(request, 'view_func', None) is serve:
-            return False
+    def show_toolbar(self, request):
         if request.is_ajax():
             return False
-        if response.status_code != 200:
+        if ADMIN_BASE and request.path.startswith(ADMIN_BASE):
             return False
-        if not response['Content-Type'].split(';')[0] in HTML_TYPES:
-            return False
-        try:
-            if request.path.startswith(reverse("admin:index")):
-                return False
-        except NoReverseMatch:
-            pass
         if is_media_request(request):
             return False
-        if "edit" in request.GET:
-            return True
         if not hasattr(request, "user"):
-            return False
-        if not request.user.is_authenticated() or not request.user.is_staff:
             return False
         return True
 
     def process_request(self, request):
-        if request.method == "POST":
-            if "edit" in request.GET and "cms_username" in request.POST:
-                user = authenticate(username=request.POST.get('cms_username', ""), password=request.POST.get('cms_password', ""))
-                if user:
-                    login(request, user)
-            if request.user.is_authenticated() and "logout_submit" in request.POST:
-                logout(request)
-                request.POST = {}
-                request.method = 'GET'
-        if request.user.is_authenticated() and request.user.is_staff:
-            if "edit-off" in request.GET:
-                request.session['cms_edit'] = False
-            if "edit" in request.GET:
-                request.session['cms_edit'] = True
-                
-    def process_view(self, request, view_func, view_args, view_kwargs):
-        request.view_func = view_func
-
+        if self.show_toolbar(request):
+            request.toolbar = CMSToolbar()
+            response = request.toolbar.request_hook(request)
+            if isinstance(response, HttpResponse):
+                return response
+    
     def process_response(self, request, response):
-        if self.show_toolbar(request, response):
-            response.content = inster_after_tag(smart_unicode(response.content), u'body', smart_unicode(self.render_toolbar(request)))
+        """
+        For backwards compatibility, will be removed in 2.3
+        """
+        
+        if not getattr(request, 'toolbar', False):
+            return response
+        if getattr(request, '_cms_toolbar_tag_used', False):
+            return response
+        if not response['Content-Type'].startswith(HTML_TYPES):
+            return response
+        response.content = _patch(response.content, request)
         return response
-
-    def render_toolbar(self, request):
-        from cms.plugin_pool import plugin_pool
-        from cms.utils.admin import get_admin_menu_item_context
-        """
-        Renders the Toolbar.
-        """
-        auth = request.user.is_staff or request.user.is_superuser
-        edit = request.session.get('cms_edit', False) and auth
-        page = request.current_page
-        move_dict = []
-        if edit and page:
-            template = get_template_from_request(request)
-            placeholders = get_placeholders(template)
-            for placeholder in placeholders:
-                d = {}
-                name = get_placeholder_conf(placeholder, page.get_template(), "name", title(placeholder))
-                name = _(name)
-                d['name'] = name
-                plugins = plugin_pool.get_all_plugins(placeholder, page)
-                d['plugins'] = []
-                for p in plugins:
-                    d['plugins'].append(p.value)
-                d['type'] = placeholder
-                move_dict.append(d)
-            data = safe(simplejson.dumps(move_dict))
-        else:
-            data = {}
-        if auth and page:
-            context = get_admin_menu_item_context(request, page, filtered=False)
-        else:
-            context = {}
-        context.update({
-            'auth':auth,
-            'page':page,
-            'templates': cms_settings.CMS_TEMPLATES,
-            'auth_error':not auth and 'cms_username' in request.POST,
-            'placeholder_data':data,
-            'edit':edit,
-            'moderator': cms_settings.CMS_MODERATOR,
-            'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
-        })
-        #from django.core.context_processors import csrf
-        #context.update(csrf(request))
-        context['toolbarconfig'] = request.toolbar.as_json(context, request)
-        return render_to_string('cms/toolbar/toolbar.html', context, RequestContext(request))

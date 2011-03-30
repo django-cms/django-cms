@@ -793,9 +793,9 @@ class Page(MPTTModel):
         if settings.CMS_MODERATOR:
             has_moderator_state = getattr(self, '_has_moderator_state_chache', None)
             if has_moderator_state == False:
-                return None
+                return self.pagemoderatorstate_set.none()
             return self.pagemoderatorstate_set.all().order_by('created',)[:5]
-        return None
+        return self.pagemoderatorstate_set.none()
     
     def get_moderator_queryset(self):
         """Returns ordered set of all PageModerator instances, which should 
