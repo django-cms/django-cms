@@ -39,6 +39,11 @@ class Serializable(object):
     
     def _populate(self, container, python, javascript, context, request,
                   **kwargs):
+        """
+        Populates the *container* using the key *javascript* by accessing the
+        attribute *python* on *self* (or serialize_*python* if that's a callable
+        on *self*).
+        """
         if hasattr(self, 'serialize_%s' % python):
             meth = getattr(self, 'serialize_%s' % python)
             value = meth(context, request, **kwargs)
@@ -49,10 +54,16 @@ class Serializable(object):
         container[javascript] = value
     
     def get_extra_data(self, context, request, **kwargs):
+        """
+        Hook for subclasses to add more data.
+        """
         return {}
 
 
 class Toolbar(Serializable):
+    """
+    A base toolbar, implements the request_hook API and the get_items API.
+    """
     def get_items(self, context, request, **kwargs):
         return []
     
@@ -74,8 +85,11 @@ class Toolbar(Serializable):
 
 
 class BaseItem(Serializable):
+    """
+    Base class for toolbar items, has default attributes common to all items.
+    """
     base_attributes = [
-        ('order', 'order'),
+        ('order', 'order'), # automatically set
         ('alignment', 'dir'),
         ('item_type', 'type'),
         ('css_class', 'class'),
@@ -85,6 +99,12 @@ class BaseItem(Serializable):
     
     
     def __init__(self, alignment, css_class_suffix):
+        """
+        alignment: either cms.toolbar.constants.LEFT or 
+            cms.toolbar.constants.RIGHT
+        css_class_suffix: suffix for the cms class to put on this item, prefix
+            is always 'cms_toolbar-item'
+        """
         if alignment not in ALIGNMENTS:
             raise ImproperlyConfigured("Item alignment %r is not valid, must "
                                        "either cms.toolbar.base.LEFT or "

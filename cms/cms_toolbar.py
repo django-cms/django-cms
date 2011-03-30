@@ -24,7 +24,13 @@ def _get_page_history_url(context, request, **kwargs):
 
 
 class CMSToolbar(Toolbar):
+    """
+    The default CMS Toolbar
+    """
     def get_items(self, context, request, **kwargs):
+        """
+        Get the CMS items on the toolbar
+        """
         is_staff = request.user.is_staff
         can_change = (request.current_page and
                       request.current_page.has_change_permission(request))
