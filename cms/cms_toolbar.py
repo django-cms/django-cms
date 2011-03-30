@@ -63,7 +63,7 @@ class CMSToolbar(Toolbar):
             )
         elif not request.user.is_authenticated():
             items.append(
-                TemplateHTML(RIGHT, 'login', 'cms/toolbar/items/login.html')
+                TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
             )
         else:
             items.append(
