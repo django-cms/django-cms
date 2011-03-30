@@ -3,12 +3,11 @@
 Edit Toolbar middleware
 """
 from cms.cms_toolbar import CMSToolbar
-from cms.utils.urlutils import is_media_request
+from django import template
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponse
 from django.template.context import RequestContext
 from django.template.loader import render_to_string
-from django.views.static import serve
 import re
 import warnings
 
@@ -20,6 +19,9 @@ except NoReverseMatch:
     ADMIN_BASE = None
 
 BODY_RE = re.compile(r'<body.*?>', re.IGNORECASE)
+BACKWARDS_COMPAT_TEMPLATE = template.Template(
+    "{% load cms_tags %}{{ pre|safe }}{% cms_toolbar %}{{ post|safe }}"
+)
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
     data = {
@@ -37,32 +39,33 @@ def _patch(data, request):
                   DeprecationWarning)
     end = match.end()
     ctx = RequestContext(request)
-    ctx['CMS_TOOLBAR_CONFIG'] = request.toolbar.as_json({}, request)
-    toolbar = render_to_string('cms/toolbar/toolbar.html', ctx)
-    return u'%s%s%s' % (data[:end], toolbar, data[end:])
+    ctx['pre'] = data[:end]
+    ctx['post'] = data[end:]
+    return BACKWARDS_COMPAT_TEMPLATE.render(ctx)
 
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
     """
 
-    def show_toolbar(self, request):
+    def should_show_toolbar(self, request):
+        """
+        Check if we should show the toolbar for this request or not.
+        """
+        # check session
         if request.session.get('cms_edit', False):
             return True
+        # check GET
         if 'edit' in request.GET:
             return True
-        if request.is_ajax():
-            return False
-        if ADMIN_BASE and request.path.startswith(ADMIN_BASE):
-            return False
-        if is_media_request(request):
-            return False
-        if not hasattr(request, "user"):
-            return False
         return False
 
     def process_request(self, request):
-        if self.show_toolbar(request):
+        """
+        If we should show the toolbar for this request, put it on
+        request.toolbar. Then call the request_hook on the toolbar.
+        """
+        if self.should_show_toolbar(request):
             request.toolbar = CMSToolbar()
             response = request.toolbar.request_hook(request)
             if isinstance(response, HttpResponse):
