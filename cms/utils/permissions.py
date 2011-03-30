@@ -193,14 +193,15 @@ def get_subordinate_users(user):
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
-        # no permission so only staff 
-    qs = User.objects.distinct().filter(
-        Q(is_staff=True) &
-                (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
-    )
-    qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
-    return qs
-
+        # no permission so only staff and no page permissions 
+        qs = User.objects.distinct().filter(
+                Q(is_staff=True) & 
+                Q(pageuser__created_by=user) & 
+                Q(pagepermission__page=None)
+        )
+        qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
+        return qs
+    # normal query
     qs = User.objects.distinct().filter(
         Q(is_staff=True) & 
         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
