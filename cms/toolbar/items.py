@@ -17,14 +17,17 @@ class Switcher(BaseItem):
     ]
     
     def __init__(self, alignment, css_class_suffix, add_parameter,
-                 remove_parameter, title):
+                 remove_parameter, title, session_key=None):
         super(Switcher, self).__init__(alignment, css_class_suffix)
         self.add_parameter = add_parameter
         self.remove_parameter = remove_parameter
         self.title = title
+        self.session_key = session_key
         
     def get_extra_data(self, context, request, **kwargs):
         state = self.add_parameter in request.GET
+        if self.session_key and request.session.get(self.session_key, False):
+            state = True
         return {
             'state': state
         }

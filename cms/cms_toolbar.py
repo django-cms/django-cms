@@ -33,7 +33,8 @@ class CMSToolbar(Toolbar):
         ]
         if is_staff:
             items.append(
-                Switcher(LEFT, 'editmode', 'edit', 'edit-off', _('Edit mode'))
+                Switcher(LEFT, 'editmode', 'edit', 'edit-off', _('Edit mode'),
+                         session_key='cms_edit')
             )
             if request.current_page:
                 has_states = request.current_page.last_page_states().exists()
@@ -77,6 +78,7 @@ class CMSToolbar(Toolbar):
         return items
     
     def request_hook(self, request):
+        request.session['cms_edit'] = True
         if request.method != 'POST':
             return self._request_hook_get(request)
         else:
@@ -86,6 +88,10 @@ class CMSToolbar(Toolbar):
         if 'cms-toolbar-logout' in request.GET:
             logout(request)
             return HttpResponseRedirect(request.path)
+        if 'edit-off' in request.GET:
+            request.session['cms_edit'] = False
+            # 'toolbar suicide':
+            request.toolbar = None
         
     def _request_hook_post(self, request):
         # login hook
