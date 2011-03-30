@@ -154,10 +154,6 @@ class CMSToolbar(Toolbar):
         if 'cms-toolbar-logout' in request.GET:
             logout(request)
             return HttpResponseRedirect(request.path)
-        if 'edit-off' in request.GET:
-            request.session['cms_edit'] = False
-            # 'toolbar suicide':
-            request.toolbar = None
         
     def _request_hook_post(self, request):
         # login hook
