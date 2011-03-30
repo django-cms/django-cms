@@ -35,6 +35,9 @@ class CMSToolbar(Toolbar):
     """
     The default CMS Toolbar
     """
+    def __init__(self):
+        self.edit_mode = False
+        
     def get_items(self, context, request, **kwargs):
         """
         Get the CMS items on the toolbar
@@ -45,10 +48,16 @@ class CMSToolbar(Toolbar):
         items = [
             Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
         ]
+        
         if is_staff:
+            
+            edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
+                                          _('Edit mode'))
+            
+            self.edit_mode = edit_mode_switcher.get_state(request)
+            
             items.append(
-                Switcher(LEFT, 'editmode', 'edit', 'edit-off', _('Edit mode'),
-                         session_key='cms_edit')
+                edit_mode_switcher
             )
             if request.current_page:
                 has_states = request.current_page.last_page_states().exists()
@@ -144,7 +153,6 @@ class CMSToolbar(Toolbar):
                     items=admin_items)
     
     def request_hook(self, request):
-        request.session['cms_edit'] = True
         if request.method != 'POST':
             return self._request_hook_get(request)
         else:

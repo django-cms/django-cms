@@ -42,12 +42,16 @@ class Switcher(BaseItem):
         self.title = title
         self.session_key = session_key
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_state(self, request):
         state = self.add_parameter in request.GET
         if self.session_key and request.session.get(self.session_key, False):
-            state = True
+            return True
+        return state
+        
+        
+    def get_extra_data(self, context, request, **kwargs):
         return {
-            'state': state
+            'state': self.get_state(request)
         }
 
 

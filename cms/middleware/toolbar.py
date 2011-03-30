@@ -57,6 +57,7 @@ class ToolbarMiddleware(object):
             return True
         # check GET
         if 'edit' in request.GET:
+            request.session['cms_edit'] = True
             return True
         return False
 
