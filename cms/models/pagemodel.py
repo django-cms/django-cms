@@ -462,6 +462,7 @@ class Page(MPTTModel):
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
+        transaction.commit()
         return published
         
     def delete(self):

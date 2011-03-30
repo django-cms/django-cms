@@ -55,7 +55,9 @@ Add the following apps to your ``INSTALLED_APPS`` which enable django-cms and re
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
 * ``'menus'``, helper for model independent hierarchical website navigation
 * ``'south'``, intelligent schema and data migrations
-* ``'appmedia'``, linking application-specific media to project media
+* ``'sekizai'``, for javascript and css management
+* ``'appmedia'``, linking application-specific media to project media (this is
+  only required for this tutorial and not a dependency of the django CMS)
 
 Also add any (or all) of the following plugins, depending on your needs:
 
@@ -122,7 +124,6 @@ right position::
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
-        'cms.middleware.media.PlaceholderMediaMiddleware',
     )
 
 You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
@@ -134,6 +135,7 @@ settings file will not have any)::
         'django.core.context_processors.request',
         'django.core.context_processors.media',
         'cms.context_processors.media',
+        'sekizai.context_processors.sekizai',
     )
 
 Almost there!

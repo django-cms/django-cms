@@ -2,6 +2,7 @@
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.cms_toolbar import CMSToolbar
+from cms.toolbar import toolbar
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page_resolver import get_page_from_request
@@ -20,6 +21,8 @@ def _handle_no_page(request, slug):
         return render_to_response("cms/new.html", locals())
     raise Http404('CMS: Page not found for "%s"' % slug)
 
+
+@toolbar(CMSToolbar)
 def details(request, slug):
     """
     The main view of the Django-CMS! Takes a request and a slug, renders the
@@ -99,5 +102,4 @@ def details(request, slug):
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
-    request.toolbar = CMSToolbar()
     return render_to_response(template_name, context)

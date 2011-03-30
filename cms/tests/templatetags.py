@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from cms.models.pagemodel import Page
 from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg
 from cms.test_utils.testcases import SettingsOverrideTestCase
