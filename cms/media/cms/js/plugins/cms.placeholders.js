@@ -221,13 +221,23 @@ jQuery(document).ready(function ($) {
 			var items = $('.cms_placeholder');
 			// the placeholders define the header (containing container)
 			// we probably need to add a wrapping div there to define the boundary
-			//var placeholders = $('.cms_placeholder-bar');
+			var placeholders = $('.cms_placeholder-bar');
 
             //log(placeholder);
-			
+
+			log(placeholders);
+
 			// lets add the drag event
 			items.draggable({
-				
+				'revert': 'invalid', // when dropped and invalid is returned, it snaps back to its origin
+				refreshPositions: true,
+				scroll: true,
+				snap: true,
+				// we need snapto document so it doesnt leave the window
+				stack: ".cms_placeholder",
+				cursor: 'move', // set the cursor to the moving hand
+				'cancel': 'button', // elements within the dragging element that will not trigger the dragging
+				'handle': '' // needs to be attached to the overlay
 			});
 		},
 		
