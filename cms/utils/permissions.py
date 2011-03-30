@@ -170,13 +170,22 @@ def get_subordinate_users(user):
     if user.is_superuser or \
             GlobalPagePermission.objects.with_can_change_permissions(user):
         return User.objects.all() 
-    
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
-    
-    user_level = get_user_permission_level(user)
-    
+    site = Site.objects.get_current()
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
+    try:
+        user_level = get_user_permission_level(user)
+    except NoPermissionsException:
+        # no permission so only staff and no page permissions 
+        qs = User.objects.distinct().filter(
+                Q(is_staff=True) & 
+                Q(pageuser__created_by=user) & 
+                Q(pagepermission__page=None)
+        )
+        qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
+        return qs
+    # normal query
     qs = User.objects.distinct().filter(
-        Q(is_staff=True) &
+        Q(is_staff=True) & 
         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
@@ -191,9 +200,18 @@ def get_subordinate_groups(user):
     if (user.is_superuser or
             GlobalPagePermission.objects.with_can_change_permissions(user)):
         return Group.objects.all()
-    
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
-    user_level = get_user_permission_level(user)
+    site = Site.objects.get_current()
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
+    try:
+        user_level = get_user_permission_level(user)
+    except NoPermissionsException:
+        # no permission no records
+        # page_id_allow_list is empty
+        qs = Group.objects.distinct().filter(
+         Q(pageusergroup__created_by=user) & 
+         Q(pagepermission__page=None)
+        )
+        return qs
     
     qs = Group.objects.distinct().filter(
          (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level)) 

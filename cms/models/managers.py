@@ -300,10 +300,11 @@ class PagePermissionManager(BasicPagePermissionManager):
         try:
             user_level = get_user_permission_level(user)
         except NoPermissionsException:
-            return self.get_empty_query_set()
-        
+            return self.none()
+        # get current site
+        site = Site.objects.get_current()
         # get all permissions
-        page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+        page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
         
         # get permission set, but without objects targeting user, or any group 
         # in which he can be
