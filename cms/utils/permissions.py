@@ -96,24 +96,6 @@ def has_page_change_permission(request):
         return True
     return False
 
-def has_page_view_permission(request):
-    """
-    Return true if the current user has permission to view any page. This is
-    just used for building the tree - only superuser, or user with can_view in
-    globalpagepermission can view a page.
-    """
-    from cms.utils.plugins import current_site
-    opts = self._meta
-    codename = '%s.%s_%s' % (opts.app_label, "view", opts.object_name.lower())
-    if request.user.is_superuser or (
-        request.user.has_perm(codename) and (
-            GlobalPagePermission.objects.with_user(request.user).filter(
-                can_view=True, sites__in=[current_site(request)]
-            ).exists()) or (
-                settings.CMS_PUBLIC_FOR == 'staff' and request.user.is_staff)):
-        return True
-    return False
-
 def get_any_page_view_permissions(request, page):
     from cms.utils.plugins import current_site
     return PagePermission.objects.filter(
