@@ -993,7 +993,7 @@ class Page(MPTTModel):
             pass
         return sibling
 
-    def get_previous_fitlered_sibling(self, **filters):
+    def get_previous_filtered_sibling(self, **filters):
         """Very simillar to original mptt method, but adds support for filters.
         Returns this model instance's previous sibling in the tree, or
         ``None`` if it doesn't have a previous sibling.
@@ -1018,6 +1018,8 @@ class Page(MPTTModel):
         except IndexError:
             pass
         return sibling
+    # backward compatibility alias for wrongly spelled version
+    get_previous_fitlered_sibling = get_previous_filtered_sibling
 
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides original
