@@ -56,7 +56,7 @@ class CMSToolbar(Toolbar):
                     )
             items.append(
                 List(RIGHT, 'admin', _('Admin'),
-                     'cms/img/toolbar/icons/admin.png', items=admin_items)
+                     '/media/cms/images/toolbar/icons/icon_admin.png', items=admin_items)
             )
             items.append(
                 Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
