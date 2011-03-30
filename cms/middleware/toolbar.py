@@ -47,6 +47,10 @@ class ToolbarMiddleware(object):
     """
 
     def show_toolbar(self, request):
+        if request.session.get('cms_edit', False):
+            return True
+        if 'edit' in request.GET:
+            return True
         if request.is_ajax():
             return False
         if ADMIN_BASE and request.path.startswith(ADMIN_BASE):
@@ -55,7 +59,7 @@ class ToolbarMiddleware(object):
             return False
         if not hasattr(request, "user"):
             return False
-        return True
+        return False
 
     def process_request(self, request):
         if self.show_toolbar(request):
