@@ -178,7 +178,7 @@ jQuery(document).ready(function ($) {
 			// add order, show item
 			template.data('order', obj.order).css('display', 'block');
 			// add class if neccessary
-			if(obj.class) template.addClass(obj.class);
+			if(obj.cls) template.addClass(obj.cls);
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
@@ -242,11 +242,11 @@ jQuery(document).ready(function ($) {
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
 				// add icon if available
-				var icon = (value.icon) ? 'cms_toolbar_icon ' : '';
+				var icon = (value.icon) ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
-						   .replace('<span>', '<span class="'+icon+value.icon+'">');
+						   .replace('<span>', '<span class="'+icon+'" style="background-image:url('+value.icon+');">');
 			});
 			// add items
 			template.find('.cms_toolbar-item_list').html($(tmp));
@@ -291,9 +291,9 @@ jQuery(document).ready(function ($) {
 		},
 
 		/* this private method processes each template and replaces the placeholders with the passed values */
-		_processTemplate: function (class, obj) {
+		_processTemplate: function (cls, obj) {
 			// lets find the template and clone it
-			var template = this.wrapper.find(class).clone();
+			var template = this.wrapper.find(cls).clone();
 				template = $('<div>').append(template).clone().remove().html();
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
@@ -304,8 +304,10 @@ jQuery(document).ready(function ($) {
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
 			// back to jquery object
 			template = $(template);
-			if(obj.class) template.addClass(obj.class);
-			if(obj.icon) template.find('.cms_toolbar-btn_right').addClass(obj.icon);
+			if(obj.cls) template.addClass(obj.cls);
+			if(obj.icon) template.find('.cms_toolbar-btn_right .toolbar_icon-prefix')
+								 .addClass('cms_toolbar_icon-enabled')
+								 .css('background-image', 'url('+obj.icon+')');
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
