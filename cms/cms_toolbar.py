@@ -57,7 +57,7 @@ class CMSToolbar(Toolbar):
                     admin_items.append(
                         ListItem('history', _('View History'),
                                  _get_page_history_url,
-                                 'cms/img/toolbar/icons/admin/history.png')
+                                 '/media/cms/images/toolbar/icons/admin/icon_history.png')
                     )
             items.append(
                 List(RIGHT, 'admin', _('Admin'),
