@@ -117,17 +117,10 @@ class CMSMenu(Menu):
             if (page.pk == home.pk and home.in_navigation) or page.pk != home.pk:
                 first = False
             ids.append(page.id)
-<<<<<<< HEAD
-            
-        titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
-        
-        for page in pages:# add the title and slugs and some meta data
-=======
             actual_pages.append(page)
 
         titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
         for page in actual_pages: # add the title and slugs and some meta data
->>>>>>> 5911f93d82c139ff6484c862d3ef787ef14ff718
             for title in titles:
                 if title.page_id == page.pk:
                     if not hasattr(page, "title_cache"):
