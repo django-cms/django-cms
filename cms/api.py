@@ -19,7 +19,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import PageUser, PagePermission
+from cms.models.permissionmodels import PageUser, PagePermission, GlobalPagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title

@@ -2,7 +2,7 @@
 from __future__ import with_statement
 from django.contrib.auth.models import User
 
-from cms.api import create_page, publish_page, approve_page, add_plugin
+from cms.api import create_page, publish_page, approve_page, add_plugin, create_page_user, assign_user_to_page
 from cms.models import Page, CMSPlugin
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
@@ -65,21 +65,20 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.user_staff.save()
 
         self.login_user(User.objects.get(username='super'))
-        
         # create non global, non staff user
         self.user_non_global = User(username="nonglobal", is_active=True)
         self.user_non_global.set_password("nonglobal")
         self.user_non_global.save()
         
         # create page_b
-        page_b = self.create_page(title="pageB", user=User.objects.get(username='super'))
+        page_b = create_page(title="pageB", user=User.objects.get(username='super'))
 
         # Normal user
-        self.user_normal = self.create_page_user("normal")
+        self.user_normal = create_page_user("normal")
         # it's allowed for the normal user to view the page
-        self.assign_user_to_page(page_b, self.user_normal, can_view=True)
+        assign_user_to_page(page_b, self.user_normal, can_view=True)
 
-        self.publish_page(page_b)
+        publish_page(page_b)
         self.client.logout()
 
     def _add_plugin(self, user, page):
@@ -455,6 +454,64 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # there should now be 0 plugins
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
+    def test_19_superuser_can_view(self):
+        self.login_user(User.objects.get(username='super'))
+        response = self.client.get("/en/pageb/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_20_staff_can_view(self):
+        self.login_user(self.user_staff)
+        response = self.client.get("/en/pageb/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_21_user_normal_can_view(self):
+        self.login_user(self.user_normal)
+        response = self.client.get("/en/pageb/")
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+        response = self.client.get("/en/pageb/")
+        self.assertEqual(response.status_code, 200)
+        self.login_user(self.user_non_global)
+        response = self.client.get("/en/pageb/")
+        self.assertEqual(response.status_code, 404)
+        self.client.logout()
+
+    def test_22_user_globalpermission(self):
+        # Global user
+        self.login_user(User.objects.get(username='super'))
+        user_global = create_page_user("global")
+        user_global.is_staff = False
+        user_global.save() # Prevent is_staff permission
+        global_page = create_page(title="global", published=True)
+        global_page = publish_page(global_page, approve=True)
+        # it's allowed for the normal user to view the page
+        assign_user_to_page(global_page, user_global,
+            global_permission=True, can_view=True)
+        self.client.logout()
+
+        self.login_user(user_global)
+        response = self.client.get("/en/global/")
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+        self.login_user(self.user_non_global)
+        response = self.client.get("/en/global/")
+        self.assertEqual(response.status_code, 404, response.content)
+        self.client.logout()
+
+    def test_23_anonymous_user(self):
+        self.client.logout()
+        with SettingsOverride(CMS_PUBLIC_FOR='all'):
+            response = self.client.get("/en/pageb/")
+            self.assertEqual(response.status_code, 200)
+
+        # default of when to show pages to anonymous user doesn't take
+        # global permissions into account
+        with SettingsOverride(CMS_PUBLIC_FOR=None):
+            response = self.client.get("/en/pageb/")
+            self.assertEqual(response.status_code, 404)
+
+
 class PatricksMoveTest(SettingsOverrideTestCase):
     """
     Fixtures contains 3 users and 1 published page and some other stuff
@@ -592,126 +649,4 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         self.assertEqual(
             ph.publisher_public.get_absolute_url(),
             u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
-        )
-
-    def test_18_plugins_get_published(self):
-        self.login_user(self.user_super)
-        # create page under root
-        page = self.create_page()
-        self.add_plugin(self.user_super, page)
-        # public must not exist
-        self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        self.publish_page(page, True, self.user_super, True)
-        self.assertEqual(CMSPlugin.objects.all().count(), 2)
-
-    def test_19_remove_plugin_page_under_moderation(self):
-        # login as slave and create page
-        self.login_user(self.user_slave)
-        page = self.create_page(self.slave_page)
-        self.assertEqual(page.get_moderator_queryset().count(), 1)
-        
-        # add plugin
-        plugin_id = self.add_plugin(self.user_slave, page)
-        
-        self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
-
-        # publish page
-        page = self.publish_page(page, published_check=False)
-        
-        # only the draft plugin should exist
-        self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        
-        # page should require approval
-        self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
-        
-        # master approves and publishes the page
-        self.login_user(self.user_master)
-        # first approve slave-home
-        self.publish_page(self.slave_page, approve=True)
-        page = self.publish_page(page, approve=True)
-        
-        # draft and public plugins should now exist
-        self.assertEqual(CMSPlugin.objects.all().count(), 2)
-        
-        # login as slave and delete the plugin - should require moderation
-        self.login_user(self.user_slave)
-        plugin_data = {
-            'plugin_id': plugin_id
-        }
-        remove_url = URL_CMS_PLUGIN_REMOVE
-        response = self.client.post(remove_url, plugin_data)
-        self.assertEquals(response.status_code, 200)
-
-        # there should only be a public plugin - since the draft has been deleted
-        self.assertEquals(CMSPlugin.objects.all().count(), 1)
-        
-        # reload the page as it's moderator value should have been set in pageadmin.remove_plugin
-        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
-        page = self.reload_page(page)
-
-        self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
-
-        # login as super user and approve/publish the page
-        self.login_user(self.user_super)
-        page = self.publish_page(page, approve=True)
-        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
-
-        # there should now be 0 plugins
-        self.assertEquals(CMSPlugin.objects.all().count(), 0)
-
-    def test_20_superuser_can_view(self):
-        self.login_user(self.user_super)
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_21_staff_can_view(self):
-        self.login_user(self.user_staff)
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_22_user_normal_can_view(self):
-        self.login_user(self.user_normal)
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
-        self.client.logout()
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
-        self.login_user(self.user_non_global)
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 404)
-        self.client.logout()
-
-    def test_23_user_globalpermission(self):
-        # Global user
-        self.login_user(self.user_super)
-        user_global = self.create_page_user("global")
-        user_global.is_staff = False
-        user_global.save() # Prevent is_staff permission
-        global_page = self.create_page(title="global", published=True)
-        global_page = self.publish_page(global_page, approve=True)
-        # it's allowed for the normal user to view the page
-        self.assign_user_to_page(global_page, user_global,
-            global_permission=True, can_view=True)
-        self.client.logout()
-
-        self.login_user(user_global)
-        response = self.client.get("/en/global/")
-        self.assertEqual(response.status_code, 200)
-        self.client.logout()
-
-        self.login_user(self.user_non_global)
-        response = self.client.get("/en/global/")
-        self.assertEqual(response.status_code, 404, response.content)
-        self.client.logout()
-
-    def test_24_anonymous_user(self):
-        self.client.logout()
-        with SettingsOverride(CMS_PUBLIC_FOR='all'):
-            response = self.client.get("/en/pageb/")
-            self.assertEqual(response.status_code, 200)
-
-        # default of when to show pages to anonymous user doesn't take
-        # global permissions into account
-        with SettingsOverride(CMS_PUBLIC_FOR=None):
-            response = self.client.get("/en/pageb/")
-            self.assertEqual(response.status_code, 404)
+        )     
