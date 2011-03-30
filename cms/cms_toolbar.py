@@ -52,23 +52,23 @@ class CMSToolbar(Toolbar):
             admin_items = [
                 ListItem('admin', _('Site Administration'),
                          reverse('admin:index'),
-                         'cms/img/toolbar/icons/admin/admin.png'),
+                         'cms/images/toolbar/icons/icon_admin.png'),
             ]
             if can_change:
                 admin_items.append(
                     ListItem('settings', _('Page Settings'),
                              _get_page_admin_url,
-                             'cms/img/toolbar/icons/admin/page.png')
+                             'cms/images/toolbar/icons/icon_page.png')
                 )
                 if 'reversion' in settings.INSTALLED_APPS:
                     admin_items.append(
                         ListItem('history', _('View History'),
                                  _get_page_history_url,
-                                 '/media/cms/images/toolbar/icons/admin/icon_history.png')
+                                 'cms/images/toolbar/icons/icon_history.png')
                     )
             items.append(
                 List(RIGHT, 'admin', _('Admin'),
-                     '/media/cms/images/toolbar/icons/icon_admin.png', items=admin_items)
+                     'cms/images/toolbar/icons/icon_admin.png', items=admin_items)
             )
             items.append(
                 Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
