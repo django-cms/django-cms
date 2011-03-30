@@ -185,7 +185,7 @@ class ListItem(Serializable):
     ]
     extra_attributes = []
     
-    def __init__(self, css_class_suffix, title, url, icon):
+    def __init__(self, css_class_suffix, title, url, icon=None):
         """
         title: name of the list
         url: target of the item
