@@ -29,7 +29,7 @@ jQuery(document).ready(function ($) {
 
 	// initialize placeholders and pass options
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
-		{% if edit %}edit_mode: true,{% endif %}
+		{% if request.toolbar.edit_mode %}edit_mode: true,{% endif %}
 		{% if compact %}compact_mode: true,{% endif %}
 		{% if page %}page_is_defined: true,{% endif %}
 		data: '{{ placeholder_data }}', /* data will be required to check if this plugin is allowed to be moved to the desired placeholder */
@@ -77,11 +77,11 @@ jQuery(document).ready(function ($) {
 	<div id="cms_placeholder-content"><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
 	<div id="cms_placeholder-overlay">
 		<ul class="cms_placeholder-options">
-			<li><a href="#" rel="drag">drag</a></li>
-			<li><a href="#" rel="edit">edit</a></li>
-			<li><a href="#" rel="moveup">up</a></li>
-			<li><a href="#" rel="movedown">down</a></li>
-			<li><a href="#" rel="settings">delete</a></li>
+			<!--<li><a href="#" rel="drag">drag</a></li>-->
+			<li class="first"><a href="#" class="cms_placeholder-icon cms_placeholder-icon_edit" rel="edit">edit</a></li>
+			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_up" rel="moveup">up</a></li>
+			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_down" rel="movedown">down</a></li>
+			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_delete" rel="delete">delete</a></li>
 		</ul>
 		<div class="cms_placeholder-overlay_bg"></div>
 	</div>

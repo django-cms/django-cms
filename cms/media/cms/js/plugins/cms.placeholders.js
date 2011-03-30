@@ -70,7 +70,7 @@ jQuery(document).ready(function ($) {
 					classy._holder.call(classy, e.currentTarget);
 				});
 				
-				this._initDrag();
+				// this._initDrag();
 			}
 			
 			// setup everything
@@ -127,7 +127,7 @@ jQuery(document).ready(function ($) {
 					'placeholder_id': split[1],
 					'placeholder': split[2]
 				};
-			
+			log(bar);
 			// attach events to placeholder plugins
 			bar.find('.cms_placeholder-subnav li a').bind('click', function (e) {
 				e.preventDefault();
@@ -175,7 +175,7 @@ jQuery(document).ready(function ($) {
 				});
 				
 				// attach delete event
-				buttons.find('a[rel^=settings]').bind('click', function (e) {
+				buttons.find('a[rel^=delete]').bind('click', function (e) {
 					e.preventDefault();
 					classy.deletePlugin.call(classy, values.placeholder, values.plugin_id);
 				});
