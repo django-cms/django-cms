@@ -444,19 +444,35 @@ To access these fields in the template use::
         ...
     </head>
 
-CMS_CONTENT_CACHE_DURATION
-==========================
+CMS_CACHE_DURATIONS
+===================
+
+This dictionary carries the varios cache duration settings.
+
+``'content'``
+-------------
 
 Default: ``60``
 
 Cache expiration (in seconds) for ``show_placeholder`` and ``page_url`` template tags.
 
-MENU_CACHE_DURATION
-===================
+.. note:: This settings was previously called ``CMS_CONTENT_CACHE_DURATION``
+
+``'menus'``
+-----------
 
 Default: ``3600``
 
 Cache expiration (in seconds) for the menu tree.
+
+.. note:: This settings was previously called ``MENU_CACHE_DURATION``
+
+``'permissions'``
+-----------------
+
+Default: ``3600``
+
+Cache expiration (in seconds) for view and other permissions.
 
 CMS_CACHE_PREFIX
 ================

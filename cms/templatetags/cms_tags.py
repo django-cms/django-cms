@@ -110,7 +110,7 @@ class PageUrl(InclusionTag):
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, settings.CMS_CONTENT_CACHE_DURATION)
+                cache.set(cache_key, url, settings.CMS_CACHE_DURATIONS['content'])
         if url:
             return {'content': url}
         return {'content': ''}
@@ -345,7 +345,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         content = "".join(c)
 
     if cache_result:
-        cache.set(cache_key, content, settings.CMS_CONTENT_CACHE_DURATION)
+        cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
 
     if content:
         return {'content': mark_safe(content)}

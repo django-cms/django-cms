@@ -12,7 +12,9 @@ def lex_cache_key(key):
     """
     Returns the language and site ID a cache key is related to.
     """
-    return key.rsplit('_', 2)[1:]
+    if key.endswith("_user"):
+        return key.split('_user')[0].rsplit('_', 3)[1:]
+    return key.rsplit('_', 2)[1:] + [None]
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
@@ -82,11 +84,14 @@ class MenuPool(object):
         register()
         self.discovered = True
         
-    def clear(self, site_id=None, language=None):
+    def clear(self, site_id=None, language=None, all=False):
         '''
         This invalidates the cache for a given menu (site_id and language)
         '''
-        cache_keys = CacheKey.objects.get_keys(site_id, language)        
+        if all:
+            cache_keys = CacheKey.objects.get_keys()
+        else:
+            cache_keys = CacheKey.objects.get_keys(site_id, language)        
         to_be_deleted = [obj.key for obj in cache_keys]
         cache.delete_many(to_be_deleted)
         cache_keys.delete()
@@ -95,15 +100,16 @@ class MenuPool(object):
         from menus.base import Menu
         assert issubclass(menu, Menu)
         if menu.__name__ in self.menus.keys():
-            raise NamespaceAllreadyRegistered, "[%s] a menu with this name is already registered" % menu.__name__
+            raise NamespaceAllreadyRegistered(
+                "[%s] a menu with this name is already registered" % menu.__name__)
         self.menus[menu.__name__] = menu()
-        
+
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
         if not modifier_class in self.modifiers:
             self.modifiers.append(modifier_class)
-    
+
     def _build_nodes(self, request, site_id):
         """
         This is slow. Caching must be used. 
@@ -125,7 +131,8 @@ class MenuPool(object):
         lang = get_language()
         prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
         key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
-        
+        if request.user.is_authenticated():
+            key += "_%s_user" % request.user.pk
         cached_nodes = cache.get(key, None)
         if cached_nodes:
             return cached_nodes
@@ -135,8 +142,7 @@ class MenuPool(object):
             nodes = self.menus[menu_class_name].get_nodes(request)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
-        duration = getattr(settings, "MENU_CACHE_DURATION", 60*60)
-        cache.set(key, final_nodes, duration)
+        cache.set(key, final_nodes, settings.CMS_CACHE_DURATIONS['menus'])
         # We need to have a list of the cache keys for languages and sites that
         # span several processes - so we follow the Django way and share through 
         # the database. It's still cheaper than recomputing every time!
@@ -144,7 +150,7 @@ class MenuPool(object):
         # since the cache shared but the keys aren't 
         CacheKey.objects.create(key=key, language=lang, site=site_id)
         return final_nodes
-    
+
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:
             nodes = self._mark_selected(request, nodes)
@@ -152,7 +158,7 @@ class MenuPool(object):
             inst = cls()
             nodes = inst.modify(request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
-    
+
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None, breadcrumb=False):
         self.discover_menus()
         if not site_id:
@@ -161,7 +167,7 @@ class MenuPool(object):
         nodes = copy.deepcopy(nodes)
         nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb=breadcrumb)
         return nodes 
-    
+
     def _mark_selected(self, request, nodes):
         sel = None
         for node in nodes:
@@ -180,7 +186,7 @@ class MenuPool(object):
         if sel:
             sel.selected = True
         return nodes
-    
+
     def get_menus_by_attribute(self, name, value):
         self.discover_menus()
         found = []
@@ -188,12 +194,12 @@ class MenuPool(object):
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
                 found.append((menu[0], menu[1].name))
         return found
-    
+
     def get_nodes_by_attribute(self, nodes, name, value):
         found = []
         for node in nodes:
             if node.attr.get(name, None) == value:
                 found.append(node)
         return found
-     
+
 menu_pool = MenuPool()

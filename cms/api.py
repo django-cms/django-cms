@@ -19,7 +19,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import PageUser, PagePermission
+from cms.models.permissionmodels import PageUser, PagePermission, GlobalPagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
@@ -271,7 +271,8 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     plugin.save()
     return plugin
     
-def create_page_user(created_by, user, can_add_page=True,
+def create_page_user(created_by, user,
+                     can_add_page=True, can_view_page=True,
                      can_change_page=True, can_delete_page=True, 
                      can_recover_page=True, can_add_pageuser=True,
                      can_change_pageuser=True, can_delete_pageuser=True,
@@ -286,13 +287,14 @@ def create_page_user(created_by, user, can_add_page=True,
     if grant_all:
         # just be lazy
         return create_page_user(created_by, user, True, True, True, True,
-                                True, True, True, True, True, True)
+                                True, True, True, True, True, True, True)
     
     # validate created_by
     assert isinstance(created_by, User)
     
     data = {
         'can_add_page': can_add_page, 
+        'can_view_page': can_view_page, 
         'can_change_page': can_change_page, 
         'can_delete_page': can_delete_page, 
         'can_recover_page': can_recover_page, 
@@ -317,16 +319,17 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     can_add=False, can_change=False, can_delete=False, 
     can_change_advanced_settings=False, can_publish=False, 
     can_change_permissions=False, can_move_page=False, can_moderate=False, 
-    grant_all=False):
+    can_recover_page=True, can_view=False,
+    grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    if grant_all:
+    if grant_all and not global_permission:
         # shortcut to grant all permissions
         return assign_user_to_page(page, user, grant_on, True, True, True, True,
-                                   True, True, True, True)
+                                   True, True, True, True, True)
     
     data = {
         'can_add': can_add,
@@ -337,10 +340,17 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         'can_change_permissions': can_change_permissions, 
         'can_move_page': can_move_page, 
         'can_moderate': can_moderate,  
+        'can_view': can_view,
     }
-    
-    page_permission = PagePermission(page=page, user=user, grant_on=grant_on,
-                                     **data)
+    if global_permission:
+        page_permission = GlobalPagePermission(
+            user=user, can_recover_page=can_recover_page, **data)
+        page_permission.save()
+        page_permission.sites.add(Site.objects.get_current())
+    else:
+        page_permission = PagePermission(page=page, user=user,
+                                         grant_on=grant_on, **data)
+        page_permission.save()
     page_permission.save()
     return page_permission
     
