@@ -50,7 +50,7 @@ jQuery(document).ready(function ($) {
 		{dir:'right',type:'button',order:20,class:'cms_toolbar-item_admin',title:'{% trans "Admin" %}',icon:'cms_toolbar_icon-settings',action:'',hidden:'',redirect:'{% url admin:index %}'}{%endif%}];
 	
 	// initialize toolbar and pass options and items
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ toolbarconfig|safe }});
+	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
 	// initialize placeholders and pass options
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {

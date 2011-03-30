@@ -35,24 +35,29 @@ class CMSToolbar(Toolbar):
             items.append(
                 Switcher(LEFT, 'editmode', 'edit', 'edit-off', _('Edit mode'))
             )
-            if request.current_page and request.current_page.last_page_states:
-                items.append(
-                    TemplateHTML(LEFT, 'status',
-                                 'cms/toolbar/items/status.html')
-                )
+            if request.current_page:
+                has_states = request.current_page.last_page_states().exists()
+                if has_states:
+                    items.append(
+                        TemplateHTML(LEFT, 'status',
+                                     'cms/toolbar/items/status.html')
+                    )
             admin_items = [
                 ListItem('admin', _('Site Administration'),
-                         reverse('admin:index')),
+                         reverse('admin:index'),
+                         'cms/img/toolbar/icons/admin/admin.png'),
             ]
             if can_change:
                 admin_items.append(
                     ListItem('settings', _('Page Settings'),
-                             _get_page_admin_url)
+                             _get_page_admin_url,
+                             'cms/img/toolbar/icons/admin/page.png')
                 )
                 if 'reversion' in settings.INSTALLED_APPS:
                     admin_items.append(
                         ListItem('history', _('View History'),
-                                 _get_page_history_url)
+                                 _get_page_history_url,
+                                 'cms/img/toolbar/icons/admin/history.png')
                     )
             items.append(
                 List(RIGHT, 'admin', _('Admin'),
