@@ -160,9 +160,9 @@ Default: ``True``
 If set to ``False``, frontend editing is not available for models using
 ``cms.models.fields.PlaceholderField``.
 
-*****************
+********************
 Editor configuration
-*****************
+********************
 
 The Wymeditor from ``cms.plugins.text`` plugin can take the same 
 configuration as vanilla Wymeditor. Therefore you will need to learn 
