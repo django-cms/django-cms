@@ -160,6 +160,21 @@ Default: ``True``
 If set to ``False``, frontend editing is not available for models using
 ``cms.models.fields.PlaceholderField``.
 
+*****************
+Editor configuration
+*****************
+
+The Wymeditor from ``cms.plugins.text`` plugin can take the same configuration as vanilla Wymeditor. Therefore you will need to learn how to configure that. The best way to understand this is to head over to `Wymeditor examples page <http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ After understand how Wymeditor works. 
+
+The ``cms.plugins.text`` plugin exposes several variables named WYM_* that correspond to the wym configuration. The simplest way to get started with this is to go to ``cms.plugins.text.settings.py and copy over the WYM_* variables and you will realize they match one to one to Wymeditor's.
+
+Currently the following variables are available:
+
+- WYM_TOOLS
+- WYM_CONTAINERS
+- WYM_CLASSES
+- WYM_STYLES
+- WYM_STYLESHEET
 
 *************
 I18N and L10N
