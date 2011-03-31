@@ -704,7 +704,9 @@ class Page(MPTTModel):
         if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
             return True
         # does any restriction exist?
+        # just checks the direct can_view Permission, not the inherited ones
         is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
+        # user is logged in
         if request.user.is_authenticated():
             site = current_site(request)
             global_view_perms = GlobalPagePermission.objects.with_user(
@@ -716,7 +718,14 @@ class Page(MPTTModel):
             if (not is_restricted and not global_view_perms and
                     not settings.CMS_PUBLIC_FOR == 'all'):
                 return False
+            # authenticated user, no restriction and public for all
+            if (not is_restricted and not global_view_perms and 
+                settings.CMS_PUBLIC_FOR == 'all'):
+                return True
+            
+            
         else:
+            #anonymous user
             if is_restricted or not settings.CMS_PUBLIC_FOR == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
