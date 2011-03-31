@@ -170,11 +170,11 @@ The ``cms.plugins.text`` plugin exposes several variables named WYM_* that corre
 
 Currently the following variables are available:
 
-- WYM_TOOLS
-- WYM_CONTAINERS
-- WYM_CLASSES
-- WYM_STYLES
-- WYM_STYLESHEET
+* ``WYM_TOOLS``
+* ``WYM_CONTAINERS``
+* ``WYM_CLASSES``
+* ``WYM_STYLES``
+* ``WYM_STYLESHEET``
 
 *************
 I18N and L10N
