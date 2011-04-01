@@ -1018,8 +1018,12 @@ class Page(MPTTModel):
         except IndexError:
             pass
         return sibling
-    # backward compatibility alias for wrongly spelled version
-    get_previous_fitlered_sibling = get_previous_filtered_sibling
+
+    def get_previous_fitlered_sibling(self, **filters):
+        """Backward compatibility alias for wrongly spelled version of 'get_previous_filtered_sibling()'"""
+        import warnings
+        warnings.warn("The 'get_previous_fitlered_sibling()' method has been deprecated in favor of the correctly spelled version 'get_previous_filtered_sibling()'.", DeprecationWarning)
+        return self.get_previous_filtered_sibling(**filters)
 
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides original
@@ -1029,7 +1033,7 @@ class Page(MPTTModel):
             obj - public variant of `self` to be saved.
 
         """
-        prev_sibling = self.get_previous_fitlered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
+        prev_sibling = self.get_previous_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
 
         if not self.publisher_public_id:
             # is there anybody on left side?
@@ -1044,7 +1048,7 @@ class Page(MPTTModel):
                     obj.insert_at(public_parent, save=False)
         else:
             # check if object was moved / structural tree change
-            prev_public_sibling = self.old_public.get_previous_fitlered_sibling()
+            prev_public_sibling = self.old_public.get_previous_filtered_sibling()
 
             if not self.level == self.old_public.level or \
                 not (self.level > 0 and self.parent.publisher_public == self.old_public.parent) or \
@@ -1064,7 +1068,7 @@ class Page(MPTTModel):
                         obj.insert_at(next_sibling.publisher_public, position="left")
             else:
                 # insert at last public position
-                prev_sibling = self.old_public.get_previous_fitlered_sibling()
+                prev_sibling = self.old_public.get_previous_filtered_sibling()
 
                 if prev_sibling:
                     obj.insert_at(prev_sibling, position="right")
