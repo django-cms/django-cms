@@ -8,6 +8,7 @@ from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
+from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
@@ -16,7 +17,7 @@ from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
@@ -27,13 +28,31 @@ from unittest import TestCase
 
 
 class AdminTestCase(CMSTestCase):
-    fixtures = ['admin_guys.json']
-    
     def _get_guys(self, admin_only=False):
-        admin = User.objects.get(username="admin")
+        admin = self.get_superuser()
         if admin_only:
             return admin
-        normal_guy = User.objects.get(username="test")
+        self.login_user(admin)
+        USERNAME = 'test'
+        
+        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
+        normal_guy.is_staff = True
+        normal_guy.is_active = True
+        normal_guy.save()
+        normal_guy.user_permissions = Permission.objects.filter(
+            codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
+        )
+        gpp = GlobalPagePermission.objects.create(
+            user=normal_guy,
+            can_change=True,
+            can_delete=True,
+            can_change_advanced_settings=False,
+            can_publish=True,
+            can_change_permissions=False,
+            can_move_page=True,
+            can_moderate=True,
+        )
+        gpp.sites = Site.objects.all()
         return admin, normal_guy
     
     def test_01_edit_does_not_reset_page_adv_fields(self):
@@ -369,20 +388,30 @@ class AdminListFilterTests(TestCase):
 class AdminTests(CMSTestCase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
     
-    fixtures = ['admin_guys.json', 'singlepage.json', 'permlessadmin.json']
+    def setUp(self):
+        create_page("testpage", "nav_playground.html", "en")
     
     @property
     def admin_class(self):
         return admin.site._registry[Page]
     
     def get_admin(self):
-        return User.objects.get(username="admin")
+        usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
+        usr.set_password("admin")
+        usr.save()
+        return usr
     
     def get_staff(self):
-        return User.objects.get(username="test")
+        usr = User(username="test", email="test@django-cms.org", is_staff=True)
+        usr.set_password("test")
+        usr.save()
+        return usr
     
     def get_permless(self):
-        return User.objects.get(username="permless")
+        usr = User(username="permless", email="permless@django-cms.org")
+        usr.set_password("permless")
+        usr.save()
+        return usr
     
     def get_page(self):
         return Page.objects.get(pk=1)

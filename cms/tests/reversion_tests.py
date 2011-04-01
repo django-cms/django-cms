@@ -1,20 +1,55 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.contrib.auth.models import User
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE
 from cms.models import Page
-from cms.plugins.text.models import Text
 from cms.models.pluginmodel import CMSPlugin
-from reversion.models import Revision, Version
+from cms.plugins.text.models import Text
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT)
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from reversion.models import Revision, Version
 
 
 class ReversionTestCase(CMSTestCase):
-    fixtures = ['reversion_tests.json']
-
     def setUp(self):
-        super(ReversionTestCase, self).setUp()
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u.set_password("test")
+        u.save()
+        
+        self.login_user(u)
+        # add a new text plugin
         self.page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
+        page = Page.objects.all()[0]
+        placeholderpk = page.placeholders.get(slot="body").pk
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'page_id':page.pk,
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':placeholderpk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        response = self.client.post(edit_url, {"body":"Hello World"})
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals("Hello World", txt.body)
+        # change the content
+        response = self.client.post(edit_url, {"body":"Bye Bye World"})
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals("Bye Bye World", txt.body)
+        p_data = self.page_data.copy()
+        p_data['published'] = True
+        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
+        self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_01_revert(self):
         """

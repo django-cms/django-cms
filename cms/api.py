@@ -167,7 +167,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     assert limit_visibility_in_menu in accepted_limitations
     
     # validate position
-    assert position in ('last-child', 'first-child')
+    assert position in ('last-child', 'first-child', 'left', 'right')
     
     page = Page(
         created_by=created_by,

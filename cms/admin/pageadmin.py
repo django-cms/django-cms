@@ -950,7 +950,7 @@ class PageAdmin(ModelAdmin):
             **kwargs
         )[:2]
         to_delete_plugins, perms_needed_plugins = get_deleted_objects(
-            plugins,
+            saved_plugins,
             pluginopts,
             **kwargs
         )[:2]
