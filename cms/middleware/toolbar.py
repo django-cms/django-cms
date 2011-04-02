@@ -52,6 +52,8 @@ class ToolbarMiddleware(object):
         """
         Check if we should show the toolbar for this request or not.
         """
+        if ADMIN_BASE and request.path.startswith(ADMIN_BASE):
+            return False
         # check session
         if request.session.get('cms_edit', False):
             return True
