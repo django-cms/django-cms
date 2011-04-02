@@ -18,7 +18,6 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Placeholder.addPlugin(url, obj);
 	 *	- CMS.Placeholder.editPlugin(placeholder_id, plugin_id);
 	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id);
-	 *	- CMS.Placeholder.movePlugin(plugin, target);
 	 *	- CMS.Placeholder.toggleFrame();
 	 *	- CMS.Placeholder.toggleDim();
 	 */
@@ -29,7 +28,6 @@ jQuery(document).ready(function ($) {
 			'compact_mode': false,
 			'page_is_defined': false, // TODO: figure out why thats needed
 			'lang': {
-				'move_slot': '',
 				'move_warning': '',
 				'delete_request': ''
 			},
@@ -56,7 +54,8 @@ jQuery(document).ready(function ($) {
 			this.timer = function () {};
 			this.overlay = this.wrapper.find('#cms_placeholder-overlay');
 			this.overlayIsHidden = false;
-			
+			this.success = this.wrapper.find('#cms_placeholder-success');
+
 			// attach event handling to placeholder buttons and overlay if editmode is active
 			if(this.options.edit_mode) {
 				this.bars = $('.cms_placeholder-bar');
@@ -69,8 +68,6 @@ jQuery(document).ready(function ($) {
 				this.holders.bind('mouseenter', function (e) {
 					classy._holder.call(classy, e.currentTarget);
 				});
-				
-				// this._initDrag();
 			}
 			
 			// setup everything
@@ -92,7 +89,7 @@ jQuery(document).ready(function ($) {
 				classy._hideOverlay();
 			});
 			// this is for testing
-			this.overlay.bind('click', function () {
+			this.overlay.find('.cms_placeholder-overlay_bg').bind('click', function () {
 				classy._hideOverlay();
 				
 				// we need to hide the oberlay and stop the event for a while
@@ -127,7 +124,7 @@ jQuery(document).ready(function ($) {
 					'placeholder_id': split[1],
 					'placeholder': split[2]
 				};
-			log(bar);
+			
 			// attach events to placeholder plugins
 			bar.find('.cms_placeholder-subnav li a').bind('click', function (e) {
 				e.preventDefault();
@@ -160,10 +157,10 @@ jQuery(document).ready(function ($) {
 					'plugin_id': split[0],
 					'placeholder': split[1],
 					'type': split[2],
-					'slot': split[3]
+					'slot': split[4]
 				};
 
-			// TODO: find better way to implement this
+			// attach events to each holder button
 			var buttons = this.overlay.find('.cms_placeholder-options li');
 				// unbind all button events
 				buttons.find('a').unbind('click');
@@ -173,72 +170,24 @@ jQuery(document).ready(function ($) {
 					e.preventDefault();
 					classy.editPlugin.call(classy, values.placeholder, values.plugin_id);
 				});
-				
+
+				// attach move event
+				buttons.find('a[rel^=moveup], a[rel^=movedown]').bind('click', function (e) {
+					e.preventDefault();
+					classy._movePluginPosition.call(classy, $(e.currentTarget).attr('rel'), holder, values);
+				});
+
 				// attach delete event
 				buttons.find('a[rel^=delete]').bind('click', function (e) {
 					e.preventDefault();
-					classy.deletePlugin.call(classy, values.placeholder, values.plugin_id);
+					classy.deletePlugin.call(classy, values.placeholder, values.plugin_id, holder);
 				});
-				
-				// attach move event
-				buttons.find('a[rel^=moveup]').bind('click', function (e) {
+
+				// attach delete event
+				buttons.find('a[rel^=more]').bind('click', function (e) {
 					e.preventDefault();
-
-					// TODO: add less docs to this description
-					// wee need to somehow determine if we can move the selected plugin up
-					// so how the fuck are we gonna do that...
-					// so holder is the current holder. lets check if we find any other placeholders
-					// now lets get the current id, if its 0 (means top) we do not need to do a shit
-					var index = holder.parent().find('.cms_placeholder').index(holder);
-					
-					// if there is no other element on top cancel the move event
-					if(index === 0) { alert(classy.options.lang.move_warning); return false; }
-					
-					// now we passed so lets get the data for the element next to it
-					var target = $(holder.parent().find('.cms_placeholder')[index-1]).attr('class').split('::');
-						target.shift();
-					
-					classy.movePlugin.call(classy, {
-						'placeholder_id': values.placeholder,
-						'plugin_id': values.plugin_id,
-						'slot_id': values.slot
-					}, {
-						'placeholder_id': target[1],
-						'plugin_id': target[0],
-						'slot_id': target[3]
-					});
+					classy._morePluginOptions.call(classy, holder, values);
 				});
-		},
-		
-		_initDrag: function () {
-			// TODO: when dragging disable the overlay
-
-			// we need to active the drag and drop somehwere using jquery ui
-			// so lets get all the containers and containing elements
-			
-			
-			// al the items should be draggable
-			var items = $('.cms_placeholder');
-			// the placeholders define the header (containing container)
-			// we probably need to add a wrapping div there to define the boundary
-			var placeholders = $('.cms_placeholder-bar');
-
-            //log(placeholder);
-
-			log(placeholders);
-
-			// lets add the drag event
-			items.draggable({
-				'revert': 'invalid', // when dropped and invalid is returned, it snaps back to its origin
-				refreshPositions: true,
-				scroll: true,
-				snap: true,
-				// we need snapto document so it doesnt leave the window
-				stack: ".cms_placeholder",
-				cursor: 'move', // set the cursor to the moving hand
-				'cancel': 'button', // elements within the dragging element that will not trigger the dragging
-				'handle': '' // needs to be attached to the overlay
-			});
 		},
 		
 		addPlugin: function (url, data) {
@@ -299,7 +248,7 @@ jQuery(document).ready(function ($) {
 			$(document.body).css('min-height', this.frame.outerHeight(true));
 		},
 		
-		deletePlugin: function (placeholder_id, plugin_id) {
+		deletePlugin: function (placeholder_id, plugin_id, plugin) {
 			// lets ask if you are sure
 			var message = this.options.lang.delete_request;
 			var confirmed = confirm(message, true);
@@ -311,8 +260,8 @@ jQuery(document).ready(function ($) {
 					'url': this.options.urls.cms_page_remove_plugin,
 					'data': { 'plugin_id': plugin_id },
 					'success': function () {
-						// refresh
-						CMS.Helpers.reloadBrowser();
+						// remove plugin from the dom
+						plugin.remove();
 					},
 					'error': function () {
 						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
@@ -321,21 +270,153 @@ jQuery(document).ready(function ($) {
 			}
 		},
 		
-		movePlugin: function (plugin, target) {
-			// TODO: this method does not work yet
-			// move plugin to certain position - will also be used for dragNdrop
-			
-			// jonas should do some shit here cause the implementation works with arrays at the moment
-			// so i have to check that with him
-			
-			log('old location');
-			log(plugin);
-			
-			log('new location');
-			log(target);
-			
-			// i need to say what plugin should be moved and where exactly
-			// so there is a plugin object and a target object
+		_movePluginPosition: function (dir, plugin, values) {
+			// save reference to this class
+			var classy = this;
+			// get all siblings within the placeholder
+			var holders = plugin.siblings('.cms_placeholder').andSelf();
+			// get selected index and bound
+			var index = holders.index(plugin);
+			var bound = holders.length;
+
+			// if the there is only 1 element, we dont need to move anything
+			if(bound <= 1) {
+				alert(this.options.lang.move_warning);
+				return false;
+			}
+
+			// create the array
+			var array = [];
+
+			holders.each(function (index, item) {
+				array.push($(item).attr('class').split('::')[1]);
+			});
+			// remove current array
+			array.splice(index, 1);
+
+			// we need to check the boundary and modify the index if item jups to top or bottom
+			if(index <= 0 && dir === 'moveup') {
+				index = bound+1;
+			} else if(index >= bound-1 && dir === 'movedown') {
+				index = -1;
+			}
+			// add array to new position
+			if(dir === 'moveup') array.splice(index-1, 0, values.plugin_id);
+			if(dir === 'movedown') array.splice(index+1, 0, values.plugin_id);
+
+			// now lets do the ajax request
+			$.ajax({
+				'type': 'POST',
+				'url': this.options.urls.cms_page_move_plugin,
+				'data': { 'ids': array.join('_') },
+				'success': refreshPluginPosition,
+				'error': function () {
+					log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+				}
+			});
+
+			// lets refresh the elements in the dom as well
+			function refreshPluginPosition() {
+				if(dir === 'moveup' && index !== bound+1) plugin.insertBefore($(holders[index-1]));
+				if(dir === 'movedown' && index !== -1) plugin.insertAfter($(holders[index+1]));
+				// move in or out of boundary
+				if(dir === 'moveup' && index === bound+1) plugin.insertAfter($(holders[index-2]));
+				if(dir === 'movedown' && index === -1) plugin.insertBefore($(holders[index+1]));
+
+				// close overlay
+				classy._hideOverlay();
+
+				// show success overlay for a second
+				classy.success.css({
+					'width': plugin.width()-2,
+					'height': plugin.height()-2,
+					'left': plugin.offset().left,
+					'top': plugin.offset().top
+				}).show().fadeOut(1000);
+			}
+		},
+
+		_morePluginOptions: function (plugin, values) {
+			// save reference to this class
+			var classy = this;
+			// how do we figure out all the placeholder names
+			var array = [];
+			$('.cms_placeholder-bar').each(function (index, item) {
+				array.push($(item).attr('class').split('::')[5]);
+			});
+
+			// so whats the current placeholder=
+			var current = plugin.attr('class').split('::')[5];
+
+			// lets remove current from array - puke
+			var idx = array.indexOf(current);
+				array.splice(idx, 1);
+
+			// grab the element
+			var more = classy.overlay.find('.cms_placeholder-options_more');
+				more.show();
+
+			var list = more.find('ul');
+
+			// we need to stop if the array is empty
+			if(array.length) list.html('');
+
+			// loop through the array
+			$(array).each(function (index, item) {
+				// do some brainfuck
+				var text = $('.cms_placeholder-bar[class$="cms_placeholder_slot::' + item + '"]').find('.cms_placeholder-title').text();
+				list.append($('<li><a href="">' +text + '</a></li>').data({
+					'slot': item,
+					'plugin_id': values.plugin_id
+				}));
+			});
+
+			// now we need to bind events to the elements
+			list.find('a').bind('click', function (e) {
+				e.preventDefault();
+				// save slot var
+				var slot = $(this).parent().data('slot');
+				// now lets do the ajax request
+				$.ajax({
+					'type': 'POST',
+					'url': classy.options.urls.cms_page_move_plugin,
+					'data': { 'placeholder': slot, 'plugin_id': $(this).parent().data('plugin_id') },
+					'success': function () {
+						refreshPluginPosition(slot);
+					},
+					'error': function () {
+						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					}
+				});
+			});
+
+			// if request is successfull move the plugin
+			function refreshPluginPosition(slot) {
+				// lets replace the element
+				var els = $('.cms_placeholder[class$="cms_placeholder::' + slot + '"]');
+				var length = els.length;
+
+				if(els.length === 0) {
+					plugin.insertAfter($('.cms_placeholder-bar[class$="cms_placeholder_slot::' + slot + '"]'));
+				} else {
+					plugin.insertAfter($(els.toArray()[els.length-1]));
+				}
+
+				// show success overlay for a second
+				classy.success.css({
+					'width': plugin.width()-2,
+					'height': plugin.height()-2,
+					'left': plugin.offset().left,
+					'top': plugin.offset().top
+				}).show().fadeOut(1000);
+
+				// we have to assign the new class slot to the moved plugin
+				var cls = plugin.attr('class').split('::');
+					cls.pop();
+					cls.push(slot);
+					cls = cls.join('::');
+				plugin.attr('class', cls);
+			}
 		},
 		
 		_showOverlay: function (holder) {
@@ -345,15 +426,14 @@ jQuery(document).ready(function ($) {
 				'height': holder.height()-2,
 				'left': holder.offset().left,
 				'top': holder.offset().top
-			});
-			
-			// and now show it
-			this.overlay.show();
+			}).show();
 		},
 		
 		_hideOverlay: function () {
 			// hide overlay again
 			this.overlay.hide();
+			// also hide submenu
+			this.overlay.find('.cms_placeholder-options_more').hide();
 		},
 		
 		_showPluginList: function (el) {

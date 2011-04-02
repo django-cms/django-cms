@@ -26,7 +26,7 @@ jQuery(document).ready(function ($) {
 	
 	// initialize toolbar and pass options and items
 	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
-
+	
 	// initialize placeholders and pass options
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
 		{% if request.toolbar.edit_mode %}edit_mode: true,{% endif %}
@@ -41,7 +41,6 @@ jQuery(document).ready(function ($) {
 			cms_page_remove_plugin: '{% url admin:cms_page_remove_plugin %}'
 		},
 		lang: {
-			move_slot: "{% trans 'Move to %(name)s' %}",
 			move_warning: "{% trans 'The selected element can not be moved to the desired location.' %}",
 			delete_request: "{% trans 'Are you sure you want to delete this plugin?' %}"
 		}
@@ -82,9 +81,18 @@ jQuery(document).ready(function ($) {
 			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_up" rel="moveup">up</a></li>
 			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_down" rel="movedown">down</a></li>
 			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_delete" rel="delete">delete</a></li>
+			<li>
+				<a href="#" class="cms_placeholder-icon cms_placeholder-icon_more" rel="more">more</a>
+				<ul class="cms_placeholder-options_more cms_placeholder-subnav">
+					<li class="cms_placeholder-subnav-title"><span>{% trans "Move to placeholder" %}</span>
+						<ul><li><span>&nbsp;</span></li></ul>
+					</li>
+				</ul>
+			</li>
 		</ul>
 		<div class="cms_placeholder-overlay_bg"></div>
 	</div>
+	<div id="cms_placeholder-success"><div class="cms_placeholder-success_inner"></div></div>
 	
 	<!-- template: anchor -->
 	{% include "cms/toolbar/items/anchor.html" %}
