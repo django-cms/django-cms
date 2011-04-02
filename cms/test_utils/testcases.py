@@ -131,7 +131,8 @@ class CMSTestCase(TestCase):
         for page in Page.objects.drafts().order_by('tree_id', 'lft'):
             ident = "  " * page.level
             
-            print "%s%s, lft: %s, rght: %s" % (ident, page, page.lft, page.rght)
+            print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+                                    page.pk, page.lft, page.rght, page.tree_id)
     
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):

@@ -401,14 +401,8 @@ class AdminTests(CMSTestCase):
         usr.save()
         return usr
     
-    def get_staff(self):
-        usr = User(username="test", email="test@django-cms.org", is_staff=True)
-        usr.set_password("test")
-        usr.save()
-        return usr
-    
     def get_permless(self):
-        usr = User(username="permless", email="permless@django-cms.org")
+        usr = User(username="permless", email="permless@django-cms.org", is_staff=True)
         usr.set_password("permless")
         usr.save()
         return usr
@@ -456,7 +450,7 @@ class AdminTests(CMSTestCase):
         with self.login_user_context(self.get_permless()):
             url = reverse('admin:cms_page_change_status', args=(1,))
             response = self.client.post(url, {})
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 403, response.content)
     
     def test_change_innavigation_requires_post(self):
         with self.login_user_context(self.get_permless()):

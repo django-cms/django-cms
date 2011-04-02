@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db import models
-from django.contrib.sites.models import Site
-from django.db.models import Q
-
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.exceptions import NoPermissionsException
-from cms.publisher import PublisherManager
 from cms.models.query import PageQuerySet
+from cms.publisher import PublisherManager
 from cms.utils.i18n import get_fallback_languages
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.db import models
+from django.db.models import Q
+
 
 
 class PageManager(PublisherManager):
@@ -440,7 +440,7 @@ class PagePermissionsPermissionManager(models.Manager):
         # read from cache if posssible
         cached = get_permission_cache(user, attr)
         if cached is not None:
-           return cached
+            return cached
         # check global permissions
         global_permissions = GlobalPagePermission.objects.with_user(user)
         if global_permissions.filter(**{
@@ -455,9 +455,9 @@ class PagePermissionsPermissionManager(models.Manager):
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
         # default is denny...
         page_id_allow_list = []
+        
         for permission in qs:
-            is_allowed = getattr(permission, attr)
-            if is_allowed:
+            if getattr(permission, attr):
 
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":

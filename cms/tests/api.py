@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from cms.api import (_generate_valid_slug, create_page, _verify_plugin_type, 
-    assign_user_to_page)
+    assign_user_to_page, publish_page)
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
