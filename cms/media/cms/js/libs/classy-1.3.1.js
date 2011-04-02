@@ -13,14 +13,14 @@ if(window['console'] === undefined) {
 	log = (window.ActiveXObject) ? function(msg) { console.debug(msg); } : console.log;
 	// allow jQuery to chain .log
 	if('jQuery' in window) jQuery.fn.log = function(msg) { log("%s: %o", msg, this); return this; };
-};
+}
 
 /* initiate classy namespace */
-var CMS = (window['CMS'] === undefined) ? {} : this.CMS;
+var CMS = (window['CMS'] === undefined) ? {} : CMS;
 
 /* initialize classy */
 (function() {
-	var CLASSY_VERSION = '1.3',
+	var CLASSY_VERSION = '1.3.1',
 		ROOT = this,
 		OLD_CLASS = Class,
 		DISABLE_CONSTRUCTOR = false;
@@ -82,11 +82,11 @@ var CMS = (window['CMS'] === undefined) ? {} : this.CMS;
 		var prototype = cheapNew(this);
 
 		/* copy all properties of the includes over if there are any */
-		if (properties.implements) {
-			for (var i = 0, n = properties.implements.length; i != n; ++i) {
-				var mixin = properties.implements[i];
+		if(properties.implement) {
+			for (var i = 0, n = properties.implement.length; i != n; ++i) {
+				var mixin = properties.implement[i];
 				for (var name in mixin) {
-					var value = getOwnProperty(mixin, name);
+					value = getOwnProperty(mixin, name);
 					if (value !== undefined) prototype[name] = mixin[name];
 				}
 			}
@@ -94,18 +94,18 @@ var CMS = (window['CMS'] === undefined) ? {} : this.CMS;
 
 		/* copy class vars from the superclass */
 		properties.options = properties.options || {};
-		if (prototype.options) {
-			for (var key in prototype.options) {
-				if (!properties.options[key]) {
-					var value = getOwnProperty(prototype.options, key);
+		if(prototype.options) {
+			for(key in prototype.options) {
+				if(!properties.options[key]) {
+					value = getOwnProperty(prototype.options, key);
 					properties.options[key] = value;
 				}
 			}
 		}
 
 		/* copy all properties over to the new prototype */
-		for (var name in properties) {
-			var value = getOwnProperty(properties, name);
+		for(name in properties) {
+			value = getOwnProperty(properties, name);
 			if (name === 'implements' || value === undefined) continue;
 
 			prototype[name] = typeof value === 'function' && usesSuper(value) ? (function(meth, name) {
@@ -122,16 +122,16 @@ var CMS = (window['CMS'] === undefined) ? {} : this.CMS;
 		}
 
 		/* dummy constructor */
-		var rv = function() {
+		var rv = function () {
 			if (DISABLE_CONSTRUCTOR) return;
 			var proper_this = ROOT === this ? cheapNew(arguments.callee) : this;
 			if (proper_this.initialize) proper_this.initialize.apply(proper_this, arguments);
 			proper_this.$options = rv;
 			return proper_this;
-		}
+		};
 
 		/* copy all class vars over of any */
-		for (var key in properties.options) {
+		for(var key in properties.options) {
 			var value = getOwnProperty(properties.options, key);
 			if (value !== undefined) rv[key] = value;
 		}
@@ -146,7 +146,7 @@ var CMS = (window['CMS'] === undefined) ? {} : this.CMS;
 	};
 
 	/* instanciate with data functionality */
-	Class.$withData = function(data) {
+	Class.$withData = function (data) {
 		var rv = cheapNew(this);
 		for (var key in data) {
 			var value = getOwnProperty(data, key);

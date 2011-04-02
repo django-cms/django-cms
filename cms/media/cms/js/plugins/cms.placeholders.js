@@ -25,8 +25,6 @@ jQuery(document).ready(function ($) {
 
 		options: {
 			'edit_mode': false,
-			'compact_mode': false,
-			'page_is_defined': false, // TODO: figure out why thats needed
 			'lang': {
 				'move_warning': '',
 				'delete_request': ''

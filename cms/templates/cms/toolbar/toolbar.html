@@ -1,6 +1,6 @@
 {% load i18n adminmedia %}
 <script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy-1.3.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy-1.3.1.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.cookie.js"></script>
 <!--<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.ui.core.js"></script>-->
 <!--<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.ui.draggable.js"></script>-->
@@ -30,8 +30,8 @@ jQuery(document).ready(function ($) {
 	// initialize placeholders and pass options
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
 		{% if request.toolbar.edit_mode %}edit_mode: true,{% endif %}
-		{% if compact %}compact_mode: true,{% endif %}
-		{% if page %}page_is_defined: true,{% endif %}
+		/*{% if request.toolbar.compact_mode %}compact_mode: true,{% endif %} not implemented yet*/
+		/*{% if page %}page_is_defined: true,{% endif %} not required so far*/
 		data: '{{ placeholder_data }}', /* data will be required to check if this plugin is allowed to be moved to the desired placeholder */
 		urls: {
 			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}',
