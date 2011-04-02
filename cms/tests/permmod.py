@@ -562,12 +562,6 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         'CMS_MODERATOR': True,
     }
     
-    pages = {
-        'home': 1,
-        'master': 2,
-        'slave': 3,
-    }
-    
     def setUp(self):
         # create super user
         self.user_super = User(username="super", is_staff=True, is_active=True, 

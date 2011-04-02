@@ -362,10 +362,8 @@ def publish_page(page, user, approve=False):
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    # we can't use
-    # Page.objects.filter(pk=page.pk).update(published=(F('published') + 1) % 2)
-    # here because of the post save signals.
     page.published = True
+    # the magic happens in the post save signal here... WTF?
     page.save()
     # reload page
     page = Page.objects.get(pk=page.pk)
