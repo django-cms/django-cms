@@ -542,10 +542,3 @@ jQuery(document).ready(function ($) {
 		
 	});
 });
-
-/* needs to be changed to CMS namespace */
-function hide_iframe() {
-	CMS.Placeholders.toggleFrame();
-	CMS.Placeholders.toggleDim();
-	CMS.Helpers.reloadBrowser();
-}
