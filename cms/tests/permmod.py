@@ -510,7 +510,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         user_global.save() # Prevent is_staff permission
         global_page = create_page("global", "nav_playground.html", "en",
                                   published=True)
-        publish_page(global_page, user_global, approve=True)
+        global_page = publish_page(global_page, user_global, approve=True)
         # it's allowed for the normal user to view the page
         assign_user_to_page(global_page, user_global,
             global_permission=True, can_view=True)

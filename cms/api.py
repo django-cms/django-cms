@@ -370,7 +370,7 @@ def publish_page(page, user, approve=False):
     # approve page if requested
     if approve:
         page = approve_page(page, user)
-    return page
+    return page.reload()
     
 def approve_page(page, user):
     """
