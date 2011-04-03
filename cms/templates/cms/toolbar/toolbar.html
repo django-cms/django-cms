@@ -26,20 +26,18 @@ jQuery(document).ready(function ($) {
 
 	// initialize placeholders and pass options
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
-		{% if request.toolbar.edit_mode %}edit_mode: true,{% endif %}
-		/*{% if request.toolbar.compact_mode %}compact_mode: true,{% endif %} not implemented yet*/
-		/*{% if page %}page_is_defined: true,{% endif %} not required so far*/
-		data: '{{ placeholder_data }}', /* data will be required to check if this plugin is allowed to be moved to the desired placeholder */
-		urls: {
-			cms_page_move_plugin: '{% url admin:cms_page_move_plugin %}',
-			cms_page_changelist: '{% url admin:cms_page_changelist %}',              
-			cms_page_change_template: '{% if page %}{% url admin:cms_page_change_template page.pk %}{% else %}null{% endif %}',
-			cms_page_add_plugin: '{% url admin:cms_page_add_plugin %}',
-			cms_page_remove_plugin: '{% url admin:cms_page_remove_plugin %}'
+		{% if request.toolbar.edit_mode %}'edit_mode': true,{% endif %}
+		'urls': {
+			'cms_page_move_plugin': '{% url admin:cms_page_move_plugin %}',
+			'cms_page_changelist': '{% url admin:cms_page_changelist %}',
+			'cms_page_change_template': '{% if page %}{% url admin:cms_page_change_template page.pk %}{% else %}null{% endif %}',
+			'cms_page_add_plugin': '{% url admin:cms_page_add_plugin %}',
+			'cms_page_remove_plugin': '{% url admin:cms_page_remove_plugin %}'
 		},
-		lang: {
-			move_warning: "{% trans 'The selected element can not be moved to the desired location.' %}",
-			delete_request: "{% trans 'Are you sure you want to delete this plugin?' %}"
+		'lang': {
+			'move_warning': '{% trans "The selected element can not be moved to the desired location." %}',
+			'delete_request': '{% trans "Are you sure you want to delete this plugin?" %}',
+			'cancel': '{% trans "Cancel" %}'
 		}
 	});
 

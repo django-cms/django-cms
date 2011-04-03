@@ -27,7 +27,8 @@ jQuery(document).ready(function ($) {
 			'edit_mode': false,
 			'lang': {
 				'move_warning': '',
-				'delete_request': ''
+				'delete_request': '',
+				'cancel': 'Cancel'
 			},
 			'urls': {
 				'cms_page_move_plugin': '',
@@ -218,7 +219,7 @@ jQuery(document).ready(function ($) {
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
 				'src': classy.options.urls.cms_page_changelist + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
-				'style': 'width:100%; height:50px; border:none; overflow:hidden;', // 100px = displayed bigger butt positioning works, needs fix
+				'style': 'width:100%; height:0; border:none; overflow:hidden;', // 100px = displayed bigger butt positioning works, needs fix
 				'allowtransparency': true,
 				'scrollbars': 'no',
 				'frameborder': 0
@@ -240,6 +241,18 @@ jQuery(document).ready(function ($) {
 				
 				// remove loader class
 				frame.removeClass('cms_placeholder-content_loader');
+
+				// add cancel button
+				var btn = $(this).contents().find('input[name=_save]');
+					btn.addClass('default').css('float', 'none');
+				var cancel = $('<input type="submit" name="_cancel" value="' + classy.options.lang.cancel + '" style="margin-left:8px;" />');
+					cancel.bind('click', function (e) {
+						e.preventDefault();
+						// hide frame
+						CMS.Placeholders.toggleFrame();
+						CMS.Placeholders.toggleDim();
+					});
+				cancel.insertAfter(btn);
 			});
 			
 			// we need to set the body min height to the frame height
