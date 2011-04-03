@@ -3,6 +3,7 @@ from cms.toolbar.base import Toolbar
 from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List, 
     PostButton)
+from cms.utils.moderator import page_moderator_state, I_APPROVE
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -25,6 +26,13 @@ def _get_add_sibling_url(context, request, **kwargs):
 
 def _get_delete_url(context, request, **kwargs):
     return reverse('admin:cms_page_delete', args=(request.current_page.pk,))
+
+def _get_approve_url(context, request, **kwargs):
+    return reverse('admin:cms_page_approve_page', args=(request.current_page.pk,))
+
+def _get_publish_url(context, request, **kwargs):
+    return reverse('admin:cms_page_publish_page', args=(request.current_page.pk,))
+
 
 class CMSToolbarLoginForm(forms.Form):
     cms_username = forms.CharField()
@@ -72,6 +80,23 @@ class CMSToolbar(Toolbar):
             # The 'Admin' Menu
             items.append(self.get_admin_menu(context, request, can_change, is_staff))
             
+            if request.current_page:
+                moderator_state = page_moderator_state(request, request.current_page)
+                print moderator_state
+                should_approve = moderator_state['state'] >= I_APPROVE
+                has_perms = request.current_page.has_moderate_permission(request)
+                if should_approve and has_perms:
+                    label = moderator_state['label']
+                    urlgetter = _get_approve_url
+                elif has_perms:
+                    label = _("Publish")
+                    urlgetter = _get_publish_url
+                else:
+                    urlgetter = _get_approve_url
+                    label = _("Request Approval")
+                items.append(
+                    Anchor(RIGHT, 'moderator', label, urlgetter)
+                )
             
             items.append(
                 Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
