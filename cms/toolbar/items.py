@@ -117,7 +117,7 @@ class TemplateHTML(BaseItem):
         }
 
 
-class GetButton(Anchor):
+class GetButton(BaseItem):
     """
     A button which triggers a GET request
     """
@@ -125,18 +125,25 @@ class GetButton(Anchor):
     extra_attributes = [
         ('title', 'title'),
         ('icon', 'icon'),
-        ('action', 'action'),
-        ('name', 'name'),
+        ('url', 'redirect'),
     ]
     
-    def __init__(self, alignment, css_class_suffix, title, icon, url):
+    def __init__(self, alignment, css_class_suffix, title, url, icon=None):
         """
         title: name of the button
         icon: icon of the button, relative to MEDIA_URL
         url: target of the GET request
         """
-        super(GetButton, self).__init__(alignment, css_class_suffix, title, url)
-        self.icon = _media(icon)
+        super(GetButton, self).__init__(alignment, css_class_suffix)
+        if icon:
+            self.icon = _media(icon)
+        else:
+            self.icon = icon
+        self.title = title
+        if callable(url):
+            self.serialize_url = url
+        else:
+            self.url = url
 
 
 class PostButton(BaseItem):
