@@ -306,6 +306,7 @@ jQuery(document).ready(function ($) {
 			// back to jquery object
 			template = $(template);
 			if(obj.cls) template.addClass(obj.cls);
+			// TODO: backend should return '' or undefined instead of /media/
 			if(obj.icon && obj.icon !== '/media/') {
 				template.find('.cms_toolbar-btn_right .toolbar_icon-prefix')
 						.addClass('cms_toolbar_icon-enabled')
