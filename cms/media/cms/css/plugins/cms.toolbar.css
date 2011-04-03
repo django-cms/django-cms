@@ -54,7 +54,8 @@
 /*##################################################|*/
 /* #TOOLBAR/items# */
 .cms_toolbar-item { float:left; display:none; padding:0 0 0 10px !important; position:relative; left:0; top:0; z-index:999; }
-.cms_toolbar-item_logout, .cms_toolbar-item_page, .cms_toolbar-item_admin, #cms_toolbar-item_login { padding-top:8px !important; }
+.cms_toolbar-item_logout, .cms_toolbar-item_page, .cms_toolbar-item_admin, #cms_toolbar-item_login,
+.cms_toolbar-item_templates { padding-top:8px !important; }
 
 /* #TOOLBAR/items/logo# */
 .cms_toolbar-item_logo { padding-right:5px !important; }
