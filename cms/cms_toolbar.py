@@ -93,7 +93,7 @@ class CMSToolbar(Toolbar):
                 ListItem('template', name, '#%s' % path),
             )
         return List(RIGHT, 'templates', _('Template'),
-                    'cms/images/toolbar/icons/templates.png', items=menu_items)
+                    '', items=menu_items)
     
     def get_page_menu(self, context, request, can_change, is_staff):
         """
@@ -102,26 +102,26 @@ class CMSToolbar(Toolbar):
         menu_items = [
             ListItem('overview', _('Move/add Pages'),
                      reverse('admin:cms_page_changelist'),
-                     'cms/img/toolbar/icons/overview.png'),
+                     'cms/images/toolbar/icons/icon_sitemap.png'),
         ]
         menu_items.append(
             ListItem('addchild', _('Add child page'),
                      _get_add_child_url,
-                     'cms/img/toolbar/icons/child.png')
+                     'cms/images/toolbar/icons/icon_child.png')
         )
         
         if not request.current_page.is_home():
             menu_items.append(
                 ListItem('addsibling', _('Add sibling page'),
                          _get_add_sibling_url,
-                         'cms/img/toolbar/icons/sibling.png')
+                         'cms/images/toolbar/icons/icon_sibling.png')
             )
             
         menu_items.append(
             ListItem('delete', _('Delete Page'), _get_delete_url,
-                     'cms/img/toolbar/icons/delete.png')
+                     'cms/images/toolbar/icons/icon_delete.png')
         )
-        return List(RIGHT, 'page', _('Page'), 'cms/img/toolbar/icons/page.png',
+        return List(RIGHT, 'page', _('Page'), 'cms/images/toolbar/icons/icon_page.png',
                     items=menu_items)
     
     def get_admin_menu(self, context, request, can_change, is_staff):
