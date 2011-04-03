@@ -125,10 +125,10 @@ class CMSTestCase(TestCase):
         self.counter = self.counter + 1
         return page_data
     
-    def print_page_structure(self, title=None):
+    def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in Page.objects.drafts().order_by('tree_id', 'lft'):
+        for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
             
             print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,

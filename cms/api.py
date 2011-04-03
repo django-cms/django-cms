@@ -370,7 +370,6 @@ def publish_page(page, user, approve=False):
     # approve page if requested
     if approve:
         page = approve_page(page, user)
-    Page.tree.rebuild()
     return page
     
 def approve_page(page, user):

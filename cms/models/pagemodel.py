@@ -149,6 +149,7 @@ class Page(MPTTModel):
         
         page_copy = None
         
+        
         if public_copy:
             # create a copy of the draft page - existing code loops through pages so added it to a list 
             pages = [copy.copy(self)]            
@@ -170,6 +171,7 @@ class Page(MPTTModel):
                 tree = []
             if tree:
                 tree[0].old_pk = tree[0].pk
+        
             
         first = True
         # loop over all affected pages (self is included in descendants)
@@ -273,6 +275,7 @@ class Page(MPTTModel):
                 if plugins:
                     copy_plugins_to(plugins, ph)
                     
+        
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
         return page_copy   # return the page_copy or None
@@ -335,7 +338,7 @@ class Page(MPTTModel):
         else:
             self.changed_by = "script"
         if not self.pk:
-            self.created_by = self.changed_by 
+            self.created_by = self.changed_by
         
         if commit:
             if no_signals:# ugly hack because of mptt
@@ -347,10 +350,13 @@ class Page(MPTTModel):
         if self.publisher_is_draft:
             if self.published:
                 if commit and publish_directly:
+                    
                     self.publish()
+                    
             elif self.publisher_public and self.publisher_public.published:
                 self.publisher_public.published = False
                 self.publisher_public.save()
+                
                 
     def save_base(self, *args, **kwargs):
         """Overriden save_base. If an instance is draft, and was changed, mark
@@ -409,7 +415,9 @@ class Page(MPTTModel):
                 transaction.commit()
 
             # we hook into the modified copy_page routing to do the heavy lifting of copying the draft page to a new public page
-            new_public = self.copy_page(target=None, site=self.site, copy_moderation=False, position=None, copy_permissions=False, public_copy=True)
+            new_public = self.copy_page(target=None, site=self.site,
+                                        copy_moderation=False, position=None,
+                                        copy_permissions=False, public_copy=True)
 
             # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
             # insert_at() was maybe calling _create_tree_space() method, in this
@@ -882,6 +890,12 @@ class Page(MPTTModel):
             return self.publisher_public.published
         #return is_public_published(self)
         return False
+    
+    def reload(self):
+        """
+        Reload a page from the database
+        """
+        return Page.objects.get(pk=self.pk)
         
     def requires_approvement(self):
         return self.moderator_state in (Page.MODERATOR_NEED_APPROVEMENT, Page.MODERATOR_NEED_DELETE_APPROVEMENT)
