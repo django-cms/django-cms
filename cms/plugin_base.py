@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models.options import get_verbose_name
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
-
+from django.utils.translation import ugettext_lazy as _
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     """

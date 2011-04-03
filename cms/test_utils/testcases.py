@@ -108,25 +108,33 @@ class CMSTestCase(TestCase):
         return staff
     
     def get_new_page_data(self, parent_id=''):
-        page_data = {'title':'test page %d' % self.counter, 
-            'slug':'test-page-%d' % self.counter, 'language':settings.LANGUAGES[0][0],
-            'site':1, 'template':'nav_playground.html', 'parent': parent_id}
-        
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0],
+            'template': 'nav_playground.html',
+            'parent': parent_id,
+            'site': 1,
+        }
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         
         self.counter = self.counter + 1
         return page_data
     
-    def print_page_structure(self, title=None):
+    def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in Page.objects.drafts().order_by('tree_id', 'lft'):
+        for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
             
-            print "%s%s, lft: %s, rght: %s" % (ident, page, page.lft, page.rght)
+            print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+                                    page.pk, page.lft, page.rght, page.tree_id)
     
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -253,18 +261,19 @@ class CMSTestCase(TestCase):
         self.assertEqual(page.level, public_page.level)
         
         # TODO: add check for siblings
-        
-        draft_siblings = list(page.get_siblings(True). \
-            filter(publisher_is_draft=True).order_by('tree_id', 'parent', 'lft'))
-        public_siblings = list(public_page.get_siblings(True). \
-            filter(publisher_is_draft=False).order_by('tree_id', 'parent', 'lft'))
-        
+        draft_siblings = list(page.get_siblings(True).filter(
+                publisher_is_draft=True
+            ).order_by('tree_id', 'parent', 'lft'))
+        public_siblings = list(public_page.get_siblings(True).filter(
+                publisher_is_draft=False
+            ).order_by('tree_id', 'parent', 'lft'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1
                 continue
-            self.assertEqual(sibling.id, public_siblings[i - skip].publisher_draft.id) 
+            self.assertEqual(sibling.id,
+                public_siblings[i-skip].publisher_draft.id)
     
     def request_moderation(self, page, level):
         """Assign current logged in user to the moderators / change moderation

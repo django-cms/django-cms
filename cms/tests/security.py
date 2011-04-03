@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 

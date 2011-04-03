@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+This is revision from 3058ab9d9d4875589638cc45e84b59e7e1d7c9c3 of
+https://github.com/ojii/django-load.
+
+ANY changes to this file, be it upstream fixes or changes for the cms *must* be
+documentet clearly within this file with comments.
+
+For documentation on how to use the functions described in this file, please
+refer to http://django-load.readthedocs.org/en/latest/index.html.
+"""
 from django.conf import settings
 from django.utils.importlib import import_module
 

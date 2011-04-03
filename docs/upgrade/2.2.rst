@@ -39,6 +39,11 @@ Accessing :attr:`cms.plugins_base.CMSPluginBase.pluginmedia` or
 :meth:`cms.plugins_base.CMSPluginBase.get_plugin_media` will raise a
 :exc:`cms.exceptions.Deprecated` exception.
 
+The :class:`cms.middleware.media.PlaceholderMediaMiddleware` middleware was also
+removed in this process and is therefore no longer required, however you now
+require to have the ``'sekizai.context_processors.sekizai'`` context processor
+in your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
+
 All templates in ``CMS_TEMPLATES`` must contain at least the ``js`` and ``css``
 sekizai namespaces.
 

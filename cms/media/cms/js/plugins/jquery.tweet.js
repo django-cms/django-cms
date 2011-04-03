@@ -1,30 +1,4 @@
 /**
- * jquery.twitter.js
- * @author: Angelo Dini
- * @copyright http://www.divio.ch under the BSD Licence
- * @version: 0.2.0
- */
-(function($) {
-	// official twitter button
-	$.fn.twitter = function (options) {
-		return this.each(function () {
-			// save options
-			var options = $.extend({
-				url: $(this).text(),
-				dataCount: 'none', /* none | horizontal | vertical */
-				dataUrl: '',
-				dataText: '',
-				dataLang: ''
-			}, options);
-			// save link
-			var iframe = '<a href="' + options.url + '" class="twitter-share-button" data-count="' + options.dataCount + '" data-url="' + options.dataUrl + '" data-text="' + options.dataText + '" data-lang="' + options.dataLang + '">Tweet</a>';
-				iframe += '<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>';
-			// add iframe
-			$(this).html(iframe);
-		});
-	};
-})(jQuery);
-/**
  * jquery.tweet.js
  * @author: http://github.com/seaofclouds/tweet
  * @version: 0.2 -  (02.02.2011)

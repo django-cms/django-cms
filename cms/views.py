@@ -7,17 +7,18 @@ from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.conf.urls.defaults import patterns
 from django.core.urlresolvers import resolve, Resolver404
+
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.http import urlquote
-
 
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         CMS_MEDIA_URL = settings.CMS_MEDIA_URL
         return render_to_response("cms/new.html", locals())
     raise Http404('CMS: Page not found for "%s"' % slug)
+
 
 def details(request, slug):
     """
@@ -98,4 +99,9 @@ def details(request, slug):
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
+    context['has_view_permissions'] = page.has_view_permission(request)
+    
+    if not context['has_view_permissions']:
+        return _handle_no_page(request, slug)
+    
     return render_to_response(template_name, context)

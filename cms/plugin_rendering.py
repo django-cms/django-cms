@@ -104,7 +104,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     slot = getattr(placeholder, 'slot', None)
     extra_context = {}
     if slot:
-        extra_context = get_placeholder_conf(slot, template, "extra_context", {})
+        extra_context = get_placeholder_conf("extra_context", slot, template, {})
     for key, value in extra_context.items():
         if not key in context:
             context[key] = value
@@ -154,7 +154,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
     name = get_placeholder_conf(slot, template, "name", title(slot))
     name = _(name)
-    toolbar = render_to_string("cms/toolbar/add_plugins.html", {
+    toolbar = render_to_string("cms/toolbar/placeholder.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),
         'placeholder_label': name,

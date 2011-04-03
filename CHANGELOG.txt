@@ -57,3 +57,5 @@
 - Replaced the old plugin media framework with django-sekizai. (This changed some plugin templates which might cause problems with your CSS styling).
 - Made django-mptt a proper dependency
 - Removed support for django-dbgettext
+- Google Maps Plugin now defaults to use HTTPS.
+- Google Maps Plugin now uses the version 3 of their API, no longer requiring an API Key.
