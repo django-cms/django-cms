@@ -369,7 +369,8 @@ def publish_page(page, user, approve=False):
     page = Page.objects.get(pk=page.pk)
     # approve page if requested
     if approve:
-        return approve_page(page, user)
+        page = approve_page(page, user)
+    Page.tree.rebuild()
     return page
     
 def approve_page(page, user):

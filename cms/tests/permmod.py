@@ -124,8 +124,6 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             publish_page(page_b, self.user_super)
             # logg in as master, and request moderation for slave page and descendants
             self.request_moderation(self.slave_page, 7)
-            
-            Page.tree.rebuild()
     
     def _add_plugin(self, user, page):
         """
