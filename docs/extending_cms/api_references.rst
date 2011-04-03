@@ -73,6 +73,7 @@ Functions and constants
     :param limit_menu_visibility: Limits visibility of this page in the menu
     :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_STAFF`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
+    :param string overwrite_url: Overwritten path for this page
 
 
 .. function:: create_title(language, title, page, menu_title=None, slug=None, apphook=None, redirect=None, meta_description=None, meta_keywords=None, parent=None)
@@ -92,6 +93,7 @@ Functions and constants
     :param string meta_keywords: Keywords for this page for SEO
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.pagemodel.Page` instance
+    :param string overwrite_url: Overwritten path for this page
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', **data)

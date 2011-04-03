@@ -107,7 +107,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
-                position="last-child"):
+                position="last-child", overwrite_url=None):
     """
     Create a CMS Page and it's title for the given language
     
@@ -201,7 +201,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         meta_keywords=meta_keywords,
-        page=page
+        page=page,
+        overwrite_url=overwrite_url
     )
         
     del _thread_locals.user
@@ -209,7 +210,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
-                 meta_keywords=None, parent=None):
+                 meta_keywords=None, parent=None, overwrite_url=None):
     """
     Create a title.
     
@@ -233,7 +234,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     else:
         application_urls = None
     
-    return Title.objects.create(
+    title = Title.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -242,8 +243,15 @@ def create_title(language, title, page, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         meta_keywords=meta_keywords,
-        page=page,
+        page=page
     )
+
+    if overwrite_url:
+        title.has_url_overwrite = True
+        title.path = overwrite_url
+        title.save()
+
+    return title
 
 def add_plugin(placeholder, plugin_type, language, position='last-child',
                **data):
