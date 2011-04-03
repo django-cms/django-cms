@@ -7,6 +7,7 @@ from cms.plugin_rendering import render_placeholder
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
+from cms.test_utils.util.mock import AttributeObject
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
@@ -218,26 +219,26 @@ class PlaceholderActionTests(CMSTestCase):
         de = Translations.objects.get(language_code='de')
         
 class PlaceholderModelTests(CMSTestCase):
+    def get_mock_user(self, superuser):
+        return AttributeObject(
+            is_superuser=superuser,
+            has_perm=lambda string: False,
+        ) 
     
-    class MockUser():
-        def __init__(self,superuser=True):
-            self.is_superuser = superuser
-        def has_perm(self, string):
-            return False # always return false, for simplicity 
-    
-    class MockRequest():
-        def __init__(self, superuser=True):
-            self.superuser = superuser
-            self.user = PlaceholderModelTests.MockUser(self.superuser)
+    def get_mock_request(self, superuser=True):
+        return AttributeObject(
+            superuser=superuser,
+            user=self.get_mock_user(superuser)
+        )
     
     def test_01_check_placeholder_permissions_ok_for_superuser(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = ph.has_change_permission(self.MockRequest())
+        result = ph.has_change_permission(self.get_mock_request(True))
         self.assertTrue(result)
         
     def test_02_check_placeholder_permissions_nok_for_user(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = ph.has_change_permission(self.MockRequest(False))
+        result = ph.has_change_permission(self.get_mock_request(False))
         self.assertFalse(result)
     
     def test_03_check_unicode_rendering(self):

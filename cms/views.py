@@ -19,6 +19,7 @@ def _handle_no_page(request, slug):
         return render_to_response("cms/new.html", locals())
     raise Http404('CMS: Page not found for "%s"' % slug)
 
+
 def details(request, slug):
     """
     The main view of the Django-CMS! Takes a request and a slug, renders the

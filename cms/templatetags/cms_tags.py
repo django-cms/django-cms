@@ -384,3 +384,22 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
+
+
+
+class CMSToolbar(InclusionTag):
+    template = 'cms/toolbar/toolbar.html'
+    name = 'cms_toolbar'
+    
+    def render(self, context):
+        request = context.get('request', None)
+        if not request:
+            return ''
+        request._cms_toolbar_tag_used = True
+        return super(CMSToolbar, self).render(context)
+    
+    def get_context(self, context):
+        request = context['request']
+        context['CMS_TOOLBAR_CONFIG'] = request.toolbar.as_json(context, request)
+        return context
+register.tag(CMSToolbar)

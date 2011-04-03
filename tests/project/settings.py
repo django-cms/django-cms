@@ -12,11 +12,12 @@ CACHE_BACKEND = 'locmem:///'
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'cms.sqlite'
-
-TEST_DATABASE_CHARSET = "utf8"
-TEST_DATABASE_COLLATION = "utf8_general_ci"
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'cms.sqlite',
+    }
+}
 
 DATABASE_SUPPORTS_TRANSACTIONS = True
 

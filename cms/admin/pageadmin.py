@@ -868,8 +868,9 @@ class PageAdmin(ModelAdmin):
         if not page.has_moderate_permission(request):
             return HttpResponseForbidden("Denied")
         page.publish()
-        referer = request.META['HTTP_REFERER']
+        referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
+        # TODO: use admin base here!
         if 'admin' not in referer:
             path = '%s?edit-off' % referer.split('?')[0]
         return HttpResponseRedirect( path )
