@@ -99,7 +99,8 @@ class CMSToolbar(Toolbar):
                 )
             
             items.append(
-                Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
+                GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
+                          'cms/images/toolbar/icons/icon_lock.png')
             )
         elif not request.user.is_authenticated():
             items.append(
@@ -107,7 +108,8 @@ class CMSToolbar(Toolbar):
             )
         else:
             items.append(
-                Anchor(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout')
+                GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
+                          'cms/images/toolbar/icons/icon_lock.png')
             )
         return items
     
