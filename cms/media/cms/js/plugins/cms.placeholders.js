@@ -12,7 +12,7 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Placeholders
-	 * @version: 0.1.0
+	 * @version: 0.1.1
 	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 * @public_methods:
 	 *	- CMS.Placeholder.addPlugin(url, obj);
@@ -65,7 +65,7 @@ jQuery(document).ready(function ($) {
 				// enable dom traversal for cms_placeholder
 				this.holders = $('.cms_placeholder');
 				this.holders.bind('mouseenter', function (e) {
-					classy._holder.call(classy, e.currentTarget);
+					classy._holders.call(classy, e.currentTarget);
 				});
 			}
 			
@@ -135,7 +135,7 @@ jQuery(document).ready(function ($) {
 		},
 		
 		/* this private method shows the overlay when hovering */
-		_holder: function (el) {
+		_holders: function (el) {
 			// save reference to this class
 			var classy = this;
 			var holder = $(el);
@@ -219,7 +219,7 @@ jQuery(document).ready(function ($) {
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
 				'src': classy.options.urls.cms_page_changelist + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
-				'style': 'width:100%; height:0; border:none; overflow:hidden;', // 100px = displayed bigger butt positioning works, needs fix
+				'style': 'width:100%; height:0; border:none; overflow:auto;',
 				'allowtransparency': true,
 				'scrollbars': 'no',
 				'frameborder': 0
@@ -233,11 +233,6 @@ jQuery(document).ready(function ($) {
 				// set new height and animate
 				var height = $('#cms_placeholder-iframe').contents().find('body').outerHeight(true);
 				$('#cms_placeholder-iframe').animate({ 'height': height }, 500);
-				
-				// resize window after animation
-				setTimeout(function () {
-					$(window).resize();
-				}, 501);
 				
 				// remove loader class
 				frame.removeClass('cms_placeholder-content_loader');
@@ -253,6 +248,9 @@ jQuery(document).ready(function ($) {
 						CMS.Placeholders.toggleDim();
 					});
 				cancel.insertAfter(btn);
+
+				// do some css changes in template
+				$(this).contents().find('#footer').css('padding', 0);
 			});
 			
 			// we need to set the body min height to the frame height
@@ -483,13 +481,16 @@ jQuery(document).ready(function ($) {
 			this.frame.fadeIn();
 			// change data information
 			this.frame.data('collapsed', false);
+			// set dynamic frame position
+			var offset = 43;
+			var pos = $(window).scrollTop();
 			// frame should always have space on top
-			this.frame.css('top', 43);
+			this.frame.css('top', pos+offset);
 			// make sure that toolbar is visible
 			if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
 			// listen to toolbar events
 			this.toolbar.bind('cms.toolbar.show cms.toolbar.hide', function (e) {
-				(e.handleObj.namespace === 'show.toolbar') ? classy.frame.css('top', 43) : classy.frame.css('top', 0);
+				(e.handleObj.namespace === 'show.toolbar') ? classy.frame.css('top', pos+offset) : classy.frame.css('top', pos);
 			});
 		},
 		
@@ -512,6 +513,7 @@ jQuery(document).ready(function ($) {
 		
 		_showDim: function () {
 			var classy = this;
+			// clear timer when initiated within resize event
 			clearTimeout(this.timer);
 			// attach resize event to window
 			$(window).bind('resize', function () {
