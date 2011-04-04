@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
+from cms.api import create_page, publish_page
+from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
-from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.models import InheritPagePlaceholder
+from cms.plugins.link.forms import LinkForm
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
-from cms.test.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
+from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.forms.widgets import Media
-from django.template import RequestContext
-from testapp.pluginapp.models import Article, Section
-from testapp.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from django.test.testcases import TestCase
+from project.pluginapp.models import Article, Section
+from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
-
-
-    
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -43,45 +44,22 @@ class PluginsTestBaseCase(CMSTestCase):
         self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
         self.super_user.set_password("test")
         self.super_user.save()
-        
+
         self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
         self.slave.set_password("slave")
         self.slave.save()
-        
+
         self.login_user(self.super_user)
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
-        
-# REFACTOR - the publish and appove methods exist in this file and in permmod.py - should they be in base?
-    def publish_page(self, page, approve=False, user=None, published_check=True):
-        if user:
-            self.login_user(user)
-
-        # publish / approve page by master
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
-        self.assertEqual(response.status_code, 200)
-
-        if not approve:
-            return self.reload_page(page)
-
-        # approve
-        page = self.approve_page(page)
-
-        if published_check:
-            # must have public object now
-            assert(page.publisher_public)
-            # and public object must be published
-            assert(page.publisher_public.published)
-
-        return page
 
     def approve_page(self, page):
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
         self.assertRedirects(response, URL_CMS_PAGE)
         # reload page
         return self.reload_page(page)
-        
+
     def get_request(self, *args, **kwargs):
         request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
         request.placeholder_media = Media()
@@ -89,7 +67,7 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-        
+
 
     def test_01_add_edit_plugin(self):
         """
@@ -118,7 +96,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
-        
+
     def test_02_copy_plugins(self):
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -137,7 +115,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(text_plugin_pk, CMSPlugin.objects.all()[0].pk)
         # now edit the plugin
         edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-        
+
         data = {
             "body":"Hello World"
         }
@@ -171,7 +149,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page_data['title'] += " %s" % settings.LANGUAGES[1][0]
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % settings.LANGUAGES[1][0], page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
-        
+
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
         self.assertEquals(Page.objects.all().count(), 1)
         copy_data = {
@@ -222,7 +200,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         # there should be no plugins
         self.assertEquals(0, CMSPlugin.objects.all().count())
-        
+
     def test_04_remove_plugin_after_published(self):
         # add a page
         page_data = self.get_new_page_data()
@@ -239,17 +217,17 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_id = int(response.content)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
-        
+
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
-        
+
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
         self.assertEqual(response.status_code, 200)
-        
+
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
-        
+
         # delete the plugin
         plugin_data = {
             'plugin_id': plugin_id
@@ -257,7 +235,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         remove_url = URL_CMS_PLUGIN_REMOVE
         response = self.client.post(remove_url, plugin_data)
         self.assertEquals(response.status_code, 200)
-        
+
         # there should be no plugins
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
@@ -276,13 +254,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             'placeholder':page.placeholders.get(slot="body").pk,
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        
+
         self.assertEquals(response.status_code, 200)
         self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
-        
+
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
-        
+
         ph = Placeholder(slot="subplugin")
         ph.save()
         plugin_data = {
@@ -294,7 +272,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         # no longer allowed for security reasons
         self.assertEqual(response.status_code, 404)
-        
+
     def test_07_register_plugin_twice_should_raise(self):
         number_of_plugins_before = len(plugin_pool.get_all_plugins())
         # The first time we register the plugin is should work
@@ -306,13 +284,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         except PluginAlreadyRegistered:
             raised = True
         self.assertTrue(raised)
-        # Let's also unregister the plugin now, and assert it's not in the 
+        # Let's also unregister the plugin now, and assert it's not in the
         # pool anymore
         plugin_pool.unregister_plugin(DumbFixturePlugin)
         # Let's make sure we have the same number of plugins as before:
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
-        
+
     def test_08_unregister_non_existing_plugin_should_raise(self):
         number_of_plugins_before = len(plugin_pool.get_all_plugins())
         raised = False
@@ -327,55 +305,62 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
                 
-    def test_09_iheritplugin_media(self):
+    def test_09_inheritplugin_media(self):
         """
         Test case for InheritPagePlaceholder
         """
-        inheritfrompage = self.create_page(title='page to inherit from')
-        
-        body = inheritfrompage.placeholders.get(slot="body")
-        
-        plugin = GoogleMap(
-            plugin_type='GoogleMapPlugin',
-            placeholder=body, 
-            position=1, 
-            language=settings.LANGUAGE_CODE, lat=1, lng=1)
-        plugin.insert_at(None, position='last-child', commit=True)
-        
-        page = self.create_page(title='inherit from page')
-        
-        inherited_body = page.placeholders.get(slot="body")
-                
-        inherit_plugin = InheritPagePlaceholder(
-            plugin_type='InheritPagePlaceholderPlugin',
-            placeholder=inherited_body, 
-            position=1, 
-            language=settings.LANGUAGE_CODE,
-            from_page=inheritfrompage,
-            from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.insert_at(None, position='last-child', commit=True)
-        
-        request = self.get_request()
-        context = RequestContext(request, {})
-        inherit_plugin.render_plugin(context, inherited_body)
-        self.assertEquals(unicode(request.placeholder_media).find('maps.google.com') != -1, True)
+        with SettingsOverride(CMS_MODERATOR=False):
+            inheritfrompage = create_page('page to inherit from',
+                                          'nav_playground.html',
+                                          'en')
+            
+            body = inheritfrompage.placeholders.get(slot="body")
+            
+            plugin = TwitterRecentEntries(
+                plugin_type='TwitterRecentEntriesPlugin',
+                placeholder=body, 
+                position=1, 
+                language=settings.LANGUAGE_CODE,
+                twitter_user='djangocms',
+            )
+            plugin.insert_at(None, position='last-child', save=True)
+            
+            page = create_page('inherit from page',
+                               'nav_playground.html',
+                               'en',
+                               published=True)
+            
+            inherited_body = page.placeholders.get(slot="body")
+                    
+            inherit_plugin = InheritPagePlaceholder(
+                plugin_type='InheritPagePlaceholderPlugin',
+                placeholder=inherited_body, 
+                position=1, 
+                language=settings.LANGUAGE_CODE,
+                from_page=inheritfrompage,
+                from_language=settings.LANGUAGE_CODE)
+            inherit_plugin.insert_at(None, position='last-child', save=True)
+            
+            self.client.logout()
+            response = self.client.get(page.get_absolute_url())
+            self.assertTrue('%sjs/plugins/jquery.tweet.js' % settings.CMS_MEDIA_URL in response.content, response.content)
         
     def test_10_fileplugin_icon_uppercase(self):
-        page = self.create_page(title='testpage')
+        page = create_page('testpage', 'nav_playground.html', 'en')
         body = page.placeholders.get(slot="body") 
         plugin = File(
             plugin_type='FilePlugin',
             placeholder=body,
-            position=1, 
+            position=1,
             language=settings.LANGUAGE_CODE,
         )
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
-        plugin.insert_at(None, position='last-child', commit=True)
-        
+        plugin.insert_at(None, position='last-child', save=True)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
-        response = self.client.get(plugin.get_icon_url(), follow=True)
-        self.assertEqual(response.status_code, 200)
-        # Nuke everything in the storage location directory (since removing just 
+        with SettingsOverride(DEBUG=True):
+            response = self.client.get(plugin.get_icon_url(), follow=True)
+            self.assertEqual(response.status_code, 200)
+        # Nuke everything in the storage location directory (since removing just
         # our file would still leave a useless directory structure)
         #
         # By the way, plugin.file.storage.delete(plugin.file.name) does not work
@@ -395,45 +380,44 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test that copying of textplugins replaces references to copied plugins
         """
-        
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         
         placeholder = page.placeholders.get(slot='body')
-        
+
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
-            placeholder=placeholder, 
-            position=1, 
+            placeholder=placeholder,
+            position=1,
             language=self.FIRST_LANG)
-        plugin_base.insert_at(None, position='last-child', commit=False)
-                
+        plugin_base.insert_at(None, position='last-child', save=False)
+
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
         plugin.save()
-        
+
         plugin_ref_1_base = CMSPlugin(
             plugin_type='TextPlugin',
-            placeholder=placeholder, 
-            position=1, 
+            placeholder=placeholder,
+            position=1,
             language=self.FIRST_LANG)
-        plugin_ref_1_base.insert_at(plugin_base, position='last-child', commit=False)    
-        
+        plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
+
         plugin_ref_1 = Text(body='')
         plugin_ref_1_base.set_base_attr(plugin_ref_1)
         plugin_ref_1.save()
-        
+
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
-            placeholder=placeholder, 
-            position=2, 
+            placeholder=placeholder,
+            position=2,
             language=self.FIRST_LANG)
-        plugin_ref_2_base.insert_at(plugin_base, position='last-child', commit=False)    
-        
+        plugin_ref_2_base.insert_at(plugin_base, position='last-child', save=False)
+
         plugin_ref_2 = Text(body='')
         plugin_ref_2_base.set_base_attr(plugin_ref_2)
 
         plugin_ref_2.save()
-        
+
         plugin.body = plugin_tags_to_admin_html(' {{ plugin_object %s }} {{ plugin_object %s }} ' % (str(plugin_ref_1.pk), str(plugin_ref_2.pk)))
         plugin.save()
         self.assertEquals(plugin.pk, 1)
@@ -446,12 +430,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         })
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
-        
+
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
         self.assertEquals(CMSPlugin.objects.count(), 3)
         self.assertEquals(Page.objects.all().count(), 1)
-        
+
         copy_data = {
             'placeholder': placeholder.pk,
             'language': self.SECOND_LANG,
@@ -467,20 +451,20 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         new_plugin = Text.objects.get(pk=6)
         self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
-        
+
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
     def setUp(self):
         self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
         self.super_user.set_password("test")
         self.super_user.save()
-        
+
         self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
         self.slave.set_password("slave")
         self.slave.save()
-        
+
         self.login_user(self.super_user)
-        
+
         # create 3 sections
         self.sections = []
         self.section_pks = []
@@ -527,7 +511,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEquals(self.section_count, plugin.sections.count())
-    
+
     def test_01_add_plugin_with_m2m_and_publisher(self):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -539,20 +523,20 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'plugin_type': "ArticlePlugin",
             'language': self.FIRST_LANG,
             'placeholder': placeholder.pk,
-            
+
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
- 
+
         # there should be only 1 plugin
         self.assertEquals(1, CMSPlugin.objects.all().count())
-        
+
         articles_plugin_pk = int(response.content)
         self.assertEquals(articles_plugin_pk, CMSPlugin.objects.all()[0].pk)
         # now edit the plugin
         edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-        
+
         data = {
             'title': "Articles Plugin 1",
             'sections': self.section_pks
@@ -563,34 +547,33 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         articles_plugin = ArticlePluginModel.objects.all()[0]
         self.assertEquals(u'Articles Plugin 1', articles_plugin.title)
         self.assertEquals(self.section_count, articles_plugin.sections.count())
-        
-        
+
+
         # check publish box
-        page = self.publish_page(page)
-    
+        page = publish_page(page, self.super_user)
+
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(2, ArticlePluginModel.objects.all().count())
-        
+
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
-        
-        
+
+
     def test_03_copy_plugin_with_m2m(self):
-        
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         
         placeholder = page.placeholders.get(slot='body')
-        
+
         plugin = ArticlePluginModel(
             plugin_type='ArticlePlugin',
-            placeholder=placeholder, 
-            position=1, 
+            placeholder=placeholder,
+            position=1,
             language=self.FIRST_LANG)
-        plugin.insert_at(None, position='last-child', commit=True)
-        
+        plugin.insert_at(None, position='last-child', save=True)
+
         edit_url = URL_CMS_PLUGIN_EDIT + str(plugin.pk) + "/"
-        
+
         data = {
             'title': "Articles Plugin 1",
             "sections": self.section_pks
@@ -598,9 +581,9 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         response = self.client.post(edit_url, data)
         self.assertEquals(response.status_code, 200)
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
-        
+
         self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
-                
+
         page_data = self.get_new_page_data()
 
         #create 2nd language page
@@ -610,7 +593,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         })
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
-        
+
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
         self.assertEquals(CMSPlugin.objects.count(), 1)
@@ -631,3 +614,18 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
         
+
+class SekizaiTests(TestCase):
+    def test_post_patch_check(self):
+        post_patch_check()
+         
+    def test_fail(self):
+        with SettingsOverride(CMS_TEMPLATES=[('fail.html', 'fail')]):
+            self.assertRaises(ImproperlyConfigured, post_patch_check)
+
+
+class LinkPluginTestCase(PluginsTestBaseCase):
+    def test_01_does_not_verify_existance_of_url(self):
+        form = LinkForm(
+            {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
+        self.assertEquals(form.is_valid(), True)

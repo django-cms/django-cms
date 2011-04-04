@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,8 @@ msgid "Page Title"
 msgstr "页面标题"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "覆盖显示在浏览器顶部标题栏或书签中的信息"
 
 #: admin/forms.py:132
@@ -153,8 +154,8 @@ msgstr "通知用户"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr "发送电子邮件通知用户关于用户名或密码变更的消息。需要用户的邮件地址。"
 
 #: admin/forms.py:316
@@ -171,14 +172,12 @@ msgstr "需要有效的电子邮件地址来发送邮件通知。"
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "添加一个新页面要求有修改页面的权限"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr "添加一个新用户要求有修改用户的权限"
 
 #: admin/forms.py:343
@@ -278,8 +277,7 @@ msgstr "复制%(language)s 插件到 %(placeholder)s"
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被修改"
 
 #: admin/pageadmin.py:1318
@@ -599,8 +597,8 @@ msgstr "修正者"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "要使得本页面可用，页面状态必须设置为“已发布”。"
 
 #: models/pagemodel.py:65
@@ -613,8 +611,8 @@ msgstr "所有的上级页面将不会在导航中显示"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr "一个唯一的标志使用模板标记 page_url 来链接到本页面"
 
 #: models/pagemodel.py:69
@@ -952,8 +950,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "输入用来生成页面的模板(例如 \"snippets/plugin_xy.html\")"
 
 #: plugins/snippet/models.py:25
@@ -1068,9 +1065,9 @@ msgid ""
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
 msgstr ""
-"例子：\"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from "
-"the user \"umbrella\" to the user \"nemesis\" that contain the words "
-"\"brains\" and \"zombies\""
+"例子：\"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the "
+"user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" "
+"and \"zombies\""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1094,8 +1091,8 @@ msgstr "电影url"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr "vimeo或youtube视频的url。例如： http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
@@ -1191,8 +1188,7 @@ msgstr "保存并继续编辑"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "页面 <a href=\"%(admin_url)s\">%(page)s</a> 需要你的授权"
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1301,8 +1297,8 @@ msgstr "页面状态"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr "本页面必须在 %(moderation_level)s 级别进行核对，请发送消息进行核对。"
 
 #: templates/admin/cms/page/change_form.html:185

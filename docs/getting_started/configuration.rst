@@ -1,3 +1,5 @@
+.. _configuration:
+
 #############
 Configuration
 #############
@@ -24,6 +26,10 @@ Example::
         ('3col.html', gettext('3 Column')),
         ('extra.html', gettext('Some extra fancy template')),
     )
+
+.. note:: All templates defined in ``CMS_TEMPLATES`` must contain at least the
+          ``js`` and ``css`` sekizai namespaces, for more information, see 
+          :ref:`sekizai-namespaces`.
 
 
 *******************
@@ -154,6 +160,30 @@ Default: ``True``
 If set to ``False``, frontend editing is not available for models using
 ``cms.models.fields.PlaceholderField``.
 
+********************
+Editor configuration
+********************
+
+The Wymeditor from ``cms.plugins.text`` plugin can take the same 
+configuration as vanilla Wymeditor. Therefore you will need to learn 
+how to configure that. The best way to understand this is to head 
+over to `Wymeditor examples page 
+<http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ 
+After understand how Wymeditor works. 
+
+The ``cms.plugins.text`` plugin exposes several variables named 
+WYM_* that correspond to the wym configuration. The simplest 
+way to get started with this is to go to ``cms.plugins.text.settings.py`` 
+and copy over the WYM_* variables and you will realize they 
+match one to one to Wymeditor's.
+
+Currently the following variables are available:
+
+* ``WYM_TOOLS``
+* ``WYM_CONTAINERS``
+* ``WYM_CLASSES``
+* ``WYM_STYLES``
+* ``WYM_STYLESHEET``
 
 *************
 I18N and L10N
@@ -301,6 +331,9 @@ By default, Django CMS creates a folder called 'cms_page_media' in your static
 files folder where all uploaded media files are stored. The media files are
 stored in subfolders numbered with the id of the page.
 
+You should take care that directory to which it points is writable by the user
+under which django will be running.
+
 
 ****
 URLs
@@ -435,19 +468,35 @@ To access these fields in the template use::
         ...
     </head>
 
-CMS_CONTENT_CACHE_DURATION
-==========================
+CMS_CACHE_DURATIONS
+===================
+
+This dictionary carries the varios cache duration settings.
+
+``'content'``
+-------------
 
 Default: ``60``
 
 Cache expiration (in seconds) for ``show_placeholder`` and ``page_url`` template tags.
 
-MENU_CACHE_DURATION
-===================
+.. note:: This settings was previously called ``CMS_CONTENT_CACHE_DURATION``
+
+``'menus'``
+-----------
 
 Default: ``3600``
 
 Cache expiration (in seconds) for the menu tree.
+
+.. note:: This settings was previously called ``MENU_CACHE_DURATION``
+
+``'permissions'``
+-----------------
+
+Default: ``3600``
+
+Cache expiration (in seconds) for view and other permissions.
 
 CMS_CACHE_PREFIX
 ================

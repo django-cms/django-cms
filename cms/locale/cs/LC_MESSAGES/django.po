@@ -65,10 +65,10 @@ msgid "Page Title"
 msgstr "Název stránky"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
-"Přepsat to, co se zobrazuje v horní části vašeho prohlížeče nebo v "
-"záložkách"
+"Přepsat to, co se zobrazuje v horní části vašeho prohlížeče nebo v záložkách"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -101,8 +101,7 @@ msgstr "Popis stránky, který mohou indexovat vyhledávače."
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Seznam klíčových slov oddělených čárkou, které mohou indexovat "
-"vyhledávače."
+"Seznam klíčových slov oddělených čárkou, které mohou indexovat vyhledávače."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -159,11 +158,11 @@ msgstr "Informovat uživatele"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Posílat uživateli informační email o změně uživatelského jména nebo "
-"hesla. Vyžaduje uživatelův email."
+"Posílat uživateli informační email o změně uživatelského jména nebo hesla. "
+"Vyžaduje uživatelův email."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -179,15 +178,14 @@ msgstr "Emailová notifikace vyžaduje platnou emailovou adresu."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Právo na přidávání nových stránek vyžaduje právo na změnu stránek!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
-msgstr "Právo na přidávání nových uživatelů vyžaduje právo na změnu uživatelů!"
+"The permission to add new users requires the permission to change users!"
+msgstr ""
+"Právo na přidávání nových uživatelů vyžaduje právo na změnu uživatelů!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -204,8 +202,8 @@ msgstr "Základní nastavení"
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"Upozornění: Při změně výběru se stránka se znovu načte. Provedené "
-"změny nejprve uložte."
+"Upozornění: Při změně výběru se stránka se znovu načte. Provedené změny "
+"nejprve uložte."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -288,8 +286,7 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -609,8 +606,8 @@ msgstr "změnil"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -623,8 +620,8 @@ msgstr "Potomci nebudou zobrazeni v navigaci"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -962,8 +959,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1101,8 +1097,8 @@ msgstr "URL videa"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 "URL adresa na youtube nebo vimeo. Př.: http://www.youtube.com/watch?v"
 "=YFa59lK-kpo"
@@ -1200,8 +1196,7 @@ msgstr "Uložit a pokračovat v editaci"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1312,8 +1307,8 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1595,8 +1590,7 @@ msgstr "Není zvolen žádný typ obsahu. Vyberte z nabídky na levé straně."
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr ""
-"Není dostupný žádný typ obsahu. Přidejte typ obsahu do placeholderu "
-"(TODO)"
+"Není dostupný žádný typ obsahu. Přidejte typ obsahu do placeholderu (TODO)"
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"

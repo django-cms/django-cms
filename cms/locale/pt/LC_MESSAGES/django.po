@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,10 +65,10 @@ msgid "Page Title"
 msgstr "Título da página"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
-"Sobrescreva o que será exibido no topo do seu navegador ou nos "
-"favoritos"
+"Sobrescreva o que será exibido no topo do seu navegador ou nos favoritos"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -101,8 +101,8 @@ msgstr "Uma descrição da página por vezes usada pelos motores de pesquisa."
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Uma lista de palavras-chave (separadas por vírgulas). Normalmente "
-"usadas por mecanismos de pesquisa."
+"Uma lista de palavras-chave (separadas por vírgulas). Normalmente usadas por"
+" mecanismos de pesquisa."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -122,15 +122,15 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"A permissão para adicionar páginas requer também acesso aos filhos, ou"
-" descendentes, caso contrário a página adicionada não poderá ser "
-"modificada pelo seu criador."
+"A permissão para adicionar páginas requer também acesso aos filhos, ou "
+"descendentes, caso contrário a página adicionada não poderá ser modificada "
+"pelo seu criador."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
 msgstr ""
-"A permissão para adicionar páginas também requer permissão de edição "
-"de páginas"
+"A permissão para adicionar páginas também requer permissão de edição de "
+"páginas"
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -162,11 +162,11 @@ msgstr "Notificar utilizador"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Enviar notificação por e-mail ao utilizador sobre modificação no nome "
-"de utilizador ou senha. Requere o e-mail do utilizador"
+"Enviar notificação por e-mail ao utilizador sobre modificação no nome de "
+"utilizador ou senha. Requere o e-mail do utilizador"
 
 #: admin/forms.py:316
 msgid "New password"
@@ -182,19 +182,17 @@ msgstr "Notificações de e-mail requerem um endereço de e-mail válido."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
-"A permissão para adicionar novas páginas requer a permissão para "
-"modificar páginas!"
+"A permissão para adicionar novas páginas requer a permissão para modificar "
+"páginas!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"A permissão para adicionar utilizadores requer a permissão para "
-"modificar utilizadores!"
+"A permissão para adicionar utilizadores requer a permissão para modificar "
+"utilizadores!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -269,8 +267,7 @@ msgstr "Você não tem permissão para publicar esta página"
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
-"Você não tem permissão para modificar o status de navegação desta "
-"página"
+"Você não tem permissão para modificar o status de navegação desta página"
 
 #: admin/pageadmin.py:1133 admin/pageadmin.py:1167
 msgid "You do not have permission to change this page"
@@ -297,11 +294,9 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
-"Plugin %(plugin_name)s editada na posição %(position)s em "
-"%(placeholder)s"
+"Plugin %(plugin_name)s editada na posição %(position)s em %(placeholder)s"
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -622,8 +617,8 @@ msgstr "modificado por"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 "Quando a página deve ir para o ar. Status deve ser \"Publicado\" para a "
 "página ir para o ar."
@@ -638,11 +633,11 @@ msgstr "Todos os ancestrais não serão exibidos na navegação"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Um identificador único que é usado com a templatetag page_url, para "
-"associar a esta página"
+"Um identificador único que é usado com a templatetag page_url, para associar"
+" a esta página"
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -727,8 +722,8 @@ msgstr "pode recuperar qualquer página excluída"
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
-"Se nenhum for selecionado, utilizador terá permissões dadas a todos os"
-" sites."
+"Se nenhum for selecionado, utilizador terá permissões dadas a todos os "
+"sites."
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -848,8 +843,7 @@ msgstr "latitude"
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
 msgstr ""
-"Use latitude e longitude para ajustar precisamente a sua posição no "
-"mapa."
+"Use latitude e longitude para ajustar precisamente a sua posição no mapa."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -983,11 +977,9 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
-"Coloque um template (ex.: \"snippets/plugin_xy.html\") que será "
-"renderizado."
+"Coloque um template (ex.: \"snippets/plugin_xy.html\") que será renderizado."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1124,8 +1116,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1221,11 +1213,9 @@ msgstr "Gravar e continuar a editar"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
-"Página <a href=\"%(admin_url)s\">%(page)s</a> pode requerer a sua "
-"aprovação."
+"Página <a href=\"%(admin_url)s\">%(page)s</a> pode requerer a sua aprovação."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1334,11 +1324,11 @@ msgstr "Estados da página"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
-"Esta página precisa ser moderada no nível %(moderation_level)s, envie "
-"uma mensagem ao moderador."
+"Esta página precisa ser moderada no nível %(moderation_level)s, envie uma "
+"mensagem ao moderador."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1573,8 +1563,7 @@ msgstr "Recuperar %(verbose_name)s excluído"
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
 msgstr ""
-"Pressione o botão 'gravar' abaixo para recuperar esta versão do "
-"objecto."
+"Pressione o botão 'gravar' abaixo para recuperar esta versão do objecto."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1584,8 +1573,7 @@ msgstr "Reverter %(verbose_name)s"
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
 msgstr ""
-"Pressione o botão 'gravar' abaixo para reverter para esta versão do "
-"objecto."
+"Pressione o botão 'gravar' abaixo para reverter para esta versão do objecto."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"

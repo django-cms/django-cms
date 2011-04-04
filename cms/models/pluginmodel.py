@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
-from cms.exceptions import DontUsePageAttributeWarning
-from cms.models.placeholdermodel import Placeholder
-from cms.plugin_rendering import PluginContext, PluginRenderer
-from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
+import os
+import warnings
 from datetime import datetime, date
+
 from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import ModelBase, model_unpickle, \
-    simple_class_factory
+from django.db.models.base import (model_unpickle, simple_class_factory)
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
-from os.path import join
-from publisher.mptt_support import Mptt, install_mptt
-import warnings
 
-class PluginModelBase(ModelBase):
+from cms.exceptions import DontUsePageAttributeWarning
+from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import PluginContext, render_plugin
+from cms.utils.helpers import reversion_register
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
+
+from mptt.models import MPTTModel, MPTTModelBase
+
+
+class PluginModelBase(MPTTModelBase):
     """
     Metaclass for all plugins.
     """
@@ -24,7 +27,6 @@ class PluginModelBase(ModelBase):
         render_meta = attrs.pop('RenderMeta', None)
         if render_meta is not None:
             attrs['_render_meta'] = render_meta()
-        attrs = install_mptt(cls, name, bases, attrs)
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
         found = False
         bbases = bases
@@ -42,7 +44,7 @@ class PluginModelBase(ModelBase):
         return new_class 
          
     
-class CMSPlugin(Mptt):
+class CMSPlugin(MPTTModel):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -159,8 +161,7 @@ class CMSPlugin(Mptt):
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            renderer = PluginRenderer(context, instance, placeholder, template, processors)
-            return renderer.content
+            return render_plugin(context, instance, placeholder, template, processors)
         return ""
             
     def get_media_path(self, filename):
@@ -169,8 +170,9 @@ class CMSPlugin(Mptt):
             return pages[0].get_media_path(filename)
         else: # django 1.0.2 compatibility
             today = date.today()
-            return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
-            
+            return os.path.join(settings.CMS_PAGE_MEDIA_PATH,
+                str(today.year), str(today.month), str(today.day), filename)
+
     @property
     def page(self):
         warnings.warn(

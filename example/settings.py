@@ -86,7 +86,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.sites',
     'cms',
-    'publisher',
     'menus',
     'cms.plugins.text',
     'cms.plugins.picture',

@@ -49,28 +49,67 @@ To make your life easier, add the following at the top of the file::
     PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-Add the following apps to your ``INSTALLED_APPS``:
+Add the following apps to your ``INSTALLED_APPS`` which enable django-cms and required or highly recommended applications/libraries):
 
-* ``'cms'``
-* ``'mptt'``
-* ``'menus'``
-* ``'south'``
-* ``'appmedia'``
+* ``'cms'``, django CMS itself
+* ``'mptt'``, utilities for implementing a modified pre-order traversal tree
+* ``'menus'``, helper for model independent hierarchical website navigation
+* ``'south'``, intelligent schema and data migrations
+* ``'sekizai'``, for javascript and css management
+* ``'appmedia'``, linking application-specific media to project media (this is
+  only required for this tutorial and not a dependency of the django CMS)
 
 Also add any (or all) of the following plugins, depending on your needs:
 
-* ``'cms.plugins.text'``
-* ``'cms.plugins.picture'``
-* ``'cms.plugins.link'``
 * ``'cms.plugins.file'``
-* ``'cms.plugins.snippet'``
+* ``'cms.plugins.flash'``
 * ``'cms.plugins.googlemap'``
+* ``'cms.plugins.link'``
+* ``'cms.plugins.picture'``
+* ``'cms.plugins.snippet'``
+* ``'cms.plugins.teaser'``
+* ``'cms.plugins.text'``
+* ``'cms.plugins.video'``
+* ``'cms.plugins.twitter'``
+
+They are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
+There is even more plugins available on django CMS `extensions page`_.
+
+.. _extensions page: http://www.django-cms.org/en/extensions/
 
 If you wish to use the moderation workflow, also add:
 
 * ``'publisher'``
 
-Further, make sure you uncomment ``'django.contrib.admin'``
+Further, make sure you uncomment (enable) ``'django.contrib.admin'``
+
+You might consider using `django-filer`_ with `django CMS plugin`_ and its
+components instead of ``cms.plugins.file``, ``cms.plugins.picture``, ``cms.plugins.teaser``
+and ``cms.plugins.video`` core plugins. In this case you should not add them to
+``INSTALLED_APPS`` but add those instead:
+
+* ``'filer'``
+* ``'cmsplugin_filer_file'``
+* ``'cmsplugin_filer_folder'``
+* ``'cmsplugin_filer_image'``
+* ``'cmsplugin_filer_teaser'``
+* ``'cmsplugin_filer_video'``
+
+.. _django-filer: https://github.com/stefanfoulis/django-filer
+.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+
+If you opt for core plugins you should take care that directory to which
+``CMS_PAGE_MEDIA_PATH`` setting points (by default ``cms_page_media/`` relative
+to ``MEDIA_ROOT``) is writable by the user under which django will be running.
+If you have opted for django-filer then similar requirement exists based on its
+configuration.
+
+If you want versioning of your content you should also enable `django-reversion`_
+by adding:
+
+* ``'reversion'``
+
+.. _django-reversion: https://github.com/etianen/django-reversion
 
 You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
 right position::
@@ -85,7 +124,6 @@ right position::
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
-        'cms.middleware.media.PlaceholderMediaMiddleware',
     )
 
 You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
@@ -97,6 +135,7 @@ settings file will not have any)::
         'django.core.context_processors.request',
         'django.core.context_processors.media',
         'cms.context_processors.media',
+        'sekizai.context_processors.sekizai',
     )
 
 Almost there!
@@ -139,7 +178,7 @@ translations for, this is way too many so we'll limit it to English for now::
     ]
 
 Finally, setup the ``DATABASES`` part of the file to reflect your database
-deployement. If you just want to try out things locally, sqlite3 is the easiest
+deployment. If you just want to try out things locally, sqlite3 is the easiest
 database to set up, however it should not be used in production. If you still
 wish to use it for now, this is what your ``DATABASES`` setting should look
 like::
@@ -147,7 +186,7 @@ like::
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(PROJECT_DIR, 'database.sqlite'),
+            'NAME': os.path.join(PROJECT_PATH, 'database.sqlite'),
         }
     }
 
@@ -251,11 +290,15 @@ Here is a simple example for a base template called ``base.html``:
 
 .. code-block:: html+django
 
-  {% load cms_tags %}
+  {% load cms_tags sekizai_tags %}
   <html>
+    <head>
+        {% render_block "css" %}
+    </head>
     <body>
-     {% placeholder base_content %}
-     {% block base_content%}{% endblock %}
+        {% placeholder base_content %}
+        {% block base_content%}{% endblock %}
+        {% render_block "js" %}
     </body>
   </html>
 
@@ -283,6 +326,23 @@ Now, feel free to experiment and make a ``template_2.html`` file! If you don't f
 just copy template_1 and name the second placeholder something like "template_2_content".
 
 .. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
+
+.. _sekizai-namespaces:
+
+Media handling with sekizai
+===========================
+
+The django CMS handles media files (css stylesheets and javascript files)
+required by CMS plugins using `django-sekizai`_. This requires you to define at
+least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
+so using the ``render_block`` template tag from the ``sekizai_tags`` template
+tag libary. It is highly recommended to put the ``{% render_block "css" %}`` tag
+as last thing before the closing ``</head>`` HTML tag and the
+``{% render_block "js" %}`` tag as the last thing before the closing ``</body>``
+HTML tag.
+
+.. _django-sekizai: https://github.com/ojii/django-sekizai 
+
 
 *****************************
 Creating your first CMS page!
@@ -329,14 +389,14 @@ By default, pages are "invisible". To let people access them you should mark the
 
 Menus 
 -----
-Another option this view lets you tweak is wether or not the page should appear in
-your site's navigation (that is, wether there should be a menu entry to reach it
+Another option this view lets you tweak is whether or not the page should appear in
+your site's navigation (that is, whether there should be a menu entry to reach it
 or not)
 
 Adding content to a page
 ========================
 
-So far, our page doesn't do much. Make sure it's marked as "published", the click on the page's 
+So far, our page doesn't do much. Make sure it's marked as "published", then click on the page's 
 "edit" button.
 
 Ignore most of the interface for now, and click the "view on site" button on the 

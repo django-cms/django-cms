@@ -19,8 +19,8 @@ msgstr ""
 
 #: media/cms/js/change_form.js:31
 msgid ""
-"Are you sure you want to change the %(field_name)s without saving the "
-"page first?"
+"Are you sure you want to change the %(field_name)s without saving the page "
+"first?"
 msgstr "هل أنت متأكد من تغيير الحقل %(field_name)s دون حفظ الصفحة أولاً؟"
 
 #: media/cms/js/change_form.js:69

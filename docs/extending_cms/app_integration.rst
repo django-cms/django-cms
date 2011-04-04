@@ -121,12 +121,6 @@ you need to define a name. We will do that with the example from above::
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
 
-
-It is encouraged to use `django-mptt <http://code.google.com/p/django-mptt/>`_
-(a suitable version is included in the `mptt` directory) for the tree
-structure because of performance considerations. The objects provided must
-adhere to the following structure:
-
 Each must have a ``get_menu_title`` function, a ``get_absolute_url`` function,
 and a ``childrens`` array with all of its children inside (the 's' at the end
 of ``childrens`` is done on purpose because ``children`` is already taken by
@@ -250,10 +244,6 @@ the following model::
     except mptt.AlreadyRegistered:
         pass
 
-It is encouraged to use `django-mptt <http://code.google.com/p/django-mptt/>`_
-(a suitable version is included in the `mptt` directory) if you have data that
-is organized in a tree.
-
 We would now create a menu out of these categories::
 
     from menus.base import NavigationNode
@@ -311,6 +301,8 @@ A simple modifier looks something like this::
                 node.counter = count
                 count += 1
             return nodes
+    
+    menu_pool.register_modifier(MyMode)
 
 It has a function modify that should return a list of NavigationNodes. Modify
 should take the following arguments:
@@ -373,6 +365,8 @@ Here is an example of a build in modifier that marks all nodes level::
                 else:
                     child.level = node.level + 1
                 self.mark_levels(child, post_cut)
+    
+    menu_pool.register_modifier(Level)
 
 **************
 Custom Plugins

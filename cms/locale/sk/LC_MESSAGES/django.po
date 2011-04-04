@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,8 @@ msgid "Page Title"
 msgstr "Názov stránky"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 "Prepísať to, čo je zobrazené v hornej časti vášho prehliadača alebo v "
 "záložkách."
@@ -85,8 +86,7 @@ msgstr "Prepísať URL"
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
-"Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná "
-"cesta."
+"Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná cesta."
 
 #: admin/forms.py:142
 msgid "Redirect"
@@ -103,8 +103,7 @@ msgstr "Popis stránky, ktorý môžu indexovať vyhľadávače."
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať "
-"vyhľadávače."
+"Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať vyhľadávače."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -124,8 +123,8 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam"
-" (potomkom). Inak nebude môcť takéto stránky editovať ich autor."
+"Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam "
+"(potomkom). Inak nebude môcť takéto stránky editovať ich autor."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -161,11 +160,11 @@ msgstr "Notifikovať užívateľa"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského"
-" mena alebo hesla. Vyžaduje sa e-mail užívateľa."
+"Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena "
+"alebo hesla. Vyžaduje sa e-mail užívateľa."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -181,19 +180,15 @@ msgstr "Notifikácia vyžaduje platnú e-mailovú adresu."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
-"Právo na pridávanie stránok vyžaduje taktiež právo na editáciu "
-"stránok!"
+"Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu "
-"užívateľov!"
+"Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -210,8 +205,8 @@ msgstr "Základné nastavenia"
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju "
-"musíte uložiť."
+"Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte "
+"uložiť."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -294,8 +289,7 @@ msgstr "Skopírované %(language)s zásuvné moduly do %(placeholder)s"
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 "Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v "
 "%(placeholder)s"
@@ -310,8 +304,8 @@ msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
-"Zásuvný modul %(plugin_name)s na pozícii %(position)s v "
-"%(placeholder)s bol vymazaný."
+"Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder)s bol "
+"vymazaný."
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -619,8 +613,8 @@ msgstr "zmenil"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "Aby bola stránka publikovaná treba zmeniť stav na  \"publikované\"."
 
 #: models/pagemodel.py:65
@@ -635,11 +629,11 @@ msgstr "Nie všetci predkovia budú zobrazení v navigácii"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Unikátny indentifikátor, ktorý použije templatetag page_url na "
-"vytvorenie odkazu na stránku"
+"Unikátny indentifikátor, ktorý použije templatetag page_url na vytvorenie "
+"odkazu na stránku"
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -885,8 +879,8 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto "
-"oblasti. Prázdne pole znamená aktuálnu stránku."
+"Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto oblasti. "
+"Prázdne pole znamená aktuálnu stránku."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -978,11 +972,10 @@ msgstr "HTML kód"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
-"Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má"
-" zobraziť. "
+"Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má "
+"zobraziť. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1084,7 +1077,8 @@ msgstr "nápoveda k odkazu"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr "Ak je zadaná, tak sa nápoveda zobrazí ako odkaz na váš Twitter profil."
+msgstr ""
+"Ak je zadaná, tak sa nápoveda zobrazí ako odkaz na váš Twitter profil."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1119,8 +1113,8 @@ msgstr "url videa"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 "vimeo alebo youtube video url. Napr.: http://www.youtube.com/watch?v"
 "=YFa59lK-kpo"
@@ -1220,8 +1214,7 @@ msgstr "Uložiť a pokračovať v úpravách"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 "Stránka <a href=\"%(admin_url)s\">%(page)s</a> môže vyžadovať Vaše "
 "schválenie."
@@ -1334,11 +1327,11 @@ msgstr "Stavy stránky"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
-"Táto stránka musí byť moderovaná na úrovni %(moderation_level)s. "
-"Pošlite správu moderátorovi."
+"Táto stránka musí byť moderovaná na úrovni %(moderation_level)s. Pošlite "
+"správu moderátorovi."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"

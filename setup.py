@@ -47,8 +47,10 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Django>=1.2',
-        'django-classy-tags>=0.2.2',
+        'django-classy-tags>=0.3.3',
         'south>=0.7.2',
+        'django-mptt>=0.4.2',
+        'django-sekizai>=0.4.2',
     ],
     packages=find_packages(exclude=["example", "example.*","testdata","testdata.*"]),
     package_data={
@@ -76,5 +78,6 @@ setup(
             'templates/menu/*.html',
         ],
     },
+    test_suite = "cms.test.run_tests.run_tests",
     zip_safe = False
 )

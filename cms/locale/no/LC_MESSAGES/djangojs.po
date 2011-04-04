@@ -19,11 +19,10 @@ msgstr ""
 
 #: media/cms/js/change_form.js:31
 msgid ""
-"Are you sure you want to change the %(field_name)s without saving the "
-"page first?"
+"Are you sure you want to change the %(field_name)s without saving the page "
+"first?"
 msgstr ""
-"Er du sikker på at du vil endre %(field_name)s uten å lagre siden "
-"først?"
+"Er du sikker på at du vil endre %(field_name)s uten å lagre siden først?"
 
 #: media/cms/js/change_form.js:69
 msgid ""

@@ -65,7 +65,8 @@ msgid "Page Title"
 msgstr "Lehekülje pealkiri"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Kirjuta üle veebilehitseja ülaosas või järjehoidjas kuvatav"
 
 #: admin/forms.py:132
@@ -120,8 +121,8 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"Õigus lehekülge lisada nõuab ka ligipääsu alamlehekülgede, vastasel "
-"juhul ei saa lehekülje looja lisatud lehekülge muuta."
+"Õigus lehekülge lisada nõuab ka ligipääsu alamlehekülgede, vastasel juhul ei"
+" saa lehekülje looja lisatud lehekülge muuta."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -157,8 +158,8 @@ msgstr "Teavita kasutajat"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 "Saada kasutajale märguanne kasutajanime või parooli muutusest. Vajab "
 "kasutaja e-posti aadressi. "
@@ -177,14 +178,12 @@ msgstr "E-posti teel teavitamine nõuab kehtivat e-posti aadressi."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Õigus lisada uusi lehekülgi nõuab õigust lehekülgi muuta!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr "Õigus lisada uusi kasutajaid nõuab õigust kasutajaid muuta!"
 
 #: admin/forms.py:343
@@ -202,8 +201,7 @@ msgstr "Põhiseadistused"
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"Tähelepanu: Valiku muutmisel lehekülg laeb ennast uuesti. Salvesta "
-"ennem."
+"Tähelepanu: Valiku muutmisel lehekülg laeb ennast uuesti. Salvesta ennem."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -286,8 +284,7 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -607,8 +604,8 @@ msgstr ""
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -621,8 +618,8 @@ msgstr ""
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -960,8 +957,7 @@ msgstr ""
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1099,8 +1095,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1196,8 +1192,7 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1307,8 +1302,8 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185

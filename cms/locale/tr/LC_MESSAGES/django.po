@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: Turkish <None>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,8 @@ msgid "Page Title"
 msgstr "Sayfa Başlığı"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Tarayıcınızın üstünde veya yerimlerinde yazanın üzerine yaz"
 
 #: admin/forms.py:132
@@ -99,8 +100,8 @@ msgstr "Sayfanın açıklaması, bazen arama motorları tarafından kullanılır
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Virgül ile ayrılmış anahtar kelimeler, bazen arama motorları "
-"tarafından kullanılır."
+"Virgül ile ayrılmış anahtar kelimeler, bazen arama motorları tarafından "
+"kullanılır."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -120,14 +121,13 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"Sayfa ekleme yetkisi aynı zamanda alt başlıkların yetkilerine de "
-"ihtiyaç duyar, yoksa sayfa ekleyen kişi içeriğini değiştiremez."
+"Sayfa ekleme yetkisi aynı zamanda alt başlıkların yetkilerine de ihtiyaç "
+"duyar, yoksa sayfa ekleyen kişi içeriğini değiştiremez."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
 msgstr ""
-"Sayfa ekleme yetkisi aynı zamanda sayfa düzenleme yetkisi de "
-"gerektirir."
+"Sayfa ekleme yetkisi aynı zamanda sayfa düzenleme yetkisi de gerektirir."
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -159,11 +159,11 @@ msgstr "Kullanıcıyı bilgilendir"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Kullanıcıya, kullanıcı adı ve parola değişikliği ile ilgili eposta "
-"gönder. Kullanıcının epostası olması gerekir."
+"Kullanıcıya, kullanıcı adı ve parola değişikliği ile ilgili eposta gönder. "
+"Kullanıcının epostası olması gerekir."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -179,14 +179,12 @@ msgstr "Eposta bilgilendirmeleri geçerli bir eposta adresi gerektirir."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Sayfa ekleme yetkisi, sayfa düzenleme yetkisi de gerektirir!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr "Kullanıcı ekleme yetkisi, kullanıcı düzenleme yetkisi de gerektirir!"
 
 #: admin/forms.py:343
@@ -286,8 +284,7 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -607,15 +604,16 @@ msgstr "değiştiren"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
-"Sayfa ne zaman yayında olacağı. Sayfanın yayında olması için durumunun"
-" \"Yayınlanmış\" olması gerekir."
+"Sayfa ne zaman yayında olacağı. Sayfanın yayında olması için durumunun "
+"\"Yayınlanmış\" olması gerekir."
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
-msgstr "Sayfa ne zaman yayından kaldırılacağı. Hiç bir zaman için boş bırakın."
+msgstr ""
+"Sayfa ne zaman yayından kaldırılacağı. Hiç bir zaman için boş bırakın."
 
 #: models/pagemodel.py:67
 msgid "All ancestors will not be displayed in the navigation"
@@ -623,8 +621,8 @@ msgstr ""
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -964,8 +962,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "Kullanılacak şablonu (ör. \"snippets/plugin_xy.html\") girin."
 
 #: plugins/snippet/models.py:25
@@ -1069,8 +1066,8 @@ msgstr "bağlantı ipucu"
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
-"Eğer verilirse ipucu, Twitter hesabınıza bir bağlantı şeklinde "
-"gösterilecek. "
+"Eğer verilirse ipucu, Twitter hesabınıza bir bağlantı şeklinde gösterilecek."
+" "
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1105,8 +1102,8 @@ msgstr "görüntü"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1202,8 +1199,7 @@ msgstr "Kaydet ve düzenlemeye devam et"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1312,8 +1308,8 @@ msgstr "Sayfa durumu"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1548,7 +1544,8 @@ msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr "Sayfanın bu sürümünü geri getirmek için aşağıdaki kaydet tuşuna basın."
+msgstr ""
+"Sayfanın bu sürümünü geri getirmek için aşağıdaki kaydet tuşuna basın."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format

@@ -65,7 +65,8 @@ msgid "Page Title"
 msgstr "Sivun otsikko"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Yliajaa selaimen ylälaidassa ja kirjanmerkeissä näytettävän tekstin"
 
 #: admin/forms.py:132
@@ -118,8 +119,8 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun "
-"luoja ei voi muokata sitä myöhemmin."
+"Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja "
+"ei voi muokata sitä myöhemmin."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -155,11 +156,11 @@ msgstr "Huomauta käyttäjää"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan "
-"vaihtumisesta. Vaatii käyttäjän sähköpostiosoitteen."
+"Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. "
+"Vaatii käyttäjän sähköpostiosoitteen."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -175,14 +176,12 @@ msgstr "Sähköpostitiedote vaatii kelvollisen sähköpostiosoitteen."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Oikeus luoda sivuja vaatii oikeuden muokata sivuja!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr "Oikeus luoda käyttäjiä vaatii oikeuden muokata käyttäjä!"
 
 #: admin/forms.py:343
@@ -200,8 +199,8 @@ msgstr "Perusasetukset"
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. "
-"Tallenna ensin."
+"Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna "
+"ensin."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -270,7 +269,8 @@ msgstr "Kielen tulee olla tuettu!"
 #: admin/pageadmin.py:1149
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr "Liitännäinen %(plugin_name)s lisätty sisältöpaikkaan  %(placeholder)s."
+msgstr ""
+"Liitännäinen %(plugin_name)s lisätty sisältöpaikkaan  %(placeholder)s."
 
 #: admin/pageadmin.py:1171
 msgid "Language must be different than the copied language!"
@@ -280,17 +280,15 @@ msgstr "Kopioidun kielen tulee poiketa lähdekielestä!"
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
-"Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan "
-"%(placeholder)s."
+"Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
 
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
-"Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s "
-"sisältöpaikassa %(placeholder)s."
+"Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa "
+"%(placeholder)s."
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -302,8 +300,8 @@ msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
-"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s "
-"sisältöpaikasta %(placeholder)s."
+"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta"
+" %(placeholder)s."
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -611,11 +609,11 @@ msgstr "muokkaaja"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
-"Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla "
-"\"julkaistu\" jotta se tulee näkyviin. "
+"Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" "
+"jotta se tulee näkyviin. "
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -627,11 +625,11 @@ msgstr "Kaikkia vanhempia ei näytetä navigaatiossa"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin "
-"kanssa tämän sivun linkittämiseksi asettelutiedostoissa. "
+"Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa "
+"tämän sivun linkittämiseksi asettelutiedostoissa. "
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -879,8 +877,8 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, "
-"tyhjä valitsee nykyisen sivun"
+"Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä "
+"valitsee nykyisen sivun"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -972,11 +970,10 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
-"Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka "
-"tulostetaan ruudulle."
+"Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan "
+"ruudulle."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1113,11 +1110,11 @@ msgstr "videon osoite"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
-"Vimeo tai Youtube videon URL. Esimerkiksi: "
-"http://www.youtube.com/watch?v=YFa59lK-kpo"
+"Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1214,8 +1211,7 @@ msgstr "Tallenna ja jatka muokkausta"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 "Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta "
 "hyväksyntää."
@@ -1327,11 +1323,11 @@ msgstr "Sivun tilat"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
-"Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä "
-"viesti moderaattorille."
+"Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti "
+"moderaattorille."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"

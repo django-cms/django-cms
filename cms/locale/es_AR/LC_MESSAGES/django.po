@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,10 +65,11 @@ msgid "Page Title"
 msgstr "Título de la página"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
-"Sobreescribe lo que se muestra en la barra de título del navegador o "
-"en los marcadores"
+"Sobreescribe lo que se muestra en la barra de título del navegador o en los "
+"marcadores"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -96,13 +97,14 @@ msgstr "Redirecciona a esta URL."
 
 #: admin/forms.py:145
 msgid "A description of the page sometimes used by search engines."
-msgstr "La descripción de la página se utiliza habitualmente en los buscadores"
+msgstr ""
+"La descripción de la página se utiliza habitualmente en los buscadores"
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Una lista de palabras clave separadas por coma se utiliza "
-"habitualmente en los buscadores"
+"Una lista de palabras clave separadas por coma se utiliza habitualmente en "
+"los buscadores"
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -122,13 +124,14 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"El permiso para añadir una página implica también el acceso a los "
-"hijos y descendientes, en caso contrario la página añadida no podría "
-"ser cambiada por su creador."
+"El permiso para añadir una página implica también el acceso a los hijos y "
+"descendientes, en caso contrario la página añadida no podría ser cambiada "
+"por su creador."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
-msgstr "El permiso para añadir una página implica también permisos de edición."
+msgstr ""
+"El permiso para añadir una página implica también permisos de edición."
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -160,11 +163,11 @@ msgstr "Avisiar al usuario"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Envia un aviso al usuario ante cambios del nombre de usuario o la "
-"clave. Requiere el e-mail del usuario."
+"Envia un aviso al usuario ante cambios del nombre de usuario o la clave. "
+"Requiere el e-mail del usuario."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -180,19 +183,16 @@ msgstr "La notificación por e-mail requiere una dirección de correo válida"
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
-"¡El permiso para añadir páginas necesita del permiso para modificar "
-"páginas!"
+"¡El permiso para añadir páginas necesita del permiso para modificar páginas!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"¡El permiso para añadir nuevos usuarios necesita del permiso para "
-"modificar usuario!"
+"¡El permiso para añadir nuevos usuarios necesita del permiso para modificar "
+"usuario!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -209,8 +209,7 @@ msgstr "Configuración básica."
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"Nota: Esta página se recargará si cambias la selección. Guárdala "
-"primero."
+"Nota: Esta página se recargará si cambias la selección. Guárdala primero."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -267,8 +266,7 @@ msgstr "No tienes permisos para publicar esta página"
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
-"No tienes permisos para cambiar el estado de navegación de esta "
-"página."
+"No tienes permisos para cambiar el estado de navegación de esta página."
 
 #: admin/pageadmin.py:1133 admin/pageadmin.py:1167
 msgid "You do not have permission to change this page"
@@ -295,8 +293,7 @@ msgstr "Se copiaron los plugins %(language)s a %(placeholder)s"
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 "Plugin %(plugin_name)s modificado en la posición %(position)s de "
 "%(placeholder)s"
@@ -618,8 +615,8 @@ msgstr ""
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -632,8 +629,8 @@ msgstr ""
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -971,8 +968,7 @@ msgstr ""
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1110,8 +1106,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1207,8 +1203,7 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1318,8 +1313,8 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185

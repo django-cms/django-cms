@@ -1,0 +1,63 @@
+##################################
+2.2 release notes (IN DEVELOPMENT)
+##################################
+
+*****************
+What's new in 2.2
+*****************
+
+``django-mptt`` now a proper dependency
+=======================================
+
+`django-mptt`_ is now used as a
+proper dependency and is now longer shipped with the django CMS. This solves the
+version conflict issues many people had when trying to use the django CMS
+together with other Django apps that require django-mptt. django CMS 2.2
+requires django-mptt 0.4.2 or higher.
+
+.. _django-mptt: https://github.com/django-mptt/django-mptt/
+
+******************************
+Backwards incompatible changes
+******************************
+
+``django-sekizai`` instead of PluginMedia
+=========================================
+
+Due to the sorry state of the old plugin media framework, it has been dropped in
+favor of the more stable and more flexible django-sekizai, which is a new
+dependency for the django CMS 2.2.
+
+The following methods and properties of :class:`cms.plugins_base.CMSPluginBase`
+are affected:
+
+* :class:`cms.plugins_base.CMSPluginBase.PluginMedia`
+* :attr:`cms.plugins_base.CMSPluginBase.pluginmedia`
+* :meth:`cms.plugins_base.CMSPluginBase.get_plugin_media`
+
+Accessing :attr:`cms.plugins_base.CMSPluginBase.pluginmedia` or
+:meth:`cms.plugins_base.CMSPluginBase.get_plugin_media` will raise a
+:exc:`cms.exceptions.Deprecated` exception.
+
+The :class:`cms.middleware.media.PlaceholderMediaMiddleware` middleware was also
+removed in this process and is therefore no longer required, however you now
+require to have the ``'sekizai.context_processors.sekizai'`` context processor
+in your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
+
+All templates in ``CMS_TEMPLATES`` must contain at least the ``js`` and ``css``
+sekizai namespaces.
+
+Please refer to the documentation on :ref:`custom-plugins-handling-media` in
+custom CMS plugins and the
+`django-sekizai documentation <http://django-sekizai.readthedocs.org/>`_ for
+more information.    
+
+**************************
+Features deprecated in 2.2
+**************************
+
+``django-dbgettext`` support
+============================
+
+The django-dbgettext support has been fully dropped in 2.2 in favor of the
+built-in mechanisms to achieve multilinguality.

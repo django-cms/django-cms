@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.api import create_page
 from cms.models import Page
-from cms.test.testcases import CMSTestCase
-from django.conf import settings
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
-from cms.test.util.context_managers import SettingsOverride
 
 
 class NonRootCase(CMSTestCase):
-    urls = 'testapp.nonroot_urls'
+    urls = 'project.nonroot_urls'
 
     def setUp(self):
         with SettingsOverride(CMS_MODERATOR = False):
@@ -32,13 +32,16 @@ class NonRootCase(CMSTestCase):
         | + P2
         |   + P3
         + P4
-        | + P5
 
         """
-        self.page1 = self.create_page(parent_page=None, published=True, in_navigation=True)
-        self.page2 = self.create_page(parent_page=self.page1, published=True, in_navigation=True)
-        self.page3 = self.create_page(parent_page=self.page2, published=True, in_navigation=True)
-        self.page4 = self.create_page(parent_page=None, published=True, in_navigation=True)
+        self.page1 = create_page("page1", "nav_playground.html", "en",
+                                 published=True, in_navigation=True)
+        self.page2 = create_page("page2", "nav_playground.html", "en",
+                          parent=self.page1, published=True, in_navigation=True)
+        self.page3 = create_page("page3", "nav_playground.html", "en",
+                          parent=self.page2, published=True, in_navigation=True)
+        self.page4 = create_page("page4", "nav_playground.html", "en",
+                                      published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4]
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]

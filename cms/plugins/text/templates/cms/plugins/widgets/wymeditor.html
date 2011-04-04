@@ -1,14 +1,17 @@
 {% load i18n %}
 <script type="text/javascript">
+//<![CDATA[
 
 // Global var, for storing callbacks, see below.
 var editPluginPopupCallbacks = {};
 
 {% include "cms/plugins/widgets/widget_lib.js" %}
 
-
-
-$(document).ready(function(){
+jQuery(document).ready(function ($) {
+	// scroll to top
+	scrollTo(0, 0);
+	
+	// init wysiwyg
     $('#id_{{ name }}').wymeditor({
         lang: '{{ language }}',
         skin: 'django',
@@ -51,12 +54,8 @@ $(document).ready(function(){
      
         }
     });
-	
-
-   
 
     /* onclick for 'Insert object' */
-	
 	function init_buttons(placeholder){
 		$('span.insert-object').click(function(){
 			var select = $(this).parent().children("select");
@@ -102,8 +101,6 @@ $(document).ready(function(){
 	}
 });
 
-
-
 function get_plugin_html(){
 	html = '<li class="wym_tools_plugins">'
         + '<select name="plugins">'
@@ -114,6 +111,6 @@ function get_plugin_html(){
         + '<span class="edit-object changelink">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
         + '</li>';
 return html;
-
 }
-    </script>
+//]]>
+</script>

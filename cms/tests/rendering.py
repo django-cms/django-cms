@@ -1,34 +1,41 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms import plugin_rendering
-from cms.models import Page, Title, CMSPlugin
+from cms.models import Page, CMSPlugin
+from cms.models.titlemodels import Title
 from cms.plugin_rendering import render_plugins, PluginContext
 from cms.plugins.text.models import Text
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.forms.widgets import Media
 from django.http import Http404, HttpResponseRedirect
 from django.template import Template, RequestContext
-from django.template.loader import render_to_string
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
 def test_plugin_processor(instance, placeholder, rendered_content, original_context):
-    return rendered_content + '|test_plugin_processor_ok|'+instance.body+'|'+placeholder.slot+'|'+original_context['original_context_var']
+    original_context_var = original_context['original_context_var']
+    return '%s|test_plugin_processor_ok|%s|%s|%s' % (rendered_content,
+                                                   instance.body,
+                                                   placeholder.slot,
+                                                   original_context_var)
 
 def test_plugin_context_processor(instance, placeholder):
-    return {'test_plugin_context_processor': 'test_plugin_context_processor_ok|'+instance.body+'|'+placeholder.slot}
+    content = 'test_plugin_context_processor_ok|'+instance.body+'|'+placeholder.slot
+    return {'test_plugin_context_processor': content}
+
 
 class RenderingTestCase(CMSTestCase):
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
-        self.login_user(u)
+        self.test_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.test_user.set_password("test")
+        self.test_user.save()
+        self.login_user(self.test_user)
 
         self.test_data = {
             'title': u'RenderingTestCase-title',
@@ -67,9 +74,9 @@ class RenderingTestCase(CMSTestCase):
         t2.save()
         # Insert some test Text plugins
         pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['main'], position=0, body=self.test_data['text_main'])
-        pl.insert_at(None, commit=True)
+        pl.insert_at(None, save=True)
         pl = Text(plugin_type='TextPlugin', page=p, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders['sub'], position=0, body=self.test_data['text_sub'])
-        pl.insert_at(None, commit=True)
+        pl.insert_at(None, save=True)
 
         # Insert another page that is not the home page
         p3 = Page(parent=p2, site=Site.objects.get_current(), reverse_id=self.test_data3['reverse_id'], template=TEMPLATE_NAME, published=True, publisher_state=1, publisher_is_draft=False)
@@ -82,20 +89,20 @@ class RenderingTestCase(CMSTestCase):
             self.test_placeholders3[placeholder.slot] = placeholder
         # # Insert some test Text plugins
         pl = Text(plugin_type='TextPlugin', page=p3, language=settings.LANGUAGES[0][0], placeholder=self.test_placeholders3['sub'], position=0, body=self.test_data3['text_sub'])
-        pl.insert_at(None, commit=True)
+        pl.insert_at(None, save=True)
 
         # Reload test pages
         self.test_page = Page.objects.get(pk=p.pk)
         self.test_page2 = Page.objects.get(pk=p2.pk)
         self.test_page3 = Page.objects.get(pk=p3.pk)
-
-    def get_context(self, context_vars={}):
-        request = self.get_request()
+        
+    def get_context(self, page, context_vars={}):
+        request = self.get_request(page)
         return RequestContext(request, context_vars)
 
-    def get_request(self, *args, **kwargs):
+    def get_request(self, page, *args, **kwargs):
         request = super(RenderingTestCase, self).get_request(*args, **kwargs)
-        request.current_page = self.test_page
+        request.current_page = page
         request.placeholder_media = Media()
         return request
 
@@ -107,9 +114,9 @@ class RenderingTestCase(CMSTestCase):
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
 
-    def render(self, template, context_vars={}):
+    def render(self, template, page, context_vars={}):
         with SettingsOverride(**self.render_settings()):
-            c = self.get_context(context_vars)
+            c = self.get_context(page, context_vars)
             t = Template(template)
             r = t.render(c)
             return self.strip_rendered(r)
@@ -120,7 +127,7 @@ class RenderingTestCase(CMSTestCase):
         """
         with SettingsOverride(**self.render_settings()):
             from cms.views import details
-            response = details(self.get_request(), slug=self.test_page.get_slug())
+            response = details(self.get_request(self.test_page), slug=self.test_page.get_slug())
             r = self.strip_rendered(response.content)
             self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         
@@ -130,8 +137,8 @@ class RenderingTestCase(CMSTestCase):
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
         with SettingsOverride(
-            CMS_PLUGIN_PROCESSORS = ('cms.tests.rendering.test_plugin_processor',),
-            CMS_PLUGIN_CONTEXT_PROCESSORS = ('cms.tests.rendering.test_plugin_context_processor',),
+                CMS_PLUGIN_PROCESSORS = ('cms.tests.rendering.test_plugin_processor',),
+                CMS_PLUGIN_CONTEXT_PROCESSORS = ('cms.tests.rendering.test_plugin_context_processor',),
             ):
             def test_passed_plugin_context_processor(instance, placeholder):
                 return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
@@ -152,7 +159,7 @@ class RenderingTestCase(CMSTestCase):
         """
         t = u'{% load cms_tags %}'+ \
             u'|{% placeholder "main" %}|{% placeholder "empty" %}'
-        r = self.render(t)
+        r = self.render(t, self.test_page)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|')
 
     def test_03_placeholderor(self):
@@ -161,7 +168,7 @@ class RenderingTestCase(CMSTestCase):
         """
         t = u'{% load cms_tags %}'+ \
             u'|{% placeholder "empty" or %}No content{% endplaceholder %}'
-        r = self.render(t)
+        r = self.render(t, self.test_page)
         self.assertEqual(r, u'|No content')
 
     def test_04_show_placeholder(self):
@@ -173,7 +180,7 @@ class RenderingTestCase(CMSTestCase):
             u'|{% show_placeholder "main" test_dict %}'+ \
             u'|{% show_placeholder "sub" "'+str(self.test_page.reverse_id)+'" %}'+ \
             u'|{% show_placeholder "sub" test_page %}'
-        r = self.render(t, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
+        r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
 
     def test_05_show_uncached_placeholder(self):
@@ -185,7 +192,7 @@ class RenderingTestCase(CMSTestCase):
             u'|{% show_uncached_placeholder "main" test_dict %}'+ \
             u'|{% show_uncached_placeholder "sub" "'+str(self.test_page.reverse_id)+'" %}'+ \
             u'|{% show_uncached_placeholder "sub" test_page %}'
-        r = self.render(t, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
+        r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
 
     def test_06_page_url(self):
@@ -197,7 +204,7 @@ class RenderingTestCase(CMSTestCase):
             u'|{% page_url test_dict %}'+ \
             u'|{% page_url "'+str(self.test_page2.reverse_id)+'" %}'+ \
             u'|{% page_url test_page %}'
-        r = self.render(t, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
+        r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
         self.assertEqual(r, (u'|'+self.test_page2.get_absolute_url())*4)
 
     def test_07_page_attribute(self):
@@ -210,63 +217,37 @@ class RenderingTestCase(CMSTestCase):
             u'|{% page_attribute title test_dict %}'+ \
             u'|{% page_attribute slug "'+str(self.test_page2.reverse_id)+'" %}'+ \
             u'|{% page_attribute slug test_page %}'
-        r = self.render(t, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
+        r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
         self.assertEqual(r, u'|'+self.test_data['title']+(u'|'+self.test_data2['title'])*2+(u'|'+self.test_data2['slug'])*2)
 
-    def test_08_mail_managers(self):
-        """
-        Tests that mail_managers() is called from the templatetags if a page cannot be found by page_lookup argument.
-        settings.DEBUG = False
-        t = u'{% load cms_tags %}'+ \
-            u'|{% page_url -1 %}'
-        r = self.render(t)
-        from django.core import mail
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals("'pk': -1" in mail.outbox[0].body, True)
-        """
-        # mail_managers is no longer used
-        self.assertTrue(True)
-
-    def test_09_inherit_placeholder(self):
+    def test_08_inherit_placeholder(self):
         t = u'{% load cms_tags %}'+ \
             u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
-        self.old_test_page = self.test_page
-        self.test_page = self.test_page3
-        r = self.render(t)
-        self.test_page = self.old_test_page
+        r = self.render(t, self.test_page3)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|'+self.test_data3['text_sub'])
         
-    def test_10_detail_view_404_when_no_language_is_found(self):
+    def test_09_detail_view_404_when_no_language_is_found(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_FALLBACK=True,
-                              CMS_DBGETTEXT=False, 
                               CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
                                           ( 'elvish', 'Elvish' )]):
             from cms.views import details
-            class Mock:
-                pass
-            request = Mock()
-            setattr(request, 'REQUEST',{'language':'elvish'})
-            setattr(request, 'GET',[])
-            setattr(request, 'session',{})
-            setattr(request, 'path','')
-            setattr(request, 'user',self.user)
-            setattr(request, 'current_page',None)
-            raised = False
-            try:
-                details(request, slug=self.test_page.get_slug())
-            except Http404:
-                raised = True
-            self.assertTrue(raised)
+            request = AttributeObject(
+                REQUEST={'language': 'elvish'},
+                GET=[],
+                session={},
+                path='/',
+                user=self.test_user,
+                current_page=None,
+                method='GET',
+            )
+            self.assertRaises(Http404, details, request, slug=self.test_page.get_slug())
 
-    def test_11_detail_view_fallsback_language(self):
+    def test_10_detail_view_fallsback_language(self):
         '''
         Ask for a page in elvish (doesn't exist), and assert that it fallsback
         to English
         '''
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_FALLBACK=True,
-                              CMS_DBGETTEXT=False, 
                               CMS_LANGUAGE_CONF={
                                   'elvish': ['klingon', 'en',]
                               },
@@ -274,20 +255,20 @@ class RenderingTestCase(CMSTestCase):
                                           ( 'elvish', 'Elvish' )
                               ]):
             from cms.views import details
-            class Mock:
-                pass
-            request = Mock()
-            setattr(request, 'REQUEST',{'language':'elvish'})
-            setattr(request, 'GET',[])
-            setattr(request, 'session',{})
-            setattr(request, 'path','/')
-            setattr(request, 'user',self.user)
-            setattr(request, 'current_page',None)
+            request = AttributeObject(
+                REQUEST={'language': 'elvish'},
+                GET=[],
+                session={},
+                path='/',
+                user=self.test_user,
+                current_page=None,
+                method='GET',
+            )
 
             response = details(request, slug=self.test_page.get_slug())
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             
-    def test_12_extra_context_isolation(self):
+    def test_11_extra_context_isolation(self):
         with ChangeModel(self.test_page, template='extra_context.html'):
             response = self.client.get(self.test_page.get_absolute_url())
             self.assertTrue('width' not in response.context)
