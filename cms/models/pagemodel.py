@@ -995,12 +995,6 @@ class Page(MPTTModel):
             pass
         return sibling
 
-    def get_previous_fitlered_sibling(self, **filters):
-        """Backward compatibility alias for wrongly spelled version of 'get_previous_filtered_sibling()'"""
-        import warnings
-        warnings.warn("The 'get_previous_fitlered_sibling()' method has been deprecated in favor of the correctly spelled version 'get_previous_filtered_sibling()'.", DeprecationWarning)
-        return self.get_previous_filtered_sibling(**filters)
-
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides original
         publisher method.
