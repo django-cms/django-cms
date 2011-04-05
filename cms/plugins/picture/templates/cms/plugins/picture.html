@@ -1,5 +1,5 @@
-<div class="plugin_picture"{% if picture.float == "center" %} style="text-align: center"{% endif %}>
+<span class="plugin_picture{% if picture.float %} {{ picture.float }}{% endif %}">
 {% if link %}<a href="{{ link }}">{% endif %}
-<img src="{{ picture.image.url }}" {% if picture.float %}class="{{ picture.float }}" {% endif %}alt="{{ picture.alt }}" />
+<img src="{{ picture.image.url }}" alt="{{ picture.alt }}" />
 {% if link %}</a>{% endif %}
-</div>
+</span>
