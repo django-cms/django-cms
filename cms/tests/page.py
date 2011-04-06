@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.db.models.query_utils import CollectedObjects
 from django.http import HttpRequest
 import os.path
 

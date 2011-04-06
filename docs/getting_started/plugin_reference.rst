@@ -191,21 +191,23 @@ Text
 ****
 
 Displays text. If plugins are text-enabled they can be placed inside the
-text-flow. At this moment the following plugins are text-enabled:
+text-flow. At this moment the following core plugins are text-enabled:
 
-- link
-- picture
-- file
-- snippet
+- ``cms.plugins.link``
+- ``cms.plugins.picture``
+- ``cms.plugins.file``
+- ``cms.plugins.snippet``
 
 The current editor is `Wymeditor <http://www.wymeditor.org/>`_. If you want to
-use TinyMce you need to install `django-tinymce
-<http://code.google.com/p/django-tinymce/>`_. If ``tinymce`` is in your
+use TinyMce you need to install `django-tinymce`_. If ``tinymce`` is in your
 ``INSTALLED_APPS`` it will be automatically enabled. If you have tinymce
 installed but don't want to use it in the cms put the following in your
 ``settings.py``::
 
     CMS_USE_TINYMCE = False
+
+.. note:: When using django-tinymce, you also need to configure it. See the
+          `django-tinymce docs`_ for more information.
 
 For installation be sure you have the following in your project's
 ``INSTALLED_APPS`` setting::
@@ -216,6 +218,8 @@ For installation be sure you have the following in your project's
         # ...
     )
 
+.. _django-tinymce: http://code.google.com/p/django-tinymce/
+.. _django-tinymce docs: http://django-tinymce.googlecode.com/svn/tags/release-1.5/docs/.build/html/installation.html#id2
 
 *****
 Video
@@ -225,7 +229,8 @@ Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 <http://github.com/FlashJunior/OSFlashVideoPlayer>`_. If you upload a file use
 .flv files or h264 encoded video files.
 
-For installation be sure you have the following in your project's ``INSTALLED_APPS`` setting::
+For installation be sure you have the following in your project's
+``INSTALLED_APPS`` setting::
 
     INSTALLED_APPS = (
         # ...

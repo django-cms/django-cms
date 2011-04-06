@@ -12,11 +12,12 @@ CACHE_BACKEND = 'locmem:///'
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'cms.sqlite'
-
-TEST_DATABASE_CHARSET = "utf8"
-TEST_DATABASE_COLLATION = "utf8_general_ci"
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'cms.sqlite',
+    }
+}
 
 DATABASE_SUPPORTS_TRANSACTIONS = True
 
@@ -169,6 +170,12 @@ CMS_PLACEHOLDER_CONF = {
 CMS_SOFTROOT = True
 CMS_MODERATOR = True
 CMS_PERMISSION = True
+CMS_PUBLIC_FOR = 'all'
+CMS_CACHE_DURATIONS = {
+    'menus': 0,
+    'content': 0,
+    'permissions': 0,
+}
 CMS_REDIRECTS = True
 CMS_SEO_FIELDS = True
 CMS_FLAT_URLS = False
@@ -192,3 +199,4 @@ except ImportError:
     pass
     
 TEST_RUNNER = 'project.testrunner.CMSTestSuiteRunner'
+TEST_OUTPUT_VERBOSE = True
