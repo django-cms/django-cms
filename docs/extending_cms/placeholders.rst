@@ -7,18 +7,20 @@ user-editable content (plugins) in templates. That is, it's the place where a
 user can add text, video or any other plugin to a webpage, using either the
 normal Django admin interface or the so called `frontend editing`.
 
-Placeholders can be viewed as containers of ``CMSPlugins``, and can be used
-outside the CMS in custom applications using the ``PlaceholderField``.
+Placeholders can be viewed as containers for :class:`CMSPlugin` instances, and
+can be used outside the CMS in custom applications using the
+:class:`PlaceholderField`.
 
-By defining one (or serveral) ``PlaceholderField`` on a custom model you can take
-advantage of the full power of ``CMSPlugins``, including frontend editing.
+By defining one (or several) :class:`PlaceholderField` on a custom model you can take
+advantage of the full power of :class:`CMSPlugin`, including frontend editing.
 
 
 **********
 Quickstart
 **********
 
-You need to define a ``PlaceholderField`` on the model you would like to use::
+You need to define a :class:`PlaceholderField` on the model you would like to
+use::
 
     from django.db import models
     from cms.models.fields import PlaceholderField
@@ -28,12 +30,13 @@ You need to define a ``PlaceholderField`` on the model you would like to use::
         my_placeholder = PlaceholderField('placeholder_name')
         # your methods
 
-The ``PlaceholderField`` takes a string as first argument which will be used to
-configure which plugins can be used in this placeholder. The configuration is
-the same as for placeholders in the CMS.
+The :class:`PlaceholderField` takes a string as first argument which will be
+used to configure which plugins can be used in this placeholder. The
+configuration is the same as for placeholders in the CMS.
 
 If you install this model in the admin application, you have to use
-``PlaceholderAdmin`` instead of ``ModelAdmin`` so the interface renders
+:class:`PlaceholderAdmin` instead of
+:class:`ModelAdmin <django.contrib.admin.ModelAdmin>` so the interface renders
 correctly::
 
     from django.contrib import admin
@@ -42,16 +45,19 @@ correctly::
 
     admin.site.register(MyModel, PlaceholderAdmin)
 
-Now to render the placeholder in a template you use the ``render_placeholder``
-tag from the ``placeholder_tags`` template tag library::
+Now to render the placeholder in a template you use the
+:ttag:`render_placeholder` tag from the ``placeholder_tags`` template tag
+library:
+
+.. code-block:: html+django
 
     {% load placeholder_tags %}
 
     {% render_placeholder mymodel_instance.my_placeholder "640" %}
 
-The ``render_placeholder`` tag takes a ``PlaceholderField`` instance as first
-argument and optionally accepts a width parameter as second argument for context
-sensitive plugins. 
+The :ttag:`render_placeholder` tag takes a :class:`PlaceholderField` instance as
+first argument and optionally accepts a width parameter as second argument for
+context sensitive plugins.
 
 
 *******************************
@@ -65,7 +71,7 @@ Using the front-end editor
 ==========================
 
 Probably the most simple way to add content to a placeholder, simply visit the
-page displaying your model (where you put the ``render_placeholder`` tag), then
+page displaying your model (where you put the :ttag:`render_placeholder` tag), then
 append "?edit" to the page's URL. This will make a top banner appear, and after
 switching the "Edit mode" button to "on", the banner will prompt you for your
 username/password (the user should be allowed to edit the page, obviously)
@@ -77,7 +83,7 @@ You are now using the so-called *front-end edit mode*:
 .. |edit-banner| image:: ../images/edit-banner.png
 
 Once in Front-end editing mode, your placeholders should display a menu,
-allowing you to add ``plugins`` to them: the following screenshot shows a
+allowing you to add plugins to them: the following screen shot shows a
 default selection of plugins in an empty placeholder.
 
 |frontend-placeholder-add-plugin|
@@ -94,9 +100,9 @@ Fieldsets
 *********
 
 There are some hard restrictions if you want to add custom fieldsets to an admin 
-page with at least one ``PlaceholderField``:
+page with at least one :class:`PlaceholderField`:
 
-1. Every ``PlacehoderField`` **must** be in it's own fieldsets, one
-   ``PlaceholderField`` per fieldset.
+1. Every :class:`PlacehoderField` **must** be in it's own fieldsets, one
+   :class:`PlaceholderField` per fieldset.
 2. You **must** include the following two classes: ``'plugin-holder'`` and
    ``'plugin-holder-nopage'``

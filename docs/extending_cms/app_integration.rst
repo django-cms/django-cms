@@ -2,7 +2,7 @@
 App Integration
 ###############
 
-It is pretty easy to integrate your own Django applications with django-cms.
+It is pretty easy to integrate your own Django applications with django CMS.
 You have 5 ways of integrating your app:
 
 1. Menus
@@ -87,11 +87,12 @@ A NavigationNode takes the following arguments:
 Attach Menus
 ************
 
-Classes that extend from `Menu` always get attached to the root. But if you
-want the menu be attached to a CMS-page you can do that as well.
+Classes that extend from :class:`Menu` always get attached to the root. But if
+you want the menu be attached to a CMS-page you can do that as well.
 
-Instead of extending from `Menu` you need to extend from `CMSAttachMenu` and
-you need to define a name. We will do that with the example from above::
+Instead of extending from :class:`Menu` you need to extend from
+:class:`CMSAttachMenu` and you need to define a name. We will do that with the
+example from above::
 
 
     from menus.base import NavigationNode
@@ -148,7 +149,7 @@ App-Hooks
 With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
 
-To create an apphook create a cms_app.py in your application. And in there
+To create an apphook create a ``cms_app.py`` in your application. And in there
 write the following::
 
     from cms.app_base import CMSApp
@@ -161,17 +162,19 @@ write the following::
 
     apphook_pool.register(MyApphook)
 
-Replace "myapp.urls" with the path to your applications urls.py.
+Replace ``myapp.urls`` with the path to your applications ``urls.py``.
 
 Now edit a page and open the advanced settings tab. Select your new apphook
 under "Application". Save the page.
 
-** ATTENTION ** If you are on a multi-threaded server (mostly all webservers,
-except the dev-server): Restart the server because the URLs are cached by
-Django and in a multi-threaded environment we don't know which caches are
-cleared yet.
+.. warning::
 
-If you attached the app to a page with the url `/hello/world/` and the app has
+    If you are on a multi-threaded server (mostly all webservers,
+    except the dev-server): Restart the server because the URLs are cached by
+    Django and in a multi-threaded environment we don't know which caches are
+    cleared yet.
+
+If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this:
 ::
 
@@ -182,27 +185,32 @@ a urls.py that looks like this:
         url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
     )
 
-The 'main_view' should now be available at `/hello/world/` and the
-'sample_view' has the url '/hello/world/sublevel/'.
+The ``main_view`` should now be available at ``/hello/world/`` and the
+``sample_view`` has the url ``/hello/world/sublevel/``.
 
 
-.. note:: All views that are attached like this must return a RequestContext
-          instance instead of the default Context instance.
+.. note:: All views that are attached like this must return a
+          :class:`RequestContext` instance instead of the default
+          :class:`Context` instance.
 
 **Language Namespaces**
 
 An additional feature of apphooks is that if you use the
-MultilingualURLMiddleware all apphook urls are language namespaced.
+:class:`MultilingualURLMiddleware` all apphook urls are language namespaced.
 
 What this means:
 
 To reverse the first url from above you would use something like this in your
-template::
+template:
+
+.. code-block:: html+django
 
     {% url app_main %}
 
 If you want to access the same url but in a different language use a langauge
-namespace::
+namespace:
+
+.. code-block:: html+django
 
     {% url de:app_main %}
     {% url en:app_main %}
@@ -221,9 +229,9 @@ in your app add it to your apphook like this::
     apphook_pool.register(MyApphook)
 
 
-For an example if your app has a Category model and you want this category
-model to be displayed in the menu when you attach the app to a page. We assume
-the following model::
+For an example if your app has a :class:`Category` model and you want this
+category model to be displayed in the menu when you attach the app to a page.
+We assume the following model::
 
     from django.db import models
     from django.core.urlresolvers import reverse
@@ -273,16 +281,16 @@ If you add this menu now to your app-hook::
         urls = ["myapp.urls"]
         menus = [MyAppMenu, CategoryMenu]
 
-You get the static entries of MyAppMenu and the dynamic entries of
-CategoryMenu both attached to the same page.
+You get the static entries of :class:`MyAppMenu` and the dynamic entries of
+:class:`CategoryMenu` both attached to the same page.
 
 ********************
 Navigation Modifiers
 ********************
 
-Navigation Modifiers can add or change properties of NavigationNodes, they
-even can rearrange whole menus. You normally want to create them in your apps
-menu.py.
+Navigation Modifiers can add or change properties of navigation nodes,
+they even can rearrange whole menus. You normally want to create them in your
+apps ``menu.py``.
 
 A simple modifier looks something like this::
 
@@ -304,8 +312,8 @@ A simple modifier looks something like this::
     
     menu_pool.register_modifier(MyMode)
 
-It has a function modify that should return a list of NavigationNodes. Modify
-should take the following arguments:
+It has a function modify that should return a list of :class:`NavigationNode`
+instances. Modify should take the following arguments:
 
 - request
 

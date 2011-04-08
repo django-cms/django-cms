@@ -49,7 +49,8 @@ To make your life easier, add the following at the top of the file::
     PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-Add the following apps to your ``INSTALLED_APPS`` which enable django-cms and required or highly recommended applications/libraries):
+Add the following apps to your :setting:`INSTALLED_APPS` which enable django CMS
+and required or highly recommended applications/libraries):
 
 * ``'cms'``, django CMS itself
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
@@ -84,9 +85,10 @@ If you wish to use the moderation workflow, also add:
 Further, make sure you uncomment (enable) ``'django.contrib.admin'``
 
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
-components instead of ``cms.plugins.file``, ``cms.plugins.picture``, ``cms.plugins.teaser``
-and ``cms.plugins.video`` core plugins. In this case you should not add them to
-``INSTALLED_APPS`` but add those instead:
+components instead of :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
+:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins. In this
+case you should not add them to :setting:`INSTALLED_APPS` but add those
+instead:
 
 * ``'filer'``
 * ``'cmsplugin_filer_file'``
@@ -100,9 +102,9 @@ and ``cms.plugins.video`` core plugins. In this case you should not add them to
 
 If you opt for core plugins you should take care that directory to which
 :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
-relative to ``MEDIA_ROOT``) is writable by the user under which django will be
-running. If you have opted for django-filer then similar requirement exists
-based on its configuration.
+relative to :setting:`MEDIA_ROOT`) is writable by the user under which django
+will be running. If you have opted for django-filer then similar requirement
+exists based on its configuration.
 
 If you want versioning of your content you should also enable `django-reversion`_
 by adding:
@@ -111,9 +113,8 @@ by adding:
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 
-You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
-right position::
-
+You need to add the django CMS middlewares to your :setting:`MIDDLEWARE_CLASSES`
+at the right position::
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.common.CommonMiddleware',
@@ -126,8 +127,8 @@ right position::
         'cms.middleware.toolbar.ToolbarMiddleware',
     )
 
-You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
-settings file will not have any)::
+You need at least the following :setting:`TEMPLATE_CONTEXT_PROCESSORS` (a
+default Django settings file will not have any)::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.core.context_processors.auth',
@@ -139,14 +140,14 @@ settings file will not have any)::
     )
 
 Almost there!
-Point your ``MEDIA_ROOT`` to where the static media should live (that is, your images, 
+Point your :setting:`MEDIA_ROOT` to where the static media should live (that is, your images,
 CSS files, Javascript files...)::
 
     MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
     MEDIA_URL = "/media/"
     ADMIN_MEDIA_PREFIX="/media/admin/"
 
-Now add a little magic to the ``TEMPLATE_DIRS`` section of the file::
+Now add a little magic to the :setting:`TEMPLATE_DIRS` section of the file::
 
     TEMPLATE_DIRS = (
         # The docs say it should be absolute path: PROJECT_PATH is precisely one.
@@ -177,11 +178,11 @@ translations for, this is way too many so we'll limit it to English for now::
         ('en', 'English'),
     ]
 
-Finally, setup the ``DATABASES`` part of the file to reflect your database
-deployment. If you just want to try out things locally, sqlite3 is the easiest
-database to set up, however it should not be used in production. If you still
-wish to use it for now, this is what your ``DATABASES`` setting should look
-like::
+Finally, setup the :setting:`DATABASES` part of the file to reflect your
+databasedeployment. If you just want to try out things locally, sqlite3 is the
+easiest database to set up, however it should not be used in production. If you
+stillwish to use it for now, this is what your :setting:`DATABASES` setting
+should look like::
 
     DATABASES = {
         'default': {
@@ -249,7 +250,7 @@ Up and running!
 
 That should be it. Restart your development server using ``python manage.py runserver`` 
 and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
-the Django CMS "It Worked" screen.
+the django CMS "It Worked" screen.
 
 |it-works-cms|
 
@@ -385,7 +386,8 @@ The list of pages available is a handy way to change a few parameters about your
 
 Visibility
 ----------
-By default, pages are "invisible". To let people access them you should mark them as "published".
+By default, pages are "invisible". To let people access them you should mark
+them as "published".
 
 Menus 
 -----
@@ -396,12 +398,12 @@ or not)
 Adding content to a page
 ========================
 
-So far, our page doesn't do much. Make sure it's marked as "published", then click on the page's 
-"edit" button.
+So far, our page doesn't do much. Make sure it's marked as "published", then
+click on the page's "edit" button.
 
 Ignore most of the interface for now, and click the "view on site" button on the 
-top right-hand corner of the screen. As expected, your page is blank for the time being,
-since our template is really a minimal one.
+top right-hand corner of the screen. As expected, your page is blank for the
+time being, since our template is really a minimal one.
 
 Let's get to it now then!
 
@@ -414,7 +416,7 @@ The admin interfaces shows you theses placeholders as sub menus:
 .. |first-placeholders| image:: ../images/first-placeholders.png
 
 Scroll down the "Available plugins" drop-down list. This displays the plugins you
-added to your INSTALLED_APPS settings. Choose the "text" plugin in the drop-down,
+added to your :setting:`INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
 then press the "Add" button.
 
 The right part of the plugin area displays a rich text editor (`TinyMCE`_).
@@ -447,7 +449,7 @@ If you're editing a Page in the Django admin, but don't see an "Add Plugin"
 button with a dropdown-list of plugins:
 
 - Be sure your :setting:`CMS_TEMPLATES` setting is correct, the templates specified
-  exist, and they contain at least one ``{% placeholder %}`` templatetag.
+  exist, and they contain at least one :ttag:`{% placeholder %} <placeholder>` template tag.
 
 
 Template errors
@@ -469,7 +471,7 @@ Safari or Chrome). The Javascript inspector may report the following errors:
 
 - **TypeError: Result of expression 'jQuery' [undefined] is not a function.**
 
-If you see this, check the ``MEDIA_URL`` variable in your settings.py file. Your
+If you see this, check the :setting:`MEDIA_URL` variable in your settings.py file. Your
 webserver (e.g.: Apache) should be configured to serve static media files from
 this URL.
 
@@ -481,7 +483,7 @@ this URL.
 This error is due to the Django test server running on a different port and URL
 than the main webserver. In your test environment, you can overcome this issue
 by adding a :setting:`CMS_MEDIA_URL` variable to your ``settings.py`` file, and
-adding a url rule in urls.py to make the Django development serve the Django
+adding a url rule in ``urls.py`` to make the Django development serve the django
 CMS files from this location.
 
 .. _South: http://south.aeracode.org/

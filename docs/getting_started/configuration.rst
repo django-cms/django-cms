@@ -146,10 +146,10 @@ CMS_APPHOOKS
 
 Default: ``()``
 
-A list of import paths for ``cms.app_base.CMSApp`` subclasses.
+A list of import paths for :class:`cms.app_base.CMSApp` subclasses.
 
 Defaults to an empty list which means CMS applications are auto-discovered in
-all ``INSTALLED_APPS`` by trying to import their ``cms_app`` module.
+all :setting:`INSTALLED_APPS` by trying to import their ``cms_app`` module.
 
 If this setting is set, the auto-discovery is disabled.
 
@@ -169,7 +169,7 @@ PLACEHOLDER_FRONTEND_EDITING
 Default: ``True``
 
 If set to ``False``, frontend editing is not available for models using
-``cms.models.fields.PlaceholderField``.
+:class:`cms.models.fields.PlaceholderField`.
 
 ********************
 Editor configuration
@@ -294,7 +294,7 @@ Example::
 CMS_DBGETTEXT
 =============
 
-Default: ``False`` (unless ``dbgettext`` is in ``settings.INSTALLED_APPS``)
+Default: ``False`` (unless ``dbgettext`` is in :setting:`INSTALLED_APPS`)
 
 Enable gettext-based translation of CMS content rather than use the standard
 administration interface. Requires `django-dbgettext
@@ -329,14 +329,14 @@ CMS_MEDIA_PATH
 
 default: ``cms/``
 
-The path from MEDIA_ROOT to the media files located in ``cms/media/``
+The path from :setting:`MEDIA_ROOT` to the media files located in ``cms/media/``
 
 .. setting:: CMS_MEDIA_ROOT
 
 CMS_MEDIA_ROOT
 ==============
 
-Default: ``settings.MEDIA_ROOT + CMS_MEDIA_PATH``
+Default: :setting:`MEDIA_ROOT` + :setting:`CMS_MEDIA_PATH`
 
 The path to the media root of the cms media files.
 
@@ -345,9 +345,9 @@ The path to the media root of the cms media files.
 CMS_MEDIA_URL
 =============
 
-default: ``MEDIA_URL + CMS_MEDIA_PATH``
+default: :setting:`MEDIA_URL` + :setting:`CMS_MEDIA_PATH`
 
-The location of the media files that are located in cms/media/cms/
+The location of the media files that are located in ``cms/media/cms/``
 
 .. setting:: CMS_PAGE_MEDIA_PATH
 
@@ -389,7 +389,9 @@ This adds a new "menu title" field beside the title field.
 
 With this field you can overwrite the title that is displayed in the menu.
 
-To access the menu title in the template, use::
+To access the menu title in the template, use:
+
+.. code-block:: html+django
 
     {{ page.get_menu_title }}
 
@@ -405,8 +407,8 @@ This adds a new "redirect" field to the "advanced settings" tab of the page
 You can set a url here, which a visitor will be redirected to when the page is
 accessed.
 
-Note: Don't use this too much. django.contrib.redirect is much more flexible,
-handy, and is designed exactly for this purpose.
+Note: Don't use this too much. :mod:`django.contrib.redirects` is much more
+flexible, handy, and is designed exactly for this purpose.
 
 .. setting:: CMS_FLAT_URLS
 
@@ -500,7 +502,9 @@ Default: ``False``
 This adds a new "SEO Fields" fieldset to the page admin. You can set the
 Page Title, Meta Keywords and Meta Description in there.
 
-To access these fields in the template use::
+To access these fields in the template use:
+
+.. code-block:: html+django
 
     {% load cms_tags %}
     <head>
@@ -523,9 +527,10 @@ This dictionary carries the varios cache duration settings.
 
 Default: ``60``
 
-Cache expiration (in seconds) for ``show_placeholder`` and ``page_url`` template tags.
+Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
+template tags.
 
-.. note:: This settings was previously called ``CMS_CONTENT_CACHE_DURATION``
+.. note:: This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
 
 ``'menus'``
 -----------
@@ -534,7 +539,7 @@ Default: ``3600``
 
 Cache expiration (in seconds) for the menu tree.
 
-.. note:: This settings was previously called ``MENU_CACHE_DURATION``
+.. note:: This settings was previously called :setting:`MENU_CACHE_DURATION`
 
 ``'permissions'``
 -----------------
@@ -552,7 +557,7 @@ Default: ``None``
 
 
 The CMS will prepend the value associated with this key to every cache access (set and get).
-This is useful when you have several Django-CMS installations, and you don't want them
+This is useful when you have several django CMS installations, and you don't want them
 to share cache objects.
 
 Example::

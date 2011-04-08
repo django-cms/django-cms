@@ -7,10 +7,10 @@ Navigation
 There are four template tags for use in the templates that are connected to the
 menu:
 
-* ``show_menu``
-* ``show_menu_below_id``
-* ``show_sub_menu``
-* ``show_breadcrumb``
+* :ttag:`show_menu`
+* :ttag`show_menu_below_id`
+* :ttag:`show_sub_menu`
+* :ttag:`show_breadcrumb`
 
 .. note::
 

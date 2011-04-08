@@ -6,7 +6,7 @@ From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
 django CMS. If a poll app is mentioned here, we mean the one you get when
 finishing the `Django Tutorial`_. 
-Also, make sure the poll app is in your INSTALLED_APPS.
+Also, make sure the poll app is in your :setting:`INSTALLED_APPS`.
 
 We assume your main ``urls.py`` looks somewhat like this::
 

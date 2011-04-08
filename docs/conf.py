@@ -29,7 +29,11 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ["djangocms"]
+extensions = ['djangocms', 'sphinx.ext.intersphinx']
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/2.6', None),
+    'django': ('http://docs.djangoproject.com/en/1.3/', 'http://docs.djangoproject.com/en/1.3/_objects/'),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['templates']
