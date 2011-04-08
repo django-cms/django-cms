@@ -18,9 +18,9 @@ in your project's ``settings.py`` file::
         # ...
     )
 
-You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
-points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
-by the user under which django will be running.
+You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`:
+setting points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is
+writable by the user under which django will be running.
 
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
 ``cmsplugin_filer_file`` component instead.
@@ -120,9 +120,9 @@ create a file called ``picture.html`` in there. Here is an example
 In this template the picture is scaled differently based on which placeholder
 it was placed in.
 
-You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
-points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
-by the user under which django will be running.
+You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
+setting points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is
+writable by the user under which django will be running.
 
 
 
@@ -171,9 +171,9 @@ settings in your project's ``settings.py`` file::
         # ...
     )
 
-You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
-points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
-by the user under which django will be running.
+You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
+setting points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is
+writable by the user under which django will be running.
 
 
 
@@ -255,9 +255,9 @@ default behavior:
 * ``VIDEO_BUTTON_OVER_COLOR`` (default: ``"000000"``)
 * ``VIDEO_BUTTON_HIGHLIGHT_COLOR`` (default: ``"FFFFFF"``)
 
-You should take care that directory to which ``CMS_PAGE_MEDIA_PATH`` setting
-points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is writable
-by the user under which django will be running.
+You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
+setting points (by default ``cms_page_media/`` relative to ``MEDIA_ROOT``) is
+writable by the user under which django will be running.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with

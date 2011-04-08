@@ -194,7 +194,7 @@ Limiting Plugins per Placeholder
 ================================
 
 You can limit in which placeholder certain plugins can appear. Add a
-``CMS_PLACEHOLDER_CONF`` to your ``settings.py``.
+:setting:`CMS_PLACEHOLDER_CONF` to your ``settings.py``.
 
 Example::
 
@@ -306,7 +306,7 @@ Plugin Context Processors
 *************************
 
 Plugin context processors are callables that modify all plugin's context before
-rendering. They are enabled using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
+rendering. They are enabled using the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS` setting.
 
 A plugin context processor takes 2 arguments:
 
@@ -342,7 +342,7 @@ Plugin Processors
 
 Plugin processors are callables that modify all plugin's output after rendering.
 They are enabled using
-the ``CMS_PLUGIN_PROCESSORS`` setting.
+the :setting:`CMS_PLUGIN_PROCESSORS` setting.
 
 A plugin processor takes 4 arguments:
 
