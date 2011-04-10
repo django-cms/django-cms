@@ -17,7 +17,7 @@ as easy as typing::
 
     pip install South
 
-Then, simply add ``south`` to the list of :setting:`INSTALLED_APPS` in your
+Then, simply add ``south`` to the list of :setting:`django:INSTALLED_APPS` in your
 ``settings.py`` file.
 
 

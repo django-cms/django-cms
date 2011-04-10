@@ -49,7 +49,7 @@ To make your life easier, add the following at the top of the file::
     PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-Add the following apps to your :setting:`INSTALLED_APPS` which enable django CMS
+Add the following apps to your :setting:`django:INSTALLED_APPS` which enable django CMS
 and required or highly recommended applications/libraries):
 
 * ``'cms'``, django CMS itself
@@ -87,7 +87,7 @@ Further, make sure you uncomment (enable) ``'django.contrib.admin'``
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
 components instead of :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
 :mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins. In this
-case you should not add them to :setting:`INSTALLED_APPS` but add those
+case you should not add them to :setting:`django:INSTALLED_APPS` but add those
 instead:
 
 * ``'filer'``
@@ -102,7 +102,7 @@ instead:
 
 If you opt for core plugins you should take care that directory to which
 :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
-relative to :setting:`MEDIA_ROOT`) is writable by the user under which django
+relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which django
 will be running. If you have opted for django-filer then similar requirement
 exists based on its configuration.
 
@@ -113,7 +113,7 @@ by adding:
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 
-You need to add the django CMS middlewares to your :setting:`MIDDLEWARE_CLASSES`
+You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_CLASSES`
 at the right position::
 
     MIDDLEWARE_CLASSES = (
@@ -127,7 +127,7 @@ at the right position::
         'cms.middleware.toolbar.ToolbarMiddleware',
     )
 
-You need at least the following :setting:`TEMPLATE_CONTEXT_PROCESSORS` (a
+You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS` (a
 default Django settings file will not have any)::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
@@ -140,14 +140,14 @@ default Django settings file will not have any)::
     )
 
 Almost there!
-Point your :setting:`MEDIA_ROOT` to where the static media should live (that is, your images,
-CSS files, Javascript files...)::
+Point your :setting:`django:MEDIA_ROOT` to where the static media should live (that is,
+your images,CSS files, Javascript files...)::
 
     MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
     MEDIA_URL = "/media/"
     ADMIN_MEDIA_PREFIX="/media/admin/"
 
-Now add a little magic to the :setting:`TEMPLATE_DIRS` section of the file::
+Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
 
     TEMPLATE_DIRS = (
         # The docs say it should be absolute path: PROJECT_PATH is precisely one.
@@ -178,11 +178,11 @@ translations for, this is way too many so we'll limit it to English for now::
         ('en', 'English'),
     ]
 
-Finally, setup the :setting:`DATABASES` part of the file to reflect your
+Finally, setup the :setting:`django:DATABASES` part of the file to reflect your
 databasedeployment. If you just want to try out things locally, sqlite3 is the
 easiest database to set up, however it should not be used in production. If you
-stillwish to use it for now, this is what your :setting:`DATABASES` setting
-should look like::
+stillwish to use it for now, this is what your :setting:`django:DATABASES`
+setting should look like::
 
     DATABASES = {
         'default': {
@@ -346,7 +346,7 @@ HTML tag.
 
 
 *****************************
-Creating your first CMS page!
+Creating your first CMS Page!
 *****************************
 
 That's it, now the best part: you can start using the CMS!
@@ -416,7 +416,7 @@ The admin interfaces shows you theses placeholders as sub menus:
 .. |first-placeholders| image:: ../images/first-placeholders.png
 
 Scroll down the "Available plugins" drop-down list. This displays the plugins you
-added to your :setting:`INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
+added to your :setting:`django:INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
 then press the "Add" button.
 
 The right part of the plugin area displays a rich text editor (`TinyMCE`_).
@@ -455,7 +455,7 @@ button with a dropdown-list of plugins:
 Template errors
 ===============
 
-If your placeholder content isn't displayed when you view a CMS page: change the
+If your placeholder content isn't displayed when you view a CMS Page: change the
 :setting:`CMS_MODERATOR` setting in your ``settings.py`` to ``False``. This bug
 has been recently fixed, so upgrade to the latest version of Django CMS. See:
 https://github.com/divio/django-cms/issues/issue/430
@@ -471,9 +471,9 @@ Safari or Chrome). The Javascript inspector may report the following errors:
 
 - **TypeError: Result of expression 'jQuery' [undefined] is not a function.**
 
-If you see this, check the :setting:`MEDIA_URL` variable in your settings.py file. Your
-webserver (e.g.: Apache) should be configured to serve static media files from
-this URL.
+If you see this, check the :setting:`django:MEDIA_URL` variable in your
+``settings.py`` file. Your webserver (e.g.: Apache) should be configured to
+serve static media files from this URL.
 
 - **Unsafe JavaScript attempt to access frame with URL
   http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame

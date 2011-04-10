@@ -13,7 +13,7 @@ File
 Allows you to upload a file. A filetype icon will be assigned based on the file
 extension.
 
-For installation be sure you have the following in the :setting:`INSTALLED_APPS`
+For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
@@ -24,7 +24,7 @@ setting in your project's ``settings.py`` file::
 
 You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
 setting points (by default ``cms_page_media/`` relative to
-:setting:`MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
@@ -44,7 +44,7 @@ Flash
 Allows you to upload and display a Flash SWF file on your page.
 
 For installation be sure you have the following in the
-:setting:`INSTALLED_APPS` setting in your project's ``settings.py`` file::
+:setting:`django:INSTALLED_APPS` setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
         # ...
@@ -62,7 +62,7 @@ GoogleMap
 
 Displays a map of an address on your page.
 
-For installation be sure you have the following in the :setting:`INSTALLED_APPS`
+For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
@@ -82,7 +82,7 @@ Link
 Displays a link to an arbitrary URL or to a page. If a page is moved the URL
 will still be correct.
 
-For installation be sure to have the following in the :setting:`INSTALLED_APPS`
+For installation be sure to have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
@@ -106,7 +106,7 @@ Picture
 
 Displays a picture in a page.
 
-For installation be sure you have the following in the :setting:`INSTALLED_APPS`
+For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
@@ -143,7 +143,7 @@ it was placed in.
 
 You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
 setting points (by default ``cms_page_media/`` relative to
-:setting:`MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
 
@@ -167,7 +167,7 @@ Snippet
 Renders a HTML snippet from a HTML file in your templates directories or a
 snippet given via direct input.
 
-For installation be sure you have the following in the :setting:`INSTALLED_APPS`
+For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
@@ -191,7 +191,7 @@ Teaser
 Displays a teaser box for another page or a URL. A picture and a description
 can be added.
 
-For installation be sure you have the following in the :setting:`INSTALLED_APPS`
+For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
 settings in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
@@ -202,7 +202,7 @@ settings in your project's ``settings.py`` file::
 
 You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
 setting points (by default ``cms_page_media/`` relative to
-:setting:`MEDIA_ROOT``) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT``) is writable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media
@@ -231,7 +231,7 @@ text-flow. At this moment the following core plugins are text-enabled:
 
 The current editor is `Wymeditor <http://www.wymeditor.org/>`_. If you want to
 use TinyMce you need to install `django-tinymce`_. If ``tinymce`` is in your
-:setting:`INSTALLED_APPS` it will be automatically enabled. If you have tinymce
+:setting:`django:INSTALLED_APPS` it will be automatically enabled. If you have tinymce
 installed but don't want to use it in the cms put the following in your
 ``settings.py``::
 
@@ -241,7 +241,7 @@ installed but don't want to use it in the cms put the following in your
           `django-tinymce docs`_ for more information.
 
 For installation be sure you have the following in your project's
-:setting:`INSTALLED_APPS` setting::
+:setting:`django:INSTALLED_APPS` setting::
 
     INSTALLED_APPS = (
         # ...
@@ -265,7 +265,7 @@ Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 .flv files or h264 encoded video files.
 
 For installation be sure you have the following in your project's
-:setting:`INSTALLED_APPS` setting::
+:setting:`django:INSTALLED_APPS` setting::
 
     INSTALLED_APPS = (
         # ...
@@ -292,7 +292,7 @@ default behavior:
 
 You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
 setting points (by default ``cms_page_media/`` relative to
-:setting:`MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media
@@ -316,7 +316,7 @@ Twitter
 Displays the last number of post of a twitter user.
 
 For installation be sure you have the following in your project's
-:setting:`INSTALLED_APPS` setting::
+:setting:`django:INSTALLED_APPS` setting::
 
     INSTALLED_APPS = (
         # ...
@@ -339,7 +339,7 @@ Displays all plugins of an other page or an other language. Great if you need
 always the same plugins on a lot of pages.
 
 For installation be sure you have the following in your project's
-:setting:`INSTALLED_APPS` setting::
+:setting:`django:INSTALLED_APPS` setting::
 
     INSTALLED_APPS = (
         # ...

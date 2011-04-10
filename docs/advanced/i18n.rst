@@ -17,7 +17,7 @@ Example::
 It also adds this prefix automatically to every ``href`` and ``form`` tag.
 To install it, include
 ``'cms.middleware.multilingual.MultilingualURLMiddleware'`` in your project's
-:setting:`MIDDLEWARE_CLASSES` setting.
+:setting:`django:MIDDLEWARE_CLASSES` setting.
 
 ****************
 Language Chooser

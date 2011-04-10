@@ -149,7 +149,7 @@ Default: ``()``
 A list of import paths for :class:`cms.app_base.CMSApp` subclasses.
 
 Defaults to an empty list which means CMS applications are auto-discovered in
-all :setting:`INSTALLED_APPS` by trying to import their ``cms_app`` module.
+all :setting:`django:INSTALLED_APPS` by trying to import their ``cms_app`` module.
 
 If this setting is set, the auto-discovery is disabled.
 
@@ -215,7 +215,7 @@ current language. With this setting set to False they will show up anyway.
 CMS_LANGUAGES
 =============
 
-Default: Value of :setting:`LANGUAGES`
+Default: Value of :setting:`django:LANGUAGES`
 
 Defines the languages available in the CMS.
 
@@ -227,7 +227,7 @@ Example::
         ('en', gettext('English')),
     )
 
-.. note:: Make sure you only define languages which are also in :setting:`LANGUAGES`.
+.. note:: Make sure you only define languages which are also in :setting:`django:LANGUAGES`.
 
 .. setting:: CMS_LANGUAGE_FALLBACK
 
@@ -294,7 +294,7 @@ Example::
 CMS_DBGETTEXT
 =============
 
-Default: ``False`` (unless ``dbgettext`` is in :setting:`INSTALLED_APPS`)
+Default: ``False`` (unless ``dbgettext`` is in :setting:`django:INSTALLED_APPS`)
 
 Enable gettext-based translation of CMS content rather than use the standard
 administration interface. Requires `django-dbgettext
@@ -329,14 +329,14 @@ CMS_MEDIA_PATH
 
 default: ``cms/``
 
-The path from :setting:`MEDIA_ROOT` to the media files located in ``cms/media/``
+The path from :setting:`django:MEDIA_ROOT` to the media files located in ``cms/media/``
 
 .. setting:: CMS_MEDIA_ROOT
 
 CMS_MEDIA_ROOT
 ==============
 
-Default: :setting:`MEDIA_ROOT` + :setting:`CMS_MEDIA_PATH`
+Default: :setting:`django:MEDIA_ROOT` + :setting:`CMS_MEDIA_PATH`
 
 The path to the media root of the cms media files.
 
@@ -345,7 +345,7 @@ The path to the media root of the cms media files.
 CMS_MEDIA_URL
 =============
 
-default: :setting:`MEDIA_URL` + :setting:`CMS_MEDIA_PATH`
+default: :setting:`django:MEDIA_URL` + :setting:`CMS_MEDIA_PATH`
 
 The location of the media files that are located in ``cms/media/cms/``
 
