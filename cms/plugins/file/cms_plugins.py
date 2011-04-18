@@ -21,6 +21,6 @@ class FilePlugin(CMSPluginBase):
     def icon_src(self, instance):
         file_icon = instance.get_icon_url()
         if file_icon: return file_icon
-        return settings.CMS_MEDIA_URL + u"images/plugins/file.png"
+        return settings.STATIC_URL + u"cms/" + u"images/plugins/file.png"
     
 plugin_pool.register_plugin(FilePlugin)

@@ -39,5 +39,5 @@ class TwitterSearchPlugin(CMSPluginBase):
         return context
     
     class PluginMedia:
-        js = ('%splugins/twitter/js/jquery.tweet.js' % settings.CMS_MEDIA_URL,)
+        js = ('%scms/plugins/twitter/js/jquery.tweet.js' % settings.STATIC_URL,)
 plugin_pool.register_plugin(TwitterSearchPlugin)

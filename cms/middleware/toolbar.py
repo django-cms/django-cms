@@ -131,7 +131,6 @@ class ToolbarMiddleware(object):
             'placeholder_data':data,
             'edit':edit,
             'moderator': cms_settings.CMS_MODERATOR,
-            'CMS_MEDIA_URL': cms_settings.CMS_MEDIA_URL,
         })
         #from django.core.context_processors import csrf
         #context.update(csrf(request))

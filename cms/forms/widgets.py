@@ -129,13 +129,13 @@ class PluginEditor(Widget):
             self.attrs = {}
         
     class Media:
-        js = [join(settings.CMS_MEDIA_URL, path) for path in (
+        js = [join(settings.STATIC_URL, 'cms', path) for path in (
             'js/lib/ui.core.js',
             'js/lib/ui.sortable.js',
             'js/plugin_editor.js',
         )]
         css = {
-            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [join(settings.STATIC_URL, 'cms', path) for path in (
                 'css/plugin_editor.css',
             )]
         }

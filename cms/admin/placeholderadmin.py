@@ -20,7 +20,7 @@ class PlaceholderAdmin(ModelAdmin):
       
     class Media:
         css = {
-            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
@@ -28,7 +28,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+        js = [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
             'js/lib/jquery.js',
             'js/lib/jquery.query.js',
             'js/lib/ui.core.js',
@@ -170,7 +170,6 @@ class PlaceholderAdmin(ModelAdmin):
             saved_object = plugin_admin.saved_object
             
             context = {
-                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL, 
                 'plugin': saved_object, 
                 'is_popup': True, 
                 'name': unicode(saved_object), 

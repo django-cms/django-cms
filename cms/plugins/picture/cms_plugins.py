@@ -27,6 +27,6 @@ class PicturePlugin(CMSPluginBase):
     
     def icon_src(self, instance):
         # TODO - possibly use 'instance' and provide a thumbnail image
-        return settings.CMS_MEDIA_URL + u"images/plugins/image.png"
+        return settings.STATIC_URL + u"cms/" + u"images/plugins/image.png"
  
 plugin_pool.register_plugin(PicturePlugin)

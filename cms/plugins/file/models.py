@@ -27,7 +27,7 @@ class File(CMSPlugin):
     # -- they are therefore imported from django.conf.settings
     ICON_EXTENSIONS = getattr(settings, "CMS_FILE_ICON_EXTENSIONS", ('gif', 'png'))
     ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(settings.CMS_MEDIA_ROOT, "images", "file_icons"))
-    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/" % (settings.CMS_MEDIA_URL, "images", "file_icons"))
+    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s%s/%s/" % (settings.STATIC_URL, "cms", "images", "file_icons"))
         
     def get_icon_url(self):
         path_base = os.path.join(self.ICON_PATH, self.get_ext())

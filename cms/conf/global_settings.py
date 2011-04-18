@@ -92,8 +92,7 @@ CMS_FRONTEND_LANGUAGES = [x[0] for x in CMS_LANGUAGES]
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
 CMS_MEDIA_PATH = 'cms/'
-CMS_MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT, CMS_MEDIA_PATH)
-CMS_MEDIA_URL = os.path.join(settings.MEDIA_URL, CMS_MEDIA_PATH)
+CMS_MEDIA_ROOT = os.path.join(settings.STATIC_ROOT, CMS_MEDIA_PATH)
 
 # Path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
 CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
