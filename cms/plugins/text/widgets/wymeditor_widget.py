@@ -49,6 +49,7 @@ class WYMEditor(Textarea):
             'WYM_STYLES': mark_safe(text_settings.WYM_STYLES),
             'WYM_STYLESHEET': mark_safe(text_settings.WYM_STYLESHEET),
             'installed_plugins': self.installed_plugins,
+            'STATIC_URL' : settings.STATIC_URL,
         }
         return mark_safe(render_to_string(
             'cms/plugins/widgets/wymeditor.html', context))
