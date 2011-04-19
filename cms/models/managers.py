@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging as log
 from django.conf import settings
 from django.db import models
 from django.contrib.sites.models import Site
@@ -440,6 +441,7 @@ class PagePermissionsPermissionManager(models.Manager):
         # read from cache if posssible
         cached = get_permission_cache(user, attr)
         if cached is not None:
+            log.debug("hit cache __get_id_list site%s user%s attr%s" %(site,user,attr))
            return cached
         # check global permissions
         global_permissions = GlobalPagePermission.objects.with_user(user)

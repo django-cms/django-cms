@@ -9,7 +9,9 @@ from django.contrib.sites.models import Site
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.utils import permissions, moderator, get_language_from_request
-
+from cms.conf import global_settings as settings
+from cms.cache.admin_menu_item import get_admin_menu_item_cache ,\
+    set_admin_menu_item_cache
 NOT_FOUND_RESPONSE = "NotFound"
 
 
@@ -18,6 +20,16 @@ def get_admin_menu_item_context(request, page, filtered=False):
     Used for rendering the page tree, inserts into context everything what
     we need for single item
     """
+    #add caching for the context
+    if settings.ENABLE_ADMIN_MENU_CACHING:
+        cached_context = None
+        if not filtered:
+            cached_context = get_admin_menu_item_cache(page.id, request.user.id)
+            if cached_context is not None:
+                # add the page to the context and continue
+                cached_context['page'] = page
+                return cached_context
+    
     has_add_page_permission = page.has_add_permission(request)
     has_move_page_permission = page.has_move_page_permission(request)
     
@@ -49,25 +61,32 @@ def get_admin_menu_item_context(request, page, filtered=False):
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add", page.site)
     #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
 
-    context = {
-        'page': page,
+    ctx_has_change_perm = page.has_change_permission(request)
+    ctx_has_publish_perm = page.has_publish_permission(request)
+    ctx_has_delete_perm = page.has_delete_permission(request)
+    ctx_has_moderator_perm = page.has_moderate_permission(request)
+    cacheable_context = {
         'site': site,
         'lang': lang,
         'filtered': filtered,
         'metadata': metadata,
         
-        'has_change_permission': page.has_change_permission(request),
-        'has_publish_permission': page.has_publish_permission(request),
-        'has_delete_permission': page.has_delete_permission(request),
+        'has_change_permission': ctx_has_change_perm,
+        'has_publish_permission': ctx_has_publish_perm,
+        'has_delete_permission': ctx_has_delete_perm,
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_page_permission,
-        'has_moderate_permission': page.has_moderate_permission(request),
+        'has_moderate_permission': ctx_has_moderator_perm,
         'page_moderator_state': moderator_state,
         'moderator_should_approve': moderator_state['state'] >= moderator.I_APPROVE,
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         'CMS_PERMISSION': settings.CMS_PERMISSION,
         'CMS_MODERATOR': settings.CMS_MODERATOR,
     }
+    if settings.ENABLE_ADMIN_MENU_CACHING:
+        set_admin_menu_item_cache(page.id, request.user.id, cacheable_context)
+    context =  cacheable_context
+    context['page'] = page
     return context
 
 

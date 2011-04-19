@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.exceptions import NoPermissionsException
+from cms.utils.plugins import current_site
 
 try:
     from threading import local
@@ -64,7 +65,7 @@ def has_page_add_permission(request):
                 return has_generic_permission(page.parent_id, request.user, "add", page.site)
                 #return page.parent.has_add_permission(request)
     else:
-        from cms.utils.plugins import current_site
+        
         site = current_site(request)
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
             GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[site])):
@@ -72,7 +73,7 @@ def has_page_add_permission(request):
     return False
 
 def has_any_page_change_permissions(request):
-    from cms.utils.plugins import current_site
+    
     return PagePermission.objects.filter(
             page__site=current_site(request)
         ).filter((
@@ -86,7 +87,7 @@ def has_page_change_permission(request):
     just used for building the tree - only superuser, or user with can_change in
     globalpagepermission can change a page.
     """
-    from cms.utils.plugins import current_site
+    
     opts = Page._meta
     if request.user.is_superuser or (
         request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and (
@@ -102,7 +103,7 @@ def has_page_view_permission(request):
     just used for building the tree - only superuser, or user with can_view in
     globalpagepermission can view a page.
     """
-    from cms.utils.plugins import current_site
+    
     opts = self._meta
     codename = '%s.%s_%s' % (opts.app_label, "view", opts.object_name.lower())
     if request.user.is_superuser or (
@@ -115,7 +116,7 @@ def has_page_view_permission(request):
     return False
 
 def get_any_page_view_permissions(request, page):
-    from cms.utils.plugins import current_site
+    
     return PagePermission.objects.filter(
             page__pk=page.pk,
             page__site=current_site(request),
