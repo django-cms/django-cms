@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from django.core.cache import cache
 
+from cms.conf import global_settings as settings
 permission_cache_keys = [] 
 all_keys = []
 
