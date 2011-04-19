@@ -7,12 +7,12 @@
 {% endfor %}
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
 <script type="text/javascript">
-//<![CDATA[
+
 (function ($){
 	$(document).ready(function () {
 		$.fn.cmsPatchCSRF();
 	});
 })(jQuery);
-})();
+
 </script>
 {% endblock %}
