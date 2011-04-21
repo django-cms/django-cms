@@ -104,7 +104,29 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_three)
     
-    def test_05_login_required(self):
+    def test_05_redirect_to_page(self):
+        one = self.create_page(
+            published=True,
+            language='en'
+        )
+        two = self.create_page(
+            parent_page=one,
+            published=True,
+            language='en'
+        )
+        three = self.create_page(
+            parent_page=one,
+            published=True,
+            language='en',
+            title_extra={'redirect_to_page': two}
+        )
+        url = three.get_absolute_url()
+        request = self.get_request(url)
+        response = details(request, url.strip('/'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], two.get_absolute_url())
+    
+    def test_06_login_required(self):
         self.create_page(
             published=True,
             language='en',
