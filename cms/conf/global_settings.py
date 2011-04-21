@@ -45,6 +45,9 @@ CMS_MENU_TITLE_OVERWRITE = False
 # Are redirects activated?
 CMS_REDIRECTS = False
 
+# Are redirects to pages activated?
+CMS_REDIRECTS_TO_PAGES = False
+
 # Allow the description, title and keywords meta tags to be edited from the
 # admin
 CMS_SEO_FIELDS = False 

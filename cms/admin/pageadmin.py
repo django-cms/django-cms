@@ -74,7 +74,7 @@ class PageAdmin(model_admin):
     if settings.CMS_DBGETTEXT:
         # no need to select language for page
         add_general_fields.remove('language')
-    advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
+    advanced_fields = ['reverse_id', 'overwrite_url', 'redirect', 'redirect_to_page', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
     change_list_template = "admin/cms/page/change_list.html"
     hidden_fields = ['site', 'parent']
@@ -100,6 +100,8 @@ class PageAdmin(model_admin):
         advanced_fields.remove("overwrite_url")
     if not settings.CMS_REDIRECTS:
         advanced_fields.remove('redirect')
+    if not settings.CMS_REDIRECTS_TO_PAGES:
+        advanced_fields.remove('redirect_to_page')
     if menu_pool.get_menus_by_attribute("cms_enabled", True):
         advanced_fields.append("navigation_extenders")
     if apphook_pool.get_apphooks():
@@ -370,6 +372,7 @@ class PageAdmin(model_admin):
                          'title',
                          'application_urls',
                          'redirect',
+                         'redirect_to_page',
                          'meta_description',
                          'meta_keywords',
                          'menu_title',

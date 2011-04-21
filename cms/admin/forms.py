@@ -141,6 +141,8 @@ class PageForm(PageAddForm):
     
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
         help_text=_('Redirects to this URL.'))
+    redirect_to_page = forms.ModelChoiceField(label=_('Redirect'), required=False, queryset=Page.objects.all(),
+        help_text=_('Redirects to this page.'))
     meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
         help_text=_('A description of the page sometimes used by search engines.'))
     meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
@@ -152,6 +154,8 @@ class PageForm(PageAddForm):
             self.fields['navigation_extenders'].widget = forms.Select({}, [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
+        if 'redirect_to_page' in self.fields:
+            self.fields['redirect_to_page'].choices = [('', "---------")] + [(page.id, "%s %s" % (u"  "*page.level, page.get_menu_title())) for page in Page.objects.all()]
     
     def clean(self):
         cleaned_data = super(PageForm, self).clean()

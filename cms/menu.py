@@ -38,7 +38,8 @@ def page_to_node(page, home, cut):
         app = apphook_pool.get_apphook(app_name)
         for menu in app.menus:
             extenders.append(menu.__name__)
-    attr['redirect_url'] = page.get_redirect()  # save redirect URL is any
+    attr['redirect_url'] = page.get_redirect()  # save redirect URL if any
+    attr['redirect_to_page'] = page.get_redirect_to_page()  # save page redirect if any
     if extenders:
         attr['navigation_extenders'] = extenders
     ret_node = NavigationNode(
