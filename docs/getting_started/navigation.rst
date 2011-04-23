@@ -8,20 +8,21 @@ There are four template tags for use in the templates that are connected to the
 menu:
 
 * :ttag:`show_menu`
-* :ttag`show_menu_below_id`
+* :ttag:`show_menu_below_id`
 * :ttag:`show_sub_menu`
 * :ttag:`show_breadcrumb`
 
 .. note::
 
-    Please note that menus were originally implemented to be application-independant
-    and as such, live in the ``menus`` application instead of the "normal" ``cms``
+    Please note that menus were originally implemented to be
+    application-independant and as such, live in the :mod:`menus` application
+    instead of the "normal" :mod:`cms`
 
 *********
 show_menu
 *********
 
-``{% show_menu %}`` renders the navigation of the current page.
+:ttag:`{% show_menu %} <show_menu>` renders the navigation of the current page.
 You can overwrite the appearance and the HTML if you add a ``menu/menu.html``
 template to your project or edit the one provided with django-cms.
 ``show_menu`` takes four optional parameters: ``start_level``, ``end_level``,
@@ -85,7 +86,7 @@ meta that is not displayed in the navigation and that has the id "meta"::
         {% show_menu_below_id "meta" %}
     </ul>
 
-You can give it the same optional parameters as ``show_menu``::
+You can give it the same optional parameters as :ttag:`show_menu`::
 
     <ul>
         {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}

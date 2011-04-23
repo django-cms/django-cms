@@ -52,8 +52,9 @@ Create a menu.py in your application and write the following inside::
     menu_pool.register_menu(TestMenu)
 
 If you refresh a page you should now see the menu entries from above.
-The get_nodes function should return a list of NavigationNode instances.
-A NavigationNode takes the following arguments:
+The get_nodes function should return a list of
+:class:`NavigationNode <menus.base.NavigationNode>` instances. A
+:class:`NavigationNode` takes the following arguments:
 
 - title
 
@@ -87,12 +88,13 @@ A NavigationNode takes the following arguments:
 Attach Menus
 ************
 
-Classes that extend from :class:`Menu` always get attached to the root. But if
-you want the menu be attached to a CMS-page you can do that as well.
+Classes that extend from :class:`menus.base.Menu` always get attached to the
+root. But if you want the menu be attached to a CMS Page you can do that as
+well.
 
-Instead of extending from :class:`Menu` you need to extend from
-:class:`CMSAttachMenu` and you need to define a name. We will do that with the
-example from above::
+Instead of extending from :class:`~menus.base.Menu` you need to extend from
+:class:`cms.menu_bases.CMSAttachMenu` and you need to define a name. We will do
+that with the example from above::
 
 
     from menus.base import NavigationNode
@@ -122,18 +124,18 @@ example from above::
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
 
-Each must have a ``get_menu_title`` function, a ``get_absolute_url`` function,
-and a ``childrens`` array with all of its children inside (the 's' at the end
-of ``childrens`` is done on purpose because ``children`` is already taken by
-mptt).
+Each must have a :meth:`get_menu_title` method, a
+:meth:`~django.db.models.Model.get_absolute_url` method, and a ``childrens``
+list with all of its children inside (the 's' at the end of ``childrens`` is
+done on purpose because ``children`` is already taken by django-mptt).
 
-Be sure that ``get_menu_title`` and ``get_absolute_url`` don't trigger any
-queries when called in a template or you may have some serious performance and
-DB problems with a lot of queries.
+Be sure that :meth:`get_menu_title` and :meth:`get_absolute_url` don't trigger
+any queries when called in a template or you may have some serious performance
+and database problems with a lot of queries.
 
-It may be wise to cache the output of ``get_nodes``. For this you may need to
-write a wrapper class because of dynamic content that the pickle module can't
-handle.
+It may be wise to cache the output of :meth:`~menu.base.Menu.get_nodes`. For
+this you may need to write a wrapper class because of dynamic content that the
+pickle module can't handle.
 
 If you want to display some static pages in the navigation ("login", for
 example) you can write your own "dummy" class that adheres to the conventions
@@ -175,8 +177,7 @@ under "Application". Save the page.
     cleared yet.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
-a urls.py that looks like this:
-::
+a urls.py that looks like this::
 
     from django.conf.urls.defaults import *
 
@@ -190,13 +191,15 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
 
 
 .. note:: All views that are attached like this must return a
-          :class:`RequestContext` instance instead of the default
-          :class:`Context` instance.
+          :class:`~django.template.RequestContext` instance instead of the
+          default :class:`~django.template.Context` instance.
 
-**Language Namespaces**
+Language Namespaces
+-------------------
 
 An additional feature of apphooks is that if you use the
-:class:`MultilingualURLMiddleware` all apphook urls are language namespaced.
+:class:`cms.middleware.multilingual.MultilingualURLMiddleware` all apphook urls
+are language namespaced.
 
 What this means:
 
@@ -312,8 +315,9 @@ A simple modifier looks something like this::
     
     menu_pool.register_modifier(MyMode)
 
-It has a function modify that should return a list of :class:`NavigationNode`
-instances. Modify should take the following arguments:
+It has a method :meth:`~menus.base.Modifier.modify` that should return a list
+of :class:`~menus.base.NavigationNode` instances.
+:meth:`~menus.base.Modifier.modify` should take the following arguments:
 
 - request
 
@@ -335,17 +339,17 @@ instances. Modify should take the following arguments:
 
 - post_cut
 
-  Every modifier is called 2 times. First on the whole tree. After that the
+  Every modifier is called two times. First on the whole tree. After that the
   tree gets cut. To only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
-  the case post_cut is True.
+  the case ``post_cut`` is ``True``.
 
 - breadcrumb
 
   Is this not a menu call but a breadcrumb call?
 
 
-Here is an example of a build in modifier that marks all nodes level::
+Here is an example of a built-in modifier that marks all node levels::
 
 
     class Level(Modifier):

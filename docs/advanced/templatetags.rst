@@ -88,12 +88,12 @@ Page Lookup
 The ``page_lookup`` argument, passed to several templatetags to retrieve a
 page, can be of any of the following types:
 
-* String: interpreted as the ``reverse_id`` field of the desired page, which
+* :class:`str <basestring>`: interpreted as the ``reverse_id`` field of the desired page, which
   can be set in the "Advanced" section when editing a page.
-* Integer: interpreted as the primary key (``pk`` field) of the desired page
-* ``dict``: a dictionary containing keyword arguments to find the desired page
+* :class:`int`: interpreted as the primary key (``pk`` field) of the desired page
+* :class:`dict`: a dictionary containing keyword arguments to find the desired page
   (for instance: ``{'pk': 1}``)
-* ``Page``: you can also pass a page object directly, in which case there will
+* :class:`~cms.models.Page`: you can also pass a page object directly, in which case there will
   be no database lookup.
 
 If you know the exact page you are referring to, it is a good idea to use a
@@ -150,7 +150,7 @@ plugins_media
 *************
 
 Outputs the appropriate tags to include all media that is used by the plugins
-on a page (defined using the ``Media`` class in the plugin class).
+on a page (defined using the :class:`Media` class in the plugin class).
 
 You normally want to place this in your ``<head>`` tag.
 

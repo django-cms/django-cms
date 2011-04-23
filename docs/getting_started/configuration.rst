@@ -175,16 +175,16 @@ If set to ``False``, frontend editing is not available for models using
 Editor configuration
 ********************
 
-The Wymeditor from ``cms.plugins.text`` plugin can take the same 
+The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
 how to configure that. The best way to understand this is to head 
 over to `Wymeditor examples page 
 <http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ 
 After understand how Wymeditor works. 
 
-The ``cms.plugins.text`` plugin exposes several variables named 
+The :mod:`cms.plugins.text` plugin exposes several variables named
 WYM_* that correspond to the wym configuration. The simplest 
-way to get started with this is to go to ``cms.plugins.text.settings.py`` 
+way to get started with this is to go to ``cms/plugins/text/settings.py``
 and copy over the WYM_* variables and you will realize they 
 match one to one to Wymeditor's.
 
@@ -356,12 +356,12 @@ CMS_PAGE_MEDIA_PATH
 
 Default: ``'cms_page_media/'``
 
-By default, Django CMS creates a folder called 'cms_page_media' in your static
-files folder where all uploaded media files are stored. The media files are
-stored in subfolders numbered with the id of the page.
+By default, Django CMS creates a folder called ``cms_page_media`` in your
+static files folder where all uploaded media files are stored. The media files
+are stored in subfolders numbered with the id of the page.
 
-You should take care that directory to which it points is writable by the user
-under which django will be running.
+You should take care that the directory to which it points is writable by the
+user under which django will be running.
 
 
 ****
@@ -489,8 +489,9 @@ CMS_SHOW_START_DATE & CMS_SHOW_END_DATE
 
 Default: ``False`` for both
 
-This adds 2 new date-time fields in the advanced-settings tab of the page.
-With this option you can limit the time a page is published.
+This adds two new :class:`~django.db.models.DateTimeField` fields in the
+"advanced settings" tab of the page. With this option you can limit the time a
+page is published.
 
 .. setting:: CMS_SEO_FIELDS
 
@@ -520,7 +521,7 @@ To access these fields in the template use:
 CMS_CACHE_DURATIONS
 ===================
 
-This dictionary carries the varios cache duration settings.
+This dictionary carries the various cache duration settings.
 
 ``'content'``
 -------------
@@ -530,7 +531,8 @@ Default: ``60``
 Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
 template tags.
 
-.. note:: This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
+.. note:: This settings was previously called
+          :setting:`CMS_CONTENT_CACHE_DURATION`
 
 ``'menus'``
 -----------
@@ -563,3 +565,7 @@ to share cache objects.
 Example::
 
     CMS_CACHE_PREFIX = 'mysite-live'
+
+.. note::
+    Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
+    :ref:`cache key prefixing <django:cache_key_prefixing>`

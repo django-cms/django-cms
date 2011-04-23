@@ -195,9 +195,9 @@ cms.plugin_base
 
     .. attribute:: model
 
-        Is the CMSPlugin model we created earlier. If you don't need a model
-        because you just want to display some template logic, use ``CMSPlugin``
-        from ``cms.models`` as the model instead.
+        Is the :class:`CMSPlugin` model we created earlier. If you don't need
+        model because you just want to display some template logic, use
+        :class:`CMSPlugin` from :mod:`cms.models` as the model instead.
         
     .. attribute:: module
 
