@@ -32,7 +32,7 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 extensions = ['djangocms', 'sphinx.ext.intersphinx']
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.6', None),
-    'django': ('http://docs.djangoproject.com/en/1.3/', 'http://docs.djangoproject.com/en/1.3/_objects/'),
+    'django': ('http://readthedocs.org/docs/django/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
