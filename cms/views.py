@@ -99,6 +99,9 @@ def details(request, slug):
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
+    from cms.models import PagePermission
+    print PagePermission.objects.for_page(page).filter(can_view=True).exists()
+    print PagePermission.objects.for_page(page.publisher_public).filter(can_view=True).exists()
     context['has_view_permissions'] = page.has_view_permission(request)
     
     if not context['has_view_permissions']:

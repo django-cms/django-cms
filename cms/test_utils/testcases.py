@@ -85,9 +85,8 @@ class CMSTestCase(TestCase):
         super(CMSTestCase, self)._post_teardown()
         
     def login_user(self, user):
-        logged_in = self.client.login(username=user.username, password=user.username)
+        self.assertTrue(self.client.login(username=user.username, password=user.username))
         self.user = user
-        self.assertEqual(logged_in, True)
         
     def login_user_context(self, user):
         return UserLoginContext(self, user)
