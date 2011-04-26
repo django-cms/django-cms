@@ -707,7 +707,7 @@ class Page(MPTTModel):
         # direct
         #is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
         # inherited and direct
-        is_restricted = PagePermission.objects.for_page(self).filter(can_view=True).exists()
+        is_restricted = PagePermission.objects.for_page_upper_tree(page=self).filter(can_view=True).exists()
         
         if request.user.is_authenticated():
             site = current_site(request)

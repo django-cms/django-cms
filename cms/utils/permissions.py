@@ -116,12 +116,16 @@ def has_page_view_permission(request):
     return False
 
 def get_any_page_view_permissions(request, page):
-    
-    return PagePermission.objects.filter(
-            page__pk=page.pk,
-            page__site=current_site(request),
-            can_view=True)
-
+    """
+    Used by the admin template tag is_restricted
+    """
+    #return PagePermission.objects.filter(
+    #        page__pk=page.pk,
+    #        page__site=current_site(request),
+    #        can_view=True)
+    #@TODO: ADD CACHING TO THIS QUERY
+    qs = PagePermission.objects.for_page_upper_tree(page=page).filter(can_view=True)
+    return qs
 
 def get_user_permission_level(user):
     """

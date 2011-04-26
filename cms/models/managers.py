@@ -333,6 +333,29 @@ class PagePermissionManager(BasicPagePermissionManager):
             | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
         ) 
         return self.filter(q).order_by('page__level')
+    
+    def for_page_upper_tree(self, page):
+        """Returns queryset containing all instances somehow connected to given 
+        page and the upper tree. This includes permissions to page itself and permissions inherited
+        from higher pages.
+        
+        NOTE: this returns just PagePermission instances, to get complete access
+        list merge return of this function with Global permissions.
+        """
+        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, \
+            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS 
+        #@todo caching here?
+        upper_tree_ids = page.get_ancestors().values_list('id', flat=True)
+        q = (Q(page__tree_id=page.tree_id) & (Q(page__id__in=upper_tree_ids) | Q(page__id=page.id)) & (
+            Q(page=page) 
+            | (Q(page__level__lt=page.level) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
+            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
+            )
+        )
+        
+        q = self.filter(q)
+        q = q.order_by('page__level')
+        return q
 
 class PagePermissionsPermissionManager(models.Manager):
     """Page permissions permission manager.
