@@ -465,7 +465,7 @@ class PagePermissionsPermissionManager(models.Manager):
         cached = get_permission_cache(user, attr)
         if cached is not None:
             log.debug("hit cache __get_id_list site%s user%s attr%s" %(site,user,attr))
-           return cached
+            return cached
         # check global permissions
         global_permissions = GlobalPagePermission.objects.with_user(user)
         if global_permissions.filter(**{
