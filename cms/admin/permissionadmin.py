@@ -21,6 +21,7 @@ class PagePermissionInlineAdmin(admin.TabularInline):
     form = PagePermissionInlineAdminForm
     classes = ['collapse', 'collapsed']
     exclude = ['can_view']
+    extra = 0 # monster edit page load time boost
     
     def queryset(self, request):
         """
@@ -67,7 +68,6 @@ class PagePermissionInlineAdmin(admin.TabularInline):
         return formset_cls
 
 class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
-    extra = 1
     form = ViewRestrictionInlineAdminForm
     verbose_name = _("View restriction")
     verbose_name_plural = _("View restrictions")
@@ -76,6 +76,7 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         'can_publish', 'can_change_advanced_settings', 'can_move_page',
         'can_moderate', 'can_change_permissions'
     ]
+    extra = 0 # monster edit page load time boost
 
     def get_formset(self, request, obj=None, **kwargs):
         """
