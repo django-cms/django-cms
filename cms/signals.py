@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging as log
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
@@ -11,6 +13,7 @@ from cms.models import (Page, Title, CMSPlugin, PagePermission,
 
 from menus.menu_pool import menu_pool
 
+from cms.cache.admin_menu_item import (clear_admin_menu_item_cache,clear_admin_menu_item_user_page_cache)
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
 
@@ -205,49 +208,81 @@ def update_placeholders(instance, **kwargs):
 
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
+    
+ 
 
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
     signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
+
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
 
+
 def pre_save_user(instance, raw, **kwargs):
+    log.debug("pre_save_user")
     clear_user_permission_cache(instance)
+    if settings.ENABLE_ADMIN_MENU_CACHING:
+        clear_admin_menu_item_user_page_cache(page_id=None, user_id=instance.id)
 
 def pre_delete_user(instance, **kwargs):
+    log.debug("pre_delete_user")
     clear_user_permission_cache(instance)
+    if settings.ENABLE_ADMIN_MENU_CACHING:
+        clear_admin_menu_item_user_page_cache(page_id=None, user_id=instance.id)
 
 def pre_save_group(instance, raw, **kwargs):
     if instance.pk:
+        log.debug("pre_save_group")
         for user in instance.user_set.all():
             clear_user_permission_cache(user)
+            if settings.ENABLE_ADMIN_MENU_CACHING:
+                clear_admin_menu_item_user_page_cache(page_id=None, user_id=user.id)
 
 def pre_delete_group(instance, **kwargs):
+    log.debug("pre_delete_group")
     for user in instance.user_set.all():
         clear_user_permission_cache(user)
+        if settings.ENABLE_ADMIN_MENU_CACHING:
+            clear_admin_menu_item_user_page_cache(page_id=None, user_id=user.id)
 
 def pre_save_pagepermission(instance, raw, **kwargs):
     if instance.user:
+        log.debug("pre_save_pagepermission")
         clear_user_permission_cache(instance.user)
+        if settings.ENABLE_ADMIN_MENU_CACHING:
+            clear_admin_menu_item_user_page_cache(page_id=None, user_id=instance.user.id)
 
 def pre_delete_pagepermission(instance, **kwargs):
     if instance.user:
+        log.debug("pre_delete_pagepermission")
         clear_user_permission_cache(instance.user)
+        if settings.ENABLE_ADMIN_MENU_CACHING:
+            clear_admin_menu_item_user_page_cache(page_id=None, user_id=instance.user.id)
 
 def pre_save_globalpagepermission(instance, raw, **kwargs):
     if instance.user:
+        log.debug("pre_save_globalpagepermission")
         clear_user_permission_cache(instance.user)
+        if settings.ENABLE_ADMIN_MENU_CACHING:
+            clear_admin_menu_item_user_page_cache(page_id=None, user_id=instance.user.id)
     menu_pool.clear(all=True)
 
 def pre_delete_globalpagepermission(instance, **kwargs):
     if instance.user:
+        log.debug("pre_delete_globalpagepermission")
         clear_user_permission_cache(instance.user)
+        if settings.ENABLE_ADMIN_MENU_CACHING:
+            clear_admin_menu_item_user_page_cache(page_id=None, user_id=instance.user.id)
 
 def pre_save_delete_page(instance, **kwargs):
+    log.debug("pre_save_delete_page clear_permission_cache called ")
     clear_permission_cache()
+    if settings.ENABLE_ADMIN_MENU_CACHING:
+        clear_admin_menu_item_user_page_cache(page_id=instance.id, user_id=None)
+
 
 if settings.CMS_PERMISSION:
     signals.pre_save.connect(pre_save_user, sender=User)
@@ -270,3 +305,4 @@ if settings.CMS_PERMISSION:
     
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
+    

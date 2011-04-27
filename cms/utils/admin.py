@@ -9,9 +9,12 @@ from django.contrib.sites.models import Site
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.utils import permissions, moderator, get_language_from_request
-from cms.conf import global_settings as settings
-from cms.cache.admin_menu_item import get_admin_menu_item_cache ,\
-    set_admin_menu_item_cache
+from cms.conf import global_settings as cms_settings
+# load only if the settings for admin caching are turned on
+if cms_settings.ENABLE_ADMIN_MENU_CACHING:
+    from cms.cache.admin_menu_item import get_admin_menu_item_cache 
+    from cms.cache.admin_menu_item import set_admin_menu_item_cache
+
 NOT_FOUND_RESPONSE = "NotFound"
 
 
@@ -21,7 +24,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     we need for single item
     """
     #add caching for the context
-    if settings.ENABLE_ADMIN_MENU_CACHING:
+    if cms_settings.ENABLE_ADMIN_MENU_CACHING:
         cached_context = None
         if not filtered:
             cached_context = get_admin_menu_item_cache(page.id, request.user.id)
@@ -83,7 +86,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'CMS_PERMISSION': settings.CMS_PERMISSION,
         'CMS_MODERATOR': settings.CMS_MODERATOR,
     }
-    if settings.ENABLE_ADMIN_MENU_CACHING:
+    if cms_settings.ENABLE_ADMIN_MENU_CACHING:
         set_admin_menu_item_cache(page.id, request.user.id, cacheable_context)
     context =  cacheable_context
     context['page'] = page

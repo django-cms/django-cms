@@ -122,4 +122,5 @@ CMS_CACHE_PREFIX = 'cms-'
 # they are missing in the permission-merge2 branch
 CMS_PLUGIN_PROCESSORS = tuple()
 CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
-ENABLE_ADMIN_MENU_CACHING = getattr(settings,"CMS_ENABLE_ADMIN_MENU_CACHING",True) 
+# add setting for admin page menu item caching
+ENABLE_ADMIN_MENU_CACHING = getattr(settings,"CMS_ENABLE_ADMIN_MENU_CACHING",False) 
