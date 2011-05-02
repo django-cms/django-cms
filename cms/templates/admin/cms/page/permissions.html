@@ -11,6 +11,7 @@
 			<th>{% trans 'Can publish' %}</th>
 			<th>{% trans 'Can change permissions' %}</th>
 			<th>{% trans 'Can move' %}</th>
+			<th>{% trans 'Can view' %}</th>
 			<th>{% trans 'Grant on' %}</th>
 		</tr></thead>
 		<tbody>
@@ -38,6 +39,7 @@
 					<td class="can_publish">{{ permission.can_publish|boolean_icon }}</td>
 					<td class="can_change_permissions">{{ permission.can_change_permissions|boolean_icon }}</td>
 					<td class="can_move_page">{{ permission.can_move_page|boolean_icon }}</td>
+					<td class="can_view">{{ permission.can_view|boolean_icon }}</td>
 					<td class="grant_on">{% if meta.0 %}{% trans 'All' %}
 						{% else %}{{ permission.get_grant_on_display }}
 					{% endif%}</td>			

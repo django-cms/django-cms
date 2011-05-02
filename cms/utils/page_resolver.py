@@ -36,30 +36,31 @@ def get_page_from_request(request, use_path=None):
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
     
-    # Get a basic queryset for Page objects, depending on if we use the 
-    # MODERATOR or not.
-    page_queryset = get_page_queryset(request)
     site = Site.objects.get_current()
     
     # Check if this is called from an admin request
     if admin_base and request.path.startswith(admin_base):
         # if so, get the page ID to query the page
         page_id = [bit for bit in request.path.split('/') if bit][-1]
-        if not page_id or not page_id.isdigit():
+        if not page_id.isdigit():
             page = None
         else:
             try:
                 page = Page.objects.get(pk=page_id)
             except Page.DoesNotExist:
-                return None
+                page = None
         request._current_page_cache = page
         return page
     
+    # Get a basic queryset for Page objects, depending on if we use the
+    # MODERATOR or not.
+    pages = get_page_queryset(request)
+
     # TODO: Isn't there a permission check needed here?
-    if 'preview' in request.GET:
-        pages = page_queryset.filter(site=site)
-    else:
-        pages = page_queryset.published().filter(site=site)
+    if not 'preview' in request.GET:
+        pages = pages.published()
+
+    pages = pages.filter(site=site)
     
     # If use_path is given, someone already did the path cleaning
     if use_path:
@@ -99,18 +100,6 @@ def get_page_from_request(request, use_path=None):
             q2 = Q(title_set__path='%s/%s' % (home.get_slug(), path))
             q2 &= Q(tree_id=home.tree_id)
             q |= q2
-        
-    if settings.CMS_DBGETTEXT and settings.CMS_DBGETTEXT_SLUGS: # pragma: no cover
-        #=======================================================================
-        # WARNING: CMS_DBGETTEXT WILL BE DEPRECATED IN 2.2!
-        #=======================================================================
-        from django.utils.translation import ugettext
-        from cms.models import Title
-        for t in Title.objects.all():
-            tpath = '/'.join([ugettext(x) for x in t.path.split('/')])
-            if path == tpath:
-                q = Q(title_set__path=t.path)
-                break
     try:
         page = pages.filter(q).distinct().get()
     except Page.DoesNotExist:

@@ -7,5 +7,4 @@ recursive-include cms/templates *
 recursive-include cms/media *
 recursive-include cms/plugins *
 recursive-include menus/templates *
-recursive-include mptt/tests/fixtures *.json
 recursive-include docs *

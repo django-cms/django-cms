@@ -11,7 +11,6 @@ class FilePlugin(CMSPluginBase):
     text_enabled = True
     
     def render(self, context, instance, placeholder):  
-        instance.title = settings.dbgettext(instance.title)
         context.update({
             'object':instance, 
             'placeholder':placeholder

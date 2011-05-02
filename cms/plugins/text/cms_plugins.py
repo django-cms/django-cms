@@ -46,9 +46,6 @@ class TextPlugin(CMSPluginBase):
         return super(TextPlugin, self).get_form(request, obj, **kwargs)
 
     def render(self, context, instance, placeholder):
-        if settings.CMS_DBGETTEXT:
-            from dbgettext.parser import parsed_gettext
-            instance.body = parsed_gettext(instance, 'body')
         context.update({
             'body': plugin_tags_to_user_html(instance.body, context, placeholder), 
             'placeholder': placeholder,

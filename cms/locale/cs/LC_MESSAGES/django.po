@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 13:38+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Country: SWITZERLAND\n"
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -65,8 +65,10 @@ msgid "Page Title"
 msgstr "Název stránky"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Přepsat to, co se zobrazuje v horní části vašeho prohlížeče nebo v záložkách"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr ""
+"Přepsat to, co se zobrazuje v horní části vašeho prohlížeče nebo v záložkách"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -98,7 +100,8 @@ msgstr "Popis stránky, který mohou indexovat vyhledávače."
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Seznam klíčových slov oddělených čárkou, které mohou indexovat vyhledávače."
+msgstr ""
+"Seznam klíčových slov oddělených čárkou, které mohou indexovat vyhledávače."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -114,8 +117,12 @@ msgid "user"
 msgstr "uživatel"
 
 #: admin/forms.py:215
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
-msgstr "Právo na přidání stránky vyžaduje také přístup k \"vnořeným\" stránkám, jinak tyto stránky nebude moci editovat jejich autor."
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr ""
+"Právo na přidání stránky vyžaduje také přístup k \"vnořeným\" stránkám, "
+"jinak tyto stránky nebude moci editovat jejich autor."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -150,8 +157,12 @@ msgid "Notify user"
 msgstr "Informovat uživatele"
 
 #: admin/forms.py:296
-msgid "Send email notification to user about username or password change. Requires user email."
-msgstr "Posílat uživateli informační email o změně uživatelského jména nebo hesla. Vyžaduje uživatelův email."
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
+msgstr ""
+"Posílat uživateli informační email o změně uživatelského jména nebo hesla. "
+"Vyžaduje uživatelův email."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -166,12 +177,15 @@ msgid "Email notification requires valid email address."
 msgstr "Emailová notifikace vyžaduje platnou emailovou adresu."
 
 #: admin/forms.py:339
-msgid "The permission to add new pages requires the permission to change pages!"
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Právo na přidávání nových stránek vyžaduje právo na změnu stránek!"
 
 #: admin/forms.py:341
-msgid "The permission to add new users requires the permission to change users!"
-msgstr "Právo na přidávání nových uživatelů vyžaduje právo na změnu uživatelů!"
+msgid ""
+"The permission to add new users requires the permission to change users!"
+msgstr ""
+"Právo na přidávání nových uživatelů vyžaduje právo na změnu uživatelů!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -187,7 +201,9 @@ msgstr "Základní nastavení"
 
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Upozornění: Při změně výběru se stránka se znovu načte. Provedené změny nejprve uložte."
+msgstr ""
+"Upozornění: Při změně výběru se stránka se znovu načte. Provedené změny "
+"nejprve uložte."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -269,7 +285,8 @@ msgstr ""
 
 #: admin/pageadmin.py:1260
 #, python-format
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -278,7 +295,9 @@ msgstr "Typy obsahu byly přesunuty"
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
@@ -586,7 +605,9 @@ msgid "changed by"
 msgstr "změnil"
 
 #: models/pagemodel.py:64
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -598,7 +619,9 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "Potomci nebudou zobrazeni v navigaci"
 
 #: models/pagemodel.py:68
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -841,7 +864,9 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -933,7 +958,8 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1043,7 +1069,10 @@ msgid "query"
 msgstr ""
 
 #: plugins/twitter/models.py:16
-msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 msgstr ""
 
 #: plugins/video/cms_plugins.py:10
@@ -1067,8 +1096,12 @@ msgid "movie url"
 msgstr "URL videa"
 
 #: plugins/video/models.py:10
-msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
-msgstr "URL adresa na youtube nebo vimeo. Př.: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
+msgstr ""
+"URL adresa na youtube nebo vimeo. Př.: http://www.youtube.com/watch?v"
+"=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1130,7 +1163,9 @@ msgid "button highlight color"
 msgstr ""
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
@@ -1160,7 +1195,8 @@ msgstr "Uložit a pokračovat v editaci"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1270,7 +1306,9 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1551,7 +1589,8 @@ msgstr "Není zvolen žádný typ obsahu. Vyberte z nabídky na levé straně."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr "Není dostupný žádný typ obsahu. Přidejte typ obsahu do placeholderu (TODO)"
+msgstr ""
+"Není dostupný žádný typ obsahu. Přidejte typ obsahu do placeholderu (TODO)"
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"

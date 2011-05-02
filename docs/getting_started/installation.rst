@@ -13,13 +13,15 @@ Requirements
 * `Django`_ 1.2.3 (or a higher release of 1.2).
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
-* `django-classy-tags`_ 0.2.2 or higher
+* `django-classy-tags`_ 0.3.2 or higher
 * `django-mptt`_ 0.4.2 or higher
+* `django-sekizai`_ 0.4.2 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
   
-.. note:: When installing the django CMS using pip, both Django, django-mptt
-          django-classy-tags, south and PIL will be installed automatically.
+.. note:: When installing the django CMS using pip, Django, django-mptt
+          django-classy-tags, django-sekizai, south and PIL will be installed
+          automatically.
 
 .. _Python: http://www.python.org
 .. _Django: http://www.djangoproject.com
@@ -27,15 +29,17 @@ Requirements
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-mptt: https://github.com/django-mptt/django-mptt
+.. _django-sekizai: https://github.com/ojii/django-sekizai
 
 Recommended
 ===========
 
-* `django-filer`_ with its `django CMS plugin`_, file and image management application to use instead of some core plugins
+* `django-filer`_ with its `django CMS plugins`_, file and image management
+  application to use instead of some core plugins
 * `django-reversion`_, to support versions of your content
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
 .. _django-reversion: https://github.com/etianen/django-reversion
 
 On Ubuntu
