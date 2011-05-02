@@ -5,12 +5,40 @@ from cms.api import (create_page, publish_page, approve_page, add_plugin,
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
     ACCESS_PAGE_AND_DESCENDANTS)
-from cms.models.titlemodels import Title
+from cms.models.permissionmodels import PagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
     SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.permissions import has_generic_permission
 from django.contrib.auth.models import User
+
+
+class ViewPermissionTests(SettingsOverrideTestCase):
+    settings_overrides = {
+        'CMS_PERMISSION': True,
+        'CMS_MODERATOR': True,
+    }
+    
+    def test_keep_view_permissions_on_publish(self):
+        user_super = User(username="super", is_staff=True, is_active=True, 
+            is_superuser=True)
+        user_super.set_password("super")
+        user_super.save()
+        page = create_page("Page", "nav_playground.html", "en", created_by=user_super)
+        # there should not be any permissions yet
+        self.assertFalse(PagePermission.objects.for_page(page).filter(can_view=True).exists())
+        normal = User(username='normal', email='normal@django-cms.org', is_active=True)
+        normal.set_password('normal')
+        normal.save()
+        user_normal = create_page_user(user_super, normal)
+        assign_user_to_page(page, user_normal, can_view=True)
+        # normal user has perms
+        self.assertTrue(PagePermission.objects.for_page(page).filter(can_view=True).exists())
+        publish_page(page, user_super)
+        # perms should still be here
+        self.assertTrue(PagePermission.objects.for_page(page).filter(can_view=True).exists())
+        self.assertTrue(PagePermission.objects.for_page(page.publisher_public).filter(can_view=True).exists())
+
 
 class PermissionModeratorTestCase(SettingsOverrideTestCase):
     """Permissions and moderator together
@@ -108,7 +136,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             self.user_normal = create_page_user(self.user_master, normal)
             # it's allowed for the normal user to view the page
             assign_user_to_page(page_b, self.user_normal, can_view=True)
-            
+            self.user_normal = self.reload(self.user_normal)
             # create page_a - sample page from master
             
             page_a = create_page("pageA", "nav_playground.html", "en",
@@ -122,7 +150,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             
             publish_page(self.master_page, self.user_super)
             
-            publish_page(page_b, self.user_super)
+            self.page_b = publish_page(page_b, self.user_super)
             # logg in as master, and request moderation for slave page and descendants
             self.request_moderation(self.slave_page, 7)
     
@@ -488,16 +516,15 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_21_user_normal_can_view(self):
-        self.login_user(self.user_normal)
+        url = self.page_b.get_absolute_url(language='en')
+        with self.login_user_context(self.user_normal):
+            response = self.client.get("/en/pageb/")
+            self.assertEqual(response.status_code, 200)
         response = self.client.get("/en/pageb/")
         self.assertEqual(response.status_code, 200)
-        self.client.logout()
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 200)
-        self.login_user(self.user_non_global)
-        response = self.client.get("/en/pageb/")
-        self.assertEqual(response.status_code, 404)
-        self.client.logout()
+        with self.login_user_context(self.user_non_global):
+            response = self.client.get("/en/pageb/")
+            self.assertEqual(response.status_code, 404)
 
     def test_22_user_globalpermission(self):
         # Global user
@@ -537,6 +564,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         with SettingsOverride(CMS_PUBLIC_FOR=None):
             response = self.client.get("/en/pageb/")
             self.assertEqual(response.status_code, 404)
+            
 
 class PatricksMoveTest(SettingsOverrideTestCase):
     """
