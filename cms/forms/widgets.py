@@ -217,5 +217,4 @@ class PlaceholderPluginEditorWidget(PluginEditor):
         #return mark_safe(render_to_string(
         #    'admin/cms/page/widgets/plugin_editor.html', context))
         return mark_safe(render_to_string(
-            'admin/cms/page/widgets/placeholder_editor.html', context))
             'admin/cms/page/widgets/placeholder_editor.html', context, RequestContext(self.request)))
