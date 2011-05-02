@@ -15,18 +15,18 @@ class LinkPlugin(CMSPluginBase):
     
     def render(self, context, instance, placeholder):
         if instance.mailto:
-            link = u"mailto:%s" % settings.dbgettext(instance.mailto)
+            link = u"mailto:%s" % instance.mailto
         elif instance.url:
-            link = settings.dbgettext(instance.url)
+            link = instance.url
         elif instance.page_link:
             link = instance.page_link.get_absolute_url()
         else:
             link = ""
         context.update({
-            'name':settings.dbgettext(instance.name),
-            'link':link, 
-            'placeholder':placeholder,
-            'object':instance
+            'name': instance.name,
+            'link': link, 
+            'placeholder': placeholder,
+            'object': instance
         })
         return context
     

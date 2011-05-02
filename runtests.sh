@@ -1,67 +1,97 @@
 #!/bin/bash
+find . -name '*.pyc' -delete
+
+cd tests
+
+sigfile=.buildoutsig
 
 args=("$@")
 num_args=${#args[@]}
 index=0
 
-quicktest=false
+reuse_env=true
 disable_coverage=true
+django=12
 
+python="python" # to ensure this script works if no python option is specified
 while [ "$index" -lt "$num_args" ]
 do
-case "${args[$index]}" in
-        "--failfast")
+    case "${args[$index]}" in
+        "-f"|"--failfast")
             failfast="--failfast"
             ;;
+
+        "-r"|"--rebuild-env")
+            reuse_env=false
+            ;;
+
+        "-c"|"--with-coverage")
+            disable_coverage=false
+            ;;
          
-        "--toxenv")
+        "-d"|"--django")
             let "index = $index + 1"
-            toxenv="${args[$index]}"
+            django="${args[$index]}"
             ;;
-            
-        "--quicktest")
-            quicktest=true
+        
+        "-p"|"--python")
+            let "index = $index + 1"
+            python="${args[$index]}"
             ;;
-            
-        "--help")
+
+        "-h"|"--help")
             echo ""
             echo "usage:"
-            echo " runtests.sh"
-            echo " or runtests.sh [testcase]"
-            echo " or runtests.sh [flags] [testcase]"
+            echo "    runtests.sh"
+            echo "    or runtests.sh [testcase]"
+            echo "    or runtests.sh [flags] [testcase]"
             echo ""
             echo "flags:"
-            echo " --toxenv [tox-env]"
-            echo "    eg. runtests.sh --toxenv py26-1.2.X,py26-trunk"
-            echo "    possible envs:"
-            echo "        py25-1.2.X, py25-1.3.X, py25-trunk"
-            echo "        py26-1.2.X, py26-1.3.X, py26-trunk"
-            echo "        py27-1.2.X, py27-1.3.X, ALL"
-            echo ""
-            echo " --quicktest - use already built tox env, for running a simple test quickly"
-            echo " --failfast - abort at first failing test"
-            echo " --with-coverage - enables coverage"
+            echo "    -f, --failfast - abort at first failing test"
+            echo "    -c, --with-coverage - enables coverage"
+            echo "    -r, --rebuild-env - run buildout before the tests"
+            echo "    -d, --django <version> - run tests against a django version, options: 12, 13 or trunk"
+            echo "    -p, --python /path/to/python - python version to use to run the tests"
+            echo "    -h, --help - display this help"
             exit 1
             ;;
-            
-        "--rebuild-env")
-            # just to make ci run instantly
-            ;;
-            
-        "--with-coverage")
-            # just to make ci run instantly
-            ;;
-            
+
         *)
-            suite="${args[$index]}"
+            suite="cms.${args[$index]}"
     esac
-let "index = $index + 1"
+    let "index = $index + 1"
 done
 
+echo "using python at: $python"
 
+sig="py:$python;dj:$django$"
 
-if [ ! "$toxenv" ]; then
-    toxenv='py26-1.2.X'
+oldsig="nosig"
+
+if [ -f $sigfile ]; then
+    oldsig=`cat $sigfile`
+fi
+
+if [ "$oldsig" != "$sig" ]; then
+    reuse_env=false
+fi
+
+echo $sig > $sigfile
+
+if [ $reuse_env == false ]; then
+    echo "setting up test environment (this might take a while)..."
+    $python bootstrap.py
+    if [ $? != 0 ]; then
+        echo "bootstrap.py failed"
+        exit 1
+    fi
+    ./bin/buildout -c "django-$django.cfg"
+    if [ $? != 0 ]; then
+        echo "bin/buildout failed"
+        exit 1
+    fi
+else
+    echo "reusing current buildout environment"
 fi
 
 if [ "$failfast" ]; then
@@ -69,40 +99,23 @@ if [ "$failfast" ]; then
 fi
 
 if [ ! "$suite" ]; then
+    suite="cms"
     echo "Running complete cms testsuite."
 else
-    if [ $quicktest == false ]; then
-        echo "Can only run specific suite with --quicktest"
-        exit 1
-    fi
     echo "Running cms test $suite."
 fi
 
-if [ ! -f "toxinstall/bin/tox" ]; then
-    echo "Installing tox"
-    virtualenv toxinstall
-    toxinstall/bin/pip install -U tox
-fi
+if [ $disable_coverage == false ]; then
+    ./bin/coverage run --rcfile=.coveragerc project/manage.py test $suite $failfast
+    retcode=$?
 
-if [ $quicktest == true ]; then
-    if [ "$toxenv" == "ALL" ]; then
-        echo "Cannot use ALL with --quicktest" 
-        exit 1
-    fi
-    IFS=","
-    tenvs=( $toxenv )
-    for tenv in ${tenvs[@]}; do
-        if [ ! -d ".tox/$tenv" ]; then
-            echo ".tox/$tenv does not exist, run without --quicktest first"
-            exit 1
-        fi
-        read -p "Hit any key to run tests in tox env $tenv"
-        # running tests without invoking tox to save time
-        .tox/$tenv/bin/python cms/test/run_tests.py --direct $failfast $suite 
-        retcode=$?
-    done
+    echo "Post test actions..."
+    ./bin/coverage xml
+    ./bin/coverage html
 else
-    toxinstall/bin/tox -e $toxenv
+    ./bin/django test $suite $failfast
     retcode=$?
 fi
+cd ..
+echo "done"
 exit $retcode

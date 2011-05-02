@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-07 13:38+0000\n"
+"PO-Revision-Date: 2011-02-16 17:11+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0\n"
+"X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Country: SWITZERLAND\n"
 
 #: plugin_base.py:100
 msgid "Advanced options"
@@ -65,7 +65,8 @@ msgid "Page Title"
 msgstr "页面标题"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "覆盖显示在浏览器顶部标题栏或书签中的信息"
 
 #: admin/forms.py:132
@@ -114,7 +115,9 @@ msgid "user"
 msgstr "用户"
 
 #: admin/forms.py:215
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
 msgstr "新增页面的权限同时赋予其子页面，否则新增页面不能被其建立者修改"
 
 #: admin/forms.py:218
@@ -150,7 +153,9 @@ msgid "Notify user"
 msgstr "通知用户"
 
 #: admin/forms.py:296
-msgid "Send email notification to user about username or password change. Requires user email."
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr "发送电子邮件通知用户关于用户名或密码变更的消息。需要用户的邮件地址。"
 
 #: admin/forms.py:316
@@ -166,11 +171,13 @@ msgid "Email notification requires valid email address."
 msgstr "需要有效的电子邮件地址来发送邮件通知。"
 
 #: admin/forms.py:339
-msgid "The permission to add new pages requires the permission to change pages!"
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
 msgstr "添加一个新页面要求有修改页面的权限"
 
 #: admin/forms.py:341
-msgid "The permission to add new users requires the permission to change users!"
+msgid ""
+"The permission to add new users requires the permission to change users!"
 msgstr "添加一个新用户要求有修改用户的权限"
 
 #: admin/forms.py:343
@@ -269,7 +276,8 @@ msgstr "复制%(language)s 插件到 %(placeholder)s"
 
 #: admin/pageadmin.py:1260
 #, python-format
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被修改"
 
 #: admin/pageadmin.py:1318
@@ -278,7 +286,9 @@ msgstr "已移动的插件"
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
 msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被删除"
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
@@ -319,11 +329,11 @@ msgstr "继承最近的上级页面模板"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "选择一个有效站点"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "选择一个有效页面"
 
 #: forms/widgets.py:173
 msgid "Add Another"
@@ -571,11 +581,11 @@ msgstr "需上一级权限批准"
 
 #: models/pagemodel.py:50
 msgid "for logged in users only"
-msgstr ""
+msgstr "登录用户专用"
 
 #: models/pagemodel.py:51
 msgid "for anonymous users only"
-msgstr ""
+msgstr "匿名用户专用"
 
 #: models/pagemodel.py:59
 msgid "created by"
@@ -586,7 +596,9 @@ msgid "changed by"
 msgstr "修正者"
 
 #: models/pagemodel.py:64
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "要使得本页面可用，页面状态必须设置为“已发布”。"
 
 #: models/pagemodel.py:65
@@ -598,12 +610,14 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr "所有的上级页面将不会在导航中显示"
 
 #: models/pagemodel.py:68
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr "一个唯一的标志使用模板标记 page_url 来链接到本页面"
 
 #: models/pagemodel.py:69
 msgid "attached menu"
-msgstr ""
+msgstr "附带的菜单"
 
 #: models/pagemodel.py:70
 msgid "is published"
@@ -627,11 +641,11 @@ msgstr "核对状态"
 
 #: models/pagemodel.py:83
 msgid "menu visibility"
-msgstr ""
+msgstr "菜单可见性"
 
 #: models/pagemodel.py:83
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "该页在菜单可见时限制"
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -728,7 +742,7 @@ msgstr "宽"
 
 #: models/pluginmodel.py:122
 msgid "<Empty>"
-msgstr ""
+msgstr "<空>"
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
@@ -826,7 +840,7 @@ msgstr "地图"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:11
 msgid "Your address: "
-msgstr ""
+msgstr "您的地址："
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:13
 msgid "Calculate route"
@@ -841,7 +855,9 @@ msgid "Language or Page must be filled out"
 msgstr "语言或页面必须被填写"
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
 msgstr "选择一个页面将它所含的插件放置到当前位置，留空将选择当前页面"
 
 #: plugins/inherit/models.py:11
@@ -933,7 +949,8 @@ msgid "HTML"
 msgstr "HTML"
 
 #: plugins/snippet/models.py:15
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "输入用来生成页面的模板(例如 \"snippets/plugin_xy.html\")"
 
 #: plugins/snippet/models.py:25
@@ -1016,7 +1033,7 @@ msgstr "推特"
 
 #: plugins/twitter/cms_plugins.py:31
 msgid "Twitter Search"
-msgstr ""
+msgstr "Twitter搜索"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1040,11 +1057,17 @@ msgstr "如果填写了Twitter账号，这个提示将链接到他的Twitter页�
 
 #: plugins/twitter/models.py:16
 msgid "query"
-msgstr ""
+msgstr "询问"
 
 #: plugins/twitter/models.py:16
-msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 msgstr ""
+"例子：\"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the "
+"user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" "
+"and \"zombies\""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1067,7 +1090,9 @@ msgid "movie url"
 msgstr "电影url"
 
 #: plugins/video/models.py:10
-msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-kpo"
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr "vimeo或youtube视频的url。例如： http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
@@ -1130,7 +1155,9 @@ msgid "button highlight color"
 msgstr "按钮按下颜色"
 
 #: plugins/video/templates/cms/plugins/video.html:3
-msgid "Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer\">here</a>"
+msgid ""
+"Missing flash plugin. Download <a "
+"href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr "flash插件缺失. 请在 <a href=\"http://adobe.com/flashplayer\">这里</a>下载"
 
 #: templates/admin/page_submit_line.html:3
@@ -1160,7 +1187,8 @@ msgstr "保存并继续编辑"
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "页面 <a href=\"%(admin_url)s\">%(page)s</a> 需要你的授权"
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1176,7 +1204,7 @@ msgstr "登录到管理界面 <a href=\"%(login_url)s\">请点这里</a>。"
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "登录链接 %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1268,7 +1296,9 @@ msgstr "页面状态"
 
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr "本页面必须在 %(moderation_level)s 级别进行核对，请发送消息进行核对。"
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1524,7 +1554,7 @@ msgstr "选择复制选项"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "普通的"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 #: templates/cms/toolbar/add_plugins.html:6
@@ -1553,7 +1583,7 @@ msgstr "当前没有插件。请添加插件到这个预留的位置。"
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
-msgstr ""
+msgstr "可用的插件"
 
 #: templates/cms/toolbar/toolbar.html:33
 #, python-format
@@ -1583,7 +1613,7 @@ msgstr "登录"
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
-msgstr ""
+msgstr "通过请求"
 
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
@@ -1677,90 +1707,90 @@ msgstr "取消下级页面核对"
 #: templatetags/cms_tags.py:78
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "该页面在 %(domain)s 中未找到"
 
 #: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
+msgstr "模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s%(path)s"
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
-msgstr ""
+msgstr "英语"
 
 #: test/run_tests.py:138 test/project/settings.py:117
 msgid "French"
-msgstr ""
+msgstr "法语"
 
 #: test/run_tests.py:139 test/project/settings.py:118
 msgid "German"
-msgstr ""
+msgstr "德语"
 
 #: test/run_tests.py:140 test/project/settings.py:119
 msgid "Brazil"
-msgstr ""
+msgstr "巴西语"
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
-msgstr ""
+msgstr "荷兰语"
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "两列"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "三列"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
-msgstr ""
+msgstr "导航案例"
 
 #: test/run_tests.py:167 test/project/settings.py:148
 msgid "sidebar column"
-msgstr ""
+msgstr "边栏列"
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr ""
+msgstr "左列"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr ""
+msgstr "右列"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "文章"
 
 #: test/apps/sampleapp/cms_app.py:7
 msgid "Sample App"
-msgstr ""
+msgstr "示例应用程序"
 
 #: test/apps/sampleapp/menu.py:17
 msgid "sample root page"
-msgstr ""
+msgstr "示例根页面"
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
-msgstr ""
+msgstr "示例设置页"
 
 #: test/apps/sampleapp/menu.py:19
 msgid "sample account page"
-msgstr ""
+msgstr "示例账户页"
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "示例个人简介页"
 
 #: test/apps/sampleapp/menu.py:32
 msgid "Static Menu"
-msgstr ""
+msgstr "静态菜单"
 
 #: test/apps/sampleapp/menu.py:48
 msgid "Static Menu2"
-msgstr ""
+msgstr "静态菜单2"
 
 #: utils/moderator.py:83
 msgid "parent first"
@@ -1787,4 +1817,4 @@ msgstr "CMS - 您的用户帐号已变更。"
 #~ msgstr "前景色"
 
 #~ msgid "Wanted language has not been translated yet."
-#~ msgstr ""
+#~ msgstr "您所要的语言还未被翻译"

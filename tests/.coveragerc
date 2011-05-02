@@ -1,0 +1,10 @@
+[run]
+branch = True
+source =
+    cms
+    menus
+omit =
+    ../*migrations*
+    ../*tests*
+[report]
+precision = 2

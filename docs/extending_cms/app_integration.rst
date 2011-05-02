@@ -301,6 +301,8 @@ A simple modifier looks something like this::
                 node.counter = count
                 count += 1
             return nodes
+    
+    menu_pool.register_modifier(MyMode)
 
 It has a function modify that should return a list of NavigationNodes. Modify
 should take the following arguments:
@@ -363,6 +365,8 @@ Here is an example of a build in modifier that marks all nodes level::
                 else:
                     child.level = node.level + 1
                 self.mark_levels(child, post_cut)
+    
+    menu_pool.register_modifier(Level)
 
 **************
 Custom Plugins

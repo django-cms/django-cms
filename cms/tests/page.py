@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.api import create_page
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
-from cms.test.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
-from cms.test.util.context_managers import LanguageOverride, SettingsOverride
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
+from cms.test_utils.util.context_managers import (LanguageOverride, 
+    SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -82,11 +84,12 @@ class PagesTestCase(CMSTestCase):
         """
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
-        page = self.create_page(title='test page 1', published=False)
+        page = create_page('test page 1', "nav_playground.html", "en")
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 404)
         self.assertTrue(page.publish())
-        with_parent = self.create_page(parent_page=page, title='test page 2', published=True)
+        create_page("test page 2", "nav_playground.html", "en", 
+                                       parent=page, published=True)
         homepage = Page.objects.get_home()
         self.assertTrue(homepage.get_slug(), 'test-page-1')
         response = self.client.get(self.get_pages_root())
@@ -146,12 +149,14 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = self.create_page()
-        page_a_a = self.create_page(page_a)
-        page_a_a_a = self.create_page(page_a_a)
+        page_a = create_page("page_a", "nav_playground.html", "en")
+        page_a_a = create_page("page_a_a", "nav_playground.html", "en",
+                                    parent=page_a)
+        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a)
         
-        page_b = self.create_page()
-        page_b_a = self.create_page(page_b)
+        page_b = create_page("page_b", "nav_playground.html", "en")
+        page_b_a = create_page("page_b", "nav_playground.html", "en", 
+                                    parent=page_b)
         
         count = Page.objects.drafts().count()
         
@@ -211,7 +216,8 @@ class PagesTestCase(CMSTestCase):
         
     def test_11_add_placeholder(self):
         # create page
-        page = self.create_page(None, None, "last-child", "Add Placeholder", 1, True, True)
+        page = create_page("Add Placeholder", "nav_playground.html", "en",
+                           position="last-child", published=True, in_navigation=True)
         page.template = 'add_placeholder.html'
         page.save()
         url = page.get_absolute_url()
@@ -238,10 +244,8 @@ class PagesTestCase(CMSTestCase):
         """
         Test that CMSSitemap object contains only published,public (login_required=False) pages
         """
-        self.create_page(parent_page=None, published=True, in_navigation=True)
-        page1 = Page.objects.all()[0]
-        page1.login_required = True
-        page1.save()
+        create_page("page", "nav_playground.html", "en", login_required=True,
+                    published=True, in_navigation=True)
         self.assertEqual(CMSSitemap().items().count(),0)
 
     def test_13_edit_page_other_site_and_language(self):
@@ -268,25 +272,14 @@ class PagesTestCase(CMSTestCase):
             home_slug = "home"
             child_slug = "child"
             grandchild_slug = "grandchild"
-            home = self.create_page(
-                title=home_slug,
-                published=True,
-                in_navigation=True
-            )
+            home = create_page(home_slug, "nav_playground.html", "en",
+                               published=True, in_navigation=True)
             home.publish()
-            child = self.create_page(
-                parent_page=home,
-                title=child_slug,
-                published=True, 
-                in_navigation=True
-            )
+            child = create_page(child_slug, "nav_playground.html", "en",
+                                parent=home, published=True, in_navigation=True)
             child.publish()
-            grandchild = self.create_page(
-                parent_page=child,
-                title=grandchild_slug,
-                published=True, 
-                in_navigation=True
-            )
+            grandchild = create_page(grandchild_slug, "nav_playground.html", "en",
+                                     parent=child, published=True, in_navigation=True)
             grandchild.publish()
             response = self.client.get(home.get_absolute_url())
             self.assertEqual(response.status_code, 200)
@@ -300,8 +293,8 @@ class PagesTestCase(CMSTestCase):
         """
         Test the inheritance magic for templates
         """
-        parent = self.create_page()
-        child = self.create_page(parent)
+        parent = create_page("parent", "nav_playground.html", "en")
+        child = create_page("child", "nav_playground.html", "en", parent=parent)
         child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         child.save()
         self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
@@ -317,7 +310,7 @@ class PagesTestCase(CMSTestCase):
         Check that plugins and placeholders get correctly deleted when we delete
         a page!
         """
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         page.rescan_placeholders() # create placeholders
         placeholder = page.placeholders.all()[0]
         plugin_base = CMSPlugin(
@@ -347,7 +340,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page, None)
         
     def test_18_get_page_from_request_on_cms_admin(self):
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
             reverse('admin:cms_page_change', args=(page.pk,))
         )
@@ -377,14 +370,14 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page, None)
     
     def test_22_get_page_from_request_with_page_404(self):
-        page = self.create_page(published=True)
+        page = create_page("page", "nav_playground.html", "en", published=True)
         page.publish()
         request = self.get_request('/does-not-exist/')
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
     
     def test_23_get_page_from_request_with_page_preview(self):
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         request = self.get_request('%s?preview' % page.get_absolute_url())
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
@@ -397,7 +390,7 @@ class PagesTestCase(CMSTestCase):
 
 
 class NoAdminPageTests(CMSTestCase):
-    urls = 'cms.test.project.noadmin_urls'
+    urls = 'project.noadmin_urls'
     
     def setUp(self):
         admin = 'django.contrib.admin'

@@ -5,7 +5,8 @@ Extending the CMS: Examples
 From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
 django CMS. If a poll app is mentioned here, we mean the one you get when
-finishing the `Django Tutorial`_.
+finishing the `Django Tutorial`_. 
+Also, make sure the poll app is in your INSTALLED_APPS.
 
 We assume your main ``urls.py`` looks somewhat like this::
 
@@ -102,11 +103,11 @@ The template could look like this:
 
 .. code-block:: html+django
 
-    <h1>{{ poll.question }}</h1>
+    <h1>{{ instance.poll.question }}</h1>
     
     <form action="{% url polls.views.vote poll.id %}" method="post">
     {% csrf_token %}
-    {% for choice in poll.choice_set.all %}
+    {% for choice in instance.poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
         <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
     {% endfor %}

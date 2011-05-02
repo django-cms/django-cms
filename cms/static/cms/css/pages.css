@@ -202,6 +202,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-moderator,
 #sitemap li .col-lastchange,
 #sitemap li .col-draft,
+#sitemap li .col-view-perms,
 #sitemap li .col-creator{
 	border-left:1px solid #DEDEDC;
 	text-align:center;
@@ -247,6 +248,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-draft{width:119px; text-align: right;}
 #sitemap li .col-lastchange { width:96px; text-align: left;}
 */
+#sitemap li .col-view-perms { width: 55px; text-align: center;}
 
 #sitemap li .col-draft {text-align: right;}
 #sitemap li .col-lastchange, 
@@ -328,6 +330,7 @@ div#sitemap ul.header li{
 #sitemap ul.header li .col-moderator,
 #sitemap ul.header li .col-lastchange,
 #sitemap ul.header li .col-draft,
+#sitemap ul.header li .col-view-perms,
 #sitemap ul.header li .col-creator{
 	height:auto;
 	border:none;

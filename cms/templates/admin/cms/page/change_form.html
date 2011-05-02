@@ -4,6 +4,7 @@
 
 {% block extrahead %}
 {{ block.super }}
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
 
 {% if not add %}
@@ -104,7 +105,7 @@
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% csrf_token %}{% block form_top %}{% endblock %}
 {{ adminForm.fields.parent }}
 
-<input type="hidden" name="language" value="{{language}}" id="id_language"/>
+<div style="display: none;"><input type="hidden" name="language" value="{{language}}" id="id_language"/></div>
 
 {% if show_language_tabs %}
 <div id="page_form_lang_tabs">

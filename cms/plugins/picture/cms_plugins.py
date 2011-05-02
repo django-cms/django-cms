@@ -12,16 +12,15 @@ class PicturePlugin(CMSPluginBase):
     
     def render(self, context, instance, placeholder):
         if instance.url:
-            link = settings.dbgettext(instance.url)
+            link = instance.url
         elif instance.page_link:
             link = instance.page_link.get_absolute_url()
         else:
             link = ""
-        instance.alt = settings.dbgettext(instance.alt)
         context.update({
-            'picture':instance,
-            'link':link, 
-            'placeholder':placeholder
+            'picture': instance,
+            'link': link, 
+            'placeholder': placeholder
         })
         return context 
     

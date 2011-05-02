@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import urlutils
 
 
