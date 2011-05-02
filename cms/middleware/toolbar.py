@@ -78,7 +78,6 @@ class ToolbarMiddleware(object):
         """
         For backwards compatibility, will be removed in 2.3
         """
-        
         if not getattr(request, 'toolbar', False):
             return response
         if getattr(request, '_cms_toolbar_tag_used', False):

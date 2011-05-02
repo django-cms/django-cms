@@ -99,9 +99,10 @@ CMS_FRONTEND_LANGUAGES = [x[0] for x in CMS_LANGUAGES]
 
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
+STATIC_ROOT = getattr(settings, 'STATIC_ROOT', 'cms/')
 CMS_MEDIA_PATH = 'cms/'
-CMS_MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT, CMS_MEDIA_PATH)
-CMS_MEDIA_URL = os.path.join(settings.MEDIA_URL, CMS_MEDIA_PATH)
+CMS_MEDIA_ROOT = os.path.join(STATIC_ROOT, CMS_MEDIA_PATH)
+STATIC_URL = 'static/'
 
 # Path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
 CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
@@ -119,6 +120,7 @@ PLACEHOLDER_FRONTEND_EDITING = True
 # Cache prefix so one can deploy several sites on one cache server
 CMS_CACHE_PREFIX = 'cms-'
 
+MENU_CACHE_DURATION = 60 * 60
 # they are missing in the permission-merge2 branch
 CMS_PLUGIN_PROCESSORS = tuple()
 CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
