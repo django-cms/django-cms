@@ -41,12 +41,12 @@ def get_page_from_request(request, use_path=None):
     # Check if this is called from an admin request
     if admin_base and request.path.startswith(admin_base):
         # if so, get the page ID to query the page
-        page_id = [bit for bit in request.path.split('/') if bit][-1]
-        if not page_id.isdigit():
+        page_ids = [bit for bit in request.path.split('/') if bit.isdigit()]
+        if not page_ids:
             page = None
         else:
             try:
-                page = Page.objects.get(pk=page_id)
+                page = Page.objects.get(pk=page_ids[0])
             except Page.DoesNotExist:
                 page = None
         request._current_page_cache = page
