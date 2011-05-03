@@ -6,7 +6,7 @@ From this part onwards, this tutorial assumes you have done the
 `Django Tutorial`_ and we will show you how to integrate that poll app into the
 django CMS. If a poll app is mentioned here, we mean the one you get when
 finishing the `Django Tutorial`_. 
-Also, make sure the poll app is in your INSTALLED_APPS.
+Also, make sure the poll app is in your :setting:`django:INSTALLED_APPS`.
 
 We assume your main ``urls.py`` looks somewhat like this::
 
@@ -44,10 +44,11 @@ In your poll application's ``models.py`` add the following model::
           return self.poll.question
 
 
-.. note:: django CMS Plugins must inherit from ``cms.models.CMSPlugin`` (or a
-          subclass thereof) and not ``django.db.models.Model``.
+.. note:: django CMS plugins must inherit from :class:`cms.models.CMSPlugin`
+          (or a subclass thereof) and not
+          :class:`models.Model <django.db.models.Model>`.
 
-Run ``syncdb`` to create the database tables for this model or see
+Run ``manage.py syncdb`` to create the database tables for this model or see
 :doc:`../getting_started/using_south` to see how to do it using `South`_
 
 
@@ -87,16 +88,18 @@ For our poll plugin, write following plugin class::
     
     plugin_pool.register_plugin(PollPlugin) # register the plugin
 
-.. note:: All plugin classes must inherit from ``cms.plugin_base.CMSPluginBase``
-          and must register themselves with the ``cms.plugin_pool.plugin_pool``.
+.. note:: All plugin classes must inherit from
+          :class:`cms.plugin_base.CMSPluginBase` and must register themselves
+          with the :data:`cms.plugin_pool.plugin_pool`.
 
 
 The Template
 ============
 
-You probably noticed the ``render_template`` attribute on that plugin class, for
-our plugin to work, that template must exist and is responsible for rendering
-the plugin.
+You probably noticed the
+:attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>`
+attribute on that plugin class, for our plugin to work, that template must
+exist and is responsible for rendering the plugin.
 
 
 The template could look like this:
@@ -122,11 +125,12 @@ The template could look like this:
 My First App (apphook)
 **********************
 
-Right now, external apps are statically hooked into the main ``urls.py``, that is not
-the preferred way in the django CMS. Ideally you attach your apps to CMS Pages.
+Right now, external apps are statically hooked into the main ``urls.py``, that
+is not the preferred way in the django CMS. Ideally you attach your apps to CMS
+pages.
 
-For that purpose you write CMS Apps. That is just a small class telling the CMS
-how to include that app.
+For that purpose you write a :class:`CMSApp <cms.app_base.CMSApp>`. That is
+just a small class telling the CMS how to include that app.
 
 CMS Apps live in a file called ``cms_app.py``, so go ahead and create that to
 make your polls app look like this::
