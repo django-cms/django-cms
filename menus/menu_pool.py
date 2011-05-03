@@ -8,14 +8,6 @@ from menus.exceptions import NamespaceAllreadyRegistered
 from menus.models import CacheKey
 import copy
 
-def lex_cache_key(key):
-    """
-    Returns the language and site ID a cache key is related to.
-    """
-    if key.endswith("_user"):
-        return key.split('_user')[0].rsplit('_', 3)[1:]
-    return key.rsplit('_', 2)[1:] + [None]
-
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
     This is an easier to test "inner loop" building the menu tree structure
