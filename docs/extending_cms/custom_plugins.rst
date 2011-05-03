@@ -27,12 +27,13 @@ Suppose you have the following gallery model::
 And that you want to display this gallery between two text blocks.
 
 You can do this with a CMS plugin. To create a CMS plugin you need two
-components: a ``CMSPlugin`` subclass model and a ``cms_plugins.py`` file.
+components: a :class:`CMSPlugin` subclass model and a ``cms_plugins.py`` file.
 
 Plugin Model
 ============
 
-First create a model that links to the gallery via a ForeignKey field::
+First create a model that links to the gallery via a
+:class:`~django.db.models.ForeignKey` field::
 
     from cms.models import CMSPlugin
 
@@ -45,10 +46,10 @@ fields that get displayed if you edit the plugin.
 
 .. warning::
 
-    ``CMSPlugin`` subclasses cannot be further subclassed, if you want to make
+    :class:`CMSPlugin` subclasses cannot be further subclassed, if you want to make
     a reusable plugin model, make an abstract base model which does not extend
-    ``CMSPlugin`` and subclass this abstract model as well as ``CMSPlugin`` in
-    your real plugin model.
+    :class:`CMSPlugin` and subclass this abstract model as well as
+    :class:`CMSPlugin` in your real plugin model.
     Further note that you cannot name your model fields the same as any plugin's
     lowercased model name you use is called, due to the implicit one to one
     relation Django uses for subclassed models. This includes but is not limited
@@ -92,7 +93,7 @@ responsible for copying those if necessary whenever the CMS copies the plugin.
 
 To do this you can implement a method called
 :meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` on your plugin
-model which get's the **old** instance of the plugin as argument.
+model which gets the **old** instance of the plugin as argument.
 
 Lets assume this is your plugin::
 
@@ -151,19 +152,19 @@ In there write the following::
 
 
 :class:`cms.plugin_base.CMSPluginBase` itself inherits from
-:class:`django.contrib.admin.options.ModelAdmin` so you can use all the things
+:class:`django.contrib.admin.ModelAdmin` so you can use all the things
 (inlines for example) you would use in a regular admin class. For more 
 information see the `Django admin documentation`_.
 
 
-For a list of all the options you have on CMSPluginBase have a look at the
-plugin reference
+For a list of all the options you have on :class:`CMSPluginBase` have a look at
+the plugin reference
 
 
 Template
 ========
 
-Now create a gallery.html template in ``templates/gallery/`` and write the
+Now create a ``gallery.html`` template in ``templates/gallery/`` and write the
 following in there:
 
 .. code-block:: html+django
@@ -194,7 +195,7 @@ Limiting Plugins per Placeholder
 ================================
 
 You can limit in which placeholder certain plugins can appear. Add a
-``CMS_PLACEHOLDER_CONF`` to your ``settings.py``.
+:setting:`CMS_PLACEHOLDER_CONF` to your ``settings.py``.
 
 Example::
 
@@ -230,15 +231,18 @@ by type) for each placeholder with the **limits** parameter (see
 Advanced
 ========
 
-CMSGalleryPlugin can be even further customized:
+:class:`CMSGalleryPlugin` can be even further customized:
 
-Because CMSPluginBase extends ModelAdmin from django.contrib.admin you can use
+Because :class:`CMSPluginBase <cms.plugin_base.CMSPluginBase>` extends
+:class:`ModelAdmin <django.contrib.admin.ModelAdmin>` you can use
 all the things you are used to with normal admin classes. You can define
 inlines, the form, the form template etc.
 
-Note: If you want to overwrite the form be sure to extend from
-``admin/cms/page/plugin_change_form.html`` to have an unified look across the
-plugins and to have the preview functionality automatically installed.
+.. note::
+
+    If you want to overwrite the form be sure to extend from
+    ``admin/cms/page/plugin_change_form.html`` to have an unified look across the
+    plugins and to have the preview functionality automatically installed.
 
 .. _custom-plugins-handling-media:
 
@@ -306,7 +310,8 @@ Plugin Context Processors
 *************************
 
 Plugin context processors are callables that modify all plugin's context before
-rendering. They are enabled using the ``CMS_PLUGIN_CONTEXT_PROCESSORS`` setting.
+rendering. They are enabled using the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS`
+setting.
 
 A plugin context processor takes 2 arguments:
 
@@ -341,8 +346,7 @@ Plugin Processors
 *****************
 
 Plugin processors are callables that modify all plugin's output after rendering.
-They are enabled using
-the ``CMS_PLUGIN_PROCESSORS`` setting.
+They are enabled using the :setting:`CMS_PLUGIN_PROCESSORS` setting.
 
 A plugin processor takes 4 arguments:
 

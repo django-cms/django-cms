@@ -47,13 +47,13 @@ Functions and constants
     language.
     
     :param string title: Title of the page
-    :param string template: Template to use for this page. Must be in ``CMS_TEMPLATES``
-    :param string language: Language code for this page. Must be in ``LANGUAGES``
+    :param string template: Template to use for this page. Must be in :setting:`CMS_TEMPLATES`
+    :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
     :param string menu_title: Menu title for this page
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
     :type apphook: string or :class:`cms.app_base.CMSApp` subclass
-    :param string redirect: URL redirect (only applicable if ``CMS_REDIRECTS`` is ``True``)
+    :param string redirect: URL redirect (only applicable if :setting:`CMS_REDIRECTS` is ``True``)
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
     :param created_by: User that creates this page
@@ -80,7 +80,7 @@ Functions and constants
     
     Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
 
-    :param string language: Language code for this page. Must be in ``LANGUAGES``
+    :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
     :param string title: Title of the page
     :param page: The page for which to create this title
     :type page: :class:`cms.models.pagemodel.Page` instance
@@ -88,7 +88,7 @@ Functions and constants
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
     :type apphook: string or :class:`cms.app_base.CMSApp` subclass
-    :param string redirect: URL redirect (only applicable if ``CMS_REDIRECTS`` is ``True``)
+    :param string redirect: URL redirect (only applicable if :setting:`CMS_REDIRECTS` is ``True``)
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
     :param parent: Used for automated slug generation
@@ -104,7 +104,7 @@ Functions and constants
     :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
     :param plugin_type: What type of plugin to add
     :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` subclass, must be a valid plugin
-    :param string language: Language code for this plugin, must be in ``LANGUAGES``
+    :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
     :param kwargs data: Data for the plugin type instance
 
@@ -195,13 +195,13 @@ cms.plugin_base
 
     .. attribute:: model
 
-        Is the CMSPlugin model we created earlier. If you don't need a model
-        because you just want to display some template logic, use CMSPlugin from
-        ``cms.models`` as the model instead.
+        Is the :class:`CMSPlugin` model we created earlier. If you don't need
+        model because you just want to display some template logic, use
+        :class:`CMSPlugin` from :mod:`cms.models` as the model instead.
         
     .. attribute:: module
 
-        Will be group the plugin in the plugin editor. If module is None,
+        Will be group the plugin in the plugin editor. If module is ``None``,
         plugin is grouped "Generic" group.
     
     .. attribute:: name
