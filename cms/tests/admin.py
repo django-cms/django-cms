@@ -32,27 +32,27 @@ class AdminTestCase(CMSTestCase):
         admin = self.get_superuser()
         if admin_only:
             return admin
-        self.login_user(admin)
-        USERNAME = 'test'
-        
-        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
-        normal_guy.is_staff = True
-        normal_guy.is_active = True
-        normal_guy.save()
-        normal_guy.user_permissions = Permission.objects.filter(
-            codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
-        )
-        gpp = GlobalPagePermission.objects.create(
-            user=normal_guy,
-            can_change=True,
-            can_delete=True,
-            can_change_advanced_settings=False,
-            can_publish=True,
-            can_change_permissions=False,
-            can_move_page=True,
-            can_moderate=True,
-        )
-        gpp.sites = Site.objects.all()
+        with self.login_user_context(admin):
+            USERNAME = 'test'
+            
+            normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
+            normal_guy.is_staff = True
+            normal_guy.is_active = True
+            normal_guy.save()
+            normal_guy.user_permissions = Permission.objects.filter(
+                codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
+            )
+            gpp = GlobalPagePermission.objects.create(
+                user=normal_guy,
+                can_change=True,
+                can_delete=True,
+                can_change_advanced_settings=False,
+                can_publish=True,
+                can_change_permissions=False,
+                can_move_page=True,
+                can_moderate=True,
+            )
+            gpp.sites = Site.objects.all()
         return admin, normal_guy
     
     def test_01_edit_does_not_reset_page_adv_fields(self):
@@ -99,46 +99,46 @@ class AdminTestCase(CMSTestCase):
         page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         
-        self.login_user(normal_guy)
-        resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
-                                follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateNotUsed(resp, 'admin/login.html')
-        page = Page.objects.get(pk=page.pk)
+        with self.login_user_context(normal_guy):
+            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
+                                    follow=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertTemplateNotUsed(resp, 'admin/login.html')
+            page = Page.objects.get(pk=page.pk)
+            
+            self.assertEqual(page.get_title(), NEW_PAGE_NAME)
+            self.assertEqual(page.reverse_id, REVERSE_ID)
+            title = page.get_title_obj()
+            self.assertEqual(title.overwrite_url, OVERRIDE_URL)
+            
+            # The admin edits the page (change the page name for ex.)
+            page_data = {
+                'title': OLD_PAGE_NAME, 
+                'slug': page.get_slug(), 
+                'language': title.language,
+                'site': page.site.pk, 
+                'template': page.template,
+                'reverse_id': page.reverse_id,
+            }
+            # required only if user haves can_change_permission
+            page_data['pagepermission_set-TOTAL_FORMS'] = 0
+            page_data['pagepermission_set-INITIAL_FORMS'] = 0
+            page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+            page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+            page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+            page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         
-        self.assertEqual(page.get_title(), NEW_PAGE_NAME)
-        self.assertEqual(page.reverse_id, REVERSE_ID)
-        title = page.get_title_obj()
-        self.assertEqual(title.overwrite_url, OVERRIDE_URL)
-        
-        # The admin edits the page (change the page name for ex.)
-        page_data = {
-            'title': OLD_PAGE_NAME, 
-            'slug': page.get_slug(), 
-            'language': title.language,
-            'site': page.site.pk, 
-            'template': page.template,
-            'reverse_id': page.reverse_id,
-        }
-        # required only if user haves can_change_permission
-        page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
-        
-        self.login_user(admin)
-        resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
-                                follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateNotUsed(resp, 'admin/login.html')
-        page = Page.objects.get(pk=page.pk)
-        
-        self.assertEqual(page.get_title(), OLD_PAGE_NAME)
-        self.assertEqual(page.reverse_id, REVERSE_ID)
-        title = page.get_title_obj()
-        self.assertEqual(title.overwrite_url, None)
+        with self.login_user_context(admin):
+            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data, 
+                                    follow=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertTemplateNotUsed(resp, 'admin/login.html')
+            page = Page.objects.get(pk=page.pk)
+            
+            self.assertEqual(page.get_title(), OLD_PAGE_NAME)
+            self.assertEqual(page.reverse_id, REVERSE_ID)
+            title = page.get_title_obj()
+            self.assertEqual(title.overwrite_url, None)
 
     def test_02_delete(self):
         admin = self._get_guys(True)
@@ -146,12 +146,12 @@ class AdminTestCase(CMSTestCase):
                            created_by=admin, published=True)
         child = create_page('child-page', "nav_playground.html", "en",
                             created_by=admin, published=True, parent=page)
-        self.login_user(admin)
-        data = {'post': 'yes'}
-        response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        self.assertRaises(Page.DoesNotExist, self.reload, page)
-        self.assertRaises(Page.DoesNotExist, self.reload, child)
+        with self.login_user_context(admin):
+            data = {'post': 'yes'}
+            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            self.assertRaises(Page.DoesNotExist, self.reload, page)
+            self.assertRaises(Page.DoesNotExist, self.reload, child)
         
     def test_03_admin_dialog_form_no_moderation_or_permissions(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
@@ -192,11 +192,11 @@ class AdminTestCase(CMSTestCase):
         page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin, published=True)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
-        self.login_user(admin)
-        response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
-        self.assertEqual(response.status_code, 200)
-        response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
-        self.assertRedirects(response, URL_CMS_PAGE)
+        with self.login_user_context(admin):
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            self.assertRedirects(response, URL_CMS_PAGE)
     
     def test_08_change_template(self):
         request = self.get_request('/admin/cms/page/1/', 'en')

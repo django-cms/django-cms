@@ -42,11 +42,11 @@ class FormsTestCase(CMSTestCase):
                 is_superuser=True)
             user_super.set_password("super")
             user_super.save()
-            self.login_user(user_super)
-            create_page("home", "nav_playground.html", "en", created_by=user_super)
-            # The proper test
-            result = get_site_choices()
-            self.assertEquals(result, [(1,'example.com')])
+            with self.login_user_context(user_super):
+                create_page("home", "nav_playground.html", "en", created_by=user_super)
+                # The proper test
+                result = get_site_choices()
+                self.assertEquals(result, [(1,'example.com')])
             
     def test_05_compress_function_raises_when_page_is_none(self):
         raised = False
@@ -77,13 +77,13 @@ class FormsTestCase(CMSTestCase):
                           is_superuser=True)
         user_super.set_password("super")
         user_super.save()
-        self.login_user(user_super)
-        home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
-        # The actual test
-        fake_field = Mock_PageSelectFormField()
-        data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
-        result = fake_field.compress(data_list)
-        self.assertEquals(home_page,result)
+        with self.login_user_context(user_super):
+            home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
+            # The actual test
+            fake_field = Mock_PageSelectFormField()
+            data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
+            result = fake_field.compress(data_list)
+            self.assertEquals(home_page,result)
         
     def test_08_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()

@@ -17,9 +17,8 @@ class NonRootCase(CMSTestCase):
             u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
             u.set_password("test")
             u.save()
-            self.login_user(u)
-    
-            self.create_some_pages()
+            with self.login_user_context(u):
+                self.create_some_pages()
         
     # def tearDown(self):
     #     menu_pool.menus = self.old_menu

@@ -713,7 +713,7 @@ class Page(MPTTModel):
         if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
             return True
         
-        if not self.publisher_is_draft:
+        if not self.publisher_is_draft and self.publisher_public:
             return self.publisher_public.has_view_permission(request)
         # does any restriction exist?
         # direct

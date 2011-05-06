@@ -23,7 +23,11 @@ class SiteTestCase(CMSTestCase):
             self.site2 = Site.objects.create(domain="sample2.com", name="sample2.com")
             self.site3 = Site.objects.create(domain="sample3.com", name="sample3.com")
             
-            self.login_user(u)
+        self._login_context = self.login_user_context(u)
+        self._login_context.__enter__()
+    
+    def tearDown(self):
+        self._login_context.__exit__(None, None, None)
     
     
     def test_01_site_framework(self):

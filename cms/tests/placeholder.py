@@ -27,7 +27,11 @@ class PlaceholderTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         
-        self.login_user(u)
+        self._login_context = self.login_user_context(u)
+        self._login_context.__enter__()
+    
+    def tearDown(self):
+        self._login_context.__exit__(None, None, None)
         
     def test_01_placeholder_scanning_extend(self):
         placeholders = get_placeholders('placeholder_tests/test_one.html')

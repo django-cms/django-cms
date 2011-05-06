@@ -17,39 +17,39 @@ class ReversionTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         
-        self.login_user(u)
-        # add a new text plugin
-        self.page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        page = Page.objects.all()[0]
-        placeholderpk = page.placeholders.get(slot="body").pk
-        plugin_data = {
-            'plugin_type':"TextPlugin",
-            'page_id':page.pk,
-            'language':settings.LANGUAGES[0][0],
-            'placeholder':placeholderpk,
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
-        # now edit the plugin
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-        response = self.client.get(edit_url)
-        self.assertEquals(response.status_code, 200)
-        response = self.client.post(edit_url, {"body":"Hello World"})
-        self.assertEquals(response.status_code, 200)
-        txt = Text.objects.all()[0]
-        self.assertEquals("Hello World", txt.body)
-        # change the content
-        response = self.client.post(edit_url, {"body":"Bye Bye World"})
-        self.assertEquals(response.status_code, 200)
-        txt = Text.objects.all()[0]
-        self.assertEquals("Bye Bye World", txt.body)
-        p_data = self.page_data.copy()
-        p_data['published'] = True
-        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        with self.login_user_context(u):
+            # add a new text plugin
+            self.page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page = Page.objects.all()[0]
+            placeholderpk = page.placeholders.get(slot="body").pk
+            plugin_data = {
+                'plugin_type':"TextPlugin",
+                'page_id':page.pk,
+                'language':settings.LANGUAGES[0][0],
+                'placeholder':placeholderpk,
+            }
+            response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+            self.assertEquals(response.status_code, 200)
+            self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+            # now edit the plugin
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+            response = self.client.get(edit_url)
+            self.assertEquals(response.status_code, 200)
+            response = self.client.post(edit_url, {"body":"Hello World"})
+            self.assertEquals(response.status_code, 200)
+            txt = Text.objects.all()[0]
+            self.assertEquals("Hello World", txt.body)
+            # change the content
+            response = self.client.post(edit_url, {"body":"Bye Bye World"})
+            self.assertEquals(response.status_code, 200)
+            txt = Text.objects.all()[0]
+            self.assertEquals("Bye Bye World", txt.body)
+            p_data = self.page_data.copy()
+            p_data['published'] = True
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_01_revert(self):
         """
