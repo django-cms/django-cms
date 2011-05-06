@@ -523,6 +523,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
+        # non logged in user
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -552,15 +553,18 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
-    def test_23_anonymous_user(self):
+    def test_23_anonymous_user_public_for_all(self):
+        url = self.page_b.get_absolute_url('en')
         with SettingsOverride(CMS_PUBLIC_FOR='all'):
-            response = self.client.get("/en/pageb/")
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
+    def test_24_anonymous_user_public_for_none(self):
         # default of when to show pages to anonymous user doesn't take
         # global permissions into account
+        url = self.page_b.get_absolute_url('en')
         with SettingsOverride(CMS_PUBLIC_FOR=None):
-            response = self.client.get("/en/pageb/")
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
             
 
