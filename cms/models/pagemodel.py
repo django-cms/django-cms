@@ -712,6 +712,9 @@ class Page(MPTTModel):
         # staff is allowed to see everything
         if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
             return True
+        
+#        if not self.publisher_is_draft:
+#            return self.publisher_public.has_view_permission(request)
         # does any restriction exist?
         # direct
         #is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()

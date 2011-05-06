@@ -518,12 +518,12 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
     def test_21_user_normal_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
         with self.login_user_context(self.user_normal):
-            response = self.client.get("/en/pageb/")
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
-        response = self.client.get("/en/pageb/")
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         with self.login_user_context(self.user_non_global):
-            response = self.client.get("/en/pageb/")
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
     def test_22_user_globalpermission(self):
