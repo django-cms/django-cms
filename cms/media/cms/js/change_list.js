@@ -92,7 +92,8 @@
 		tree.init($("div.tree"), options);
 	};
 	
-	$(document).ready(function() {	
+	$(document).ready(function() {
+		$.fn.cmsPatchCSRF();
 	    var selected_page = false;
 	    var action = false;
 		
@@ -286,7 +287,7 @@
 	                $('.move-target-container').hide();
 	            }else if(action=="add") {
 	                site = $('#site-select')[0].value;
-	                window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&position="+position+"&site="+site;
+	                window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&amp;position="+position+"&amp;site="+site;
 	            }
 				e.stopPropagation();
 	            return false;

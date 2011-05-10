@@ -1,34 +1,43 @@
-from django.conf import settings 
-from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, RegexURLPattern
-from django.conf.urls.defaults import *
-from django.utils.importlib import import_module
-from django.core.exceptions import ImproperlyConfigured
-from django.contrib.sites.models import Site
-from cms.exceptions import NoHomeFound
-import re
+# -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
+from cms.exceptions import NoHomeFound
+from cms.utils.moderator import get_page_queryset
+
+from django.conf import settings
+from django.conf.urls.defaults import patterns
+from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, \
+    RegexURLPattern
+from django.utils.importlib import import_module
 
 APP_RESOLVERS = []
+
+def clear_app_resolvers():
+    global APP_RESOLVERS
+    APP_RESOLVERS = []
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application. 
     Applications have higher priority than other cms pages. 
     """
-    from cms.utils.moderator import get_page_queryset
     if current_page:
         return current_page
     if path is None:
+        # We should get in this branch only if an apphook is active on /
+        # This removes the non-CMS part of the URL.
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
     for resolver in APP_RESOLVERS:
         try:
-            page_id = resolver.resolve_page_id(path+"/")
+            page_id = resolver.resolve_page_id(path)
             # yes, it is application page
             page = get_page_queryset(request).get(id=page_id)
             # If current page was matched, then we have some override for content
             # from cms, but keep current page. Otherwise return page to which was application assigned.
             return page
         except Resolver404:
+            # Raised if the page is not managed by an apphook
             pass
     return None
 
@@ -94,6 +103,18 @@ def _flatten_patterns(patterns):
             flat.append(pattern)
     return flat
 
+def get_app_urls(urls):
+    for urlconf in urls:
+        if isinstance(urlconf, basestring):
+            mod = import_module(urlconf)
+            if not hasattr(mod, 'urlpatterns'):
+                raise ImproperlyConfigured(
+                    "URLConf `%s` has no urlpatterns attribute" % urlconf)
+            yield getattr(mod, 'urlpatterns')
+        else:
+            yield urlconf
+    
+
 def get_patterns_for_title(path, title):
     """
     Resolve the urlconf module for a path+title combination
@@ -101,16 +122,7 @@ def get_patterns_for_title(path, title):
     """
     app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
-    for urlconf in app.urls:
-        pattern_list = None
-        if isinstance(urlconf, (str)):
-            mod = import_module(urlconf)
-            if not hasattr(mod, 'urlpatterns'):
-                raise ImproperlyConfigured("URLConf `%s` has no urlpatterns attribute"
-                    % urlconf)
-            pattern_list = getattr(mod, 'urlpatterns')
-        else:
-            pattern_list = urlconf
+    for pattern_list in get_app_urls(app.urls):
         if not path.endswith('/'):
             path += '/'
         page_id = title.page.id

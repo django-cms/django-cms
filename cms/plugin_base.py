@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 from cms.models import CMSPlugin
 from cms.exceptions import SubClassNeededError
 from django.conf import settings
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.contrib import admin
-from cms import settings as cms_settings
 from django.forms.widgets import Media, MediaDefiningClass
 
 def pluginmedia_property(cls):

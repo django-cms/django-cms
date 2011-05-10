@@ -1,0 +1,92 @@
+####################
+Internationalization
+####################
+
+
+***************************
+Multilingual URL Middleware
+***************************
+
+The multilingual URL middleware adds a language prefix to every URL. 
+
+Example::
+
+    /de/account/login/
+    /fr/account/login/
+
+It also adds this prefix automatically to every ``href`` and ``form`` tag.
+To install it, include
+``'cms.middleware.multilingual.MultilingualURLMiddleware'`` in your project's
+``MIDDLEWARE_CLASSES`` setting.
+
+****************
+Language Chooser
+****************
+
+The ``language_chooser`` template tag will display a language chooser for the
+current page. You can modify the template in ``menu/language_chooser.html`` or
+provide your own template if necessary.
+
+Example:
+
+.. code-block:: html+django
+
+    {% load menu_tags %}
+    {% language_chooser "myapp/language_chooser.html" %}
+
+If the current URL is not handled by the CMS and you have some i18n slugs in the
+URL you may use the ``set_language_changer`` function in the view that handles
+the current URL.
+
+In the models of the current object add an optional language parameter to the
+``get_absolute_url`` function::
+
+    from django.utils.translation import get_language
+
+    def get_absolute_url(self, language=None):
+        if not language:
+            language = get_language()
+        reverse("product_view", args=[self.get_slug(language=language)])
+
+
+In the view pass the ``get_absolute_url`` function to the
+``set_language_chooser`` function::
+
+    from cms.utils import set_language_changer
+
+    def get_product(request, slug):
+        item = get_object_or_404(Product, slug=slug, published=True)
+        set_language_changer(request, item.get_absolute_url)
+        # ...
+
+This allows the language chooser to have another URL then the current one.
+If the current URL is not handled by the CMS and no ``set_language_changer``
+function is provided it will take the exact same URL as the current one and
+will only change the language prefix.
+
+For the language chooser to work the Multilingual URL Middleware
+must be enabled.
+
+
+*****************
+page_language_url
+*****************
+
+This template_tag returns the URL of the current page in another language.
+
+Example::
+
+    {% page_language_url "de" %}
+
+
+*********************
+CMS_HIDE_UNTRANSLATED
+*********************
+
+If you put ``CMS_HIDE_UNTRANSLATED = False`` in your ``settings.py`` all pages
+will be displayed in all  languages even if they are not translated yet.
+
+If ``CMS_HIDE_UNTRANSLATED = True`` is in your ``settings.py``.
+And you are on a page that hasn't got a english translation yet and you view the
+german version then the language chooser will redirect to ``/``. The same goes
+for urls that are not handled by the cms and display a language chooser.

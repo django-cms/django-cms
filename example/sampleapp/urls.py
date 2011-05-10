@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('sampleapp.views',
     url(r'^$', 'sample_view', {'message': 'sample root page',}, name='sample-root'),  

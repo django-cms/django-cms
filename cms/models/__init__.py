@@ -1,19 +1,18 @@
+# -*- coding: utf-8 -*-
+from django.conf import settings as d_settings
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import get_resolver, get_script_prefix, \
+    NoReverseMatch
+from django.utils.encoding import iri_to_uri
 from moderatormodels import *
 from pagemodel import *
 from permissionmodels import *
+from placeholdermodel import *
 from pluginmodel import *
 from titlemodels import *
-from placeholdermodel import *
-
-from django.core.exceptions import ImproperlyConfigured
-from cms import signals as s_import
-
-from django.conf import settings as d_settings
-from django.core.urlresolvers import get_resolver, get_script_prefix,\
-    NoReverseMatch
 import django.core.urlresolvers
-from django.utils.encoding import iri_to_uri
-
+# must be last
+from cms import signals as s_import
 
 
 def validate_settings():
@@ -38,6 +37,8 @@ def remove_current_root(url):
     return url
 
 def monkeypatch_reverse():
+    if hasattr(django.core.urlresolvers.reverse, 'cms_monkeypatched'):
+        return
     django.core.urlresolvers.old_reverse = django.core.urlresolvers.reverse
     
     def new_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
@@ -63,13 +64,10 @@ def monkeypatch_reverse():
             raise e
         url = remove_current_root(url)
         return url
-    
+
+    new_reverse.cms_monkeypatched = True
     django.core.urlresolvers.reverse = new_reverse
         
 validate_dependencies()
 validate_settings()
-
-monkeypatched = False
-if not monkeypatched: 
-    monkeypatch_reverse()
-    monkeypatched = True
+monkeypatch_reverse()

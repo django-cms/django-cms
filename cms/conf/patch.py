@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.utils.translation import ugettext_lazy  as _
 from django.core.exceptions import ImproperlyConfigured
@@ -33,6 +34,12 @@ def post_patch():
     else:
         # dummy translation
         settings.dbgettext = lambda x: x
+    if settings.CMS_DBGETTEXT_SLUGS:
+        warn(
+            "CMS_DBGETTEXT_SLUGS (and general support for django-dbggettext "
+            "for CMS contents) will be deprecated in django CMS 2.2.",
+            DeprecationWarning
+        )
 
 
 def post_patch_check():

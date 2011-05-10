@@ -1,27 +1,51 @@
-from django.conf import settings
-from django import forms
-from django.template.defaultfilters import slugify
-from django.utils.translation import ugettext_lazy as _, get_language
-from django.forms.util import ErrorList
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Permission, Group
-from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields import BooleanField
-
-
-from cms.models import Page, Title, PagePermission, PageUser, ACCESS_PAGE,\
-    PageUserGroup
-from cms.utils.urlutils import any_path_re
-from cms.utils.permissions import get_current_user, get_subordinate_users,\
-    get_subordinate_groups, mail_page_user_change
+# -*- coding: utf-8 -*-
+from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, \
+    PageUserGroup
 from cms.utils.page import is_valid_page_slug
-from django.forms.widgets import HiddenInput
+from cms.utils.permissions import get_current_user, get_subordinate_users, \
+    get_subordinate_groups, mail_page_user_change
+from cms.utils.urlutils import any_path_re
+from django import forms
+from django.conf import settings
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
+from django.db.models.fields import BooleanField
+from django.forms.util import ErrorList
+from django.forms.widgets import HiddenInput
+from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
-from django.utils.functional import lazy
-from cms.apphook_pool import apphook_pool
+
+def get_permission_acessor(obj):
+    if isinstance(obj, (PageUser, User,)):
+        rel_name = 'user_permissions' 
+    else:
+        rel_name = 'permissions'
+    return getattr(obj, rel_name)
+
+def save_permissions(data, obj):
+    models = ((Page, 'page'), (PageUser, 'pageuser'), (PageUserGroup, 'pageuser'), (PagePermission, 'pagepermission'))
+    
+    if not obj.pk:
+        # save obj, otherwise we can't assign permissions to him
+        obj.save()
+    permission_acessor = get_permission_acessor(obj)
+    
+    for model, name in models:
+        content_type = ContentType.objects.get_for_model(model)
+        for t in ('add', 'change', 'delete'):
+            # add permission `t` to model `model`
+            codename = getattr(model._meta, 'get_%s_permission' % t)()
+            permission = Permission.objects.get(content_type=content_type, codename=codename)
+            if data.get('can_%s_%s' % (t, name), None):
+                permission_acessor.add(permission)
+            else:
+                permission_acessor.remove(permission)
 
 
 class PageAddForm(forms.ModelForm):
@@ -67,7 +91,10 @@ class PageAddForm(forms.ModelForm):
             slug = ""
         
         page = self.instance
-        lang = cleaned_data['language']
+        lang = cleaned_data.get('language', None)
+        # No language, can not go further, but validation failed already
+        if not lang: 
+            return cleaned_data
         
         if 'parent' not in cleaned_data:
             cleaned_data['parent'] = None
@@ -78,6 +105,7 @@ class PageAddForm(forms.ModelForm):
         except Site.DoesNotExist:
             site = None
             raise ValidationError("No site found for current settings.")
+        
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
@@ -127,18 +155,20 @@ class PageForm(PageAddForm):
     
     def clean(self):
         cleaned_data = super(PageForm, self).clean()
-        id = cleaned_data['reverse_id']
-        site_id = cleaned_data['site']
-        if id:
-            if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
-                raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
+        if 'reverse_id' in self.fields:
+            id = cleaned_data['reverse_id']
+            site_id = cleaned_data['site']
+            if id:
+                if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
+                    raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
         return cleaned_data
 
     def clean_overwrite_url(self):
-        url = self.cleaned_data['overwrite_url']
-        if url:
-            if not any_path_re.match(url):
-                raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
+        if 'overwrite_url' in self.fields:
+            url = self.cleaned_data['overwrite_url']
+            if url:
+                if not any_path_re.match(url):
+                    raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
         return url
     
 
@@ -247,7 +277,7 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 initials['can_%s_%s' % (t, name)] = obj.has_perm('%s.%s' % (model._meta.app_label, codename)) 
         return initials
         """
-        permission_acessor = self.permission_acessor(obj)
+        permission_acessor = get_permission_acessor(obj)
         for model in models:
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
@@ -257,31 +287,8 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 initials['can_%s_%s' % (t, name)] = codename in permissions 
         return initials
     
-    def permission_acessor(self, obj):
-        if isinstance(obj, PageUser):
-            rel_name = 'user_permissions' 
-        else:
-            rel_name = 'permissions'
-        return getattr(obj, rel_name)
-
     def save_permissions(self, obj):
-        models = ((Page, 'page'), (PageUser, 'pageuser'), (PageUserGroup, 'pageuser'), (PagePermission, 'pagepermission'))
-        
-        if not obj.pk:
-            # save obj, otherwise we can't assign permissions to him
-            obj.save()
-        permission_acessor = self.permission_acessor(obj)
-        
-        for model, name in models:
-            content_type = ContentType.objects.get_for_model(model)
-            for t in ('add', 'change', 'delete'):
-                # add permission `t` to model `model`
-                codename = getattr(model._meta, 'get_%s_permission' % t)()
-                permission = Permission.objects.get(content_type=content_type, codename=codename)
-                if self.cleaned_data.get('can_%s_%s' % (t, name), None):
-                    permission_acessor.add(permission)
-                else:
-                    permission_acessor.remove(permission)
+        save_permissions(self.cleaned_data, obj)
         
 
 class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
@@ -352,7 +359,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         if commit:
             user.save()
 
-        self.save_permissions(user)
+        save_permissions(self.cleaned_data, user)
 
         if self.cleaned_data['notify_user']:
             mail_page_user_change(user, created, self.cleaned_data['password1'])

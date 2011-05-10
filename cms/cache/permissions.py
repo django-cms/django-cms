@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.cache import cache
 
 # Time to live for cache entry 10 minutes, so it gets cleaned if we don't catch 

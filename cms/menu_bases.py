@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from menus.base import Menu
 from django.core.exceptions import ValidationError
 

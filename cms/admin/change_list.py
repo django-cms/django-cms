@@ -1,13 +1,13 @@
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR,\
-    ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
-from cms.models import Title, PagePermission, Page, PageModerator
-from cms.utils import get_language_from_request
-from cms.utils.permissions import get_user_sites_queryset
+# -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
-from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN,\
+from cms.models import Title, Page, PageModerator
+from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
     MASK_DESCENDANTS, PageModeratorState
+from cms.utils.permissions import get_user_sites_queryset
+from django.conf import settings
+from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
+    ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
+from django.contrib.sites.models import Site
 from menus.utils import find_children
 
 
@@ -15,6 +15,12 @@ from menus.utils import find_children
 COPY_VAR = "copy"
 
 class CMSChangeList(ChangeList):
+    '''
+    Renders a Changelist - In our case it looks like a tree - it's the list of
+    *instances* in the Admin.
+    It is usually responsible for pagination (not here though, we have a 
+    treeview)
+    '''
     real_queryset = False
     
     def __init__(self, request, *args, **kwargs):
@@ -66,15 +72,18 @@ class CMSChangeList(ChangeList):
                 self.full_result_count = self.root_query_set.count()
     
     def set_items(self, request):
-        lang = get_language_from_request(request)
         site = self._current_site
+        # Get all the pages, ordered by tree ID (it's convenient to build the 
+        # tree using a stack now)
         pages = self.get_query_set(request).drafts().order_by('tree_id', 'parent', 'lft').select_related()
         
+        # Get lists of page IDs for which the current user has 
+        # "permission to..." on the current site. 
         perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
         perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
         perm_change_list_ids = Page.permissions.get_change_id_list(request.user, site)
-
+        
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
             pages = pages.filter(pk__in=perm_edit_ids)
             #pages = pages.filter(pk__in=perm_change_list_ids)   

@@ -1,14 +1,13 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
-from django.conf import settings
 from django.utils.html import strip_tags
 from django.utils.text import truncate_words
 from cms.plugins.text.utils import plugin_admin_html_to_tags,\
-    plugin_tags_to_admin_html, plugin_tags_to_id_list
-from cms.models.pluginmodel import PluginModelBase
-from cms.plugin_base import PluginMediaDefiningClass
-from django.db.models.base import ModelBase
+    plugin_tags_to_admin_html, plugin_tags_to_id_list,\
+    replace_plugin_tags
+
+_old_tree_cache = {}
 
 class AbstractText(CMSPlugin):
     """Abstract Text Plugin Class"""
@@ -42,7 +41,18 @@ class AbstractText(CMSPlugin):
             if not str(plugin.pk) in ids:
                 plugin.delete() #delete plugins that are not referenced in the text anymore
 
-    
+    def post_copy(self, old_instance, ziplist):
+        """
+        Fix references to plugins
+        """
+
+        replace_ids = {}
+        for new, old in ziplist:
+            replace_ids[old.pk] = new.pk
+
+        self.body = replace_plugin_tags(old_instance.text.body, replace_ids)
+        self.save()
+            
 class Text(AbstractText):
     """
     Actual Text Class

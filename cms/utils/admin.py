@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
 from django.conf import settings
 from cms.utils.moderator import page_moderator_state, I_APPROVE
@@ -5,7 +6,7 @@ from cms.utils import get_language_from_request
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from cms.utils.permissions import has_page_add_permission, has_generic_permission
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.models.pagemodel import Page
 
@@ -80,9 +81,17 @@ def render_admin_menu_item(request, page):
     
     if not page.pk:
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
+        
+    # languages
+    languages = []
+    if page.site_id in settings.CMS_SITE_LANGUAGES:
+        languages = settings.CMS_SITE_LANGUAGES[page.site_id]
+    else:
+        languages = [x[0] for x in settings.CMS_LANGUAGES]
     
     context = RequestContext(request, {
         'has_add_permission': has_page_add_permission(request),
+        'site_languages': languages,
     })
     
     filtered = 'filtered' in request.REQUEST

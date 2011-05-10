@@ -1,15 +1,16 @@
-from cms.utils import get_language_from_request
+# -*- coding: utf-8 -*-
 from cms import settings
+from cms.models.placeholdermodel import Placeholder
+from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from django.conf import settings as django_settings
-from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Template, Context
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
-from django.conf import settings
+from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
-import copy
+from django.utils.translation import ugettext_lazy as _
 
 def plugin_meta_context_processor(instance, placeholder):
     return {
@@ -43,12 +44,11 @@ DEFAULT_PLUGIN_PROCESSORS = (
 _standard_processors = {}
 
 def get_standard_processors(settings_attr):
-    from django.conf import settings
     global _standard_processors
     if not _standard_processors.has_key(settings_attr):
         processors = []
-        if hasattr(settings, settings_attr):
-            for path in getattr(settings, settings_attr):
+        if hasattr(django_settings, settings_attr):
+            for path in getattr(django_settings, settings_attr):
                 i = path.rfind('.')
                 module, attr = path[:i], path[i+1:]
                 try:
@@ -114,16 +114,19 @@ def render_plugins(plugins, context, placeholder, processors=None):
     for index, plugin in enumerate(plugins):
         plugin._render_meta.total = total 
         plugin._render_meta.index = index
-        c.append(plugin.render_plugin(copy.copy(context), placeholder, processors=processors))
+        context.push()
+        c.append(plugin.render_plugin(context, placeholder, processors=processors))
+        context.pop()
     return c
 
-def render_placeholder(placeholder, context_to_copy):
+def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the 
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-    context = copy.copy(context_to_copy) 
+    context = context_to_copy 
+    context.push()
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
     page = get_page_from_placeholder_if_exists(placeholder)
@@ -135,9 +138,12 @@ def render_placeholder(placeholder, context_to_copy):
     # since settings are general and database/template are specific
     # TODO this should actually happen as a plugin context processor, but these currently overwrite 
     # existing context -- maybe change this order?
-    extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("extra_context", None)
-    if not extra_context:
-        extra_context = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("extra_context", {})
+    slot = getattr(placeholder, 'slot', None)
+    extra_context = {}
+    if slot:
+        extra_context = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, slot), {}).get("extra_context", None)
+        if not extra_context:
+            extra_context = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("extra_context", {})
     for key, value in extra_context.items():
         if not key in context:
             context[key] = value
@@ -160,24 +166,38 @@ def render_placeholder(placeholder, context_to_copy):
     c.extend(render_plugins(plugins, context, placeholder, processors))
     content = "".join(c)
     if edit:
-        content = render_placeholder_toolbar(placeholder, context, content)
+        content = render_placeholder_toolbar(placeholder, context, content, name_fallback)
+    context.pop()
     return content
 
-def render_placeholder_toolbar(placeholder, context, content):
+def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
     request = context['request']
     page = get_page_from_placeholder_if_exists(placeholder)
+    if not page:
+        page = getattr(request, 'current_page', None)
     if page:
         template = page.template
+        if name_fallback and not placeholder:
+            placeholder = Placeholder.objects.create(slot=name_fallback)
+            page.placeholders.add(placeholder)
     else:
         template = None
-    installed_plugins = plugin_pool.get_all_plugins(placeholder.slot, page)
-    name = settings.CMS_PLACEHOLDER_CONF.get("%s %s" % (template, placeholder.slot), {}).get("name", None)
+    if placeholder:
+        slot = placeholder.slot
+    else:
+        slot = None
+    installed_plugins = plugin_pool.get_all_plugins(slot, page)
+    mixed_key = "%s %s" % (template, slot)
+    name = settings.CMS_PLACEHOLDER_CONF.get(mixed_key, {}).get("name", None)
     if not name:
-        name = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get("name", None)
+        name = settings.CMS_PLACEHOLDER_CONF.get(slot, {}).get("name", None)
+    if name:
+        name = _(name)
+    elif slot:
+        name = title(slot)
     if not name:
-        name = placeholder.slot
-    name = title(name)
+        name = name_fallback
     toolbar = render_to_string("cms/toolbar/add_plugins.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from cms.admin.forms import PageUserForm, PageUserGroupForm
 from cms.admin.permissionadmin import GenericCmsPermissionAdmin

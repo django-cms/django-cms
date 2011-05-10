@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.models import User, Group
-from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from cms.models import Page, PagePermission, GlobalPagePermission
@@ -217,7 +217,7 @@ def mail_page_user_change(user, created=False, password=""):
 
 def has_generic_permission(page_id, user, attr, site):
     """Permission getter for single page with given id.
-    """    
+    """
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
     permission = func(user, site)
     return permission == Page.permissions.GRANT_ALL or page_id in permission

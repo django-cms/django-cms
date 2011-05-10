@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Global cms settings, are applied if there isn't value defined in project
 settings. All available settings are listed here. Please don't put any 

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.http import HttpRequest
-from django.template import TemplateDoesNotExist
 from django.contrib.auth.models import User
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
+from cms.test.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,\
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE
-from cms.models import Page, Title
+from cms.models import Page
 from cms.plugins.text.models import Text
 from cms.models.pluginmodel import CMSPlugin
 from reversion.models import Revision, Version
@@ -25,11 +23,12 @@ class ReversionTestCase(CMSTestCase):
         response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
         page = Page.objects.all()[0]
+        placeholderpk = page.placeholders.get(slot="body").pk
         plugin_data = {
             'plugin_type':"TextPlugin",
             'page_id':page.pk,
             'language':settings.LANGUAGES[0][0],
-            'placeholder':"body",
+            'placeholder':placeholderpk,
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
@@ -71,10 +70,12 @@ class ReversionTestCase(CMSTestCase):
         self.assertEquals(response.status_code, 200)
         response = self.client.post(revert_url, self.page_data)
         self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
-        self.assertEquals(Page.objects.all()[1].published, False)
+        # test for publisher_is_draft, published is set for both draft and published page
+        self.assertEquals(Page.objects.all()[0].publisher_is_draft, True)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
+        # test that CMSPlugin subclasses are reverted
+        self.assertEquals(Text.objects.all().count(), 2)
         self.assertEquals(Revision.objects.all().count(), 6)
-
     
     def test_02_recover(self):
         """
@@ -87,6 +88,7 @@ class ReversionTestCase(CMSTestCase):
         
         self.assertEquals(Page.objects.all().count(), 2)
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
+        self.assertEquals(Text.objects.all().count(), 2)
         
         page = Page.objects.all()[0]
         page_pk = page.pk
@@ -94,7 +96,8 @@ class ReversionTestCase(CMSTestCase):
         
         self.assertEquals(Page.objects.all().count(), 0)
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
-        
+        self.assertEquals(Text.objects.all().count(), 0)
+                
         recover_url = URL_CMS_PAGE + "recover/"
         response = self.client.get(recover_url)
         self.assertEquals(response.status_code, 200)
@@ -105,4 +108,5 @@ class ReversionTestCase(CMSTestCase):
         self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
         self.assertEquals(Page.objects.all().count(), 1)
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
-        
+        # test that CMSPlugin subclasses are recovered
+        self.assertEquals(Text.objects.all().count(), 1)

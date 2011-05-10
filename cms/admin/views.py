@@ -1,23 +1,14 @@
-from django.shortcuts import get_object_or_404, render_to_response
-from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpResponseBadRequest
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.template.context import RequestContext
-from django.conf import settings
-from django.template.defaultfilters import escapejs, force_escape
-from django.views.decorators.http import require_POST
-
-from cms.models import Page, Title, CMSPlugin, MASK_CHILDREN, MASK_DESCENDANTS,\
-    MASK_PAGE
-from cms.plugin_pool import plugin_pool
-from cms.utils.admin import render_admin_menu_item
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+# -*- coding: utf-8 -*-
+from cms.models import Page, Title, CMSPlugin, Placeholder
 from cms.utils import get_language_from_request
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 def save_all_plugins(request, page, placeholder, excludes=None):
+
     if not page.has_change_permission(request):
         raise Http404
-    
+
     for plugin in CMSPlugin.objects.filter(placeholder=placeholder):
         if excludes:
             if plugin.pk in excludes:
@@ -33,6 +24,7 @@ def revert_plugins(request, version_id, obj):
     version = get_object_or_404(Version, pk=version_id)
     revs = [related_version.object_version for related_version in version.revision.version_set.all()]
     cms_plugin_list = []
+    placeholders = {}
     plugin_list = []
     titles = []
     others = []
@@ -40,7 +32,8 @@ def revert_plugins(request, version_id, obj):
     lang = get_language_from_request(request)
     for rev in revs:
         obj = rev.object
-        
+        if obj.__class__ == Placeholder:
+            placeholders[obj.pk] = obj        
         if obj.__class__ == CMSPlugin:
             cms_plugin_list.append(obj)
         elif hasattr(obj, 'cmsplugin_ptr_id'):
@@ -49,15 +42,22 @@ def revert_plugins(request, version_id, obj):
             pass
             #page = obj #Page.objects.get(pk=obj.pk)
         elif obj.__class__ == Title:
-            if not obj.language == lang: 
-                titles.append(obj) 
+            titles.append(obj) 
         else:
             others.append(rev)
     if not page.has_change_permission(request):
         raise Http404
     current_plugins = list(CMSPlugin.objects.filter(placeholder__page=page))
+    for pk, placeholder in placeholders.items():
+        # admin has already created the placeholders/ get them instead 
+        try:
+            placeholders[pk] = page.placeholders.get(slot=placeholder.slot)
+        except Placeholder.DoesNotExist:
+            placeholders[pk].save()
+            page.placeholders.add(placeholders[pk])
     for plugin in cms_plugin_list:
-        plugin.page = page
+        # connect plugins to the correct placeholder
+        plugin.placeholder = placeholders[plugin.placeholder_id]
         plugin.save(no_signals=True)
     for plugin in cms_plugin_list:
         plugin.save()
@@ -67,7 +67,6 @@ def revert_plugins(request, version_id, obj):
                 p.save()
         for old in current_plugins:
             if old.pk == plugin.pk:
-                plugin.publisher_public = old.publisher_public
                 plugin.save()
                 current_plugins.remove(old)
     for title in titles:
@@ -81,4 +80,3 @@ def revert_plugins(request, version_id, obj):
         other.object.save()
     for plugin in current_plugins:
         plugin.delete()
-

@@ -16,7 +16,7 @@ for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
         media_files.append(os.path.join(*filepath.split(os.sep)[1:]))
         
 if cms.VERSION[-1] == 'final':
-    CLASSIFIERS = ['Development Status :: 5 - Stable']
+    CLASSIFIERS = ['Development Status :: 5 - Production/Stable']
 elif 'beta' in cms.VERSION[-1]:
     CLASSIFIERS = ['Development Status :: 4 - Beta']
 else:
@@ -40,15 +40,17 @@ setup(
     name='django-cms',
     version=cms.__version__,
     description='An Advanced Django CMS',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     url='http://www.django-cms.org/',
     license='BSD License',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
-    requires=[
-        'django (>1.1.0)',
+    install_requires=[
+        'Django>=1.2',
+        'django-classy-tags>=0.2.2',
+        'south>=0.7.2',
     ],
-    packages=find_packages(exclude=["example", "example.*"]),
+    packages=find_packages(exclude=["example", "example.*","testdata","testdata.*"]),
     package_data={
         'cms': [
             'templates/admin/*.html',
@@ -62,7 +64,6 @@ setup(
             'plugins/*/templates/cms/plugins/*/*.html',
             'plugins/*/templates/cms/plugins/*/*.js',
             'locale/*/LC_MESSAGES/*',
-            'docs/*.txt'
         ] + media_files,
         'example': [
             'media/css/*.css',

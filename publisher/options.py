@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class PublisherOptions(object):
     """Option class which instance is accessible on all models which inherit from
     publisher over `PublisherModel`._publisher_meta.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models.pagemodel import Page
 import sys
 from django.db import models

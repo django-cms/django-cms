@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -34,8 +35,8 @@ def page_changed(page, old_page=None, force_moderation_action=None):
         # see the last message
         mail_approvement_request(page, user)
 
-    # TODO: if page was changed, remove all approvements from hiher instances,
-    # but keep approvements by lover instances, if there are some
+    # TODO: if page was changed, remove all approvements from higher instances,
+    # but keep approvements by lower instances, if there are any
 
 
 def update_moderation_message(page, message):
@@ -178,8 +179,11 @@ def approve_page(request, page):
     """
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
     if not moderator_should_approve(request, page):
-        # escape soon if there isn't any approvement required by this user
-        return
+        # escape soon if there isn't any approval required by this user
+        if not page.publisher_public or page.get_absolute_url() != page.publisher_public.get_absolute_url():
+            page.publish()
+        else:
+            return
     if not moderation_required:
         # this is a second case - user can publish changes
         if page.pagemoderatorstate_set.get_delete_actions().count():
@@ -189,23 +193,30 @@ def approve_page(request, page):
             page.publish()
     else:
         # first case - just mark page as approved from this user
-        PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 
+        PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save()
+    page.save(change_state=False)
 
 
 def get_model_queryset(model, request=None):
     """Decision function used in frontend - says which model should be used.
     Public models are used only if CMS_MODERATOR.
     """
-    if not settings.CMS_MODERATOR or \
-        (request and (('preview' in request.GET and 
-            'draft' in request.GET) or ('edit' in request.GET or request.session.get('cms_edit', False))) and request.user.is_staff):
+    if not settings.CMS_MODERATOR:
+        # We do not use moderator
         return model.objects.drafts()
+    # We do use moderator
+    if request:
+        preview_draft = ('preview' in request.GET and 'draft' in request.GET)
+        edit_mode = ('edit' in request.GET or request.session.get('cms_edit', False))
+        if preview_draft or edit_mode:    
+            return model.objects.drafts()
+    # Default case / moderator is used but there is no request
     return model.objects.public()
 
 # queryset helpers for basic models
 get_page_queryset = lambda request=None: get_model_queryset(Page, request) 
-get_title_queryset = lambda request=None: get_model_queryset(Title, request)
-get_cmsplugin_queryset = lambda request=None: get_model_queryset(CMSPlugin, request)
+get_title_queryset = lambda request=None: Title.objects.all()   # not sure if we need to only grab public items here
+get_cmsplugin_queryset = lambda request=None: CMSPlugin.objects.all()   # CMSPlugin is no longer extending from Publisher
 
 
 def mail_approvement_request(page, user=None):
