@@ -165,8 +165,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(edit_url, data)
         self.assertEqual(response.status_code, 200)
+        # before copying text plugin has only one child
+        self.assertEquals(CMSPlugin.objects.filter(parent=txt.pk).count(), 1)
         self.assertEqual(CMSPlugin.objects.get(pk=link_pk).parent.pk, txt.pk)
-        #create 2nd language page
+        # create 2nd language page
         page_data['language'] = settings.LANGUAGES[1][0]
         page_data['title'] += " %s" % settings.LANGUAGES[1][0]
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % settings.LANGUAGES[1][0], page_data)
@@ -186,6 +188,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[0][0]).count(), 2)
         self.assertEquals(CMSPlugin.objects.filter(language=settings.LANGUAGES[1][0]).count(), 2)
         self.assertEquals(CMSPlugin.objects.all().count(), 4)
+        # after copying text plugin should have still only one child
+        self.assertEquals(CMSPlugin.objects.filter(parent=txt.pk).count(), 1)
+        self.assertEqual(CMSPlugin.objects.get(pk=link_pk).parent.pk, txt.pk)
         # assert plugin tree
         for link in CMSPlugin.objects.filter(plugin_type="LinkPlugin"):
             self.assertNotEqual(link.parent, None)
