@@ -35,27 +35,27 @@ class RenderingTestCase(CMSTestCase):
         self.test_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
         self.test_user.set_password("test")
         self.test_user.save()
-        self.login_user(self.test_user)
-
-        self.test_data = {
-            'title': u'RenderingTestCase-title',
-            'slug': u'renderingtestcase-slug',
-            'reverse_id': u'renderingtestcase-reverse-id',
-            'text_main': u'RenderingTestCase-main',
-            'text_sub': u'RenderingTestCase-sub',
-        }
-        self.test_data2 = {
-            'title': u'RenderingTestCase-title2',
-            'slug': u'RenderingTestCase-slug2',
-            'reverse_id': u'renderingtestcase-reverse-id2',
-        }
-        self.test_data3 = {
-            'title': u'RenderingTestCase-title3',
-            'slug': u'RenderingTestCase-slug3',
-            'reverse_id': u'renderingtestcase-reverse-id3',
-            'text_sub': u'RenderingTestCase-sub3',
-        }
-        self.insert_test_content()
+        with self.login_user_context(self.test_user):
+    
+            self.test_data = {
+                'title': u'RenderingTestCase-title',
+                'slug': u'renderingtestcase-slug',
+                'reverse_id': u'renderingtestcase-reverse-id',
+                'text_main': u'RenderingTestCase-main',
+                'text_sub': u'RenderingTestCase-sub',
+            }
+            self.test_data2 = {
+                'title': u'RenderingTestCase-title2',
+                'slug': u'RenderingTestCase-slug2',
+                'reverse_id': u'renderingtestcase-reverse-id2',
+            }
+            self.test_data3 = {
+                'title': u'RenderingTestCase-title3',
+                'slug': u'RenderingTestCase-slug3',
+                'reverse_id': u'renderingtestcase-reverse-id3',
+                'text_sub': u'RenderingTestCase-sub3',
+            }
+            self.insert_test_content()
 
     def insert_test_content(self):
         # Insert a page

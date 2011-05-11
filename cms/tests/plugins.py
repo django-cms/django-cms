@@ -49,10 +49,15 @@ class PluginsTestBaseCase(CMSTestCase):
         self.slave.set_password("slave")
         self.slave.save()
 
-        self.login_user(self.super_user)
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
+        
+        self._login_context = self.login_user_context(self.super_user)
+        self._login_context.__enter__()
+    
+    def tearDown(self):
+        self._login_context.__exit__(None, None, None)
 
     def approve_page(self, page):
         response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
@@ -462,9 +467,10 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
         self.slave.set_password("slave")
         self.slave.save()
-
-        self.login_user(self.super_user)
-
+        
+        self._login_context = self.login_user_context(self.super_user)
+        self._login_context.__enter__()
+    
         # create 3 sections
         self.sections = []
         self.section_pks = []
@@ -482,8 +488,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
                 )
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
-
-
+    
     def test_01_add_plugin_with_m2m(self):
         # add a new text plugin
         page_data = self.get_new_page_data()
