@@ -191,7 +191,14 @@ CMS_LANGUAGE_FALLBACK
 Default: ``True``
 
 This will redirect the browser to the same page in another language if the
-page is not available in the current language.
+page is not available in the current language. It redirects to a language
+defined in CMS_LANGUAGE_CONF. If it can't find a fallback there, it
+tries to find one in ``CMS_LANGUAGES``.
+
+If set to ``False``, the lanaguage fallback functionality is not active.
+
+If set to ``'no_redirect'`` it will display the fallback content directly
+instead of redirecting to the fallback language URL.
 
 
 CMS_LANGUAGE_CONF
@@ -199,7 +206,8 @@ CMS_LANGUAGE_CONF
 
 Default: ``{}``
 
-Language fallback ordering for each language.
+Language fallback ordering for each language. It's only usefull, if
+``CMS_LANGUAGE_FALLBACK`` is enabled.
 
 Example::
 
@@ -207,6 +215,12 @@ Example::
         'de': ['en', 'fr'],
         'en': ['de'],
     }
+
+This means, if content for ``de`` is not available, the fallback is ``en``. If
+``en`` is also not available, the next fallback is ``fr``. If ``fr`` is also
+not available, it will use the first match it can find for any language in
+``CMS_LAGUAGES``. If this also fails, it will return a HTTP404 response.
+
 
 CMS_SITE_LANGUAGES
 ==================
