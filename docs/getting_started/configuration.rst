@@ -196,7 +196,6 @@ defined in CMS_LANGUAGE_CONF. If it can't find a fallback there, it
 tries to find one in ``CMS_LANGUAGES``.
 
 If set to ``False``, the lanaguage fallback functionality is not active.
-
 If set to ``'no_redirect'`` it will display the fallback content directly
 instead of redirecting to the fallback language URL.
 
@@ -219,7 +218,8 @@ Example::
 This means, if content for ``de`` is not available, the fallback is ``en``. If
 ``en`` is also not available, the next fallback is ``fr``. If ``fr`` is also
 not available, it will use the first match it can find for any language in
-``CMS_LAGUAGES``. If this also fails, it will return a HTTP404 response.
+``CMS_LANGUAGES``. If this also fails, it will return a HTTP404 response.
+The same goes for ``en`` but here only one explicit fallback is defined.
 
 
 CMS_SITE_LANGUAGES
