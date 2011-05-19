@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
-from classytags.helpers import InclusionTag
+from classytags.helpers import AsTag, InclusionTag
 from classytags.parser import Parser
 from cms.models import Page
 from cms.plugin_rendering import render_plugins, render_placeholder
@@ -385,7 +385,36 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
+class GetPlaceholderContent(AsTag):
+    """
+    Used to stores the rendered content of a placholder as a template variable.
+    conditional having a value.
 
+    Example
+         {% get_placeholder_content "my_placeholder_name" as some_variable %}
+
+         {% if some_variable %}
+             <h3>Here's The Content</h3>
+             {{ some_variable|safe }}
+         {% else %}
+             <p>There's nothing here.</p>
+         {% endif %}
+    """
+    name = 'get_placeholder_content'
+    options = Options(
+        Argument('name', resolve=False, required=True),
+        'as',
+        Argument('varname', resolve=False, required=False),
+    )
+
+    def get_value(self, context, name):
+        request = context['request']
+        page = request.current_page
+        inherit = False
+        content = get_placeholder_content(context, request, page, name, inherit)
+        return content
+register.tag(GetPlaceholderContent)
+register.tag('GetPlaceholderContent', GetPlaceholderContent)
 
 class CMSToolbar(InclusionTag):
     template = 'cms/toolbar/toolbar.html'
