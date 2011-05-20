@@ -14,7 +14,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.db.models.query_utils import CollectedObjects
 from django.http import HttpRequest
 import os.path
 
@@ -25,16 +24,20 @@ class PagesTestCase(CMSTestCase):
         u.set_password("test")
         u.save()
         
-        self.login_user(u)
+        self._login_context = self.login_user_context(u)
+        self._login_context.__enter__()
     
-    def test_01_add_page(self):
+    def tearDown(self):
+        self._login_context.__exit__(None, None, None)
+    
+    def test_add_page(self):
         """
         Test that the add admin page could be displayed via the admin
         """
         response = self.client.get(URL_CMS_PAGE_ADD)
         self.assertEqual(response.status_code, 200)
 
-    def test_02_create_page(self):
+    def test_create_page(self):
         """
         Test that a page can be created via the admin
         """
@@ -55,7 +58,7 @@ class PagesTestCase(CMSTestCase):
         title = Title.objects.drafts().get(slug=page_data['slug'])
 
         
-    def test_03_slug_collision(self):
+    def test_slug_collision(self):
         """
         Test a slug collision
         """
@@ -79,7 +82,7 @@ class PagesTestCase(CMSTestCase):
         # TODO: check for slug collisions after move
         # TODO: check for slug collisions with different settings         
   
-    def test_04_details_view(self):
+    def test_details_view(self):
         """
         Test the details view
         """
@@ -96,7 +99,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.get(self.get_pages_root())
         self.assertEqual(response.status_code, 200)
 
-    def test_05_edit_page(self):
+    def test_edit_page(self):
         """
         Test that a page can edited via the admin
         """
@@ -110,7 +113,7 @@ class PagesTestCase(CMSTestCase):
         self.assertRedirects(response, URL_CMS_PAGE)
         self.assertEqual(page.get_title(), 'changed title')
     
-    def test_06_meta_description_and_keywords_fields_from_admin(self):
+    def test_meta_description_and_keywords_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin
         """
@@ -128,7 +131,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page.get_meta_description(), 'I am a duck')
         self.assertEqual(page.get_meta_keywords(), 'page,cms,stuff')
 
-    def test_07_meta_description_and_keywords_from_template_tags(self):
+    def test_meta_description_and_keywords_from_template_tags(self):
         from django import template
         page_data = self.get_new_page_data()
         page_data["title"] = "Hello"
@@ -146,7 +149,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page,cms,stuff")
     
     
-    def test_08_copy_page(self):
+    def test_copy_page(self):
         """
         Test that a page can be copied via the admin
         """
@@ -166,7 +169,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.drafts().count() - count, 3)
         
         
-    def test_09_language_change(self):
+    def test_language_change(self):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         pk = Page.objects.all()[0].pk
@@ -175,7 +178,7 @@ class PagesTestCase(CMSTestCase):
         response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
         self.assertEqual(response.status_code, 200)
         
-    def test_10_move_page(self):
+    def test_move_page(self):
         page_data1 = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data1)
         page_data2 = self.get_new_page_data()
@@ -215,7 +218,16 @@ class PagesTestCase(CMSTestCase):
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
         
-    def test_11_add_placeholder(self):
+    def test_move_page_inherit(self):
+        parent = create_page("Parent", 'col_three.html', "en")
+        child = create_page("Child", settings.CMS_TEMPLATE_INHERITANCE_MAGIC,
+                            "en", parent=parent)
+        self.assertEqual(child.get_template(), parent.get_template())
+        child.move_page(parent, 'left')
+        self.assertEqual(child.get_template(), parent.get_template())
+        
+        
+    def test_add_placeholder(self):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
                            position="last-child", published=True, in_navigation=True)
@@ -241,7 +253,7 @@ class PagesTestCase(CMSTestCase):
         f.write(old)
         f.close()
 
-    def test_12_sitemap_login_required_pages(self):
+    def test_sitemap_login_required_pages(self):
         """
         Test that CMSSitemap object contains only published,public (login_required=False) pages
         """
@@ -249,7 +261,7 @@ class PagesTestCase(CMSTestCase):
                     published=True, in_navigation=True)
         self.assertEqual(CMSSitemap().items().count(),0)
 
-    def test_13_edit_page_other_site_and_language(self):
+    def test_edit_page_other_site_and_language(self):
         """
         Test that a page can edited via the admin when your current site is
         different from the site you are editing and the language isn't available
@@ -268,7 +280,7 @@ class PagesTestCase(CMSTestCase):
         with LanguageOverride(TESTLANG):
             self.assertEqual(page.get_title(), 'changed title')
         
-    def test_14_flat_urls(self):
+    def test_flat_urls(self):
         with SettingsOverride(CMS_FLAT_URLS=True):
             home_slug = "home"
             child_slug = "child"
@@ -290,7 +302,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertFalse(child.get_absolute_url() in grandchild.get_absolute_url())
 
-    def test_15_templates(self):
+    def test_templates(self):
         """
         Test the inheritance magic for templates
         """
@@ -306,7 +318,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(parent.get_template(), settings.CMS_TEMPLATES[0][0])
         self.assertEqual(parent.get_template_name(), settings.CMS_TEMPLATES[0][1])
         
-    def test_16_delete_with_plugins(self):
+    def test_delete_with_plugins(self):
         """
         Check that plugins and placeholders get correctly deleted when we delete
         a page!
@@ -333,14 +345,14 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Text.objects.count(), 0)
         self.assertEqual(Placeholder.objects.count(), 0)
         
-    def test_17_get_page_from_request_on_non_cms_admin(self):
+    def test_get_page_from_request_on_non_cms_admin(self):
         request = self.get_request(
             reverse('admin:sampleapp_category_change', args=(1,))
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
         
-    def test_18_get_page_from_request_on_cms_admin(self):
+    def test_get_page_from_request_on_cms_admin(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
             reverse('admin:cms_page_change', args=(page.pk,))
@@ -349,14 +361,14 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(found_page)
         self.assertEqual(found_page.pk, page.pk)
         
-    def test_19_get_page_from_request_on_cms_admin_nopage(self):
+    def test_get_page_from_request_on_cms_admin_nopage(self):
         request = self.get_request(
             reverse('admin:cms_page_change', args=(1,))
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
         
-    def test_20_get_page_from_request_cached(self):
+    def test_get_page_from_request_cached(self):
         mock_page = 'hello world'
         request = self.get_request(
             reverse('admin:sampleapp_category_change', args=(1,))
@@ -365,19 +377,19 @@ class PagesTestCase(CMSTestCase):
         page = get_page_from_request(request)
         self.assertEqual(page, mock_page)
         
-    def test_21_get_page_from_request_nopage(self):
+    def test_get_page_from_request_nopage(self):
         request = self.get_request('/')
         page = get_page_from_request(request)
         self.assertEqual(page, None)
     
-    def test_22_get_page_from_request_with_page_404(self):
+    def test_get_page_from_request_with_page_404(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
         page.publish()
         request = self.get_request('/does-not-exist/')
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
     
-    def test_23_get_page_from_request_with_page_preview(self):
+    def test_get_page_from_request_with_page_preview(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request('%s?preview' % page.get_absolute_url())
         found_page = get_page_from_request(request)
@@ -388,6 +400,22 @@ class PagesTestCase(CMSTestCase):
             found_page = get_page_from_request(request)
             self.assertTrue(found_page)
             self.assertEqual(found_page.pk, page.pk)
+        
+    def test_get_page_from_request_on_cms_admin_with_editplugin(self):
+        page = create_page("page", "nav_playground.html", "en")
+        request = self.get_request(
+            reverse('admin:cms_page_change', args=(page.pk,)) + 'edit-plugin/42/'
+        )
+        found_page = get_page_from_request(request)
+        self.assertTrue(found_page)
+        self.assertEqual(found_page.pk, page.pk)
+        
+    def test_get_page_from_request_on_cms_admin_with_editplugin_nopage(self):
+        request = self.get_request(
+            reverse('admin:cms_page_change', args=(1,)) + 'edit-plugin/42/'
+        )
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
 
 
 class NoAdminPageTests(CMSTestCase):
@@ -402,7 +430,7 @@ class NoAdminPageTests(CMSTestCase):
     def tearDown(self):
         self._ctx.__exit__(None, None, None)
     
-    def test_01_get_page_from_request_fakeadmin_nopage(self):
+    def test_get_page_from_request_fakeadmin_nopage(self):
         request = self.get_request('/admin/')
         page = get_page_from_request(request)
         self.assertEqual(page, None)

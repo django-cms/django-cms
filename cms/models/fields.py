@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.db import models
-from django.utils.text import capfirst
-
 from cms.forms.fields import PageSelectFormField, PlaceholderFormField
 from cms.forms.widgets import PlaceholderPluginEditorWidget
 from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
-from cms.utils.placeholder import PlaceholderNoAction
+from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
+from django.db import models
+from django.utils.text import capfirst
+
 
 
 class PlaceholderField(models.ForeignKey):
     def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
+        validate_placeholder_name(slotname)
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()

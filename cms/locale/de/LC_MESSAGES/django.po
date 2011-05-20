@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-05-09 13:13+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -512,19 +511,19 @@ msgstr "Aktuelle Seite"
 
 #: models/moderatormodels.py:26
 msgid "Page children (immediate)"
-msgstr "Untergeordnete Seite (direkt)"
+msgstr "Direkt untergeordnete Seite"
 
 #: models/moderatormodels.py:27
 msgid "Page and children (immediate)"
-msgstr "Aktuelle und untergeordnete Seite (direkt)"
+msgstr "Aktuelle und direkt untergeordnete Seite"
 
 #: models/moderatormodels.py:28
 msgid "Page descendants"
-msgstr "Folgeseiten"
+msgstr "Alle untergeordnete Seiten"
 
 #: models/moderatormodels.py:29
 msgid "Page and descendants"
-msgstr "Aktuelle Seite und Folgeseiten"
+msgstr "Aktuelle Seite und alle untergeordnete Seiten"
 
 #: models/moderatormodels.py:45 templates/admin/cms/page/permissions.html:5
 #: templates/cms/toolbar/toolbar.html:193
@@ -543,11 +542,11 @@ msgstr "Seite moderieren"
 
 #: models/moderatormodels.py:51 templatetags/cms_admin.py:86
 msgid "Moderate children"
-msgstr "Untergeordnete Seiten moderieren"
+msgstr "Direkt untergeordnete Seiten moderieren"
 
 #: models/moderatormodels.py:52 templatetags/cms_admin.py:87
 msgid "Moderate descendants"
-msgstr "Nachfolgende Seiten moderieren"
+msgstr "Untergeordnete Seiten moderieren"
 
 #: models/moderatormodels.py:55 models/moderatormodels.py:56
 msgid "PageModerator"
@@ -1744,11 +1743,11 @@ msgstr "Seitenmoderation lösen"
 
 #: templatetags/cms_admin.py:86
 msgid "Unbind children moderation"
-msgstr "Moderation untergeordneter Seiten lösen"
+msgstr "Moderation von direkt untergeordneter Seiten lösen"
 
 #: templatetags/cms_admin.py:87
 msgid "Unbind descendants moderation"
-msgstr "Moderation von Folgeseiten lösen"
+msgstr "Moderation von untergeordneten Seiten lösen"
 
 #: templatetags/cms_tags.py:78
 #, python-format
@@ -1866,3 +1865,5 @@ msgstr "CMS - Ihr Benutzerkonto wurde verändert."
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
+
+

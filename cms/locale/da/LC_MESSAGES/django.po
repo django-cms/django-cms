@@ -1,15 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-23 14:45+0000\n"
-"Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
+"PO-Revision-Date: 2011-04-06 07:11+0000\n"
+"Last-Translator: KristianOellegaard <kristian@oellegaard.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,19 +21,19 @@ msgstr ""
 
 #: plugin_base.py:100
 msgid "Advanced options"
-msgstr ""
+msgstr "Avancerede indstillinger"
 
 #: admin/forms.py:52
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #: admin/forms.py:53
 msgid "The default title"
-msgstr ""
+msgstr "Standard titel"
 
 #: admin/forms.py:54
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 #: admin/forms.py:55
 msgid "The part of the title that is used in the URL"
@@ -42,83 +41,87 @@ msgstr ""
 
 #: admin/forms.py:56
 msgid "Language"
-msgstr ""
+msgstr "Sprog"
 
 #: admin/forms.py:57
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "Nuværende sprog for indholdsfeltet."
 
 #: admin/forms.py:110
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Der eksisterer allerede en side med dette slug."
 
 #: admin/forms.py:128
 msgid "Menu Title"
-msgstr ""
+msgstr "Menu titel"
 
 #: admin/forms.py:129
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Overskriv det der er vist i menuen"
 
 #: admin/forms.py:130
 msgid "Page Title"
-msgstr ""
+msgstr "Sidetitel"
 
 #: admin/forms.py:131
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Overskriv hvad der er vist i toppen af din browser eller bogmærker"
 
 #: admin/forms.py:132
 msgid "Application"
-msgstr ""
+msgstr "Applikation"
 
 #: admin/forms.py:134
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Tilknyt applikation til denne side"
 
 #: admin/forms.py:135
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Overskriv URL"
 
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Lad feltet stå tomt, hvis standardstien skal bruges"
 
 #: admin/forms.py:142
 msgid "Redirect"
-msgstr ""
+msgstr "Redirect"
 
 #: admin/forms.py:143
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Redirect this denne URL"
 
 #: admin/forms.py:145
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "Beskrivelse af siden der i visse tilfælde bruges af søgemaskiner"
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
+"En liste med kommaseparerede nøgleord, der i visse tilfælde bruges af "
+"søgemaskiner"
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "En side med dette URL id eksisterer allerede"
 
 #: admin/forms.py:171
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "Ugyldig URL, brug /min/url format"
 
 #: admin/forms.py:182 admin/forms.py:183 migrations/0001_initial.py:41
 #: models/permissionmodels.py:17
 msgid "user"
-msgstr ""
+msgstr "bruger"
 
 #: admin/forms.py:215
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
+"Tilladelse til at tilføje sider kræver at der også er adgang til undersider,"
+" ellers kan siden ikke blive ændret af brugeren der har oprettet den."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -1816,3 +1819,5 @@ msgstr ""
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr ""
+
+

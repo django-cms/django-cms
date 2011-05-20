@@ -14,7 +14,7 @@ class PublisherTestCase(CMSTestCase):
     A test case to exercise publisher
     '''
     
-    def test_01_simple_publisher(self):
+    def test_simple_publisher(self):
         '''
         Creates the stuff needed for theses tests.
         Please keep this up-to-date (the docstring!)
@@ -45,7 +45,7 @@ class PublisherTestCase(CMSTestCase):
         self.assertTrue(pageC.published)
         self.assertTrue(len(Page.objects.published()), 3)
         
-    def test_02_command_line_should_raise_without_superuser(self):
+    def test_command_line_should_raise_without_superuser(self):
         raised = False
         try:
             com = publisher_publish.Command()
@@ -54,7 +54,7 @@ class PublisherTestCase(CMSTestCase):
             raised = True
         self.assertTrue(raised)
         
-    def test_03_command_line_should_raise_when_moderator_false(self):
+    def test_command_line_should_raise_when_moderator_false(self):
         with SettingsOverride(CMS_MODERATOR=False):
             raised = False
             try:
@@ -64,7 +64,7 @@ class PublisherTestCase(CMSTestCase):
                 raised = True
         self.assertTrue(raised)
         
-    def test_04_command_line_publishes_zero_pages_on_empty_db(self):
+    def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         
@@ -86,7 +86,7 @@ class PublisherTestCase(CMSTestCase):
         self.assertEqual(pages_from_output,0)
         self.assertEqual(published_from_output,0)
         
-    def test_05_command_line_publishes_one_page(self):
+    def test_command_line_publishes_one_page(self):
         '''
         Publisher always creates two Page objects for every CMS page,
         one is_draft and one is_public.
@@ -133,7 +133,7 @@ class PublisherTestCase(CMSTestCase):
         non_draft = Page.objects.public()[0]
         self.assertEquals(non_draft.reverse_id, 'a_test')
         
-    def test_06_unpublish(self):
+    def test_unpublish(self):
         page = create_page("Page", "nav_playground.html", "en", published=True,
                            in_navigation=True)
         page.published = False
@@ -143,7 +143,7 @@ class PublisherTestCase(CMSTestCase):
         page.save()
         self.assertEqual(page.published, True)
 
-    def test_07_publish_works_with_descendants(self):
+    def test_publish_works_with_descendants(self):
         '''
         For help understanding what this tests for, see:
         http://articles.sitepoint.com/print/hierarchical-data-database

@@ -48,17 +48,23 @@ On Ubuntu
 If you're using Ubuntu (tested with 10.10), the following should get you
 started:
 
-``sudo aptitude install python2.6 python-setuptools python-imaging``
+.. code-block:: bash
 
-``sudo easy_install pip``
-
-``sudo pip install django-cms south django-appmedia``
+    sudo aptitude install python2.6 python-setuptools python-imaging
+    sudo easy_install pip
+    sudo pip install django-cms south django-appmedia
 
 Additionally, you need the python driver for your selected database:
 
-``sudo aptitude python-psycopg2``
+.. code-block:: bash
+
+    sudo aptitude python-psycopg2
+    
 or
-``sudo aptitude install python-mysql``
+
+.. code-block:: bash
+
+    sudo aptitude install python-mysql
 
 This will install PIL and your database's driver globally.
 
@@ -83,7 +89,7 @@ We recommend using `PostgreSQL`_ or `MySQL`_ with Django CMS. Installing and
 maintaining database systems is outside the scope of this documentation, but is
 very well documented on the system's respective websites.
 
-To use Django CMS efficiently, we recommend:
+To use django CMS efficiently, we recommend:
 
 * Create a separate set of credentials for django CMS.
 * Create a separate database for django CMS to use.

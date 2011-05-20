@@ -224,6 +224,7 @@ class CMSPlugin(MPTTModel):
         new_plugin.tree_id = None
         new_plugin.lft = None
         new_plugin.rght = None
+        new_plugin.level = None
         if self.parent:
             pdif = self.level - plugin_tree[-1].level
             if pdif < 0:
@@ -248,6 +249,7 @@ class CMSPlugin(MPTTModel):
             plugin_instance.level = new_plugin.level
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
+            plugin_instance.parent = new_plugin.parent
             plugin_instance.position = new_plugin.position # added to retain the position when creating a public copy of a plugin
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)

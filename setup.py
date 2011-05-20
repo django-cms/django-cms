@@ -52,32 +52,25 @@ setup(
         'django-mptt>=0.4.2',
         'django-sekizai>=0.4.2',
     ],
-    packages=find_packages(exclude=["example", "example.*","testdata","testdata.*"]),
-    package_data={
-        'cms': [
-            'templates/admin/*.html',
-            'templates/admin/cms/mail/*.html',
-            'templates/admin/cms/mail/*.txt',
-            'templates/admin/cms/page/*.html',
-            'templates/admin/cms/page/*/*.html',
-            'templates/cms/*.html',
-            'templates/cms/*/*.html',
-            'plugins/*/templates/cms/plugins/*.html',
-            'plugins/*/templates/cms/plugins/*/*.html',
-            'plugins/*/templates/cms/plugins/*/*.js',
-            'locale/*/LC_MESSAGES/*',
-        ] + media_files,
-        'example': [
-            'media/css/*.css',
-            'media/img/*.jpg',
-            'templates/*.html',
-            'sampleapp/media/sampleapp/img/gift.jpg',
-            'sampleapp/templates/sampleapp/*.html',
-        ],
-        'menus': [
-            'templates/menu/*.html',
-        ],
-    },
-    test_suite = "cms.test.run_tests.run_tests",
+    packages=find_packages(exclude=["testdata","testdata.*"]),
+    include_package_data=True,
+#    package_data={
+#        'cms': [
+#            'templates/admin/*.html',
+#            'templates/admin/cms/mail/*.html',
+#            'templates/admin/cms/mail/*.txt',
+#            'templates/admin/cms/page/*.html',
+#            'templates/admin/cms/page/*/*.html',
+#            'templates/cms/*.html',
+#            'templates/cms/*/*.html',
+#            'plugins/*/templates/cms/plugins/*.html',
+#            'plugins/*/templates/cms/plugins/*/*.html',
+#            'plugins/*/templates/cms/plugins/*/*.js',
+#            'locale/*/LC_MESSAGES/*',
+#        ] + media_files,
+#        'menus': [
+#            'templates/menu/*.html',
+#        ],
+#    },
     zip_safe = False
 )
