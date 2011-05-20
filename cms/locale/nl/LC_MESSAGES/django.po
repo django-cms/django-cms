@@ -1,21 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+# Chris Wesseling <chris.wesseling@xs4all.nl>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-05-10 20:54+0200\n"
+"Last-Translator: Chris Wesseling <chris.wesseling@xs4all.nl>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.6.1\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -353,11 +353,11 @@ msgstr "Erf het sjabloon van de dichtstbijzijnde voorouder"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "Selecteer een geldige site"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "Selecteer een geldige pagina"
 
 #: forms/widgets.py:173
 msgid "Add Another"
@@ -605,11 +605,11 @@ msgstr "ouders goedkeuren vereist"
 
 #: models/pagemodel.py:50
 msgid "for logged in users only"
-msgstr ""
+msgstr "alleen voor aangemelde gebruikers"
 
 #: models/pagemodel.py:51
 msgid "for anonymous users only"
-msgstr ""
+msgstr "alleen voor anonieme gebruikers"
 
 #: models/pagemodel.py:59
 msgid "created by"
@@ -644,8 +644,9 @@ msgstr ""
 "deze pagina te verwijzen."
 
 #: models/pagemodel.py:69
+#, fuzzy
 msgid "attached menu"
-msgstr ""
+msgstr "bevestigd menu"
 
 #: models/pagemodel.py:70
 msgid "is published"
@@ -669,11 +670,12 @@ msgstr "moderatie-toestand"
 
 #: models/pagemodel.py:83
 msgid "menu visibility"
-msgstr ""
+msgstr "menu zichtbaarheid"
 
 #: models/pagemodel.py:83
+#, fuzzy
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "limiteer wanneer deze pagina zichtbaar is in het menu"
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -770,7 +772,7 @@ msgstr "breedte"
 
 #: models/pluginmodel.py:122
 msgid "<Empty>"
-msgstr ""
+msgstr "<Empty>"
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
@@ -870,7 +872,7 @@ msgstr "Kaart"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:11
 msgid "Your address: "
-msgstr ""
+msgstr "Uw adres:"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:13
 msgid "Calculate route"
@@ -1069,7 +1071,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:31
 msgid "Twitter Search"
-msgstr ""
+msgstr "Twitter-zoekopdracht"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1094,8 +1096,9 @@ msgstr ""
 "profiel."
 
 #: plugins/twitter/models.py:16
+#, fuzzy
 msgid "query"
-msgstr ""
+msgstr "opdracht"
 
 #: plugins/twitter/models.py:16
 msgid ""
@@ -1103,6 +1106,9 @@ msgid ""
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
 msgstr ""
+"Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden "
+"\"hersenen\" en \"zombies\" bevatten"
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1177,19 +1183,19 @@ msgstr "zoekbar achtergrondkleur"
 
 #: plugins/video/models.py:26
 msgid "loadingbar color"
-msgstr ""
+msgstr "laadbalk kleur"
 
 #: plugins/video/models.py:27
 msgid "button out color"
-msgstr ""
+msgstr "knop \"out\" kleur"
 
 #: plugins/video/models.py:28
 msgid "button over color"
-msgstr ""
+msgstr "knop \"over\" kleur"
 
 #: plugins/video/models.py:29
 msgid "button highlight color"
-msgstr ""
+msgstr "knop \"oplicht\" kleur"
 
 #: plugins/video/templates/cms/plugins/video.html:3
 msgid ""
@@ -1245,7 +1251,7 @@ msgstr "Log <a href=\"%(login_url)s\">hier</a> in op de administratie."
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "Login url: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1602,7 +1608,7 @@ msgstr "Kies kopiëer-opties"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "Algemeen"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 #: templates/cms/toolbar/add_plugins.html:6
@@ -1632,7 +1638,7 @@ msgstr ""
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
-msgstr ""
+msgstr "Beschikbare plugins"
 
 #: templates/cms/toolbar/toolbar.html:33
 #, python-format
@@ -1662,7 +1668,7 @@ msgstr "inloggen"
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
-msgstr ""
+msgstr "Verzoek Goedkeuring"
 
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
@@ -1686,11 +1692,11 @@ msgstr "Sub-pagina toevoegen"
 
 #: templates/cms/toolbar/toolbar.html:198
 msgid "add sibling"
-msgstr ""
+msgstr "voeg in op hetzelfde niveau"
 
 #: templates/cms/toolbar/toolbar.html:198
 msgid "Add sibling page"
-msgstr ""
+msgstr "Voeg pagina in op hetzelfde niveau"
 
 #: templates/cms/toolbar/toolbar.html:200
 msgid "Delete Page"
@@ -1756,90 +1762,95 @@ msgstr "Afstammelingen-moderatie ontbinden"
 #: templatetags/cms_tags.py:78
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Pagina niet gevonden in %(domain)s"
 
 #: templatetags/cms_tags.py:79
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"Een sjabloon tag kon de pagina met zoekopdracht `%(page_lookup)s`. De URL "
+"van het verzoek was: http://%(host)s%(path)s"
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
-msgstr ""
+msgstr "Engels"
 
 #: test/run_tests.py:138 test/project/settings.py:117
 msgid "French"
-msgstr ""
+msgstr "Frans"
 
 #: test/run_tests.py:139 test/project/settings.py:118
 msgid "German"
-msgstr ""
+msgstr "Duits"
 
 #: test/run_tests.py:140 test/project/settings.py:119
+#, fuzzy
 msgid "Brazil"
-msgstr ""
+msgstr "Brazilië"
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
-msgstr ""
+msgstr "Nederlands"
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "twee kolommen"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "drie kolommen"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
-msgstr ""
+msgstr "navigatie voorbeelden"
 
 #: test/run_tests.py:167 test/project/settings.py:148
 msgid "sidebar column"
-msgstr ""
+msgstr "zijbalk kolom"
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr ""
+msgstr "linker kolom"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr ""
+msgstr "rechter kolom"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "Artikelen"
 
 #: test/apps/sampleapp/cms_app.py:7
 msgid "Sample App"
-msgstr ""
+msgstr "Voorbeeld App"
 
 #: test/apps/sampleapp/menu.py:17
+#, fuzzy
 msgid "sample root page"
-msgstr ""
+msgstr "voorbeeld root pagina"
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
-msgstr ""
+msgstr "voorbeeld instellingenpagina"
 
 #: test/apps/sampleapp/menu.py:19
+#, fuzzy
 msgid "sample account page"
-msgstr ""
+msgstr "voorbeeld account pagina"
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "voorbeeld mijn profiel pagina"
 
 #: test/apps/sampleapp/menu.py:32
 msgid "Static Menu"
-msgstr ""
+msgstr "Statisch Menu"
 
 #: test/apps/sampleapp/menu.py:48
 msgid "Static Menu2"
-msgstr ""
+msgstr "Statisch Menu2"
 
 #: utils/moderator.py:83
 msgid "parent first"
@@ -1862,8 +1873,8 @@ msgstr "CMS - je gebruikersaccount is aangemaakt."
 msgid "CMS - your user account was changed."
 msgstr "CMS - je gebruikersaccount is veranderd."
 
-#~ msgid "fgcolor"
-#~ msgstr "voorgrondkleur"
+#~ msgid "Revisions"
+#~ msgstr "Revisies"
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Er is nog niet naar de gevraagde taal vertaald."
