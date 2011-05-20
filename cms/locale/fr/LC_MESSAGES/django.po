@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1864,3 +1863,5 @@ msgstr "CMS - votre compte utilisateur a été modifié"
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "La traduction pour la langue demandée n'est pas encore disponible."
+
+

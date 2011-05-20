@@ -1,21 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Chris Wesseling <chris.wesseling@xs4all.nl>, 2011.
+# 
+# Chris Wesseling <chris.wesseling@xs4all.nl>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-05-10 20:54+0200\n"
-"Last-Translator: Chris Wesseling <chris.wesseling@xs4all.nl>\n"
+"PO-Revision-Date: 2011-05-20 08:37+0000\n"
+"Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Virtaal 0.6.1\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -644,9 +644,8 @@ msgstr ""
 "deze pagina te verwijzen."
 
 #: models/pagemodel.py:69
-#, fuzzy
 msgid "attached menu"
-msgstr "bevestigd menu"
+msgstr ""
 
 #: models/pagemodel.py:70
 msgid "is published"
@@ -673,9 +672,8 @@ msgid "menu visibility"
 msgstr "menu zichtbaarheid"
 
 #: models/pagemodel.py:83
-#, fuzzy
 msgid "limit when this page is visible in the menu"
-msgstr "limiteer wanneer deze pagina zichtbaar is in het menu"
+msgstr ""
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -1096,9 +1094,8 @@ msgstr ""
 "profiel."
 
 #: plugins/twitter/models.py:16
-#, fuzzy
 msgid "query"
-msgstr "opdracht"
+msgstr ""
 
 #: plugins/twitter/models.py:16
 msgid ""
@@ -1106,8 +1103,8 @@ msgid ""
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
 msgstr ""
-"Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets "
-"van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden "
+"Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets"
+" van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden "
 "\"hersenen\" en \"zombies\" bevatten"
 
 #: plugins/video/cms_plugins.py:10
@@ -1765,13 +1762,11 @@ msgid "Page not found on %(domain)s"
 msgstr "Pagina niet gevonden in %(domain)s"
 
 #: templatetags/cms_tags.py:79
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
-"Een sjabloon tag kon de pagina met zoekopdracht `%(page_lookup)s`. De URL "
-"van het verzoek was: http://%(host)s%(path)s"
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
@@ -1786,9 +1781,8 @@ msgid "German"
 msgstr "Duits"
 
 #: test/run_tests.py:140 test/project/settings.py:119
-#, fuzzy
 msgid "Brazil"
-msgstr "Brazilië"
+msgstr ""
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
@@ -1827,18 +1821,16 @@ msgid "Sample App"
 msgstr "Voorbeeld App"
 
 #: test/apps/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample root page"
-msgstr "voorbeeld root pagina"
+msgstr ""
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
 msgstr "voorbeeld instellingenpagina"
 
 #: test/apps/sampleapp/menu.py:19
-#, fuzzy
 msgid "sample account page"
-msgstr "voorbeeld account pagina"
+msgstr ""
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
@@ -1873,8 +1865,10 @@ msgstr "CMS - je gebruikersaccount is aangemaakt."
 msgid "CMS - your user account was changed."
 msgstr "CMS - je gebruikersaccount is veranderd."
 
-#~ msgid "Revisions"
-#~ msgstr "Revisies"
+#~ msgid "fgcolor"
+#~ msgstr "voorgrondkleur"
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Er is nog niet naar de gevraagde taal vertaald."
+
+

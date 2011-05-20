@@ -1,15 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-05-12 06:22+0000\n"
+"Last-Translator: nanook <klaus.dahlen@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -341,11 +340,11 @@ msgstr "Peri lähimmän vanhemman asettelu"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "Valitse kelvollinen sivusto"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "Valitse kelvollinen sivu"
 
 #: forms/widgets.py:173
 msgid "Add Another"
@@ -593,7 +592,7 @@ msgstr "Hyväksy äitisivu"
 
 #: models/pagemodel.py:50
 msgid "for logged in users only"
-msgstr ""
+msgstr "ja kirjautuneet käyttäjät vain"
 
 #: models/pagemodel.py:51
 msgid "for anonymous users only"
@@ -1844,7 +1843,9 @@ msgid "CMS - your user account was changed."
 msgstr "CMS - käyttäjätiliäsi on muokattu."
 
 #~ msgid "fgcolor"
-#~ msgstr "Vordergrundfarbe"
+#~ msgstr "etualan väri"
 
 #~ msgid "Wanted language has not been translated yet."
-#~ msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
+#~ msgstr "Pyydetty kieli ei ole vielä käännetty."
+
+
