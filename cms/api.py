@@ -254,7 +254,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     return title
 
 def add_plugin(placeholder, plugin_type, language, position='last-child',
-               **data):
+               target=None, **data):
     """
     Add a plugin to a placeholder
     
@@ -272,7 +272,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         position=1, 
         language=language
     )
-    plugin_base.insert_at(None, position=position, save=False)
+    plugin_base.insert_at(target, position=position, save=False)
             
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
