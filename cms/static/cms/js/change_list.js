@@ -92,8 +92,7 @@
 		tree.init($("div.tree"), options);
 	};
 	
-	$(document).ready(function() {
-		$.fn.cmsPatchCSRF();
+	$(document).ready(function() {	
 	    var selected_page = false;
 	    var action = false;
 		

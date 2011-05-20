@@ -161,14 +161,14 @@ class PageAdmin(ModelAdmin):
 
     class Media:
         css = {
-            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
             )]
         }
-        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+        js = [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
             'js/lib/jquery.js',
             'js/lib/jquery.query.js',
             'js/lib/ui.core.js',
@@ -673,7 +673,6 @@ class PageAdmin(ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
             'CMS_PERMISSION': settings.CMS_PERMISSION,
             'CMS_MODERATOR': settings.CMS_MODERATOR,
@@ -1247,7 +1246,6 @@ class PageAdmin(ModelAdmin):
             saved_object = plugin_admin.saved_object
 
             context = {
-                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
                 'plugin': saved_object,
                 'is_popup': True,
                 'name': unicode(saved_object),
