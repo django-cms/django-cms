@@ -218,6 +218,15 @@ class PagesTestCase(CMSTestCase):
         page3 = Page.objects.get(pk=page3.pk)
         self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
         
+    def test_move_page_inherit(self):
+        parent = create_page("Parent", 'col_three.html', "en")
+        child = create_page("Child", settings.CMS_TEMPLATE_INHERITANCE_MAGIC,
+                            "en", parent=parent)
+        self.assertEqual(child.get_template(), parent.get_template())
+        child.move_page(parent, 'left')
+        self.assertEqual(child.get_template(), parent.get_template())
+        
+        
     def test_add_placeholder(self):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
