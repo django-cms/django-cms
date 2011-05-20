@@ -242,10 +242,10 @@
 			// moderation
 			if(jtarget.hasClass("moderator-checkbox")) {
 	            var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-	            parent = jtarget.parents('div.col-moderator');
+	            myparent = jtarget.parents('div.col-moderator');
 				
 				value = 0;
-				parent.find('input[type=checkbox]').each(function(i, el){
+				myparent.find('input[type=checkbox]').each(function(i, el){
 					value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
 				});
 				
