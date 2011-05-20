@@ -30,7 +30,7 @@ class SiteTestCase(CMSTestCase):
         self._login_context.__exit__(None, None, None)
     
     
-    def test_01_site_framework(self):
+    def test_site_framework(self):
         #Test the site framework, and test if it's possible to disable it
         with SettingsOverride(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "en", site=self.site2)

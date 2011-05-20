@@ -51,7 +51,7 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
-    def test_01_revert(self):
+    def test_revert(self):
         """
         Test that you can revert a plugin
         """
@@ -78,7 +78,7 @@ class ReversionTestCase(CMSTestCase):
             self.assertEquals(Text.objects.all().count(), 2)
             self.assertEquals(Revision.objects.all().count(), 6)
         
-    def test_02_recover(self):
+    def test_recover(self):
         """
         Test that you can recover a page
         """

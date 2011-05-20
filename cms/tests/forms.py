@@ -22,20 +22,20 @@ class FormsTestCase(CMSTestCase):
     def setUp(self):
         cache.clear()
         
-    def test_01_get_site_choices(self):
+    def test_get_site_choices(self):
         result = get_site_choices()
         self.assertEquals(result, [])
         
-    def test_02_get_page_choices(self):
+    def test_get_page_choices(self):
         result = get_page_choices()
         self.assertEquals(result, [('', '----')])
         
-    def test_03_get_site_choices_without_moderator(self):
+    def test_get_site_choices_without_moderator(self):
         with SettingsOverride(CMS_MODERATOR=False):
             result = get_site_choices()
             self.assertEquals(result, [])
             
-    def test_04_get_site_choices_without_moderator(self):
+    def test_get_site_choices_without_moderator(self):
         with SettingsOverride(CMS_MODERATOR=False):
             # boilerplate (creating a page)
             user_super = User(username="super", is_staff=True, is_active=True, 
@@ -48,7 +48,7 @@ class FormsTestCase(CMSTestCase):
                 result = get_site_choices()
                 self.assertEquals(result, [(1,'example.com')])
             
-    def test_05_compress_function_raises_when_page_is_none(self):
+    def test_compress_function_raises_when_page_is_none(self):
         raised = False
         try:
             fake_field = Mock_PageSelectFormField(required=True)
@@ -59,19 +59,19 @@ class FormsTestCase(CMSTestCase):
             raised = True
         self.assertTrue(raised)
         
-    def test_06_compress_function_returns_none_when_not_required(self):
+    def test_compress_function_returns_none_when_not_required(self):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = (0, None) #(site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEquals(result, None)
         
-    def test_06_compress_function_returns_none_when_no_data_list(self):
+    def test_compress_function_returns_none_when_no_data_list(self):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = None
         result = fake_field.compress(data_list)
         self.assertEquals(result, None)
         
-    def test_07_compress_function_gets_a_page_when_one_exists(self):
+    def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
         user_super = User(username="super", is_staff=True, is_active=True, 
                           is_superuser=True)
@@ -85,19 +85,19 @@ class FormsTestCase(CMSTestCase):
             result = fake_field.compress(data_list)
             self.assertEquals(home_page,result)
         
-    def test_08_superlazy_iterator_behaves_properly_for_sites(self):
+    def test_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()
         lazy_result = SuperLazyIterator(get_site_choices)
         
         self.assertEquals(normal_result, list(lazy_result))
         
-    def test_08_superlazy_iterator_behaves_properly_for_pages(self):
+    def test_superlazy_iterator_behaves_properly_for_pages(self):
         normal_result = get_page_choices()
         lazy_result = SuperLazyIterator(get_page_choices)
         
         self.assertEquals(normal_result, list(lazy_result))
 
-    def test_09_page_user_form_initial(self):
+    def test_page_user_form_initial(self):
         myuser = User.objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)

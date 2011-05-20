@@ -30,11 +30,11 @@ class NavExtenderTestCase(SettingsOverrideTestCase):
     def tearDown(self):
         menu_pool.menus = self.old_menu
         
-    def test_01_menu_registration(self):
+    def test_menu_registration(self):
         self.assertEqual(len(menu_pool.menus), 2)
         self.assertEqual(len(menu_pool.modifiers) >=4, True)
         
-    def test_02_extenders_on_root(self):
+    def test_extenders_on_root(self):
         Page.objects.filter(pk=1).update(navigation_extenders="TestMenu")
         menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
@@ -52,7 +52,7 @@ class NavExtenderTestCase(SettingsOverrideTestCase):
         nodes = context['children']
         self.assertEqual(len(nodes), 5)
         
-    def test_03_extenders_on_root_child(self):
+    def test_extenders_on_root_child(self):
         Page.objects.filter(pk=4).update(navigation_extenders="TestMenu")
         menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
@@ -62,7 +62,7 @@ class NavExtenderTestCase(SettingsOverrideTestCase):
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[1].children), 4)
         
-    def test_04_extenders_on_child(self):
+    def test_extenders_on_child(self):
         """
         TestMenu has 4 flat nodes
         """
@@ -78,7 +78,7 @@ class NavExtenderTestCase(SettingsOverrideTestCase):
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(nodes[0].children[1].get_absolute_url(), "/" )
         
-    def test_05_incorrect_nav_extender_in_db(self):
+    def test_incorrect_nav_extender_in_db(self):
         Page.objects.filter(pk=2).update(navigation_extenders="SomethingWrong")
         menu_pool.clear(settings.SITE_ID)
         context = self.get_context()

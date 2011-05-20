@@ -55,7 +55,7 @@ class AdminTestCase(CMSTestCase):
             gpp.sites = Site.objects.all()
         return admin, normal_guy
     
-    def test_01_edit_does_not_reset_page_adv_fields(self):
+    def test_edit_does_not_reset_page_adv_fields(self):
         """
         Makes sure that if a non-superuser with no rights to edit advanced page
         fields edits a page, those advanced fields are not touched.
@@ -140,7 +140,7 @@ class AdminTestCase(CMSTestCase):
             title = page.get_title_obj()
             self.assertEqual(title.overwrite_url, None)
 
-    def test_02_delete(self):
+    def test_delete(self):
         admin = self._get_guys(True)
         page = create_page("delete-page", "nav_playground.html", "en",
                            created_by=admin, published=True)
@@ -153,27 +153,27 @@ class AdminTestCase(CMSTestCase):
             self.assertRaises(Page.DoesNotExist, self.reload, page)
             self.assertRaises(Page.DoesNotExist, self.reload, child)
         
-    def test_03_admin_dialog_form_no_moderation_or_permissions(self):
+    def test_admin_dialog_form_no_moderation_or_permissions(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             result = _form_class_selector()
             self.assertEqual(result, None)
             
-    def test_04_admin_dialog_form_permission_only(self):
+    def test_admin_dialog_form_permission_only(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
             result = _form_class_selector()
             self.assertEqual(result, PermissionForm)
             
-    def test_05_admin_dialog_form_moderation_only(self):
+    def test_admin_dialog_form_moderation_only(self):
         with SettingsOverride(CMS_MODERATOR=True, CMS_PERMISSION=False):
             result = _form_class_selector()
             self.assertEqual(result, ModeratorForm)
             
-    def test_05_admin_dialog_form_moderation_and_permisison(self):
+    def test_admin_dialog_form_moderation_and_permisison(self):
         with SettingsOverride(CMS_MODERATOR=True, CMS_PERMISSION=True):
             result = _form_class_selector()
             self.assertEqual(result, PermissionAndModeratorForm)
 
-    def test_06_search_fields(self):
+    def test_search_fields(self):
         superuser = self._get_guys(admin_only=True)
         from django.contrib.admin import site
         with self.login_user_context(superuser):
@@ -187,7 +187,7 @@ class AdminTestCase(CMSTestCase):
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
 
-    def test_07_delete_translation(self):
+    def test_delete_translation(self):
         admin = self._get_guys(True)
         page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin, published=True)
@@ -198,7 +198,7 @@ class AdminTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
             self.assertRedirects(response, URL_CMS_PAGE)
     
-    def test_08_change_template(self):
+    def test_change_template(self):
         request = self.get_request('/admin/cms/page/1/', 'en')
         pageadmin = site._registry[Page]
         self.assertRaises(Http404, pageadmin.change_template, request, 1)
@@ -215,7 +215,7 @@ class AdminTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, 'ok')
             
-    def test_09_get_permissions(self):
+    def test_get_permissions(self):
         page = create_page('test-page', 'nav_playground.html', 'en')
         url = reverse('admin:cms_page_get_permissions', args=(page.pk,))
         response = self.client.get(url)

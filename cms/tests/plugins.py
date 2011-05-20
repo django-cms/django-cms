@@ -74,7 +74,7 @@ class PluginsTestBaseCase(CMSTestCase):
 class PluginsTestCase(PluginsTestBaseCase):
 
 
-    def test_01_add_edit_plugin(self):
+    def test_add_edit_plugin(self):
         """
         Test that you can add a text plugin
         """
@@ -102,7 +102,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
 
-    def test_02_copy_plugins(self):
+    def test_copy_plugins(self):
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertRedirects(response, URL_CMS_PAGE)
@@ -175,7 +175,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         for text in Text.objects.all():
             self.assertEquals(text.body, "Hello World")
 
-    def test_03_remove_plugin_before_published(self):
+    def test_remove_plugin_before_published(self):
         """
         When removing a draft plugin we would expect the public copy of the plugin to also be removed
         """
@@ -206,7 +206,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # there should be no plugins
         self.assertEquals(0, CMSPlugin.objects.all().count())
 
-    def test_04_remove_plugin_after_published(self):
+    def test_remove_plugin_after_published(self):
         # add a page
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -244,7 +244,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # there should be no plugins
         self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
-    def test_05_remove_plugin_not_associated_to_page(self):
+    def test_remove_plugin_not_associated_to_page(self):
         """
         Test case for PlaceholderField
         """
@@ -278,7 +278,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # no longer allowed for security reasons
         self.assertEqual(response.status_code, 404)
 
-    def test_07_register_plugin_twice_should_raise(self):
+    def test_register_plugin_twice_should_raise(self):
         number_of_plugins_before = len(plugin_pool.get_all_plugins())
         # The first time we register the plugin is should work
         plugin_pool.register_plugin(DumbFixturePlugin)
@@ -296,7 +296,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
-    def test_08_unregister_non_existing_plugin_should_raise(self):
+    def test_unregister_non_existing_plugin_should_raise(self):
         number_of_plugins_before = len(plugin_pool.get_all_plugins())
         raised = False
         try:
@@ -310,7 +310,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
                 
-    def test_09_inheritplugin_media(self):
+    def test_inheritplugin_media(self):
         """
         Test case for InheritPagePlaceholder
         """
@@ -350,7 +350,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             response = self.client.get(page.get_absolute_url())
             self.assertTrue('%sjs/plugins/jquery.tweet.js' % settings.CMS_MEDIA_URL in response.content, response.content)
         
-    def test_10_fileplugin_icon_uppercase(self):
+    def test_fileplugin_icon_uppercase(self):
         page = create_page('testpage', 'nav_playground.html', 'en')
         body = page.placeholders.get(slot="body") 
         plugin = File(
@@ -381,7 +381,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 # Now all directories we walked...
                 os.rmdir(os.path.join(root, name))
 
-    def test_11_copy_textplugin(self):
+    def test_copy_textplugin(self):
         """
         Test that copying of textplugins replaces references to copied plugins
         """
@@ -489,7 +489,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
     
-    def test_01_add_plugin_with_m2m(self):
+    def test_add_plugin_with_m2m(self):
         # add a new text plugin
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -517,7 +517,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEquals(self.section_count, plugin.sections.count())
 
-    def test_01_add_plugin_with_m2m_and_publisher(self):
+    def test_add_plugin_with_m2m_and_publisher(self):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
@@ -565,7 +565,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(expected, db_counts)
 
 
-    def test_03_copy_plugin_with_m2m(self):
+    def test_copy_plugin_with_m2m(self):
         page = create_page("page", "nav_playground.html", "en")
         
         placeholder = page.placeholders.get(slot='body')
@@ -630,7 +630,7 @@ class SekizaiTests(TestCase):
 
 
 class LinkPluginTestCase(PluginsTestBaseCase):
-    def test_01_does_not_verify_existance_of_url(self):
+    def test_does_not_verify_existance_of_url(self):
         form = LinkForm(
             {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
         self.assertEquals(form.is_valid(), True)

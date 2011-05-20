@@ -18,7 +18,7 @@ class DocsTestCase(CMSTestCase):
     """
     Test docs building correctly for HTML
     """
-    def test_01_html(self):
+    def test_html(self):
         nullout = StringIO()
         with TemporaryDirectory() as OUT_DIR:
             app = Sphinx(
