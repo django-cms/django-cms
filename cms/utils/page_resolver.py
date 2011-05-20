@@ -8,7 +8,10 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models.query_utils import Q
 import urllib
+import re
 
+ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
+ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
 def get_page_from_request(request, use_path=None):
     """
@@ -41,12 +44,12 @@ def get_page_from_request(request, use_path=None):
     # Check if this is called from an admin request
     if admin_base and request.path.startswith(admin_base):
         # if so, get the page ID to query the page
-        page_id = [bit for bit in request.path.split('/') if bit][-1]
-        if not page_id.isdigit():
+        match = ADMIN_PAGE_RE.search(request.path)
+        if not match:
             page = None
         else:
             try:
-                page = Page.objects.get(pk=page_id)
+                page = Page.objects.get(pk=match.group(1))
             except Page.DoesNotExist:
                 page = None
         request._current_page_cache = page
