@@ -392,7 +392,7 @@ class PagesTestCase(CMSTestCase):
             self.assertTrue(found_page)
             self.assertEqual(found_page.pk, page.pk)
         
-    def test_24_get_page_from_request_on_cms_admin_with_editplugin(self):
+    def test_get_page_from_request_on_cms_admin_with_editplugin(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
             reverse('admin:cms_page_change', args=(page.pk,)) + 'edit-plugin/42/'
@@ -401,7 +401,7 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(found_page)
         self.assertEqual(found_page.pk, page.pk)
         
-    def test_25_get_page_from_request_on_cms_admin_with_editplugin_nopage(self):
+    def test_get_page_from_request_on_cms_admin_with_editplugin_nopage(self):
         request = self.get_request(
             reverse('admin:cms_page_change', args=(1,)) + 'edit-plugin/42/'
         )
