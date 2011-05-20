@@ -971,7 +971,7 @@ class Page(MPTTModel):
             pass
         return sibling
 
-    def get_previous_fitlered_sibling(self, **filters):
+    def get_previous_filtered_sibling(self, **filters):
         """Very simillar to original mptt method, but adds support for filters.
         Returns this model instance's previous sibling in the tree, or
         ``None`` if it doesn't have a previous sibling.
@@ -1005,7 +1005,7 @@ class Page(MPTTModel):
             obj - public variant of `self` to be saved.
 
         """
-        prev_sibling = self.get_previous_fitlered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
+        prev_sibling = self.get_previous_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
 
         if not self.publisher_public_id:
             # is there anybody on left side?
@@ -1020,7 +1020,7 @@ class Page(MPTTModel):
                     obj.insert_at(public_parent, save=False)
         else:
             # check if object was moved / structural tree change
-            prev_public_sibling = self.old_public.get_previous_fitlered_sibling()
+            prev_public_sibling = self.old_public.get_previous_filtered_sibling()
 
             if not self.level == self.old_public.level or \
                 not (self.level > 0 and self.parent.publisher_public == self.old_public.parent) or \
@@ -1040,7 +1040,7 @@ class Page(MPTTModel):
                         obj.insert_at(next_sibling.publisher_public, position="left")
             else:
                 # insert at last public position
-                prev_sibling = self.old_public.get_previous_fitlered_sibling()
+                prev_sibling = self.old_public.get_previous_filtered_sibling()
 
                 if prev_sibling:
                     obj.insert_at(prev_sibling, position="right")
