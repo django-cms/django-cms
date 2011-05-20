@@ -717,7 +717,6 @@ class Page(MPTTModel):
             return self.publisher_public.has_view_permission(request)
         # does any restriction exist?
         # direct
-        #is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(self).filter(can_view=True).exists()
         

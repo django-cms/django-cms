@@ -5,7 +5,6 @@ from cms.api import (create_page, publish_page, approve_page, add_plugin,
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
     ACCESS_PAGE_AND_DESCENDANTS)
-from cms.models.permissionmodels import PagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
     SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD)
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -13,34 +12,7 @@ from cms.utils.permissions import has_generic_permission
 from django.contrib.auth.models import User
 
 
-class ViewPermissionTests(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_MODERATOR': True,
-    }
-    
-    def test_keep_view_permissions_on_publish(self):
-        user_super = User(username="super", is_staff=True, is_active=True, 
-            is_superuser=True)
-        user_super.set_password("super")
-        user_super.save()
-        page = create_page("Page", "nav_playground.html", "en", created_by=user_super)
-        # there should not be any permissions yet
-        self.assertFalse(PagePermission.objects.for_page(page).filter(can_view=True).exists())
-        normal = User(username='normal', email='normal@django-cms.org', is_active=True)
-        normal.set_password('normal')
-        normal.save()
-        user_normal = create_page_user(user_super, normal)
-        assign_user_to_page(page, user_normal, can_view=True)
-        # normal user has perms
-        self.assertTrue(PagePermission.objects.for_page(page).filter(can_view=True).exists())
-        publish_page(page, user_super)
-        # perms should still be here
-        self.assertTrue(PagePermission.objects.for_page(page).filter(can_view=True).exists())
-        self.assertTrue(PagePermission.objects.for_page(page.publisher_public).filter(can_view=True).exists())
-
-
-class PermissionModeratorTestCase(SettingsOverrideTestCase):
+class PermissionModeratorTests(SettingsOverrideTestCase):
     """Permissions and moderator together
     
     Fixtures contains 3 users and 1 published page and some other stuff
@@ -184,25 +156,25 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             self.assertTrue(response.content.isdigit())
             return response.content
 
-    def test_01_super_can_add_page_to_root(self):
+    def test_super_can_add_page_to_root(self):
         with self.login_user_context(self.user_super):
             response = self.client.get(URL_CMS_PAGE_ADD)
             self.assertEqual(response.status_code, 200)
     
-    def test_02_master_can_add_page_to_root(self):
+    def test_master_can_add_page_to_root(self):
         with self.login_user_context(self.user_master):
             response = self.client.get(URL_CMS_PAGE_ADD)
             self.assertEqual(response.status_code, 403)
         
-    def test_03_slave_can_add_page_to_root(self):
+    def test_slave_can_add_page_to_root(self):
         with self.login_user_context(self.user_slave):
             response = self.client.get(URL_CMS_PAGE_ADD)
             self.assertEqual(response.status_code, 403)
     
-    def test_04_moderation_on_slave_home(self):
+    def test_moderation_on_slave_home(self):
         self.assertEqual(self.slave_page.get_moderator_queryset().count(), 1)
     
-    def test_05_slave_can_add_page_under_slave_home(self):
+    def test_slave_can_add_page_under_slave_home(self):
         with self.login_user_context(self.user_slave):
             # move to admin.py?
             # url = URL_CMS_PAGE_ADD + "?target=%d&position=last-child" % slave_page.pk
@@ -237,11 +209,11 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             # user master should be able to approve aswell
             page = approve_page(page, self.user_slave)
 
-    def test_06_page_added_by_slave_can_be_published_approved_by_user_master(self):
+    def test_page_added_by_slave_can_be_published_approved_by_user_master(self):
         # add page
         page = create_page("page", "nav_playground.html", "en",
                            parent=self.slave_page, created_by=self.user_slave)
-        # same as test_05_slave_can_add_page_under_slave_home        
+        # same as test_slave_can_add_page_under_slave_home        
         self.assertEqual(page.get_moderator_queryset().count(), 1)
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
         
@@ -258,16 +230,16 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # user master should be able to approve descendants
         page = approve_page(page, self.user_master)    
         
-    def test_07_super_can_add_plugin(self):
+    def test_super_can_add_plugin(self):
         self._add_plugin(self.user_super, page=self.slave_page)
     
-    def test_08_master_can_add_plugin(self):
+    def test_master_can_add_plugin(self):
         self._add_plugin(self.user_master, page=self.slave_page)
     
-    def test_09_slave_can_add_plugin(self):
+    def test_slave_can_add_plugin(self):
         self._add_plugin(self.user_slave, page=self.slave_page)
     
-    def test_10_same_order(self):
+    def test_same_order(self):
         # create 4 pages
         slugs = []
         for i in range(0, 4):
@@ -282,7 +254,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             page = publish_page(page, self.user_master, True)
             self.check_published_page_attributes(page)
     
-    def test_11_create_copy_publish(self):
+    def test_create_copy_publish(self):
         # create new page to copy
         page = create_page("page", "nav_playground.html", "en",
                            parent=self.slave_page)
@@ -296,7 +268,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.check_published_page_attributes(page)
     
     
-    def test_12_create_publish_copy(self):
+    def test_create_publish_copy(self):
         # create new page to copy
         page = create_page("page", "nav_playground.html", "en",
                            parent=self.home_page)
@@ -313,7 +285,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.check_published_page_attributes(copied_page)
         
         
-    def test_13_subtree_needs_approvement(self):
+    def test_subtree_needs_approvement(self):
         # create page under slave_page
         page = create_page("parent", "nav_playground.html", "en",
                            parent=self.home_page)
@@ -348,7 +320,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.check_published_page_attributes(subpage)
 
 
-    def test_14_subtree_with_super(self):
+    def test_subtree_with_super(self):
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
         self.assertFalse(page.publisher_public)
@@ -380,7 +352,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.check_published_page_attributes(subpage)
         
         
-    def test_15_super_add_page_to_root(self):
+    def test_super_add_page_to_root(self):
         """Create page which is not under moderation in root, and check if 
         some properties are correct.
         """
@@ -394,7 +366,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
     
     
-    def test_16_moderator_flags(self):
+    def test_moderator_flags(self):
         """Add page under slave_home and check its flag
         """
         page = create_page("page", "nav_playground.html", "en",
@@ -439,7 +411,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         # page must be approved also now
         self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
         
-    def test_17_plugins_get_published(self):
+    def test_plugins_get_published(self):
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
         placeholder = page.placeholders.all()[0]
@@ -449,7 +421,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         publish_page(page, self.user_super, True)
         self.assertEqual(CMSPlugin.objects.all().count(), 2)
 
-    def test_18_remove_plugin_page_under_moderation(self):
+    def test_remove_plugin_page_under_moderation(self):
         # login as slave and create page
         page = create_page("page", "nav_playground.html", "en", parent=self.slave_page)
         self.assertEqual(page.get_moderator_queryset().count(), 1)
@@ -505,17 +477,17 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             # there should now be 0 plugins
             self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
-    def test_19_superuser_can_view(self):
+    def test_superuser_can_view(self):
         with self.login_user_context(self.user_super):
             response = self.client.get("/en/pageb/")
             self.assertEqual(response.status_code, 200)
 
-    def test_20_staff_can_view(self):
+    def test_staff_can_view(self):
         with self.login_user_context(self.user_staff):
             response = self.client.get("/en/pageb/")
             self.assertEqual(response.status_code, 200)
 
-    def test_21_user_normal_can_view(self):
+    def test_user_normal_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
         with self.login_user_context(self.user_normal):
             response = self.client.get(url)
@@ -527,7 +499,7 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_22_user_globalpermission(self):
+    def test_user_globalpermission(self):
         # Global user
         with self.login_user_context(self.user_super):
             user_global = User(username="global", is_active=True)
@@ -553,13 +525,13 @@ class PermissionModeratorTestCase(SettingsOverrideTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
-    def test_23_anonymous_user_public_for_all(self):
+    def test_anonymous_user_public_for_all(self):
         url = self.page_b.get_absolute_url('en')
         with SettingsOverride(CMS_PUBLIC_FOR='all'):
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 404)
 
-    def test_24_anonymous_user_public_for_none(self):
+    def test_anonymous_user_public_for_none(self):
         # default of when to show pages to anonymous user doesn't take
         # global permissions into account
         url = self.page_b.get_absolute_url('en')
