@@ -311,7 +311,7 @@ class PageAdmin(ModelAdmin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder_name in sorted(plugins.get_placeholders(placeholders_template)):
+            for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
                 name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
                 name = _(name)
                 given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
@@ -325,6 +325,9 @@ class PageAdmin(ModelAdmin):
             given_fieldsets = deepcopy(self.add_fieldsets)
 
         return given_fieldsets
+    
+    def get_fieldset_placeholders(self, template):
+        return plugins.get_placeholders(template)
 
     def get_form(self, request, obj=None, **kwargs):
         """
