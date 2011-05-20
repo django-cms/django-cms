@@ -123,6 +123,11 @@ class Page(MPTTModel):
         all the places which are changing page position. Used like an interface
         to mptt, but after move is done page_moved signal is fired.
         """
+        # make sure move_page does not break when using INHERIT template
+        if (position in ('left', 'right')
+            and not target.parent
+            and self.template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC):
+            self.template = self.get_template()
         self.move_to(target, position)
         
         # fire signal
