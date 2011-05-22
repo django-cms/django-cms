@@ -77,7 +77,8 @@ class MultilingualURLMiddleware(object):
             t = prefix
             if t in SUPPORTED:
                 lang = t
-                if hasattr(request, "session"):
+                if hasattr(request, "session") and \
+                        request.session.get("django_language", None) != lang:
                     request.session["django_language"] = lang
                 changed = True
         else:
@@ -95,12 +96,12 @@ class MultilingualURLMiddleware(object):
                 lang = translation.get_language_from_request(request)
         lang = get_default_language(lang)
         return lang
-    
+
     def process_request(self, request):
         language = self.get_language_from_request(request)
         translation.activate(language)
         request.LANGUAGE_CODE = language
-       
+
     def process_response(self, request, response):
         language = getattr(request, 'LANGUAGE_CODE', self.get_language_from_request(request))
         local_middleware = LocaleMiddleware()
@@ -109,7 +110,7 @@ class MultilingualURLMiddleware(object):
 
         # note: pages_root is assumed to end in '/'.
         #       testing this and throwing an exception otherwise, would probably be a good idea
-        
+
         if not path.startswith(settings.MEDIA_URL) and \
                 not path.startswith(settings.STATIC_URL) and \
                 not (getattr(settings,'STATIC_URL', False) and path.startswith(settings.STATIC_URL)) and \
