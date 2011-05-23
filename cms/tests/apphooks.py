@@ -24,7 +24,7 @@ class ApphooksTestCase(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
     
-    def test_01_explicit_apphooks(self):
+    def test_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
         """
@@ -40,7 +40,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
             
             
-    def test_02_implicit_apphooks(self):
+    def test_implicit_apphooks(self):
         """
         Test implicit apphook loading with INSTALLED_APPS + cms_app.py
         """
@@ -54,7 +54,7 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEqual(app_names, [APP_NAME])
             apphook_pool.clear()
     
-    def test_03_apphook_on_root(self):
+    def test_apphook_on_root(self):
         
         with SettingsOverride(ROOT_URLCONF='project.urls_for_apphook_tests'):
             apphook_pool.clear()    
@@ -70,7 +70,7 @@ class ApphooksTestCase(CMSTestCase):
             self.assertTemplateUsed(response, 'sampleapp/home.html')
             apphook_pool.clear()
     
-    def test_04_get_page_for_apphook(self):
+    def test_get_page_for_apphook(self):
             
         with SettingsOverride(ROOT_URLCONF='project.second_urls_for_apphook_tests'):
     

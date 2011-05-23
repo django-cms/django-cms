@@ -3,8 +3,10 @@ from cms.models.pagemodel import Page
 from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.plugins import get_placeholders
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from unittest import TestCase
 
 
@@ -27,6 +29,9 @@ class TemplatetagTests(TestCase):
     def test_get_site_id_from_str(self):
         with SettingsOverride(SITE_ID=10):
             self.assertEqual(10, get_site_id("something"))
+    
+    def test_unicode_placeholder_name_fails_fast(self):
+        self.assertRaises(ImproperlyConfigured, get_placeholders, 'unicode_placeholder.html')
 
 
 class TemplatetagDatabaseTests(SettingsOverrideTestCase):

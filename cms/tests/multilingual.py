@@ -8,7 +8,7 @@ import urllib
 
 
 class MultilingualTestCase(CMSTestCase):
-    def test_01_multilingual_url_middleware(self):
+    def test_multilingual_url_middleware(self):
         """
         Test the Multilingual URL Middleware correctly handles the various ways
         one can write URLs in HTML.
@@ -42,7 +42,7 @@ class MultilingualTestCase(CMSTestCase):
         expected = '<form action="/en/url/">'
         self.assertEqual(output, expected)
         
-    def test_02_multilingual_page(self):
+    def test_multilingual_page(self):
         page = create_page("mlpage", "nav_playground.html", "en")
         create_title("de", page.get_title(), page, slug=page.get_slug())
         page.rescan_placeholders()
@@ -59,7 +59,7 @@ class MultilingualTestCase(CMSTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
 
-    def test_03_multiple_reverse_monkeypatch(self):
+    def test_multiple_reverse_monkeypatch(self):
         """
         This test is not very well behaved, every following
         test that uses reverse will fail with a RuntimeException.

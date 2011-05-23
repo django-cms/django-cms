@@ -21,7 +21,7 @@ class ViewTests(SettingsOverrideTestCase):
     def setUp(self):
         clear_url_caches()
     
-    def test_01_handle_no_page(self):
+    def test_handle_no_page(self):
         """
         Test handle nopage correctly works with DEBUG=True
         """
@@ -34,7 +34,7 @@ class ViewTests(SettingsOverrideTestCase):
             response = _handle_no_page(request, slug)
             self.assertEqual(response.status_code, 200)
             
-    def test_02_language_fallback(self):
+    def test_language_fallback(self):
         """
         Test language fallbacks in details view
         """
@@ -46,7 +46,7 @@ class ViewTests(SettingsOverrideTestCase):
         with SettingsOverride(CMS_LANGUAGE_FALLBACK=False):
             self.assertRaises(Http404, details, request, '')
     
-    def test_03_apphook_not_hooked(self):
+    def test_apphook_not_hooked(self):
         """
         Test details view when apphook pool has apphooks, but they're not
         actually hooked
@@ -63,7 +63,7 @@ class ViewTests(SettingsOverrideTestCase):
             self.assertEqual(response.status_code, 200)
             apphook_pool.clear()
     
-    def test_04_redirect(self):
+    def test_redirect(self):
         redirect_one = 'https://www.django-cms.org/'
         redirect_two = '/'
         redirect_three = '/en/'
@@ -94,7 +94,7 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_three)
     
-    def test_05_login_required(self):
+    def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
                          login_required=True)
         request = self.get_request('/')

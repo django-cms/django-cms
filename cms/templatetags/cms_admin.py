@@ -4,10 +4,11 @@ from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from cms.utils.permissions import get_any_page_view_permissions
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 register = template.Library()
 
@@ -73,6 +74,16 @@ register.tag(CleanAdminListFilter)
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[value], value))
+
+@register.filter
+def is_restricted(page, request):
+    all_perms = get_any_page_view_permissions(request, page)
+    icon = boolean_icon(all_perms.exists())
+    return mark_safe(
+        ugettext('<span title="Restrictions: %(title)s">%(icon)s</span>') % {
+            'title': u', '.join((perm.get_grant_on_display() for perm in all_perms)) or None,
+            'icon': icon,
+        })
 
 @register.filter
 def moderator_choices(page, user):    

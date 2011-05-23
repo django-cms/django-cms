@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from cms.api import (_generate_valid_slug, create_page, _verify_plugin_type, 
-    assign_user_to_page)
+    assign_user_to_page, publish_page)
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
@@ -174,3 +174,15 @@ class PythonAPITests(TestCase):
         request = AttributeObject(user=user)
         self.assertTrue(page.has_change_permission(request))
         self.assertTrue(page.has_add_permission(request))
+
+    def test_page_overwrite_url_default(self):
+        page = create_page(**self._get_default_create_page_arguments())
+        self.assertFalse(page.get_title_obj_attribute('has_url_overwrite'))
+        self.assertEqual(page.get_title_obj_attribute('path'), 'test')
+
+    def test_create_page_can_overwrite_url(self):
+        page_attrs = self._get_default_create_page_arguments()
+        page_attrs["overwrite_url"] = 'test/home'
+        page = create_page(**page_attrs)
+        self.assertTrue(page.get_title_obj_attribute('has_url_overwrite'))
+        self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')

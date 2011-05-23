@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.tests.admin import (AdminTestCase, AdminFieldsetTests, 
-    AdminListFilterTests, AdminTests)
+    AdminListFilterTests, AdminTests, NoDBAdminTests)
 from cms.tests.api import PythonAPITests
 from cms.tests.apphooks import ApphooksTestCase
 from cms.tests.docs import DocsTestCase
@@ -14,7 +14,7 @@ from cms.tests.multilingual import MultilingualTestCase
 from cms.tests.navextender import NavExtenderTestCase
 from cms.tests.nonroot import NonRootCase
 from cms.tests.page import PagesTestCase, NoAdminPageTests
-from cms.tests.permmod import PermissionModeratorTestCase, PatricksMoveTest
+from cms.tests.permmod import PermissionModeratorTests, PatricksMoveTest
 from cms.tests.placeholder import (PlaceholderModelTests, PlaceholderAdminTest, 
     PlaceholderTestCase, PlaceholderActionTests)
 from cms.tests.plugins import (PluginManyToManyTestCase, PluginsTestCase, 

@@ -8,6 +8,7 @@ from cms.plugin_rendering import render_plugins, render_placeholder
 from cms.plugins.utils import get_plugins
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -110,7 +111,7 @@ class PageUrl(InclusionTag):
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, settings.CMS_CONTENT_CACHE_DURATION)
+                cache.set(cache_key, url, settings.CMS_CACHE_DURATIONS['content'])
         if url:
             return {'content': url}
         return {'content': ''}
@@ -192,6 +193,7 @@ class Placeholder(Tag):
     )
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
+        validate_placeholder_name(name)
         width = None
         inherit = False
         for bit in extra_bits:
@@ -315,6 +317,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
+    validate_placeholder_name(placeholder_name)
+    
     request = context.get('request', False)
     site_id = get_site_id(site)
 
@@ -345,7 +349,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         content = "".join(c)
 
     if cache_result:
-        cache.set(cache_key, content, settings.CMS_CONTENT_CACHE_DURATION)
+        cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
 
     if content:
         return {'content': mark_safe(content)}

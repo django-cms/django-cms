@@ -19,7 +19,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import PageUser, PagePermission
+from cms.models.permissionmodels import PageUser, PagePermission, GlobalPagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
@@ -107,7 +107,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
-                position="last-child"):
+                position="last-child", overwrite_url=None):
     """
     Create a CMS Page and it's title for the given language
     
@@ -167,7 +167,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     assert limit_visibility_in_menu in accepted_limitations
     
     # validate position
-    assert position in ('last-child', 'first-child')
+    assert position in ('last-child', 'first-child', 'left', 'right')
     
     page = Page(
         created_by=created_by,
@@ -201,7 +201,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         meta_keywords=meta_keywords,
-        page=page
+        page=page,
+        overwrite_url=overwrite_url
     )
         
     del _thread_locals.user
@@ -209,7 +210,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
-                 meta_keywords=None, parent=None):
+                 meta_keywords=None, parent=None, overwrite_url=None):
     """
     Create a title.
     
@@ -233,7 +234,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     else:
         application_urls = None
     
-    return Title.objects.create(
+    title = Title.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -242,11 +243,18 @@ def create_title(language, title, page, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         meta_keywords=meta_keywords,
-        page=page,
+        page=page
     )
 
+    if overwrite_url:
+        title.has_url_overwrite = True
+        title.path = overwrite_url
+        title.save()
+
+    return title
+
 def add_plugin(placeholder, plugin_type, language, position='last-child',
-               **data):
+               target=None, **data):
     """
     Add a plugin to a placeholder
     
@@ -264,14 +272,15 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         position=1, 
         language=language
     )
-    plugin_base.insert_at(None, position=position, save=False)
+    plugin_base.insert_at(target, position=position, save=False)
             
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
     return plugin
     
-def create_page_user(created_by, user, can_add_page=True,
+def create_page_user(created_by, user,
+                     can_add_page=True, can_view_page=True,
                      can_change_page=True, can_delete_page=True, 
                      can_recover_page=True, can_add_pageuser=True,
                      can_change_pageuser=True, can_delete_pageuser=True,
@@ -286,13 +295,14 @@ def create_page_user(created_by, user, can_add_page=True,
     if grant_all:
         # just be lazy
         return create_page_user(created_by, user, True, True, True, True,
-                                True, True, True, True, True, True)
+                                True, True, True, True, True, True, True)
     
     # validate created_by
     assert isinstance(created_by, User)
     
     data = {
         'can_add_page': can_add_page, 
+        'can_view_page': can_view_page, 
         'can_change_page': can_change_page, 
         'can_delete_page': can_delete_page, 
         'can_recover_page': can_recover_page, 
@@ -317,16 +327,17 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     can_add=False, can_change=False, can_delete=False, 
     can_change_advanced_settings=False, can_publish=False, 
     can_change_permissions=False, can_move_page=False, can_moderate=False, 
-    grant_all=False):
+    can_recover_page=True, can_view=False,
+    grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    if grant_all:
+    if grant_all and not global_permission:
         # shortcut to grant all permissions
         return assign_user_to_page(page, user, grant_on, True, True, True, True,
-                                   True, True, True, True)
+                                   True, True, True, True, True)
     
     data = {
         'can_add': can_add,
@@ -337,11 +348,16 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         'can_change_permissions': can_change_permissions, 
         'can_move_page': can_move_page, 
         'can_moderate': can_moderate,  
+        'can_view': can_view,
     }
-    
-    page_permission = PagePermission(page=page, user=user, grant_on=grant_on,
-                                     **data)
+    page_permission = PagePermission(page=page, user=user,
+                                     grant_on=grant_on, **data)
     page_permission.save()
+    if global_permission:
+        page_permission = GlobalPagePermission(
+            user=user, can_recover_page=can_recover_page, **data)
+        page_permission.save()
+        page_permission.sites.add(Site.objects.get_current())
     return page_permission
     
 def publish_page(page, user, approve=False):
@@ -352,17 +368,15 @@ def publish_page(page, user, approve=False):
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    # we can't use
-    # Page.objects.filter(pk=page.pk).update(published=(F('published') + 1) % 2)
-    # here because of the post save signals.
     page.published = True
+    # the magic happens in the post save signal here... WTF?
     page.save()
     # reload page
     page = Page.objects.get(pk=page.pk)
     # approve page if requested
     if approve:
-        return approve_page(page, user)
-    return page
+        page = approve_page(page, user)
+    return page.reload()
     
 def approve_page(page, user):
     """

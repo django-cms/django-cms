@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
+import os
+import warnings
+from datetime import datetime, date
+
+from django.conf import settings
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.db import models
+from django.db.models.base import (model_unpickle, simple_class_factory)
+from django.db.models.query_utils import DeferredAttribute
+from django.utils.translation import ugettext_lazy as _
+
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from datetime import datetime, date
-from django.conf import settings
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db import models
-from django.db.models.base import (ModelBase, model_unpickle, 
-    simple_class_factory)
-from django.db.models.query_utils import DeferredAttribute
-from django.utils.translation import ugettext_lazy as _
+
 from mptt.models import MPTTModel, MPTTModelBase
-from os.path import join
-import warnings
+
 
 class PluginModelBase(MPTTModelBase):
     """
@@ -167,8 +170,9 @@ class CMSPlugin(MPTTModel):
             return pages[0].get_media_path(filename)
         else: # django 1.0.2 compatibility
             today = date.today()
-            return join(settings.CMS_PAGE_MEDIA_PATH, str(today.year), str(today.month), str(today.day), filename)
-            
+            return os.path.join(settings.CMS_PAGE_MEDIA_PATH,
+                str(today.year), str(today.month), str(today.day), filename)
+
     @property
     def page(self):
         warnings.warn(
@@ -220,6 +224,7 @@ class CMSPlugin(MPTTModel):
         new_plugin.tree_id = None
         new_plugin.lft = None
         new_plugin.rght = None
+        new_plugin.level = None
         if self.parent:
             pdif = self.level - plugin_tree[-1].level
             if pdif < 0:
@@ -244,6 +249,7 @@ class CMSPlugin(MPTTModel):
             plugin_instance.level = new_plugin.level
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
+            plugin_instance.parent = new_plugin.parent
             plugin_instance.position = new_plugin.position # added to retain the position when creating a public copy of a plugin
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)

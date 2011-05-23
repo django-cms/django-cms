@@ -9,6 +9,8 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_save, post_save
 from django.template.context import Context
+from django.test.client import (encode_multipart, BOUNDARY, MULTIPART_CONTENT, 
+    FakePayload)
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool
 from urlparse import urlparse
@@ -82,11 +84,6 @@ class CMSTestCase(TestCase):
         menu_pool.clear()
         super(CMSTestCase, self)._post_teardown()
         
-    def login_user(self, user):
-        logged_in = self.client.login(username=user.username, password=user.username)
-        self.user = user
-        self.assertEqual(logged_in, True)
-        
     def login_user_context(self, user):
         return UserLoginContext(self, user)
         
@@ -106,25 +103,33 @@ class CMSTestCase(TestCase):
         return staff
     
     def get_new_page_data(self, parent_id=''):
-        page_data = {'title':'test page %d' % self.counter, 
-            'slug':'test-page-%d' % self.counter, 'language':settings.LANGUAGES[0][0],
-            'site':1, 'template':'nav_playground.html', 'parent': parent_id}
-        
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0],
+            'template': 'nav_playground.html',
+            'parent': parent_id,
+            'site': 1,
+        }
         # required only if user haves can_change_permission
         page_data['pagepermission_set-TOTAL_FORMS'] = 0
         page_data['pagepermission_set-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         
         self.counter = self.counter + 1
         return page_data
     
-    def print_page_structure(self, title=None):
+    def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in Page.objects.drafts().order_by('tree_id', 'lft'):
+        for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
             
-            print "%s%s, lft: %s, rght: %s" % (ident, page, page.lft, page.rght)
+            print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+                                    page.pk, page.lft, page.rght, page.tree_id)
     
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -197,7 +202,7 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None, language=None):
+    def get_request(self, path=None, language=None, post_data=None):
         if not path:
             path = self.get_pages_root()
         
@@ -228,6 +233,14 @@ class CMSTestCase(TestCase):
             'wsgi.run_once':     False,
             'wsgi.input':        ''
         }
+        if post_data:
+            post_data = encode_multipart(BOUNDARY, post_data)
+            environ.update({
+                    'CONTENT_LENGTH': len(post_data),
+                    'CONTENT_TYPE':   MULTIPART_CONTENT,
+                    'REQUEST_METHOD': 'POST',
+                    'wsgi.input':     FakePayload(post_data),
+            })
         request = WSGIRequest(environ)
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
@@ -243,18 +256,19 @@ class CMSTestCase(TestCase):
         self.assertEqual(page.level, public_page.level)
         
         # TODO: add check for siblings
-        
-        draft_siblings = list(page.get_siblings(True). \
-            filter(publisher_is_draft=True).order_by('tree_id', 'parent', 'lft'))
-        public_siblings = list(public_page.get_siblings(True). \
-            filter(publisher_is_draft=False).order_by('tree_id', 'parent', 'lft'))
-        
+        draft_siblings = list(page.get_siblings(True).filter(
+                publisher_is_draft=True
+            ).order_by('tree_id', 'parent', 'lft'))
+        public_siblings = list(public_page.get_siblings(True).filter(
+                publisher_is_draft=False
+            ).order_by('tree_id', 'parent', 'lft'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1
                 continue
-            self.assertEqual(sibling.id, public_siblings[i - skip].publisher_draft.id) 
+            self.assertEqual(sibling.id,
+                public_siblings[i-skip].publisher_draft.id)
     
     def request_moderation(self, page, level):
         """Assign current logged in user to the moderators / change moderation

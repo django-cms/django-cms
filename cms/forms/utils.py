@@ -1,42 +1,56 @@
 # -*- coding: utf-8 -*-
+from cms.models import Page
+from cms.models.titlemodels import Title
+from cms.utils import i18n
+from collections import defaultdict
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db.models.signals import post_save, post_delete
-from django.utils.safestring import mark_safe
 from django.utils import translation
-from django.conf import settings
+from django.utils.safestring import mark_safe
 
-from django.contrib.sites.models import Site
-from cms.models import Page
 
 def update_site_and_page_choices(lang=None):
     lang = lang or translation.get_language()
     SITE_CHOICES_KEY = get_site_cache_key(lang)
     PAGE_CHOICES_KEY = get_page_cache_key(lang)
     if settings.CMS_MODERATOR:
-        page_queryset = Page.objects.public().select_related('site')
+        title_queryset = Title.objects.filter(page__publisher_is_draft=False)
     else:
-        page_queryset = Page.objects.drafts().select_related('site')
+        title_queryset = Title.objects.filter(page__publisher_is_draft=True)
+    title_queryset = title_queryset.select_related('page', 'page__site')
+    pages = defaultdict(lambda: defaultdict(dict))
+    sites = {}
+    for title in title_queryset:
+        pages[title.page.site.pk][title.page.pk][title.language] = title
+        sites[title.page.site.pk] = title.page.site.name
+    
     site_choices = []
     page_choices = [('', '----')]
-    current_site_pages = []
-    current_site = None
-    for page in page_queryset:
-        if page.site != current_site:
-            if current_site_pages:
-                site_choices.append( (current_site.id, current_site.name ) )
-                page_choices.append( (current_site.name, current_site_pages) )
-                current_site_pages = []
-            current_site = page.site
-        page_title = page.get_menu_title(fallback=True)
-        if page_title is None:
-            page_title = u"page %s" % page.pk
-        page_title = mark_safe(u"%s %s" % (u"&nbsp;&nbsp;"*page.level, page_title))
-        current_site_pages.append(  (page.pk, page_title) )
-    if current_site_pages:
-        site_choices.append( (current_site.id, current_site.name ) )
-        page_choices.append( (current_site.name, current_site_pages) )
+    
+    language_order = [lang] + i18n.get_fallback_languages(lang)
+    
+    for sitepk, sitename in sites.items():
+        site_choices.append((sitepk, sitename))
+        
+        site_page_choices = []
+        for titles in pages[sitepk].values():
+            title = None
+            for language in language_order:
+                title = titles.get(language)
+                if title:
+                    break
+            if not title:
+                continue
+            
+            indent = u"&nbsp;&nbsp;" * title.page.level
+            page_title = mark_safe(u"%s%s" % (indent, title.title))
+            site_page_choices.append((title.page.pk, page_title))
+            
+        page_choices.append((sitename, site_page_choices))
+
     # We set it to 1 day here because we actively invalidate this cache.
-    # There is absolutely NO point in making this 
     cache.set(SITE_CHOICES_KEY, site_choices, 86400)
     cache.set(PAGE_CHOICES_KEY, page_choices, 86400)
     return site_choices, page_choices

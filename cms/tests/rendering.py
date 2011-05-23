@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms import plugin_rendering
-from cms.models import Page, CMSPlugin
+from cms.api import create_page, add_plugin
+from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
 from django.contrib.auth.models import User
@@ -25,49 +26,76 @@ def test_plugin_context_processor(instance, placeholder):
     return {'test_plugin_context_processor': content}
 
 
-class RenderingTestCase(CMSTestCase):
-    fixtures = ['rendering_content.json']
+class RenderingTestCase(SettingsOverrideTestCase):
+    
+    settings_overrides = {
+        'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME)],
+        'CMS_MODERATOR': False,
+    }
 
     def setUp(self):
-        self.test_data = {
-            'title': u'RenderingTestCase-title',
-            'slug': u'renderingtestcase-slug',
-            'reverse_id': u'renderingtestcase-reverse-id',
-            'text_main': u'RenderingTestCase-main',
-            'text_sub': u'RenderingTestCase-sub',
-        }
-        self.test_data2 = {
-            'title': u'RenderingTestCase-title2',
-            'slug': u'RenderingTestCase-slug2',
-            'reverse_id': u'renderingtestcase-reverse-id2',
-        }
-        self.test_data3 = {
-            'title': u'RenderingTestCase-title3',
-            'slug': u'RenderingTestCase-slug3',
-            'reverse_id': u'renderingtestcase-reverse-id3',
-            'text_sub': u'RenderingTestCase-sub3',
-        }
-        
-    @property
-    def test_user(self):
-        return User.objects.get(username="test")
+        super(RenderingTestCase, self).setUp()
+        self.test_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        self.test_user.set_password("test")
+        self.test_user.save()
+        with self.login_user_context(self.test_user):
     
-    @property
-    def test_page(self):
-        return Page.objects.get(pk=1)
-    
-    @property
-    def test_page2(self):
-        return Page.objects.get(pk=2)
-    
-    @property
-    def test_page3(self):
-        return Page.objects.get(pk=3)
-    
-    @property
-    def test_placeholders(self):
-        return dict([(ph.slot, ph) for ph in self.test_page.placeholders.all()])
+            self.test_data = {
+                'title': u'RenderingTestCase-title',
+                'slug': u'renderingtestcase-slug',
+                'reverse_id': u'renderingtestcase-reverse-id',
+                'text_main': u'RenderingTestCase-main',
+                'text_sub': u'RenderingTestCase-sub',
+            }
+            self.test_data2 = {
+                'title': u'RenderingTestCase-title2',
+                'slug': u'RenderingTestCase-slug2',
+                'reverse_id': u'renderingtestcase-reverse-id2',
+            }
+            self.test_data3 = {
+                'title': u'RenderingTestCase-title3',
+                'slug': u'RenderingTestCase-slug3',
+                'reverse_id': u'renderingtestcase-reverse-id3',
+                'text_sub': u'RenderingTestCase-sub3',
+            }
+            self.insert_test_content()
 
+    def insert_test_content(self):
+        # Insert a page
+        p = create_page(self.test_data['title'], TEMPLATE_NAME, 'en',
+                    slug=self.test_data['slug'], created_by=self.test_user,
+                    reverse_id=self.test_data['reverse_id'], published=True)
+        # Placeholders have been inserted on post_save signal:
+        self.test_placeholders = {}
+        for placeholder in p.placeholders.all():
+            self.test_placeholders[placeholder.slot] = placeholder
+        # Insert another page that is not the home page
+        p2 = create_page(self.test_data2['title'], TEMPLATE_NAME, 'en',
+                    parent=p, slug=self.test_data2['slug'], published=True,
+                    reverse_id=self.test_data2['reverse_id'])
+        # Insert some test Text plugins
+        add_plugin(self.test_placeholders['main'], 'TextPlugin', 'en',
+                   body=self.test_data['text_main'])
+        add_plugin(self.test_placeholders['sub'], 'TextPlugin', 'en',
+                   body=self.test_data['text_sub'])
+
+        # Insert another page that is not the home page
+        p3 = create_page(self.test_data3['title'], TEMPLATE_NAME, 'en',
+                         slug=self.test_data3['slug'], parent=p2,
+                         reverse_id=self.test_data3['reverse_id'], published=True)
+        # Placeholders have been inserted on post_save signal:
+        self.test_placeholders3 = {}
+        for placeholder in p3.placeholders.all():
+            self.test_placeholders3[placeholder.slot] = placeholder
+        # # Insert some test Text plugins
+        add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
+                   body=self.test_data3['text_sub'])
+
+        # Reload test pages
+        self.test_page = self.reload(p)
+        self.test_page2 = self.reload(p2)
+        self.test_page3 = self.reload(p3)
+        
     def get_context(self, page, context_vars={}):
         request = self.get_request(page)
         return RequestContext(request, context_vars)
@@ -93,7 +121,7 @@ class RenderingTestCase(CMSTestCase):
             r = t.render(c)
             return self.strip_rendered(r)
 
-    def test_00_details_view(self):
+    def test_details_view(self):
         """
         Tests that the `detail` view is working.
         """
@@ -103,7 +131,7 @@ class RenderingTestCase(CMSTestCase):
             r = self.strip_rendered(response.content)
             self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         
-    def test_01_processors(self):
+    def test_processors(self):
         """
         Tests that default plugin context processors are working, that plugin processors and plugin context processors
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
@@ -125,7 +153,7 @@ class RenderingTestCase(CMSTestCase):
             self.assertEqual(r, u'1|'+self.test_data['text_main']+'|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|'+self.test_data['text_main']+'|main|test_plugin_processor_ok|'+self.test_data['text_main']+'|main|original_context_var_ok')
             plugin_rendering._standard_processors = {}
     
-    def test_02_placeholder(self):
+    def test_placeholder(self):
         """
         Tests the {% placeholder %} templatetag.
         """
@@ -134,7 +162,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|')
 
-    def test_03_placeholderor(self):
+    def test_placeholderor(self):
         """
         Tests the {% placeholder %} templatetag.
         """
@@ -143,7 +171,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page)
         self.assertEqual(r, u'|No content')
 
-    def test_04_show_placeholder(self):
+    def test_show_placeholder(self):
         """
         Tests the {% show_placeholder %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
         """
@@ -155,7 +183,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
 
-    def test_05_show_uncached_placeholder(self):
+    def test_show_uncached_placeholder(self):
         """
         Tests the {% show_uncached_placeholder %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
         """
@@ -167,7 +195,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
 
-    def test_06_page_url(self):
+    def test_page_url(self):
         """
         Tests the {% page_url %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
         """
@@ -179,7 +207,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
         self.assertEqual(r, (u'|'+self.test_page2.get_absolute_url())*4)
 
-    def test_07_page_attribute(self):
+    def test_page_attribute(self):
         """
         Tests the {% page_attribute %} templatetag, using current page, lookup by pk/dict/reverse_id and passing a Page object.
         """
@@ -192,13 +220,13 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
         self.assertEqual(r, u'|'+self.test_data['title']+(u'|'+self.test_data2['title'])*2+(u'|'+self.test_data2['slug'])*2)
 
-    def test_08_inherit_placeholder(self):
+    def test_inherit_placeholder(self):
         t = u'{% load cms_tags %}'+ \
             u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
         r = self.render(t, self.test_page3)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|'+self.test_data3['text_sub'])
         
-    def test_09_detail_view_404_when_no_language_is_found(self):
+    def test_detail_view_404_when_no_language_is_found(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
                               CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
                                           ( 'elvish', 'Elvish' )]):
@@ -214,7 +242,7 @@ class RenderingTestCase(CMSTestCase):
             )
             self.assertRaises(Http404, details, request, slug=self.test_page.get_slug())
 
-    def test_10_detail_view_fallsback_language(self):
+    def test_detail_view_fallsback_language(self):
         '''
         Ask for a page in elvish (doesn't exist), and assert that it fallsback
         to English
@@ -240,7 +268,7 @@ class RenderingTestCase(CMSTestCase):
             response = details(request, slug=self.test_page.get_slug())
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             
-    def test_11_extra_context_isolation(self):
+    def test_extra_context_isolation(self):
         with ChangeModel(self.test_page, template='extra_context.html'):
             response = self.client.get(self.test_page.get_absolute_url())
             self.assertTrue('width' not in response.context)

@@ -80,7 +80,7 @@ class CMSToolbar(Toolbar):
             # The 'Admin' Menu
             items.append(self.get_admin_menu(context, request, can_change, is_staff))
             
-            if request.current_page:
+            if request.current_page and self.edit_mode:
                 moderator_state = page_moderator_state(request, request.current_page)
                 print moderator_state
                 should_approve = moderator_state['state'] >= I_APPROVE
