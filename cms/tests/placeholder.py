@@ -275,7 +275,7 @@ class PlaceholderModelTests(CMSTestCase):
         self.assertEqual(result, [Example1]) # Simple PH - Example1 model
         add_plugin(ph, TextPlugin, 'en', body='en body')
         result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1]) # Simple PH - error! should be one Example1 model name
+        self.assertEqual(result, [Example1]) # Simple PH still one Example1 model
         
     def test_excercise_get_attached_fields_notplugins(self):
         ex = Example1(
@@ -290,7 +290,7 @@ class PlaceholderModelTests(CMSTestCase):
         self.assertEqual(result, ['placeholder']) # Simple PH - placeholder field name
         add_plugin(ph, TextPlugin, 'en', body='en body')
         result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder']) # Simple PH - error! should be one placeholder field name
+        self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
         
 class PlaceholderAdminTest(CMSTestCase):
     placeholderconf = {'test': {
