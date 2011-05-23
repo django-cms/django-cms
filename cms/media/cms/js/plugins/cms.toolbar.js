@@ -12,7 +12,7 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Toolbar
-	 * @version: 0.1.0
+	 * @version: 0.1.1
 	 * @description: Implements and controls toolbar
 	 * @public_methods:
 	 *	- CMS.Toolbar.toggleToolbar();
@@ -23,11 +23,14 @@ jQuery(document).ready(function ($) {
 	 */
 	CMS.Toolbar = Class.$extend({
 
+		implement: [CMS.Helpers, CMS.Security],
+
 		options: {
 			// not integrated yet
 			debug: false,
 			items: [],
 			// type definitions used in registerItem()
+			// TODO: needs proper implementation
 			types: [
 				{ 'anchor': '_registerAnchor' },
 				{ 'html': '_reigsterHtml' },
@@ -57,7 +60,7 @@ jQuery(document).ready(function ($) {
 				e.preventDefault();
 				classy.toggleToolbar();
 			});
-
+log(this);
 			// initial setups
 			this._setup();
 		},
@@ -78,6 +81,9 @@ jQuery(document).ready(function ($) {
 
 			// start register items if any given
 			if(this.options.items.length) this.registerItems(this.options.items);
+
+			// apply csrf patch to toolbar from cms.base.js
+			this.csrf();
 		},
 
 		toggleToolbar: function () {
@@ -211,13 +217,13 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = CMS.Helpers.removeUrl(window.location.href, obj.addParameter);
-						window.location = CMS.Helpers.insertUrl(url, obj.removeParameter, "")
+						var url = classy.removeUrl(window.location.href, obj.addParameter);
+						window.location = classy.insertUrl(url, obj.removeParameter, "")
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = CMS.Helpers.insertUrl(location.href, obj.addParameter, "");
+						window.location = classy.insertUrl(location.href, obj.addParameter, "");
 					});
 				}
 			});
