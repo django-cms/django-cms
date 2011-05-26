@@ -13,6 +13,6 @@ class Command(LabelCommand):
         
         if number_of_apphooks > 0:
             queryset.update(application_urls=None)
-            print '%d "%s" apphooks uninstalled' % (number_of_apphooks, label)
+            self.stdout.write('%d "%s" apphooks uninstalled' % (number_of_apphooks, label))
         else:
-            print 'no "%s" apphooks found' % label
+            self.stdout.write('no "%s" apphooks found' % label)
