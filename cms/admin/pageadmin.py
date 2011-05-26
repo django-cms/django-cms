@@ -1086,7 +1086,7 @@ class PageAdmin(ModelAdmin):
             if page:
                 language = request.POST['language'] or get_language_from_request(request)
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
-                limits = placeholder_utils.get_placeholder_conf(placeholder.slot, page.get_template(), "limits", None)
+                limits = placeholder_utils.get_placeholder_conf("limits", placeholder.slot, page.get_template())
                 if limits:
                     global_limit = limits.get("global")
                     type_limit = limits.get(plugin_type)

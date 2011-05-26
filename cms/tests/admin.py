@@ -21,7 +21,7 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
@@ -611,6 +611,54 @@ class AdminTests(CMSTestCase, AdminTestsBase):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],
                         'http://django-cms.org%s?preview=1&draft=1' % base_url)
+    
+    def test_too_many_plugins_global(self):
+        conf = {
+            'body': {
+                'limits': {
+                    'global': 1,
+                },
+            },
+        }
+        admin = self.get_admin()
+        url = reverse('admin:cms_page_add_plugin')
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSIONS=False,
+                              CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('somepage', 'nav_playground.html', 'en')
+            body = page.placeholders.get(slot='body')
+            add_plugin(body, 'TextPlugin', 'en', body='text')
+            with self.login_user_context(admin):
+                data = {
+                    'plugin_type': 'TextPlugin',
+                    'placeholder': body.pk,
+                    'language': 'en',
+                }
+                response = self.client.post(url, data)
+                self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+    
+    def test_too_many_plugins_type(self):
+        conf = {
+            'body': {
+                'limits': {
+                    'TextPlugin': 1,
+                },
+            },
+        }
+        admin = self.get_admin()
+        url = reverse('admin:cms_page_add_plugin')
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSIONS=False,
+                              CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('somepage', 'nav_playground.html', 'en')
+            body = page.placeholders.get(slot='body')
+            add_plugin(body, 'TextPlugin', 'en', body='text')
+            with self.login_user_context(admin):
+                data = {
+                    'plugin_type': 'TextPlugin',
+                    'placeholder': body.pk,
+                    'language': 'en',
+                }
+                response = self.client.post(url, data)
+                self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
 
 class NoDBAdminTests(TestCase, AdminTestsBase):
