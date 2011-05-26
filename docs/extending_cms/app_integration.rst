@@ -175,7 +175,13 @@ under "Application". Save the page.
     except the dev-server): Restart the server because the URLs are cached by
     Django and in a multi-threaded environment we don't know which caches are
     cleared yet.
+    
+.. note::
 
+    If at some point you want to remove this apphook from the page
+    there is a django management commend called uninstall_apphooks
+    that removes the specified apphook(s) from all pages.
+          
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::
 
