@@ -1095,7 +1095,8 @@ class PageAdmin(ModelAdmin):
                     elif type_limit:
                         type_count = CMSPlugin.objects.filter(language=language, placeholder=placeholder, plugin_type=plugin_type).count()
                         if type_count >= type_limit:
-                            return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
+                            plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+                            return HttpResponseBadRequest("This placeholder already has the maximum number allowed of %s plugins." % plugin_name)
             # in-plugin add-plugin
             elif parent_id:
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)
