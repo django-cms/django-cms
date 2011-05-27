@@ -160,7 +160,13 @@ information see the `Django admin documentation`_.
 For a list of all the options you have on :class:`CMSPluginBase` have a look at
 the plugin reference
 
+.. note::
 
+    If at some point you want to remove this plugin after deleting the cms_plugins.py
+    there is a cms management command called uninstall apphooks
+    that removes the specified plugin(s) from all pages by name.
+    eg. manage.py ``cmsmanage uninstall plugins CMSGalleryPlugin``
+    
 Template
 ========
 
