@@ -11,7 +11,7 @@ class SubcommandsCommand(BaseCommand):
             if args[0] in self.subcommands.keys():
                 handle_command = self.subcommands.get(args[0])()
             else:
-                raise CommandError('No such command "%s"' % args[0])        
+                raise CommandError('No such command %r' % args[0])        
             if handle_command:
                 handle_command.stdout = getattr(self, 'stdout', sys.stdout)
                 handle_command.stderr = getattr(self, 'stderr', sys.stderr)
@@ -28,12 +28,20 @@ class UninstallApphooksCommand(LabelCommand):
     def handle_label(self, label, **options):
         queryset = Title.objects.filter(application_urls=label)
         number_of_apphooks = queryset.count()
-        
+
         if number_of_apphooks > 0:
-            queryset.update(application_urls=None)
-            self.stdout.write('%d "%s" apphooks uninstalled\n' % (number_of_apphooks, label))
+            if options.get('interactive'):
+                confirm = raw_input("""
+You have requested to remove %d %r apphooks.
+Are you sure you want to do this?
+Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
+            else:
+                confirm = 'yes'
+            if confirm == 'yes':
+                queryset.update(application_urls=None)
+                self.stdout.write('%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
         else:
-            self.stdout.write('no "%s" apphooks found\n' % label)
+            self.stdout.write('no %r apphooks found\n' % label)
             
 class UninstallPluginsCommand(LabelCommand):
 
@@ -46,10 +54,17 @@ class UninstallPluginsCommand(LabelCommand):
         number_of_plugins = queryset.count()
         
         if number_of_plugins > 0:
+            if options.get('interactive'):
+                confirm = raw_input("""
+You have requested to remove %d %r plugins.
+Are you sure you want to do this?
+Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
+            else:
+                confirm = 'yes'
             queryset.delete()
-            self.stdout.write('%d "%s" plugins uninstalled\n' % (number_of_plugins, label))
+            self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
-            self.stdout.write('no "%s" plugins found\n' % label)            
+            self.stdout.write('no %r plugins found\n' % label)            
 
 class UninstallCommand(SubcommandsCommand):
     help = 'Uninstall commands'
