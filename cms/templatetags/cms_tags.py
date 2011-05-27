@@ -399,7 +399,6 @@ class CMSToolbar(InclusionTag):
         request = context.get('request', None)
         if not request:
             return ''
-        request._cms_toolbar_tag_used = True
         return super(CMSToolbar, self).render(context)
     
     def get_context(self, context):
