@@ -164,7 +164,7 @@ the plugin reference
 
     If at some point you want to remove this plugin after deleting the cms_plugins.py
     there is a cms management command called uninstall apphooks
-    that removes the specified plugin(s) from all pages by name.
+    that removes all intancoes of the specified plugin(s) by name.
     eg. manage.py ``cmsmanage uninstall plugins CMSGalleryPlugin``
     
 Template
