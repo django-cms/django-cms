@@ -1,47 +1,27 @@
 from optparse import make_option
 from django.core.management.base import BaseCommand, LabelCommand, CommandError
-from cms.models.pluginmodel import CMSPlugin
-from cms.models.titlemodels import Title
 
 class SubcommandsCommand(BaseCommand):
 
-    def __init__(self):
-        super(SubcommandsCommand, self).__init__()
-        extra_options = []
-        for subcommand, command in self.subcommands.items():
-            extra_options.append(
-                make_option('--%s' % subcommand,
-                    action='store_true',
-                    dest=subcommand,
-                    default=False,
-                    help=command.help)
-                )
-            for option in command.option_list:
-                extra_options.append(option)
-                
-        self.option_list = BaseCommand.option_list + tuple(extra_options)
-
     def handle(self, *args, **options):
- 
-        handle_command = None 
-        for subcommand, command in self.subcommands.items():
-            if options[subcommand] == True:
-                handle_command = command()
-                del options[subcommand]
-                
-        if handle_command:
-            handle_command.execute(*args, **options)
+        if len(args) > 0:
+            if args[0] in self.subcommands.keys():
+                handle_command = self.subcommands.get(args[0])()
+            else:
+                raise CommandError('No such command "%s"' % args[0])        
+            if handle_command:
+                handle_command.execute(*args[1:], **options)
         else:
-            raise CommandError('No cms command in options')
+            raise CommandError('No commands in arguments')
             
 class UninstallApphooksCommand(LabelCommand):
     
-    option_list = tuple()
     args = "APPHOK_NAME"
     label = 'apphook name (SampleApp)'
     help = 'Uninstalls (sets to null) specified apphooks for all pages'
     
     def handle_label(self, label, **options):
+        from cms.models.titlemodels import Title
         queryset = Title.objects.filter(application_urls=label)
         number_of_apphooks = queryset.count()
         
@@ -52,13 +32,13 @@ class UninstallApphooksCommand(LabelCommand):
             self.stdout.write('no "%s" apphooks found' % label)
             
 class UninstallPluginsCommand(LabelCommand):
-    
-    option_list = tuple()
+
     args = "PLUGIN_NAME"
     label = 'plugin name (SamplePlugin)'
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
     
     def handle_label(self, label, **options):
+        from cms.models.pluginmodel import CMSPlugin
         queryset = CMSPlugin.objects.filter(type=label)
         number_of_plugins = queryset.count()
         
@@ -67,9 +47,16 @@ class UninstallPluginsCommand(LabelCommand):
             self.stdout.write('%d "%s" plugins uninstalled' % (number_of_plugins, label))
         else:
             self.stdout.write('no "%s" plugins found' % label)            
-            
-class Command(SubcommandsCommand):
+
+class UninstallCommand(SubcommandsCommand):
+    help = 'Uninstall commands'
     subcommands = {
-        'uninstall_apphooks': UninstallApphooksCommand,
-        'uninstall_plugins': UninstallPluginsCommand
+        'apphooks': UninstallApphooksCommand,
+        'plugins': UninstallPluginsCommand
+    }
+
+class Command(SubcommandsCommand):
+    help = 'Various django-cms commands'
+    subcommands = {
+        'uninstall': UninstallCommand,
     }

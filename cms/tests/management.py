@@ -15,7 +15,7 @@ class ManagementTestCase(CMSTestCase):
     
     def test_no_apphook(self):
         out = StringIO()
-        call_command('cms', APPHOOK, uninstall_apphooks=True, interactive=False, stout=out)
+        call_command('cms', 'uninstall', 'apphooks', APPHOOK, interactive=False, stout=out)
         self.assertEqual(out.getvalue(), "")
 
     def test_with_apphook(self):
@@ -24,6 +24,6 @@ class ManagementTestCase(CMSTestCase):
         with SettingsOverride(INSTALLED_APPS=apps):
             create_page("Hello Title", 'nav_playground.html', 'en', apphook=APPHOOK)
             self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)            
-            call_command('cms', APPHOOK,  uninstall_apphooks=True, interactive=False, stout=out)
+            call_command('cms', 'uninstall', 'apphooks', APPHOOK, interactive=False, stout=out)
             self.assertEqual(out.getvalue(), "")
             self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 0)
