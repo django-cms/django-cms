@@ -1,7 +1,8 @@
+import sys
 from optparse import make_option
-from django.core.management.base import BaseCommand, LabelCommand, CommandError
-from cms.models import CMSPlugin
-from cms.models import Title
+from django.core.management.base import BaseCommand, NoArgsCommand, LabelCommand, CommandError
+from cms.models.pluginmodel import CMSPlugin
+from cms.models.titlemodels import Title
 
 class SubcommandsCommand(BaseCommand):
 
@@ -12,7 +13,9 @@ class SubcommandsCommand(BaseCommand):
             else:
                 raise CommandError('No such command "%s"' % args[0])        
             if handle_command:
-                handle_command.execute(*args[1:], **options)
+                handle_command.stdout = getattr(self, 'stdout', sys.stdout)
+                handle_command.stderr = getattr(self, 'stderr', sys.stderr)
+                handle_command.handle(*args[1:], **options)
         else:
             raise CommandError('No commands in arguments')
             
@@ -28,9 +31,9 @@ class UninstallApphooksCommand(LabelCommand):
         
         if number_of_apphooks > 0:
             queryset.update(application_urls=None)
-            self.stdout.write('%d "%s" apphooks uninstalled' % (number_of_apphooks, label))
+            self.stdout.write('%d "%s" apphooks uninstalled\n' % (number_of_apphooks, label))
         else:
-            self.stdout.write('no "%s" apphooks found' % label)
+            self.stdout.write('no "%s" apphooks found\n' % label)
             
 class UninstallPluginsCommand(LabelCommand):
 
@@ -39,14 +42,14 @@ class UninstallPluginsCommand(LabelCommand):
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
     
     def handle_label(self, label, **options):
-        queryset = CMSPlugin.objects.filter(type=label)
+        queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()
         
-        if number_of_apphooks > 0:
+        if number_of_plugins > 0:
             queryset.delete()
-            self.stdout.write('%d "%s" plugins uninstalled' % (number_of_plugins, label))
+            self.stdout.write('%d "%s" plugins uninstalled\n' % (number_of_plugins, label))
         else:
-            self.stdout.write('no "%s" plugins found' % label)            
+            self.stdout.write('no "%s" plugins found\n' % label)            
 
 class UninstallCommand(SubcommandsCommand):
     help = 'Uninstall commands'
@@ -55,21 +58,21 @@ class UninstallCommand(SubcommandsCommand):
         'plugins': UninstallPluginsCommand
     }
     
-class ListApphooksCommand(LabelCommand):
+class ListApphooksCommand(NoArgsCommand):
     
     help = 'Lists all apphooks in pages'
     def handle_noargs(self, **options):
-        urls = Title.objects.distinct().values_list("application_urls", flat=True)
+        urls = Title.objects.values_list("application_urls", flat=True)
         for url in urls:
-            self.stdout.write(url)
+            self.stdout.write(url+'\n')
             
-class ListPluginsCommand(LabelCommand):
+class ListPluginsCommand(NoArgsCommand):
 
     help = 'Lists all plugins in CMSPlugin'
     def handle_noargs(self, **options):
         plugins = CMSPlugin.objects.distinct().values_list("plugin_type", flat=True)
         for plugin in plugins:
-            self.stdout.write(plugin)            
+            self.stdout.write(plugin+'\n')            
     
 class ListCommand(SubcommandsCommand):
     help = 'List commands'
