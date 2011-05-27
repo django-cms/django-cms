@@ -1,5 +1,7 @@
 from optparse import make_option
 from django.core.management.base import BaseCommand, LabelCommand, CommandError
+from cms.models import CMSPlugin
+from cms.models import Title
 
 class SubcommandsCommand(BaseCommand):
 
@@ -21,7 +23,6 @@ class UninstallApphooksCommand(LabelCommand):
     help = 'Uninstalls (sets to null) specified apphooks for all pages'
     
     def handle_label(self, label, **options):
-        from cms.models.titlemodels import Title
         queryset = Title.objects.filter(application_urls=label)
         number_of_apphooks = queryset.count()
         
@@ -38,7 +39,6 @@ class UninstallPluginsCommand(LabelCommand):
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
     
     def handle_label(self, label, **options):
-        from cms.models.pluginmodel import CMSPlugin
         queryset = CMSPlugin.objects.filter(type=label)
         number_of_plugins = queryset.count()
         
@@ -54,9 +54,33 @@ class UninstallCommand(SubcommandsCommand):
         'apphooks': UninstallApphooksCommand,
         'plugins': UninstallPluginsCommand
     }
+    
+class ListApphooksCommand(LabelCommand):
+    
+    help = 'Lists all apphooks in pages'
+    def handle_noargs(self, **options):
+        urls = Title.objects.distinct().values_list("application_urls", flat=True)
+        for url in urls:
+            self.stdout.write(url)
+            
+class ListPluginsCommand(LabelCommand):
 
+    help = 'Lists all plugins in CMSPlugin'
+    def handle_noargs(self, **options):
+        plugins = CMSPlugin.objects.distinct().values_list("plugin_type", flat=True)
+        for plugin in plugins:
+            self.stdout.write(plugin)            
+    
+class ListCommand(SubcommandsCommand):
+    help = 'List commands'
+    subcommands = {
+        'apphooks': ListApphooksCommand,
+        'plugins': ListPluginsCommand
+    }
+    
 class Command(SubcommandsCommand):
     help = 'Various django-cms commands'
     subcommands = {
         'uninstall': UninstallCommand,
+        'list': ListCommand,
     }
