@@ -97,6 +97,12 @@ class ListCommand(SubcommandsCommand):
     }
     
 class Command(SubcommandsCommand):
+    
+    option_list = BaseCommand.option_list + (
+        make_option('--noinput', action='store_false', dest='interactive', default=True,
+        help='Tells django-cms to NOT prompt the user for input of any kind. '),
+    )
+    
     help = 'Various django-cms commands'
     subcommands = {
         'uninstall': UninstallCommand,
