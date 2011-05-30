@@ -23,6 +23,13 @@ class ApphooksTestCase(CMSTestCase):
         
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
+
+    def tearDown(self):
+        clear_app_resolvers()
+        clear_url_caches()
+
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
     
     def test_explicit_apphooks(self):
         """
