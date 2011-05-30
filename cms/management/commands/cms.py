@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import sys
 from optparse import make_option
 from django.core.management.base import BaseCommand, NoArgsCommand, LabelCommand, CommandError
@@ -6,24 +7,40 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 
 class SubcommandsCommand(BaseCommand):
+    subcommands = {}
+    command_name = ''
+
+    def __init__(self):
+        super(SubcommandsCommand, self).__init__()
+        for name, subcommand in self.subcommands.items():
+            subcommand.command_name = '%s %s' % (self.command_name, name)
 
     def handle(self, *args, **options):
+        stderr = getattr(self, 'stderr', sys.stderr)
+        stdout = getattr(self, 'stdout', sys.stdout)
         if len(args) > 0:
             if args[0] in self.subcommands.keys():
                 handle_command = self.subcommands.get(args[0])()
-            else:
-                raise CommandError('No such command %r' % args[0])        
-            if handle_command:
-                handle_command.stdout = getattr(self, 'stdout', sys.stdout)
-                handle_command.stderr = getattr(self, 'stderr', sys.stderr)
+                handle_command.stdout = stdout
+                handle_command.stderr = stderr
                 handle_command.handle(*args[1:], **options)
+            else:
+                stderr.write("%r is not a valid subcommand for %r\n" % (args[0], self.command_name))
+                stderr.write("Available subcommands are:\n")
+                for subcommand in sorted(self.subcommands.keys()):
+                    stderr.write("  %r\n" % subcommand)
+                raise CommandError('Invalid subcommand %r for %r' % (args[0], self.command_name))
         else:
-            raise CommandError('No commands in arguments')
+            stderr.write("%r must be called with at least one argument, it's subcommand.\n" % self.command_name)
+            stderr.write("Available subcommands are:\n")
+            for subcommand in sorted(self.subcommands.keys()):
+                stderr.write("  %r\n" % subcommand)
+            raise CommandError('No subcommand given for %r' % self.command_name)
             
 class UninstallApphooksCommand(LabelCommand):
     
     args = "APPHOK_NAME"
-    label = 'apphook name (SampleApp)'
+    label = 'apphook name (eg SampleApp)'
     help = 'Uninstalls (sets to null) specified apphooks for all pages'
     
     def handle_label(self, label, **options):
@@ -47,7 +64,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
 class UninstallPluginsCommand(LabelCommand):
 
     args = "PLUGIN_NAME"
-    label = 'plugin name (SamplePlugin)'
+    label = 'plugin name (eg SamplePlugin)'
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
     
     def handle_label(self, label, **options):
@@ -103,6 +120,8 @@ class Command(SubcommandsCommand):
         make_option('--noinput', action='store_false', dest='interactive', default=True,
         help='Tells django-cms to NOT prompt the user for input of any kind. '),
     )
+
+    command_name = 'cms'
     
     help = 'Various django-cms commands'
     subcommands = {
