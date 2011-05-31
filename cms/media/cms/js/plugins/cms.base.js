@@ -4,7 +4,6 @@
  * @requires:	Classy, jQuery
  *
  * assign Class and CMS namespace */
- var Class = Class || {};
  var CMS = CMS || {};
 
 /*##################################################|*/
