@@ -152,7 +152,7 @@ Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the fil
     TEMPLATE_DIRS = (
         # The docs say it should be absolute path: PROJECT_PATH is precisely one.
         # Life is wonderful!
-        os.path.join(PROJECT_PATH, "templates")
+        os.path.join(PROJECT_PATH, "templates"),
     )
 
 Add at least one template to :setting:`CMS_TEMPLATES`; for example::
