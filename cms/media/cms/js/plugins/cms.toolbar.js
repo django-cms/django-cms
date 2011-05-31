@@ -2,17 +2,14 @@
  * @author:		Angelo Dini
  * @copyright:	http://www.divio.ch under the BSD Licence
  * @requires:	Classy, jQuery, jQuery.cookie
- *
- * assign Class and CMS namespace */
- var Class = Class || {};
- var CMS = CMS || {};
+ */
 
 /*##################################################|*/
 /* #CUSTOM APP# */
 jQuery(document).ready(function ($) {
 	/**
 	 * Toolbar
-	 * @version: 0.1.0
+	 * @version: 0.1.2
 	 * @description: Implements and controls toolbar
 	 * @public_methods:
 	 *	- CMS.Toolbar.toggleToolbar();
@@ -23,11 +20,14 @@ jQuery(document).ready(function ($) {
 	 */
 	CMS.Toolbar = Class.$extend({
 
+		implement: [CMS.Helpers, CMS.Security],
+
 		options: {
 			// not integrated yet
 			debug: false,
 			items: [],
 			// type definitions used in registerItem()
+			// TODO: needs proper implementation
 			types: [
 				{ 'anchor': '_registerAnchor' },
 				{ 'html': '_reigsterHtml' },
@@ -39,7 +39,7 @@ jQuery(document).ready(function ($) {
 
 		initialize: function (container, options) {
 			// save reference to this class
-			var classy = this;
+			var that = this;
 			// check if only one element is given
 			if($(container).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
 			// merge passed argument options with internal options
@@ -55,7 +55,7 @@ jQuery(document).ready(function ($) {
 			this.toggle = this.wrapper.find('#cms_toolbar-toggle');
 			this.toggle.bind('click', function (e) {
 				e.preventDefault();
-				classy.toggleToolbar();
+				that.toggleToolbar();
 			});
 
 			// initial setups
@@ -64,7 +64,7 @@ jQuery(document).ready(function ($) {
 
 		_setup: function () {
 			// save reference to this class
-			var classy = this;
+			var that = this;
 
 			// scheck if toolbar should be shown or hidden
 			($.cookie('CMS_toolbar-collapsed') == 'false') ? this.toolbar.data('collapsed', true) : this.toolbar.data('collapsed', false);
@@ -74,10 +74,13 @@ jQuery(document).ready(function ($) {
 			// set toolbar to visible
 			this.wrapper.show();
 			// some browsers have problem showing it directly (loading css...)
-			setTimeout(function () { classy.wrapper.show(); }, 50);
+			setTimeout(function () { that.wrapper.show(); }, 50);
 
 			// start register items if any given
 			if(this.options.items.length) this.registerItems(this.options.items);
+
+			// apply csrf patch to toolbar from cms.base.js
+			this.csrf();
 		},
 
 		toggleToolbar: function () {
@@ -150,10 +153,10 @@ jQuery(document).ready(function ($) {
 			// make sure an array is passed
 			if(typeof(items) != 'object') return false;
 			// save reference to this class
-			var classy = this;
+			var that = this;
 			// loopp through all items and pass them to single function
 			$(items).each(function (index, value) {
-				classy.registerItem(value);
+				that.registerItem(value);
 			});
 
 			return items;
@@ -190,7 +193,7 @@ jQuery(document).ready(function ($) {
 
 		_registerSwitcher: function (obj) {
 			// save reference to this class
-			var classy = this;
+			var that = this;
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_switcher', obj);
 			// should btn be shown?
@@ -211,13 +214,13 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = CMS.Helpers.removeUrl(window.location.href, obj.addParameter);
-						window.location = CMS.Helpers.insertUrl(url, obj.removeParameter, "")
+						var url = that.removeUrl(window.location.href, obj.addParameter);
+						window.location = that.insertUrl(url, obj.removeParameter, "")
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = CMS.Helpers.insertUrl(location.href, obj.addParameter, "");
+						window.location = that.insertUrl(location.href, obj.addParameter, "");
 					});
 				}
 			});
@@ -237,7 +240,7 @@ jQuery(document).ready(function ($) {
 			var template = this._processTemplate('#cms_toolbar-item_list', obj);
 
 			// item injection logic
-			var list = template.find('.cms_toolbar-item_list').html().trim();
+			var list = template.find('.cms_toolbar-item_list').html();
 			var tmp = '';
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {

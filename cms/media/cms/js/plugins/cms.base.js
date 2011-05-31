@@ -4,7 +4,6 @@
  * @requires:	Classy, jQuery
  *
  * assign Class and CMS namespace */
- var Class = Class || {};
  var CMS = CMS || {};
 
 /*##################################################|*/
@@ -12,15 +11,13 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Security
-	 * @version: 0.1.0
+	 * @version: 0.1.1
 	 * @description: Adds security layer to CMS namespace
 	 * @public_methods:
 	 *	- CMS.Security.csrf();
 	 */
-	CMS.Security = Class.$extend({
+	CMS.Security = {
 	
-		initialize: function () {},
-		
 		csrf: function () {
 			$.ajaxSetup({
 				beforeSend: function (xhr, settings) {
@@ -54,7 +51,7 @@ jQuery(document).ready(function ($) {
 			});
 		}
 	
-	});
+	};
 	
 	/**
 	 * Helpers
@@ -65,10 +62,8 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Helpers.insertUrl(url, name, value);
 	 *	- CMS.Helpers.removeUrl(url, name);
 	 */
-	CMS.Helpers = Class.$extend({
+	CMS.Helpers = {
 	
-		initialize: function () {},
-		
 		reloadBrowser: function () {
 			window.location.reload();
 		},
@@ -119,6 +114,6 @@ jQuery(document).ready(function ($) {
 			return url;
 		}
 	
-	});
+	};
 
 });

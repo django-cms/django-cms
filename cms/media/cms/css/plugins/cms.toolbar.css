@@ -80,7 +80,9 @@
 /* #TOOLBAR/items/custom# */
 .cms_toolbar-item_page .cms_toolbar-item_list li { min-width:300px; }
 .cms_toolbar-item_moderator { padding-top:8px !important; }
-.cms_toolbar-item_moderator a span { color:#f00 !important; }
+.cms_toolbar-item_moderator a { background-position:left -225px; }
+.cms_toolbar-item_moderator a span { background-position:right -251px; color:#eee; }
+.cms_toolbar-item_moderator a:hover span { color:#385e92; }
 
 /* #TOOLBAR/list# */
 .cms_toolbar-item_list { display:none; list-style:none; padding:0; margin:0; position:absolute; top:35px; z-index:100; border:1px solid #ddd; background:#fff !important;
