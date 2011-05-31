@@ -36,6 +36,9 @@
 .cms_placeholder-content_inner { padding:25px !important; overflow:hidden; }
 .cms_placeholder-content_loader { min-height:50px; background:url('../../images/toolbar/loader.gif') no-repeat center center; }
 
+.cms_placeholder-content_zone { position:absolute; left:0; top:-10px; width:100%; height:10px;
+    background:url('../../images/toolbar/toolbar_bg.gif') repeat-x left top; }
+
 /* #PLACEHOLDERS/overlay# */
 #cms_placeholder-overlay { display:none; position:absolute; left:0; top:0; z-index:9999;
 	min-height:15px; border:1px solid #5b80b2; }
