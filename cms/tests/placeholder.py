@@ -10,6 +10,8 @@ from cms.test_utils.util.context_managers import (SettingsOverride,
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
+from cms.api import add_plugin
+from cms.plugins.text.cms_plugins import TextPlugin
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -259,8 +261,37 @@ class PlaceholderModelTests(CMSTestCase):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = ph._get_attached_field_name()
         self.assertEqual(result, None) # Simple PH - no field name
-
-
+    
+    def test_excercise_get_attached_models_notplugins(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph = ex.placeholder
+        result = list(ph._get_attached_models())
+        self.assertEqual(result, [Example1]) # Simple PH - Example1 model
+        add_plugin(ph, TextPlugin, 'en', body='en body')
+        result = list(ph._get_attached_models())
+        self.assertEqual(result, [Example1]) # Simple PH still one Example1 model
+        
+    def test_excercise_get_attached_fields_notplugins(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four',
+        )
+        ex.save()
+        ph = ex.placeholder
+        result = [f.name for f in list(ph._get_attached_fields())]
+        self.assertEqual(result, ['placeholder']) # Simple PH - placeholder field name
+        add_plugin(ph, TextPlugin, 'en', body='en body')
+        result = [f.name for f in list(ph._get_attached_fields())]
+        self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
+        
 class PlaceholderAdminTest(CMSTestCase):
     placeholderconf = {'test': {
             'limits': {

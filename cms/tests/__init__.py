@@ -30,6 +30,7 @@ from cms.tests.templatetags import TemplatetagTests, TemplatetagDatabaseTests
 from cms.tests.toolbar import ToolbarTests
 from cms.tests.urlutils import UrlutilsTestCase
 from cms.tests.views import ViewTests
+from cms.tests.management import ManagementTestCase
 
 try:
     from cms.tests.javascript import JavascriptTestCase
