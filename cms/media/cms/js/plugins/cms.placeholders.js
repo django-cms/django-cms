@@ -228,9 +228,12 @@ jQuery(document).ready(function ($) {
 			// bind load event to injected iframe
 			$('#cms_placeholder-iframe').load(function () {
 				// set new height and animate
-				var height = $('#cms_placeholder-iframe').contents().find('body').outerHeight(true);
-				$('#cms_placeholder-iframe').animate({ 'height': height }, 500);
-				
+				// cause IE is so awesome, we need a timeout so that slow rendering bitch catches up
+				setTimeout(function () {
+					var height = $('#cms_placeholder-iframe').contents().find('body').outerHeight(true)+26;
+					$('#cms_placeholder-iframe').animate({ 'height': height }, 500);
+				}, 100);
+
 				// remove loader class
 				frame.removeClass('cms_placeholder-content_loader');
 
@@ -355,7 +358,8 @@ jQuery(document).ready(function ($) {
 			var current = plugin.attr('class').split('::')[5];
 
 			// lets remove current from array - puke
-			var idx = array.indexOf(current);
+			// cause ie is a fucking motherfucker it doesn't support indexOf so use jquerys crap instead
+			var idx = $.inArray(current, array);
 				array.splice(idx, 1);
 
 			// grab the element
@@ -447,14 +451,14 @@ jQuery(document).ready(function ($) {
 			var that = this;
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.show();
-			
+
 			// add event to body to hide the list needs a timout for late trigger
 			setTimeout(function () {
-				$(window).bind('click', function () {
+				$(document).bind('click', function () {
 					that._hidePluginList.call(that, el);
 				});
 			}, 100);
-			
+
 			el.addClass('cms_toolbar-btn-active').data('collapsed', false);
 		},
 		
@@ -463,7 +467,7 @@ jQuery(document).ready(function ($) {
 				list.hide();
 			
 			// remove the body event
-			$(window).unbind('click');
+			$(document).unbind('click');
 			
 			el.removeClass('cms_toolbar-btn-active').data('collapsed', true);
 		},
@@ -480,12 +484,11 @@ jQuery(document).ready(function ($) {
 			this.frame.data('collapsed', false);
 			// set dynamic frame position
 			var offset = 43;
-			var pos = $(window).scrollTop();
+			var pos = $(document).scrollTop();
 			// frame should always have space on top
 			this.frame.css('top', pos+offset);
 			// make sure that toolbar is visible
-			// TODO: triggers IE error
-			//if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
+			if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
 			// listen to toolbar events
 			this.toolbar.bind('cms.toolbar.show cms.toolbar.hide', function (e) {
 				(e.handleObj.namespace === 'show.toolbar') ? that.frame.css('top', pos+offset) : that.frame.css('top', pos);
@@ -513,28 +516,34 @@ jQuery(document).ready(function ($) {
 			var that = this;
 			// clear timer when initiated within resize event
 			clearTimeout(this.timer);
+
+			/* cause IE's mother had sex with a sheep, we need to always usw window instead of document
+			 * we need to substract 4 pixel from the frame cause IE's vater has a small dick
+			 */
+			var scrollbarWidth = ($.browser.msie) ? 4 : 0;
+
 			// attach resize event to window
-			$(window).bind('resize', function () {
+			$(document).bind('resize', function () {
 				that.dim.css({
-					'width': $(window).width(),
-					'height': $(window).height()
+					'width': $(document).width(),
+					'height': $(document).height()
 				});
-				that.frame.css('width', $(window).width());
+				that.frame.css('width', $(document).width());
 				// adjust after resizing
 				that.timer = setTimeout(function () {
 					that.dim.css({
-						'width': $(window).width(),
-						'height': $(document).height()
+						'width': $(document).width()-scrollbarWidth,
+						'height': $(document).height()-scrollbarWidth
 					});
-					that.frame.css('width', $(window).width());
+					that.frame.css('width', $(document).width()-scrollbarWidth);
 				}, 100);
 			});
 			// init dim resize
-			$(window).resize();
+			$(document).resize();
 			// change data information
 			this.dim.data('dimmed', true);
 			// show dim
-			this.dim.stop().fadeIn();
+			this.dim.css('opacity', 0.6).stop().fadeIn();
 			// add event to dim to hide
 			this.dim.bind('click', function () {
 				that.toggleFrame.call(that);
@@ -544,7 +553,7 @@ jQuery(document).ready(function ($) {
 		
 		_hideDim: function () {
 			// unbind resize event
-			$(window).unbind('resize');
+			$(document).unbind('resize');
 			// change data information
 			this.dim.data('dimmed', false);
 			// hide dim
