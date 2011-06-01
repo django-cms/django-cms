@@ -29,7 +29,7 @@
 .cms_placeholder-subnav-title li:last-child a { -webkit-border-radius:0 0 4px 4px; -moz-border-radius:0 0 4px 4px; border-radius:0 0 4px 4px; }
 
 /* #PLACEHOLDERS/loader# */
-#cms_placeholder-dim { display:none; position:absolute; left:0; top:0; z-index:99997; background:#000; width:100%; height:100%; opacity:0.6; }
+#cms_placeholder-dim { display:none; position:absolute; left:0; top:0; z-index:99997; background:#000; width:100%; height:100%; }
 #cms_placeholder-content { display:none; position:absolute; left:0; top:43px; z-index:99998; width:100%; color:#fff;
 	background:#5a7fb0 url('../../images/toolbar/frame_shadow.gif') repeat-x left top; /* might need some ie fixing */
 	-webkit-box-shadow:#000 -5px 0px 5px; -moz-box-shadow:#000 -5px 0px 5px; box-shadow:#000 -5px 0px 5px; }
@@ -43,7 +43,7 @@
 #cms_placeholder-overlay { display:none; position:absolute; left:0; top:0; z-index:9999;
 	min-height:15px; border:1px solid #5b80b2; }
 .cms_placeholder-overlay_bg { position:relative; left:0; top:0; z-index:9999;
-	width:100%; height:100%; opacity:0.5; background:#5b80b2 !important; }
+	width:100%; height:100%; background:#5b80b2 !important; }
 
 /* #PLACEHOLDERS/overlay/list# */
 .cms_placeholder-options { list-style:none; padding:0; margin:0; position:absolute; right:0; top:0; z-index:10000;
@@ -71,4 +71,18 @@
 .cms_placeholder-icon_more:hover { background-position:-70px -173px; }
 
 #cms_placeholder-success { display:none; position:absolute; left:0; top:0; z-index:9999; min-height:15px; border:1px solid #59e140; }
-.cms_placeholder-success_inner { width:100%; height:100%; opacity:0.5; background:#59e140; }
+.cms_placeholder-success_inner { width:100%; height:100%; background:#59e140; }
+
+/*##################################################|*/
+/* #PLACEHOLDERS/IE# */
+#cms_placeholder-dim {
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+	filter:alpha(opacity=60);
+	opacity:0.6;
+}
+.cms_placeholder-overlay_bg,
+.cms_placeholder-success_inner {
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter:alpha(opacity=50);
+	opacity:0.5;
+}
