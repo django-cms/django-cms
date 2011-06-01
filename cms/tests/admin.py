@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.admin.dialog.forms import (ModeratorForm, PermissionForm, 
-    PermissionAndModeratorForm)
+from cms.admin.dialog.forms import ModeratorForm, PermissionForm, \
+    PermissionAndModeratorForm
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter, PageAdmin
 from cms.admin.change_list import CMSChangeList
@@ -11,19 +11,29 @@ from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.models.placeholdermodel import Placeholder
+from cms.models.titlemodels import Title
+from cms.plugins.text.models import Text
 from cms.test_utils import testcases as base
+<<<<<<< HEAD
 from cms.test_utils.util.request_factory import RequestFactory
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
+=======
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, \
+    URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
+>>>>>>> Made PageAdmin.add_plugin check add permissions for the actual plugin model
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, \
+    HttpResponse
+from django.test.client import Client
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
@@ -709,3 +719,62 @@ class NoDBAdminTests(TestCase, AdminTestsBase):
             
     def test_lookup_allowed_published(self):
         self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))
+
+
+class PluginPermissionTests(CMSTestCase):
+    def setUp(self):
+        self._page = create_page('test page', 'nav_playground.html', 'en')
+        self._placeholder = self._page.placeholders.all()[0]
+        
+    def _get_admin(self):
+        admin = User(
+            username='admin',
+            email='admin@admin.com',
+            is_active=True,
+            is_staff=True,
+        )
+        admin.set_password('admin')
+        admin.save()
+        return admin
+    
+    def _get_page_admin(self):
+        return admin.site._registry[Page]
+    
+    def _give_permission(self, user, model, permission_type, save=True):
+        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        user.user_permissions.add(Permission.objects.get(codename=codename))
+    
+    def _give_cms_permissions(self, user, save=True):
+        for perm_type in ['add', 'change', 'delete']:
+            for model in [Page, Title]:
+                self._give_permission(user, model, perm_type, False)
+        gpp = GlobalPagePermission.objects.create(
+            user=user,
+            can_change=True,
+            can_delete=True,
+            can_change_advanced_settings=False,
+            can_publish=True,
+            can_change_permissions=False,
+            can_move_page=True,
+            can_moderate=True,
+        )
+        gpp.sites = Site.objects.all()
+        if save:
+            user.save()
+        
+    def test_plugin_add_requires_permissions(self):
+        admin = self._get_admin()
+        self._give_cms_permissions(admin)
+        client = Client()
+        client.login(username='admin', password='admin')
+        url = reverse('admin:cms_page_add_plugin')
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': self._placeholder.pk,
+            'language': 'en',
+        }
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self._give_permission(admin, Text, 'add')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)

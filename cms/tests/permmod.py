@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import (create_page, publish_page, approve_page, add_plugin, 
-    create_page_user, assign_user_to_page)
+from cms.api import create_page, publish_page, approve_page, add_plugin, \
+    create_page_user, assign_user_to_page
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
     ACCESS_PAGE_AND_DESCENDANTS)
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
     SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
+
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.core.management import call_command
-
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
     """Permissions and moderator together
@@ -74,6 +74,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             master = User(username="master", email="master@django-cms.org", is_staff=True, is_active=True)
             master.set_password('master')
             master.save()
+            master.user_permissions.add(Permission.objects.get(codename='add_text'))
             self.user_master = create_page_user(self.user_super, master, grant_all=True)
             # create non global, non staff user
             self.user_non_global = User(username="nonglobal", is_active=True)
@@ -96,6 +97,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             slave = User(username='slave', email='slave@django-cms.org', is_staff=True)
             slave.set_password('slave')
             slave.save()
+            slave.user_permissions.add(Permission.objects.get(codename='add_text'))
             self.user_slave = create_page_user(self.user_super, slave,  can_add_page=True,
                                         can_change_page=True, can_delete_page=True)
             

@@ -40,7 +40,7 @@ class SecurityTests(CMSTestCase):
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
         
     def test_edit(self):
