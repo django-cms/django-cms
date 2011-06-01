@@ -22,7 +22,7 @@
 	text-align:left; border:none; padding:0; margin:0; }
 
 /* #TOOLBAR/toggle# */
-#cms_toolbar-toggle { cursor:pointer; position:absolute; width:20px; right:18px; top:0; z-index:9999999; padding-top:8px !important; }
+#cms_toolbar-toggle { cursor:pointer; position:absolute; width:30px; right:8px; top:0; z-index:9999999; padding-top:8px !important; }
 
 /* #TOOLBAR/buttons# */
 .cms_toolbar-btn_left { float:left; color:#5b80b2; float:left; height:26px; overflow:hidden; line-height:1.2 !important;
