@@ -177,7 +177,7 @@ def get_app_patterns():
         hooked_applications = []
     
     # Loop over all titles with an application hooked to them
-    for title in title_qs.exclude(application_urls="").select_related():
+    for title in title_qs.exclude(application_urls=None).select_related():
         if settings.CMS_FLAT_URLS:
             if title.language in home_slugs:
                 path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
