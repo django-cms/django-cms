@@ -176,7 +176,6 @@ class CMSToolbar(Toolbar):
                     items=admin_items)
     
     def request_hook(self, request):
-        request.session['cms_edit'] = True
         if request.method != 'POST':
             return self._request_hook_get(request)
         else:

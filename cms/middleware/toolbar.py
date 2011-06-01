@@ -24,9 +24,11 @@ class ToolbarMiddleware(object):
         If we should show the toolbar for this request, put it on
         request.toolbar. Then call the request_hook on the toolbar.
         """
-        if 'edit' in request.GET:
+        if 'edit' in request.GET and not request.session.get('cms_edit', False):
             request.session['cms_edit'] = True
         request.toolbar = CMSToolbar()
+
+    def process_view(self, request, view_func, view_args, view_kwarg):
         response = request.toolbar.request_hook(request)
         if isinstance(response, HttpResponse):
             return response
