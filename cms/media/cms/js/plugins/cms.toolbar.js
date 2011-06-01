@@ -185,7 +185,7 @@ jQuery(document).ready(function ($) {
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
-				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
@@ -214,13 +214,13 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = that.removeUrl(window.location.href, obj.addParameter);
-						window.location = that.insertUrl(url, obj.removeParameter, "")
+						var url = that.removeUrl(document.location.href, obj.addParameter);
+						document.location = that.insertUrl(url, obj.removeParameter, "")
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = that.insertUrl(location.href, obj.addParameter, "");
+						document.location = that.insertUrl(location.href, obj.addParameter, "");
 					});
 				}
 			});
@@ -267,7 +267,7 @@ jQuery(document).ready(function ($) {
 			function show_list() {
 				// add event to body to hide the list needs a timout for late trigger
 				setTimeout(function () {
-					$(window).bind('click', hide_list);
+					$(document).bind('click', hide_list);
 				}, 100);
 
 				// show element and save data
@@ -276,7 +276,7 @@ jQuery(document).ready(function ($) {
 			}
 			function hide_list() {
 				// remove the body event
-				$(window).unbind('click');
+				$(document).unbind('click');
 
 				// show element and save data
 				container.hide();
@@ -318,7 +318,7 @@ jQuery(document).ready(function ($) {
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
-				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
 			// save order remove id and show element
 			template.data('order', obj.order)
