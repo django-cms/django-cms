@@ -519,8 +519,9 @@ jQuery(document).ready(function ($) {
 
 			/* cause IE's mother had sex with a sheep, we need to always usw window instead of document
 			 * we need to substract 4 pixel from the frame cause IE's vater has a small dick
+			 * TODO: Check if scrollbars are shown, than we dont need to substract 20px, they are forced now
 			 */
-			var scrollbarWidth = ($.browser.msie) ? 4 : 0;
+			var scrollbarWidth = ($.browser.msie && $.browser.version >= '8.0') ? 20 : 0;
 
 			// attach resize event to window
 			$(document).bind('resize', function () {
@@ -533,10 +534,10 @@ jQuery(document).ready(function ($) {
 				that.timer = setTimeout(function () {
 					that.dim.css({
 						'width': $(document).width()-scrollbarWidth,
-						'height': $(document).height()-scrollbarWidth
+						'height': $(document).height()
 					});
 					that.frame.css('width', $(document).width()-scrollbarWidth);
-				}, 100);
+				}, 500);
 			});
 			// init dim resize
 			$(document).resize();
