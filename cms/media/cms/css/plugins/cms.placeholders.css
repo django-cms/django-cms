@@ -17,14 +17,14 @@
 .cms_placeholder-subnav { display:none; list-style:none; float:none !important; padding:0; margin:0; min-width:200px;
 	position:absolute; right:5px; top:32px; z-index:99999; border:1px solid #ddd; background:#fff;
 	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; max-height:205px; overflow:auto; }
-.cms_placeholder-subnav ul { list-style:none; padding:0; margin:0; }
-.cms_placeholder-subnav ul li { float:none !important; padding-left:0; }
+.cms_placeholder-subnav ul { list-style:none; padding:0; margin:0; width:100%; }
+.cms_placeholder-subnav ul li { float:none !important; padding-left:0; zoom:1; }
 
 .cms_placeholder-subnav-title { color:#666 !important; float:none !important; }
-.cms_placeholder-subnav-title span { display:block; padding:4px 10px !important; font-weight:bold;
+.cms_placeholder-subnav-title span { display:block; padding:4px 10px !important; font-weight:bold; zoom:1;
 	zoom:1; white-space:nowrap; background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom;
 	-webkit-border-radius:4px 4px 0 0; -moz-border-radius:4px 4px 0 0; border-radius:4px 4px 0 0; }
-.cms_placeholder-subnav-title li a { display:block; padding:3px 10px 4px !important; zoom:1; }
+.cms_placeholder-subnav-title li a { display:block; padding:3px 10px 4px !important; zoom:1; zoom:1; }
 .cms_placeholder-subnav-title li a:hover { color:#fff !important; background:#5b80b2; }
 .cms_placeholder-subnav-title li:last-child a { -webkit-border-radius:0 0 4px 4px; -moz-border-radius:0 0 4px 4px; border-radius:0 0 4px 4px; }
 
@@ -86,3 +86,6 @@
 	filter:alpha(opacity=50);
 	opacity:0.5;
 }
+
+/* #PLACEHOLDERS/IE7# */
+*+html .cms_placeholder-subnav { width:200px; }
