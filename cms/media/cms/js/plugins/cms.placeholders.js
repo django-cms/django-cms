@@ -238,16 +238,15 @@ jQuery(document).ready(function ($) {
 				frame.removeClass('cms_placeholder-content_loader');
 
 				// add cancel button
-				var btn = $(this).contents().find('input[name=_save]');
+				var btn = $(this).contents().find('input[name^="_save"]');
 					btn.addClass('default').css('float', 'none');
-				var cancel = $('<input type="submit" name="_cancel" value="' + that.options.lang.cancel + '" style="margin-left:8px;" />');
+				var cancel = $(this).contents().find('input[name^="_cancel"]');
 					cancel.bind('click', function (e) {
 						e.preventDefault();
 						// hide frame
 						that.toggleFrame();
 						that.toggleDim();
 					});
-				cancel.insertAfter(btn);
 
 				// do some css changes in template
 				$(this).contents().find('#footer').css('padding', 0);
@@ -261,7 +260,7 @@ jQuery(document).ready(function ($) {
 			// lets ask if you are sure
 			var message = this.options.lang.delete_request;
 			var confirmed = confirm(message, true);
-			
+
 			// now do ajax
 			if(confirmed) {
 				$.ajax({
@@ -459,16 +458,22 @@ jQuery(document).ready(function ($) {
 				});
 			}, 100);
 
+			// ie <7 likes to be fucked on top thats cause he doesnt know z-index
+			if($.browser.msie && $.browser.version < '8.0') el.parent().parent().css({'position': 'relative','z-index': 999999});
+
 			el.addClass('cms_toolbar-btn-active').data('collapsed', false);
 		},
 		
 		_hidePluginList: function (el) {
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.hide();
-			
+
 			// remove the body event
 			$(document).unbind('click');
-			
+
+			// ie <7 likes to be fucked on top thats cause he doesnt know z-index
+			if($.browser.msie && $.browser.version < '8.0') el.parent().parent().css({'position': '','z-index': ''});
+
 			el.removeClass('cms_toolbar-btn-active').data('collapsed', true);
 		},
 		
