@@ -7,6 +7,7 @@ from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem,
     GetButton)
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.core.urlresolvers import reverse
 
 
 class ToolbarTests(SettingsOverrideTestCase):
@@ -121,8 +122,8 @@ class ToolbarTests(SettingsOverrideTestCase):
         self.assertEqual(login.template, 'cms/toolbar/items/login.html')
     
     def test_toolbar_staff(self):
-        page = create_page('test', 'nav_playground.html', 'en')
-        request = self.request_factory.get('/')
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        request = self.request_factory.get(page.get_absolute_url())
         request.user = self.get_staff()
         request.current_page = page
         toolbar = CMSToolbar()
@@ -147,6 +148,10 @@ class ToolbarTests(SettingsOverrideTestCase):
         self.assertTrue(isinstance(pagemenu, List))
         self.assertEqual(len(pagemenu.raw_items), 4)
         overview, addchild, addsibling, delete = pagemenu.raw_items
+        self.assertEqual(overview.url, reverse('admin:cms_page_changelist'))
+        self.assertEqual(addchild.serialize_url({}, request), reverse('admin:cms_page_add') + '?position=last-child&target=%s' % page.pk)
+        self.assertEqual(addsibling.serialize_url({}, request), reverse('admin:cms_page_add') + '?position=last-child')
+        self.assertEqual(delete.serialize_url({}, request), reverse('admin:cms_page_delete', args=(page.pk,)))
         # check the admin-menu
         admin = items[4]
         self.assertTrue(isinstance(admin, List))
