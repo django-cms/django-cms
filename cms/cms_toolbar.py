@@ -2,7 +2,7 @@
 from cms.toolbar.base import Toolbar
 from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List, 
-    PostButton, GetButton)
+    GetButton)
 from cms.utils.moderator import page_moderator_state, I_APPROVE
 from django import forms
 from django.conf import settings
