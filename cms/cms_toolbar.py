@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
+import urllib
 
 
 def _get_page_admin_url(context, request, **kwargs):
@@ -19,10 +20,21 @@ def _get_page_history_url(context, request, **kwargs):
     return reverse('admin:cms_page_history', args=(request.current_page.pk,))
 
 def _get_add_child_url(context, request, **kwargs):
-    return '%s?target=%s&position=last-child' % (reverse('admin:cms_page_add'), request.current_page.pk)
+    data = {
+        'position': 'last-child',
+        'target': request.current_page.pk,
+    }
+    args = urllib.urlencode(data)
+    return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
 def _get_add_sibling_url(context, request, **kwargs):
-    return '%s?target=%s&position=last-child' % (reverse('admin:cms_page_add'), request.current_page.parent.pk)
+    data = {
+        'position': 'last-child',
+    }
+    if request.current_page.parent_id:
+        data['target'] = request.current_page.parent_id
+    args = urllib.urlencode(data)
+    return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
 def _get_delete_url(context, request, **kwargs):
     return reverse('admin:cms_page_delete', args=(request.current_page.pk,))
@@ -137,12 +149,11 @@ class CMSToolbar(Toolbar):
                      'cms/images/toolbar/icons/icon_child.png')
         )
         
-        if not request.current_page.is_home():
-            menu_items.append(
-                ListItem('addsibling', _('Add sibling page'),
-                         _get_add_sibling_url,
-                         'cms/images/toolbar/icons/icon_sibling.png')
-            )
+        menu_items.append(
+            ListItem('addsibling', _('Add sibling page'),
+                     _get_add_sibling_url,
+                     'cms/images/toolbar/icons/icon_sibling.png')
+        )
             
         menu_items.append(
             ListItem('delete', _('Delete Page'), _get_delete_url,
