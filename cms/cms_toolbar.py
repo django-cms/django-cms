@@ -94,7 +94,6 @@ class CMSToolbar(Toolbar):
             
             if request.current_page and self.edit_mode:
                 moderator_state = page_moderator_state(request, request.current_page)
-                print moderator_state
                 should_approve = moderator_state['state'] >= I_APPROVE
                 has_perms = request.current_page.has_moderate_permission(request)
                 if should_approve and has_perms:
