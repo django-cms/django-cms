@@ -17,24 +17,15 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Toolbar.registerItems(array);
 	 *	- CMS.Toolbar.removeItem(id);
 	 *	- CMS.Toolbar.registerType(function);
+	 * TODO: login needs special treatment (errors, login on enter)
 	 */
 	CMS.Toolbar = Class.$extend({
 
 		implement: [CMS.Helpers, CMS.Security],
 
 		options: {
-			// not integrated yet
-			debug: false,
-			items: [],
-			// type definitions used in registerItem()
-			// TODO: needs proper implementation
-			types: [
-				{ 'anchor': '_registerAnchor' },
-				{ 'html': '_reigsterHtml' },
-				{ 'switcher': '_reigsterSwitcher' },
-				{ 'button': '_reigsterButton' },
-				{ 'list': '_reigsterList' }
-			]
+			'debug': false, // not integrated yet
+			'items': []
 		},
 
 		initialize: function (container, options) {
@@ -81,6 +72,12 @@ jQuery(document).ready(function ($) {
 
 			// apply csrf patch to toolbar from cms.base.js
 			this.csrf();
+
+			// the toolbar needs to resize depending on the window size on motherfucking ie6
+			if($.browser.msie && $.browser.version <= '6.0') {
+				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); })
+				$(window).trigger('resize');
+			}
 		},
 
 		toggleToolbar: function () {
