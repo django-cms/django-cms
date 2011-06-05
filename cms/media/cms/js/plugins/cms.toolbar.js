@@ -17,6 +17,7 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Toolbar.registerItems(array);
 	 *	- CMS.Toolbar.removeItem(id);
 	 *	- CMS.Toolbar.registerType(function);
+	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 * TODO: login needs special treatment (errors, login on enter)
 	 */
 	CMS.Toolbar = Class.$extend({

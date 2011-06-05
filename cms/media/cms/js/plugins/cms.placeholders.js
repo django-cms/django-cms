@@ -17,6 +17,7 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id);
 	 *	- CMS.Placeholder.toggleFrame();
 	 *	- CMS.Placeholder.toggleDim();
+	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 	CMS.Placeholders = Class.$extend({
 
