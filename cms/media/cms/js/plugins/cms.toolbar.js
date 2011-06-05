@@ -238,6 +238,8 @@ jQuery(document).ready(function ($) {
 
 			// item injection logic
 			var list = template.find('.cms_toolbar-item_list').html();
+				// ff2 list check
+				if(!list) return false;
 			var tmp = '';
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {

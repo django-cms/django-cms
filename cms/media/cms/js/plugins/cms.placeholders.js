@@ -48,7 +48,7 @@ jQuery(document).ready(function ($) {
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.dim = this.wrapper.find('#cms_placeholder-dim');
 			this.frame = this.wrapper.find('#cms_placeholder-content');
-			this.timer = function () {};
+			this.timer = null;
 			this.overlay = this.wrapper.find('#cms_placeholder-overlay');
 			this.overlayIsHidden = false;
 			this.success = this.wrapper.find('#cms_placeholder-success');
@@ -521,7 +521,7 @@ jQuery(document).ready(function ($) {
 		_showDim: function () {
 			var that = this;
 			// clear timer when initiated within resize event
-			clearTimeout(this.timer);
+			if(this.timer) clearTimeout(this.timer);
 
 			/* cause IE's mother had sex with a sheep, we need to always usw window instead of document
 			 * we need to substract 4 pixel from the frame cause IE's vater has a small dick
