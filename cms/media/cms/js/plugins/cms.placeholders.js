@@ -21,6 +21,7 @@ jQuery(document).ready(function ($) {
 	CMS.Placeholders = Class.$extend({
 
 		options: {
+			'debug': false, // not integrated yet
 			'edit_mode': false,
 			'lang': {
 				'move_warning': '',
