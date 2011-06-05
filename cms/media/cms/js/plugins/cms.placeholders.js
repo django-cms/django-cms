@@ -14,13 +14,15 @@ jQuery(document).ready(function ($) {
 	 * @public_methods:
 	 *	- CMS.Placeholder.addPlugin(url, obj);
 	 *	- CMS.Placeholder.editPlugin(placeholder_id, plugin_id);
-	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id);
+	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
 	 *	- CMS.Placeholder.toggleFrame();
 	 *	- CMS.Placeholder.toggleDim();
+	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 	CMS.Placeholders = Class.$extend({
 
 		options: {
+			'debug': false, // not integrated yet
 			'edit_mode': false,
 			'lang': {
 				'move_warning': '',
@@ -47,7 +49,7 @@ jQuery(document).ready(function ($) {
 			this.toolbar = this.wrapper.find('#cms_toolbar-toolbar');
 			this.dim = this.wrapper.find('#cms_placeholder-dim');
 			this.frame = this.wrapper.find('#cms_placeholder-content');
-			this.timer = function () {};
+			this.timer = null;
 			this.overlay = this.wrapper.find('#cms_placeholder-overlay');
 			this.overlayIsHidden = false;
 			this.success = this.wrapper.find('#cms_placeholder-success');
@@ -238,16 +240,15 @@ jQuery(document).ready(function ($) {
 				frame.removeClass('cms_placeholder-content_loader');
 
 				// add cancel button
-				var btn = $(this).contents().find('input[name=_save]');
+				var btn = $(this).contents().find('input[name^="_save"]');
 					btn.addClass('default').css('float', 'none');
-				var cancel = $('<input type="submit" name="_cancel" value="' + that.options.lang.cancel + '" style="margin-left:8px;" />');
+				var cancel = $(this).contents().find('input[name^="_cancel"]');
 					cancel.bind('click', function (e) {
 						e.preventDefault();
 						// hide frame
 						that.toggleFrame();
 						that.toggleDim();
 					});
-				cancel.insertAfter(btn);
 
 				// do some css changes in template
 				$(this).contents().find('#footer').css('padding', 0);
@@ -261,7 +262,7 @@ jQuery(document).ready(function ($) {
 			// lets ask if you are sure
 			var message = this.options.lang.delete_request;
 			var confirmed = confirm(message, true);
-			
+
 			// now do ajax
 			if(confirmed) {
 				$.ajax({
@@ -459,16 +460,22 @@ jQuery(document).ready(function ($) {
 				});
 			}, 100);
 
+			// ie <7 likes to be fucked on top thats cause he doesnt know z-index
+			if($.browser.msie && $.browser.version < '8.0') el.parent().parent().css({'position': 'relative','z-index': 999999});
+
 			el.addClass('cms_toolbar-btn-active').data('collapsed', false);
 		},
 		
 		_hidePluginList: function (el) {
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.hide();
-			
+
 			// remove the body event
 			$(document).unbind('click');
-			
+
+			// ie <7 likes to be fucked on top thats cause he doesnt know z-index
+			if($.browser.msie && $.browser.version < '8.0') el.parent().parent().css({'position': '','z-index': ''});
+
 			el.removeClass('cms_toolbar-btn-active').data('collapsed', true);
 		},
 		
@@ -515,12 +522,13 @@ jQuery(document).ready(function ($) {
 		_showDim: function () {
 			var that = this;
 			// clear timer when initiated within resize event
-			clearTimeout(this.timer);
+			if(this.timer) clearTimeout(this.timer);
 
 			/* cause IE's mother had sex with a sheep, we need to always usw window instead of document
 			 * we need to substract 4 pixel from the frame cause IE's vater has a small dick
+			 * TODO: Check if scrollbars are shown, than we dont need to substract 20px, they are forced now
 			 */
-			var scrollbarWidth = ($.browser.msie) ? 4 : 0;
+			var scrollbarWidth = ($.browser.msie && $.browser.version >= '8.0') ? 20 : 0;
 
 			// attach resize event to window
 			$(document).bind('resize', function () {
@@ -533,10 +541,10 @@ jQuery(document).ready(function ($) {
 				that.timer = setTimeout(function () {
 					that.dim.css({
 						'width': $(document).width()-scrollbarWidth,
-						'height': $(document).height()-scrollbarWidth
+						'height': $(document).height()
 					});
 					that.frame.css('width', $(document).width()-scrollbarWidth);
-				}, 100);
+				}, 500);
 			});
 			// init dim resize
 			$(document).resize();
