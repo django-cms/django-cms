@@ -14,7 +14,7 @@ jQuery(document).ready(function ($) {
 	 * @public_methods:
 	 *	- CMS.Placeholder.addPlugin(url, obj);
 	 *	- CMS.Placeholder.editPlugin(placeholder_id, plugin_id);
-	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id);
+	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
 	 *	- CMS.Placeholder.toggleFrame();
 	 *	- CMS.Placeholder.toggleDim();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
