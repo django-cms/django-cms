@@ -12,6 +12,9 @@ menu:
 * :ttag:`show_sub_menu`
 * :ttag:`show_breadcrumb`
 
+To use any of these templatetags, you need to have ``{% load menu_tags %}`` in
+your template before the line on which you call the templatetag.
+
 .. note::
 
     Please note that menus were originally implemented to be
