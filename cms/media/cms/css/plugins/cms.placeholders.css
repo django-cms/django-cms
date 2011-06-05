@@ -89,3 +89,7 @@
 
 /* #PLACEHOLDERS/IE7# */
 *+html .cms_placeholder-subnav { width:200px; }
+
+/* #PLACEHOLDERS/IE6# */
+*html .cms_placeholder-subnav { width:200px; }
+*html .cms_placeholder-icon { background-image: url('../../images/toolbar/sprite_toolbar-ie.png') !important; }
