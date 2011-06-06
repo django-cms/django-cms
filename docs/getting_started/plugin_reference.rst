@@ -202,7 +202,7 @@ settings in your project's ``settings.py`` file::
 
 You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
 setting points (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT``) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media
