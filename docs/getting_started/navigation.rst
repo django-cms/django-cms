@@ -160,7 +160,7 @@ in the next section) the first node still would have 0 as its `menu_level`.
 
     {{ node.get_absolute_url }}
 
-The absolute URL of the node.
+The absolute URL of the node, without any protocol, domain or port.
 ::
 
     {{ node.get_title }}
