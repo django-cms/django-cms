@@ -22,8 +22,8 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
-You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
-setting points (by default ``cms_page_media/`` relative to
+You should take care that the directory defined by the configuration setting
+:setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
 :setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
@@ -141,8 +141,8 @@ create a file called ``picture.html`` in there. Here is an example
 In this template the picture is scaled differently based on which placeholder
 it was placed in.
 
-You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
-setting points (by default ``cms_page_media/`` relative to
+You should take care that the directory defined by the configuration setting
+:setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
 :setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
@@ -200,8 +200,8 @@ settings in your project's ``settings.py`` file::
         # ...
     )
 
-You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
-setting points (by default ``cms_page_media/`` relative to
+You should take care that the directory defined by the configuration setting
+:setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
 :setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
@@ -290,8 +290,8 @@ default behavior:
 * ``VIDEO_BUTTON_OVER_COLOR`` (default: ``"000000"``)
 * ``VIDEO_BUTTON_HIGHLIGHT_COLOR`` (default: ``"FFFFFF"``)
 
-You should take care that directory to which :setting:`CMS_PAGE_MEDIA_PATH`
-setting points (by default ``cms_page_media/`` relative to
+You should take care that the directory defined by the configuration setting
+:setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
 :setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
