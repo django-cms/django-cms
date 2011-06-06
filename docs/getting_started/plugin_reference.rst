@@ -335,7 +335,7 @@ For installation be sure you have the following in your project's
 Inherit
 *******
 
-Displays all plugins of an other page or an other language. Great if you need
+Displays all plugins of another page or another language. Great if you need
 always the same plugins on a lot of pages.
 
 For installation be sure you have the following in your project's
