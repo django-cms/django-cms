@@ -16,7 +16,7 @@ Required Settings
 CMS_TEMPLATES
 =============
 
-Default: ``None`` (Not a valid setting!)
+Default: ``()`` (Not a valid setting!)
 
 A list of templates you can select for a page.
 
