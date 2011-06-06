@@ -49,7 +49,7 @@ Some Examples
 
 Complete navigation (as a nested list)::
 
-    {% load cache menu_tags %}
+    {% load menu_tags %}
     <ul>
         {% show_menu 0 100 100 100 %}
     </ul>
