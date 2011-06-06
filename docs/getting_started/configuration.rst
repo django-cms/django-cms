@@ -565,7 +565,7 @@ Cache expiration (in seconds) for view and other permissions.
 CMS_CACHE_PREFIX
 ================
 
-Default: ``None``
+Default: ``cms-``
 
 
 The CMS will prepend the value associated with this key to every cache access (set and get).
