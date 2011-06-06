@@ -18,7 +18,7 @@ your template before the line on which you call the templatetag.
 .. note::
 
     Please note that menus were originally implemented to be
-    application-independant and as such, live in the :mod:`menus` application
+    application-independent and as such, live in the :mod:`menus` application
     instead of the "normal" :mod:`cms`
 
 *********
