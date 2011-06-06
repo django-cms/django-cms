@@ -47,7 +47,7 @@ same name on parent pages, simply pass the ``inherit`` argument::
     {% placeholder "content" inherit %}
 
 This will walk the page tree up till the root page and will show the first
-placeholde it can find with content.
+placeholder it can find with content.
 
 It's also possible to combine this with the ``or`` argument to show an
 ultimate fallback if the placeholder and none of the placeholders on parent
