@@ -47,7 +47,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request.user = self.get_anon()
         request.current_page = None
         toolbar = CMSToolbar(request)
-        items = toolbar.get_items({}, request)
+        items = toolbar.get_items({})
         self.assertEqual(len(items), 2) # Logo + login
         # check the logo is there
         logo = items[0]
@@ -62,7 +62,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request.user = self.get_staff()
         request.current_page = None
         toolbar = CMSToolbar(request)
-        items = toolbar.get_items({}, request)
+        items = toolbar.get_items({})
         self.assertEqual(len(items), 4) # Logo + edit-mode + admin-menu + logout
         # check the logo is there
         logo = items[0]
@@ -86,7 +86,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request.user = self.get_superuser()
         request.current_page = None
         toolbar = CMSToolbar(request)
-        items = toolbar.get_items({}, request)
+        items = toolbar.get_items({})
         self.assertEqual(len(items), 4) # Logo + edit-mode + admin-menu + logout
         # check the logo is there
         logo = items[0]
@@ -111,7 +111,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request.user = self.get_anon()
         request.current_page = page
         toolbar = CMSToolbar(request)
-        items = toolbar.get_items({}, request)
+        items = toolbar.get_items({})
         self.assertEqual(len(items), 2) # Logo + login
         # check the logo is there
         logo = items[0]
@@ -127,7 +127,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request.user = self.get_staff()
         request.current_page = page
         toolbar = CMSToolbar(request)
-        items = toolbar.get_items({}, request)
+        items = toolbar.get_items({})
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6) 
         # check the logo is there

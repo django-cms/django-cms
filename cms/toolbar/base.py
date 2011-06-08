@@ -17,28 +17,27 @@ class Serializable(object):
     # additional attributes to serialize only on this type
     extra_attributes = []
     
-    def as_json(self, context, request, **kwargs):
+    def as_json(self, context, **kwargs):
         """
         Converts the (serialized) data to JSON
         """
-        data = self.serialize(context, request, **kwargs)
+        data = self.serialize(context, **kwargs)
         return simplejson.dumps(data)
         
-    def serialize(self, context, request, **kwargs):
+    def serialize(self, context, **kwargs):
         """
         Serializes it's data. Uses self.base_attributes, self.extra_attributes
         and self.get_extra_data to 
         """
         data = {}
         for python, javascript in self.base_attributes:
-            self._populate(data, python, javascript, context, request, **kwargs)
+            self._populate(data, python, javascript, context, **kwargs)
         for python, javascript in self.extra_attributes:
-            self._populate(data, python, javascript, context, request, **kwargs)
-        data.update(self.get_extra_data(context, request, **kwargs))
+            self._populate(data, python, javascript, context, **kwargs)
+        data.update(self.get_extra_data(context, **kwargs))
         return data
     
-    def _populate(self, container, python, javascript, context, request,
-                  **kwargs):
+    def _populate(self, container, python, javascript, context, **kwargs):
         """
         Populates the *container* using the key *javascript* by accessing the
         attribute *python* on *self* (or serialize_*python* if that's a callable
@@ -46,14 +45,14 @@ class Serializable(object):
         """
         if hasattr(self, 'serialize_%s' % python):
             meth = getattr(self, 'serialize_%s' % python)
-            value = meth(context, request, **kwargs)
+            value = meth(context, **kwargs)
         else:
             value = getattr(self, python)
         if isinstance(value, Promise):
             value = force_unicode(value)
         container[javascript] = value
     
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, **kwargs):
         """
         Hook for subclasses to add more data.
         """
@@ -67,14 +66,14 @@ class Toolbar(Serializable):
     def __init__(self, request):
         self.request = request
         
-    def get_items(self, context, request, **kwargs):
+    def get_items(self, context, **kwargs):
         return []
     
-    def get_extra_data(self, context, request, **kwargs):
-        raw_items = self.get_items(context, request, **kwargs)
+    def get_extra_data(self, context, **kwargs):
+        raw_items = self.get_items(context, **kwargs)
         items = []
         for item in raw_items:
-            items.append(item.serialize(context, request, toolbar=self, **kwargs))
+            items.append(item.serialize(context, self.request, toolbar=self, **kwargs))
         return {
             'debug': settings.TEMPLATE_DEBUG,
             'items': items,

@@ -65,7 +65,7 @@ class CMSToolbar(Toolbar):
         self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(request)
         
     
-    def get_items(self, context, request, **kwargs):
+    def get_items(self, context, **kwargs):
         """
         Get the CMS items on the toolbar
         """
@@ -80,8 +80,8 @@ class CMSToolbar(Toolbar):
                 self.edit_mode_switcher
             )
             
-            if request.current_page:
-                has_states = request.current_page.last_page_states().exists()
+            if self.request.current_page:
+                has_states = self.request.current_page.last_page_states().exists()
                 if has_states:
                     items.append(
                         TemplateHTML(LEFT, 'status',
@@ -90,9 +90,9 @@ class CMSToolbar(Toolbar):
                 
                 # publish button
                 if self.edit_mode:
-                    moderator_state = page_moderator_state(request, request.current_page)
+                    moderator_state = page_moderator_state(self.request, self.request.current_page)
                     should_approve = moderator_state['state'] >= I_APPROVE
-                    has_perms = request.current_page.has_moderate_permission(request)
+                    has_perms = self.request.current_page.has_moderate_permission(self.request)
                     if should_approve and has_perms:
                         label = moderator_state['label']
                         urlgetter = _get_approve_url
@@ -107,19 +107,19 @@ class CMSToolbar(Toolbar):
                     )
             
                 # The 'templates' Menu
-                items.append(self.get_template_menu(context, request, self.can_change, self.is_staff))
+                items.append(self.get_template_menu(context, self.can_change, self.is_staff))
                 
                 # The 'page' Menu
-                items.append(self.get_page_menu(context, request, self.can_change, self.is_staff))
+                items.append(self.get_page_menu(context, self.can_change, self.is_staff))
             
             # The 'Admin' Menu
-            items.append(self.get_admin_menu(context, request, self.can_change, self.is_staff))
+            items.append(self.get_admin_menu(context, self.can_change, self.is_staff))
             
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
                           'cms/images/toolbar/icons/icon_lock.png')
             )
-        elif not request.user.is_authenticated():
+        elif not self.request.user.is_authenticated():
             items.append(
                 TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
             )
@@ -130,7 +130,7 @@ class CMSToolbar(Toolbar):
             )
         return items
     
-    def get_template_menu(self, context, request, can_change, is_staff):
+    def get_template_menu(self, context, can_change, is_staff):
         menu_items = []
         for path, name in settings.CMS_TEMPLATES:
             menu_items.append(
@@ -139,7 +139,7 @@ class CMSToolbar(Toolbar):
         return List(RIGHT, 'templates', _('Template'),
                     '', items=menu_items)
     
-    def get_page_menu(self, context, request, can_change, is_staff):
+    def get_page_menu(self, context, can_change, is_staff):
         """
         Builds the 'page menu'
         """
@@ -167,7 +167,7 @@ class CMSToolbar(Toolbar):
         return List(RIGHT, 'page', _('Page'), 'cms/images/toolbar/icons/icon_page.png',
                     items=menu_items)
     
-    def get_admin_menu(self, context, request, can_change, is_staff):
+    def get_admin_menu(self, context, can_change, is_staff):
         """
         Builds the 'admin menu' (the one with the cogwheel)
         """
