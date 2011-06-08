@@ -191,24 +191,24 @@ class CMSToolbar(Toolbar):
         return List(RIGHT, 'admin', _('Admin'), 'cms/images/toolbar/icons/icon_admin.png',
                     items=admin_items)
     
-    def request_hook(self, request):
-        request.session['cms_edit'] = True
-        if request.method != 'POST':
-            return self._request_hook_get(request)
+    def request_hook(self):
+        self.request.session['cms_edit'] = True
+        if self.request.method != 'POST':
+            return self._request_hook_get()
         else:
-            return self._request_hook_post(request)
+            return self._request_hook_post()
         
-    def _request_hook_get(self, request):
-        if 'cms-toolbar-logout' in request.GET:
-            logout(request)
-            return HttpResponseRedirect(request.path)
+    def _request_hook_get(self):
+        if 'cms-toolbar-logout' in self.request.GET:
+            logout(self.request)
+            return HttpResponseRedirect(self.request.path)
         
-    def _request_hook_post(self, request):
+    def _request_hook_post(self):
         # login hook
-        login_form = CMSToolbarLoginForm(request.POST)
+        login_form = CMSToolbarLoginForm(self.request.POST)
         if login_form.is_valid():
             username = login_form.cleaned_data['cms_username']
             password = login_form.cleaned_data['cms_password']
             user = authenticate(username=username, password=password)
             if user:
-                login(request, user)
+                login(self.request, user)

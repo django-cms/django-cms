@@ -80,7 +80,7 @@ class Toolbar(Serializable):
             'items': items,
         }
         
-    def request_hook(self, request):
+    def request_hook(self):
         """
         May return a HttpResponse instance
         """
