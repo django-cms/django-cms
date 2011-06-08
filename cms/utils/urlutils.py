@@ -59,3 +59,11 @@ def is_media_request(request):
         else:
             return True
     return False 
+
+def is_static_media_request(request):
+    """
+    Check if a request is a static media request.
+    """
+    if request.path.startswith(settings.STATIC_URL):
+        return True
+    return False

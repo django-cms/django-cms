@@ -5,7 +5,7 @@ Edit Toolbar middleware
 from cms import settings as cms_settings
 from cms.utils import get_template_from_request
 from cms.utils.plugins import get_placeholders
-from cms.utils.urlutils import is_media_request
+from cms.utils.urlutils import is_media_request, is_static_media_request
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.context import RequestContext
@@ -54,6 +54,8 @@ class ToolbarMiddleware(object):
         except NoReverseMatch:
             pass
         if is_media_request(request):
+            return False
+        if is_static_media_request(request):
             return False
         if "edit" in request.GET:
             return True
