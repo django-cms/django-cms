@@ -93,21 +93,22 @@ class CMSToolbar(Toolbar):
             items.append(self.get_admin_menu(context, request, can_change, is_staff))
             
             if request.current_page and self.edit_mode:
-                moderator_state = page_moderator_state(request, request.current_page)
-                should_approve = moderator_state['state'] >= I_APPROVE
-                has_perms = request.current_page.has_moderate_permission(request)
-                if should_approve and has_perms:
-                    label = moderator_state['label']
-                    urlgetter = _get_approve_url
-                elif has_perms:
-                    label = _("Publish")
-                    urlgetter = _get_publish_url
-                else:
-                    urlgetter = _get_approve_url
-                    label = _("Request Approval")
-                items.append(
-                    GetButton(RIGHT, 'moderator', label, urlgetter)
-                )
+                if settings.CMS_MODERATOR:
+                    moderator_state = page_moderator_state(request, request.current_page)
+                    should_approve = moderator_state['state'] >= I_APPROVE
+                    has_perms = request.current_page.has_moderate_permission(request)
+                    if should_approve and has_perms:
+                        label = moderator_state['label']
+                        urlgetter = _get_approve_url
+                    elif has_perms:
+                        label = _("Publish")
+                        urlgetter = _get_publish_url
+                    else:
+                        urlgetter = _get_approve_url
+                        label = _("Request Approval")
+                    items.append(
+                        GetButton(RIGHT, 'moderator', label, urlgetter)
+                    )
             
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
