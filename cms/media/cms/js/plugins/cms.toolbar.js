@@ -76,7 +76,7 @@ jQuery(document).ready(function ($) {
 
 			// the toolbar needs to resize depending on the window size on motherfucking ie6
 			if($.browser.msie && $.browser.version <= '6.0') {
-				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); })
+				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); });
 				$(window).trigger('resize');
 			}
 		},
@@ -212,13 +212,12 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = that.removeUrl(document.location.href, obj.addParameter);
-						document.location = that.insertUrl(url, obj.removeParameter, "")
+						document.location = that.setUrl(that.getUrl(location.href), obj.removeParameter, obj.addParameter);
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						document.location = that.insertUrl(location.href, obj.addParameter, "");
+						document.location = that.setUrl(that.getUrl(location.href), obj.addParameter, obj.removeParameter);
 					});
 				}
 			});
