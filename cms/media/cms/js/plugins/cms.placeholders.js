@@ -6,7 +6,8 @@
 
 /*##################################################|*/
 /* #CUSTOM APP# */
-jQuery(document).ready(function ($) {
+(function($){ // indent properly when merged
+$(document).ready(function ($) {
 	/**
 	 * Placeholders
 	 * @version: 0.1.2
@@ -572,3 +573,4 @@ jQuery(document).ready(function ($) {
 		
 	});
 });
+})(CMS.jQuery)

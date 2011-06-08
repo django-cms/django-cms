@@ -7,7 +7,8 @@
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.placeholders.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-jQuery(document).ready(function ($) {
+(function($){ // indent properly when merged
+$(document).ready(function ($) {
 	// load css file
 	$('<link>').appendTo('head').attr({
 		rel: 'stylesheet', type: 'text/css',
@@ -38,6 +39,7 @@ jQuery(document).ready(function ($) {
 		}
 	});
 });
+})(CMS.jQuery)
 //]]>
 </script>
 
