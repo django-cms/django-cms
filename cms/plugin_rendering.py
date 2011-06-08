@@ -113,13 +113,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     # Prepend frontedit toolbar output if applicable
     edit = False
-    if (
-        ("edit" in request.GET
-         or request.session.get("cms_edit", False)
-        )
-        and 'cms.middleware.toolbar.ToolbarMiddleware' in settings.MIDDLEWARE_CLASSES
-        and request.user.is_staff and request.user.is_authenticated()
-        and (not page or page.has_change_permission(request))):
+    toolbar = getattr(request, 'toolbar', None)
+    
+    if (getattr(toolbar, 'edit_mode', False) and
+        (not page or page.has_change_permission(request))):
             edit = True
     if edit:
         from cms.middleware.toolbar import toolbar_plugin_processor
