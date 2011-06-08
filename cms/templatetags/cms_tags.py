@@ -403,6 +403,6 @@ class CMSToolbar(InclusionTag):
         return super(CMSToolbar, self).render(context)
     
     def get_context(self, context):
-        context['CMS_TOOLBAR_CONFIG'] = request.toolbar.as_json(context)
+        context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context
 register.tag(CMSToolbar)
