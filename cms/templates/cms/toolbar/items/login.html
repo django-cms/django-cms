@@ -1,5 +1,5 @@
 {% load i18n %}
-<form action="" method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
+<form action="." method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
 	<fieldset>
 		{% csrf_token %}
 		<label for="cms_toolbar-item_login-username">{% trans "Username" %}</label>

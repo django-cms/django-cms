@@ -39,9 +39,10 @@
 			cookies : {},
 			callback: {
 				beforemove  : function(what, where, position, tree) {
-					item_id = what.id.split("page_")[1];
-					target_id = where.id.split("page_")[1];
-					old_node = what;
+					var old_target, old_position; 
+					var item_id = what.id.split("page_")[1];
+					var target_id = where.id.split("page_")[1];
+					var old_node = what;
 					if($(what).parent().children("li").length > 1){
 						if($(what).next("li").length){
 							old_target = $(what).next("li")[0];
@@ -62,8 +63,9 @@
 					return true; 
 				},
 				onmove: function(what, where, position, tree){
-					item_id = what.id.split("page_")[1];
-					target_id = where.id.split("page_")[1];
+					var position;
+					var item_id = what.id.split("page_")[1];
+					var target_id = where.id.split("page_")[1];
 					if (position == "before") {
 						position = "left";
 					}else if (position == "after") {
@@ -75,7 +77,7 @@
 				},
 				onchange: function(node, tree){
 					var url = $(node).find('a.title').attr("href");
-					self.location = url;
+					window.location = url;
 				}
 			}
 		};
@@ -104,7 +106,7 @@
 			// always
 			$('#loader-message').show();
 			
-			callback = s.success || false;
+			var callback = s.success || false;
 			s.success = function(data, status){
 				if (callback) {
 					callback(data, status);
@@ -156,19 +158,20 @@
 		
 	    $('#changelist li').click(function(e) {
 	        // I want a link to check the class
-	        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN')
-	            var target = e.target.parentNode;
-	        else
-	            var target = e.target;
-	        var jtarget = $(target);
-	        
+	    	var target, selected_page, action, id, page_id, view_page_url, admin_base_url, pageId, parent, value, position, target_id, site;
+	        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
+	            target = e.target.parentNode;
+	        } else {
+	            target = e.target;
+	        }
+            var jtarget = $(target);
 	        if(jtarget.hasClass("move")) {
 	        	// prepare tree for move / cut paste
-				var id = e.target.id.split("move-link-")[1];
+				id = e.target.id.split("move-link-")[1];
 				if(id==null){
 					id = e.target.parentNode.id.split("move-link-")[1];
 				}
-	            var page_id = id;
+	            page_id = id;
 	            selected_page = page_id;
 	            action = "move";
 				$('span.move-target-container, span.line, a.move-target').show();
@@ -180,7 +183,7 @@
 	        
 	        if(jtarget.hasClass("copy")) {
 	        	// prepare tree for copy
-				var id = e.target.id.split("copy-link-")[1];
+				id = e.target.id.split("copy-link-")[1];
 				if(id==null){
 					id = e.target.parentNode.id.split("copy-link-")[1];
 				}
@@ -191,7 +194,7 @@
 	        }
 	        
 	        if(jtarget.hasClass("viewpage")) {
-	            var view_page_url = $('#' + target.id + '-select').val();
+	            view_page_url = $('#' + target.id + '-select').val();
 	            if(view_page_url){
 	                window.open(view_page_url);
 	            }
@@ -206,7 +209,7 @@
 				
 				$("tr").removeClass("target");
 	            $("#changelist table").removeClass("table-selected");
-	            var page_id = target.id.split("add-link-")[1];
+	            page_id = target.id.split("add-link-")[1];
 	            selected_page = page_id;
 	            action = "add";
 	            $('tr').removeClass("selected");
@@ -223,7 +226,7 @@
 	        
 			// publish
 			if(jtarget.hasClass("publish-checkbox")) {
-	            var pageId = jtarget.attr("name").split("status-")[1];
+	            pageId = jtarget.attr("name").split("status-")[1];
 	            // if I don't put data in the post, django doesn't get it
 	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", { 1:1 });
 				e.stopPropagation();
@@ -232,7 +235,7 @@
 			
 			// in navigation
 			if(jtarget.hasClass("navigation-checkbox")) {
-	            var pageId = jtarget.attr("name").split("navigation-")[1];
+	            pageId = jtarget.attr("name").split("navigation-")[1];
 	            // if I don't put data in the post, django doesn't get it
 				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
 				e.stopPropagation();
@@ -241,7 +244,7 @@
 			
 			// moderation
 			if(jtarget.hasClass("moderator-checkbox")) {
-	            var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+	            pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
 	            parent = jtarget.parents('div.col-moderator');
 				
 				value = 0;
@@ -260,7 +263,7 @@
 			
 			// quick approve
 			if(jtarget.hasClass("approve")) {
-				var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
 				// just reload the page for now in callback... 
 				// TODO: this must be changed sometimes to reloading just the portion
 				// of the tree = current node + descendants 
@@ -270,13 +273,16 @@
 	        }
 			
 	        if(jtarget.hasClass("move-target")) {
-	            if(jtarget.hasClass("left"))
-	                var position = "left";
-	            if(jtarget.hasClass("right"))
-	                var position = "right";
-	            if(jtarget.hasClass("last-child"))
-	                var position = "last-child";
-	            var target_id = target.parentNode.id.split("move-target-")[1];
+	            if(jtarget.hasClass("left")){
+	                position = "left";
+	            }
+	            if(jtarget.hasClass("right")){
+	                position = "right";
+	            }
+	            if(jtarget.hasClass("last-child")){
+	                position = "last-child";
+	            }
+	            target_id = target.parentNode.id.split("move-target-")[1];
 	            
 				if(action=="move") {
 					moveTreeItem(null, selected_page, target_id, position, tree);
@@ -335,8 +341,8 @@
 		var copy_splits = window.location.href.split("copy=");
 		if(copy_splits.length > 1){
 			var id = copy_splits[1].split("&")[0];
-			selected_page = id;
-			action = mark_copy_node(id);		                                   
+			var selected_page = id;
+			var action = mark_copy_node(id);		                                   
 		}
 		
 		// moderation checkboxes over livequery
@@ -357,7 +363,7 @@
 		};
 		
 		function _copyTreeItem(item_id, target_id, position, site, options) {
-			data = {
+			var data = {
 			    position:position,
 			    target:target_id,
 			    site:site

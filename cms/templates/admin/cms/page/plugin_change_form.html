@@ -109,7 +109,10 @@
 {% prepopulated_fields_js %}
  
 </div>
-<div><input type="submit" value="{% trans "Save" %}" name="_save"/></div>
+<div>
+	<input type="submit" value="{% trans "Save" %}" name="_save"/>
+	<input type="submit" style="margin-left: 8px;" value="{% trans "Cancel" %}" name="_cancel">
+</div>
 </form>
 
 </div>

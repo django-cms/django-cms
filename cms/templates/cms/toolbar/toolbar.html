@@ -1,6 +1,6 @@
-{% load i18n adminmedia %}
+{% load i18n sekizai_tags adminmedia %}
 <script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy-1.3.1.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy.min.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.cookie.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.base.js"></script>
 <script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.toolbar.js"></script>
@@ -18,13 +18,10 @@ jQuery(document).ready(function ($) {
 		href: '{{ CMS_MEDIA_URL }}css/plugins/cms.placeholders.css'
 	});
 
-	// invoke helpers method for toolbar
-	CMS.Helpers = new CMS.Helpers();
-
-	// initialize toolbar and pass options and items
+	// initialize toolbar, pass options, items and allow public access
 	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
-	// initialize placeholders and pass options
+	// initialize placeholders, pass options and keep it private
 	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
 		{% if request.toolbar.edit_mode %}'edit_mode': true,{% endif %}
 		'urls': {
@@ -40,10 +37,6 @@ jQuery(document).ready(function ($) {
 			'cancel': '{% trans "Cancel" %}'
 		}
 	});
-
-	// initialize security patch
-	CMS.Security = new CMS.Security();
-	CMS.Security.csrf();
 });
 //]]>
 </script>
@@ -55,7 +48,6 @@ jQuery(document).ready(function ($) {
 			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
 				<span class="cms_toolbar-btn_right cms_toolbar_icon-toggle">
 					<span class="cms_toolbar_icon">&nbsp;</span>
-					<span class="cms_toolbar_icon-hide">{% trans "Show/Hide toolbar" %}</span>
 				</span>
 			</a>
 		</div>
@@ -68,7 +60,7 @@ jQuery(document).ready(function ($) {
 
 	<!-- start: placeholders -->
 	<div id="cms_placeholder-dim"></div>
-	<div id="cms_placeholder-content"><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
+	<div id="cms_placeholder-content"><div class="cms_placeholder-content_zone"></div><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
 	<div id="cms_placeholder-overlay">
 		<ul class="cms_placeholder-options">
 			<li class="first"><a href="#" class="cms_placeholder-icon cms_placeholder-icon_edit" rel="edit">edit</a></li>
