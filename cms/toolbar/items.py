@@ -49,9 +49,9 @@ class Switcher(BaseItem):
         return state
         
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, toolbar, **kwargs):
         return {
-            'state': self.get_state(request)
+            'state': self.get_state(toolbar.request)
         }
 
 
@@ -108,8 +108,8 @@ class TemplateHTML(BaseItem):
         super(TemplateHTML, self).__init__(alignment, css_class_suffix)
         self.template =  template
         
-    def get_extra_data(self, context, request, **kwargs):
-        new_context = RequestContext(request)
+    def get_extra_data(self, context, toolbar, **kwargs):
+        new_context = RequestContext(toolbar.request)
         rendered = render_to_string(self.template, new_context)
         stripped = strip_spaces_between_tags(rendered.strip())
         return {
@@ -173,9 +173,9 @@ class PostButton(BaseItem):
         self.args = args
         self.kwargs = kwargs
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, toolbar, **kwargs):
         double = self.kwargs.copy()
-        double['csrfmiddlewaretoken'] = get_token(request)
+        double['csrfmiddlewaretoken'] = get_token(toolbar.request)
         hidden = render_to_string('cms/toolbar/items/_post_button_hidden.html',
                                   Context({'single': self.args,
                                            'double': double}))
@@ -242,8 +242,8 @@ class List(BaseItem):
                     'List instances'
                 )
     
-    def get_extra_data(self, context, request, **kwargs):
-        items = [item.serialize(context, request, **kwargs)
+    def get_extra_data(self, context, **kwargs):
+        items = [item.serialize(context, **kwargs)
                  for item in self.raw_items]
         return {
             'items': items
