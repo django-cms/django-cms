@@ -73,7 +73,7 @@ class Toolbar(Serializable):
         raw_items = self.get_items(context, **kwargs)
         items = []
         for item in raw_items:
-            items.append(item.serialize(context, self.request, toolbar=self, **kwargs))
+            items.append(item.serialize(context, toolbar=self, **kwargs))
         return {
             'debug': settings.TEMPLATE_DEBUG,
             'items': items,
@@ -115,11 +115,10 @@ class BaseItem(Serializable):
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
     
-    def serialize(self, context, request, toolbar, **kwargs):
+    def serialize(self, context, toolbar, **kwargs):
         counter_attr = 'counter_%s' % self.alignment
         current = getattr(toolbar, counter_attr, 0)
         this = current + 1
         self.order = this * 10
         setattr(toolbar, counter_attr, this)
-        return super(BaseItem, self).serialize(context, request,
-                                               toolbar=toolbar, **kwargs)
+        return super(BaseItem, self).serialize(context, toolbar=toolbar, **kwargs)
