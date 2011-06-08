@@ -536,7 +536,8 @@ jQuery(document).ready(function ($) {
 				}, 500);
 			});
 			// init dim resize
-			$(window).resize();
+			// insure that onload it takes the document width
+			this.dim.css('height', $(document).height());
 			// change data information
 			this.dim.data('dimmed', true);
 			// show dim
