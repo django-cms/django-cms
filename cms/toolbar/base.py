@@ -64,6 +64,9 @@ class Toolbar(Serializable):
     """
     A base toolbar, implements the request_hook API and the get_items API.
     """
+    def __init__(self, request):
+        self.request = request
+        
     def get_items(self, context, request, **kwargs):
         return []
     

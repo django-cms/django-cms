@@ -46,7 +46,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request = self.request_factory.get('/')
         request.user = self.get_anon()
         request.current_page = None
-        toolbar = CMSToolbar()
+        toolbar = CMSToolbar(request)
         items = toolbar.get_items({}, request)
         self.assertEqual(len(items), 2) # Logo + login
         # check the logo is there
@@ -61,7 +61,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request = self.request_factory.get('/')
         request.user = self.get_staff()
         request.current_page = None
-        toolbar = CMSToolbar()
+        toolbar = CMSToolbar(request)
         items = toolbar.get_items({}, request)
         self.assertEqual(len(items), 4) # Logo + edit-mode + admin-menu + logout
         # check the logo is there
@@ -85,7 +85,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request = self.request_factory.get('/')
         request.user = self.get_superuser()
         request.current_page = None
-        toolbar = CMSToolbar()
+        toolbar = CMSToolbar(request)
         items = toolbar.get_items({}, request)
         self.assertEqual(len(items), 4) # Logo + edit-mode + admin-menu + logout
         # check the logo is there
@@ -110,7 +110,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request = self.request_factory.get('/')
         request.user = self.get_anon()
         request.current_page = page
-        toolbar = CMSToolbar()
+        toolbar = CMSToolbar(request)
         items = toolbar.get_items({}, request)
         self.assertEqual(len(items), 2) # Logo + login
         # check the logo is there
@@ -126,7 +126,7 @@ class ToolbarTests(SettingsOverrideTestCase):
         request = self.request_factory.get(page.get_absolute_url())
         request.user = self.get_staff()
         request.current_page = page
-        toolbar = CMSToolbar()
+        toolbar = CMSToolbar(request)
         items = toolbar.get_items({}, request)
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6) 

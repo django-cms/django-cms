@@ -69,7 +69,7 @@ class ToolbarMiddleware(object):
         request.toolbar. Then call the request_hook on the toolbar.
         """
         if self.should_show_toolbar(request):
-            request.toolbar = CMSToolbar()
+            request.toolbar = CMSToolbar(request)
             response = request.toolbar.request_hook(request)
             if isinstance(response, HttpResponse):
                 return response

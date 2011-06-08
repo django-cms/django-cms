@@ -55,25 +55,30 @@ class CMSToolbar(Toolbar):
     """
     The default CMS Toolbar
     """
+    def __init__(self, request):
+        super(CMSToolbar, self).__init__(request)
+        self.is_staff = request.user.is_staff
+        self.can_change = (request.current_page and
+                           request.current_page.has_change_permission(request))
+        self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
+                                           _('Edit mode'))
+        self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(request)
+        
+    
     def get_items(self, context, request, **kwargs):
         """
         Get the CMS items on the toolbar
         """
-        is_staff = request.user.is_staff
-        can_change = (request.current_page and
-                      request.current_page.has_change_permission(request))
         items = [
             Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
         ]
-        if is_staff:
-            edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
-                                          _('Edit mode'))
+        
+        
+        if self.is_staff:
             
             items.append(
-                edit_mode_switcher
+                self.edit_mode_switcher
             )
-            
-            self.edit_mode = edit_mode_switcher.get_state(request)
             
             if request.current_page:
                 has_states = request.current_page.last_page_states().exists()
@@ -82,32 +87,33 @@ class CMSToolbar(Toolbar):
                         TemplateHTML(LEFT, 'status',
                                      'cms/toolbar/items/status.html')
                     )
+                
+                # publish button
+                if self.edit_mode:
+                    moderator_state = page_moderator_state(request, request.current_page)
+                    should_approve = moderator_state['state'] >= I_APPROVE
+                    has_perms = request.current_page.has_moderate_permission(request)
+                    if should_approve and has_perms:
+                        label = moderator_state['label']
+                        urlgetter = _get_approve_url
+                    elif has_perms:
+                        label = _("Publish")
+                        urlgetter = _get_publish_url
+                    else:
+                        urlgetter = _get_approve_url
+                        label = _("Request Approval")
+                    items.append(
+                        GetButton(RIGHT, 'moderator', label, urlgetter)
+                    )
             
                 # The 'templates' Menu
-                items.append(self.get_template_menu(context, request, can_change, is_staff))
+                items.append(self.get_template_menu(context, request, self.can_change, self.is_staff))
                 
                 # The 'page' Menu
-                items.append(self.get_page_menu(context, request, can_change, is_staff))
+                items.append(self.get_page_menu(context, request, self.can_change, self.is_staff))
             
             # The 'Admin' Menu
-            items.append(self.get_admin_menu(context, request, can_change, is_staff))
-            
-            if request.current_page and self.edit_mode:
-                moderator_state = page_moderator_state(request, request.current_page)
-                should_approve = moderator_state['state'] >= I_APPROVE
-                has_perms = request.current_page.has_moderate_permission(request)
-                if should_approve and has_perms:
-                    label = moderator_state['label']
-                    urlgetter = _get_approve_url
-                elif has_perms:
-                    label = _("Publish")
-                    urlgetter = _get_publish_url
-                else:
-                    urlgetter = _get_approve_url
-                    label = _("Request Approval")
-                items.append(
-                    GetButton(RIGHT, 'moderator', label, urlgetter)
-                )
+            items.append(self.get_admin_menu(context, request, self.can_change, self.is_staff))
             
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
