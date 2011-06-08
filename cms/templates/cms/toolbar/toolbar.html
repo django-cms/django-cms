@@ -1,11 +1,15 @@
 {% load i18n adminmedia %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
 <script type="text/javascript">
     //<![CDATA[
     // When jQuery is sourced, it's going to overwrite whatever might be in the
     // '$' variable, so store a reference of it in a temporary variable...
     var _$ = window.$;
+    //]]>
+</script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
     // add stylesheets to head
     (function ($) {
 		$('<link>').appendTo('head').attr({
