@@ -109,10 +109,10 @@
 {% prepopulated_fields_js %}
  
 </div>
-<div>
-	<input type="submit" value="{% trans "Save" %}" name="_save"/>
+<span class="plugin-submit-row"{% if is_popup %} style="overflow: auto;"{% endif %}>
+	<input type="submit" name="_save" class="default" value="{% trans "Save" %}" {{ onclick_attrib }}/>
 	<input type="submit" style="margin-left: 8px;" value="{% trans "Cancel" %}" name="_cancel">
-</div>
+</span>
 </form>
 
 </div>
