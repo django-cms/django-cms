@@ -1,3 +1,4 @@
+(function ($) {
 /**
  * @author:		Angelo Dini
  * @copyright:	http://www.divio.ch under the BSD Licence
@@ -5,8 +6,9 @@
  */
 
 /*##################################################|*/
-/* #CUSTOM APP# */
+/* #CMS.TOOLBAR# */
 jQuery(document).ready(function ($) {
+
 	/**
 	 * Toolbar
 	 * @version: 0.1.2
@@ -20,7 +22,7 @@ jQuery(document).ready(function ($) {
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 * TODO: login needs special treatment (errors, login on enter)
 	 */
-	CMS.Toolbar = Class.$extend({
+	CMS.Toolbar = CMS.Class.$extend({
 
 		implement: [CMS.Helpers, CMS.Security],
 
@@ -367,3 +369,5 @@ jQuery(document).ready(function ($) {
 
 	});
 });
+
+})(jQuery);
