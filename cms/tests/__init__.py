@@ -22,7 +22,7 @@ from cms.tests.plugins import (PluginManyToManyTestCase, PluginsTestCase,
 from cms.tests.po import PoTest
 from cms.tests.publisher import PublisherTestCase
 from cms.tests.rendering import RenderingTestCase
-from cms.tests.reversion_tests import ReversionTestCase
+from cms.tests.reversion_tests import ReversionTestCase, ReversionFileFieldTests
 from cms.tests.security import SecurityTests
 from cms.tests.settings import SettingsTests
 from cms.tests.site import SiteTestCase
