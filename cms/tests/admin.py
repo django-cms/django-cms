@@ -3,7 +3,8 @@ from __future__ import with_statement
 from cms.admin.dialog.forms import (ModeratorForm, PermissionForm, 
     PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
-from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
+from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter, PageAdmin
+from cms.admin.change_list import CMSChangeList
 from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState
@@ -11,6 +12,7 @@ from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils import testcases as base
+from cms.test_utils.util.request_factory import RequestFactory
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -28,6 +30,10 @@ from unittest import TestCase
 
 
 class AdminTestCase(CMSTestCase):
+    
+    def setUp(self):
+        self.request_factory = RequestFactory()
+    
     def _get_guys(self, admin_only=False):
         admin = self.get_superuser()
         if admin_only:
@@ -226,6 +232,42 @@ class AdminTestCase(CMSTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
             self.assertTemplateNotUsed(response, 'admin/login.html')
+            
+    def test_changelist_items(self):
+        admin = self._get_guys(True)
+        first_level_page = create_page('level1',  'nav_playground.html', 'en')
+        second_level_page_top = create_page('level21', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= first_level_page)
+        second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= self.reload(first_level_page))
+        third_level_page = create_page('level3', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= second_level_page_top)
+        self.assertEquals(Page.objects.all().count(), 4)
+        
+        url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
+        request = self.request_factory.get(url)
+        
+        request.session = {}
+        request.user = admin
+        
+        page_admin = site._registry[Page]
+                
+        cl = CMSChangeList(request, page_admin.model, page_admin.list_display,
+                            page_admin.list_display_links, page_admin.list_filter,
+                            page_admin.date_hierarchy, page_admin.search_fields, 
+                            page_admin.list_select_related, page_admin.list_per_page, 
+                            page_admin.list_editable, page_admin)
+        
+        cl.set_items(request)
+        
+        
+        root_page = cl.get_items()[0]
+
+        self.assertEqual(root_page, first_level_page)
+        self.assertEqual(root_page.get_children()[0], second_level_page_top)
+        self.assertEqual(root_page.get_children()[1], second_level_page_bottom)
+        self.assertEqual(root_page.get_children()[0].get_children()[0], third_level_page)
+
 
 
 class AdminFieldsetTests(TestCase):
@@ -622,7 +664,7 @@ class AdminTests(CMSTestCase, AdminTestsBase):
         }
         admin = self.get_admin()
         url = reverse('admin:cms_page_add_plugin')
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSIONS=False,
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False,
                               CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.placeholders.get(slot='body')
@@ -646,7 +688,7 @@ class AdminTests(CMSTestCase, AdminTestsBase):
         }
         admin = self.get_admin()
         url = reverse('admin:cms_page_add_plugin')
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSIONS=False,
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False,
                               CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.placeholders.get(slot='body')
