@@ -23,11 +23,14 @@ class ShowAdminMenu(InclusionTag):
     
     def get_context(self, context, page):
         request = context['request']
+
         
         if context.has_key("cl"):
             filtered = context['cl'].is_filtered()
         elif context.has_key('filtered'):
             filtered = context['filtered']
+        
+        
         
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
