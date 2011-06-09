@@ -1033,7 +1033,8 @@ class PageAdmin(ModelAdmin):
         site = Site.objects.get_current()
 
         if not site == page.site:
-            url = "http://%s%s" % (page.site.domain, url)
+            url = "http%s://%s%s" % ('s' if request.is_secure() else '',
+                                     page.site.domain, url)
         return HttpResponseRedirect(url)
 
     def change_status(self, request, page_id):
