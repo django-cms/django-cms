@@ -161,3 +161,15 @@ class ToolbarTests(SettingsOverrideTestCase):
         logout = items[5]
         self.assertTrue(isinstance(logout, GetButton))
         self.assertEqual(logout.url, '?cms-toolbar-logout')
+        
+    def test_toolbar_markup(self):
+        superuser = self.get_superuser()
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True)
+        
+        response = self.client.get('/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'nav_playground.html')
+        self.assertContains(response, '<div id="cms_toolbar"')
+        # self.assertContains(response, 'cms.placeholders.js')
+        # self.assertContains(response, 'cms.placeholders.css')
