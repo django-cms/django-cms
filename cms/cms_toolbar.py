@@ -13,37 +13,37 @@ from django.utils.translation import ugettext_lazy as _
 import urllib
 
 
-def _get_page_admin_url(context, request, **kwargs):
-    return reverse('admin:cms_page_change', args=(request.current_page.pk,))
+def _get_page_admin_url(context, toolbar, **kwargs):
+    return reverse('admin:cms_page_change', args=(toolbar.request.current_page.pk,))
 
-def _get_page_history_url(context, request, **kwargs):
-    return reverse('admin:cms_page_history', args=(request.current_page.pk,))
+def _get_page_history_url(context, toolbar, **kwargs):
+    return reverse('admin:cms_page_history', args=(toolbar.request.current_page.pk,))
 
-def _get_add_child_url(context, request, **kwargs):
+def _get_add_child_url(context, toolbar, **kwargs):
     data = {
         'position': 'last-child',
-        'target': request.current_page.pk,
+        'target': toolbar.request.current_page.pk,
     }
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
-def _get_add_sibling_url(context, request, **kwargs):
+def _get_add_sibling_url(context, toolbar, **kwargs):
     data = {
         'position': 'last-child',
     }
-    if request.current_page.parent_id:
-        data['target'] = request.current_page.parent_id
+    if toolbar.request.current_page.parent_id:
+        data['target'] = toolbar.request.current_page.parent_id
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
-def _get_delete_url(context, request, **kwargs):
-    return reverse('admin:cms_page_delete', args=(request.current_page.pk,))
+def _get_delete_url(context, toolbar, **kwargs):
+    return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.pk,))
 
-def _get_approve_url(context, request, **kwargs):
-    return reverse('admin:cms_page_approve_page', args=(request.current_page.pk,))
+def _get_approve_url(context, toolbar, **kwargs):
+    return reverse('admin:cms_page_approve_page', args=(toolbar.request.current_page.pk,))
 
-def _get_publish_url(context, request, **kwargs):
-    return reverse('admin:cms_page_publish_page', args=(request.current_page.pk,))
+def _get_publish_url(context, toolbar, **kwargs):
+    return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.pk,))
 
 
 class CMSToolbarLoginForm(forms.Form):

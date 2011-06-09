@@ -149,9 +149,9 @@ class ToolbarTests(SettingsOverrideTestCase):
         self.assertEqual(len(pagemenu.raw_items), 4)
         overview, addchild, addsibling, delete = pagemenu.raw_items
         self.assertEqual(overview.url, reverse('admin:cms_page_changelist'))
-        self.assertEqual(addchild.serialize_url({}, request), reverse('admin:cms_page_add') + '?position=last-child&target=%s' % page.pk)
-        self.assertEqual(addsibling.serialize_url({}, request), reverse('admin:cms_page_add') + '?position=last-child')
-        self.assertEqual(delete.serialize_url({}, request), reverse('admin:cms_page_delete', args=(page.pk,)))
+        self.assertEqual(addchild.serialize_url({}, toolbar), reverse('admin:cms_page_add') + '?position=last-child&target=%s' % page.pk)
+        self.assertEqual(addsibling.serialize_url({}, toolbar), reverse('admin:cms_page_add') + '?position=last-child')
+        self.assertEqual(delete.serialize_url({}, toolbar), reverse('admin:cms_page_delete', args=(page.pk,)))
         # check the admin-menu
         admin = items[4]
         self.assertTrue(isinstance(admin, List))

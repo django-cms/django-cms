@@ -12,11 +12,14 @@ menu:
 * :ttag:`show_sub_menu`
 * :ttag:`show_breadcrumb`
 
+To use any of these templatetags, you need to have ``{% load menu_tags %}`` in
+your template before the line on which you call the templatetag.
+
 .. note::
 
     Please note that menus were originally implemented to be
-    application-independant and as such, live in the :mod:`menus` application
-    instead of the "normal" :mod:`cms`
+    application-independent and as such, live in the :mod:`menus` application
+    instead of the :mod:`cms` application.
 
 *********
 show_menu
@@ -46,7 +49,7 @@ Some Examples
 
 Complete navigation (as a nested list)::
 
-    {% load cache menu_tags %}
+    {% load menu_tags %}
     <ul>
         {% show_menu 0 100 100 100 %}
     </ul>
@@ -157,7 +160,7 @@ in the next section) the first node still would have 0 as its `menu_level`.
 
     {{ node.get_absolute_url }}
 
-The absolute URL of the node.
+The absolute URL of the node, without any protocol, domain or port.
 ::
 
     {{ node.get_title }}
