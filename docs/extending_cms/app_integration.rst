@@ -305,9 +305,9 @@ Navigation Modifiers give your application access to navigation menus.
 A modifier can add nodes to a menu, change the properties of existing
 nodes, and even rearrange entire menus.
 
-===================
+
 An example use-case
-===================
+-------------------
 
 A simple example: you have a news application that publishes pages
 independently of Django CMS. However, you would like to integrate the 
@@ -316,9 +316,9 @@ places a *News* node appears in the navigation menu.
 
 In such a case, a Navigation Modifier is the solution.
 
-============
+
 How it works
-============
+------------
 
 Normally, you'd want to place modifiers in your application's 
 ``menu.py``.

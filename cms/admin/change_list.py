@@ -75,7 +75,8 @@ class CMSChangeList(ChangeList):
         site = self._current_site
         # Get all the pages, ordered by tree ID (it's convenient to build the 
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id', 'parent', 'lft').select_related()
+        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
+        
         
         # Get lists of page IDs for which the current user has 
         # "permission to..." on the current site. 
@@ -121,9 +122,12 @@ class CMSChangeList(ChangeList):
         # This is normally a tag filter, but it's really nice in our case too:
         # It caches children for every page in the list we pass it, so no
         # further queries are needed.
+
         mptt_tags.cache_tree_children(pages)
         
         for page in pages:
+           
+
             children = page.get_children()
 
             # note: We are using change_list permission here, because we must
