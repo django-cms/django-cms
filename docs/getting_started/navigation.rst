@@ -196,17 +196,27 @@ If true this node is a "soft root".
 Soft Roots
 **********
 
-"Soft roots" are pages that start a new navigation.
-If you are in a child of a soft root node you can only see the path to the soft
-root. This feature is useful if you have big navigation trees with a lot of
-pages and don't want to overwhelm the user.
+A *soft root* is a page that acts as the root for a menu 
+navigation tree.
 
-To enable it put the following in your ``settings.py`` file::
+Typically, this will be a page that is the root of a significant 
+new section on your site.
+
+When the *soft root* feature is enabled, the navigation menu 
+for any page will start at the nearest *soft root*, rather than 
+at the real root of the site's page hierarchy.
+
+This feature is useful when your site has deep page hierarchies 
+(and therefore multiple levels in its navigation trees). In such 
+a case, you usually don’t want to present site visitors with deep 
+menus of nested items.
+
+To enable the feature, ``settings.py`` requires:
 
     CMS_SOFTROOT = True
 
-Now you can mark a page as "soft root" in the 'Advanced' tab of the page's
-settings in the admin interface.
+Mark a page as *soft root* in the 'Advanced' tab of the its settings 
+in the admin interface.
 
 ******************************
 Modifying & Extending the menu
