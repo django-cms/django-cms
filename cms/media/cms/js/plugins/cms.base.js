@@ -5,10 +5,12 @@
  *
  * assign Class and CMS namespace */
  var CMS = CMS || {};
+ CMS.jQuery = CMS.jQuery || jQuery.noConflict();
 
 /*##################################################|*/
 /* #CUSTOM APP# */
-jQuery(document).ready(function ($) {
+(function($){ // indent properly when merged
+$(document).ready(function ($) {
 	/**
 	 * Security
 	 * @version: 0.1.1
@@ -117,3 +119,4 @@ jQuery(document).ready(function ($) {
 	};
 
 });
+})(CMS.jQuery)
