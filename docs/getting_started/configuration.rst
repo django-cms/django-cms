@@ -16,7 +16,7 @@ Required Settings
 CMS_TEMPLATES
 =============
 
-Default: ``None`` (Not a valid setting!)
+Default: ``()`` (Not a valid setting!)
 
 A list of templates you can select for a page.
 
@@ -565,7 +565,7 @@ Cache expiration (in seconds) for view and other permissions.
 CMS_CACHE_PREFIX
 ================
 
-Default: ``None``
+Default: ``cms-``
 
 
 The CMS will prepend the value associated with this key to every cache access (set and get).

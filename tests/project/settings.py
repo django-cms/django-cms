@@ -104,6 +104,7 @@ INSTALLED_APPS = (
     'project.pluginapp',
     'project.pluginapp.plugins.manytomany_rel',
     'project.fakemlng',
+    'project.fileapp',
     'south',
     'reversion',
     'sekizai',

@@ -89,7 +89,7 @@ class CMSToolbar(Toolbar):
                     )
                 
                 # publish button
-                if self.edit_mode:
+                if self.edit_mode and settings.CMS_MODERATOR:
                     moderator_state = page_moderator_state(self.request, self.request.current_page)
                     should_approve = moderator_state['state'] >= I_APPROVE
                     has_perms = self.request.current_page.has_moderate_permission(self.request)

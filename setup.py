@@ -46,7 +46,7 @@ setup(
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Django>=1.2',
+        'Django>=1.2.5',
         'django-classy-tags>=0.3.3',
         'south>=0.7.2',
         'django-mptt>=0.4.2',
