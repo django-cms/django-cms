@@ -50,7 +50,7 @@ class CMSChangeList(ChangeList):
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
             qs = qs.filter(site=self._current_site)
-        qs = qs.order_by('tree_id', 'parent', 'lft')
+        qs = qs.order_by('tree_id',  'lft')
         return qs
     
     def is_filtered(self):
