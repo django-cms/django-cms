@@ -5,9 +5,11 @@
  *
  * assign Class and CMS namespace */
  var CMS = CMS || {};
+     CMS.Class = CMS.Class || Class.$noConflict();
 
+(function ($) {
 /*##################################################|*/
-/* #CUSTOM APP# */
+/* #CMS.BASE# */
 jQuery(document).ready(function ($) {
 	/**
 	 * Security
@@ -117,3 +119,5 @@ jQuery(document).ready(function ($) {
 	};
 
 });
+
+})(jQuery);
