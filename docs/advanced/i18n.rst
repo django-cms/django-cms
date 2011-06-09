@@ -68,6 +68,21 @@ For the language chooser to work the
 :class:`cms.middleware.multilingual.MultilingualURLMiddleware` must be enabled.
 
 
+simple_language_changer
+=======================
+
+If the URLs of your views don't actually change besides the language prefix,
+you can use the :func:`menus.utils.simple_language_changer` view decorator,
+instead of manually using `set_language_changer`::
+
+
+    from menus.utils import simple_language_changer
+
+    @simple_language_changer
+    def get_prodcut(request, slug):
+        # ...
+
+
 *****************
 page_language_url
 *****************

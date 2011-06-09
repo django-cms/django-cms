@@ -68,13 +68,20 @@ class ApphooksTestCase(CMSTestCase):
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
             page = create_page("apphooked-page", "nav_playground.html", "en",
                                created_by=superuser, published=True, apphook="SampleApp")
+            blank_page = create_page("not-apphooked-page", "nav_playground.html", "en",
+                                     created_by=superuser, published=True, apphook="", slug='blankapp')
             english_title = page.title_set.all()[0]
             self.assertEquals(english_title.language, 'en')
             create_title("de", "aphooked-page-de", page, apphook="SampleApp")
             self.assertTrue(page.publish())
+            self.assertTrue(blank_page.publish())
     
             response = self.client.get(self.get_pages_root())
             self.assertTemplateUsed(response, 'sampleapp/home.html')
+
+            response = self.client.get('/en/blankapp/')
+            self.assertTemplateUsed(response, 'nav_playground.html')
+
             apphook_pool.clear()
     
     def test_get_page_for_apphook(self):

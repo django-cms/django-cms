@@ -17,24 +17,16 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Toolbar.registerItems(array);
 	 *	- CMS.Toolbar.removeItem(id);
 	 *	- CMS.Toolbar.registerType(function);
+	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
+	 * TODO: login needs special treatment (errors, login on enter)
 	 */
 	CMS.Toolbar = Class.$extend({
 
 		implement: [CMS.Helpers, CMS.Security],
 
 		options: {
-			// not integrated yet
-			debug: false,
-			items: [],
-			// type definitions used in registerItem()
-			// TODO: needs proper implementation
-			types: [
-				{ 'anchor': '_registerAnchor' },
-				{ 'html': '_reigsterHtml' },
-				{ 'switcher': '_reigsterSwitcher' },
-				{ 'button': '_reigsterButton' },
-				{ 'list': '_reigsterList' }
-			]
+			'debug': false, // not integrated yet
+			'items': []
 		},
 
 		initialize: function (container, options) {
@@ -81,6 +73,12 @@ jQuery(document).ready(function ($) {
 
 			// apply csrf patch to toolbar from cms.base.js
 			this.csrf();
+
+			// the toolbar needs to resize depending on the window size on motherfucking ie6
+			if($.browser.msie && $.browser.version <= '6.0') {
+				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); })
+				$(window).trigger('resize');
+			}
 		},
 
 		toggleToolbar: function () {
@@ -185,7 +183,7 @@ jQuery(document).ready(function ($) {
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
-				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
@@ -214,13 +212,13 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = that.removeUrl(window.location.href, obj.addParameter);
-						window.location = that.insertUrl(url, obj.removeParameter, "")
+						var url = that.removeUrl(document.location.href, obj.addParameter);
+						document.location = that.insertUrl(url, obj.removeParameter, "")
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = that.insertUrl(location.href, obj.addParameter, "");
+						document.location = that.insertUrl(location.href, obj.addParameter, "");
 					});
 				}
 			});
@@ -241,6 +239,8 @@ jQuery(document).ready(function ($) {
 
 			// item injection logic
 			var list = template.find('.cms_toolbar-item_list').html();
+				// ff2 list check
+				if(!list) return false;
 			var tmp = '';
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
@@ -267,7 +267,7 @@ jQuery(document).ready(function ($) {
 			function show_list() {
 				// add event to body to hide the list needs a timout for late trigger
 				setTimeout(function () {
-					$(window).bind('click', hide_list);
+					$(document).bind('click', hide_list);
 				}, 100);
 
 				// show element and save data
@@ -276,7 +276,7 @@ jQuery(document).ready(function ($) {
 			}
 			function hide_list() {
 				// remove the body event
-				$(window).unbind('click');
+				$(document).unbind('click');
 
 				// show element and save data
 				container.hide();
@@ -318,7 +318,7 @@ jQuery(document).ready(function ($) {
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
-				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
 			// save order remove id and show element
 			template.data('order', obj.order)

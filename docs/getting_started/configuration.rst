@@ -16,7 +16,7 @@ Required Settings
 CMS_TEMPLATES
 =============
 
-Default: ``None`` (Not a valid setting!)
+Default: ``()`` (Not a valid setting!)
 
 A list of templates you can select for a page.
 
@@ -464,6 +464,16 @@ a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
 only a subset of the pages he's allowed access to, for example.
 
+.. setting:: CMS_PUBLIC_FOR
+
+CMS_PUBLIC_FOR
+==============
+
+Default: ``all``
+
+Decides if pages without any view restrictions are public by default, or staff
+only. Possible values are ``all`` and ``staff``.
+
 .. setting:: CMS_MODERATOR
 
 CMS_MODERATOR
@@ -555,7 +565,7 @@ Cache expiration (in seconds) for view and other permissions.
 CMS_CACHE_PREFIX
 ================
 
-Default: ``None``
+Default: ``cms-``
 
 
 The CMS will prepend the value associated with this key to every cache access (set and get).
