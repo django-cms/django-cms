@@ -564,7 +564,7 @@ class AdvancedSoftrootTests(SettingsOverrideTestCase):
     """
     settings_overrides = {
         'CMS_MODERATOR': False,
-        'CMS_PERMISSIONS': False
+        'CMS_PERMISSION': False
     }
     fixtures = ['advanced_softroot.json']
         
