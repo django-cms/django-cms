@@ -8,7 +8,7 @@
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
 
 {% if not add %}
-	<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_form.js"></script>
+<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_form.js"></script>
 {% endif %}
 <script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
 
@@ -16,12 +16,12 @@
 <script type="text/javascript">
 //<![CDATA[	
 (function($) {
-	$(document).ready(function(){
-		$("#id_title").keyup(function() {
-	        var e = $("#id_slug")[0];
-	        if (!e._changed) {
-	            e.value = URLify(this.value, 64);
-	        }
+	$(document).ready(function (){
+		$("#id_title").keyup(function () {
+			var e = $("#id_slug")[0];
+			if(!e._changed) {
+				e.value = URLify(this.value, 64);
+			}
 	    });
 	});
 })(jQuery);
@@ -30,28 +30,29 @@
 {% endif %}
 
 <style type="text/css">
-
+<!--
 .language_button { 
-    font-weight:bold;
-    margin-bottom:-1px; 
-    border-color:#DDDDDD #AAAAAA #CCCCCC #DDDDDD !important; 
-    border:1px;  
-    background:white url({{ ADMIN_MEDIA_URL }}img/admin/nav-bg.gif) repeat-x scroll center bottom !important;
-    }
-
-#lang_tab_content h2.header {
-    margin: 0;
-    padding: 2px 5px 3px 5px;
-    font-size: 11px;
-    text-align: left;
-    font-weight: bold;
-    background: #7CA0C7 url({{ ADMIN_MEDIA_URL }}img/admin/default-bg.gif) top left repeat-x;
-    color: white;
+	font-weight:bold;
+	margin-bottom:-1px;
+	border-color:#ddd #aaa #ccc #ddd !important;
+	border:1px;
+	background:#fff url('{{ ADMIN_MEDIA_URL }}img/admin/nav-bg.gif') repeat-x center bottom !important;
 }
 
-.notfilled{
-    color: #808080 !important;
+#lang_tab_content h2.header {
+	margin:0;
+	padding:2px 5px 3px 5px;
+	font-size:11px;
+	text-align:left;
+	font-weight:bold;
+	background:#7ca0c7 url('{{ ADMIN_MEDIA_URL }}img/admin/default-bg.gif') repeat-x left top;
+	color:#fff;
+}
 
+.notfilled {
+    color: #808080 !important;
+}
+-->
 </style>
 
 
@@ -211,7 +212,7 @@
 						// show previously posted message if there were an error
 						$('#id_df_moderator_message').val($('#id_moderator_message').val());
 					}
-					seen = true
+					seen = true;
 					event.preventDefault();
 					submitActor = actor;
 					$('#dialog').dialog('open');
@@ -243,7 +244,6 @@
 						Save: function() {
 							dialogSave();
 						}
-
 					},
 					open: function(){
 						var val = $('#id_moderator_state').val();
