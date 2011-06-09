@@ -27,7 +27,8 @@ from cms.tests.security import SecurityTests
 from cms.tests.settings import SettingsTests
 from cms.tests.site import SiteTestCase
 from cms.tests.templatetags import TemplatetagTests, TemplatetagDatabaseTests
-from cms.tests.toolbar import ToolbarTests
+from cms.tests.toolbar import (ToolbarTests, ToolbarModeratorTests,
+    ToolbarNoModeratorTests)
 from cms.tests.urlutils import UrlutilsTestCase
 from cms.tests.views import ViewTests
 from cms.tests.management import ManagementTestCase
