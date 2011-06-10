@@ -29,6 +29,7 @@ class DocsTestCase(CMSTestCase):
                 "html",
                 warningiserror=True,
                 status=nullout,
+                confoverrides={'extensions':['djangocms']},
             )
             try:
                 app.build()
