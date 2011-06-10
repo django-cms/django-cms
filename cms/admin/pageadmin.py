@@ -1214,6 +1214,9 @@ class PageAdmin(ModelAdmin):
             if not instance:
                 raise Http404("This plugin is not saved in a revision")
 
+        if not has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
+            return HttpResponseForbidden()
+
         plugin_admin.cms_plugin_instance = cms_plugin
         try:
             plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?

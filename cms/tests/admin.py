@@ -792,22 +792,15 @@ class PluginPermissionTests(AdminTestCase):
         # The admin creates the page and the plugin
         page = create_page('Test Page', "nav_playground.html", "en",
                            site=site, created_by=admin)
-        plugin = add_plugin(self._placeholder,
-                            'TextPlugin',
-                            'en')
-
+        plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
         # Normal guy want to change the plugin
         client = Client()
-        client.login(username='normal_guy', password='normal_guy')
-        url = reverse('admin:cms_page_edit_plugin', args=(plugin.id, ))
-        data = {
-            'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
-        }
-        response = client.post(url, data)
+        client.login(username='test', password='test')
+        #url = reverse('admin:cms_page_change', args=(page.pk,)) + 'edit-plugin/%i/' % plugin.id
+        url = reverse('admin:cms_page_edit_plugin', args=[plugin.id])
+        response = client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
-        self._give_permission(admin, Text, 'edit')
-        response = client.post(url, data)
+        self._give_permission(normal_guy, Text, 'change')
+        response = client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponse.status_code)
