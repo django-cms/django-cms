@@ -721,7 +721,7 @@ class NoDBAdminTests(TestCase, AdminTestsBase):
         self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))
 
 
-class PluginPermissionTests(CMSTestCase):
+class PluginPermissionTests(AdminTestCase):
     def setUp(self):
         self._page = create_page('test page', 'nav_playground.html', 'en')
         self._placeholder = self._page.placeholders.all()[0]
@@ -776,5 +776,38 @@ class PluginPermissionTests(CMSTestCase):
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self._give_permission(admin, Text, 'add')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+
+    def test_plugin_edit_requires_permissions(self):
+        """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
+
+        # Create a page
+        admin, normal_guy = self._get_guys()
+        self._give_cms_permissions(admin)
+        self._give_permission(admin, Text, 'add')
+        site = Site.objects.get(pk=1)
+
+        # The admin creates the page and the plugin
+        page = create_page('Test Page', "nav_playground.html", "en",
+                           site=site, created_by=admin)
+        plugin = add_plugin(self._placeholder,
+                            'TextPlugin',
+                            'en')
+
+        # Normal guy want to change the plugin
+        client = Client()
+        client.login(username='normal_guy', password='normal_guy')
+        url = reverse('admin:cms_page_edit_plugin', args=(plugin.id, ))
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': self._placeholder.pk,
+            'language': 'en',
+        }
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(admin, Text, 'edit')
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
