@@ -107,7 +107,19 @@ class PlaceholderTestCase(CMSTestCase):
                         self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
                         phfields.remove(field)
             self.assertEqual(phfields, [])
-
+            
+    def test_no_inheritplugin_nopage(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        response = self.client.get(reverse('admin:placeholderapp_example1_change', args=(ex.pk,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
+        
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
 
