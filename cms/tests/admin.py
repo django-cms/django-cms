@@ -761,6 +761,15 @@ class PluginPermissionTests(AdminTestCase):
         gpp.sites = Site.objects.all()
         if save:
             user.save()
+
+    def _create_page_and_plugin(self):
+        # The admin creates the page and the plugin
+        admin = self._get_admin()
+        site = Site.objects.get(pk=1)
+        page = create_page('Test Page', "nav_playground.html", "en",
+                           site=site, created_by=admin)
+        plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
+        return (page, plugin)
         
     def test_plugin_add_requires_permissions(self):
         """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
@@ -779,16 +788,6 @@ class PluginPermissionTests(AdminTestCase):
         self._give_permission(admin, Text, 'add')
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-
-
-    def _create_page_and_plugin(self):
-        # The admin creates the page and the plugin
-        admin = self._get_admin()
-        site = Site.objects.get(pk=1)
-        page = create_page('Test Page', "nav_playground.html", "en",
-                           site=site, created_by=admin)
-        plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
-        return (page, plugin)
 
     def test_plugin_edit_requires_permissions(self):
         """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
@@ -832,5 +831,23 @@ class PluginPermissionTests(AdminTestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'change')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugins_copy_requires_permissions(self):
+        """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
+        _, plugin = self._create_page_and_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_copy_plugins')
+        data = dict(plugin_id=plugin.id,
+                    placeholder=self._placeholder.pk,
+                    language='fr',
+                    copy_from='en')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'add')
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)

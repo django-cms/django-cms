@@ -1162,6 +1162,11 @@ class PageAdmin(ModelAdmin):
             return HttpResponseBadRequest(_("Language must be different than the copied language!"))
         plugins = list(placeholder.cmsplugin_set.filter(language=copy_from).order_by('tree_id', '-rght'))
 
+        # check permissions before copy the plugins:
+        for plugin in plugins:
+            if not has_plugin_permission(request.user, plugin.plugin_type, "add"):
+                return HttpResponseForbidden("You do not have permission to add plugins")
+
         copy_plugins.copy_plugins_to(plugins, placeholder, language)
 
         if page and "reversion" in settings.INSTALLED_APPS:
