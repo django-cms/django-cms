@@ -85,9 +85,11 @@ class CMSTestCase(TestCase):
         return UserLoginContext(self, user)
         
     def get_superuser(self):
-        admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
-        admin.set_password("admin")
-        admin.save()
+        admin = User.objects.get(username="admin")
+        if not admin:
+            admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
+            admin.set_password("admin")
+            admin.save()
         return admin
         
     def get_staff_user_with_no_permissions(self):

@@ -1283,6 +1283,9 @@ class PageAdmin(ModelAdmin):
         success = False
         if 'plugin_id' in request.POST:
             plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
+            if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
+                return HttpResponseForbidden()
+
             page = plugins.get_page_from_plugin_or_404(plugin)
             if not page.has_change_permission(request):
                 raise Http404
@@ -1301,6 +1304,8 @@ class PageAdmin(ModelAdmin):
         if 'ids' in request.POST:
             for plugin_id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=plugin_id)
+                if has_plugin_permission(request.user, plugin.plugin_type, "change"):
+                    return HttpResponseForbidden()
                 page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
                 if not page: # use placeholderadmin instead!
                     raise Http404
@@ -1330,6 +1335,10 @@ class PageAdmin(ModelAdmin):
             raise Http404
         plugin_id = request.POST['plugin_id']
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+
+        if not has_plugin_permission(request.user, plugin.plugin_type, "delete"):
+            return HttpResponseForbidden()
+
         placeholder = plugin.placeholder
         page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
 

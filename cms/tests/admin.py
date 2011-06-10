@@ -763,6 +763,7 @@ class PluginPermissionTests(AdminTestCase):
             user.save()
         
     def test_plugin_add_requires_permissions(self):
+        """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
         admin = self._get_admin()
         self._give_cms_permissions(admin)
         client = Client()
@@ -780,27 +781,56 @@ class PluginPermissionTests(AdminTestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
-    def test_plugin_edit_requires_permissions(self):
-        """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
-
-        # Create a page
-        admin, normal_guy = self._get_guys()
-        self._give_cms_permissions(admin)
-        self._give_permission(admin, Text, 'add')
-        site = Site.objects.get(pk=1)
-
+    def _create_page_and_plugin(self):
         # The admin creates the page and the plugin
+        admin = self._get_admin()
+        site = Site.objects.get(pk=1)
         page = create_page('Test Page', "nav_playground.html", "en",
                            site=site, created_by=admin)
         plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
-        # Normal guy want to change the plugin
+        return (page, plugin)
+
+    def test_plugin_edit_requires_permissions(self):
+        """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
+        _, plugin = self._create_page_and_plugin()
+        _, normal_guy = self._get_guys()
         client = Client()
         client.login(username='test', password='test')
-        #url = reverse('admin:cms_page_change', args=(page.pk,)) + 'edit-plugin/%i/' % plugin.id
         url = reverse('admin:cms_page_edit_plugin', args=[plugin.id])
         response = client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'change')
         response = client.post(url, dict())
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugin_remove_requires_permissions(self):
+        """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
+        _, plugin = self._create_page_and_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_remove_plugin')
+        data = dict(plugin_id=plugin.id)
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'delete')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugin_move_requires_permissions(self):
+        """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
+        _, plugin = self._create_page_and_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_move_plugin')
+        data = dict(plugin_id=plugin.id,
+                    placeholder=self._placeholder)
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'change')
+        response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
