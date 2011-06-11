@@ -265,6 +265,32 @@ jQuery(document).ready(function ($) {
 					($(this).data('collapsed')) ? show_list() : hide_list();
 			});
 
+			// add form action if rel equals get or post
+			var anchors = container.find('a');
+			if(anchors.attr('rel') !== '') {
+				// loop through the items and attach post events
+				anchors.each(function (index, item) {
+					if($(item).attr('rel') !== '') {
+						$(item).unbind('click').bind('click', function (e) {
+							e.preventDefault();
+							// attach form action
+							$.ajax({
+								'type': $(e.currentTarget).attr('rel'),
+								'url': $(e.currentTarget).attr('href'),
+								'success': function (response) {
+									(response === true) ? CMS.Helpers.reloadBrowser() : alert(response);
+								},
+								'error': function () {
+									log('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
+								}
+							});
+							// after clicking hide list
+							hide_list();
+						});
+					}
+				});
+			}
+
 			function show_list() {
 				// add event to body to hide the list needs a timout for late trigger
 				setTimeout(function () {
