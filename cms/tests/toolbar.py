@@ -164,8 +164,9 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         templates = items[2]
         self.assertTrue(isinstance(templates, List))
         self.assertEqual(len(templates.raw_items), len(settings.CMS_TEMPLATES))
+        base = reverse('admin:cms_page_change_template', args=(page.pk,))
         for item, template in zip(templates.raw_items, settings.CMS_TEMPLATES):
-            self.assertEqual(item.url, '#%s' % template[0])
+            self.assertEqual(item.url, '%s?template=%s' % (base, template[0]))
 
         # check page menu
         pagemenu = items[3]
