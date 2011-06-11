@@ -57,12 +57,15 @@ class CMSToolbar(Toolbar):
     """
     def __init__(self, request):
         super(CMSToolbar, self).__init__(request)
-        self.is_staff = request.user.is_staff
-        self.can_change = (request.current_page and
-                           request.current_page.has_change_permission(request))
+        self.init()
+        
+    def init(self):
+        self.is_staff = self.request.user.is_staff
+        self.can_change = (self.request.current_page and
+                           self.request.current_page.has_change_permission(self.request))
         self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
                                            _('Edit mode'))
-        self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(request)
+        self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(self.request)
         
     
     def get_items(self, context, **kwargs):
@@ -73,6 +76,8 @@ class CMSToolbar(Toolbar):
             Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
         ]
         
+        self.page_states = []
+        
         
         if self.is_staff:
             
@@ -81,7 +86,9 @@ class CMSToolbar(Toolbar):
             )
             
             if self.request.current_page:
-                has_states = self.request.current_page.last_page_states().exists()
+                states = self.request.current_page.last_page_states()
+                has_states = states.exists()
+                self.page_states = states
                 if has_states:
                     items.append(
                         TemplateHTML(LEFT, 'status',
@@ -211,3 +218,4 @@ class CMSToolbar(Toolbar):
             user = authenticate(username=username, password=password)
             if user:
                 login(self.request, user)
+                self.init()
