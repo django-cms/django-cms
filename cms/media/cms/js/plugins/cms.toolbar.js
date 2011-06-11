@@ -78,7 +78,7 @@ jQuery(document).ready(function ($) {
 
 			// the toolbar needs to resize depending on the window size on motherfucking ie6
 			if($.browser.msie && $.browser.version <= '6.0') {
-				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); })
+				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); });
 				$(window).trigger('resize');
 			}
 		},
@@ -214,13 +214,12 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = that.removeUrl(document.location.href, obj.addParameter);
-						document.location = that.insertUrl(url, obj.removeParameter, "")
+						document.location = that.setUrl(that.getUrl(document.location), obj.removeParameter, obj.addParameter);
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						document.location = that.insertUrl(location.href, obj.addParameter, "");
+						document.location = that.setUrl(that.getUrl(document.location), obj.addParameter, obj.removeParameter);
 					});
 				}
 			});
@@ -247,12 +246,12 @@ jQuery(document).ready(function ($) {
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
 				// add icon if available
-				// TODO: backend needs to return '' instead of '/media/None'
-				var icon = (value.icon !== '/media/None') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
+				var icon = (value.icon !== '') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
 						   .replace('[list_method]', value.method)
+						   .replace('[list_class]', value.class)
 						   .replace('<span>', '<span class="'+icon+'" style="background-image:url('+value.icon+');">');
 			});
 			// add items
@@ -266,6 +265,33 @@ jQuery(document).ready(function ($) {
 					e.preventDefault();
 					($(this).data('collapsed')) ? show_list() : hide_list();
 			});
+
+			// add form action if rel equals get or post
+			var anchors = container.find('a');
+			if(anchors.attr('rel') !== '') {
+				// loop through the items and attach post events
+				anchors.each(function (index, item) {
+					if($(item).attr('rel') !== '') {
+						$(item).unbind('click').bind('click', function (e) {
+							e.preventDefault();
+							// attach form action
+							$.ajax({
+								'type': $(e.currentTarget).attr('rel'),
+								'url': $(e.currentTarget).attr('href'),
+								'data': $(e.currentTarget).attr('href').split('?')[1],
+								'success': function () {
+									CMS.Helpers.reloadBrowser();
+								},
+								'error': function () {
+									log('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
+								}
+							});
+							// after clicking hide list
+							hide_list();
+						});
+					}
+				});
+			}
 
 			function show_list() {
 				// add event to body to hide the list needs a timout for late trigger
