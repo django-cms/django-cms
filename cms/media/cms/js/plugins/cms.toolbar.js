@@ -252,6 +252,7 @@ jQuery(document).ready(function ($) {
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
+						   .replace('[list_method]', value.method)
 						   .replace('<span>', '<span class="'+icon+'" style="background-image:url('+value.icon+');">');
 			});
 			// add items
