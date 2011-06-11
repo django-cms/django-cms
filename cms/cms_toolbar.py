@@ -142,8 +142,11 @@ class CMSToolbar(Toolbar):
         url = reverse('admin:cms_page_change_template', args=(self.request.current_page.pk,))
         for path, name in settings.CMS_TEMPLATES:
             args = urllib.urlencode({'template': path})
+            css = 'template'
+            if self.request.current_page.get_template() == path:
+                css += ' active'
             menu_items.append(
-                ListItem('template', name, '%s?%s' % (url, args), 'POST'),
+                ListItem(css, name, '%s?%s' % (url, args), 'POST'),
             )
         return List(RIGHT, 'templates', _('Template'),
                     '', items=menu_items)

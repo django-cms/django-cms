@@ -12,7 +12,9 @@ def _media(suffix):
     """
     Helper that prefixes a URL with MEDIA_URL
     """
-    return u'%s%s' % (settings.MEDIA_URL, suffix)
+    if suffix:
+        return u'%s%s' % (settings.MEDIA_URL, suffix)
+    return ''
 
 
 class Switcher(BaseItem):
