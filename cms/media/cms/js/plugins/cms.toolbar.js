@@ -268,10 +268,10 @@ jQuery(document).ready(function ($) {
 
 			// add form action if rel equals get or post
 			var anchors = container.find('a');
-			if(anchors.attr('rel') !== '') {
+			if(anchors.attr('rel') === 'POST') {
 				// loop through the items and attach post events
 				anchors.each(function (index, item) {
-					if($(item).attr('rel') !== '') {
+					if($(item).attr('rel') === 'POST') {
 						$(item).unbind('click').bind('click', function (e) {
 							e.preventDefault();
 							// attach form action
