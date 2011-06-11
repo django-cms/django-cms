@@ -101,7 +101,9 @@ jQuery(document).ready(function ($) {
 			// we could loop the query and replace the param at the right place
 			// but instead of replacing it just append it to the end of the query so its more visible
 			delete query[removeParam];
-				   query[addParam] = '';
+				   query[addParam.split('=')[0]] = addParam.split('=')[1];
+
+				   log(addParam);
 
 			$.each(query, function (key, value) {
 				// add &
