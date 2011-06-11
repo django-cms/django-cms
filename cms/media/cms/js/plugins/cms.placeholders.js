@@ -414,6 +414,9 @@ jQuery(document).ready(function ($) {
 					plugin.insertAfter($(els.toArray()[els.length-1]));
 				}
 
+				// close overlay
+				that._hideOverlay();
+
 				// show success overlay for a second
 				that.success.css({
 					'width': plugin.width()-2,
@@ -524,31 +527,18 @@ jQuery(document).ready(function ($) {
 			var that = this;
 			// clear timer when initiated within resize event
 			if(this.timer) clearTimeout(this.timer);
-
-			/* cause IE's mother had sex with a sheep, we need to always usw window instead of document
-			 * we need to substract 4 pixel from the frame cause IE's vater has a small dick
-			 * TODO: Check if scrollbars are shown, than we dont need to substract 20px, they are forced now
-			 */
-			var scrollbarWidth = ($.browser.msie && $.browser.version >= '8.0') ? 20 : 0;
-
 			// attach resize event to window
-			$(document).bind('resize', function () {
-				that.dim.css({
-					'width': $(document).width(),
-					'height': $(document).height()
-				});
-				that.frame.css('width', $(document).width());
-				// adjust after resizing
+			$(window).bind('resize', function () {
+				// first we need to response to the window
+				that.dim.css('height', $(window).height());
+				// after a while we response to the document dimensions
 				that.timer = setTimeout(function () {
-					that.dim.css({
-						'width': $(document).width()-scrollbarWidth,
-						'height': $(document).height()
-					});
-					that.frame.css('width', $(document).width()-scrollbarWidth);
+					that.dim.css('height', $(document).height());
 				}, 500);
 			});
 			// init dim resize
-			$(document).resize();
+			// insure that onload it takes the document width
+			this.dim.css('height', $(document).height());
 			// change data information
 			this.dim.data('dimmed', true);
 			// show dim
