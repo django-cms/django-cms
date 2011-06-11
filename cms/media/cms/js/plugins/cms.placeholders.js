@@ -1,3 +1,4 @@
+(function ($) {
 /**
  * @author:		Angelo Dini
  * @copyright:	http://www.divio.ch under the BSD Licence
@@ -5,7 +6,7 @@
  */
 
 /*##################################################|*/
-/* #CUSTOM APP# */
+/* #CMS.PLACEHOLDERS# */
 jQuery(document).ready(function ($) {
 	/**
 	 * Placeholders
@@ -19,7 +20,7 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Placeholder.toggleDim();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
-	CMS.Placeholders = Class.$extend({
+	CMS.Placeholders = CMS.Class.$extend({
 
 		options: {
 			'debug': false, // not integrated yet
@@ -562,3 +563,5 @@ jQuery(document).ready(function ($) {
 		
 	});
 });
+
+})(jQuery);

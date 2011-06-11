@@ -6,7 +6,8 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
+    URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, 
     SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
@@ -15,6 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
+import datetime
 import os.path
 
 class PagesTestCase(CMSTestCase):
@@ -416,6 +418,19 @@ class PagesTestCase(CMSTestCase):
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
+    
+    def test_page_already_expired(self):
+        """
+        Test that a page which has a end date in the past gives a 404, not a
+        500.
+        """
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            page = create_page('page', 'nav_playground.html', 'en',
+                               publication_end_date=yesterday, published=True)
+            resp = self.client.get(page.get_absolute_url('en'))
+            self.assertEqual(resp.status_code, 404)
+        
 
 
 class NoAdminPageTests(CMSTestCase):

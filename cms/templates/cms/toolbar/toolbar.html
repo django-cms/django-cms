@@ -1,23 +1,16 @@
-{% load i18n sekizai_tags adminmedia %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy.min.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.cookie.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.base.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.toolbar.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.placeholders.js"></script>
+{% load i18n adminmedia sekizai_tags %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/jquery.cookie.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.base.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.toolbar.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.placeholders.js"></script>{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/plugins/cms.toolbar.css?v1" media="all" />{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/plugins/cms.placeholders.css?v1" media="all" />{% endaddtoblock %}
+{% addtoblock "js" %}
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
-	// load css file
-	$('<link>').appendTo('head').attr({
-		rel: 'stylesheet', type: 'text/css',
-		href: '{{ CMS_MEDIA_URL }}css/plugins/cms.toolbar.css'
-	});
-	$('<link>').appendTo('head').attr({
-		rel: 'stylesheet', type: 'text/css',
-		href: '{{ CMS_MEDIA_URL }}css/plugins/cms.placeholders.css'
-	});
-
 	// initialize toolbar, pass options, items and allow public access
 	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
@@ -40,6 +33,7 @@ jQuery(document).ready(function ($) {
 });
 //]]>
 </script>
+{% endaddtoblock %}
 
 <div id="cms_toolbar" class="cms_reset" style="display:none;">
 	<!-- start: toolbar -->

@@ -12,11 +12,14 @@ menu:
 * :ttag:`show_sub_menu`
 * :ttag:`show_breadcrumb`
 
+To use any of these templatetags, you need to have ``{% load menu_tags %}`` in
+your template before the line on which you call the templatetag.
+
 .. note::
 
     Please note that menus were originally implemented to be
-    application-independant and as such, live in the :mod:`menus` application
-    instead of the "normal" :mod:`cms`
+    application-independent and as such, live in the :mod:`menus` application
+    instead of the :mod:`cms` application.
 
 *********
 show_menu
@@ -46,7 +49,7 @@ Some Examples
 
 Complete navigation (as a nested list)::
 
-    {% load cache menu_tags %}
+    {% load menu_tags %}
     <ul>
         {% show_menu 0 100 100 100 %}
     </ul>
@@ -157,7 +160,7 @@ in the next section) the first node still would have 0 as its `menu_level`.
 
     {{ node.get_absolute_url }}
 
-The absolute URL of the node.
+The absolute URL of the node, without any protocol, domain or port.
 ::
 
     {{ node.get_title }}
@@ -193,17 +196,27 @@ If true this node is a "soft root".
 Soft Roots
 **********
 
-"Soft roots" are pages that start a new navigation.
-If you are in a child of a soft root node you can only see the path to the soft
-root. This feature is useful if you have big navigation trees with a lot of
-pages and don't want to overwhelm the user.
+A *soft root* is a page that acts as the root for a menu 
+navigation tree.
 
-To enable it put the following in your ``settings.py`` file::
+Typically, this will be a page that is the root of a significant 
+new section on your site.
+
+When the *soft root* feature is enabled, the navigation menu 
+for any page will start at the nearest *soft root*, rather than 
+at the real root of the site's page hierarchy.
+
+This feature is useful when your site has deep page hierarchies 
+(and therefore multiple levels in its navigation trees). In such 
+a case, you usually don’t want to present site visitors with deep 
+menus of nested items.
+
+To enable the feature, ``settings.py`` requires:
 
     CMS_SOFTROOT = True
 
-Now you can mark a page as "soft root" in the 'Advanced' tab of the page's
-settings in the admin interface.
+Mark a page as *soft root* in the 'Advanced' tab of the its settings 
+in the admin interface.
 
 ******************************
 Modifying & Extending the menu

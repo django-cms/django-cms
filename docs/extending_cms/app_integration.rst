@@ -300,9 +300,34 @@ You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 Navigation Modifiers
 ********************
 
-Navigation Modifiers can add or change properties of navigation nodes,
-they even can rearrange whole menus. You normally want to create them in your
-apps ``menu.py``.
+Navigation Modifiers give your application access to navigation menus.
+
+A modifier can add nodes to a menu, change the properties of existing
+nodes, and even rearrange entire menus.
+
+
+An example use-case
+-------------------
+
+A simple example: you have a news application that publishes pages
+independently of Django CMS. However, you would like to integrate the 
+application into the menu structure of your site, so that at appropriate 
+places a *News* node appears in the navigation menu.
+
+In such a case, a Navigation Modifier is the solution.
+
+
+How it works
+------------
+
+Normally, you'd want to place modifiers in your application's 
+``menu.py``.
+
+To make your modifier available, it then needs to be registered with 
+``menus.menu_pool.menu_pool``.
+
+Now, when a page is loaded and the menu generated, your modifier will
+be able to inspect and modify its nodes.
 
 A simple modifier looks something like this::
 
