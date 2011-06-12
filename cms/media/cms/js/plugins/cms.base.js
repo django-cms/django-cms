@@ -103,8 +103,6 @@ jQuery(document).ready(function ($) {
 			delete query[removeParam];
 				   query[addParam.split('=')[0]] = addParam.split('=')[1];
 
-				   log(addParam);
-
 			$.each(query, function (key, value) {
 				// add &
 				if(index != 0) serialized += '&';
