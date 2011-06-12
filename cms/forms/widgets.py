@@ -14,6 +14,11 @@ from django.utils.translation import ugettext as _
 from os.path import join
 import copy
 
+PAGE_ONLY_PLUGINS = []
+if 'cms.plugins.inherit' in settings.INSTALLED_APPS:
+    from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
+    PAGE_ONLY_PLUGINS.append(InheritPagePlaceholderPlugin)
+
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
@@ -205,9 +210,11 @@ class PlaceholderPluginEditorWidget(PluginEditor):
                     model=ph._get_attached_model(),
                     fieldname=ph._get_attached_field_name()
                 )
+            installed_plugins = [plugin for plugin in plugin_pool.get_all_plugins(ph.slot) \
+                if plugin not in PAGE_ONLY_PLUGINS]
             context = {
                 'plugin_list': plugin_list,
-                'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
+                'installed_plugins': installed_plugins,
                 'copy_languages': copy_languages, 
                 'language': language,
                 'show_copy': bool(copy_languages) and ph.actions.can_copy,
