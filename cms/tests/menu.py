@@ -721,3 +721,36 @@ class ShowSubMenuCheck(BaseMenuTest):
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].id, 8)
+        
+
+class ShowMenuBelowIdTests(BaseMenuTest):
+    def test_not_in_navigation(self):
+        """
+        Test for issue 521
+        
+        Build the following tree:
+        
+            A
+            |-B
+              |-C
+              \-D (not in nav)
+        """
+        a = create_page('A', 'nav_playground.html', 'en', published=True,
+                        in_navigation=True, reverse_id='a')
+        b =create_page('B', 'nav_playground.html', 'en', parent=a,
+                       published=True, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', parent=b,
+                        published=True, in_navigation=True)
+        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
+                    published=True, in_navigation=False)
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1, nodes)
+        node = nodes[0]
+        self.assertEqual(node.id, b.id)
+        children = node.children
+        self.assertEqual(len(children), 1, repr(children))
+        child = children[0]
+        self.assertEqual(child.id, c.id)
