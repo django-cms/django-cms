@@ -20,6 +20,10 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Placeholder.toggleDim();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
+	function jqId(myid) {
+		return '#' + myid.replace(/(:|\.)/g,'\\$1');
+	},
+
 	CMS.Placeholders = CMS.Class.$extend({
 
 		options: {
@@ -454,8 +458,46 @@ jQuery(document).ready(function ($) {
 		_showPluginList: function (el) {
 			// save reference to this class
 			var that = this;
-			var list = el.parent().find('.cms_placeholder-subnav');
-				list.show();
+			var split = el.parent().parent().attr('class').split('::');
+				split.shift(); // remove classes
+			var values = {
+					'language': split[0],
+			 		'placeholder_id': split[1],
+					'placeholder': split[2]
+				};
+			subnavIdParts = [ split[0], split[1], split[2] ];
+			var cloneId = 'cms_placeholder-subnav_clone::' + subnavIdParts.join('::');
+			var listClone = $(jqId(cloneId));
+			if (!listClone.length) {
+				var list = el.parent().find('.cms_placeholder-subnav');
+					list.show();
+				var listClone = list.clone();
+				listClone.attr('id', cloneId);
+				listClone.css({
+					'top': list.offset().top,
+					'left': list.offset().left,
+					'right': 'auto',
+					'width': list.outerWidth(true)
+				});
+				listClone.addClass('cms_reset');
+				listClone.appendTo($(document.body));
+
+				// attach events to placeholder plugins
+			
+				listClone.find('li a').bind('click', function (e) {
+					e.preventDefault();
+					// add type to values
+					values.plugin_type = $(this).attr('rel').split('::')[1];
+					// try to add a new plugin
+					that.addPlugin.call(
+						that, that.options.urls.cms_page_add_plugin, values
+					);
+				});
+				listClone.show();
+				list.hide();
+			} else {
+				listClone.show();
+			}	
 
 			// add event to body to hide the list needs a timout for late trigger
 			setTimeout(function () {
@@ -471,8 +513,18 @@ jQuery(document).ready(function ($) {
 		},
 		
 		_hidePluginList: function (el) {
-			var list = el.parent().find('.cms_placeholder-subnav');
-				list.hide();
+			// read and save placeholder bar variables
+			var split = el.parent().parent().attr('class').split('::');
+				split.shift(); // remove classes
+			var values = {
+					'language': split[0],
+					'placeholder_id': split[1],
+					'placeholder': split[2]
+				};
+			split = [ split[0], split[1], split[2] ];
+			var cloneId = 'cms_placeholder-subnav_clone::' + split.join('::');
+			var listClone = $(jqId(cloneId));
+				listClone.hide();
 
 			// remove the body event
 			$(document).unbind('click');
