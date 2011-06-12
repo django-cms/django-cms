@@ -28,11 +28,3 @@ from cms.tests.urlutils import *
 from cms.tests.views import *
 from cms.tests.management import *
 
-try:
-    from cms.tests.javascript import *
-except ImportError:
-    import warnings
-    import traceback
-    exc = traceback.format_exc()
-    warnings.warn("JavascriptTestCase cannot be run: %s" % exc)
-
