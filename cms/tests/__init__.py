@@ -46,7 +46,7 @@ from cms.tests.nonroot import NonRootCase
 from cms.tests.page import PagesTestCase, NoAdminPageTests
 from cms.tests.permmod import PermissionModeratorTests, PatricksMoveTest
 from cms.tests.placeholder import (PlaceholderModelTests, PlaceholderAdminTest, 
-    PlaceholderTestCase, PlaceholderActionTests)
+    PlaceholderTestCase, PlaceholderActionTests, PlaceholderPluginPermissionTests)
 from cms.tests.plugins import (PluginManyToManyTestCase, PluginsTestCase, 
     SekizaiTests, LinkPluginTestCase)
 from cms.tests.po import PoTest

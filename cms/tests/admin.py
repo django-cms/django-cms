@@ -762,14 +762,9 @@ class PluginPermissionTests(AdminTestCase):
         if save:
             user.save()
 
-    def _create_page_and_plugin(self):
-        # The admin creates the page and the plugin
-        admin = self._get_admin()
-        site = Site.objects.get(pk=1)
-        page = create_page('Test Page', "nav_playground.html", "en",
-                           site=site, created_by=admin)
+    def _create_plugin(self):
         plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
-        return (page, plugin)
+        return plugin
         
     def test_plugin_add_requires_permissions(self):
         """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
@@ -791,7 +786,7 @@ class PluginPermissionTests(AdminTestCase):
 
     def test_plugin_edit_requires_permissions(self):
         """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
-        _, plugin = self._create_page_and_plugin()
+        plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         client = Client()
         client.login(username='test', password='test')
@@ -805,7 +800,7 @@ class PluginPermissionTests(AdminTestCase):
 
     def test_plugin_remove_requires_permissions(self):
         """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
-        _, plugin = self._create_page_and_plugin()
+        plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         client = Client()
         client.login(username='test', password='test')
@@ -820,7 +815,7 @@ class PluginPermissionTests(AdminTestCase):
 
     def test_plugin_move_requires_permissions(self):
         """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
-        _, plugin = self._create_page_and_plugin()
+        plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         client = Client()
         client.login(username='test', password='test')
@@ -836,7 +831,7 @@ class PluginPermissionTests(AdminTestCase):
 
     def test_plugins_copy_requires_permissions(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
-        _, plugin = self._create_page_and_plugin()
+        plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         client = Client()
         client.login(username='test', password='test')

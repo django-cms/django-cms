@@ -85,8 +85,9 @@ class CMSTestCase(TestCase):
         return UserLoginContext(self, user)
         
     def get_superuser(self):
-        admin = User.objects.get(username="admin")
-        if not admin:
+        try:
+            admin = User.objects.get(username="admin")
+        except User.DoesNotExist:
             admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
             admin.set_password("admin")
             admin.save()

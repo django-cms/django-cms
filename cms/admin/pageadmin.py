@@ -298,7 +298,7 @@ class PageAdmin(ModelAdmin):
             else:
                 return HttpResponseBadRequest("template not valid")
         else:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(_("You have no permission to change the template"))
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -1078,7 +1078,7 @@ class PageAdmin(ModelAdmin):
             raise Http404
         plugin_type = request.POST['plugin_type']
         if not has_plugin_permission(request.user, plugin_type, "add"):
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(_('You have no permission to add a plugin'))
         placeholder_id = request.POST.get('placeholder', None)
         parent_id = request.POST.get('parent_id', None)
         if placeholder_id:
@@ -1165,7 +1165,7 @@ class PageAdmin(ModelAdmin):
         # check permissions before copy the plugins:
         for plugin in plugins:
             if not has_plugin_permission(request.user, plugin.plugin_type, "add"):
-                return HttpResponseForbidden("You do not have permission to add plugins")
+                return HttpResponseForbidden(_("You do not have permission to add plugins"))
 
         copy_plugins.copy_plugins_to(plugins, placeholder, language)
 
@@ -1220,7 +1220,7 @@ class PageAdmin(ModelAdmin):
                 raise Http404("This plugin is not saved in a revision")
 
         if not has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(_("You have no permission to edit a plugin"))
 
         plugin_admin.cms_plugin_instance = cms_plugin
         try:
@@ -1310,7 +1310,7 @@ class PageAdmin(ModelAdmin):
             for plugin_id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=plugin_id)
                 if has_plugin_permission(request.user, plugin.plugin_type, "change"):
-                    return HttpResponseForbidden()
+                    return HttpResponseForbidden(_("You have no permission to move a plugin"))
                 page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
                 if not page: # use placeholderadmin instead!
                     raise Http404
@@ -1342,7 +1342,7 @@ class PageAdmin(ModelAdmin):
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
 
         if not has_plugin_permission(request.user, plugin.plugin_type, "delete"):
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(_("You have no permission to remove a plugin"))
 
         placeholder = plugin.placeholder
         page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
