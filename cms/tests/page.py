@@ -431,6 +431,61 @@ class PagesTestCase(CMSTestCase):
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.status_code, 404)
         
+    def test_page_urls(self):
+        self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
+        page1 = Page.objects.get(title_set__slug='test-page-1')
+        page1.publish()
+
+        self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data(page1.pk))
+        page2 = Page.objects.get(title_set__slug='test-page-2')
+        page2.publish()
+
+        self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data(page2.pk))
+        page3 = Page.objects.get(title_set__slug='test-page-3')
+        page3.publish()
+
+        self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
+        page4 = Page.objects.get(title_set__slug='test-page-4')
+        page4.publish()
+
+        self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data(page4.pk))
+        page5 = Page.objects.get(title_set__slug='test-page-5')
+        page5.publish()
+
+        self.assertEqual(page1.get_absolute_url(),
+            self.get_pages_root()+'')
+        self.assertEqual(page2.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/test-page-3/')
+        self.assertEqual(page4.get_absolute_url(),
+            self.get_pages_root()+'test-page-4/')
+        self.assertEqual(page5.get_absolute_url(),
+            self.get_pages_root()+'test-page-4/test-page-5/')
+
+        self.client.post(
+            '/admin/cms/page/%s/move-page/' % page3.pk,
+            {'target': page1.pk, 'position': 'last-child'})
+
+        page3 = self.reload_page(page3)
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'test-page-3/')
+
+        self.client.post(
+            '/admin/cms/page/%s/move-page/' % page5.pk,
+            {'target': page2.pk, 'position': 'last-child'})
+
+        page5 = self.reload_page(page5)
+        self.assertEqual(page5.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/test-page-5/')
+
+        self.client.post(
+            '/admin/cms/page/%s/move-page/' % page3.pk,
+            {'target': page4.pk, 'position': 'last-child'})
+
+        page3 = self.reload_page(page3)
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'test-page-4/test-page-3/')
 
 
 class NoAdminPageTests(CMSTestCase):
