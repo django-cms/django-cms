@@ -67,7 +67,7 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins"):
+    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", page_only=True):
         self.discover_plugins()
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
@@ -80,7 +80,8 @@ class PluginPool(object):
                     getattr(page, 'template', None)
                 )
                 if allowed_plugins:
-                    if plugin.__name__ in allowed_plugins:
+                    if plugin.__name__ in allowed_plugins and \
+                        (plugin.page_only is True and page_only is False):
                         final_plugins.append(plugin)
                 elif setting_key == "plugins":
                     final_plugins.append(plugin)

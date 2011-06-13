@@ -108,7 +108,7 @@ class PlaceholderTestCase(CMSTestCase):
                         phfields.remove(field)
             self.assertEqual(phfields, [])
             
-    def test_no_inheritplugin_nopage(self):
+    def test_page_only_plugins(self):
         ex = Example1(
             char_1='one',
             char_2='two',
