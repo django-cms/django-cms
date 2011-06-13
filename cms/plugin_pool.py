@@ -67,24 +67,30 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", page_only=True):
+    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         self.discover_plugins()
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
-        if placeholder:
-            final_plugins = []
-            for plugin in plugins:
+        final_plugins = []
+        for plugin in plugins:
+            include_plugin = False
+            if placeholder:
                 allowed_plugins = get_placeholder_conf(
                     setting_key,
                     placeholder,
                     getattr(page, 'template', None)
                 )
                 if allowed_plugins:
-                    if plugin.__name__ in allowed_plugins and \
-                        (plugin.page_only is True and page_only is False):
-                        final_plugins.append(plugin)
+                    if plugin.__name__ in allowed_plugins:
+                        include_plugin = True
                 elif setting_key == "plugins":
-                    final_plugins.append(plugin)
+                    include_plugin = True
+            if plugin.page_only and not include_page_only:
+                include_plugin = False
+            if include_plugin:
+                final_plugins.append(plugin)
+                
+        if final_plugins:
             plugins = final_plugins
 
         # plugins sorted by modules

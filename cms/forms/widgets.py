@@ -207,7 +207,7 @@ class PlaceholderPluginEditorWidget(PluginEditor):
                 )
             context = {
                 'plugin_list': plugin_list,
-                'installed_plugins': plugin_pool.get_all_plugins(ph.slot, page_only=False),
+                'installed_plugins': plugin_pool.get_all_plugins(ph.slot, include_page_only=False),
                 'copy_languages': copy_languages, 
                 'language': language,
                 'show_copy': bool(copy_languages) and ph.actions.can_copy,
