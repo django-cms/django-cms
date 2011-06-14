@@ -146,7 +146,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         template = None
         
-    url_base = 'admin:cms_page_' % (ctype.app_label, ctype.model)
+    url_base = 'admin:cms_page_'
     if placeholder:
         slot = placeholder.slot
         model = placeholder._get_attached_model()
