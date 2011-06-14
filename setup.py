@@ -15,14 +15,8 @@ for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
             continue
         media_files.append(os.path.join(*filepath.split(os.sep)[1:]))
         
-if cms.VERSION[-1] == 'final':
-    CLASSIFIERS = ['Development Status :: 5 - Production/Stable']
-elif 'beta' in cms.VERSION[-1]:
-    CLASSIFIERS = ['Development Status :: 4 - Beta']
-else:
-    CLASSIFIERS = ['Development Status :: 3 - Alpha']
-
-CLASSIFIERS += [
+CLASSIFIERS = [
+    'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
     'Framework :: Django',
     'Intended Audience :: Developers',
