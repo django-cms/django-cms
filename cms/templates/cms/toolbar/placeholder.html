@@ -12,7 +12,7 @@ jQuery(document).ready(function ($) {
 		    {% for key, url in urls.items %}
 		    '{{ key }}': '{{ url }}',
 		    {% endfor %}
-			'change_template_url': {% if page %}'{% url cms_page_change_template page.pk %}'{% else %}null{% endif %},
+			'change_template_url': {% if page %}'{% url admin:cms_page_change_template page.pk %}'{% else %}null{% endif %},
 		},
 		'lang': {
 			'move_warning': '{% trans "The selected element can not be moved to the desired location." %}',
