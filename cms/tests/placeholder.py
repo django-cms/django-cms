@@ -4,14 +4,14 @@ from cms.api import add_plugin
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import render_placeholder
+from cms.plugins.text.cms_plugins import TextPlugin
+from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
-from cms.api import add_plugin
-from cms.plugins.text.cms_plugins import TextPlugin
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -19,8 +19,8 @@ from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from project.fakemlng.models import Translations
-from project.placeholderapp.models import (Example1, Example2, Example3, Example4, 
-    Example5)
+from project.placeholderapp.models import (Example1, Example2, Example3, 
+    Example4, Example5)
 
 
 class PlaceholderTestCase(CMSTestCase):
@@ -147,8 +147,7 @@ class PlaceholderTestCase(CMSTestCase):
             self.assertEqual(context['width'], 10)
 
 
-class PlaceholderActionTests(CMSTestCase):
-    fixtures = ['fakemlng.json']
+class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     
     def test_placeholder_no_action(self):
         actions = PlaceholderNoAction()
@@ -210,8 +209,9 @@ class PlaceholderActionTests(CMSTestCase):
         
     def test_mlng_placeholder_actions_no_placeholder(self):
         actions = MLNGPlaceholderActions()
-        nl = Translations.objects.get(language_code='nl')
+        Translations.objects.filter(language_code='nl').update(placeholder=None)
         de = Translations.objects.get(language_code='de')
+        nl = Translations.objects.get(language_code='nl')
         self.assertEqual(nl.placeholder, None)
         self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
         
