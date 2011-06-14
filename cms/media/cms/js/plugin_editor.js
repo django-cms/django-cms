@@ -97,8 +97,14 @@
                 {
                     // moved to new placeholder
                     var plugin_id = ui.item.attr('id').split('plugin_')[1];
-                    var target = ui.item.parent().parent().data('name');
-                    $.post("move-plugin/", { placeholder: target, plugin_id: plugin_id, ids: d }, function(data){}, "json");
+                    var slot_name = ui.item.parent().parent().data('name');
+                    var placeholder_id = ui.item.parent().parent().data('id')
+                    $.post("move-plugin/", {
+                        placeholder: slot_name,
+                        placeholder_id: placeholder_id,
+                        plugin_id: plugin_id,
+                        ids: d
+                    }, function(data){}, "json");
                 }
                 else
                 {
