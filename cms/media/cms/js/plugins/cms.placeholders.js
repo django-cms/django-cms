@@ -453,6 +453,7 @@ jQuery(document).ready(function ($) {
 		
 		_showPluginList: function (el) {
 			// save reference to this class
+			// TODO: make sure the element is really shown over everything
 			var that = this;
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.show();

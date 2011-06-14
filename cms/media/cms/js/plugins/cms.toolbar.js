@@ -248,6 +248,7 @@ jQuery(document).ready(function ($) {
 				// add icon if available
 				var icon = (value.icon !== '') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
+				// TODO: instead of using value.class use value.cls
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
 						   .replace('[list_method]', value.method)
