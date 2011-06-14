@@ -129,7 +129,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     c.extend(render_plugins(plugins, context, placeholder, processors))
     content = "".join(c)
     if edit:
+        context.push()
         content = render_placeholder_toolbar(placeholder, context, content, name_fallback)
+        context.pop()
     context.pop()
     return content
 
@@ -164,7 +166,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
     name = get_placeholder_conf(slot, template, "name", title(slot))
     name = _(name)
-    toolbar = render_to_string("cms/toolbar/placeholder.html", {
+    context.update( {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),
         'placeholder_label': name,
@@ -172,4 +174,5 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         'page': page,
         'urls': urls
     })
+    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     return "".join([toolbar, content])
