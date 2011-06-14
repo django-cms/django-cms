@@ -12,6 +12,7 @@ from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.contrib.contenttypes.models import ContentType
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
