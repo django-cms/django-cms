@@ -164,11 +164,12 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
     name = get_placeholder_conf(slot, template, "name", title(slot))
     name = _(name)
-    toolbar = render_to_string("cms/toolbar/placeholder.html", dict({
+    toolbar = render_to_string("cms/toolbar/placeholder.html", {
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),
         'placeholder_label': name,
         'placeholder': placeholder,
         'page': page,
-    }, **urls))
+        'urls': urls
+    })
     return "".join([toolbar, content])
