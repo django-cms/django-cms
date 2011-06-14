@@ -31,11 +31,11 @@ jQuery(document).ready(function ($) {
 				'cancel': 'Cancel'
 			},
 			'urls': {
-				'cms_page_move_plugin': '',
-				'cms_page_changelist': '',
-				'cms_page_change_template': '',
-				'cms_page_add_plugin': '',
-				'cms_page_remove_plugin': ''
+				'move_plugin': '',
+				'changelist': '',
+				'change_template': '',
+				'add_plugin': '',
+				'remove_plugin': ''
 			}
 		},
 
@@ -130,7 +130,7 @@ jQuery(document).ready(function ($) {
 				// add type to values
 				values.plugin_type = $(this).attr('rel').split('::')[1];
 				// try to add a new plugin
-				that.addPlugin.call(that, that.options.urls.cms_page_add_plugin, values);
+				that.addPlugin.call(that, that.options.urls.add_plugin, values);
 			});
 		},
 		
@@ -218,7 +218,7 @@ jQuery(document).ready(function ($) {
 			// for that we create an iframe with the specific url
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
-				'src': that.options.urls.cms_page_changelist + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
+				'src': that.options.urls.changelist + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
 				'style': 'width:100%; height:0; border:none; overflow:auto;',
 				'allowtransparency': true,
 				'scrollbars': 'no',
@@ -268,7 +268,7 @@ jQuery(document).ready(function ($) {
 			if(confirmed) {
 				$.ajax({
 					'type': 'POST',
-					'url': this.options.urls.cms_page_remove_plugin,
+					'url': this.options.urls.remove_plugin,
 					'data': { 'plugin_id': plugin_id },
 					'success': function () {
 						// remove plugin from the dom
@@ -318,7 +318,7 @@ jQuery(document).ready(function ($) {
 			// now lets do the ajax request
 			$.ajax({
 				'type': 'POST',
-				'url': this.options.urls.cms_page_move_plugin,
+				'url': this.options.urls.move_plugin,
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
 				'error': function () {
@@ -393,7 +393,7 @@ jQuery(document).ready(function ($) {
 				// now lets do the ajax request
 				$.ajax({
 					'type': 'POST',
-					'url': that.options.urls.cms_page_move_plugin,
+					'url': that.options.urls.move_plugin,
 					'data': { 'placeholder': slot, 'placeholder_id': placeholder_id, 'plugin_id': $(this).parent().data('plugin_id') },
 					'success': function () {
 						refreshPluginPosition(slot);

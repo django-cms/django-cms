@@ -11,6 +11,7 @@ from django.template import Template, Context
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -144,18 +145,29 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
             page.placeholders.add(placeholder)
     else:
         template = None
+        
+    url_base = 'admin:cms_page_' % (ctype.app_label, ctype.model)
     if placeholder:
         slot = placeholder.slot
+        model = placeholder._get_attached_model()
+        ctype = ContentType.objects.get_for_model(model)
+        url_base = 'admin:%s_%s_' % (ctype.app_label, ctype.model)
     else:
         slot = None
+    urls = {
+        'move_plugin_url': reverse('%s%s' % (url_base, 'move_plugin')),
+        'changelist_url': reverse('%s%s' % (url_base, 'changelist')),
+        'add_plugin_url': reverse('%s%s' % (url_base, 'add_plugin')),
+        'remove_plugin_url': reverse('%s%s' % (url_base, 'remove_plugin'))
+    }
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
     name = get_placeholder_conf(slot, template, "name", title(slot))
     name = _(name)
-    toolbar = render_to_string("cms/toolbar/placeholder.html", {
+    toolbar = render_to_string("cms/toolbar/placeholder.html", dict({
         'installed_plugins': installed_plugins,
         'language': get_language_from_request(request),
         'placeholder_label': name,
         'placeholder': placeholder,
         'page': page,
-    })
+    }, **urls))
     return "".join([toolbar, content])
