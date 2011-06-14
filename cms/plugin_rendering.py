@@ -158,10 +158,10 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         slot = None
     urls = {
-        'move_plugin_url': reverse('%s%s' % (url_base, 'move_plugin')),
-        'changelist_url': reverse('%s%s' % (url_base, 'changelist')),
-        'add_plugin_url': reverse('%s%s' % (url_base, 'add_plugin')),
-        'remove_plugin_url': reverse('%s%s' % (url_base, 'remove_plugin'))
+        'move_plugin': reverse('%s%s' % (url_base, 'move_plugin')),
+        'changelist': reverse('%s%s' % (url_base, 'changelist')),
+        'add_plugin': reverse('%s%s' % (url_base, 'add_plugin')),
+        'remove_plugin': reverse('%s%s' % (url_base, 'remove_plugin'))
     }
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
     name = get_placeholder_conf(slot, template, "name", title(slot))
