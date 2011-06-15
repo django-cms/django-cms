@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.admin.forms import PageForm
 from cms.api import create_page
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
@@ -442,6 +443,22 @@ class PagesTestCase(CMSTestCase):
                                publication_end_date=yesterday, published=True)
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.status_code, 404)
+    
+    def test_existing_overwrite_url(self):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            create_page('home', 'nav_playground.html', 'en', published=True)
+            create_page('boo', 'nav_playground.html', 'en', published=True)
+            data = {
+                'title': 'foo',
+                'overwrite_url': '/boo/',
+                'slug': 'foo',
+                'language': 'en',
+                'template': 'nav_playground.html',
+                'site': 1,
+            }
+            form = PageForm(data)
+            self.assertFalse(form.is_valid())
+            self.assertTrue('overwrite_url' in form.errors)
         
 
 
