@@ -79,6 +79,23 @@ class PlaceholderTestCase(CMSTestCase):
         response = self.client.get(reverse('admin:placeholderapp_example5_add'))
         self.assertEqual(response.status_code, 200)
         
+    def test_frontend_editing(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph = ex.placeholder
+        add_plugin(ph, TextPlugin, 'en', body='ph1 plugin1')
+        response = self.client.get('%s?edit' % reverse('placeholderapp_example1_detail', args=(ex.pk,)))
+        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.content, '')
+        self.assertContains(response, '/admin/placeholderapp/example1/move-plugin/')
+        self.assertContains(response, '/admin/placeholderapp/example1/remove-plugin/')
+        self.assertContains(response, '/admin/placeholderapp/example1/add-plugin/')
+
     def test_fieldsets(self):
         request = self.get_request('/')
         admins = [
@@ -183,7 +200,9 @@ class PlaceholderTestCase(CMSTestCase):
             ph.render(context, None)
             self.assertTrue('width' in context)
             self.assertEqual(context['width'], 10)
+            
 
+        
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     
