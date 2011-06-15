@@ -211,7 +211,7 @@ at the real root of the site's page hierarchy.
 
 This feature is useful when your site has deep page hierarchies 
 (and therefore multiple levels in its navigation trees). In such 
-a case, you usually donâ€™t want to present site visitors with deep 
+a case, you usually don't want to present site visitors with deep 
 menus of nested items.
 
 For example, you're on the page "Introduction to Bleeding", so the menu might look like this:
