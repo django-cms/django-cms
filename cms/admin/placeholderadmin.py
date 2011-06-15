@@ -225,8 +225,26 @@ class PlaceholderAdmin(ModelAdmin):
         # only allow POST
         if request.method != "POST":
             return HttpResponse(str("error"))
+            
+        if 'plugin_id' in request.POST: # single plugin moving
+            plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
+            
+            if 'placeholder_id' in request.POST:
+                placeholder = Placeholder.objects.get(pk=int(request.POST['placeholder_id']))
+            else:
+                placeholder = plugin.placeholder
+                
+            # check permissions
+            if not placeholder.has_change_permission(request):
+                raise Http404
+
+            # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
+            position = CMSPlugin.objects.filter(placeholder=placeholder).count()
+            plugin.placeholder = placeholder
+            plugin.position = position
+            plugin.save()
         pos = 0
-        if 'ids' in request.POST: # multiple plugins
+        if 'ids' in request.POST: # multiple plugins/ reordering
             whitelisted_placeholders = []
             for id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=id)
@@ -244,18 +262,7 @@ class PlaceholderAdmin(ModelAdmin):
                     plugin.position = pos
                     plugin.save()
                 pos += 1
-        elif 'plugin_id' in request.POST: # single plugin moving
-            plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-    
-            # check permissions
-            if not plugin.placeholder.has_change_permission(request):
-                raise Http404
-            
-            placeholder = plugin.placeholder
-            # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
-            position = CMSPlugin.objects.filter(placeholder=placeholder).count()
-            plugin.position = position
-            plugin.save()
+
         else:
             HttpResponse(str("error"))
         return HttpResponse(str("ok"))
