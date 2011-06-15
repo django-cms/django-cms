@@ -5,7 +5,7 @@ from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE,
     PageUserGroup)
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
-from cms.utils.page_resolver import get_page_from_request
+from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import (get_current_user, get_subordinate_users, 
     get_subordinate_groups)
 from cms.utils.urlutils import any_path_re
@@ -176,8 +176,7 @@ class PageForm(PageAddForm):
             if url:
                 if not any_path_re.match(url):
                     raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
-                mock_request = type('Request', (object,), {'path': url, 'GET': {}})
-                if get_page_from_request(mock_request):
+                if get_page_from_path(url.strip('/')):
                     raise forms.ValidationError(_('Page with redirect url %r already exist') % url)
         return url
 
