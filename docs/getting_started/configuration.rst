@@ -289,34 +289,6 @@ Example::
 
     CMS_FRONTEND_LANGUAGES = ("de", "en", "pt-BR")
 
-.. setting:: CMS_DBGETTEXT
-
-CMS_DBGETTEXT
-=============
-
-Default: ``False`` (unless ``dbgettext`` is in :setting:`django:INSTALLED_APPS`)
-
-Enable gettext-based translation of CMS content rather than use the standard
-administration interface. Requires `django-dbgettext
-<http://http://bitbucket.org/drmeers/django-dbgettext>`_.
-
-.. warning:: This feature is deprecated and will be removed in 2.2.
-
-.. setting:: CMS_DBGETTEXT_SLUGS
-
-CMS_DBGETTEXT_SLUGS
-===================
-
-Default: ``False``
-
-Enable gettext-based translation of page paths/slugs. Experimental at this
-stage, as resulting translations cannot be guaranteed to be unique.
-
-For general dbgettext settings, see the `dbgettext documentation
-<http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
-
-.. warning:: This feature is deprecated and will be removed in 2.2.
-
 
 **************
 Media Settings
@@ -490,6 +462,10 @@ on the "live" site. If you make changes to a page you moderate yourself, you
 will need to approve it anyway. This allows you to change a lot of pages for
 a new version of the site, for example, and go live with all the changes at the
 same time.
+
+.. note:: When switching this value to ``True`` on an existing site, you have
+          to run the ``cms moderator on`` command to make the required database
+          changes.
 
 .. setting:: CMS_SHOW_START_DATE
 .. setting:: CMS_SHOW_END_DATE
