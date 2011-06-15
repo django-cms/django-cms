@@ -3,6 +3,8 @@ from __future__ import with_statement
 from cms.api import create_page
 from cms.menu import CMSMenu
 from cms.models import Page
+from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
+    SoftrootFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
@@ -42,7 +44,7 @@ class BaseMenuTest(SettingsOverrideTestCase):
         super(BaseMenuTest, self).tearDown()
 
 
-class FixturesMenuTests(BaseMenuTest):
+class FixturesMenuTests(MenusFixture, BaseMenuTest):
     """
     Tree from fixture:
         
@@ -55,10 +57,8 @@ class FixturesMenuTests(BaseMenuTest):
           + P7
           + P8
     """
-    fixtures = ['menus.json']
-    
     def get_page(self, num):
-        return Page.objects.get(pk=num)
+        return Page.objects.get(title_set__title='P%s' % num)
     
     def get_level(self, num):
         return Page.objects.filter(level=num)
@@ -537,7 +537,7 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(len(nodes), 0)
 
 
-class AdvancedSoftrootTests(SettingsOverrideTestCase):
+class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
     """
     Tree in fixture (as taken from issue 662):
     
@@ -566,7 +566,6 @@ class AdvancedSoftrootTests(SettingsOverrideTestCase):
         'CMS_MODERATOR': False,
         'CMS_PERMISSION': False
     }
-    fixtures = ['advanced_softroot.json']
         
     def tearDown(self):
         Page.objects.all().delete()
@@ -698,7 +697,7 @@ class AdvancedSoftrootTests(SettingsOverrideTestCase):
         self.assertTreeQuality(soft_root, mock_tree, 'title', 'level')
 
 
-class ShowSubMenuCheck(BaseMenuTest):
+class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
     """
     Tree from fixture:
 
@@ -711,10 +710,9 @@ class ShowSubMenuCheck(BaseMenuTest):
           + P7 (not in menu)
           + P8
     """
-    fixtures = ['menus-sub.json']
-
     def test_show_submenu(self):
-        context = self.get_context('/test-page-6/')
+        page = Page.objects.get(title_set__title='P6')
+        context = self.get_context(page.get_absolute_url())
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
