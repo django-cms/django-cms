@@ -20,24 +20,15 @@ import datetime
 import os.path
 
 class PagesTestCase(CMSTestCase):
-
-    def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-        u.set_password("test")
-        u.save()
-        
-        self._login_context = self.login_user_context(u)
-        self._login_context.__enter__()
-    
-    def tearDown(self):
-        self._login_context.__exit__(None, None, None)
     
     def test_add_page(self):
         """
         Test that the add admin page could be displayed via the admin
         """
-        response = self.client.get(URL_CMS_PAGE_ADD)
-        self.assertEqual(response.status_code, 200)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get(URL_CMS_PAGE_ADD)
+            self.assertEqual(response.status_code, 200)
 
     def test_create_page(self):
         """
@@ -45,19 +36,21 @@ class PagesTestCase(CMSTestCase):
         """
         page_data = self.get_new_page_data()
 
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        title = Title.objects.get(slug=page_data['slug'])
-        self.assertNotEqual(title, None)
-        page = title.page
-        page.published = True
-        page.save()
-        self.assertEqual(page.get_title(), page_data['title'])
-        self.assertEqual(page.get_slug(), page_data['slug'])
-        self.assertEqual(page.placeholders.all().count(), 2)
-        
-        # were public instanes created?
-        title = Title.objects.drafts().get(slug=page_data['slug'])
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            title = Title.objects.get(slug=page_data['slug'])
+            self.assertNotEqual(title, None)
+            page = title.page
+            page.published = True
+            page.save()
+            self.assertEqual(page.get_title(), page_data['title'])
+            self.assertEqual(page.get_slug(), page_data['slug'])
+            self.assertEqual(page.placeholders.all().count(), 2)
+            
+            # were public instanes created?
+            title = Title.objects.drafts().get(slug=page_data['slug'])
 
         
     def test_slug_collision(self):
@@ -66,89 +59,99 @@ class PagesTestCase(CMSTestCase):
         """
         page_data = self.get_new_page_data()
         # create first page
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        
-        #page1 = Title.objects.get(slug=page_data['slug']).page
-        # create page with the same page_data
-        
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        
-        if settings.i18n_installed:
-            self.assertEqual(response.status_code, 302)
-            # did we got right redirect?
-            self.assertEqual(response['Location'].endswith(URL_CMS_PAGE), True)
-        else:
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
-        # TODO: check for slug collisions after move
-        # TODO: check for slug collisions with different settings         
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            
+            #page1 = Title.objects.get(slug=page_data['slug']).page
+            # create page with the same page_data
+            
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            
+            if settings.i18n_installed:
+                self.assertEqual(response.status_code, 302)
+                # did we got right redirect?
+                self.assertEqual(response['Location'].endswith(URL_CMS_PAGE), True)
+            else:
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
+            # TODO: check for slug collisions after move
+            # TODO: check for slug collisions with different settings         
   
     def test_details_view(self):
         """
         Test the details view
         """
-        response = self.client.get(self.get_pages_root())
-        self.assertEqual(response.status_code, 404)
-        page = create_page('test page 1', "nav_playground.html", "en")
-        response = self.client.get(self.get_pages_root())
-        self.assertEqual(response.status_code, 404)
-        self.assertTrue(page.publish())
-        create_page("test page 2", "nav_playground.html", "en", 
-                                       parent=page, published=True)
-        homepage = Page.objects.get_home()
-        self.assertTrue(homepage.get_slug(), 'test-page-1')
-        response = self.client.get(self.get_pages_root())
-        self.assertEqual(response.status_code, 200)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get(self.get_pages_root())
+            self.assertEqual(response.status_code, 404)
+            page = create_page('test page 1', "nav_playground.html", "en")
+            response = self.client.get(self.get_pages_root())
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(page.publish())
+            create_page("test page 2", "nav_playground.html", "en", 
+                                           parent=page, published=True)
+            homepage = Page.objects.get_home()
+            self.assertTrue(homepage.get_slug(), 'test-page-1')
+            response = self.client.get(self.get_pages_root())
+            self.assertEqual(response.status_code, 200)
 
     def test_edit_page(self):
         """
         Test that a page can edited via the admin
         """
-        page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page =  Page.objects.get(title_set__slug=page_data['slug'])
-        response = self.client.get('/admin/cms/page/%s/' %page.id)
-        self.assertEqual(response.status_code, 200)
-        page_data['title'] = 'changed title'
-        response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        self.assertEqual(page.get_title(), 'changed title')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page =  Page.objects.get(title_set__slug=page_data['slug'])
+            response = self.client.get('/admin/cms/page/%s/' %page.id)
+            self.assertEqual(response.status_code, 200)
+            page_data['title'] = 'changed title'
+            response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            self.assertEqual(page.get_title(), 'changed title')
     
     def test_meta_description_and_keywords_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin
         """
-        page_data = self.get_new_page_data()
-        page_data["meta_description"] = "I am a page"
-        page_data["meta_keywords"] = "page,cms,stuff"
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page =  Page.objects.get(title_set__slug=page_data['slug'])
-        response = self.client.get('/admin/cms/page/%s/' %page.id)
-        self.assertEqual(response.status_code, 200)
-        page_data['meta_description'] = 'I am a duck'
-        response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        page = Page.objects.get(title_set__slug=page_data["slug"])
-        self.assertEqual(page.get_meta_description(), 'I am a duck')
-        self.assertEqual(page.get_meta_keywords(), 'page,cms,stuff')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            page_data["meta_description"] = "I am a page"
+            page_data["meta_keywords"] = "page,cms,stuff"
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page =  Page.objects.get(title_set__slug=page_data['slug'])
+            response = self.client.get('/admin/cms/page/%s/' %page.id)
+            self.assertEqual(response.status_code, 200)
+            page_data['meta_description'] = 'I am a duck'
+            response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page = Page.objects.get(title_set__slug=page_data["slug"])
+            self.assertEqual(page.get_meta_description(), 'I am a duck')
+            self.assertEqual(page.get_meta_keywords(), 'page,cms,stuff')
 
     def test_meta_description_and_keywords_from_template_tags(self):
         from django import template
-        page_data = self.get_new_page_data()
-        page_data["title"] = "Hello"
-        page_data["meta_description"] = "I am a page"
-        page_data["meta_keywords"] = "page,cms,stuff"
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page =  Page.objects.get(title_set__slug=page_data['slug'])
-        self.client.post('/admin/cms/page/%s/' %page.id, page_data)
-        t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
-        req = HttpRequest()
-        page.published = True
-        page.save()
-        req.current_page = page 
-        req.REQUEST = {}
-        self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page,cms,stuff")
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            page_data["title"] = "Hello"
+            page_data["meta_description"] = "I am a page"
+            page_data["meta_keywords"] = "page,cms,stuff"
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page =  Page.objects.get(title_set__slug=page_data['slug'])
+            self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+            t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
+            req = HttpRequest()
+            page.published = True
+            page.save()
+            req.current_page = page 
+            req.REQUEST = {}
+            self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page,cms,stuff")
     
     
     def test_copy_page(self):
@@ -166,59 +169,65 @@ class PagesTestCase(CMSTestCase):
         
         count = Page.objects.drafts().count()
         
-        self.copy_page(page_a, page_b_a)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            self.copy_page(page_a, page_b_a)
         
         self.assertEqual(Page.objects.drafts().count() - count, 3)
         
         
     def test_language_change(self):
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        pk = Page.objects.all()[0].pk
-        response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"en" })
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
-        self.assertEqual(response.status_code, 200)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            pk = Page.objects.all()[0].pk
+            response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"en" })
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
+            self.assertEqual(response.status_code, 200)
         
     def test_move_page(self):
-        page_data1 = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data1)
-        page_data2 = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data2)
-        page_data3 = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data3)
-        page1 = Page.objects.all()[0]
-        page2 = Page.objects.all()[1]
-        page3 = Page.objects.all()[2]
-        # move pages
-        response = self.client.post("/admin/cms/page/%s/move-page/" % page3.pk, {"target":page2.pk, "position":"last-child" })
-        self.assertEqual(response.status_code, 200)
-        response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"last-child" })
-        self.assertEqual(response.status_code, 200)
-        # check page2 path and url
-        page2 = Page.objects.get(pk=page2.pk)
-        self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
-        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
-        # check page3 path and url
-        page3 = Page.objects.get(pk=page3.pk)
-        self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
-        # publish page 1 (becomes home)
-        page1 = Page.objects.all()[0]
-        page1.published = True
-        page1.save()
-        # check that page2 and page3 url have changed
-        page2 = Page.objects.get(pk=page2.pk)
-        self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/")
-        page3 = Page.objects.get(pk=page3.pk)
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
-        # move page2 back to root and check path of 2 and 3
-        response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"left" })
-        self.assertEqual(response.status_code, 200)
-        page2 = Page.objects.get(pk=page2.pk)
-        self.assertEqual(page2.get_path(), page_data2['slug'])
-        page3 = Page.objects.get(pk=page3.pk)
-        self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data1 = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data1)
+            page_data2 = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data2)
+            page_data3 = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data3)
+            page1 = Page.objects.all()[0]
+            page2 = Page.objects.all()[1]
+            page3 = Page.objects.all()[2]
+            # move pages
+            response = self.client.post("/admin/cms/page/%s/move-page/" % page3.pk, {"target":page2.pk, "position":"last-child" })
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"last-child" })
+            self.assertEqual(response.status_code, 200)
+            # check page2 path and url
+            page2 = Page.objects.get(pk=page2.pk)
+            self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
+            self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
+            # check page3 path and url
+            page3 = Page.objects.get(pk=page3.pk)
+            self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
+            self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+            # publish page 1 (becomes home)
+            page1 = Page.objects.all()[0]
+            page1.published = True
+            page1.save()
+            # check that page2 and page3 url have changed
+            page2 = Page.objects.get(pk=page2.pk)
+            self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/")
+            page3 = Page.objects.get(pk=page3.pk)
+            self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
+            # move page2 back to root and check path of 2 and 3
+            response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target":page1.pk, "position":"left" })
+            self.assertEqual(response.status_code, 200)
+            page2 = Page.objects.get(pk=page2.pk)
+            self.assertEqual(page2.get_path(), page_data2['slug'])
+            page3 = Page.objects.get(pk=page3.pk)
+            self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
         
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
@@ -276,11 +285,13 @@ class PagesTestCase(CMSTestCase):
         page_data['title'] = 'changed title'
         TESTLANG = settings.CMS_SITE_LANGUAGES[site.pk][0]
         page_data['language'] = TESTLANG
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        page =  Page.objects.get(title_set__slug=page_data['slug'])
-        with LanguageOverride(TESTLANG):
-            self.assertEqual(page.get_title(), 'changed title')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page =  Page.objects.get(title_set__slug=page_data['slug'])
+            with LanguageOverride(TESTLANG):
+                self.assertEqual(page.get_title(), 'changed title')
         
     def test_flat_urls(self):
         with SettingsOverride(CMS_FLAT_URLS=True):
@@ -394,6 +405,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_with_page_preview(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request('%s?preview' % page.get_absolute_url())
+        request.user.is_staff = False
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
         superuser = self.get_superuser()
