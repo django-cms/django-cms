@@ -84,6 +84,11 @@ def details(request, slug):
         # add language prefix to url
         return HttpResponseRedirect(redirect_url)
     
+    # Check if the page has a redirect page defined for this language. 
+    redirect_to_page = page.get_redirect_to_page(language=current_language)
+    if redirect_to_page and redirect_to_page.pk != page.pk:
+        return HttpResponseRedirect(redirect_to_page.get_absolute_url())
+
     # permission checks
     if page.login_required and not request.user.is_authenticated():
         if settings.i18n_installed:

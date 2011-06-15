@@ -333,13 +333,30 @@ CMS_REDIRECTS
 
 Default: ``False``
 
-This adds a new "redirect" field to the "advanced settings" tab of the page
+This adds a new "redirect" field to the "advanced settings" tab of the page.
 
 You can set a url here, which a visitor will be redirected to when the page is
 accessed.
 
 Note: Don't use this too much. django.contrib.redirect is much more flexible,
 handy, and is designed exactly for this purpose.
+
+
+CMS_REDIRECTS_TO_PAGES
+======================
+
+Default: ``False``
+
+This adds a new "redirect to page" field to the "advanced settings" tab of the
+page.
+
+You can select a page here, which a visitor will be redirected to when the page is
+accessed.
+
+Note: ``CMS_REDIRECTS`` has precedence over ``CMS_REDIRECTS_TO_PAGES``, i.e. if
+both are enabled and a redirect URL is set for a page then this will be used for
+the redirecting and a page redirection that might also be set will not be taken
+into account. 
 
 
 CMS_FLAT_URLS

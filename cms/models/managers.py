@@ -184,6 +184,7 @@ class TitleManager(PublisherManager):
             'title',
             'application_urls',
             'redirect',
+            'redirect_to_page',
             'meta_description',
             'meta_keywords',
             'page_title',

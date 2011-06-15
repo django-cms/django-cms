@@ -650,6 +650,12 @@ class Page(Mptt):
         """
         return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
     
+    def get_redirect_to_page(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get redirect to page
+        """
+        return self.get_title_obj_attribute("redirect_to_page", language, fallback, version_id, force_reload)
+
     def _get_title_cache(self, language, fallback, version_id, force_reload):
         if not language:
             language = get_language()

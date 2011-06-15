@@ -15,6 +15,7 @@ class Title(models.Model):
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
+    redirect_to_page = models.ForeignKey(Page, verbose_name=_("redirect to page"), blank=True, null=True, related_name="redirect_to_page_title_set")
     meta_description = models.TextField(_("description"), max_length=255, blank=True, null=True)
     meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
     page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
@@ -63,6 +64,7 @@ class EmptyTitle(object):
     meta_description = ""
     meta_keywords = ""
     redirect = ""
+    redirect_to_page = None
     has_url_overwite = False
     application_urls = ""
     menu_title = ""
