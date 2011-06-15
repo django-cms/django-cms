@@ -153,8 +153,9 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     if placeholder:
         slot = placeholder.slot
         model = placeholder._get_attached_model()
-        ctype = ContentType.objects.get_for_model(model)
-        url_base = 'admin:%s_%s_' % (ctype.app_label, ctype.model)
+        if model:
+            ctype = ContentType.objects.get_for_model(model)
+            url_base = 'admin:%s_%s_' % (ctype.app_label, ctype.model)
     else:
         slot = None
     urls = {
