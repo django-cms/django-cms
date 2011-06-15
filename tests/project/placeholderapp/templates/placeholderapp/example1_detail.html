@@ -1,0 +1,15 @@
+{% load cms_tags placeholder_tags sekizai_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
+<head>
+<title></title>
+{% render_block "css" %}
+</head>
+<body>
+{% cms_toolbar %}
+<div id="main">
+<h2>Content</h2>
+{% render_placeholder object.placeholder %}
+</div>
+{% render_block "js" %}
+</body>
+</html>
