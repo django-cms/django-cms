@@ -77,6 +77,31 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
+
+    def _create_text_plugin_on_page(self, page):
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        created_plugin_id = int(response.content)
+        self.assertEquals(created_plugin_id, CMSPlugin.objects.all()[0].pk)
+        return created_plugin_id
+
+    def _edit_text_plugin(self, plugin_id, text):
+        edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT, plugin_id) 
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body": text
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.get(pk=plugin_id)
+        return txt
+
     def test_add_edit_plugin(self):
         """
         Test that you can add a text plugin
@@ -85,24 +110,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
-        plugin_data = {
-            'plugin_type':"TextPlugin",
-            'language':settings.LANGUAGES[0][0],
-            'placeholder':page.placeholders.get(slot="body").pk,
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        created_plugin_id = self._create_text_plugin_on_page(page)
         # now edit the plugin
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-        response = self.client.get(edit_url)
-        self.assertEquals(response.status_code, 200)
-        data = {
-            "body":"Hello World"
-        }
-        response = self.client.post(edit_url, data)
-        self.assertEquals(response.status_code, 200)
-        txt = Text.objects.all()[0]
+        txt = self._edit_text_plugin(created_plugin_id, "Hello World")
         self.assertEquals("Hello World", txt.body)
         # edit body, but click cancel button
         data = {
