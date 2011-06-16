@@ -14,6 +14,7 @@ from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
@@ -28,6 +29,7 @@ from django.test.testcases import TestCase
 from project.pluginapp.models import Article, Section
 from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
+import datetime
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -451,6 +453,19 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         new_plugin = Text.objects.get(pk=6)
         self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
+
+    def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
+        now = datetime.datetime.now()
+        one_day_ago = now - datetime.timedelta(days=1)
+        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        page.creation_date = one_day_ago
+        page.changed_date = one_day_ago
+        
+        plugin_id = self._create_text_plugin_on_page(page)
+        plugin = self._edit_text_plugin(plugin_id, "fnord")
+        
+        actual_last_modification_time = CMSSitemap().lastmod(page)
+        self.assertEqual(plugin.changed_date, actual_last_modification_time)
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
