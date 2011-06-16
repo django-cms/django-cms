@@ -19,11 +19,10 @@ from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
-    URL_CMS_PLUGIN_REMOVE)
+    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE)
+from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.views import details
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
@@ -32,6 +31,7 @@ from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
 import os
+import datetime
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -627,6 +627,19 @@ class FileSystemPluginTests(PluginsTestBaseCase):
         plugin.insert_at(None, position='last-child', save=True)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
+
+    def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
+        now = datetime.datetime.now()
+        one_day_ago = now - datetime.timedelta(days=1)
+        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        page.creation_date = one_day_ago
+        page.changed_date = one_day_ago
+        
+        plugin_id = self._create_text_plugin_on_page(page)
+        plugin = self._edit_text_plugin(plugin_id, "fnord")
+        
+        actual_last_modification_time = CMSSitemap().lastmod(page)
+        self.assertEqual(plugin.changed_date, actual_last_modification_time)
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
