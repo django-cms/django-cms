@@ -360,6 +360,26 @@ class PagesTestCase(CMSTestCase):
                     published=True, in_navigation=True)
         self.assertEqual(CMSSitemap().items().count(),0)
 
+    def test_sitemap_includes_last_modification_date(self):
+        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=one_day_ago)
+        page.creation_date = one_day_ago
+        page.save()
+        sitemap = CMSSitemap()
+        self.assertEqual(sitemap.items().count(), 1)
+        actual_last_modification_time = sitemap.lastmod(sitemap.items()[0])
+        self.assertTrue(actual_last_modification_time > one_day_ago)
+
+    def test_sitemap_uses_publication_date_when_later_than_modification(self):
+        now = datetime.datetime.now()
+        one_day_ago = now - datetime.timedelta(days=1)
+        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        page.creation_date = one_day_ago
+        page.changed_date = one_day_ago
+        sitemap = CMSSitemap()
+        actual_last_modification_time = sitemap.lastmod(page)
+        self.assertEqual(actual_last_modification_time, now)
+
     def test_edit_page_other_site_and_language(self):
         """
         Test that a page can edited via the admin when your current site is

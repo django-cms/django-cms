@@ -12,5 +12,6 @@ class CMSSitemap(Sitemap):
         return all_pages
 
     def lastmod(self, page):
-        return page.publication_date or page.creation_date
+        modification_dates = [page.changed_date, page.publication_date]
+        return max(modification_dates)
     
