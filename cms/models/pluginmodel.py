@@ -82,7 +82,7 @@ class CMSPlugin(MPTTModel):
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
-
+    changed_date = models.DateTimeField(auto_now=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
