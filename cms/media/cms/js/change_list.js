@@ -331,13 +331,22 @@
 
 			if(action=="copy"){
 				//url = insert_into_url(url, "copy", selected_page);
-				url = CMS.Helpers.setUrl(CMS.Helpers.getUrl(document.location), "copy=" + selected_page + "", "copy");
+				url = CMS.API.Helpers.setUrl(document.location, {
+					'addParam': "copy=" + selected_page,
+					'removeParam': "copy"
+				});
 			}else{
 				//url = remove_from_url(url, "copy");
-				url = CMS.Helpers.setUrl(CMS.Helpers.getUrl(document.location), "copy", "copy");
+				url = CMS.API.Helpers.setUrl(document.location, {
+					'addParam': "copy",
+					'removeParam': "copy"
+				});
 			}
 			//url = insert_into_url(url, "site__exact", id);
-			url = CMS.Helpers.setUrl(CMS.Helpers.getUrl(document.location), "site__exact=" + id + "", "site__exact");
+			url = CMS.API.Helpers.setUrl(document.location, {
+				'addParam': "site__exact=" + id,
+				'removeParam': "site__exact"
+			});
 
 			window.location = url;
 		});

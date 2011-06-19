@@ -11,20 +11,21 @@ jQuery(document).ready(function ($) {
 
 	/**
 	 * Toolbar
-	 * @version: 0.1.2
+	 * @version: 1.0.0
 	 * @description: Implements and controls toolbar
 	 * @public_methods:
-	 *	- CMS.Toolbar.toggleToolbar();
-	 *	- CMS.Toolbar.registerItem(obj);
-	 *	- CMS.Toolbar.registerItems(array);
-	 *	- CMS.Toolbar.removeItem(id);
-	 *	- CMS.Toolbar.registerType(function);
+	 *	- CMS.API.Toolbar.toggleToolbar();
+	 *	- CMS.API.Toolbar.registerItem(obj);
+	 *	- CMS.API.Toolbar.registerItems(array);
+	 *	- CMS.API.Toolbar.removeItem(id);
+	 *	- CMS.API.Toolbar.registerType(function);
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 * TODO: login needs special treatment (errors, login on enter)
+	 * TODO: styling of the collapser button needs to be somehow transparent
 	 */
 	CMS.Toolbar = CMS.Class.$extend({
 
-		implement: [CMS.Helpers, CMS.Security],
+		implement: [CMS.API.Helpers, CMS.API.Security],
 
 		options: {
 			'debug': false, // not integrated yet
@@ -35,7 +36,7 @@ jQuery(document).ready(function ($) {
 			// save reference to this class
 			var that = this;
 			// check if only one element is given
-			if($(container).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
+			if($(container).length > 2) { throw new Error('Toolbar Error: one element expected, multiple elements given.'); return false; }
 			// merge passed argument options with internal options
 			this.options = $.extend(this.options, options);
 
@@ -86,7 +87,7 @@ jQuery(document).ready(function ($) {
 		toggleToolbar: function () {
 			(this.toolbar.data('collapsed')) ? this._showToolbar() : this._hideToolbar();
 
-			return this;
+			return this.toolbar.data('collapsed');
 		},
 
 		_showToolbar: function () {
@@ -103,6 +104,8 @@ jQuery(document).ready(function ($) {
 			$.cookie('CMS_toolbar-collapsed', false, { path:'/', expires:7 });
 			// add show event to toolbar
 			this.toolbar.trigger('cms.toolbar.show');
+
+			return this.toolbar.data('collapsed');
 		},
 
 		_hideToolbar: function () {
@@ -119,10 +122,13 @@ jQuery(document).ready(function ($) {
 			$.cookie('CMS_toolbar-collapsed', true, { path:'/', expires:7 });
 			// add hide event to toolbar
 			this.toolbar.trigger('cms.toolbar.hide');
+
+			return this.toolbar.data('collapsed');
 		},
 
 		registerItem: function (obj) {
 			// error handling
+			if(typeof(obj) != 'object') return false;
 			if(!obj.order) obj.dir = 0;
 
 			// check for internal types
@@ -214,12 +220,18 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						document.location = that.setUrl(that.getUrl(document.location), obj.removeParameter, obj.addParameter);
+						document.location = that.setUrl(document.location, {
+							'addParam': obj.removeParameter,
+							'removeParam': obj.addParameter
+						});
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						document.location = that.setUrl(that.getUrl(document.location), obj.addParameter, obj.removeParameter);
+						document.location = that.setUrl(document.location, {
+							'addParam': obj.addParameter,
+							'removeParam': obj.removeParameter
+						});
 					});
 				}
 			});
@@ -248,6 +260,7 @@ jQuery(document).ready(function ($) {
 				// add icon if available
 				var icon = (value.icon !== '') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
+				// TODO: instead of using value.class use value.cls
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
 						   .replace('[list_method]', value.method)
@@ -280,10 +293,10 @@ jQuery(document).ready(function ($) {
 								'url': $(e.currentTarget).attr('href'),
 								'data': $(e.currentTarget).attr('href').split('?')[1],
 								'success': function () {
-									CMS.Helpers.reloadBrowser();
+									CMS.API.Helpers.reloadBrowser();
 								},
 								'error': function () {
-									log('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
+									throw new Error('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
 								}
 							});
 							// after clicking hide list

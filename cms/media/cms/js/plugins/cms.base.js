@@ -6,6 +6,7 @@
  * assign Class and CMS namespace */
  var CMS = CMS || {};
      CMS.Class = CMS.Class || Class.$noConflict();
+     CMS.API = CMS.API || {};
 
 (function ($) {
 /*##################################################|*/
@@ -13,12 +14,12 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Security
-	 * @version: 0.1.1
+	 * @version: 1.0.0
 	 * @description: Adds security layer to CMS namespace
 	 * @public_methods:
-	 *	- CMS.Security.csrf();
+	 *	- CMS.API.Security.csrf();
 	 */
-	CMS.Security = {
+	CMS.API.Security = {
 	
 		csrf: function () {
 			$.ajaxSetup({
@@ -51,20 +52,21 @@ jQuery(document).ready(function ($) {
 					}
 				}
 			});
+			return 'ready';
 		}
 	
 	};
 	
 	/**
 	 * Helpers
-	 * @version: 0.1.1
+	 * @version: 1.0.0
 	 * @description: Adds helper methods to be invoked
 	 * @public_methods:
-	 *	- CMS.Helpers.reloadBrowser();
-	 *	- CMS.Helpers.getUrl(str);
-	 *	- CMS.Helpers.setUrl(getUrlObj, addParam, removeParam);
+	 *	- CMS.API.Helpers.reloadBrowser();
+	 *	- CMS.API.Helpers.getUrl(urlString);
+	 *	- CMS.API.Helpers.setUrl(urlString, options);
 	 */
-	CMS.Helpers = {
+	CMS.API.Helpers = {
 	
 		reloadBrowser: function () {
 			window.location.reload();
@@ -93,15 +95,19 @@ jQuery(document).ready(function ($) {
 			return uri;
 		},
 
-		setUrl: function (getUrlObj, addParam, removeParam) {
+		setUrl: function (str, options) {
+			var uri = str;
+
+			// now we neet to get the partials of the element
+			var getUrlObj = this.getUrl(uri);
 			var query = getUrlObj.queryKey;
 			var serialized = '';
 			var index = 0;
 
 			// we could loop the query and replace the param at the right place
 			// but instead of replacing it just append it to the end of the query so its more visible
-			delete query[removeParam];
-				   query[addParam.split('=')[0]] = addParam.split('=')[1];
+			if(options && options.removeParam) delete query[options.removeParam];
+			if(options && options.addParam) query[options.addParam.split('=')[0]] = options.addParam.split('=')[1];
 
 			$.each(query, function (key, value) {
 				// add &
@@ -111,7 +117,11 @@ jQuery(document).ready(function ($) {
 				index++;
 			});
 
-			uri = getUrlObj.directory + '?' + serialized;
+			// check if we should add the questionmark
+			var addition = (serialized === '') ? '' : '?';
+			var anchor = (getUrlObj.anchor) ? '#' + getUrlObj.anchor : '';
+
+			uri = getUrlObj.protocol + '://' + getUrlObj.authority + getUrlObj.directory + getUrlObj.file + addition + serialized + anchor;
 
 			return uri;
 		}

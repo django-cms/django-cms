@@ -10,14 +10,14 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Placeholders
-	 * @version: 0.1.2
+	 * @version: 1.0.0
 	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 * @public_methods:
-	 *	- CMS.Placeholder.addPlugin(url, obj);
-	 *	- CMS.Placeholder.editPlugin(placeholder_id, plugin_id);
-	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
-	 *	- CMS.Placeholder.toggleFrame();
-	 *	- CMS.Placeholder.toggleDim();
+	 *	- CMS.API.Placeholder.addPlugin(url, obj);
+	 *	- CMS.API.Placeholder.editPlugin(placeholder_id, plugin_id);
+	 *	- CMS.API.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
+	 *	- CMS.API.Placeholder.toggleFrame();
+	 *	- CMS.API.Placeholder.toggleDim();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 	CMS.Placeholders = CMS.Class.$extend({
@@ -201,7 +201,7 @@ jQuery(document).ready(function ($) {
 					that.editPlugin.call(that, data.placeholder_id, response);
 				},
 				'error': function () {
-					log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
 			});
 		},
@@ -275,7 +275,7 @@ jQuery(document).ready(function ($) {
 						plugin.remove();
 					},
 					'error': function () {
-						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 					}
 				});
 			}
@@ -322,7 +322,7 @@ jQuery(document).ready(function ($) {
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
 				'error': function () {
-					log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
 			});
 
@@ -399,7 +399,7 @@ jQuery(document).ready(function ($) {
 						refreshPluginPosition(slot);
 					},
 					'error': function () {
-						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 					}
 				});
 			});
@@ -455,6 +455,7 @@ jQuery(document).ready(function ($) {
 		
 		_showPluginList: function (el) {
 			// save reference to this class
+			// TODO: make sure the element is really shown over everything
 			var that = this;
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.show();
@@ -501,7 +502,7 @@ jQuery(document).ready(function ($) {
 			// frame should always have space on top
 			this.frame.css('top', pos+offset);
 			// make sure that toolbar is visible
-			if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
+			if(this.toolbar.data('collapsed')) CMS.Toolbar.API._showToolbar();
 			// listen to toolbar events
 			this.toolbar.bind('cms.toolbar.show cms.toolbar.hide', function (e) {
 				(e.handleObj.namespace === 'show.toolbar') ? that.frame.css('top', pos+offset) : that.frame.css('top', pos);
