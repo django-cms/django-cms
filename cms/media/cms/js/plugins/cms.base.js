@@ -17,7 +17,7 @@ jQuery(document).ready(function ($) {
 	 * @version: 1.0.0
 	 * @description: Adds security layer to CMS namespace
 	 * @public_methods:
-	 *	- CMS.Security.csrf();
+	 *	- CMS.API.Security.csrf();
 	 */
 	CMS.API.Security = {
 	
@@ -62,9 +62,9 @@ jQuery(document).ready(function ($) {
 	 * @version: 1.0.0
 	 * @description: Adds helper methods to be invoked
 	 * @public_methods:
-	 *	- CMS.Helpers.reloadBrowser();
-	 *	- CMS.Helpers.getUrl(urlString);
-	 *	- CMS.Helpers.setUrl(urlString, options);
+	 *	- CMS.API.Helpers.reloadBrowser();
+	 *	- CMS.API.Helpers.getUrl(urlString);
+	 *	- CMS.API.Helpers.setUrl(urlString, options);
 	 */
 	CMS.API.Helpers = {
 	

@@ -14,11 +14,11 @@ jQuery(document).ready(function ($) {
 	 * @version: 1.0.0
 	 * @description: Implements and controls toolbar
 	 * @public_methods:
-	 *	- CMS.Toolbar.toggleToolbar();
-	 *	- CMS.Toolbar.registerItem(obj);
-	 *	- CMS.Toolbar.registerItems(array);
-	 *	- CMS.Toolbar.removeItem(id);
-	 *	- CMS.Toolbar.registerType(function);
+	 *	- CMS.API.Toolbar.toggleToolbar();
+	 *	- CMS.API.Toolbar.registerItem(obj);
+	 *	- CMS.API.Toolbar.registerItems(array);
+	 *	- CMS.API.Toolbar.removeItem(id);
+	 *	- CMS.API.Toolbar.registerType(function);
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 * TODO: login needs special treatment (errors, login on enter)
 	 * TODO: styling of the collapser button needs to be somehow transparent

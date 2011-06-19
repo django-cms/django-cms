@@ -16,7 +16,7 @@
 jQuery(document).ready(function ($) {
 	// if it is an iframe
 	if(window.parent != self) {
-		setTimeout(function () { window.parent.CMS.Helpers.reloadBrowser(); }, 1000);
+		setTimeout(function () { window.parent.CMS.API.Helpers.reloadBrowser(); }, 1000);
 	} else {
 		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
 	}
