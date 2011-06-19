@@ -296,7 +296,7 @@ jQuery(document).ready(function ($) {
 									CMS.API.Helpers.reloadBrowser();
 								},
 								'error': function () {
-									log('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
+									throw new Error('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
 								}
 							});
 							// after clicking hide list
