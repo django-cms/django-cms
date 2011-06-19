@@ -8,6 +8,10 @@ import re
 import urllib
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
+CMS_LANGUAGES_URL_IGNORE_PREFIXES = list(getattr(settings, 'CMS_LANGUAGES_URL_IGNORE_PREFIXES', ()))
+CMS_LANGUAGES_URL_IGNORE_PREFIXES.append(settings.MEDIA_URL)
+CMS_LANGUAGES_URL_IGNORE_PREFIXES.append(settings.ADMIN_MEDIA_PREFIX)
+CMS_LANGUAGES_URL_IGNORE_PREFIXES = tuple(CMS_LANGUAGES_URL_IGNORE_PREFIXES)
 
 HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join(map(lambda l: re.escape(l[0]), settings.CMS_LANGUAGES)))
 
@@ -17,6 +21,12 @@ def has_lang_prefix(path):
         return check.group(1)
     else:
         return False
+
+def starts_with_ignore_prefix(path):
+    for p in CMS_LANGUAGES_URL_IGNORE_PREFIXES:
+        if path.startswith(p):
+            return True
+    return False
 
 def patch_response(content, pages_root, language):
     # Customarily user pages are served from http://the.server.com/~username/
@@ -37,22 +47,20 @@ def patch_response(content, pages_root, language):
     # Notice that (?=...) and (?!=...) do not consume input or produce a group in the match object.
     # If the regex matches, the extracted path we want is stored in the fourth group (\4).
     quoted_root = urllib.quote(pages_root)
-    HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s|%s|%s))(%s(.*?))("|\')(.*?)>' % (
+    HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s|%s))(%s(.*?))("|\')(.*?)>' % (
         quoted_root,
         "|".join(map(lambda l: quoted_root + l[0] + "/" , settings.CMS_LANGUAGES)),
-        settings.MEDIA_URL,
-        settings.ADMIN_MEDIA_PREFIX,
+        "|".join(CMS_LANGUAGES_URL_IGNORE_PREFIXES),
         quoted_root
     ))
 
     # Unlike in href links, the '~' (see above) the '~' in form actions appears unquoted.
     #
     # For understanding this regex, please read the documentation for HREF_URL_FIX_RE above.
-    FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s|%s|%s))(%s(.*?))("|\')(.*?)>' % (
+    FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s|%s))(%s(.*?))("|\')(.*?)>' % (
         pages_root,
         "|".join(map(lambda l: pages_root + l[0] + "/" , settings.CMS_LANGUAGES)),
-        settings.MEDIA_URL,
-        settings.ADMIN_MEDIA_PREFIX,
+        "|".join(CMS_LANGUAGES_URL_IGNORE_PREFIXES),
         pages_root
     ))
 
@@ -103,8 +111,7 @@ class MultilingualURLMiddleware:
         # note: pages_root is assumed to end in '/'.
         #       testing this and throwing an exception otherwise, would probably be a good idea
         
-        if not path.startswith(settings.MEDIA_URL) and \
-                not path.startswith(settings.ADMIN_MEDIA_PREFIX) and \
+        if not starts_with_ignore_prefix(path) and \
                 response.status_code == 200 and \
                 response._headers['content-type'][1].split(';')[0] == "text/html":
             pages_root = urllib.unquote(reverse("pages-root"))
@@ -122,8 +129,7 @@ class MultilingualURLMiddleware:
         if (response.status_code == 301 or response.status_code == 302 ):
             location = response['Location']
             if not has_lang_prefix(location) and location.startswith("/") and \
-                    not location.startswith(settings.MEDIA_URL) and \
-                    not location.startswith(settings.ADMIN_MEDIA_PREFIX):
+                    not starts_with_ignore_prefix(location):
                 response['Location'] = "/%s%s" % (language, location)
         response.set_cookie("django_language", language)
         return response
