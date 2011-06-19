@@ -12,10 +12,10 @@
 //<![CDATA[
 jQuery(document).ready(function ($) {
 	// initialize toolbar, pass options, items and allow public access
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
+	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
 	// initialize placeholders, pass options and keep it private
-	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
+	CMS.API.Placeholders = new CMS.Placeholders('#cms_toolbar', {
 		{% if request.toolbar.edit_mode %}'edit_mode': true,{% endif %}
 		'urls': {
 			'cms_page_move_plugin': '{% url admin:cms_page_move_plugin %}',

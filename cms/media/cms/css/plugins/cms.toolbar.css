@@ -104,6 +104,7 @@
 .cms_toolbar-item_list li:only-child a { -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; }
 .cms_toolbar-item_list li.active a { background:#ddd; }
 
+.cms_toolbar-item_list .cms_toolbar-item_admin { padding-top:0 !important; }
 
 /* #TOOLBAR/list/icons# */
 .cms_toolbar-item_list .cms_toolbar_icon { width:18px; margin-right:4px; background-position:left 1px; }
