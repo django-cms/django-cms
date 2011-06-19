@@ -15,6 +15,12 @@ version conflict issues many people had when trying to use the django CMS
 together with other Django apps that require django-mptt. django CMS 2.2
 requires django-mptt 0.4.2 or higher.
 
+.. warning::
+
+    Please remove the old ``mptt`` package from your Python site-packages
+    directory before upgrading. The ``setup.py`` file will install the
+    `django-mptt`_ package as an external dependency!
+
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
 
 ******************************

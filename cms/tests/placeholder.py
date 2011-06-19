@@ -184,6 +184,10 @@ class PlaceholderTestCase(CMSTestCase):
             self.assertTrue('width' in context)
             self.assertEqual(context['width'], 10)
 
+    def test_placeholder_scanning_nested_super(self):
+        placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
+        self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
+
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     
