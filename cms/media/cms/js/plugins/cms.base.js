@@ -6,6 +6,7 @@
  * assign Class and CMS namespace */
  var CMS = CMS || {};
      CMS.Class = CMS.Class || Class.$noConflict();
+     CMS.API = CMS.API || {};
 
 (function ($) {
 /*##################################################|*/
@@ -18,7 +19,7 @@ jQuery(document).ready(function ($) {
 	 * @public_methods:
 	 *	- CMS.Security.csrf();
 	 */
-	CMS.Security = {
+	CMS.API.Security = {
 	
 		csrf: function () {
 			$.ajaxSetup({
@@ -58,14 +59,14 @@ jQuery(document).ready(function ($) {
 	
 	/**
 	 * Helpers
-	 * @version: 0.1.1
+	 * @version: 1.0.0
 	 * @description: Adds helper methods to be invoked
 	 * @public_methods:
 	 *	- CMS.Helpers.reloadBrowser();
 	 *	- CMS.Helpers.getUrl(urlString);
 	 *	- CMS.Helpers.setUrl(urlString, options);
 	 */
-	CMS.Helpers = {
+	CMS.API.Helpers = {
 	
 		reloadBrowser: function () {
 			window.location.reload();

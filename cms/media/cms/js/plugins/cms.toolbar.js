@@ -220,12 +220,18 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						document.location = that.setUrl(that.getUrl(document.location), obj.removeParameter, obj.addParameter);
+						document.location = that.setUrl(document.location, {
+							'addParam': obj.removeParameter,
+							'removeParam': obj.addParameter
+						});
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						document.location = that.setUrl(that.getUrl(document.location), obj.addParameter, obj.removeParameter);
+						document.location = that.setUrl(document.location, {
+							'addParam': obj.addParameter,
+							'removeParam': obj.removeParameter
+						});
 					});
 				}
 			});

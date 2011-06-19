@@ -10,7 +10,7 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Placeholders
-	 * @version: 0.1.2
+	 * @version: 1.0.0
 	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 * @public_methods:
 	 *	- CMS.Placeholder.addPlugin(url, obj);
