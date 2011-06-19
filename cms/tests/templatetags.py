@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from cms.models.pagemodel import Page
 from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg
+from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.plugins import get_placeholders
@@ -34,15 +35,14 @@ class TemplatetagTests(TestCase):
         self.assertRaises(ImproperlyConfigured, get_placeholders, 'unicode_placeholder.html')
 
 
-class TemplatetagDatabaseTests(SettingsOverrideTestCase):
+class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
     settings_overrides = {'CMS_MODERATOR': False}
-    fixtures = ['twopages.json']
     
     def _getfirst(self):
-        return Page.objects.get(pk=1)
+        return Page.objects.get(title_set__title='first')
     
     def _getsecond(self):
-        return Page.objects.get(pk=2)
+        return Page.objects.get(title_set__title='second')
     
     def test_get_page_by_untyped_arg_none(self):
         control = self._getfirst()
@@ -65,7 +65,7 @@ class TemplatetagDatabaseTests(SettingsOverrideTestCase):
     def test_get_page_by_untyped_arg_dict(self):
         second = self._getsecond()
         request = self.get_request('/')
-        page = _get_page_by_untyped_arg({'pk': 2}, request, 1)
+        page = _get_page_by_untyped_arg({'pk': second.pk}, request, 1)
         self.assertEqual(page, second)
         
     def test_get_page_by_untyped_arg_dict_fail_debug(self):

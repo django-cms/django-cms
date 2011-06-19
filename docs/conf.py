@@ -64,7 +64,7 @@ path = os.path.split(path)[0]
 sys.path.insert(0, path)
 import cms
 
-version = '.'.join(map(str, cms.VERSION))
+version = cms.__version__
 # The full version, including alpha/beta/rc tags.
 release = cms.__version__
 

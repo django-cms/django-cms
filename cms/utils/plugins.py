@@ -29,7 +29,10 @@ def _extend_blocks(extend_node, blocks):
             blocks[node.name] = node
         else:
             # set this node as the super node (for {{ block.super }})
-            blocks[node.name].super = node
+            block = blocks[node.name]
+            while hasattr(block.super, 'nodelist'):
+                block = block.super
+            block.super = node
     # search for further ExtendsNodes
     for node in parent.nodelist:
         if not isinstance(node, TextNode):

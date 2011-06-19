@@ -551,6 +551,10 @@ class Page(MPTTModel):
                     home_pk = self.home_pk_cache
                 except NoHomeFound:
                     pass
+                """
+                this is pain slow! the code fetches all ancestors for all pages
+                and then checks if the root node is a home_pk, if yes, it cuts off the first path part.
+                """
                 ancestors = self.get_cached_ancestors(ascending=True)
                 # sometimes there are no ancestors
                 if len(ancestors) != 0:

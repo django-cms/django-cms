@@ -379,6 +379,7 @@ jQuery(document).ready(function ($) {
 				var text = $('.cms_placeholder-bar[class$="cms_placeholder_slot::' + item + '"]').find('.cms_placeholder-title').text();
 				list.append($('<li><a href="">' +text + '</a></li>').data({
 					'slot': item,
+					'placeholder_id': values.placeholder,
 					'plugin_id': values.plugin_id
 				}));
 			});
@@ -388,11 +389,12 @@ jQuery(document).ready(function ($) {
 				e.preventDefault();
 				// save slot var
 				var slot = $(this).parent().data('slot');
+				var placeholder_id = $(this).parent().data('placeholder_id');
 				// now lets do the ajax request
 				$.ajax({
 					'type': 'POST',
 					'url': that.options.urls.cms_page_move_plugin,
-					'data': { 'placeholder': slot, 'plugin_id': $(this).parent().data('plugin_id') },
+					'data': { 'placeholder': slot, 'placeholder_id': placeholder_id, 'plugin_id': $(this).parent().data('plugin_id') },
 					'success': function () {
 						refreshPluginPosition(slot);
 					},
