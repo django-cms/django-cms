@@ -460,6 +460,44 @@ class PagesTestCase(CMSTestCase):
             self.assertFalse(form.is_valid())
             self.assertTrue('overwrite_url' in form.errors)
         
+    def test_page_urls(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+            published=True)
+
+        page2 = create_page('test page 2', 'nav_playground.html', 'en',
+            published=True, parent=page1)
+
+        page3 = create_page('test page 3', 'nav_playground.html', 'en',
+            published=True, parent=page2)
+
+        page4 = create_page('test page 4', 'nav_playground.html', 'en',
+            published=True)
+
+        page5 = create_page('test page 5', 'nav_playground.html', 'en',
+            published=True, parent=page4)
+
+        self.assertEqual(page1.get_absolute_url(),
+            self.get_pages_root()+'')
+        self.assertEqual(page2.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/test-page-3/')
+        self.assertEqual(page4.get_absolute_url(),
+            self.get_pages_root()+'test-page-4/')
+        self.assertEqual(page5.get_absolute_url(),
+            self.get_pages_root()+'test-page-4/test-page-5/')
+
+        page3 = self.move_page(page3, page1)
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'test-page-3/')
+
+        page5 = self.move_page(page5, page2)
+        self.assertEqual(page5.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/test-page-5/')
+
+        page3 = self.move_page(page3, page4)
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'test-page-4/test-page-3/')
 
 
 class NoAdminPageTests(CMSTestCase):
