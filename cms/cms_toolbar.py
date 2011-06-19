@@ -57,12 +57,15 @@ class CMSToolbar(Toolbar):
     """
     def __init__(self, request):
         super(CMSToolbar, self).__init__(request)
-        self.is_staff = request.user.is_staff
-        self.can_change = (request.current_page and
-                           request.current_page.has_change_permission(request))
+        self.init()
+        
+    def init(self):
+        self.is_staff = self.request.user.is_staff
+        self.can_change = (self.request.current_page and
+                           self.request.current_page.has_change_permission(self.request))
         self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
                                            _('Edit mode'))
-        self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(request)
+        self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(self.request)
         
     
     def get_items(self, context, **kwargs):
@@ -73,6 +76,8 @@ class CMSToolbar(Toolbar):
             Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
         ]
         
+        self.page_states = []
+        
         
         if self.is_staff:
             
@@ -81,7 +86,9 @@ class CMSToolbar(Toolbar):
             )
             
             if self.request.current_page:
-                has_states = self.request.current_page.last_page_states().exists()
+                states = self.request.current_page.last_page_states()
+                has_states = states.exists()
+                self.page_states = states
                 if has_states:
                     items.append(
                         TemplateHTML(LEFT, 'status',
@@ -132,9 +139,14 @@ class CMSToolbar(Toolbar):
     
     def get_template_menu(self, context, can_change, is_staff):
         menu_items = []
+        url = reverse('admin:cms_page_change_template', args=(self.request.current_page.pk,))
         for path, name in settings.CMS_TEMPLATES:
+            args = urllib.urlencode({'template': path})
+            css = 'template'
+            if self.request.current_page.get_template() == path:
+                css += ' active'
             menu_items.append(
-                ListItem('template', name, '#%s' % path),
+                ListItem(css, name, '%s?%s' % (url, args), 'POST'),
             )
         return List(RIGHT, 'templates', _('Template'),
                     '', items=menu_items)
@@ -146,26 +158,26 @@ class CMSToolbar(Toolbar):
         menu_items = [
             ListItem('overview', _('Move/add Pages'),
                      reverse('admin:cms_page_changelist'),
-                     'cms/images/toolbar/icons/icon_sitemap.png'),
+                     icon='cms/images/toolbar/icons/icon_sitemap.png'),
         ]
         menu_items.append(
             ListItem('addchild', _('Add child page'),
                      _get_add_child_url,
-                     'cms/images/toolbar/icons/icon_child.png')
+                     icon='cms/images/toolbar/icons/icon_child.png')
         )
         
         menu_items.append(
             ListItem('addsibling', _('Add sibling page'),
                      _get_add_sibling_url,
-                     'cms/images/toolbar/icons/icon_sibling.png')
+                     icon='cms/images/toolbar/icons/icon_sibling.png')
         )
             
         menu_items.append(
             ListItem('delete', _('Delete Page'), _get_delete_url,
-                     'cms/images/toolbar/icons/icon_delete.png')
+                     icon='cms/images/toolbar/icons/icon_delete.png')
         )
-        return List(RIGHT, 'page', _('Page'), 'cms/images/toolbar/icons/icon_page.png',
-                    items=menu_items)
+        return List(RIGHT, 'page', _('Page'),
+                    'cms/images/toolbar/icons/icon_page.png', items=menu_items)
     
     def get_admin_menu(self, context, can_change, is_staff):
         """
@@ -174,19 +186,19 @@ class CMSToolbar(Toolbar):
         admin_items = [
             ListItem('admin', _('Site Administration'),
                      reverse('admin:index'),
-                     'cms/images/toolbar/icons/icon_admin.png'),
+                     icon='cms/images/toolbar/icons/icon_admin.png'),
         ]
         if can_change:
             admin_items.append(
                 ListItem('settings', _('Page Settings'),
                          _get_page_admin_url,
-                         'cms/images/toolbar/icons/icon_page.png')
+                         icon='cms/images/toolbar/icons/icon_page.png')
             )
             if 'reversion' in settings.INSTALLED_APPS:
                 admin_items.append(
                     ListItem('history', _('View History'),
                              _get_page_history_url,
-                             'cms/images/toolbar/icons/icon_history.png')
+                             icon='cms/images/toolbar/icons/icon_history.png')
                 )
         return List(RIGHT, 'admin', _('Admin'), 'cms/images/toolbar/icons/icon_admin.png',
                     items=admin_items)
@@ -211,3 +223,4 @@ class CMSToolbar(Toolbar):
             user = authenticate(username=username, password=password)
             if user:
                 login(self.request, user)
+                self.init()

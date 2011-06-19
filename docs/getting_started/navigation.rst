@@ -196,6 +196,9 @@ If true this node is a "soft root".
 Soft Roots
 **********
 
+What Soft Roots do
+==================
+
 A *soft root* is a page that acts as the root for a menu 
 navigation tree.
 
@@ -208,8 +211,57 @@ at the real root of the site's page hierarchy.
 
 This feature is useful when your site has deep page hierarchies 
 (and therefore multiple levels in its navigation trees). In such 
-a case, you usually don’t want to present site visitors with deep 
+a case, you usually don't want to present site visitors with deep 
 menus of nested items.
+
+For example, you're on the page "Introduction to Bleeding", so the menu might look like this:
+
+* School of Medicine
+    * Medical Education
+    * Departments
+        * Department of Lorem Ipsum
+        * Department of Donec Imperdiet
+        * Department of Cras Eros
+        * Department of Mediaeval Surgery
+            * Theory
+            * Cures
+                * Bleeding
+                    * Introduction to Bleeding <this is the current page>
+                    * Bleeding - the scientific evidence
+                    * Cleaning up the mess
+                * Cupping
+                * Leaches
+                * Maggots
+            * Techniques
+            * Instruments
+        * Department of Curabitur a Purus
+        * Department of Sed Accumsan
+        * Department of Etiam
+    * Research
+    * Administration
+    * Contact us
+    * Impressum
+
+which is frankly overwhelming.
+
+By making "Department of Mediaeval Surgery" a *soft root*, the 
+menu becomes much more manageable:
+
+* Department of Mediaeval Surgery
+    * Theory
+    * Cures
+        * Bleeding
+            * Introduction to Bleeding <current page>
+            * Bleeding - the scientific evidence
+            * Cleaning up the mess
+        * Cupping
+        * Leaches
+        * Maggots
+    * Techniques
+    * Instruments
+
+Using Soft Roots
+================
 
 To enable the feature, ``settings.py`` requires:
 
