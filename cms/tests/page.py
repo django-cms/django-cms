@@ -487,11 +487,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page5.get_absolute_url(),
             self.get_pages_root()+'test-page-4/test-page-5/')
 
-        self.client.post(
-            '/admin/cms/page/%s/move-page/' % page3.pk,
-            {'target': page1.pk, 'position': 'last-child'})
-
-        page3 = self.reload_page(page3)
+        page3 = self.move_page(page3, page1)
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'test-page-3/')
 
