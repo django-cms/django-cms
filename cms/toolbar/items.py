@@ -10,10 +10,10 @@ from django.utils.html import strip_spaces_between_tags
 
 def _media(suffix):
     """
-    Helper that prefixes a URL with MEDIA_URL
+    Helper that prefixes a URL with CMS_MEDIA_URL
     """
     if suffix:
-        return u'%s%s' % (settings.MEDIA_URL, suffix)
+        return u'%s%s' % (settings.CMS_MEDIA_URL, suffix)
     return ''
 
 
@@ -133,7 +133,7 @@ class GetButton(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, url, icon=None):
         """
         title: name of the button
-        icon: icon of the button, relative to MEDIA_URL
+        icon: icon of the button, relative to CMS_MEDIA_URL
         url: target of the GET request
         """
         super(GetButton, self).__init__(alignment, css_class_suffix)
@@ -162,7 +162,7 @@ class PostButton(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, icon, action, *args, **kwargs):
         """
         title: name of the button
-        icon: icon of the button, relative to MEDIA_URL
+        icon: icon of the button, relative to CMS_MEDIA_URL
         action: target of the request
         *args, **kwargs: data to POST
         
@@ -203,7 +203,7 @@ class ListItem(Serializable):
         """
         title: name of the list
         url: target of the item
-        icon: icon of the item, relative to MEDIA_URL
+        icon: icon of the item, relative to CMS_MEDIA_URL
         """
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
@@ -229,7 +229,7 @@ class List(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, icon, items):
         """
         title: name of the item
-        icon: icon of the item, relative to MEDIA_URL
+        icon: icon of the item, relative to CMS_MEDIA_URL
         items: an iterable of ListItem instances.
         """
         super(List, self).__init__(alignment, css_class_suffix)

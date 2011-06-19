@@ -124,7 +124,7 @@ class CMSToolbar(Toolbar):
             
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                          'cms/images/toolbar/icons/icon_lock.png')
+                          'images/toolbar/icons/icon_lock.png')
             )
         elif not self.request.user.is_authenticated():
             items.append(
@@ -133,7 +133,7 @@ class CMSToolbar(Toolbar):
         else:
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                          'cms/images/toolbar/icons/icon_lock.png')
+                          'images/toolbar/icons/icon_lock.png')
             )
         return items
     
@@ -158,26 +158,26 @@ class CMSToolbar(Toolbar):
         menu_items = [
             ListItem('overview', _('Move/add Pages'),
                      reverse('admin:cms_page_changelist'),
-                     icon='cms/images/toolbar/icons/icon_sitemap.png'),
+                     icon='images/toolbar/icons/icon_sitemap.png'),
         ]
         menu_items.append(
             ListItem('addchild', _('Add child page'),
                      _get_add_child_url,
-                     icon='cms/images/toolbar/icons/icon_child.png')
+                     icon='images/toolbar/icons/icon_child.png')
         )
         
         menu_items.append(
             ListItem('addsibling', _('Add sibling page'),
                      _get_add_sibling_url,
-                     icon='cms/images/toolbar/icons/icon_sibling.png')
+                     icon='images/toolbar/icons/icon_sibling.png')
         )
             
         menu_items.append(
             ListItem('delete', _('Delete Page'), _get_delete_url,
-                     icon='cms/images/toolbar/icons/icon_delete.png')
+                     icon='images/toolbar/icons/icon_delete.png')
         )
         return List(RIGHT, 'page', _('Page'),
-                    'cms/images/toolbar/icons/icon_page.png', items=menu_items)
+                    'images/toolbar/icons/icon_page.png', items=menu_items)
     
     def get_admin_menu(self, context, can_change, is_staff):
         """
@@ -186,21 +186,21 @@ class CMSToolbar(Toolbar):
         admin_items = [
             ListItem('admin', _('Site Administration'),
                      reverse('admin:index'),
-                     icon='cms/images/toolbar/icons/icon_admin.png'),
+                     icon='images/toolbar/icons/icon_admin.png'),
         ]
         if can_change:
             admin_items.append(
                 ListItem('settings', _('Page Settings'),
                          _get_page_admin_url,
-                         icon='cms/images/toolbar/icons/icon_page.png')
+                         icon='images/toolbar/icons/icon_page.png')
             )
             if 'reversion' in settings.INSTALLED_APPS:
                 admin_items.append(
                     ListItem('history', _('View History'),
                              _get_page_history_url,
-                             icon='cms/images/toolbar/icons/icon_history.png')
+                             icon='images/toolbar/icons/icon_history.png')
                 )
-        return List(RIGHT, 'admin', _('Admin'), 'cms/images/toolbar/icons/icon_admin.png',
+        return List(RIGHT, 'admin', _('Admin'), 'images/toolbar/icons/icon_admin.png',
                     items=admin_items)
     
     def request_hook(self):
