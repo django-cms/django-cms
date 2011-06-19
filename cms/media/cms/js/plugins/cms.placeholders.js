@@ -500,7 +500,7 @@ jQuery(document).ready(function ($) {
 			// frame should always have space on top
 			this.frame.css('top', pos+offset);
 			// make sure that toolbar is visible
-			if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
+			if(this.toolbar.data('collapsed')) CMS.Toolbar.API._showToolbar();
 			// listen to toolbar events
 			this.toolbar.bind('cms.toolbar.show cms.toolbar.hide', function (e) {
 				(e.handleObj.namespace === 'show.toolbar') ? that.frame.css('top', pos+offset) : that.frame.css('top', pos);

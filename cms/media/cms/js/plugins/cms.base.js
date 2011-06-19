@@ -6,6 +6,7 @@
  * assign Class and CMS namespace */
  var CMS = CMS || {};
      CMS.Class = CMS.Class || Class.$noConflict();
+     CMS.API = CMS.API || {};
 
 (function ($) {
 /*##################################################|*/
@@ -18,7 +19,7 @@ jQuery(document).ready(function ($) {
 	 * @public_methods:
 	 *	- CMS.Security.csrf();
 	 */
-	CMS.Security = {
+	CMS.API.Security = {
 	
 		csrf: function () {
 			$.ajaxSetup({
@@ -64,7 +65,7 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Helpers.getUrl(str);
 	 *	- CMS.Helpers.setUrl(getUrlObj, addParam, removeParam);
 	 */
-	CMS.Helpers = {
+	CMS.API.Helpers = {
 	
 		reloadBrowser: function () {
 			window.location.reload();
@@ -111,7 +112,16 @@ jQuery(document).ready(function ($) {
 				index++;
 			});
 
-			uri = getUrlObj.directory + '?' + serialized;
+			// check if we should add the questionmark
+			var addition = (serialized === '') ? '' : '?';
+			var anchor = (getUrlObj.anchor) ? '#' + getUrlObj.anchor : '';
+
+			// if no params are given just return the normal url
+			if(options && (options.removeParam || options.addParam)) {
+				uri = getUrlObj.protocol + '://' + getUrlObj.authority + getUrlObj.directory + getUrlObj.file + addition + serialized + anchor;
+			} else {
+				uri = getUrlObj.source;
+			}
 
 			return uri;
 		}

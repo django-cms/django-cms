@@ -12,10 +12,10 @@
 //<![CDATA[
 jQuery(document).ready(function ($) {
 	// initialize toolbar, pass options, items and allow public access
-	CMS.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
+	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
 	// initialize placeholders, pass options and keep it private
-	CMS.Placeholders = new CMS.Placeholders('#cms_toolbar', {
+	CMS.API.Placeholders = new CMS.Placeholders('#cms_toolbar', {
 		{% if request.toolbar.edit_mode %}'edit_mode': true,{% endif %}
 		'urls': {
 			'cms_page_move_plugin': '{% url admin:cms_page_move_plugin %}',
@@ -74,19 +74,4 @@ jQuery(document).ready(function ($) {
 	</div>
 	<div id="cms_placeholder-success"><div class="cms_placeholder-success_inner"></div></div>
 	<!-- end: placeholders -->
-
-	<!-- template: anchor -->
-	{% include "cms/toolbar/items/anchor.html" %}
-
-	<!-- template: switcher -->
-	{% include "cms/toolbar/items/switcher.html" %}
-
-	<!-- template: button -->
-	{% include "cms/toolbar/items/button.html" %}
-
-	<!-- template: list -->
-	{% include "cms/toolbar/items/list.html" %}
-
-	<!-- item: html - login -->
-	{% include "cms/toolbar/items/login.html" %}
 </div>

@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
 
 	/**
 	 * Toolbar
-	 * @version: 0.1.2
+	 * @version: 1.0.0
 	 * @description: Implements and controls toolbar
 	 * @public_methods:
 	 *	- CMS.Toolbar.toggleToolbar();
@@ -21,10 +21,11 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.Toolbar.registerType(function);
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 * TODO: login needs special treatment (errors, login on enter)
+	 * TODO: styling of the collapser button needs to be somehow transparent
 	 */
 	CMS.Toolbar = CMS.Class.$extend({
 
-		implement: [CMS.Helpers, CMS.Security],
+		implement: [CMS.API.Helpers, CMS.API.Security],
 
 		options: {
 			'debug': false, // not integrated yet
@@ -35,7 +36,7 @@ jQuery(document).ready(function ($) {
 			// save reference to this class
 			var that = this;
 			// check if only one element is given
-			if($(container).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
+			if($(container).length > 2) { throw new Error('Toolbar Error: one element expected, multiple elements given.'); return false; }
 			// merge passed argument options with internal options
 			this.options = $.extend(this.options, options);
 
@@ -86,7 +87,7 @@ jQuery(document).ready(function ($) {
 		toggleToolbar: function () {
 			(this.toolbar.data('collapsed')) ? this._showToolbar() : this._hideToolbar();
 
-			return this;
+			return this.toolbar.data('collapsed');
 		},
 
 		_showToolbar: function () {
@@ -103,6 +104,8 @@ jQuery(document).ready(function ($) {
 			$.cookie('CMS_toolbar-collapsed', false, { path:'/', expires:7 });
 			// add show event to toolbar
 			this.toolbar.trigger('cms.toolbar.show');
+
+			return this.toolbar.data('collapsed');
 		},
 
 		_hideToolbar: function () {
@@ -119,10 +122,13 @@ jQuery(document).ready(function ($) {
 			$.cookie('CMS_toolbar-collapsed', true, { path:'/', expires:7 });
 			// add hide event to toolbar
 			this.toolbar.trigger('cms.toolbar.hide');
+
+			return this.toolbar.data('collapsed');
 		},
 
 		registerItem: function (obj) {
 			// error handling
+			if(typeof(obj) != 'object') return false;
 			if(!obj.order) obj.dir = 0;
 
 			// check for internal types
@@ -281,7 +287,7 @@ jQuery(document).ready(function ($) {
 								'url': $(e.currentTarget).attr('href'),
 								'data': $(e.currentTarget).attr('href').split('?')[1],
 								'success': function () {
-									CMS.Helpers.reloadBrowser();
+									CMS.API.Helpers.reloadBrowser();
 								},
 								'error': function () {
 									log('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
