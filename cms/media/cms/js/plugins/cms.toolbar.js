@@ -128,7 +128,7 @@ jQuery(document).ready(function ($) {
 
 		registerItem: function (obj) {
 			// error handling
-			if(typeof(obj) != 'object') return false;
+			if(typeof(obj) !== 'object') return false;
 			if(!obj.order) obj.dir = 0;
 
 			// check for internal types
@@ -157,7 +157,7 @@ jQuery(document).ready(function ($) {
 
 		registerItems: function (items) {
 			// make sure an array is passed
-			if(typeof(items) != 'object') return false;
+			if(typeof(items) !== 'object') return false;
 			// save reference to this class
 			var that = this;
 			// loopp through all items and pass them to single function
@@ -331,7 +331,7 @@ jQuery(document).ready(function ($) {
 
 		registerType: function (handler) {
 			// invoke function
-			if(typeof(handler) == 'function') handler();
+			if(typeof(handler) === 'function') handler();
 
 			return handler;
 		},
@@ -344,7 +344,7 @@ jQuery(document).ready(function ($) {
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
 			if(obj.url) template = template.replace('[url]', obj.url);
-			if(!obj.icon && obj.type == 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
+			if(!obj.icon && obj.type === 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
 			// template = template.replace('[token]', this.options.csrf_token);
 			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
@@ -375,7 +375,7 @@ jQuery(document).ready(function ($) {
 			var left = this.toolbar.left;
 			var right = this.toolbar.right;
 
-			if(dir == 'left') {
+			if(dir === 'left') {
 				var leftContent = left.find('> *');
 					if(!leftContent.length) { left.append(el); return false; }
 
@@ -391,7 +391,7 @@ jQuery(document).ready(function ($) {
 				});
 			}
 
-			if(dir == 'right') {
+			if(dir === 'right') {
 				var rightContent = right.find('> *');
 					if(!rightContent.length) { right.append(el); return false; }
 
