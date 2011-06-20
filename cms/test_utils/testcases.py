@@ -202,7 +202,7 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None, language=None, post_data=None):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False):
         if not path:
             path = self.get_pages_root()
         
@@ -245,6 +245,8 @@ class CMSTestCase(TestCase):
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if not enforce_csrf_checks:
+            request.csrf_processing_done = True 
         return request
     
     def check_published_page_attributes(self, page):
