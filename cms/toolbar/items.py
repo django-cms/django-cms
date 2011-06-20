@@ -191,7 +191,7 @@ class ListItem(Serializable):
     A item in a dropdown list (List).
     """
     base_attributes = [
-        ('css_class', 'class'),
+        ('css_class', 'cls'),
         ('title', 'title'),
         ('url', 'url'),
         ('icon', 'icon'),
