@@ -13,7 +13,7 @@ def _media(suffix):
     Helper that prefixes a URL with MEDIA_URL
     """
     if suffix:
-        return u'%s%s' % (settings.MEDIA_URL, suffix)
+        return u'%s%s' % (settings.STATIC_URL, suffix)
     return ''
 
 
