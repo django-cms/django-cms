@@ -721,7 +721,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         db.reset_queries()
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
-        self.assertEqual(len(db.connection.queries), 19)
+        self.assertEqual(len(db.connection.queries), 19) # five less queries as expected
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].id, 8)
