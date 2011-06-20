@@ -215,13 +215,14 @@ class AdminTestCase(CMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE)
     
     def test_change_template(self):
+        admin, staff = self._get_guys()
         request = self.get_request('/admin/cms/page/1/', 'en')
         pageadmin = site._registry[Page]
-        self.assertRaises(Http404, pageadmin.change_template, request, 1)
-        page = create_page('test-page', 'nav_playground.html', 'en')
-        response = pageadmin.change_template(request, page.pk)
-        self.assertEqual(response.status_code, 403)
-        admin = self._get_guys(True)
+        with self.login_user_context(staff):
+            self.assertRaises(Http404, pageadmin.change_template, request, 1)
+            page = create_page('test-page', 'nav_playground.html', 'en')
+            response = pageadmin.change_template(request, page.pk)
+            self.assertEqual(response.status_code, 403)
         url = reverse('admin:cms_page_change_template', args=(page.pk,))
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
@@ -612,7 +613,7 @@ class AdminTests(CMSTestCase, AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': target.slot})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+            self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': target.slot})
@@ -622,7 +623,7 @@ class AdminTests(CMSTestCase, AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request(post_data={'ids': pageplugin.pk,
                                                   'placeholder': target.slot})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+            self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'ids': pageplugin.pk,
                                                   'placeholder': target.slot})

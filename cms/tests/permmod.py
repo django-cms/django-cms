@@ -75,6 +75,9 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             master.set_password('master')
             master.save()
             master.user_permissions.add(Permission.objects.get(codename='add_text'))
+            master.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            master.user_permissions.add(Permission.objects.get(codename='change_text'))
+            
             self.user_master = create_page_user(self.user_super, master, grant_all=True)
             # create non global, non staff user
             self.user_non_global = User(username="nonglobal", is_active=True)
@@ -98,6 +101,9 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             slave.set_password('slave')
             slave.save()
             slave.user_permissions.add(Permission.objects.get(codename='add_text'))
+            slave.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            slave.user_permissions.add(Permission.objects.get(codename='change_text'))
+            
             self.user_slave = create_page_user(self.user_super, slave,  can_add_page=True,
                                         can_change_page=True, can_delete_page=True)
             
