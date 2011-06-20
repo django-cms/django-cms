@@ -38,12 +38,15 @@ from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
 
-
-class AdminTestCase(CMSTestCase):
+class AdminTestsBase(CMSTestCase):
     
     def setUp(self):
         self.request_factory = RequestFactory()
-    
+        
+    @property
+    def admin_class(self):
+        return site._registry[Page]
+        
     def _get_guys(self, admin_only=False):
         admin = self.get_superuser()
         if admin_only:
@@ -70,7 +73,9 @@ class AdminTestCase(CMSTestCase):
             )
             gpp.sites = Site.objects.all()
         return admin, normal_guy
-    
+        
+class AdminTestCase(AdminTestsBase):
+            
     def test_edit_does_not_reset_page_adv_fields(self):
         """
         Makes sure that if a non-superuser with no rights to edit advanced page
@@ -438,16 +443,11 @@ class AdminListFilterTests(TestCase):
         self.assertFalse('soft_root' in experiment.list_filter, experiment.list_filter)
 
 
-class AdminTestsBase(object):
-    @property
-    def admin_class(self):
-        return site._registry[Page]
-
-
-class AdminTests(CMSTestCase, AdminTestsBase):
+class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
     
     def setUp(self):
+        super(AdminTests, self).setUp()
         create_page("testpage", "nav_playground.html", "en")
     
     def get_admin(self):
@@ -714,7 +714,12 @@ class AdminTests(CMSTestCase, AdminTestsBase):
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
 
-class NoDBAdminTests(TestCase, AdminTestsBase):
+class NoDBAdminTests(TestCase):
+    
+    @property
+    def admin_class(self):
+        return site._registry[Page]
+        
     def test_lookup_allowed_site__exact(self):
         self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
             
@@ -722,8 +727,10 @@ class NoDBAdminTests(TestCase, AdminTestsBase):
         self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))
 
 
-class PluginPermissionTests(AdminTestCase):
+class PluginPermissionTests(AdminTestsBase):
+    
     def setUp(self):
+        super(PluginPermissionTests, self).setUp()
         self._page = create_page('test page', 'nav_playground.html', 'en')
         self._placeholder = self._page.placeholders.all()[0]
         

@@ -39,7 +39,7 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
+        # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
         
@@ -66,8 +66,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
     
@@ -93,8 +93,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
@@ -121,7 +121,7 @@ class SecurityTests(CMSTestCase):
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
         # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
     
     def test_edit_ph(self):
