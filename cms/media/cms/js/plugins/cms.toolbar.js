@@ -57,6 +57,9 @@ jQuery(document).ready(function ($) {
 			this._setup();
 		},
 
+		/**
+		 * All methods with an underscore as prefix should not be called through the API namespace
+		 */
 		_setup: function () {
 			// save reference to this class
 			var that = this;
@@ -84,12 +87,18 @@ jQuery(document).ready(function ($) {
 			}
 		},
 
+		/**
+		 * Binds the collapsed data element to the toolbar
+		 * Calls private methods _showToolbar and _hideToolbar when required
+		 * Saves current state in a cookie
+		 */
 		toggleToolbar: function () {
 			(this.toolbar.data('collapsed')) ? this._showToolbar() : this._hideToolbar();
 
 			return this.toolbar.data('collapsed');
 		},
 
+		// sets collapsed data to false
 		_showToolbar: function () {
 			// add toolbar padding
 			var padding = parseInt($(document.body).css('margin-top'));
@@ -104,10 +113,9 @@ jQuery(document).ready(function ($) {
 			$.cookie('CMS_toolbar-collapsed', false, { path:'/', expires:7 });
 			// add show event to toolbar
 			this.toolbar.trigger('cms.toolbar.show');
-
-			return this.toolbar.data('collapsed');
 		},
 
+		// sets collapsed data to true
 		_hideToolbar: function () {
 			// remove toolbar padding
 			var padding = parseInt($(document.body).css('margin-top'));
@@ -122,10 +130,12 @@ jQuery(document).ready(function ($) {
 			$.cookie('CMS_toolbar-collapsed', true, { path:'/', expires:7 });
 			// add hide event to toolbar
 			this.toolbar.trigger('cms.toolbar.hide');
-
-			return this.toolbar.data('collapsed');
 		},
 
+		/**
+		 * Handles the different item types and redirects them to their private method
+		 * @param: obj (object that represents the item data to be registered)
+		 */
 		registerItem: function (obj) {
 			// error handling
 			if(typeof(obj) !== 'object') return false;
@@ -155,6 +165,10 @@ jQuery(document).ready(function ($) {
 			return obj;
 		},
 
+		/**
+		 * This public method allows multiple addition of registerItems within one call
+		 * @param: items (array of objects)
+		 */
 		registerItems: function (items) {
 			// make sure an array is passed
 			if(typeof(items) !== 'object') return false;
@@ -168,19 +182,29 @@ jQuery(document).ready(function ($) {
 			return items;
 		},
 
+		/**
+		 * Removes the item with a specific id. This is not in use yet
+		 * @param: index
+		 */
 		removeItem: function (index) {
+			if(typeof(index) !== 'number') return false;
 			// function to remove an item
-			if(index) $($('.cms_toolbar-item:visible')[index]).remove();
+			$($('.cms_toolbar-item')[index]).remove();
 
 			return index;
 		},
 
+		// requires: type, order, dir, title, url
+		// optional: cls
 		_registerAnchor: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_anchor', obj);
+			// append item
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, html || htmlElement
+		// optional: cls, redirect
 		_registerHtml: function (obj) {
 			// here we dont need processTemplate cause we create the template
 			var template = (obj.html) ? $(obj.html) : $(obj.htmlElement);
@@ -188,15 +212,18 @@ jQuery(document).ready(function ($) {
 			template.data('order', obj.order).css('display', 'block');
 			// add class if neccessary
 			if(obj.cls) template.addClass(obj.cls);
-			// add events
+			// special case for form html
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
 				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
+			
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, removeParameter, addParameter
+		// optional: cls, state
 		_registerSwitcher: function (obj) {
 			// save reference to this class
 			var that = this;
@@ -239,6 +266,8 @@ jQuery(document).ready(function ($) {
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, redirect
+		// optional: cls, icon, action, hidden
 		_registerButton: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_button', obj);
@@ -246,6 +275,8 @@ jQuery(document).ready(function ($) {
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, items (title, url, method (get/post), cls, icon)
+		// optional: cls, icon
 		_registerList: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_list', obj);
@@ -328,6 +359,10 @@ jQuery(document).ready(function ($) {
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		/**
+		 * Basic API to add more types rather than the predefined (anchor, html, switcher, button, list)
+		 * @param: handler (function)
+		 */
 		registerType: function (handler) {
 			// invoke function
 			if(typeof(handler) === 'function') handler();
@@ -335,10 +370,10 @@ jQuery(document).ready(function ($) {
 			return handler;
 		},
 
-		/* this private method processes each template and replaces the placeholders with the passed values */
-		_processTemplate: function (cls, obj) {
+		// parses passed templates from items
+		_processTemplate: function (id, obj) {
 			// lets find the template and clone it
-			var template = this.wrapper.find(cls).clone();
+			var template = this.wrapper.find(id).clone();
 				template = $('<div>').append(template).clone().remove().html();
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
@@ -369,6 +404,7 @@ jQuery(document).ready(function ($) {
 			return template;
 		},
 
+		// appends item in correct order and position
 		_injectItem: function (el, dir, order) {
 			// save some vars
 			var left = this.toolbar.left;
