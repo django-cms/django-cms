@@ -164,8 +164,9 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         templates = items[2]
         self.assertTrue(isinstance(templates, List))
         self.assertEqual(len(templates.raw_items), len(settings.CMS_TEMPLATES))
+        base = reverse('admin:cms_page_change_template', args=(page.pk,))
         for item, template in zip(templates.raw_items, settings.CMS_TEMPLATES):
-            self.assertEqual(item.url, '#%s' % template[0])
+            self.assertEqual(item.url, '%s?template=%s' % (base, template[0]))
 
         # check page menu
         pagemenu = items[3]
@@ -191,6 +192,19 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         logout = items[5]
         self.assertTrue(isinstance(logout, GetButton))
         self.assertEqual(logout.url, '?cms-toolbar-logout')
+        
+    def test_toolbar_markup(self):
+        superuser = self.get_superuser()
+        create_page("toolbar-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True)
+        
+        with self.login_user_context(superuser):
+            response = self.client.get('/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'nav_playground.html')
+        self.assertContains(response, '<div id="cms_toolbar"')
+        self.assertContains(response, 'cms.placeholders.js')
+        self.assertContains(response, 'cms.placeholders.css')
 
 
 class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
@@ -235,3 +249,4 @@ class ToolbarNoModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
         items = toolbar.get_items({})
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6)
+

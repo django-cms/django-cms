@@ -6,6 +6,7 @@
  * assign Class and CMS namespace */
  var CMS = CMS || {};
      CMS.Class = CMS.Class || Class.$noConflict();
+     CMS.API = CMS.API || {};
 
 (function ($) {
 /*##################################################|*/
@@ -13,12 +14,12 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Security
-	 * @version: 0.1.1
+	 * @version: 1.0.0
 	 * @description: Adds security layer to CMS namespace
 	 * @public_methods:
-	 *	- CMS.Security.csrf();
+	 *	- CMS.API.Security.csrf();
 	 */
-	CMS.Security = {
+	CMS.API.Security = {
 	
 		csrf: function () {
 			$.ajaxSetup({
@@ -51,69 +52,78 @@ jQuery(document).ready(function ($) {
 					}
 				}
 			});
+			return 'ready';
 		}
 	
 	};
 	
 	/**
 	 * Helpers
-	 * @version: 0.1.0
+	 * @version: 1.0.0
 	 * @description: Adds helper methods to be invoked
 	 * @public_methods:
-	 *	- CMS.Helpers.reloadBrowser();
-	 *	- CMS.Helpers.insertUrl(url, name, value);
-	 *	- CMS.Helpers.removeUrl(url, name);
+	 *	- CMS.API.Helpers.reloadBrowser();
+	 *	- CMS.API.Helpers.getUrl(urlString);
+	 *	- CMS.API.Helpers.setUrl(urlString, options);
 	 */
-	CMS.Helpers = {
+	CMS.API.Helpers = {
 	
 		reloadBrowser: function () {
 			window.location.reload();
 		},
-		
-		insertUrl: function (url, name, value) {
-			// this is a one to one copy from the old toolbar
-			if(url.substr(url.length-1, url.length)== "&") url = url.substr(0, url.length-1); 
-			var dash_splits = url.split("#");
-			url = dash_splits[0];
-			var splits = url.split(name + "=");
-			if(splits.length == 1) splits = url.split(name);
-			var get_args = false;
-			if(url.split("?").length>1) get_args = true;
-			if(splits.length > 1){
-				var after = "";
-				if(splits[1].split("&").length > 1) after = splits[1].split("&")[1];
-				url = splits[0] + name;
-				if(value) url += "=" + value;
-				url += "&" + after;
-			} else {
-				if(get_args) { url = url + "&" + name; } else { url = url + "?" + name; }
-				if(value) url += "=" + value;
-			}
-			if(dash_splits.length>1) url += '#' + dash_splits[1];
-			if(url.substr(url.length-1, url.length)== "&") url = url.substr(0, url.length-1);
-			
-			return url;
-		},
-		
-		removeUrl: function (url, name) {
-			// this is a one to one copy from the old toolbar
-			var dash_splits = url.split("#");
-			url = dash_splits[0];
-			var splits = url.split(name + "=");
-			if(splits.length == 1) splits = url.split(name);
-			if(splits.length > 1){
-				var after = "";
-				if (splits[1].split("&").length > 1) after = splits[1].split("&")[1];
-				if (splits[0].substr(splits[0].length-2, splits[0].length-1)=="?" || !after) {
-					url = splits[0] + after;
-				} else {
-					url = splits[0] + "&" + after;
+
+		getUrl: function(str) {
+			var	o = {
+				'strictMode': false,
+				'key': ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+				'q': { 'name': 'queryKey', 'parser': /(?:^|&)([^&=]*)=?([^&]*)/g },
+				'parser': {
+					'strict': /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+					'loose':  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
 				}
-			}
-			if(url.substr(url.length-1,1) == "?") url = url.substr(0, url.length-1);
-			if(dash_splits.length > 1 && dash_splits[1]) url += "#" + dash_splits[1];
+			};
 			
-			return url;
+			var m = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), uri = {}, i = 14;
+
+			while(i--) uri[o.key[i]] = m[i] || '';
+
+			uri[o.q.name] = {};
+			uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+				if($1) { uri[o.q.name][$1] = $2; }
+			});
+
+			return uri;
+		},
+
+		setUrl: function (str, options) {
+			var uri = str;
+
+			// now we neet to get the partials of the element
+			var getUrlObj = this.getUrl(uri);
+			var query = getUrlObj.queryKey;
+			var serialized = '';
+			var index = 0;
+
+			// we could loop the query and replace the param at the right place
+			// but instead of replacing it just append it to the end of the query so its more visible
+			if(options && options.removeParam) delete query[options.removeParam];
+			if(options && options.addParam) query[options.addParam.split('=')[0]] = options.addParam.split('=')[1];
+
+			$.each(query, function (key, value) {
+				// add &
+				if(index != 0) serialized += '&';
+				// if a value is given attach it
+				serialized += (value) ? (key + '=' + value) : (key);
+				index++;
+			});
+
+			// check if we should add the questionmark
+			var addition = (serialized === '') ? '' : '?';
+			var anchor = (getUrlObj.anchor) ? '#' + getUrlObj.anchor : '';
+
+			uri = getUrlObj.protocol + '://' + getUrlObj.authority + getUrlObj.directory + getUrlObj.file + addition + serialized + anchor;
+
+			return uri;
 		}
 	
 	};

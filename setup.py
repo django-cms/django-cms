@@ -15,14 +15,8 @@ for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
             continue
         media_files.append(os.path.join(*filepath.split(os.sep)[1:]))
         
-if cms.VERSION[-1] == 'final':
-    CLASSIFIERS = ['Development Status :: 5 - Production/Stable']
-elif 'beta' in cms.VERSION[-1]:
-    CLASSIFIERS = ['Development Status :: 4 - Beta']
-else:
-    CLASSIFIERS = ['Development Status :: 3 - Alpha']
-
-CLASSIFIERS += [
+CLASSIFIERS = [
+    'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
     'Framework :: Django',
     'Intended Audience :: Developers',
@@ -41,7 +35,7 @@ setup(
     version=cms.__version__,
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
-    url='http://www.django-cms.org/',
+    url='https://www.django-cms.org/',
     license='BSD License',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,

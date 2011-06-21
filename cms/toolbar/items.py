@@ -12,7 +12,9 @@ def _media(suffix):
     """
     Helper that prefixes a URL with MEDIA_URL
     """
-    return u'%s%s' % (settings.MEDIA_URL, suffix)
+    if suffix:
+        return u'%s%s' % (settings.MEDIA_URL, suffix)
+    return ''
 
 
 class Switcher(BaseItem):
@@ -189,14 +191,15 @@ class ListItem(Serializable):
     A item in a dropdown list (List).
     """
     base_attributes = [
-        ('css_class', 'class'),
+        ('css_class', 'cls'),
         ('title', 'title'),
         ('url', 'url'),
         ('icon', 'icon'),
+        ('method', 'method'),
     ]
     extra_attributes = []
     
-    def __init__(self, css_class_suffix, title, url, icon=None):
+    def __init__(self, css_class_suffix, title, url, method='GET', icon=None):
         """
         title: name of the list
         url: target of the item
@@ -205,6 +208,7 @@ class ListItem(Serializable):
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
         self.title = title
+        self.method = method
         self.icon = _media(icon)
         if callable(url):
             self.serialize_url = url

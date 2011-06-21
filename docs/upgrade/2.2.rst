@@ -15,6 +15,12 @@ version conflict issues many people had when trying to use the django CMS
 together with other Django apps that require django-mptt. django CMS 2.2
 requires django-mptt 0.4.2 or higher.
 
+.. warning::
+
+    Please remove the old ``mptt`` package from your Python site-packages
+    directory before upgrading. The ``setup.py`` file will install the
+    `django-mptt`_ package as an external dependency!
+
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
 
 ******************************
@@ -44,13 +50,26 @@ removed in this process and is therefore no longer required, however you now
 require to have the ``'sekizai.context_processors.sekizai'`` context processor
 in your :setting:`django:TEMPLATE_CONTEXT_PROCESSORS` setting.
 
-All templates in :setting:`CMS_TEMPLATES` must contain at least the ``js`` and ``css``
-sekizai namespaces.
+All templates in :setting:`CMS_TEMPLATES` must contain at least the ``js`` and
+``css`` sekizai namespaces.
 
 Please refer to the documentation on :ref:`custom-plugins-handling-media` in
 custom CMS plugins and the
 `django-sekizai documentation <http://django-sekizai.readthedocs.org/>`_ for
-more information.    
+more information.
+
+
+Toolbar must be enabled explicitly in templates
+===============================================
+
+The toolbar no longer hacks itself into responses in the middleware, but rather
+has to be enabled explictely using the ``{% cms_toolbar %}`` template tag from
+the ``cms_tags`` template tag library in your templates. The template tag
+should be placed somewhere within the body of the HTML (within ``<body>...</body>``).
+
+This solves issues people where having with the toolbar showing up in places it
+shouldn't.
+
 
 **************************
 Features deprecated in 2.2

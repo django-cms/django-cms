@@ -10,14 +10,14 @@
 jQuery(document).ready(function ($) {
 	/**
 	 * Placeholders
-	 * @version: 0.1.2
+	 * @version: 1.0.0
 	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 * @public_methods:
-	 *	- CMS.Placeholder.addPlugin(url, obj);
-	 *	- CMS.Placeholder.editPlugin(placeholder_id, plugin_id);
-	 *	- CMS.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
-	 *	- CMS.Placeholder.toggleFrame();
-	 *	- CMS.Placeholder.toggleDim();
+	 *	- CMS.API.Placeholder.addPlugin(url, obj);
+	 *	- CMS.API.Placeholder.editPlugin(placeholder_id, plugin_id);
+	 *	- CMS.API.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
+	 *	- CMS.API.Placeholder.toggleFrame();
+	 *	- CMS.API.Placeholder.toggleDim();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 	CMS.Placeholders = CMS.Class.$extend({
@@ -201,7 +201,7 @@ jQuery(document).ready(function ($) {
 					that.editPlugin.call(that, data.placeholder_id, response);
 				},
 				'error': function () {
-					log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
 			});
 		},
@@ -275,7 +275,7 @@ jQuery(document).ready(function ($) {
 						plugin.remove();
 					},
 					'error': function () {
-						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 					}
 				});
 			}
@@ -322,7 +322,7 @@ jQuery(document).ready(function ($) {
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
 				'error': function () {
-					log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
 			});
 
@@ -379,6 +379,7 @@ jQuery(document).ready(function ($) {
 				var text = $('.cms_placeholder-bar[class$="cms_placeholder_slot::' + item + '"]').find('.cms_placeholder-title').text();
 				list.append($('<li><a href="">' +text + '</a></li>').data({
 					'slot': item,
+					'placeholder_id': values.placeholder,
 					'plugin_id': values.plugin_id
 				}));
 			});
@@ -388,16 +389,17 @@ jQuery(document).ready(function ($) {
 				e.preventDefault();
 				// save slot var
 				var slot = $(this).parent().data('slot');
+				var placeholder_id = $(this).parent().data('placeholder_id');
 				// now lets do the ajax request
 				$.ajax({
 					'type': 'POST',
 					'url': that.options.urls.cms_page_move_plugin,
-					'data': { 'placeholder': slot, 'plugin_id': $(this).parent().data('plugin_id') },
+					'data': { 'placeholder': slot, 'placeholder_id': placeholder_id, 'plugin_id': $(this).parent().data('plugin_id') },
 					'success': function () {
 						refreshPluginPosition(slot);
 					},
 					'error': function () {
-						log('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 					}
 				});
 			});
@@ -413,6 +415,9 @@ jQuery(document).ready(function ($) {
 				} else {
 					plugin.insertAfter($(els.toArray()[els.length-1]));
 				}
+
+				// close overlay
+				that._hideOverlay();
 
 				// show success overlay for a second
 				that.success.css({
@@ -450,6 +455,7 @@ jQuery(document).ready(function ($) {
 		
 		_showPluginList: function (el) {
 			// save reference to this class
+			// TODO: make sure the element is really shown over everything
 			var that = this;
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.show();
@@ -496,7 +502,7 @@ jQuery(document).ready(function ($) {
 			// frame should always have space on top
 			this.frame.css('top', pos+offset);
 			// make sure that toolbar is visible
-			if(this.toolbar.data('collapsed')) CMS.Toolbar._showToolbar();
+			if(this.toolbar.data('collapsed')) CMS.Toolbar.API._showToolbar();
 			// listen to toolbar events
 			this.toolbar.bind('cms.toolbar.show cms.toolbar.hide', function (e) {
 				(e.handleObj.namespace === 'show.toolbar') ? that.frame.css('top', pos+offset) : that.frame.css('top', pos);
@@ -524,31 +530,18 @@ jQuery(document).ready(function ($) {
 			var that = this;
 			// clear timer when initiated within resize event
 			if(this.timer) clearTimeout(this.timer);
-
-			/* cause IE's mother had sex with a sheep, we need to always usw window instead of document
-			 * we need to substract 4 pixel from the frame cause IE's vater has a small dick
-			 * TODO: Check if scrollbars are shown, than we dont need to substract 20px, they are forced now
-			 */
-			var scrollbarWidth = ($.browser.msie && $.browser.version >= '8.0') ? 20 : 0;
-
 			// attach resize event to window
-			$(document).bind('resize', function () {
-				that.dim.css({
-					'width': $(document).width(),
-					'height': $(document).height()
-				});
-				that.frame.css('width', $(document).width());
-				// adjust after resizing
+			$(window).bind('resize', function () {
+				// first we need to response to the window
+				that.dim.css('height', $(window).height());
+				// after a while we response to the document dimensions
 				that.timer = setTimeout(function () {
-					that.dim.css({
-						'width': $(document).width()-scrollbarWidth,
-						'height': $(document).height()
-					});
-					that.frame.css('width', $(document).width()-scrollbarWidth);
+					that.dim.css('height', $(document).height());
 				}, 500);
 			});
 			// init dim resize
-			$(document).resize();
+			// insure that onload it takes the document width
+			this.dim.css('height', $(document).height());
 			// change data information
 			this.dim.data('dimmed', true);
 			// show dim

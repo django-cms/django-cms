@@ -142,11 +142,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
     # validate publication date
     if publication_date:
-        assert isinstance(publication_date, datetime.datetime)
+        assert isinstance(publication_date, datetime.date)
     
     # validate publication end date
     if publication_end_date:
-        assert isinstance(publication_date, datetime.datetime)
+        assert isinstance(publication_end_date, datetime.date)
         
     # validate softroot
     assert settings.CMS_SOFTROOT or not soft_root

@@ -6,10 +6,12 @@ from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
     ACCESS_PAGE_AND_DESCENDANTS)
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
-    SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD)
+    SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
 from django.contrib.auth.models import User
+from django.core.management import call_command
 
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
@@ -779,3 +781,20 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             self.ph.publisher_public.get_absolute_url(),
             u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
         )
+
+
+class ModeratorSwitchCommandTest(CMSTestCase):
+    def test_switch_moderator_on(self):
+        with SettingsOverride(CMS_MODERATOR=False):
+            page1 = create_page('page', 'nav_playground.html', 'en', published=True)
+        with SettingsOverride(CMS_MODERATOR=True):
+            call_command('cms', 'moderator', 'on')
+            page2 = get_page_from_path(page1.get_absolute_url().strip('/'))
+        self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
+        
+    def test_switch_moderator_off(self):
+        with SettingsOverride(CMS_MODERATOR=True):
+            page1 = create_page('page', 'nav_playground.html', 'en', published=True)
+        with SettingsOverride(CMS_MODERATOR=False):
+            page2 = get_page_from_path(page1.get_absolute_url().strip('/'))
+        self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())

@@ -11,6 +11,9 @@ from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
 import urllib
 
+register = template.Library()
+
+
 class NOT_PROVIDED: pass
 
 
@@ -73,7 +76,13 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             if node in final:
                 final.remove(node)
     return final
-register = template.Library()
+
+def flatten(nodes):
+    flat = []
+    for node in nodes:
+        flat.append(node)
+        flat.extend(flatten(node.children))
+    return flat
 
 
 class ShowMenu(InclusionTag):
@@ -118,14 +127,14 @@ class ShowMenu(InclusionTag):
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
-                    new_nodes = node.children
-                    for n in new_nodes:
+                    nodes = node.children
+                    for n in nodes:
                         n.parent = None
                     from_level += node.level + 1
                     to_level += node.level + 1
+                    nodes = flatten(nodes)
                 else:
-                    new_nodes = []
-                nodes = new_nodes
+                    nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
     

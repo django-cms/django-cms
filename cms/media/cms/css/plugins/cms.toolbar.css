@@ -98,10 +98,13 @@
 .cms_toolbar-item_list li { padding:0; zoom:1; }
 .cms_toolbar-item_list li a { display:block; padding:4px 10px !important; zoom:1; white-space:nowrap; }
 /*.cms_toolbar-item_list li a span { float:left; text-indent:-1000px; overflow:hidden; }*/
-.cms_toolbar-item_list li a:hover { color:#fff !important; background:#5b80b2; }
+.cms_toolbar-item_list li a:hover { color:#fff !important; background:#5b80b2 !important; }
 .cms_toolbar-item_list li:first-child a { -webkit-border-radius:4px 4px 0 0; -moz-border-radius:4px 4px 0 0; border-radius:4px 4px 0 0; }
 .cms_toolbar-item_list li:last-child a { -webkit-border-radius:0 0 4px 4px; -moz-border-radius:0 0 4px 4px; border-radius:0 0 4px 4px; }
 .cms_toolbar-item_list li:only-child a { -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; }
+.cms_toolbar-item_list li.active a { background:#ddd; }
+
+.cms_toolbar-item_list .cms_toolbar-item_admin { padding-top:0 !important; }
 
 /* #TOOLBAR/list/icons# */
 .cms_toolbar-item_list .cms_toolbar_icon { width:18px; margin-right:4px; background-position:left 1px; }

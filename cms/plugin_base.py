@@ -90,6 +90,7 @@ class CMSPluginBase(admin.ModelAdmin):
     render_plugin = True 
     model = CMSPlugin
     text_enabled = False
+    page_only = False
     
     opts = {}
     module = None #track in which module/application belongs

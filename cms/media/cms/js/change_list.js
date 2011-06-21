@@ -39,10 +39,10 @@
 			cookies : {},
 			callback: {
 				beforemove  : function(what, where, position, tree) {
-					var old_target, old_position; 
-					var item_id = what.id.split("page_")[1];
-					var target_id = where.id.split("page_")[1];
-					var old_node = what;
+					item_id = what.id.split("page_")[1];
+					target_id = where.id.split("page_")[1];
+					old_node = what;
+
 					if($(what).parent().children("li").length > 1){
 						if($(what).next("li").length){
 							old_target = $(what).next("li")[0];
@@ -63,9 +63,9 @@
 					return true; 
 				},
 				onmove: function(what, where, position, tree){
-					var position;
-					var item_id = what.id.split("page_")[1];
-					var target_id = where.id.split("page_")[1];
+					item_id = what.id.split("page_")[1];
+					target_id = where.id.split("page_")[1];
+
 					if (position == "before") {
 						position = "left";
 					}else if (position == "after") {
@@ -76,7 +76,7 @@
 					moveTreeItem(what, item_id, target_id, position, false);
 				},
 				onchange: function(node, tree){
-					var url = $(node).find('a.title').attr("href");
+					url = $(node).find('a.title').attr("href");
 					window.location = url;
 				}
 			}
@@ -96,8 +96,8 @@
 	
 	$(document).ready(function() {
 		$.fn.cmsPatchCSRF();
-	    var selected_page = false;
-	    var action = false;
+	    selected_page = false;
+	    action = false;
 		
 		var _oldAjax = $.ajax;
 		
@@ -106,7 +106,7 @@
 			// always
 			$('#loader-message').show();
 			
-			var callback = s.success || false;
+			callback = s.success || false;
 			s.success = function(data, status){
 				if (callback) {
 					callback(data, status);
@@ -153,12 +153,10 @@
 			});
 		}
 		
-		
 		// let's start event delegation
 		
 	    $('#changelist li').click(function(e) {
 	        // I want a link to check the class
-	    	var target, selected_page, action, id, page_id, view_page_url, admin_base_url, pageId, parent, value, position, target_id, site;
 	        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
 	            target = e.target.parentNode;
 	        } else {
@@ -167,11 +165,11 @@
             var jtarget = $(target);
 	        if(jtarget.hasClass("move")) {
 	        	// prepare tree for move / cut paste
-				id = e.target.id.split("move-link-")[1];
+				var id = e.target.id.split("move-link-")[1];
 				if(id==null){
 					id = e.target.parentNode.id.split("move-link-")[1];
 				}
-	            page_id = id;
+	            var page_id = id;
 	            selected_page = page_id;
 	            action = "move";
 				$('span.move-target-container, span.line, a.move-target').show();
@@ -194,7 +192,7 @@
 	        }
 	        
 	        if(jtarget.hasClass("viewpage")) {
-	            view_page_url = $('#' + target.id + '-select').val();
+	            var view_page_url = $('#' + target.id + '-select').val();
 	            if(view_page_url){
 	                window.open(view_page_url);
 	            }
@@ -324,25 +322,39 @@
 			$('#sitemap ul .col-moderator').syncWidth(68);
 			$('#sitemap ul .col-draft').syncWidth(0);
 		}	
-		syncCols();	
-		
+		syncCols();
+
 		/* Site Selector */
 		$('#site-select').change(function(event){
 			var id = this.value;
 			var url = window.location.href;
+
 			if(action=="copy"){
-				url = insert_into_url(url, "copy", selected_page);
+				//url = insert_into_url(url, "copy", selected_page);
+				url = CMS.API.Helpers.setUrl(document.location, {
+					'addParam': "copy=" + selected_page,
+					'removeParam': "copy"
+				});
 			}else{
-				url = remove_from_url(url, "copy");
+				//url = remove_from_url(url, "copy");
+				url = CMS.API.Helpers.setUrl(document.location, {
+					'addParam': "copy",
+					'removeParam': "copy"
+				});
 			}
-			url = insert_into_url(url, "site__exact", id);
+			//url = insert_into_url(url, "site__exact", id);
+			url = CMS.API.Helpers.setUrl(document.location, {
+				'addParam': "site__exact=" + id,
+				'removeParam': "site__exact"
+			});
+
 			window.location = url;
 		});
 		var copy_splits = window.location.href.split("copy=");
 		if(copy_splits.length > 1){
 			var id = copy_splits[1].split("&")[0];
-			var selected_page = id;
-			var action = mark_copy_node(id);		                                   
+			var action = mark_copy_node(id);
+			selected_page = id;
 		}
 		
 		// moderation checkboxes over livequery
@@ -360,7 +372,7 @@
 				});	
 			}
 			return _copyTreeItem(item_id, target_id, position, site);
-		};
+		}
 		
 		function _copyTreeItem(item_id, target_id, position, site, options) {
 			var data = {
@@ -413,9 +425,9 @@
 			
 			if (/page_\d+/.test($(el).attr('id'))) {
 				// one level higher
-				var target = $(el).find('div.cont:first');
+				target = $(el).find('div.cont:first');
 			} else { 
-				var target = $(el).parents('div.cont:first');
+				target = $(el).parents('div.cont:first');
 			}
 			
 			var parent = target.parent();
@@ -424,6 +436,8 @@
 			}
 			target.replace(response);
 			parent.find('div.cont:first').yft();
+
+			return true;
 		}
 		
 		function onError(XMLHttpRequest, textStatus, errorThrown) {
@@ -440,7 +454,7 @@
 		});
 	}
 	
-	
+
 	function moveTreeItem(jtarget, item_id, target_id, position, tree){
 		reloadItem(
 			jtarget, "./" + item_id + "/move-page/", 
@@ -462,7 +476,7 @@
 				moveError($('#page_'+item_id + " div.col1:eq(0)"));
 			}
 		);
-	};
+	}
 	
 	var undos = [];
 		

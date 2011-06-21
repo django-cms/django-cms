@@ -319,7 +319,7 @@ class AdminFieldsetTests(TestCase):
     def test_dates(self):
         with SettingsOverride(CMS_SHOW_START_DATE=False, CMS_SHOW_END_DATE=False):
             control = AttributeObject()
-        contribute_fieldsets(control)
+            contribute_fieldsets(control)
         with SettingsOverride(CMS_SHOW_START_DATE=True, CMS_SHOW_END_DATE=True):
             experiment1 = AttributeObject()
             contribute_fieldsets(experiment1)
