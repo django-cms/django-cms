@@ -67,7 +67,10 @@ def pre_save_title(instance, raw, **kwargs):
         parent_page = instance.page.parent
         slug = u'%s' % instance.slug
         
-        instance.path = u'%s' % slug
+        if instance.page.is_home():
+            instance.path = ''
+        else:
+            instance.path = u'%s' % slug
         if parent_page:
             parent_title = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True)
             if parent_title:
