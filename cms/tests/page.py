@@ -16,7 +16,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
 import os.path
 
@@ -498,6 +498,15 @@ class PagesTestCase(CMSTestCase):
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'test-page-4/test-page-3/')
+    
+    def test_home_slug_not_accessible(self):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            page = create_page('page', 'nav_playground.html', 'en', published=True)
+            self.assertEqual(page.get_absolute_url('en'), '/')
+            resp = self.client.get('/en/')
+            self.assertEqual(resp.status_code, HttpResponse.status_code)
+            resp = self.client.get('/en/page/')
+            self.assertEqual(resp.status_code, HttpResponseNotFound.status_code)
 
 
 class NoAdminPageTests(CMSTestCase):
