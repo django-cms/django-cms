@@ -100,10 +100,8 @@ CMS_FRONTEND_LANGUAGES = [x[0] for x in CMS_LANGUAGES]
 
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)
-STATIC_ROOT = getattr(settings, 'STATIC_ROOT', 'cms/')
 CMS_MEDIA_PATH = 'cms/'
-CMS_MEDIA_ROOT = os.path.join(STATIC_ROOT, CMS_MEDIA_PATH)
-STATIC_URL = 'static/'
+CMS_MEDIA_ROOT = os.path.join(settings.STATIC_ROOT, CMS_MEDIA_PATH)
 
 # Path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
 CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
