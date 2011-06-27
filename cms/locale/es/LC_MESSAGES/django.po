@@ -1638,11 +1638,7 @@ msgstr "Mover a %(name)s"
 
 #: templates/cms/toolbar/toolbar.html:34
 msgid "Are you sure you want to delete this plugin?"
-<<<<<<< HEAD
 msgstr "¿Seguro que desea eliminar este plugin?"
-=======
-msgstr "¿Seguro que desea eliminar este 'plugin'?"
->>>>>>> upstream/develop
 
 #: templates/cms/toolbar/toolbar.html:136
 msgid "Edit mode"
