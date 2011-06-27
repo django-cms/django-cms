@@ -121,7 +121,6 @@ class CMSPluginBase(admin.ModelAdmin):
             'preview': not "no_preview" in request.GET,
             'is_popup': True,
             'plugin': self.cms_plugin_instance,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
         })
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)

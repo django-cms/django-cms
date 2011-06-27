@@ -4,11 +4,11 @@
 
 {% block extrahead %}
 {{ block.super }}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
 
 {% if not add %}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_form.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_form.js"></script>
 {% endif %}
 <script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
 

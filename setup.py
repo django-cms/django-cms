@@ -4,7 +4,7 @@ import cms
 
 media_files = []
 
-for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'media')):
+for dirpath, dirnames, filenames in os.walk(os.path.join('cms', 'static')):
     for filename in filenames:
         filepath = os.path.join(dirpath, filename)
         failed = False

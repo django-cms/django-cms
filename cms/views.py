@@ -15,7 +15,6 @@ from django.utils.http import urlquote
 
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
-        CMS_MEDIA_URL = settings.CMS_MEDIA_URL
         return render_to_response("cms/new.html", locals())
     raise Http404('CMS: Page not found for "%s"' % slug)
 

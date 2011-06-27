@@ -1,7 +1,6 @@
 (function($) {
     $(document).ready(function() {
         // Add Plugin Handler
-    	$.fn.cmsPatchCSRF();
         $('span.add-plugin').click(function(){
          var select = $(this).parent().children("select[name=plugins]");
             var pluginvalue = select.attr('value');

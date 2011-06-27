@@ -32,4 +32,3 @@ class ToolbarMiddleware(object):
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
-
