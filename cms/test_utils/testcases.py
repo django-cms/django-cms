@@ -7,7 +7,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
-from django.db.models.signals import pre_save, post_save
 from django.template.context import Context
 from django.test.client import (encode_multipart, BOUNDARY, MULTIPART_CONTENT, 
     FakePayload)
@@ -71,22 +70,16 @@ class CMSTestCase(TestCase):
     counter = 1
     
     def _fixture_setup(self):
-        pre_save_receivers = pre_save.receivers
-        pre_save.receivers = []
-        post_save_receivers = post_save.receivers
-        post_save.receivers = []
         super(CMSTestCase, self)._fixture_setup()
-        pre_save.receivers = pre_save_receivers
-        post_save.receivers = post_save_receivers
+        self.create_fixtures()
+    
+    def create_fixtures(self):
+        pass
             
     def _post_teardown(self):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
         super(CMSTestCase, self)._post_teardown()
-        
-    def login_user(self, user):
-        self.assertTrue(self.client.login(username=user.username, password=user.username))
-        self.user = user
         
     def login_user_context(self, user):
         return UserLoginContext(self, user)

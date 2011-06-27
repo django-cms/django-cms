@@ -8,6 +8,7 @@ from cms.plugin_rendering import render_plugins, render_placeholder
 from cms.plugins.utils import get_plugins
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -192,6 +193,7 @@ class Placeholder(Tag):
     )
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
+        validate_placeholder_name(name)
         width = None
         inherit = False
         for bit in extra_bits:
@@ -315,6 +317,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
+    validate_placeholder_name(placeholder_name)
+    
     request = context.get('request', False)
     site_id = get_site_id(site)
 
@@ -380,7 +384,7 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
-        kwargs['cache_result'] = True
+        kwargs['cache_result'] = False
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
@@ -395,11 +399,9 @@ class CMSToolbar(InclusionTag):
         request = context.get('request', None)
         if not request:
             return ''
-        request._cms_toolbar_tag_used = True
         return super(CMSToolbar, self).render(context)
     
     def get_context(self, context):
-        request = context['request']
-        context['CMS_TOOLBAR_CONFIG'] = request.toolbar.as_json(context, request)
+        context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context
 register.tag(CMSToolbar)

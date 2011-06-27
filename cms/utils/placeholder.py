@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ImproperlyConfigured
 from django.db.models.query_utils import Q
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
@@ -32,6 +32,17 @@ def get_page_from_placeholder_if_exists(placeholder):
         return Page.objects.get(placeholders=placeholder)
     except (Page.DoesNotExist, MultipleObjectsReturned,):
         return None
+
+def validate_placeholder_name(name):
+    try:
+        name.decode('ascii')
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        raise ImproperlyConfigured("Placeholder identifiers names may not "
+           "contain non-ascii characters. If you wish your placeholder "
+           "identifiers to contain non-ascii characters when displayed to "
+           "users, please use the CMS_PLACEHOLDER_CONF setting with the 'name' "
+           "key to specify a verbose name.")
+
     
 class PlaceholderNoAction(object):
     can_copy = False

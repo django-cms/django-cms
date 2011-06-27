@@ -42,6 +42,7 @@
 					item_id = what.id.split("page_")[1];
 					target_id = where.id.split("page_")[1];
 					old_node = what;
+
 					if($(what).parent().children("li").length > 1){
 						if($(what).next("li").length){
 							old_target = $(what).next("li")[0];
@@ -64,6 +65,7 @@
 				onmove: function(what, where, position, tree){
 					item_id = what.id.split("page_")[1];
 					target_id = where.id.split("page_")[1];
+
 					if (position == "before") {
 						position = "left";
 					}else if (position == "after") {
@@ -74,8 +76,8 @@
 					moveTreeItem(what, item_id, target_id, position, false);
 				},
 				onchange: function(node, tree){
-					var url = $(node).find('a.title').attr("href");
-					self.location = url;
+					url = $(node).find('a.title').attr("href");
+					window.location = url;
 				}
 			}
 		};
@@ -92,9 +94,10 @@
 		tree.init($("div.tree"), options);
 	};
 	
-	$(document).ready(function() {	
-	    var selected_page = false;
-	    var action = false;
+	$(document).ready(function() {
+		$.fn.cmsPatchCSRF();
+	    selected_page = false;
+	    action = false;
 		
 		var _oldAjax = $.ajax;
 		
@@ -150,17 +153,16 @@
 			});
 		}
 		
-		
 		// let's start event delegation
 		
 	    $('#changelist li').click(function(e) {
 	        // I want a link to check the class
-	        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN')
-	            var target = e.target.parentNode;
-	        else
-	            var target = e.target;
-	        var jtarget = $(target);
-	        
+	        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
+	            target = e.target.parentNode;
+	        } else {
+	            target = e.target;
+	        }
+            var jtarget = $(target);
 	        if(jtarget.hasClass("move")) {
 	        	// prepare tree for move / cut paste
 				var id = e.target.id.split("move-link-")[1];
@@ -179,7 +181,7 @@
 	        
 	        if(jtarget.hasClass("copy")) {
 	        	// prepare tree for copy
-				var id = e.target.id.split("copy-link-")[1];
+				id = e.target.id.split("copy-link-")[1];
 				if(id==null){
 					id = e.target.parentNode.id.split("copy-link-")[1];
 				}
@@ -205,7 +207,7 @@
 				
 				$("tr").removeClass("target");
 	            $("#changelist table").removeClass("table-selected");
-	            var page_id = target.id.split("add-link-")[1];
+	            page_id = target.id.split("add-link-")[1];
 	            selected_page = page_id;
 	            action = "add";
 	            $('tr').removeClass("selected");
@@ -222,7 +224,7 @@
 	        
 			// publish
 			if(jtarget.hasClass("publish-checkbox")) {
-	            var pageId = jtarget.attr("name").split("status-")[1];
+	            pageId = jtarget.attr("name").split("status-")[1];
 	            // if I don't put data in the post, django doesn't get it
 	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", { 1:1 });
 				e.stopPropagation();
@@ -231,7 +233,7 @@
 			
 			// in navigation
 			if(jtarget.hasClass("navigation-checkbox")) {
-	            var pageId = jtarget.attr("name").split("navigation-")[1];
+	            pageId = jtarget.attr("name").split("navigation-")[1];
 	            // if I don't put data in the post, django doesn't get it
 				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
 				e.stopPropagation();
@@ -240,7 +242,7 @@
 			
 			// moderation
 			if(jtarget.hasClass("moderator-checkbox")) {
-	            var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+	            pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
 	            parent = jtarget.parents('div.col-moderator');
 				
 				value = 0;
@@ -259,7 +261,7 @@
 			
 			// quick approve
 			if(jtarget.hasClass("approve")) {
-				var pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
 				// just reload the page for now in callback... 
 				// TODO: this must be changed sometimes to reloading just the portion
 				// of the tree = current node + descendants 
@@ -269,13 +271,16 @@
 	        }
 			
 	        if(jtarget.hasClass("move-target")) {
-	            if(jtarget.hasClass("left"))
-	                var position = "left";
-	            if(jtarget.hasClass("right"))
-	                var position = "right";
-	            if(jtarget.hasClass("last-child"))
-	                var position = "last-child";
-	            var target_id = target.parentNode.id.split("move-target-")[1];
+	            if(jtarget.hasClass("left")){
+	                position = "left";
+	            }
+	            if(jtarget.hasClass("right")){
+	                position = "right";
+	            }
+	            if(jtarget.hasClass("last-child")){
+	                position = "last-child";
+	            }
+	            target_id = target.parentNode.id.split("move-target-")[1];
 	            
 				if(action=="move") {
 					moveTreeItem(null, selected_page, target_id, position, tree);
@@ -317,25 +322,39 @@
 			$('#sitemap ul .col-moderator').syncWidth(68);
 			$('#sitemap ul .col-draft').syncWidth(0);
 		}	
-		syncCols();	
-		
+		syncCols();
+
 		/* Site Selector */
 		$('#site-select').change(function(event){
 			var id = this.value;
 			var url = window.location.href;
+
 			if(action=="copy"){
-				url = insert_into_url(url, "copy", selected_page);
+				//url = insert_into_url(url, "copy", selected_page);
+				url = CMS.API.Helpers.setUrl(document.location, {
+					'addParam': "copy=" + selected_page,
+					'removeParam': "copy"
+				});
 			}else{
-				url = remove_from_url(url, "copy");
+				//url = remove_from_url(url, "copy");
+				url = CMS.API.Helpers.setUrl(document.location, {
+					'addParam': "copy",
+					'removeParam': "copy"
+				});
 			}
-			url = insert_into_url(url, "site__exact", id);
+			//url = insert_into_url(url, "site__exact", id);
+			url = CMS.API.Helpers.setUrl(document.location, {
+				'addParam': "site__exact=" + id,
+				'removeParam': "site__exact"
+			});
+
 			window.location = url;
 		});
 		var copy_splits = window.location.href.split("copy=");
 		if(copy_splits.length > 1){
 			var id = copy_splits[1].split("&")[0];
+			var action = mark_copy_node(id);
 			selected_page = id;
-			action = mark_copy_node(id);		                                   
 		}
 		
 		// moderation checkboxes over livequery
@@ -353,10 +372,10 @@
 				});	
 			}
 			return _copyTreeItem(item_id, target_id, position, site);
-		};
+		}
 		
 		function _copyTreeItem(item_id, target_id, position, site, options) {
-			data = {
+			var data = {
 			    position:position,
 			    target:target_id,
 			    site:site
@@ -406,9 +425,9 @@
 			
 			if (/page_\d+/.test($(el).attr('id'))) {
 				// one level higher
-				var target = $(el).find('div.cont:first');
+				target = $(el).find('div.cont:first');
 			} else { 
-				var target = $(el).parents('div.cont:first');
+				target = $(el).parents('div.cont:first');
 			}
 			
 			var parent = target.parent();
@@ -417,6 +436,8 @@
 			}
 			target.replace(response);
 			parent.find('div.cont:first').yft();
+
+			return true;
 		}
 		
 		function onError(XMLHttpRequest, textStatus, errorThrown) {
@@ -433,7 +454,7 @@
 		});
 	}
 	
-	
+
 	function moveTreeItem(jtarget, item_id, target_id, position, tree){
 		reloadItem(
 			jtarget, "./" + item_id + "/move-page/", 
@@ -455,7 +476,7 @@
 				moveError($('#page_'+item_id + " div.col1:eq(0)"));
 			}
 		);
-	};
+	}
 	
 	var undos = [];
 		

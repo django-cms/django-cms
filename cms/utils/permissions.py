@@ -171,7 +171,7 @@ def get_subordinate_users(user):
             GlobalPagePermission.objects.with_can_change_permissions(user):
         return User.objects.all() 
     site = Site.objects.get_current()
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
@@ -201,7 +201,7 @@ def get_subordinate_groups(user):
             GlobalPagePermission.objects.with_can_change_permissions(user)):
         return Group.objects.all()
     site = Site.objects.get_current()
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:

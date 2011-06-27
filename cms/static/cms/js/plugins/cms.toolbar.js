@@ -1,47 +1,42 @@
+(function ($) {
 /**
  * @author:		Angelo Dini
  * @copyright:	http://www.divio.ch under the BSD Licence
  * @requires:	Classy, jQuery, jQuery.cookie
- *
- * assign Class and CMS namespace */
- var Class = Class || {};
- var CMS = CMS || {};
+ */
 
 /*##################################################|*/
-/* #CUSTOM APP# */
+/* #CMS.TOOLBAR# */
 jQuery(document).ready(function ($) {
+
 	/**
 	 * Toolbar
-	 * @version: 0.1.0
+	 * @version: 1.0.0
 	 * @description: Implements and controls toolbar
 	 * @public_methods:
-	 *	- CMS.Toolbar.toggleToolbar();
-	 *	- CMS.Toolbar.registerItem(obj);
-	 *	- CMS.Toolbar.registerItems(array);
-	 *	- CMS.Toolbar.removeItem(id);
-	 *	- CMS.Toolbar.registerType(function);
+	 *	- CMS.API.Toolbar.toggleToolbar();
+	 *	- CMS.API.Toolbar.registerItem(obj);
+	 *	- CMS.API.Toolbar.registerItems(array);
+	 *	- CMS.API.Toolbar.removeItem(id);
+	 *	- CMS.API.Toolbar.registerType(function);
+	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
+	 * TODO: login needs special treatment (errors, login on enter)
+	 * TODO: styling of the collapser button needs to be somehow transparent
 	 */
-	CMS.Toolbar = Class.$extend({
+	CMS.Toolbar = CMS.Class.$extend({
+
+		implement: [CMS.API.Helpers, CMS.API.Security],
 
 		options: {
-			// not integrated yet
-			debug: false,
-			items: [],
-			// type definitions used in registerItem()
-			types: [
-				{ 'anchor': '_registerAnchor' },
-				{ 'html': '_reigsterHtml' },
-				{ 'switcher': '_reigsterSwitcher' },
-				{ 'button': '_reigsterButton' },
-				{ 'list': '_reigsterList' }
-			]
+			'debug': false, // not integrated yet
+			'items': []
 		},
 
 		initialize: function (container, options) {
 			// save reference to this class
-			var classy = this;
+			var that = this;
 			// check if only one element is given
-			if($(container).length > 2) { log('Toolbar Error: one element expected, multiple elements given.'); return false; }
+			if($(container).length > 2) { throw new Error('Toolbar Error: one element expected, multiple elements given.'); return false; }
 			// merge passed argument options with internal options
 			this.options = $.extend(this.options, options);
 
@@ -55,16 +50,19 @@ jQuery(document).ready(function ($) {
 			this.toggle = this.wrapper.find('#cms_toolbar-toggle');
 			this.toggle.bind('click', function (e) {
 				e.preventDefault();
-				classy.toggleToolbar();
+				that.toggleToolbar();
 			});
 
 			// initial setups
 			this._setup();
 		},
 
+		/**
+		 * All methods with an underscore as prefix should not be called through the API namespace
+		 */
 		_setup: function () {
 			// save reference to this class
-			var classy = this;
+			var that = this;
 
 			// scheck if toolbar should be shown or hidden
 			($.cookie('CMS_toolbar-collapsed') == 'false') ? this.toolbar.data('collapsed', true) : this.toolbar.data('collapsed', false);
@@ -74,18 +72,33 @@ jQuery(document).ready(function ($) {
 			// set toolbar to visible
 			this.wrapper.show();
 			// some browsers have problem showing it directly (loading css...)
-			setTimeout(function () { classy.wrapper.show(); }, 50);
+			setTimeout(function () { that.wrapper.show(); }, 50);
 
 			// start register items if any given
 			if(this.options.items.length) this.registerItems(this.options.items);
+
+			// apply csrf patch to toolbar from cms.base.js
+			this.csrf();
+
+			// the toolbar needs to resize depending on the window size on motherfucking ie6
+			if($.browser.msie && $.browser.version <= '6.0') {
+				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); });
+				$(window).trigger('resize');
+			}
 		},
 
+		/**
+		 * Binds the collapsed data element to the toolbar
+		 * Calls private methods _showToolbar and _hideToolbar when required
+		 * Saves current state in a cookie
+		 */
 		toggleToolbar: function () {
 			(this.toolbar.data('collapsed')) ? this._showToolbar() : this._hideToolbar();
 
-			return this;
+			return this.toolbar.data('collapsed');
 		},
 
+		// sets collapsed data to false
 		_showToolbar: function () {
 			// add toolbar padding
 			var padding = parseInt($(document.body).css('margin-top'));
@@ -102,6 +115,7 @@ jQuery(document).ready(function ($) {
 			this.toolbar.trigger('cms.toolbar.show');
 		},
 
+		// sets collapsed data to true
 		_hideToolbar: function () {
 			// remove toolbar padding
 			var padding = parseInt($(document.body).css('margin-top'));
@@ -118,8 +132,13 @@ jQuery(document).ready(function ($) {
 			this.toolbar.trigger('cms.toolbar.hide');
 		},
 
+		/**
+		 * Handles the different item types and redirects them to their private method
+		 * @param: obj (object that represents the item data to be registered)
+		 */
 		registerItem: function (obj) {
 			// error handling
+			if(typeof(obj) !== 'object') return false;
 			if(!obj.order) obj.dir = 0;
 
 			// check for internal types
@@ -146,32 +165,46 @@ jQuery(document).ready(function ($) {
 			return obj;
 		},
 
+		/**
+		 * This public method allows multiple addition of registerItems within one call
+		 * @param: items (array of objects)
+		 */
 		registerItems: function (items) {
 			// make sure an array is passed
-			if(typeof(items) != 'object') return false;
+			if(typeof(items) !== 'object') return false;
 			// save reference to this class
-			var classy = this;
+			var that = this;
 			// loopp through all items and pass them to single function
 			$(items).each(function (index, value) {
-				classy.registerItem(value);
+				that.registerItem(value);
 			});
 
 			return items;
 		},
 
+		/**
+		 * Removes the item with a specific id. This is not in use yet
+		 * @param: index
+		 */
 		removeItem: function (index) {
+			if(typeof(index) !== 'number') return false;
 			// function to remove an item
-			if(index) $($('.cms_toolbar-item:visible')[index]).remove();
+			$($('.cms_toolbar-item')[index]).remove();
 
 			return index;
 		},
 
+		// requires: type, order, dir, title, url
+		// optional: cls
 		_registerAnchor: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_anchor', obj);
+			// append item
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, html || htmlElement
+		// optional: cls, redirect
 		_registerHtml: function (obj) {
 			// here we dont need processTemplate cause we create the template
 			var template = (obj.html) ? $(obj.html) : $(obj.htmlElement);
@@ -179,18 +212,21 @@ jQuery(document).ready(function ($) {
 			template.data('order', obj.order).css('display', 'block');
 			// add class if neccessary
 			if(obj.cls) template.addClass(obj.cls);
-			// add events
+			// special case for form html
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
-				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
+			
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, removeParameter, addParameter
+		// optional: cls, state
 		_registerSwitcher: function (obj) {
 			// save reference to this class
-			var classy = this;
+			var that = this;
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_switcher', obj);
 			// should btn be shown?
@@ -211,13 +247,18 @@ jQuery(document).ready(function ($) {
 				if(btn.data('state')) {
 					btn.stop().animate({'backgroundPosition': '-40px -198px'}, function () {
 						// disable link
-						var url = CMS.Helpers.removeUrl(window.location.href, obj.addParameter);
-						window.location = CMS.Helpers.insertUrl(url, obj.removeParameter, "")
+						document.location = that.setUrl(document.location, {
+							'addParam': obj.removeParameter,
+							'removeParam': obj.addParameter
+						});
 					});
 				} else {
 					btn.stop().animate({'backgroundPosition': '0px -198px'}, function () {
 						// enable link
-						window.location = CMS.Helpers.insertUrl(location.href, obj.addParameter, "");
+						document.location = that.setUrl(document.location, {
+							'addParam': obj.addParameter,
+							'removeParam': obj.removeParameter
+						});
 					});
 				}
 			});
@@ -225,6 +266,8 @@ jQuery(document).ready(function ($) {
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, redirect
+		// optional: cls, icon, action, hidden
 		_registerButton: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_button', obj);
@@ -232,21 +275,26 @@ jQuery(document).ready(function ($) {
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		// required: type, order, dir, items (title, url, method (get/post), cls, icon)
+		// optional: cls, icon
 		_registerList: function (obj) {
 			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
 			var template = this._processTemplate('#cms_toolbar-item_list', obj);
 
 			// item injection logic
-			var list = template.find('.cms_toolbar-item_list').html().trim();
+			var list = template.find('.cms_toolbar-item_list').html();
+				// ff2 list check
+				if(!list) return false;
 			var tmp = '';
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
 				// add icon if available
-				// TODO: backend needs to return '' instead of '/media/None'
-				var icon = (value.icon !== '/media/None') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
+				var icon = (value.icon !== '') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
+						   .replace('[list_method]', value.method)
+						   .replace('[list_class]', value.cls)
 						   .replace('<span>', '<span class="'+icon+'" style="background-image:url('+value.icon+');">');
 			});
 			// add items
@@ -261,10 +309,37 @@ jQuery(document).ready(function ($) {
 					($(this).data('collapsed')) ? show_list() : hide_list();
 			});
 
+			// add form action if rel equals get or post
+			var anchors = container.find('a');
+			if(anchors.attr('rel') === 'POST') {
+				// loop through the items and attach post events
+				anchors.each(function (index, item) {
+					if($(item).attr('rel') === 'POST') {
+						$(item).unbind('click').bind('click', function (e) {
+							e.preventDefault();
+							// attach form action
+							$.ajax({
+								'type': $(e.currentTarget).attr('rel'),
+								'url': $(e.currentTarget).attr('href'),
+								'data': $(e.currentTarget).attr('href').split('?')[1],
+								'success': function () {
+									CMS.API.Helpers.reloadBrowser();
+								},
+								'error': function () {
+									throw new Error('CMS.Toolbar was unable to perform this ajax request. Try again or contact the developers.');
+								}
+							});
+							// after clicking hide list
+							hide_list();
+						});
+					}
+				});
+			}
+
 			function show_list() {
 				// add event to body to hide the list needs a timout for late trigger
 				setTimeout(function () {
-					$(window).bind('click', hide_list);
+					$(document).bind('click', hide_list);
 				}, 100);
 
 				// show element and save data
@@ -273,7 +348,7 @@ jQuery(document).ready(function ($) {
 			}
 			function hide_list() {
 				// remove the body event
-				$(window).unbind('click');
+				$(document).unbind('click');
 
 				// show element and save data
 				container.hide();
@@ -284,22 +359,26 @@ jQuery(document).ready(function ($) {
 			this._injectItem(template, obj.dir, obj.order);
 		},
 
+		/**
+		 * Basic API to add more types rather than the predefined (anchor, html, switcher, button, list)
+		 * @param: handler (function)
+		 */
 		registerType: function (handler) {
 			// invoke function
-			if(typeof(handler) == 'function') handler();
+			if(typeof(handler) === 'function') handler();
 
 			return handler;
 		},
 
-		/* this private method processes each template and replaces the placeholders with the passed values */
-		_processTemplate: function (cls, obj) {
+		// parses passed templates from items
+		_processTemplate: function (id, obj) {
 			// lets find the template and clone it
-			var template = this.wrapper.find(cls).clone();
+			var template = this.wrapper.find(id).clone();
 				template = $('<div>').append(template).clone().remove().html();
 			// replace placeholders
 			if(obj.title) template = template.replace('[title]', obj.title);
 			if(obj.url) template = template.replace('[url]', obj.url);
-			if(!obj.icon && obj.type == 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
+			if(!obj.icon && obj.type === 'button') template = template.replace('&nbsp;', '').replace('&nbsp;', '');
 			// template = template.replace('[token]', this.options.csrf_token);
 			template = (obj.action) ? template.replace('[action]', obj.action) : template.replace('[action]', '');
 			template = (obj.hidden) ? template.replace('[hidden]', obj.hidden) : template.replace('[hidden]', '');
@@ -315,7 +394,7 @@ jQuery(document).ready(function ($) {
 			// add events
 			template.find('.cms_toolbar-btn').bind('click', function (e) {
 				e.preventDefault();
-				(obj.redirect) ? window.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
+				(obj.redirect) ? document.location = obj.redirect : $(this).parentsUntil('form').parent().submit();
 			});
 			// save order remove id and show element
 			template.data('order', obj.order)
@@ -325,12 +404,13 @@ jQuery(document).ready(function ($) {
 			return template;
 		},
 
+		// appends item in correct order and position
 		_injectItem: function (el, dir, order) {
 			// save some vars
 			var left = this.toolbar.left;
 			var right = this.toolbar.right;
 
-			if(dir == 'left') {
+			if(dir === 'left') {
 				var leftContent = left.find('> *');
 					if(!leftContent.length) { left.append(el); return false; }
 
@@ -346,7 +426,7 @@ jQuery(document).ready(function ($) {
 				});
 			}
 
-			if(dir == 'right') {
+			if(dir === 'right') {
 				var rightContent = right.find('> *');
 					if(!rightContent.length) { right.append(el); return false; }
 
@@ -364,3 +444,5 @@ jQuery(document).ready(function ($) {
 
 	});
 });
+
+})(jQuery);

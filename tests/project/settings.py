@@ -104,6 +104,7 @@ INSTALLED_APPS = (
     'project.pluginapp',
     'project.pluginapp.plugins.manytomany_rel',
     'project.fakemlng',
+    'project.fileapp',
     'south',
     'reversion',
     'sekizai',
@@ -182,6 +183,8 @@ CMS_FLAT_URLS = False
 CMS_MENU_TITLE_OVERWRITE = True
 CMS_HIDE_UNTRANSLATED = False
 CMS_URL_OVERWRITE = True
+CMS_SHOW_END_DATE = True
+CMS_SHOW_START_DATE = True
 
 CMS_PLUGIN_PROCESSORS = tuple()
 

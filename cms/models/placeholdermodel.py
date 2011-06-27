@@ -69,7 +69,7 @@ class Placeholder(models.Model):
         """
         from cms.models import CMSPlugin
         for rel in self._meta.get_all_related_objects():
-            if isinstance(rel.model, CMSPlugin):
+            if issubclass(rel.model, CMSPlugin):
                 continue
             field = getattr(self, rel.get_accessor_name())
             if field.count():
@@ -80,7 +80,7 @@ class Placeholder(models.Model):
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
             for rel in self._meta.get_all_related_objects():
-                if isinstance(rel.model, CMSPlugin):
+                if issubclass(rel.model, CMSPlugin):
                     continue
                 field = getattr(self, rel.get_accessor_name())
                 if field.count():

@@ -1,15 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-04-27 10:08+0000\n"
+"Last-Translator: lasarux <lasarux@neuroomante.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -254,7 +253,7 @@ msgstr "Sólo existe una traducción para esta página."
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
-"El título y los \"plugins\" con el lenguaje %(language)s fueron eliminados."
+"El título y los 'plugins' con el lenguaje %(language)s fueron eliminados."
 
 #: admin/pageadmin.py:1012
 msgid "Are you sure?"
@@ -289,7 +288,7 @@ msgstr "¡El idioma debe ser diferente del de la copia!"
 #: admin/pageadmin.py:1179
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "\"plugins\" en %(language)s copiados a %(placeholder)s"
+msgstr "'plugins' en %(language)s copiados a %(placeholder)s"
 
 #: admin/pageadmin.py:1260
 #, python-format
@@ -301,7 +300,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
-msgstr "\"Plugins\" movidos"
+msgstr "Los 'plugins' fueron movidos"
 
 #: admin/pageadmin.py:1345 admin/placeholderadmin.py:216
 #, python-format
@@ -350,11 +349,11 @@ msgstr "Heredar el template de su ancestro más cercano"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "Elija un sitio válido"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "Elija una página válida"
 
 #: forms/widgets.py:173
 msgid "Add Another"
@@ -602,11 +601,11 @@ msgstr "app. par."
 
 #: models/pagemodel.py:50
 msgid "for logged in users only"
-msgstr ""
+msgstr "solo para usuarios identificados"
 
 #: models/pagemodel.py:51
 msgid "for anonymous users only"
-msgstr ""
+msgstr "solo para usuarios anónimos"
 
 #: models/pagemodel.py:59
 msgid "created by"
@@ -642,7 +641,7 @@ msgstr ""
 
 #: models/pagemodel.py:69
 msgid "attached menu"
-msgstr ""
+msgstr "menú anclado"
 
 #: models/pagemodel.py:70
 msgid "is published"
@@ -666,11 +665,11 @@ msgstr "estado del moderador"
 
 #: models/pagemodel.py:83
 msgid "menu visibility"
-msgstr ""
+msgstr "visibilidad del menú"
 
 #: models/pagemodel.py:83
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "límite cuando la página es visible en el menú"
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -769,7 +768,7 @@ msgstr "ancho"
 
 #: models/pluginmodel.py:122
 msgid "<Empty>"
-msgstr ""
+msgstr "<Vacío>"
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
@@ -867,7 +866,7 @@ msgstr "Mapa"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:11
 msgid "Your address: "
-msgstr ""
+msgstr "Su dirección:"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:13
 msgid "Calculate route"
@@ -875,7 +874,7 @@ msgstr "Calcular la ruta"
 
 #: plugins/inherit/cms_plugins.py:18
 msgid "Inherit Plugins from Page"
-msgstr "Hereda \"Plugins\" de la Página"
+msgstr "Hereda 'Plugins' de la Página"
 
 #: plugins/inherit/forms.py:19
 msgid "Language or Page must be filled out"
@@ -886,12 +885,12 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Elija una página para incluir sus \"plugins\" en este \"placeholder\". Si la"
-" deja vacía elegirá la página actual"
+"Elija una página para incluir sus 'plugins' en este 'placeholder'. Si la "
+"deja vacía elegirá la página actual"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr "Opcional: el idioma de los \"plugins\" que desee"
+msgstr "Opcional: el idioma de los 'plugins' que desee"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
@@ -981,7 +980,7 @@ msgstr "HTML"
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
-"Introduzca una plantilla (p.ej. \"snippets/plugin_xy.html\") que será "
+"Introduzca una plantilla (p.ej. 'snippets/plugin_xy.html') que será "
 "utilizada."
 
 #: plugins/snippet/models.py:25
@@ -1064,7 +1063,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:31
 msgid "Twitter Search"
-msgstr ""
+msgstr "Búscar en Twitter"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1090,7 +1089,7 @@ msgstr ""
 
 #: plugins/twitter/models.py:16
 msgid "query"
-msgstr ""
+msgstr "questión"
 
 #: plugins/twitter/models.py:16
 msgid ""
@@ -1098,6 +1097,9 @@ msgid ""
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
 msgstr ""
+"Ejemplo: \"cerebros AND zombis AND from:paraguas AND to:nemesis\": tweets "
+"desde el usuario \"paraguas\" hasta el usuario \"nemesis\" que contiene las "
+"palabras \"cerebos\" and \"zombis\""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1191,7 +1193,7 @@ msgid ""
 "Missing flash plugin. Download <a "
 "href=\"http://adobe.com/flashplayer\">here</a>"
 msgstr ""
-"No está el \"plugin\" de flash. Descargelo de <a "
+"No está el 'plugin' de flash. Descargelo de <a "
 "href=\"http://adobe.com/flashplayer\">here</a>"
 
 #: templates/admin/page_submit_line.html:3
@@ -1241,7 +1243,7 @@ msgstr ""
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "URL de entrada: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1560,11 +1562,11 @@ msgstr "La página no hereda ningún permiso."
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
-msgstr "¡Una versión antigüa de un \"plugin\" no puede ser guardada!"
+msgstr "¡Una versión antigüa de un 'plugin' no puede ser guardada!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:17
 msgid "Plugin saved successfully."
-msgstr "\"Plugin\" guardado con éxito."
+msgstr "'Plugin' guardado con éxito."
 
 #: templates/admin/cms/page/recover_form.html:17
 #, python-format
@@ -1597,12 +1599,12 @@ msgstr "Elija las opciones de copia"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "Genérico"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 #: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
-msgstr "Añadir un \"Plugin\""
+msgstr "Añadir un 'Plugin'"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:18
 msgid "From Language"
@@ -1610,7 +1612,7 @@ msgstr "Desde el idioma"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
 msgid "Copy Plugins"
-msgstr "Copiar \"Plugins\""
+msgstr "Copiar 'Plugins'"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:12
 msgid "You must save the page first to add plugins."
@@ -1618,15 +1620,16 @@ msgstr "Debe guardar la página antes de añadir plugins."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugin selected. Selected one on the left side"
-msgstr "No ha seleccionado ningún Plugin. Seleccione uno de la izquierda"
+msgstr "No ha seleccionado ningún 'Plugin'. Seleccione uno de la izquierda"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr "No hay Plugins presentes. Añada un plugin en el slot del placeholder."
+msgstr ""
+"No hay 'Plugins' presentes. Añada un 'plugin' en el slot del placeholder."
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
-msgstr ""
+msgstr "Pluigns dispobibles"
 
 #: templates/cms/toolbar/toolbar.html:33
 #, python-format
@@ -1635,7 +1638,11 @@ msgstr "Mover a %(name)s"
 
 #: templates/cms/toolbar/toolbar.html:34
 msgid "Are you sure you want to delete this plugin?"
+<<<<<<< HEAD
 msgstr "¿Seguro que desea eliminar este plugin?"
+=======
+msgstr "¿Seguro que desea eliminar este 'plugin'?"
+>>>>>>> upstream/develop
 
 #: templates/cms/toolbar/toolbar.html:136
 msgid "Edit mode"
@@ -1656,7 +1663,7 @@ msgstr "Entrar"
 
 #: templates/cms/toolbar/toolbar.html:175
 msgid "Request Approval"
-msgstr ""
+msgstr "Petición de Aprobación"
 
 #: templates/cms/toolbar/toolbar.html:184
 msgid "Template"
@@ -1733,7 +1740,7 @@ msgstr "Configuración"
 
 #: templates/cms/toolbar/toolbar.html:239
 msgid "Delete Plugin"
-msgstr "Eliminar \"Plugin\""
+msgstr "Eliminar 'Plugin'"
 
 #: templatetags/cms_admin.py:85
 msgid "Unbind page moderation"
@@ -1750,7 +1757,7 @@ msgstr "Desligar moderación de los descendientes"
 #: templatetags/cms_tags.py:78
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Página no encontrada en %(domain)s"
 
 #: templatetags/cms_tags.py:79
 #, python-format
@@ -1758,82 +1765,84 @@ msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"Una etiqueta en la plantilla no puedo encontrar la página con estos argumentos de lookup `%(page_lookup)s\n"
+"`. La URL de la petición era: http://%(host)s%(path)s"
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
-msgstr ""
+msgstr "Inglés"
 
 #: test/run_tests.py:138 test/project/settings.py:117
 msgid "French"
-msgstr ""
+msgstr "Francés"
 
 #: test/run_tests.py:139 test/project/settings.py:118
 msgid "German"
-msgstr ""
+msgstr "Alemán"
 
 #: test/run_tests.py:140 test/project/settings.py:119
 msgid "Brazil"
-msgstr ""
+msgstr "Brasileño"
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
-msgstr ""
+msgstr "Holandés"
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "dos columnas"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "tres columnas"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
-msgstr ""
+msgstr "ejemplos de navegación"
 
 #: test/run_tests.py:167 test/project/settings.py:148
 msgid "sidebar column"
-msgstr ""
+msgstr "columna lateral"
 
 #: test/run_tests.py:173 test/project/settings.py:154
 msgid "left column"
-msgstr ""
+msgstr "columna izquierda"
 
 #: test/run_tests.py:179 test/project/settings.py:160
 msgid "right column"
-msgstr ""
+msgstr "columna derecha"
 
 #: test/apps/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "Artículos"
 
 #: test/apps/sampleapp/cms_app.py:7
 msgid "Sample App"
-msgstr ""
+msgstr "Aplicación de ejemplo"
 
 #: test/apps/sampleapp/menu.py:17
 msgid "sample root page"
-msgstr ""
+msgstr "página raiz de ejemplo"
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
-msgstr ""
+msgstr "página de configuración de ejemplo"
 
 #: test/apps/sampleapp/menu.py:19
 msgid "sample account page"
-msgstr ""
+msgstr "página de cuenta de ejemplo"
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "página de perfil de ejemplo"
 
 #: test/apps/sampleapp/menu.py:32
 msgid "Static Menu"
-msgstr ""
+msgstr "Menú Estático"
 
 #: test/apps/sampleapp/menu.py:48
 msgid "Static Menu2"
-msgstr ""
+msgstr "Menú Estático2"
 
 #: utils/moderator.py:83
 msgid "parent first"
@@ -1861,3 +1870,5 @@ msgstr "CMS - su cuenta de usuario ha cambiado."
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "No ha sido traducido aun al idioma deseado."
+
+

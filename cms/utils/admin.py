@@ -48,7 +48,6 @@ def get_admin_menu_item_context(request, page, filtered=False):
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add", page.site)
     #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
-
     context = {
         'page': page,
         'site': site,

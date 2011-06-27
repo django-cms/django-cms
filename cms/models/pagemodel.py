@@ -123,6 +123,11 @@ class Page(MPTTModel):
         all the places which are changing page position. Used like an interface
         to mptt, but after move is done page_moved signal is fired.
         """
+        # make sure move_page does not break when using INHERIT template
+        if (position in ('left', 'right')
+            and not target.parent
+            and self.template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC):
+            self.template = self.get_template()
         self.move_to(target, position)
         
         # fire signal
@@ -546,6 +551,10 @@ class Page(MPTTModel):
                     home_pk = self.home_pk_cache
                 except NoHomeFound:
                     pass
+                """
+                this is pain slow! the code fetches all ancestors for all pages
+                and then checks if the root node is a home_pk, if yes, it cuts off the first path part.
+                """
                 ancestors = self.get_cached_ancestors(ascending=True)
                 # sometimes there are no ancestors
                 if len(ancestors) != 0:
@@ -712,9 +721,11 @@ class Page(MPTTModel):
         # staff is allowed to see everything
         if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
             return True
+        
+        if not self.publisher_is_draft and self.publisher_public:
+            return self.publisher_public.has_view_permission(request)
         # does any restriction exist?
         # direct
-        #is_restricted = PagePermission.objects.filter(page=self, can_view=True).exists()
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(self).filter(can_view=True).exists()
         
@@ -969,7 +980,7 @@ class Page(MPTTModel):
             pass
         return sibling
 
-    def get_previous_fitlered_sibling(self, **filters):
+    def get_previous_filtered_sibling(self, **filters):
         """Very simillar to original mptt method, but adds support for filters.
         Returns this model instance's previous sibling in the tree, or
         ``None`` if it doesn't have a previous sibling.
@@ -1003,7 +1014,7 @@ class Page(MPTTModel):
             obj - public variant of `self` to be saved.
 
         """
-        prev_sibling = self.get_previous_fitlered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
+        prev_sibling = self.get_previous_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
 
         if not self.publisher_public_id:
             # is there anybody on left side?
@@ -1018,7 +1029,7 @@ class Page(MPTTModel):
                     obj.insert_at(public_parent, save=False)
         else:
             # check if object was moved / structural tree change
-            prev_public_sibling = self.old_public.get_previous_fitlered_sibling()
+            prev_public_sibling = self.old_public.get_previous_filtered_sibling()
 
             if not self.level == self.old_public.level or \
                 not (self.level > 0 and self.parent.publisher_public == self.old_public.parent) or \
@@ -1038,7 +1049,7 @@ class Page(MPTTModel):
                         obj.insert_at(next_sibling.publisher_public, position="left")
             else:
                 # insert at last public position
-                prev_sibling = self.old_public.get_previous_fitlered_sibling()
+                prev_sibling = self.old_public.get_previous_filtered_sibling()
 
                 if prev_sibling:
                     obj.insert_at(prev_sibling, position="right")

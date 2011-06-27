@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:22-0600\n"
-"PO-Revision-Date: 2011-02-23 14:44+0000\n"
+"PO-Revision-Date: 2011-05-20 08:39+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -36,3 +35,5 @@ msgstr ""
 #: media/cms/js/plugin_editor.js:125
 msgid "Are you sure you want to delete this plugin?"
 msgstr ""
+
+

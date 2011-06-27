@@ -12,7 +12,9 @@ def _media(suffix):
     """
     Helper that prefixes a URL with MEDIA_URL
     """
-    return u'%s%s' % (settings.MEDIA_URL, suffix)
+    if suffix:
+        return u'%s%s' % (settings.MEDIA_URL, suffix)
+    return ''
 
 
 class Switcher(BaseItem):
@@ -49,9 +51,9 @@ class Switcher(BaseItem):
         return state
         
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, toolbar, **kwargs):
         return {
-            'state': self.get_state(request)
+            'state': self.get_state(toolbar.request)
         }
 
 
@@ -108,8 +110,8 @@ class TemplateHTML(BaseItem):
         super(TemplateHTML, self).__init__(alignment, css_class_suffix)
         self.template =  template
         
-    def get_extra_data(self, context, request, **kwargs):
-        new_context = RequestContext(request)
+    def get_extra_data(self, context, toolbar, **kwargs):
+        new_context = RequestContext(toolbar.request)
         rendered = render_to_string(self.template, new_context)
         stripped = strip_spaces_between_tags(rendered.strip())
         return {
@@ -173,9 +175,9 @@ class PostButton(BaseItem):
         self.args = args
         self.kwargs = kwargs
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, toolbar, **kwargs):
         double = self.kwargs.copy()
-        double['csrfmiddlewaretoken'] = get_token(request)
+        double['csrfmiddlewaretoken'] = get_token(toolbar.request)
         hidden = render_to_string('cms/toolbar/items/_post_button_hidden.html',
                                   Context({'single': self.args,
                                            'double': double}))
@@ -189,14 +191,15 @@ class ListItem(Serializable):
     A item in a dropdown list (List).
     """
     base_attributes = [
-        ('css_class', 'class'),
+        ('css_class', 'cls'),
         ('title', 'title'),
         ('url', 'url'),
         ('icon', 'icon'),
+        ('method', 'method'),
     ]
     extra_attributes = []
     
-    def __init__(self, css_class_suffix, title, url, icon=None):
+    def __init__(self, css_class_suffix, title, url, method='GET', icon=None):
         """
         title: name of the list
         url: target of the item
@@ -205,6 +208,7 @@ class ListItem(Serializable):
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
         self.title = title
+        self.method = method
         self.icon = _media(icon)
         if callable(url):
             self.serialize_url = url
@@ -242,8 +246,8 @@ class List(BaseItem):
                     'List instances'
                 )
     
-    def get_extra_data(self, context, request, **kwargs):
-        items = [item.serialize(context, request, **kwargs)
+    def get_extra_data(self, context, **kwargs):
+        items = [item.serialize(context, **kwargs)
                  for item in self.raw_items]
         return {
             'items': items

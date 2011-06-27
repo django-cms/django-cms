@@ -49,7 +49,8 @@ To make your life easier, add the following at the top of the file::
     PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-Add the following apps to your ``INSTALLED_APPS`` which enable django-cms and required or highly recommended applications/libraries):
+Add the following apps to your :setting:`django:INSTALLED_APPS` which enable django CMS
+and required or highly recommended applications/libraries):
 
 * ``'cms'``, django CMS itself
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
@@ -77,16 +78,13 @@ There is even more plugins available on django CMS `extensions page`_.
 
 .. _extensions page: http://www.django-cms.org/en/extensions/
 
-If you wish to use the moderation workflow, also add:
-
-* ``'publisher'``
-
 Further, make sure you uncomment (enable) ``'django.contrib.admin'``
 
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
-components instead of ``cms.plugins.file``, ``cms.plugins.picture``, ``cms.plugins.teaser``
-and ``cms.plugins.video`` core plugins. In this case you should not add them to
-``INSTALLED_APPS`` but add those instead:
+components instead of :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
+:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins. In this
+case you should not add them to :setting:`django:INSTALLED_APPS` but add those
+instead:
 
 * ``'filer'``
 * ``'cmsplugin_filer_file'``
@@ -99,10 +97,10 @@ and ``cms.plugins.video`` core plugins. In this case you should not add them to
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
 If you opt for core plugins you should take care that directory to which
-``CMS_PAGE_MEDIA_PATH`` setting points (by default ``cms_page_media/`` relative
-to ``MEDIA_ROOT``) is writable by the user under which django will be running.
-If you have opted for django-filer then similar requirement exists based on its
-configuration.
+:setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
+relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which django
+will be running. If you have opted for django-filer then similar requirement
+exists based on its configuration.
 
 If you want versioning of your content you should also enable `django-reversion`_
 by adding:
@@ -111,9 +109,8 @@ by adding:
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 
-You need to add the django CMS middlewares to your ``MIDDLEWARE_CLASSES`` at the
-right position::
-
+You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_CLASSES`
+at the right position::
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.common.CommonMiddleware',
@@ -126,8 +123,8 @@ right position::
         'cms.middleware.toolbar.ToolbarMiddleware',
     )
 
-You need at least the following ``TEMPLATE_CONTEXT_PROCESSORS`` (a default Django
-settings file will not have any)::
+You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS` (a
+default Django settings file will not have any)::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.core.context_processors.auth',
@@ -139,22 +136,22 @@ settings file will not have any)::
     )
 
 Almost there!
-Point your ``MEDIA_ROOT`` to where the static media should live (that is, your images, 
-CSS files, Javascript files...)::
+Point your :setting:`django:MEDIA_ROOT` to where the static media should live (that is,
+your images,CSS files, Javascript files...)::
 
     MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
     MEDIA_URL = "/media/"
     ADMIN_MEDIA_PREFIX="/media/admin/"
 
-Now add a little magic to the ``TEMPLATE_DIRS`` section of the file::
+Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
 
     TEMPLATE_DIRS = (
         # The docs say it should be absolute path: PROJECT_PATH is precisely one.
         # Life is wonderful!
-        os.path.join(PROJECT_PATH, "templates")
+        os.path.join(PROJECT_PATH, "templates"),
     )
 
-Add at least one template to ``CMS_TEMPLATES``; for example::
+Add at least one template to :setting:`CMS_TEMPLATES`; for example::
 
     CMS_TEMPLATES = (
         ('template_1.html', 'Template One'),
@@ -166,7 +163,7 @@ now, and simply paste this code in your settings file.
 
 .. note::
 
-    The templates you define in ``CMS_TEMPLATES`` have to exist at runtime and
+    The templates you define in :setting:`CMS_TEMPLATES` have to exist at runtime and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
     for django CMS. For more details see `Creating templates`_
     
@@ -177,11 +174,11 @@ translations for, this is way too many so we'll limit it to English for now::
         ('en', 'English'),
     ]
 
-Finally, setup the ``DATABASES`` part of the file to reflect your database
-deployment. If you just want to try out things locally, sqlite3 is the easiest
-database to set up, however it should not be used in production. If you still
-wish to use it for now, this is what your ``DATABASES`` setting should look
-like::
+Finally, setup the :setting:`django:DATABASES` part of the file to reflect your
+databasedeployment. If you just want to try out things locally, sqlite3 is the
+easiest database to set up, however it should not be used in production. If you
+stillwish to use it for now, this is what your :setting:`django:DATABASES`
+setting should look like::
 
     DATABASES = {
         'default': {
@@ -249,7 +246,7 @@ Up and running!
 
 That should be it. Restart your development server using ``python manage.py runserver`` 
 and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
-the Django CMS "It Worked" screen.
+the django CMS "It Worked" screen.
 
 |it-works-cms|
 
@@ -271,7 +268,7 @@ it are editable. Editable areas are called *placeholders*. These templates are
 standard Django templates and you may use them as described in the
 `official documentation`_.
 
-Templates you wish to use on your pages must be declared in the ``CMS_TEMPLATES``
+Templates you wish to use on your pages must be declared in the :setting:`CMS_TEMPLATES`
 setting::
 
   CMS_TEMPLATES = (
@@ -345,7 +342,7 @@ HTML tag.
 
 
 *****************************
-Creating your first CMS page!
+Creating your first CMS Page!
 *****************************
 
 That's it, now the best part: you can start using the CMS!
@@ -385,7 +382,8 @@ The list of pages available is a handy way to change a few parameters about your
 
 Visibility
 ----------
-By default, pages are "invisible". To let people access them you should mark them as "published".
+By default, pages are "invisible". To let people access them you should mark
+them as "published".
 
 Menus 
 -----
@@ -396,12 +394,12 @@ or not)
 Adding content to a page
 ========================
 
-So far, our page doesn't do much. Make sure it's marked as "published", then click on the page's 
-"edit" button.
+So far, our page doesn't do much. Make sure it's marked as "published", then
+click on the page's "edit" button.
 
 Ignore most of the interface for now, and click the "view on site" button on the 
-top right-hand corner of the screen. As expected, your page is blank for the time being,
-since our template is really a minimal one.
+top right-hand corner of the screen. As expected, your page is blank for the
+time being, since our template is really a minimal one.
 
 Let's get to it now then!
 
@@ -414,7 +412,7 @@ The admin interfaces shows you theses placeholders as sub menus:
 .. |first-placeholders| image:: ../images/first-placeholders.png
 
 Scroll down the "Available plugins" drop-down list. This displays the plugins you
-added to your INSTALLED_APPS settings. Choose the "text" plugin in the drop-down,
+added to your :setting:`django:INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
 then press the "Add" button.
 
 The right part of the plugin area displays a rich text editor (`TinyMCE`_).
@@ -446,16 +444,16 @@ If you've created a page & you don't see it in the cms list of the Django admin:
 If you're editing a Page in the Django admin, but don't see an "Add Plugin"
 button with a dropdown-list of plugins:
 
-- Be sure your ``CMS_TEMPLATES`` setting is correct, the templates specified
-  exist, and they contain at least one ``{% placeholder %}`` templatetag.
+- Be sure your :setting:`CMS_TEMPLATES` setting is correct, the templates specified
+  exist, and they contain at least one :ttag:`{% placeholder %} <placeholder>` template tag.
 
 
 Template errors
 ===============
 
-If your placeholder content isn't displayed when you view a CMS page: change the
-CMS_MODERATOR variable in settings.py to False. This bug has been recently
-fixed, so upgrade to the latest version of Django CMS. See:
+If your placeholder content isn't displayed when you view a CMS Page: change the
+:setting:`CMS_MODERATOR` setting in your ``settings.py`` to ``False``. This bug
+has been recently fixed, so upgrade to the latest version of Django CMS. See:
 https://github.com/divio/django-cms/issues/issue/430
 
 
@@ -469,9 +467,9 @@ Safari or Chrome). The Javascript inspector may report the following errors:
 
 - **TypeError: Result of expression 'jQuery' [undefined] is not a function.**
 
-If you see this, check the ``MEDIA_URL`` variable in your settings.py file. Your
-webserver (e.g.: Apache) should be configured to serve static media files from
-this URL.
+If you see this, check the :setting:`django:MEDIA_URL` variable in your
+``settings.py`` file. Your webserver (e.g.: Apache) should be configured to
+serve static media files from this URL.
 
 - **Unsafe JavaScript attempt to access frame with URL
   http://localhost/media/cms/wymeditor/iframe/default/wymiframe.html from frame
@@ -480,9 +478,9 @@ this URL.
 
 This error is due to the Django test server running on a different port and URL
 than the main webserver. In your test environment, you can overcome this issue
-by adding a CMS_MEDIA_URL variable to your settings.py file, and adding a url
-rule in urls.py to make the Django development serve the Django CMS files from
-this location.
+by adding a :setting:`CMS_MEDIA_URL` variable to your ``settings.py`` file, and
+adding a url rule in ``urls.py`` to make the Django development serve the django
+CMS files from this location.
 
 .. _South: http://south.aeracode.org/
 .. _TinyMCE: http://tinymce.moxiecode.com/

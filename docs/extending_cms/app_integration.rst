@@ -2,7 +2,7 @@
 App Integration
 ###############
 
-It is pretty easy to integrate your own Django applications with django-cms.
+It is pretty easy to integrate your own Django applications with django CMS.
 You have 5 ways of integrating your app:
 
 1. Menus
@@ -52,8 +52,9 @@ Create a menu.py in your application and write the following inside::
     menu_pool.register_menu(TestMenu)
 
 If you refresh a page you should now see the menu entries from above.
-The get_nodes function should return a list of NavigationNode instances.
-A NavigationNode takes the following arguments:
+The get_nodes function should return a list of
+:class:`NavigationNode <menus.base.NavigationNode>` instances. A
+:class:`NavigationNode` takes the following arguments:
 
 - title
 
@@ -87,11 +88,13 @@ A NavigationNode takes the following arguments:
 Attach Menus
 ************
 
-Classes that extend from `Menu` always get attached to the root. But if you
-want the menu be attached to a CMS-page you can do that as well.
+Classes that extend from :class:`menus.base.Menu` always get attached to the
+root. But if you want the menu be attached to a CMS Page you can do that as
+well.
 
-Instead of extending from `Menu` you need to extend from `CMSAttachMenu` and
-you need to define a name. We will do that with the example from above::
+Instead of extending from :class:`~menus.base.Menu` you need to extend from
+:class:`cms.menu_bases.CMSAttachMenu` and you need to define a name. We will do
+that with the example from above::
 
 
     from menus.base import NavigationNode
@@ -121,18 +124,18 @@ you need to define a name. We will do that with the example from above::
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
 
-Each must have a ``get_menu_title`` function, a ``get_absolute_url`` function,
-and a ``childrens`` array with all of its children inside (the 's' at the end
-of ``childrens`` is done on purpose because ``children`` is already taken by
-mptt).
+Each must have a :meth:`get_menu_title` method, a
+:meth:`~django.db.models.Model.get_absolute_url` method, and a ``childrens``
+list with all of its children inside (the 's' at the end of ``childrens`` is
+done on purpose because ``children`` is already taken by django-mptt).
 
-Be sure that ``get_menu_title`` and ``get_absolute_url`` don't trigger any
-queries when called in a template or you may have some serious performance and
-DB problems with a lot of queries.
+Be sure that :meth:`get_menu_title` and :meth:`get_absolute_url` don't trigger
+any queries when called in a template or you may have some serious performance
+and database problems with a lot of queries.
 
-It may be wise to cache the output of ``get_nodes``. For this you may need to
-write a wrapper class because of dynamic content that the pickle module can't
-handle.
+It may be wise to cache the output of :meth:`~menu.base.Menu.get_nodes`. For
+this you may need to write a wrapper class because of dynamic content that the
+pickle module can't handle.
 
 If you want to display some static pages in the navigation ("login", for
 example) you can write your own "dummy" class that adheres to the conventions
@@ -148,7 +151,7 @@ App-Hooks
 With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
 
-To create an apphook create a cms_app.py in your application. And in there
+To create an apphook create a ``cms_app.py`` in your application. And in there
 write the following::
 
     from cms.app_base import CMSApp
@@ -161,19 +164,29 @@ write the following::
 
     apphook_pool.register(MyApphook)
 
-Replace "myapp.urls" with the path to your applications urls.py.
+Replace ``myapp.urls`` with the path to your applications ``urls.py``.
 
 Now edit a page and open the advanced settings tab. Select your new apphook
 under "Application". Save the page.
 
-** ATTENTION ** If you are on a multi-threaded server (mostly all webservers,
-except the dev-server): Restart the server because the URLs are cached by
-Django and in a multi-threaded environment we don't know which caches are
-cleared yet.
+.. warning::
 
-If you attached the app to a page with the url `/hello/world/` and the app has
-a urls.py that looks like this:
-::
+    If you are on a multi-threaded server (mostly all webservers,
+    except the dev-server): Restart the server because the URLs are cached by
+    Django and in a multi-threaded environment we don't know which caches are
+    cleared yet.
+    
+.. note::
+
+    If at some point you want to remove this apphook after deleting the cms_app.py
+    there is a cms management command called uninstall apphooks
+    that removes the specified apphook(s) from all pages by name.
+    eg. ``manage.py cmsmanage uninstall apphooks MyApphook``.
+    To find all names for uninstallable apphooks there is a command for this aswell
+    ``manage.py cmsmanage list apphooks``.
+
+If you attached the app to a page with the url ``/hello/world/`` and the app has
+a urls.py that looks like this::
 
     from django.conf.urls.defaults import *
 
@@ -182,27 +195,34 @@ a urls.py that looks like this:
         url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
     )
 
-The 'main_view' should now be available at `/hello/world/` and the
-'sample_view' has the url '/hello/world/sublevel/'.
+The ``main_view`` should now be available at ``/hello/world/`` and the
+``sample_view`` has the url ``/hello/world/sublevel/``.
 
 
-.. note:: All views that are attached like this must return a RequestContext
-          instance instead of the default Context instance.
+.. note:: All views that are attached like this must return a
+          :class:`~django.template.RequestContext` instance instead of the
+          default :class:`~django.template.Context` instance.
 
-**Language Namespaces**
+Language Namespaces
+-------------------
 
 An additional feature of apphooks is that if you use the
-MultilingualURLMiddleware all apphook urls are language namespaced.
+:class:`cms.middleware.multilingual.MultilingualURLMiddleware` all apphook urls
+are language namespaced.
 
 What this means:
 
 To reverse the first url from above you would use something like this in your
-template::
+template:
+
+.. code-block:: html+django
 
     {% url app_main %}
 
 If you want to access the same url but in a different language use a langauge
-namespace::
+namespace:
+
+.. code-block:: html+django
 
     {% url de:app_main %}
     {% url en:app_main %}
@@ -221,9 +241,9 @@ in your app add it to your apphook like this::
     apphook_pool.register(MyApphook)
 
 
-For an example if your app has a Category model and you want this category
-model to be displayed in the menu when you attach the app to a page. We assume
-the following model::
+For an example if your app has a :class:`Category` model and you want this
+category model to be displayed in the menu when you attach the app to a page.
+We assume the following model::
 
     from django.db import models
     from django.core.urlresolvers import reverse
@@ -273,16 +293,41 @@ If you add this menu now to your app-hook::
         urls = ["myapp.urls"]
         menus = [MyAppMenu, CategoryMenu]
 
-You get the static entries of MyAppMenu and the dynamic entries of
-CategoryMenu both attached to the same page.
+You get the static entries of :class:`MyAppMenu` and the dynamic entries of
+:class:`CategoryMenu` both attached to the same page.
 
 ********************
 Navigation Modifiers
 ********************
 
-Navigation Modifiers can add or change properties of NavigationNodes, they
-even can rearrange whole menus. You normally want to create them in your apps
-menu.py.
+Navigation Modifiers give your application access to navigation menus.
+
+A modifier can add nodes to a menu, change the properties of existing
+nodes, and even rearrange entire menus.
+
+
+An example use-case
+-------------------
+
+A simple example: you have a news application that publishes pages
+independently of Django CMS. However, you would like to integrate the 
+application into the menu structure of your site, so that at appropriate 
+places a *News* node appears in the navigation menu.
+
+In such a case, a Navigation Modifier is the solution.
+
+
+How it works
+------------
+
+Normally, you'd want to place modifiers in your application's 
+``menu.py``.
+
+To make your modifier available, it then needs to be registered with 
+``menus.menu_pool.menu_pool``.
+
+Now, when a page is loaded and the menu generated, your modifier will
+be able to inspect and modify its nodes.
 
 A simple modifier looks something like this::
 
@@ -304,8 +349,9 @@ A simple modifier looks something like this::
     
     menu_pool.register_modifier(MyMode)
 
-It has a function modify that should return a list of NavigationNodes. Modify
-should take the following arguments:
+It has a method :meth:`~menus.base.Modifier.modify` that should return a list
+of :class:`~menus.base.NavigationNode` instances.
+:meth:`~menus.base.Modifier.modify` should take the following arguments:
 
 - request
 
@@ -327,17 +373,17 @@ should take the following arguments:
 
 - post_cut
 
-  Every modifier is called 2 times. First on the whole tree. After that the
+  Every modifier is called two times. First on the whole tree. After that the
   tree gets cut. To only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
-  the case post_cut is True.
+  the case ``post_cut`` is ``True``.
 
 - breadcrumb
 
   Is this not a menu call but a breadcrumb call?
 
 
-Here is an example of a build in modifier that marks all nodes level::
+Here is an example of a built-in modifier that marks all node levels::
 
 
     class Level(Modifier):

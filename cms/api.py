@@ -142,11 +142,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
     # validate publication date
     if publication_date:
-        assert isinstance(publication_date, datetime.datetime)
+        assert isinstance(publication_date, datetime.date)
     
     # validate publication end date
     if publication_end_date:
-        assert isinstance(publication_date, datetime.datetime)
+        assert isinstance(publication_end_date, datetime.date)
         
     # validate softroot
     assert settings.CMS_SOFTROOT or not soft_root
@@ -254,7 +254,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     return title
 
 def add_plugin(placeholder, plugin_type, language, position='last-child',
-               **data):
+               target=None, **data):
     """
     Add a plugin to a placeholder
     
@@ -272,7 +272,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         position=1, 
         language=language
     )
-    plugin_base.insert_at(None, position=position, save=False)
+    plugin_base.insert_at(target, position=position, save=False)
             
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
@@ -350,16 +350,14 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         'can_moderate': can_moderate,  
         'can_view': can_view,
     }
+    page_permission = PagePermission(page=page, user=user,
+                                     grant_on=grant_on, **data)
+    page_permission.save()
     if global_permission:
         page_permission = GlobalPagePermission(
             user=user, can_recover_page=can_recover_page, **data)
         page_permission.save()
         page_permission.sites.add(Site.objects.get_current())
-    else:
-        page_permission = PagePermission(page=page, user=user,
-                                         grant_on=grant_on, **data)
-        page_permission.save()
-    page_permission.save()
     return page_permission
     
 def publish_page(page, user, approve=False):

@@ -311,7 +311,7 @@ class PageAdmin(ModelAdmin):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
-            for placeholder_name in sorted(plugins.get_placeholders(placeholders_template)):
+            for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
                 name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
                 name = _(name)
                 given_fieldsets += [(title(name), {'fields':[placeholder_name], 'classes':['plugin-holder']})]
@@ -325,6 +325,9 @@ class PageAdmin(ModelAdmin):
             given_fieldsets = deepcopy(self.add_fieldsets)
 
         return given_fieldsets
+    
+    def get_fieldset_placeholders(self, template):
+        return plugins.get_placeholders(template)
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -1029,7 +1032,8 @@ class PageAdmin(ModelAdmin):
         site = Site.objects.get_current()
 
         if not site == page.site:
-            url = "http://%s%s" % (page.site.domain, url)
+            url = "http%s://%s%s" % ('s' if request.is_secure() else '',
+                                     page.site.domain, url)
         return HttpResponseRedirect(url)
 
     def change_status(self, request, page_id):
@@ -1082,7 +1086,7 @@ class PageAdmin(ModelAdmin):
             if page:
                 language = request.POST['language'] or get_language_from_request(request)
                 position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
-                limits = placeholder_utils.get_placeholder_conf(placeholder.slot, page.get_template(), "limits", None)
+                limits = placeholder_utils.get_placeholder_conf("limits", placeholder.slot, page.get_template())
                 if limits:
                     global_limit = limits.get("global")
                     type_limit = limits.get(plugin_type)
@@ -1091,7 +1095,8 @@ class PageAdmin(ModelAdmin):
                     elif type_limit:
                         type_count = CMSPlugin.objects.filter(language=language, placeholder=placeholder, plugin_type=plugin_type).count()
                         if type_count >= type_limit:
-                            return HttpResponseBadRequest("This placeholder already has the maximum number allowed %s plugins.'%s'" % plugin_type)
+                            plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+                            return HttpResponseBadRequest("This placeholder already has the maximum number allowed of %s plugins." % plugin_name)
             # in-plugin add-plugin
             elif parent_id:
                 parent = get_object_or_404(CMSPlugin, pk=parent_id)

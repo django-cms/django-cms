@@ -17,9 +17,8 @@ class NonRootCase(CMSTestCase):
             u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
             u.set_password("test")
             u.save()
-            self.login_user(u)
-    
-            self.create_some_pages()
+            with self.login_user_context(u):
+                self.create_some_pages()
         
     # def tearDown(self):
     #     menu_pool.menus = self.old_menu
@@ -48,13 +47,13 @@ class NonRootCase(CMSTestCase):
         self.level2_pages = [self.page3]
         
 
-    def test_01_basic_cms_menu(self):
+    def test_basic_cms_menu(self):
         with SettingsOverride(CMS_MODERATOR = False):
             response = self.client.get(self.get_pages_root())
             self.assertEquals(response.status_code, 200)
             self.assertEquals(self.get_pages_root(), "/content/")
 
-    def test_02_show_menu(self):
+    def test_show_menu(self):
         with SettingsOverride(CMS_MODERATOR = False):
             context = self.get_context()
             tpl = Template("{% load menu_tags %}{% show_menu %}")
@@ -63,7 +62,7 @@ class NonRootCase(CMSTestCase):
             self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
             self.assertEqual(nodes[0].get_absolute_url(), "/content/")
 
-    def test_03_show_breadcrumb(self):
+    def test_show_breadcrumb(self):
         with SettingsOverride(CMS_MODERATOR = False):    
             page2 = Page.objects.get(pk=self.page2.pk)
             context = self.get_context(path=self.page2.get_absolute_url())

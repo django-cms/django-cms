@@ -2,13 +2,14 @@
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
 from cms.templatetags.cms_tags import Placeholder
+from cms.utils.placeholder import validate_placeholder_name
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
-from django.template import NodeList, TextNode, VariableNode, \
-    TemplateSyntaxError
+from django.template import (NodeList, TextNode, VariableNode, 
+    TemplateSyntaxError)
 from django.template.loader import get_template
-from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, \
-    BlockNode
+from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode, 
+    BlockNode)
 import warnings
 
 def get_page_from_plugin_or_404(cms_plugin):
@@ -28,7 +29,10 @@ def _extend_blocks(extend_node, blocks):
             blocks[node.name] = node
         else:
             # set this node as the super node (for {{ block.super }})
-            blocks[node.name].super = node
+            block = blocks[node.name]
+            while hasattr(block.super, 'nodelist'):
+                block = block.super
+            block.super = node
     # search for further ExtendsNodes
     for node in parent.nodelist:
         if not isinstance(node, TextNode):
@@ -110,6 +114,7 @@ def get_placeholders(template):
         if placeholder in clean_placeholders:
             warnings.warn("Duplicate placeholder found: `%s`" % placeholder, DuplicatePlaceholderWarning)
         else:
+            validate_placeholder_name(placeholder)
             clean_placeholders.append(placeholder)
     return clean_placeholders
 
