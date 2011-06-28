@@ -8,9 +8,9 @@ class Picture(CMSPlugin):
     """
     A Picture with or without a link
     """
-    CENTER = "align-center"
-    LEFT = "align-left"
-    RIGHT = "align-right"
+    CENTER = "center"
+    LEFT = "left"
+    RIGHT = "right"
     FLOAT_CHOICES = ((CENTER, _("center")),
                      (LEFT, _("left")),
                      (RIGHT, _("right")),

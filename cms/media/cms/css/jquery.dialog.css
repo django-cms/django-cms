@@ -76,7 +76,7 @@
 .ui-dialog .ui-dialog-buttonpane button,
 .ui-dialog .ui-dialog-buttonpane button {
 	margin: 6px;
-	background: white url(../img/admin/nav-bg.gif) repeat-x scroll center bottom;
+	background: white url(../images/jquery/nav-bg.gif) repeat-x scroll center bottom;
 	border-color: #ddd #aaa #aaa #ddd;
 	border-style: solid;
 	border-width: 1px;
@@ -85,7 +85,7 @@
 }
 
 .ui-dialog .ui-dialog-buttonpane button.default {
-	background: #7CA0C7 url(../img/admin/default-bg.gif) repeat-x scroll center bottom;
+	background: #7CA0C7 url(../images/jquery/default-bg.gif) repeat-x scroll center bottom;
 	border: 2px solid #5B80B2;
 	font-weight: bold;
 	color: white;
