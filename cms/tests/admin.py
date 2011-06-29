@@ -14,14 +14,10 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.titlemodels import Title
 from cms.plugins.text.models import Text
 from cms.test_utils import testcases as base
-<<<<<<< HEAD
 from cms.test_utils.util.request_factory import RequestFactory
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
-=======
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, \
-    URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
->>>>>>> Made PageAdmin.add_plugin check add permissions for the actual plugin model
+
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
