@@ -78,10 +78,6 @@ There is even more plugins available on django CMS `extensions page`_.
 
 .. _extensions page: http://www.django-cms.org/en/extensions/
 
-If you wish to use the moderation workflow, also add:
-
-* ``'publisher'``
-
 Further, make sure you uncomment (enable) ``'django.contrib.admin'``
 
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
