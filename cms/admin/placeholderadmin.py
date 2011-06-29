@@ -284,7 +284,7 @@ class PlaceholderAdmin(ModelAdmin):
     
         # check the permissions!
         if not plugin.placeholder.has_delete_permission(request):
-            raise Http404
+            return HttpResponseForbidden(_("You don't have permission to delete a plugin"))
         
         plugin.delete_with_public()
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
