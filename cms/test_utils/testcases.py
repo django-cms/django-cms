@@ -85,9 +85,12 @@ class CMSTestCase(TestCase):
         return UserLoginContext(self, user)
         
     def get_superuser(self):
-        admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
-        admin.set_password("admin")
-        admin.save()
+        try:
+            admin = User.objects.get(username="admin")
+        except User.DoesNotExist:
+            admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
+            admin.set_password("admin")
+            admin.save()
         return admin
         
     def get_staff_user_with_no_permissions(self):
@@ -199,7 +202,7 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None, language=None, post_data=None):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False):
         if not path:
             path = self.get_pages_root()
         
@@ -242,6 +245,8 @@ class CMSTestCase(TestCase):
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if not enforce_csrf_checks:
+            request.csrf_processing_done = True 
         return request
     
     def check_published_page_attributes(self, page):
