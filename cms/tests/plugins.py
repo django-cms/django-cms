@@ -334,7 +334,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
-            self.assertTrue('%sjs/plugins/jquery.tweet.js' % settings.CMS_MEDIA_URL in response.content, response.content)
+            self.assertTrue('%scss/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
         
     def test_fileplugin_icon_uppercase(self):
         page = create_page('testpage', 'nav_playground.html', 'en')
