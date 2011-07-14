@@ -185,7 +185,7 @@ jQuery(document).ready(function($) {
 
     $(document).ready(function () {
         bodyBackgroundPos = $("body").css("background-position");            
-        if (bodyBackgroundPos == 'undefined' || bodyBackgroundPos == null) {
+        if (bodyBackgroundPos == 'undefined' || bodyBackgroundPos == null || bodyBackgroundPos.split(" ").length == 1) {
             //for IE
             bodyBackgroundPosXFull = $("body").css("background-position-x");
             bodyBackgroundPosYFull = $("body").css("background-position-y");                
