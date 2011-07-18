@@ -29,9 +29,11 @@ Example::
         ('extra.html', gettext('Some extra fancy template')),
     )
 
-.. note:: All templates defined in :setting:`CMS_TEMPLATES` must contain at least the
-          ``js`` and ``css`` sekizai namespaces, for more information, see 
-          :ref:`sekizai-namespaces`.
+.. note::
+
+    All templates defined in :setting:`CMS_TEMPLATES` must contain at least the
+    ``js`` and ``css`` sekizai namespaces, for more information, see 
+    :ref:`sekizai-namespaces`.
 
 
 *******************
@@ -517,8 +519,9 @@ Default: ``60``
 Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
 template tags.
 
-.. note:: This settings was previously called
-          :setting:`CMS_CONTENT_CACHE_DURATION`
+.. note::
+
+    This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
 
 ``'menus'``
 -----------
@@ -527,7 +530,9 @@ Default: ``3600``
 
 Cache expiration (in seconds) for the menu tree.
 
-.. note:: This settings was previously called :setting:`MENU_CACHE_DURATION`
+.. note::
+
+    This settings was previously called :setting:`MENU_CACHE_DURATION`
 
 ``'permissions'``
 -----------------
@@ -553,5 +558,6 @@ Example::
     CMS_CACHE_PREFIX = 'mysite-live'
 
 .. note::
+
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`

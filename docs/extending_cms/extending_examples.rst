@@ -44,9 +44,11 @@ In your poll application's ``models.py`` add the following model::
           return self.poll.question
 
 
-.. note:: django CMS plugins must inherit from :class:`cms.models.CMSPlugin`
-          (or a subclass thereof) and not
-          :class:`models.Model <django.db.models.Model>`.
+.. note::
+
+    django CMS plugins must inherit from :class:`cms.models.CMSPlugin`
+    (or a subclass thereof) and not
+    :class:`models.Model <django.db.models.Model>`.
 
 Run ``manage.py syncdb`` to create the database tables for this model or see
 :doc:`../getting_started/using_south` to see how to do it using `South`_
@@ -88,9 +90,11 @@ For our poll plugin, write following plugin class::
     
     plugin_pool.register_plugin(PollPlugin) # register the plugin
 
-.. note:: All plugin classes must inherit from
-          :class:`cms.plugin_base.CMSPluginBase` and must register themselves
-          with the :data:`cms.plugin_pool.plugin_pool`.
+.. note::
+
+    All plugin classes must inherit from 
+    :class:`cms.plugin_base.CMSPluginBase` and must register themselves
+    with the :data:`cms.plugin_pool.plugin_pool`.
 
 
 The Template
@@ -118,8 +122,10 @@ The template could look like this:
     </form>
 
 
-.. note:: We don't show the errors here, because when submitting the form you're
-          taken off this page to the actual voting page.
+.. note::
+
+    We don't show the errors here, because when submitting the form you're
+    taken off this page to the actual voting page.
 
 **********************
 My First App (apphook)
