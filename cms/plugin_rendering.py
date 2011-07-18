@@ -159,6 +159,6 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         'placeholder': placeholder,
         'page': page,
     })
-    toolbar = render_to_string("cms/toolbar/placeholder.html", )
+    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return "".join([toolbar, content])
