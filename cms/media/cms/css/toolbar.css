@@ -619,6 +619,7 @@ span.cms_toolbar_icon.cms_toolbar_state-icon.del
     padding-left:10px;
     padding-right:10px;
     position:relative;
+    overflow:hidden;
 }
 
 .cms_toolbar_placeholder_plugins_title
