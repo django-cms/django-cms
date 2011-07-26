@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext, 
-    SettingsOverride)
+    SettingsOverride, _AssertNumQueriesContext)
 from django.conf import settings
+from django.db.utils import DEFAULT_DB_ALIAS
+from django.db import connections
+
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
@@ -10,7 +13,7 @@ from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.test.client import (encode_multipart, BOUNDARY, MULTIPART_CONTENT, 
     FakePayload)
-from django.test.testcases import TestCase
+from django.test import testcases
 from menus.menu_pool import menu_pool
 from urlparse import urlparse
 import sys
@@ -65,7 +68,39 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         warnings.filters[:] = origFilters
         warnings.showwarning = origShow
     return result
-
+    
+    
+if hasattr(testcases.TestCase, 'assertNumQueries'):
+    TestCase = testcases.TestCase
+else:
+    class TestCase(testcases.TestCase):
+        def assertNumQueries(self, num, func=None, *args, **kwargs):
+            if hasattr(testcases.TestCase, 'assertNumQueries'):
+                return super(TestCase, self).assertNumQueries(num, func, *args, **kwargs)
+            return self._assertNumQueries(num, func, *args, **kwargs)
+    
+        def _assertNumQueries(self, num, func=None, *args, **kwargs):
+            """
+            Backport from Django 1.3 for Django 1.2
+            """
+            using = kwargs.pop("using", DEFAULT_DB_ALIAS)
+            connection = connections[using]
+    
+            context = _AssertNumQueriesContext(self, num, connection)
+            if func is None:
+                return context
+    
+            # Basically emulate the `with` statement here.
+    
+            context.__enter__()
+            try:
+                func(*args, **kwargs)
+            except:
+                context.__exit__(*sys.exc_info())
+                raise
+            else:
+                context.__exit__(*sys.exc_info())
+                
 class CMSTestCase(TestCase):
     counter = 1
     
@@ -85,9 +120,12 @@ class CMSTestCase(TestCase):
         return UserLoginContext(self, user)
         
     def get_superuser(self):
-        admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
-        admin.set_password("admin")
-        admin.save()
+        try:
+            admin = User.objects.get(username="admin")
+        except User.DoesNotExist:
+            admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
+            admin.set_password("admin")
+            admin.save()
         return admin
         
     def get_staff_user_with_no_permissions(self):
@@ -199,7 +237,7 @@ class CMSTestCase(TestCase):
         
         return Context(context)   
         
-    def get_request(self, path=None, language=None, post_data=None):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False):
         if not path:
             path = self.get_pages_root()
         
@@ -242,6 +280,8 @@ class CMSTestCase(TestCase):
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if not enforce_csrf_checks:
+            request.csrf_processing_done = True 
         return request
     
     def check_published_page_attributes(self, page):

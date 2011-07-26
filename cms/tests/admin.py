@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.admin.dialog.forms import (ModeratorForm, PermissionForm, 
-    PermissionAndModeratorForm)
+from cms.admin.dialog.forms import ModeratorForm, PermissionForm, \
+    PermissionAndModeratorForm
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter, PageAdmin
 from cms.admin.change_list import CMSChangeList
@@ -11,29 +11,38 @@ from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.models.placeholdermodel import Placeholder
+from cms.models.titlemodels import Title
+from cms.plugins.text.models import Text
 from cms.test_utils import testcases as base
 from cms.test_utils.util.request_factory import RequestFactory
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE, 
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
+
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, \
+    HttpResponse
+from django.test.client import Client
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
 
-
-class AdminTestCase(CMSTestCase):
+class AdminTestsBase(CMSTestCase):
     
     def setUp(self):
         self.request_factory = RequestFactory()
-    
+        
+    @property
+    def admin_class(self):
+        return site._registry[Page]
+        
     def _get_guys(self, admin_only=False):
         admin = self.get_superuser()
         if admin_only:
@@ -60,7 +69,9 @@ class AdminTestCase(CMSTestCase):
             )
             gpp.sites = Site.objects.all()
         return admin, normal_guy
-    
+        
+class AdminTestCase(AdminTestsBase):
+            
     def test_edit_does_not_reset_page_adv_fields(self):
         """
         Makes sure that if a non-superuser with no rights to edit advanced page
@@ -205,13 +216,14 @@ class AdminTestCase(CMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE)
     
     def test_change_template(self):
+        admin, staff = self._get_guys()
         request = self.get_request('/admin/cms/page/1/', 'en')
         pageadmin = site._registry[Page]
-        self.assertRaises(Http404, pageadmin.change_template, request, 1)
-        page = create_page('test-page', 'nav_playground.html', 'en')
-        response = pageadmin.change_template(request, page.pk)
-        self.assertEqual(response.status_code, 403)
-        admin = self._get_guys(True)
+        with self.login_user_context(staff):
+            self.assertRaises(Http404, pageadmin.change_template, request, 1)
+            page = create_page('test-page', 'nav_playground.html', 'en')
+            response = pageadmin.change_template(request, page.pk)
+            self.assertEqual(response.status_code, 403)
         url = reverse('admin:cms_page_change_template', args=(page.pk,))
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
@@ -427,16 +439,11 @@ class AdminListFilterTests(TestCase):
         self.assertFalse('soft_root' in experiment.list_filter, experiment.list_filter)
 
 
-class AdminTestsBase(object):
-    @property
-    def admin_class(self):
-        return site._registry[Page]
-
-
-class AdminTests(CMSTestCase, AdminTestsBase):
+class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
     
     def setUp(self):
+        super(AdminTests, self).setUp()
         create_page("testpage", "nav_playground.html", "en")
     
     def get_admin(self):
@@ -602,7 +609,7 @@ class AdminTests(CMSTestCase, AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': target.slot})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+            self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': target.slot})
@@ -612,7 +619,7 @@ class AdminTests(CMSTestCase, AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request(post_data={'ids': pageplugin.pk,
                                                   'placeholder': target.slot})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+            self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'ids': pageplugin.pk,
                                                   'placeholder': target.slot})
@@ -703,9 +710,143 @@ class AdminTests(CMSTestCase, AdminTestsBase):
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
 
-class NoDBAdminTests(TestCase, AdminTestsBase):
+class NoDBAdminTests(TestCase):
+    
+    @property
+    def admin_class(self):
+        return site._registry[Page]
+        
     def test_lookup_allowed_site__exact(self):
         self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
             
     def test_lookup_allowed_published(self):
         self.assertTrue(self.admin_class.lookup_allowed('published', value='1'))
+
+
+class PluginPermissionTests(AdminTestsBase):
+    
+    def setUp(self):
+        super(PluginPermissionTests, self).setUp()
+        self._page = create_page('test page', 'nav_playground.html', 'en')
+        self._placeholder = self._page.placeholders.all()[0]
+        
+    def _get_admin(self):
+        admin = User(
+            username='admin',
+            email='admin@admin.com',
+            is_active=True,
+            is_staff=True,
+        )
+        admin.set_password('admin')
+        admin.save()
+        return admin
+    
+    def _get_page_admin(self):
+        return admin.site._registry[Page]
+    
+    def _give_permission(self, user, model, permission_type, save=True):
+        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        user.user_permissions.add(Permission.objects.get(codename=codename))
+    
+    def _give_cms_permissions(self, user, save=True):
+        for perm_type in ['add', 'change', 'delete']:
+            for model in [Page, Title]:
+                self._give_permission(user, model, perm_type, False)
+        gpp = GlobalPagePermission.objects.create(
+            user=user,
+            can_change=True,
+            can_delete=True,
+            can_change_advanced_settings=False,
+            can_publish=True,
+            can_change_permissions=False,
+            can_move_page=True,
+            can_moderate=True,
+        )
+        gpp.sites = Site.objects.all()
+        if save:
+            user.save()
+
+    def _create_plugin(self):
+        plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
+        return plugin
+        
+    def test_plugin_add_requires_permissions(self):
+        """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
+        admin = self._get_admin()
+        self._give_cms_permissions(admin)
+        client = Client()
+        client.login(username='admin', password='admin')
+        url = reverse('admin:cms_page_add_plugin')
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': self._placeholder.pk,
+            'language': 'en',
+        }
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self._give_permission(admin, Text, 'add')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugin_edit_requires_permissions(self):
+        """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
+        plugin = self._create_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_edit_plugin', args=[plugin.id])
+        response = client.post(url, dict())
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'change')
+        response = client.post(url, dict())
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugin_remove_requires_permissions(self):
+        """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
+        plugin = self._create_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_remove_plugin')
+        data = dict(plugin_id=plugin.id)
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'delete')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugin_move_requires_permissions(self):
+        """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
+        plugin = self._create_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_move_plugin')
+        data = dict(plugin_id=plugin.id,
+                    placeholder=self._placeholder)
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'change')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugins_copy_requires_permissions(self):
+        """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
+        plugin = self._create_plugin()
+        _, normal_guy = self._get_guys()
+        client = Client()
+        client.login(username='test', password='test')
+        url = reverse('admin:cms_page_copy_plugins')
+        data = dict(plugin_id=plugin.id,
+                    placeholder=self._placeholder.pk,
+                    language='fr',
+                    copy_from='en')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'add')
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)

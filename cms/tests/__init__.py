@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from cms.tests.admin import *
 from cms.tests.api import *
 from cms.tests.apphooks import *
@@ -27,4 +28,3 @@ from cms.tests.toolbar import *
 from cms.tests.urlutils import *
 from cms.tests.views import *
 from cms.tests.management import *
-
