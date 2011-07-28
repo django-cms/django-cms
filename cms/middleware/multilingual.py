@@ -44,7 +44,7 @@ def patch_response(content, pages_root, language):
         
     HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         quoted_root,
-        "|".join(ignore_paths),
+        "|".join(map(lambda p: re.escape(p),ignore_paths)),
         quoted_root
     ))
 
@@ -58,7 +58,7 @@ def patch_response(content, pages_root, language):
         ignore_paths += [settings.STATIC_URL]
     FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         pages_root,
-        "|".join(ignore_paths),
+        "|".join(map(lambda p: re.escape(p), ignore_paths)),
         pages_root
     ))
 
