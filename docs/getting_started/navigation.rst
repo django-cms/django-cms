@@ -41,8 +41,10 @@ The third parameter, ``extra_inactive`` (default=0), specifies how many levels
 of navigation should be displayed if a node is not a direct ancestor or
 descendant of the current active node.
 
-Finally, the fourth parameter, ``extra_active`` (default=100), specifies how
+The fourth parameter, ``extra_active`` (default=100), specifies how
 many levels of descendants of the currently active node should be displayed.
+
+You can supply a ``template`` parameter to the tag.
 
 Some Examples
 =============
