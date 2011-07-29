@@ -39,7 +39,7 @@ def patch_response(content, pages_root, language):
     quoted_root = urllib.quote(pages_root)
     ignore_paths = map(lambda l: quoted_root + l[0] + "/" , settings.CMS_LANGUAGES)
     ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
-    if settings.STATIC_URL:
+    if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
         
     HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
@@ -54,7 +54,7 @@ def patch_response(content, pages_root, language):
     
     ignore_paths = map(lambda l: pages_root + l[0] + "/" , settings.CMS_LANGUAGES)
     ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
-    if settings.STATIC_URL:
+    if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
     FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         pages_root,
@@ -111,7 +111,7 @@ class MultilingualURLMiddleware:
         
         if not path.startswith(settings.MEDIA_URL) and \
                 not path.startswith(settings.ADMIN_MEDIA_PREFIX) and \
-                not (settings.STATIC_URL and path.startswith(settings.STATIC_URL)) and \
+                not (getattr(settings,'STATIC_URL', False) and path.startswith(settings.STATIC_URL)) and \
                 response.status_code == 200 and \
                 response._headers['content-type'][1].split(';')[0] == "text/html":
             pages_root = urllib.unquote(reverse("pages-root"))
@@ -130,7 +130,7 @@ class MultilingualURLMiddleware:
             location = response['Location']
             if not has_lang_prefix(location) and location.startswith("/") and \
                     not location.startswith(settings.MEDIA_URL) and \
-                    not (settings.STATIC_URL and location.startswith(settings.STATIC_URL)) and \
+                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)) and \
                     not location.startswith(settings.ADMIN_MEDIA_PREFIX):
                 response['Location'] = "/%s%s" % (language, location)
         response.set_cookie("django_language", language)
