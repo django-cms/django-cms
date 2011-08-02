@@ -1,6 +1,21 @@
 {% load i18n %}
-<!-- load placeholder bar -->
-<div class="cms_placeholder-bar cms_reset cms_placeholder::{{ language }}::{{ page.id }}::{{ placeholder.pk }}:: cms_placeholder_slot::{{ placeholder.slot }}">
+<script type="text/javascript">
+//<![CDATA[
+jQuery(document).ready(function ($) {
+	new CMS.Placeholder('#cms_placeholder-bar-{{ placeholder.pk }}', {
+		'type': 'bar',
+		'page_id': '{{ page.id }}',
+		'page_language': '{{ language }}',
+		'placeholder_id': '{{ placeholder.pk }}',
+		'urls': {
+			'add_plugin': '{% url admin:cms_page_add_plugin %}',
+			'change_list': '{% url admin:cms_page_changelist %}'
+		}
+	});
+});
+//]]>
+</script>
+<div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar cms_reset cms_placeholder_slot::{{ placeholder.slot }}">
 	<div class="cms_placeholder-title">{{ placeholder_label }}</div>
 	<div class="cms_placeholder-btn">
 		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">

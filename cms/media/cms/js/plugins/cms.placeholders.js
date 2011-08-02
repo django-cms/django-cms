@@ -13,13 +13,23 @@ jQuery(document).ready(function ($) {
 	 * @version: 1.0.0
 	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 * @public_methods:
-	 *	- CMS.API.Placeholder.addPlugin(url, obj);
+	 *	- CMS.API.Placeholder.addPlugin(obj, url);
 	 *	- CMS.API.Placeholder.editPlugin(placeholder_id, plugin_id);
 	 *	- CMS.API.Placeholder.deletePlugin(placeholder_id, plugin_id, plugin);
 	 *	- CMS.API.Placeholder.toggleFrame();
 	 *	- CMS.API.Placeholder.toggleDim();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
+
+	/**
+	 * new concept
+	 * cms.placeholders register basic events like:
+	 * - dimmer
+	 * - frameloader
+	 * - overlay (blue)
+	 * - listshow (show list elements for add)
+	 */
+
 	CMS.Placeholders = CMS.Class.$extend({
 
 		options: {
@@ -29,13 +39,6 @@ jQuery(document).ready(function ($) {
 				'move_warning': '',
 				'delete_request': '',
 				'cancel': 'Cancel'
-			},
-			'urls': {
-				'cms_page_move_plugin': '',
-				'cms_page_changelist': '',
-				'cms_page_change_template': '',
-				'cms_page_add_plugin': '',
-				'cms_page_remove_plugin': ''
 			}
 		},
 
@@ -55,20 +58,6 @@ jQuery(document).ready(function ($) {
 			this.overlayIsHidden = false;
 			this.success = this.wrapper.find('#cms_placeholder-success');
 
-			// attach event handling to placeholder buttons and overlay if editmode is active
-			if(this.options.edit_mode) {
-				this.bars = $('.cms_placeholder-bar');
-				this.bars.each(function (index, item) {
-					that._bars.call(that, item);
-				});
-				
-				// enable dom traversal for cms_placeholder
-				this.holders = $('.cms_placeholder');
-				this.holders.bind('mouseenter', function (e) {
-					that._holders.call(that, e.currentTarget);
-				});
-			}
-			
 			// setup everything
 			this._setup();
 		},
@@ -85,11 +74,11 @@ jQuery(document).ready(function ($) {
 			
 			// bind overlay event
 			this.overlay.bind('mouseleave', function () {
-				that._hideOverlay();
+				that.hideOverlay();
 			});
 			// this is for testing
 			this.overlay.find('.cms_placeholder-overlay_bg').bind('click', function () {
-				that._hideOverlay();
+				that.hideOverlay();
 				
 				// we need to hide the oberlay and stop the event for a while
 				that.overlay.css('visibility', 'hidden');
@@ -100,105 +89,17 @@ jQuery(document).ready(function ($) {
 				}, 100);
 			});
 		},
-		
-		/* this private method controls the buttons on the bar (add plugins) */
-		_bars: function (el) {
-			// save reference to this class
-			var that = this;
-			var bar = $(el);
-			
-			// attach button event
-			var barButton = bar.find('.cms_toolbar-btn');
-				barButton.data('collapsed', true).bind('click', function (e) {
-					e.preventDefault();
-					
-					($(this).data('collapsed')) ? that._showPluginList.call(that, $(e.currentTarget)) : that._hidePluginList.call(that, $(e.currentTarget));
-				});
-			
-			// read and save placeholder bar variables
-			var split = bar.attr('class').split('::');
-				split.shift(); // remove classes
-			var values = {
-					'language': split[0],
-					'placeholder_id': split[1],
-					'placeholder': split[2]
-				};
-			
-			// attach events to placeholder plugins
-			bar.find('.cms_placeholder-subnav li a').bind('click', function (e) {
-				e.preventDefault();
-				// add type to values
-				values.plugin_type = $(this).attr('rel').split('::')[1];
-				// try to add a new plugin
-				that.addPlugin.call(that, that.options.urls.cms_page_add_plugin, values);
-			});
-		},
-		
-		/* this private method shows the overlay when hovering */
-		_holders: function (el) {
-			// save reference to this class
-			var that = this;
-			var holder = $(el);
-			
-			// show overlay
-			this._showOverlay.call(that, holder);
-			
-			// set overlay to visible
-			if(this.overlayIsHidden === true) {
-				this.overlay.css('visibility', 'visible');
-				this.overlayIsHidden = false;
-			}
-			
-			// get values
-			var split = holder.attr('class').split('::');
-				split.shift(); // remove classes
-			var values = {
-					'plugin_id': split[0],
-					'placeholder': split[1],
-					'type': split[2],
-					'slot': split[4]
-				};
 
-			// attach events to each holder button
-			var buttons = this.overlay.find('.cms_placeholder-options li');
-				// unbind all button events
-				buttons.find('a').unbind('click');
-				
-				// attach edit event
-				buttons.find('a[rel^=edit]').bind('click', function (e) {
-					e.preventDefault();
-					that.editPlugin.call(that, values.placeholder, values.plugin_id);
-				});
-
-				// attach move event
-				buttons.find('a[rel^=moveup], a[rel^=movedown]').bind('click', function (e) {
-					e.preventDefault();
-					that._movePluginPosition.call(that, $(e.currentTarget).attr('rel'), holder, values);
-				});
-
-				// attach delete event
-				buttons.find('a[rel^=delete]').bind('click', function (e) {
-					e.preventDefault();
-					that.deletePlugin.call(that, values.placeholder, values.plugin_id, holder);
-				});
-
-				// attach delete event
-				buttons.find('a[rel^=more]').bind('click', function (e) {
-					e.preventDefault();
-					that._morePluginOptions.call(that, holder, values);
-				});
-		},
-		
-		addPlugin: function (url, data) {
+		addPlugin: function (values, addUrl, editUrl) {
 			var that = this;
 			// do ajax thingy
 			$.ajax({
 				'type': 'POST',
-				'url': url,
-				'data': data,
+				'url': addUrl,
+				'data': values,
 				'success': function (response) {
 					// we get the id back
-					that.editPlugin.call(that, data.placeholder_id, response);
+					that.editPlugin.call(that, values.placeholder_id, response, editUrl);
 				},
 				'error': function () {
 					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
@@ -206,7 +107,7 @@ jQuery(document).ready(function ($) {
 			});
 		},
 		
-		editPlugin: function (placeholder_id, plugin_id) {
+		editPlugin: function (placeholder_id, plugin_id, url) {
 			var that = this;
 			var frame = this.frame.find('.cms_placeholder-content_inner');
 			
@@ -218,7 +119,7 @@ jQuery(document).ready(function ($) {
 			// for that we create an iframe with the specific url
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
-				'src': that.options.urls.cms_page_changelist + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
+				'src': url + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
 				'style': 'width:100%; height:0; border:none; overflow:auto;',
 				'allowtransparency': true,
 				'scrollbars': 'no',
@@ -259,7 +160,7 @@ jQuery(document).ready(function ($) {
 			$(document.body).css('min-height', this.frame.outerHeight(true));
 		},
 		
-		deletePlugin: function (placeholder_id, plugin_id, plugin) {
+		deletePlugin: function (plugin, plugin_id, url) {
 			// lets ask if you are sure
 			var message = this.options.lang.delete_request;
 			var confirmed = confirm(message, true);
@@ -268,7 +169,7 @@ jQuery(document).ready(function ($) {
 			if(confirmed) {
 				$.ajax({
 					'type': 'POST',
-					'url': this.options.urls.cms_page_remove_plugin,
+					'url': url,
 					'data': { 'plugin_id': plugin_id },
 					'success': function () {
 						// remove plugin from the dom
@@ -280,8 +181,8 @@ jQuery(document).ready(function ($) {
 				});
 			}
 		},
-		
-		_movePluginPosition: function (dir, plugin, values) {
+
+		movePluginPosition: function (dir, plugin, values, url) {
 			// save reference to this class
 			var that = this;
 			// get all siblings within the placeholder
@@ -300,7 +201,7 @@ jQuery(document).ready(function ($) {
 			var array = [];
 
 			holders.each(function (index, item) {
-				array.push($(item).attr('class').split('::')[1]);
+				array.push($(item).data('options').plugin_id);
 			});
 			// remove current array
 			array.splice(index, 1);
@@ -318,7 +219,7 @@ jQuery(document).ready(function ($) {
 			// now lets do the ajax request
 			$.ajax({
 				'type': 'POST',
-				'url': this.options.urls.cms_page_move_plugin,
+				'url': url,
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
 				'error': function () {
@@ -335,7 +236,7 @@ jQuery(document).ready(function ($) {
 				if(dir === 'movedown' && index === -1) plugin.insertBefore($(holders[index+1]));
 
 				// close overlay
-				that._hideOverlay();
+				that.hideOverlay();
 
 				// show success overlay for a second
 				that.success.css({
@@ -347,17 +248,19 @@ jQuery(document).ready(function ($) {
 			}
 		},
 
-		_morePluginOptions: function (plugin, values) {
+		morePluginOptions: function (plugin, values, url) {
 			// save reference to this class
 			var that = this;
+
 			// how do we figure out all the placeholder names
 			var array = [];
 			$('.cms_placeholder-bar').each(function (index, item) {
-				array.push($(item).attr('class').split('::')[5]);
+				// TODO: get the data from the bar
+				array.push($(item).attr('class').split('::')[1]);
 			});
 
-			// so whats the current placeholder=
-			var current = plugin.attr('class').split('::')[5];
+			// so whats the current placeholder?
+			var current = plugin.attr('class').split('::')[1];
 
 			// lets remove current from array - puke
 			// cause ie is a fucking motherfucker it doesn't support indexOf so use jquerys crap instead
@@ -374,11 +277,11 @@ jQuery(document).ready(function ($) {
 			if(array.length) list.html('');
 
 			// loop through the array
-			$(array).each(function (index, item) {
+			$(array).each(function (index, slot) {
 				// do some brainfuck
-				var text = $('.cms_placeholder-bar[class$="cms_placeholder_slot::' + item + '"]').find('.cms_placeholder-title').text();
+				var text = $('.cms_placeholder-bar[class$="cms_placeholder_slot::' + slot + '"]').find('.cms_placeholder-title').text();
 				list.append($('<li><a href="">' +text + '</a></li>').data({
-					'slot': item,
+					'slot': slot,
 					'placeholder_id': values.placeholder,
 					'plugin_id': values.plugin_id
 				}));
@@ -393,7 +296,7 @@ jQuery(document).ready(function ($) {
 				// now lets do the ajax request
 				$.ajax({
 					'type': 'POST',
-					'url': that.options.urls.cms_page_move_plugin,
+					'url': url,
 					'data': { 'placeholder': slot, 'placeholder_id': placeholder_id, 'plugin_id': $(this).parent().data('plugin_id') },
 					'success': function () {
 						refreshPluginPosition(slot);
@@ -417,7 +320,7 @@ jQuery(document).ready(function ($) {
 				}
 
 				// close overlay
-				that._hideOverlay();
+				that.hideOverlay();
 
 				// show success overlay for a second
 				that.success.css({
@@ -435,8 +338,8 @@ jQuery(document).ready(function ($) {
 				plugin.attr('class', cls);
 			}
 		},
-		
-		_showOverlay: function (holder) {
+
+		showOverlay: function (holder) {
 			// lets place the overlay
 			this.overlay.css({
 				'width': holder.width()-2,
@@ -446,14 +349,14 @@ jQuery(document).ready(function ($) {
 			}).show();
 		},
 		
-		_hideOverlay: function () {
+		hideOverlay: function () {
 			// hide overlay again
 			this.overlay.hide();
 			// also hide submenu
 			this.overlay.find('.cms_placeholder-options_more').hide();
 		},
 		
-		_showPluginList: function (el) {
+		showPluginList: function (el) {
 			// save reference to this class
 			// TODO: make sure the element is really shown over everything
 			var that = this;
@@ -473,7 +376,7 @@ jQuery(document).ready(function ($) {
 			el.addClass('cms_toolbar-btn-active').data('collapsed', false);
 		},
 		
-		_hidePluginList: function (el) {
+		hidePluginList: function (el) {
 			var list = el.parent().find('.cms_placeholder-subnav');
 				list.hide();
 
@@ -485,7 +388,7 @@ jQuery(document).ready(function ($) {
 
 			el.removeClass('cms_toolbar-btn-active').data('collapsed', true);
 		},
-		
+
 		toggleFrame: function () {
 			(this.frame.data('collapsed')) ? this._showFrame() : this._hideFrame();
 		},
@@ -563,8 +466,127 @@ jQuery(document).ready(function ($) {
 			// remove dim event
 			this.dim.unbind('click');
 		}
-		
+
 	});
+
+	/**
+	 * Placeholder
+	 * @version: 1.0.0
+	 * @description: Handles each placeholder separately
+	 */
+	CMS.Placeholder = CMS.Class.$extend({
+
+		initialize: function (container, options) {
+			// save reference to this class
+			var that = this;
+
+			// do not merge options here
+			this.options = options;
+			this.container = $(container);
+
+			// save data on item
+			this.container.data('options', this.options);
+
+			// attach event handling to placeholder buttons and overlay if editmode is active
+			if(this.options.type === 'bar') {
+				this._bars();
+			}
+
+			// attach events to the placeholder bars
+			if(this.options.type === 'holder') {
+				this.container.bind('mouseenter', function (e) {
+					that._holders.call(that, e.currentTarget);
+				});
+			}
+		},
+
+		/* this private method controls the buttons on the bar (add plugins) */
+		_bars: function () {
+			// save reference to this class
+			var that = this;
+			var bar = this.container;
+
+			// attach button event
+			var barButton = bar.find('.cms_toolbar-btn');
+				barButton.data('collapsed', true).bind('click', function (e) {
+					e.preventDefault();
+
+					($(this).data('collapsed')) ? CMS.API.Placeholders.showPluginList($(e.currentTarget)) : CMS.API.Placeholders.hidePluginList($(e.currentTarget));
+				});
+
+			// read and save placeholder bar variables
+			var values = {
+				'language': that.options.page_language,
+				'placeholder_id': that.options.page_id,
+				'placeholder': that.options.placeholder_id
+			};
+
+			// attach events to placeholder plugins
+			bar.find('.cms_placeholder-subnav li a').bind('click', function (e) {
+				e.preventDefault();
+				// add type to values
+				values.plugin_type = $(this).attr('rel').split('::')[1];
+
+				// try to add a new plugin
+				CMS.API.Placeholders.addPlugin(values, that.options.urls.add_plugin, that.options.urls.change_list);
+			});
+		},
+
+		/* this private method shows the overlay when hovering */
+		_holders: function (el) {
+			// save reference to this class
+			var that = this;
+			var holder = $(el);
+
+			// show overlay
+			CMS.API.Placeholders.showOverlay(holder);
+
+			// set overlay to visible
+			if(CMS.API.Placeholders.overlayIsHidden === true) {
+				CMS.API.Placeholders.overlay.css('visibility', 'visible');
+				CMS.API.Placeholders.overlayIsHidden = false;
+			}
+
+			// get values from options
+			var values = {
+				'plugin_id': this.options.plugin_id,
+				'placeholder': this.options.placeholder_id,
+				'type': this.options.plugin_type,
+				'slot': this.options.placeholder_slot
+			};
+
+			// attach events to each holder button
+			var buttons = CMS.API.Placeholders.overlay.find('.cms_placeholder-options li');
+				// unbind all button events
+				buttons.find('a').unbind('click');
+
+				// attach edit event
+				buttons.find('a[rel^=edit]').bind('click', function (e) {
+					e.preventDefault();
+					CMS.API.Placeholders.editPlugin(values.placeholder, values.plugin_id, that.options.urls.change_list);
+				});
+
+				// attach move event
+				buttons.find('a[rel^=moveup], a[rel^=movedown]').bind('click', function (e) {
+					e.preventDefault();
+					CMS.API.Placeholders.movePluginPosition($(e.currentTarget).attr('rel'), holder, values, that.options.urls.move_plugin);
+				});
+
+				// attach delete event
+				buttons.find('a[rel^=delete]').bind('click', function (e) {
+					e.preventDefault();
+					CMS.API.Placeholders.deletePlugin(holder, values.plugin_id, that.options.urls.remove_plugin);
+				});
+
+				// attach more event
+				buttons.find('a[rel^=more]').bind('click', function (e) {
+					e.preventDefault();
+					CMS.API.Placeholders.morePluginOptions(holder, values, that.options.urls.move_plugin);
+				});
+		}
+
+	});
+
 });
 
 })(jQuery);
