@@ -215,50 +215,6 @@ and `django-appmedia`_ will do all the work for you.
 
 .. _django-appmedia: http://pypi.python.org/pypi/django-appmedia
 
-Initial database setup
-======================
-
-This command depends on whether you **upgrade** your installation or do a
-**fresh install**. We recommend that you get familiar with the way `South`_ works, 
-as it is a very powerful, easy and convenient tool. Django CMS uses it extensively.
-
-Fresh install
--------------
-
-Run::
-
-    python manage.py syncdb --all
-    python manage.py migrate --fake
-
-The first command will prompt you to create a super user; choose 'yes' and enter
-appropriate values.
-
-Upgrade
--------
-
-Run::
-
-    python manage.py syncdb
-    python manage.py migrate
-
-Up and running!
-===============
-
-That should be it. Restart your development server using ``python manage.py runserver`` 
-and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
-the django CMS "It Worked" screen.
-
-|it-works-cms|
-
-.. |it-works-cms| image:: ../images/it-works-cms.png
-
-Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
-the user you created during the database setup.
-
-To deploy your django CMS project on a production webserver, please refer to the
-`Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
-
-
 ******************
 Creating templates
 ******************
@@ -339,6 +295,52 @@ as last thing before the closing ``</head>`` HTML tag and the
 HTML tag.
 
 .. _django-sekizai: https://github.com/ojii/django-sekizai 
+
+Initial database setup
+======================
+
+This command depends on whether you **upgrade** your installation or do a
+**fresh install**. We recommend that you get familiar with the way `South`_ works, 
+as it is a very powerful, easy and convenient tool. Django CMS uses it extensively.
+
+Fresh install
+-------------
+
+Run::
+
+    python manage.py syncdb --all
+    python manage.py migrate --fake
+
+The first command will prompt you to create a super user; choose 'yes' and enter
+appropriate values.
+
+Upgrade
+-------
+
+Run::
+
+    python manage.py syncdb
+    python manage.py migrate
+
+Up and running!
+===============
+
+That should be it. Restart your development server using ``python manage.py runserver`` 
+and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
+the django CMS "It Worked" screen.
+
+|it-works-cms|
+
+.. |it-works-cms| image:: ../images/it-works-cms.png
+
+Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
+the user you created during the database setup.
+
+To deploy your django CMS project on a production webserver, please refer to the
+`Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
+
+
+
 
 
 *****************************
