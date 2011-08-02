@@ -8,15 +8,6 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_spaces_between_tags
 
 
-def _media(suffix):
-    """
-    Helper that prefixes a URL with MEDIA_URL
-    """
-    if suffix:
-        return u'%s%s' % (settings.MEDIA_URL, suffix)
-    return ''
-
-
 class Switcher(BaseItem):
     """
     A 'switcher' button, state is defined using GET (and optionally a session
@@ -137,10 +128,7 @@ class GetButton(BaseItem):
         url: target of the GET request
         """
         super(GetButton, self).__init__(alignment, css_class_suffix)
-        if icon:
-            self.icon = _media(icon)
-        else:
-            self.icon = icon
+        self.icon = icon
         self.title = title
         if callable(url):
             self.serialize_url = url
@@ -170,7 +158,7 @@ class PostButton(BaseItem):
         """
         super(PostButton, self).__init__(alignment, css_class_suffix)
         self.title = title
-        self.icon = _media(icon)
+        self.icon = icon
         self.action = action
         self.args = args
         self.kwargs = kwargs
@@ -209,7 +197,7 @@ class ListItem(Serializable):
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
         self.title = title
         self.method = method
-        self.icon = _media(icon)
+        self.icon = icon
         if callable(url):
             self.serialize_url = url
         else:
@@ -234,7 +222,7 @@ class List(BaseItem):
         """
         super(List, self).__init__(alignment, css_class_suffix)
         self.title = title
-        self.icon = _media(icon)
+        self.icon = icon
         self.validate_items(items)
         self.raw_items = items
         

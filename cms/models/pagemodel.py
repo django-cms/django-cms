@@ -117,6 +117,16 @@ class Page(MPTTModel):
         if title is None:
             title = u""
         return u'%s' % (title,)
+
+    def get_absolute_url(self, language=None, fallback=True):
+        if self.is_home():
+            return reverse('pages-root')
+        if settings.CMS_FLAT_URLS:
+            path = self.get_slug(language, fallback)
+            return urlutils.urljoin(reverse('pages-root'), path)
+        # else
+        path = self.get_path(language, fallback)
+        return urlutils.urljoin(reverse('pages-root'), path)
     
     def move_page(self, target, position='first-child'):
         """Called from admin interface when page is moved. Should be used on
@@ -394,6 +404,7 @@ class Page(MPTTModel):
         """
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
+            transaction.rollback()
             return
 
         # publish, but only if all parents are published!!
@@ -480,7 +491,9 @@ class Page(MPTTModel):
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
+
         transaction.commit()
+
         return published
         
     def delete(self):
@@ -531,37 +544,6 @@ class Page(MPTTModel):
             self.all_languages = list(self.all_languages)
             self.all_languages.sort()    
         return self.all_languages
-
-    def get_absolute_url(self, language=None, fallback=True):
-        try:
-            if self.is_home():
-                return reverse('pages-root')
-        except NoHomeFound:
-            pass
-        if settings.CMS_FLAT_URLS:
-            path = self.get_slug(language, fallback)
-        else:
-            path = self.get_path(language, fallback)
-            if hasattr(self, "home_cut_cache") and self.home_cut_cache:
-                if not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
-                    path = "/".join(path.split("/")[1:])
-            else:    
-                home_pk = None
-                try:
-                    home_pk = self.home_pk_cache
-                except NoHomeFound:
-                    pass
-                """
-                this is pain slow! the code fetches all ancestors for all pages
-                and then checks if the root node is a home_pk, if yes, it cuts off the first path part.
-                """
-                ancestors = self.get_cached_ancestors(ascending=True)
-                # sometimes there are no ancestors
-                if len(ancestors) != 0:
-                    if self.parent_id and ancestors[-1].pk == home_pk and not self.get_title_obj_attribute("has_url_overwrite", language, fallback) and path:
-                        path = "/".join(path.split("/")[1:])
-
-        return urlutils.urljoin(reverse('pages-root'), path)
     
     def get_cached_ancestors(self, ascending=True):
         if ascending:

@@ -63,11 +63,9 @@ class ViewTests(SettingsOverrideTestCase):
             self.assertEqual(response.status_code, 200)
             apphook_pool.clear()
     
-    def test_redirect(self):
-        redirect_one = 'https://www.django-cms.org/'
-        redirect_two = '/'
-        redirect_three = '/en/'
+    def test_external_redirect(self):
         # test external redirect
+        redirect_one = 'https://www.django-cms.org/'
         one = create_page("one", "nav_playground.html", "en", published=True,
                           redirect=redirect_one)
         url = one.get_absolute_url()
@@ -76,7 +74,12 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_one)
         
+    def test_internal_neutral_redirect(self):
         # test internal language neutral redirect
+        redirect_one = 'https://www.django-cms.org/'
+        redirect_two = '/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect_one)
         two = create_page("two", "nav_playground.html", "en", parent=one,
                           published=True, redirect=redirect_two)
         url = two.get_absolute_url()
@@ -85,7 +88,12 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/en/')
         
+    def test_internal_forced_redirect(self):
         # test internal forced language redirect
+        redirect_one = 'https://www.django-cms.org/'
+        redirect_three = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect_one)
         three = create_page("three", "nav_playground.html", "en", parent=one,
                             published=True, redirect=redirect_three)
         url = three.get_absolute_url()

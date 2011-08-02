@@ -130,7 +130,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         """
         with SettingsOverride(**self.render_settings()):
             from cms.views import details
-            response = details(self.get_request(self.test_page), slug=self.test_page.get_slug())
+            response = details(self.get_request(self.test_page), '')
             r = self.strip_rendered(response.content)
             self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         
@@ -231,11 +231,13 @@ class RenderingTestCase(SettingsOverrideTestCase):
         
     def test_detail_view_404_when_no_language_is_found(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
-                                          ( 'elvish', 'Elvish' )]):
+                              CMS_LANGUAGES=[
+                                  ('x-klingon', 'Klingon'),
+                                  ('x-elvish', 'Elvish')
+                              ]):
             from cms.views import details
             request = AttributeObject(
-                REQUEST={'language': 'elvish'},
+                REQUEST={'language': 'x-elvish'},
                 GET=[],
                 session={},
                 path='/',
@@ -243,23 +245,24 @@ class RenderingTestCase(SettingsOverrideTestCase):
                 current_page=None,
                 method='GET',
             )
-            self.assertRaises(Http404, details, request, slug=self.test_page.get_slug())
+            self.assertRaises(Http404, details, request, '')
 
-    def test_detail_view_fallsback_language(self):
+    def test_detail_view_fallback_language(self):
         '''
         Ask for a page in elvish (doesn't exist), and assert that it fallsback
         to English
         '''
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
                               CMS_LANGUAGE_CONF={
-                                  'elvish': ['klingon', 'en',]
+                                  'x-elvish': ['x-klingon', 'en',]
                               },
-                              CMS_LANGUAGES=[( 'klingon', 'Klingon' ),
-                                          ( 'elvish', 'Elvish' )
+                              CMS_LANGUAGES=[
+                                  ('x-klingon', 'Klingon'),
+                                  ('x-elvish', 'Elvish'),
                               ]):
             from cms.views import details
             request = AttributeObject(
-                REQUEST={'language': 'elvish'},
+                REQUEST={'language': 'x-elvish'},
                 GET=[],
                 session={},
                 path='/',
@@ -268,7 +271,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
                 method='GET',
             )
 
-            response = details(request, slug=self.test_page.get_slug())
+            response = details(request, '')
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             
     def test_extra_context_isolation(self):
