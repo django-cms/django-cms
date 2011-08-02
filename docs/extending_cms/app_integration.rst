@@ -199,9 +199,12 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the url ``/hello/world/sublevel/``.
 
 
-.. note:: All views that are attached like this must return a
-          :class:`~django.template.RequestContext` instance instead of the
-          default :class:`~django.template.Context` instance.
+.. note::
+
+    All views that are attached like this must return a
+    :class:`~django.template.RequestContext` instance instead of the
+    default :class:`~django.template.Context` instance.
+
 
 Language Namespaces
 -------------------

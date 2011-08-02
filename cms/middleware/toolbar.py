@@ -8,11 +8,15 @@ from django.template.loader import render_to_string
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
+    original_context.push()
     data = {
         'instance': instance,
         'rendered_content': rendered_content
     }
-    return render_to_string('cms/toolbar/placeholder_wrapper.html', data)
+    original_context.update(data)
+    output = render_to_string('cms/toolbar/placeholder_wrapper.html', original_context)
+    original_context.pop()
+    return output
 
 class ToolbarMiddleware(object):
     """

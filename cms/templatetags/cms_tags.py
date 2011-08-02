@@ -82,7 +82,8 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            mail_managers(subject, body, fail_silently=True)
+            if settings.SEND_BROKEN_LINK_EMAILS:
+                mail_managers(subject, body, fail_silently=True)
             return None
 
 class PageUrl(InclusionTag):

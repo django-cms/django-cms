@@ -2,8 +2,10 @@
 from __future__ import with_statement
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
+from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_rendering import render_plugins, PluginContext
+from cms.plugin_rendering import (render_plugins, PluginContext, 
+    render_placeholder_toolbar)
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
@@ -11,6 +13,7 @@ from django.contrib.auth.models import User
 from django.forms.widgets import Media
 from django.http import Http404, HttpResponseRedirect
 from django.template import Template, RequestContext
+from django.template.context import Context
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -272,3 +275,25 @@ class RenderingTestCase(SettingsOverrideTestCase):
         with ChangeModel(self.test_page, template='extra_context.html'):
             response = self.client.get(self.test_page.get_absolute_url())
             self.assertTrue('width' not in response.context)
+
+    def test_render_placeholder_toolbar(self):
+        placeholder = Placeholder()
+        placeholder.slot = 'test'
+        placeholder.pk = placeholder.id = 99
+        context = Context()
+        context['request'] = AttributeObject(
+                REQUEST={'language': 'en'},
+                GET=[],
+                session={},
+                path='/',
+                user=self.test_user,
+                current_page=None,
+                method='GET',
+            )
+        classes = [
+            "cms_placeholder::en::::99::",
+            "cms_placeholder_slot::test",
+        ]
+        output = render_placeholder_toolbar(placeholder, context, '', 'test')
+        for cls in classes:
+            self.assertTrue(cls in output)
