@@ -237,7 +237,10 @@ else clause.
     ``file``, ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
     ``teaser``, ``twittersearch``, ``twitterrecententries`` and ``video``.
 
-
+    Additionally, it is *recommended* that you avoid using ``page`` as a model
+    field, as it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`,
+    and your plugin will not work as intended in the administration without
+    further work.
 
 Handling Relations
 ==================
