@@ -31,7 +31,7 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
 
 CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../../cms/media/cms/')
 MEDIA_URL = '/media/'
-
+STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
