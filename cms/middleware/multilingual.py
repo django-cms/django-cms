@@ -66,7 +66,7 @@ def patch_response(content, pages_root, language):
     content = FORM_URL_FIX_RE.sub(ur'<form\1action=\2%s%s/\5\6\7>' % (pages_root, language), content).encode("utf8")
     return content
 
-class MultilingualURLMiddleware:
+class MultilingualURLMiddleware(object):
     def get_language_from_request (self,request):
         changed = False
         prefix = has_lang_prefix(request.path_info)
