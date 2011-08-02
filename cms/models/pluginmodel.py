@@ -19,15 +19,30 @@ from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from mptt.models import MPTTModel, MPTTModelBase
 
 
+class BoundRenderMeta(object):
+    def __init__(self, meta):
+        self.index = 0
+        self.total = 1
+        self.text_enabled = getattr(meta, 'text_enabled', False)
+
+
 class PluginModelBase(MPTTModelBase):
     """
     Metaclass for all plugins.
     """
     def __new__(cls, name, bases, attrs):
-        render_meta = attrs.pop('RenderMeta', None)
-        if render_meta is not None:
-            attrs['_render_meta'] = render_meta()
+        attr_meta = attrs.pop('RenderMeta', None)
+
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
+        
+        if attr_meta:
+            meta = attr_meta
+        else:
+            meta = getattr(new_class, '_render_meta', None)
+        
+        new_class._render_meta = BoundRenderMeta(meta)
+        
+        # WTF does the following code do???
         found = False
         bbases = bases
         while bbases:
