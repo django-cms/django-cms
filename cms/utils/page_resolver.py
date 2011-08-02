@@ -65,15 +65,6 @@ def get_page_from_path(path, preview=False):
         q = Q(title_set__slug=path)
     else:
         q = Q(title_set__path=path)
-        if home:
-            # if we have a home, also search for all paths prefixed with the
-            # home slug that are on the same tree as home, since home isn't ussually
-            # called with it's slug, thus it's children don't have the home bit in
-            # the request either, thus we need to re-add it.
-            q2 = Q()
-            q2 = Q(title_set__path='%s/%s' % (home.get_slug(), path))
-            q2 &= Q(tree_id=home.tree_id)
-            q |= q2
     try:
         page = pages.filter(q).distinct().get()
     except Page.DoesNotExist:
