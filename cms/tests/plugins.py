@@ -625,4 +625,20 @@ class NoDatabasePluginTests(TestCase):
     def test_render_meta_is_unique(self):
         text = Text()
         link = Link()
-        self.assertNotEqual(id(text._render_meta), id(link._render_meta)) 
+        self.assertNotEqual(id(text._render_meta), id(link._render_meta))
+    
+    def test_render_meta_does_not_leak(self):
+        text = Text()
+        link = Link()
+        
+        text._render_meta.text_enabled = False
+        link._render_meta.text_enabled = False
+        
+        self.assertFalse(text._render_meta.text_enabled)
+        self.assertFalse(link._render_meta.text_enabled)
+        
+        link._render_meta.text_enabled = True
+
+        self.assertFalse(text._render_meta.text_enabled)
+        self.assertTrue(link._render_meta.text_enabled)
+    

@@ -41,7 +41,7 @@ class PluginModelBase(MPTTModelBase):
             if new_class._meta.db_table.startswith("%s_" % new_class._meta.app_label):
                 table = "cmsplugin_" + new_class._meta.db_table.split("%s_" % new_class._meta.app_label, 1)[1]
                 new_class._meta.db_table = table
-        return new_class 
+        return new_class
          
     
 class CMSPlugin(MPTTModel):
