@@ -35,7 +35,7 @@ class ApphookPool(object):
             return
         from cms.app_base import CMSApp
         # validate the app
-        if not isinstance(app, CMSApp):
+        if not issubclass(app, CMSApp):
             raise ImproperlyConfigured('CMS Apps must inherit '
                                        'cms.app_base.CMSApp, %r does not' % app)
         if hasattr(app, 'menu') and not app.menus:
