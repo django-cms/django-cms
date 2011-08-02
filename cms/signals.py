@@ -43,6 +43,19 @@ def update_title_paths(instance, **kwargs):
 page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
 
 
+def update_title(title):
+    parent_page_id = title.page.parent_id
+    slug = u'%s' % title.slug
+    
+    if title.page.is_home():
+        title.path = ''
+    else:
+        title.path = u'%s' % slug
+    if parent_page_id:
+        parent_title = Title.objects.get_title(parent_page_id, language=title.language, language_fallback=True)
+        if parent_title:
+            title.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
@@ -64,14 +77,7 @@ def pre_save_title(instance, raw, **kwargs):
     if instance.has_url_overwrite and instance.path:
         instance.path = instance.path.strip(" /")
     else:
-        parent_page = instance.page.parent
-        slug = u'%s' % instance.slug
-        
-        instance.path = u'%s' % slug
-        if parent_page:
-            parent_title = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True)
-            if parent_title:
-                instance.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+        update_title(instance)
         
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
@@ -198,6 +204,10 @@ def post_save_page(instance, raw, created, **kwargs):
         # tell moderator something was happen with this page
         from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
+    for page in instance.get_descendants():
+        for title in page.title_set.all():
+            update_title(title)
+            title.save()
 
 
 def update_placeholders(instance, **kwargs):
