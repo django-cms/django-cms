@@ -73,3 +73,11 @@ def get_page_from_request(request):
          "'cms.utils.page_resolver.get_page_from_request' and will be removed "
          "in Django-CMS 2.2.", DeprecationWarning)
     return new(request)
+
+def cms_media(suffix):
+    '''
+    Helper that prefixes a URL with CMS_MEDIA_URL
+    '''
+    if suffix:
+        return u'%s%s' % (settings.CMS_MEDIA_URL, suffix)
+    return ''
