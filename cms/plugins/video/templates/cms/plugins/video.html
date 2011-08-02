@@ -30,7 +30,7 @@
 	var attributes = { align: 'middle' };
 	
 	// load
-	swfobject.embedSWF('{{ CMS_MEDIA_URL }}swf/player.swf', 'video-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ MEDIA_URL }}swf/expressInstall.swf', flashvars, params, attributes);
+	swfobject.embedSWF('{{ CMS_MEDIA_URL }}swf/player.swf', 'video-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ CMS_MEDIA_URL }}swf/expressInstall.swf', flashvars, params, attributes);
 })();
 //]]>
 </script>
