@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-class PluginAlreadyRegistered(Exception):
+class AppAlreadyRegistered(Exception):
     pass
+
+AppAllreadyRegistered = AppAlreadyRegistered # backwards compatibility, will be dropped in 2.3
 
 class PluginNotRegistered(Exception):
     pass
