@@ -112,7 +112,6 @@ class CMSMenu(Menu):
             elif not settings.CMS_PUBLIC_FOR == 'all':
                 continue
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
-                page.home_cut_cache = True 
                 home_children.append(page.pk)
             if (page.pk == home.pk and home.in_navigation) or page.pk != home.pk:
                 first = False

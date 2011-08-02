@@ -279,8 +279,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl.render(context) 
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].get_absolute_url(), "%s%s/" % (self.get_pages_root(), self.get_page(2).get_slug()))
-        self.assertEqual(nodes[0].children[0].get_absolute_url(), "%s%s/%s/" % (self.get_pages_root(), self.get_page(2).get_slug(), self.get_page(3).get_slug()))
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
+        self.assertEqual(nodes[0].children[0].get_absolute_url(), self.get_page(3).get_absolute_url())
         page4 = Page.objects.get(pk=self.get_page(4).pk)
         page4.in_navigation = True
         page4.save()
