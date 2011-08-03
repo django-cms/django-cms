@@ -52,7 +52,7 @@ started:
 
     sudo aptitude install python2.6 python-setuptools python-imaging
     sudo easy_install pip
-    sudo pip install django-cms south django-appmedia
+    sudo pip install Django==1.2.5 django-cms south django-appmedia
 
 Additionally, you need the python driver for your selected database:
 
@@ -69,6 +69,11 @@ or
 This will install PIL and your database's driver globally.
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
+
+.. note:: This will install Django version 1.2.5 for use with the CMS. While 
+          later verisons of Django (such as 1.3) are know to work for some
+          people, it is NOT recommended and will not be supported until further
+          notice (and tests)
 
 On Mac OSX
 ==========
