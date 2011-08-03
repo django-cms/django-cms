@@ -18,6 +18,7 @@ jQuery(document).ready(function ($) {
 	 * @description: Adds security layer to CMS namespace
 	 * @public_methods:
 	 *	- CMS.API.Security.csrf();
+	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 	CMS.API.Security = {
 	
