@@ -14,7 +14,7 @@ jQuery(document).ready(function ($) {
     $('#id_{{ name }}').wymeditor({
         lang: '{{ language }}',
         skin: 'django',
-        skinPath: "{{ CMS_MEDIA_URL }}js/wymeditor/skins/django/",
+        skinPath: "{{ STATIC_URL }}cms/js/wymeditor/skins/django/",
         updateSelector: 'input[type=submit],',
         updateEvent: 'click',
 		logoHtml: '',

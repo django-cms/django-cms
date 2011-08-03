@@ -10,7 +10,7 @@ from django.utils.translation.trans_real import get_language
 
 class WYMEditor(Textarea):
     class Media:
-        js = [join(settings.CMS_MEDIA_URL, path) for path in (
+        js = [join(settings.STATIC_URL, 'cms', path) for path in (
             'wymeditor/jquery.wymeditor.js',
             'wymeditor/plugins/resizable/jquery.wymeditor.resizable.js',
             'js/wymeditor.placeholdereditor.js',
@@ -18,7 +18,7 @@ class WYMEditor(Textarea):
             'js/placeholder_editor_registry.js',
         )]
         css = {
-            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [join(settings.STATIC_URL, 'cms', path) for path in (
                         'css/jquery/cupertino/jquery-ui.css',
                     )],
         }

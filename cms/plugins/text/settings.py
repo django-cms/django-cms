@@ -61,6 +61,6 @@ WYM_STYLES = getattr(settings, "WYM_STYLES", WYM_STYLES)
 #Advantageously replaces WYM_CLASSES and WYM_STYLES
 ##Prepare url for wymeditor.css
 CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
-WYM_STYLESHEET_PATH = getattr(settings, 'CMS_MEDIA_URL', ''.join((settings.MEDIA_URL, CMS_MEDIA_PATH)) )
+WYM_STYLESHEET_PATH = getattr(settings, 'WYM_STYLESHEET_PATH', ''.join((settings.STATIC_URL, 'cms')) )
 WYM_STYLESHEET = getattr(settings, "WYM_STYLESHEET",  '"%scss/wymeditor.css"' % WYM_STYLESHEET_PATH  )
 

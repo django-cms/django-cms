@@ -76,8 +76,8 @@ def get_page_from_request(request):
 
 def cms_media(suffix):
     '''
-    Helper that prefixes a URL with CMS_MEDIA_URL
+    Helper that prefixes a URL with STATIC_URL and cms
     '''
     if suffix:
-        return u'%s%s' % (settings.CMS_MEDIA_URL, suffix)
+        return u'%scms/%s' % (settings.STATIC_URL, suffix)
     return ''

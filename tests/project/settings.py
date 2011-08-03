@@ -28,6 +28,7 @@ SITE_ID = 1
 USE_I18N = True
 
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static/')
 
 CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../../cms/media/cms/')
 MEDIA_URL = '/media/'
@@ -55,6 +56,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.csrf',
     "cms.context_processors.media",
     "sekizai.context_processors.sekizai",
+    "staticfiles.context_processors.static",
 )
 
 INTERNAL_IPS = ('127.0.0.1',)
@@ -85,6 +87,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.sites',
+    'staticfiles',
     'cms',
     'menus',
     'cms.plugins.text',
