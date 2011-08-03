@@ -43,17 +43,43 @@ class PluginModelBase(MPTTModelBase):
         new_class._render_meta = BoundRenderMeta(meta)
         
         # WTF does the following code do???
+        
+        # chrisglass's answer: Apparently, it strips the app_label prefix from
+        # the plugin's _meta.db_table and replaces it with "cmsplugin_", but:
+        # ONLY when the new_class is a subclass of CMSPlugin *as a left-only
+        # ancestor*.
+        #
+        # Example in pseudo doctests:
+        #
+        # (Working)
+        # >> a = myapp.MyPlugin(CMSPlugin)
+        # >> print a._meta.db_table
+        # 'cmsplugin_myplugin'
+        #
+        # (Broken)
+        # >> b = myapp.MyPlugin(MyMixin, CMSPlugin)
+        # >> print b._meta.db_table
+        # 'myapp_myplugin'
+
         found = False
         bbases = bases
-        while bbases:
-            bcls = bbases[0]
+        while bbases: # Loop over baseclases, looking for the CMSPlugin class
+            bcls = bbases[0] # This means mixins will break this behavior.
             if bcls.__name__ == "CMSPlugin":
                 found = True
                 bbases = False
             else:
+                # If the first baseclass is not an instance of CMSplugin, 
+                # continue looping on the first base's bases.
+                # Essentially, we go up the tree of inheritence, always taking
+                # the first class we find as the next ancestor.
                 bbases = bcls.__bases__  
         if found:
+            # Ok, this is weird: if the new classe's db_table is prefixed with
+            # the plugins's app_label (it should always be the case?), then...
             if new_class._meta.db_table.startswith("%s_" % new_class._meta.app_label):
+                # ... make the plugin's table be prefixed with cmsplugin_
+                # instead of _meta.app_name.
                 table = "cmsplugin_" + new_class._meta.db_table.split("%s_" % new_class._meta.app_label, 1)[1]
                 new_class._meta.db_table = table
         return new_class
