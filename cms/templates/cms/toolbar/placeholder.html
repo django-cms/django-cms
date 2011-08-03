@@ -1,4 +1,5 @@
-{% load i18n %}
+{% load i18n sekizai_tags %}
+{% addtoblock "js" %}
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
@@ -8,13 +9,14 @@ jQuery(document).ready(function ($) {
 		'page_language': '{{ language }}',
 		'placeholder_id': '{{ placeholder.pk }}',
 		'urls': {
-			'add_plugin': '{% url admin:cms_page_add_plugin %}',
-			'change_list': '{% url admin:cms_page_changelist %}'
+			'add_plugin': '{{ placeholder.get_add_url }}',
+			'change_list': '{{ placeholder.get_changelist_url }}'
 		}
 	});
 });
 //]]>
 </script>
+{% endaddtoblock %}
 <div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar cms_reset cms_placeholder_slot::{{ placeholder.slot }}">
 	<div class="cms_placeholder-title">{{ placeholder_label }}</div>
 	<div class="cms_placeholder-btn">
@@ -24,7 +26,7 @@ jQuery(document).ready(function ($) {
 				<span class="cms_toolbar_icon cms_toolbar_icon-more">-</span>
 			</span>
 		</a>
-		<ul class="cms_placeholder-subnav">				
+		<ul class="cms_placeholder-subnav">
 			{% regroup installed_plugins by module as module_list %}
 			{% for module in module_list %}
 			<li class="cms_placeholder-subnav-title"><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span>
