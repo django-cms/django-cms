@@ -14,10 +14,10 @@ Community
 
 People interested in developing for the django-cms should join the
 `django-cms-developers`_ mailing list as well as heading over to #django-cms on
-freenode for help and to discuss the development.
+the `freenode`_ IRC network for help and to discuss the development.
 
-You may also be interested in following @djangocmsstatus on twitter to get the
-github commits as well as the hudson build reports. There is also a @djangocms
+You may also be interested in following `@djangocmsstatus`_ on twitter to get the
+github commits as well as the hudson build reports. There is also a `@djangocms`_
 account for less technical announcements.
 
 
@@ -32,8 +32,8 @@ only for the stuff we host on github:
 #. The best method to contribute back is to create an account there, then fork
    the project. You can use this fork as if it was your own project, and should
    push your changes to it.
-#. When you feel your code is good enough for inclusion, "send us a pull
-   request", by using the nice Github web interface.
+#. When you feel your code is good enough for inclusion, "send us a `pull
+   request`_", by using the nice Github web interface.
 
 
 
@@ -45,7 +45,7 @@ Contributing Code
 Getting the source code
 =======================
 
-If you're interested in developing a new feature for the cms, it is recommended
+If you're interested in developing a new feature for the CMS, it is recommended
 that you first discuss it on the `django-cms-developers`_  mailing list so as
 not to do any work that will not get merged in anyway.
 
@@ -58,7 +58,7 @@ not to do any work that will not get merged in anyway.
 - Usually, if unit tests are written, pass, and your change is relevant, then
   it'll be merged.
 
-Since we're hosted on github, django-cms uses git as a version control system.
+Since we're hosted on github, django-cms uses `git`_ as a version control system.
 
 The `Github help`_ is very well written and will get you started on using git
 and github in a jiffy. It is an invaluable resource for newbies and old timers
@@ -135,7 +135,7 @@ correctness.
 
 Documentation should be:
 
-- We use `Sphinx`_/restructuredText. So obviously this is the format you should
+- We use `Sphinx`_/`restructuredText`_. So obviously this is the format you should
   use :) File extensions should be .rst.
 - Written in English. We can discuss how it would bring more people to the
   project to have a Klingon translation or anything, but that's a problem we
@@ -184,3 +184,10 @@ contribute. All changes there will be automatically sent to the project.
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _Github : http://www.github.com
 .. _Github help : http://help.github.com
+.. _freenode : http://freenode.net/
+.. _@djangocmsstatus : https://twitter.com/djangocmsstatus
+.. _@djangocms : https://twitter.com/djangocms
+.. _pull request : http://help.github.com/send-pull-requests/
+.. _git : http://git-scm.com/
+.. _restructuredText: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
+
