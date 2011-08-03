@@ -24,6 +24,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
 from project.pluginapp.models import Article, Section
@@ -334,37 +335,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
             self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
-        
-    def test_fileplugin_icon_uppercase(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        body = page.placeholders.get(slot="body") 
-        plugin = File(
-            plugin_type='FilePlugin',
-            placeholder=body,
-            position=1,
-            language=settings.LANGUAGE_CODE,
-        )
-        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
-        plugin.insert_at(None, position='last-child', save=True)
-        self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
-        with SettingsOverride(DEBUG=True):
-            response = self.client.get(plugin.get_icon_url(), follow=True)
-            self.assertEqual(response.status_code, 200)
-        # Nuke everything in the storage location directory (since removing just
-        # our file would still leave a useless directory structure)
-        #
-        # By the way, plugin.file.storage.delete(plugin.file.name) does not work
-        # since the delete method is a pass... See reversion.storage.delete()
-        storage_location = plugin.file.storage.location # This is ".../media/"
-        for root, dirs, files in os.walk(storage_location, topdown=False):
-            # We need to walk() the directory tree since rmdir() does not allow
-            # to remove non-empty directories...
-            for name in files:
-                # Start by killing all files we walked
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                # Now all directories we walked...
-                os.rmdir(os.path.join(root, name))
 
     def test_copy_textplugin(self):
         """
@@ -441,6 +411,39 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         new_plugin = Text.objects.get(pk=6)
         self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
+
+
+class FileSystemPluginTests(PluginsTestBaseCase):
+    def setUp(self):
+        super(FileSystemPluginTests, self).setUp()
+        call_command('collectstatic', interactive=False, verbosity=0, link=True)
+        
+    def tearDown(self):
+        for directory in [settings.STATIC_ROOT, settings.MEDIA_ROOT]:
+            for root, dirs, files in os.walk(directory, topdown=False):
+                # We need to walk() the directory tree since rmdir() does not allow
+                # to remove non-empty directories...
+                for name in files:
+                    # Start by killing all files we walked
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    # Now all directories we walked...
+                    os.rmdir(os.path.join(root, name))
+        super(FileSystemPluginTests, self).tearDown()
+        
+    def test_fileplugin_icon_uppercase(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        body = page.placeholders.get(slot="body") 
+        plugin = File(
+            plugin_type='FilePlugin',
+            placeholder=body,
+            position=1,
+            language=settings.LANGUAGE_CODE,
+        )
+        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
+        plugin.insert_at(None, position='last-child', save=True)
+        self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 

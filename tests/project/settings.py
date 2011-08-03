@@ -1,4 +1,6 @@
 # Django settings for cms project.
+from distutils.version import LooseVersion
+import django
 import os
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -81,13 +83,12 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_DIR, 'templates'),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.sites',
-    'staticfiles',
     'cms',
     'menus',
     'cms.plugins.text',
@@ -111,7 +112,13 @@ INSTALLED_APPS = (
     'south',
     'reversion',
     'sekizai',
-)
+]
+
+if LooseVersion(django.get_version()) >= LooseVersion('1.3'):
+    INSTALLED_APPS.append('django.contrib.staticfiles')
+else:
+    INSTALLED_APPS.append('staticfiles')
+
 
 gettext = lambda s: s
 
