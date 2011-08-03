@@ -4,18 +4,19 @@ from cms.api import create_page, publish_page, add_plugin
 from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
-from cms.models.pluginmodel import CMSPlugin
+from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
+from cms.plugins.link.models import Link
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
+    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -73,8 +74,6 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-
-
     def test_add_edit_plugin(self):
         """
         Test that you can add a text plugin
@@ -620,3 +619,37 @@ class LinkPluginTestCase(PluginsTestBaseCase):
         form = LinkForm(
             {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
         self.assertEquals(form.is_valid(), True)
+
+
+class NoDatabasePluginTests(TestCase):
+    def test_render_meta_is_unique(self):
+        text = Text()
+        link = Link()
+        self.assertNotEqual(id(text._render_meta), id(link._render_meta))
+    
+    def test_render_meta_does_not_leak(self):
+        text = Text()
+        link = Link()
+        
+        text._render_meta.text_enabled = False
+        link._render_meta.text_enabled = False
+        
+        self.assertFalse(text._render_meta.text_enabled)
+        self.assertFalse(link._render_meta.text_enabled)
+        
+        link._render_meta.text_enabled = True
+
+        self.assertFalse(text._render_meta.text_enabled)
+        self.assertTrue(link._render_meta.text_enabled)
+    
+    def test_db_table_hack(self):
+        # TODO: Django tests seem to leak models from test methods, somehow
+        # we should clear django.db.models.loading.app_cache in tearDown.
+        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
+        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin')
+    
+    def test_db_table_hack_with_mixin(self):
+        class LeftMixin: pass
+        class RightMixin: pass
+        plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin), {'__module__': 'cms.tests.plugins'})
+        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')
