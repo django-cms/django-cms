@@ -14,7 +14,7 @@ class WYMEditor(Textarea):
             'wymeditor/jquery.wymeditor.js',
             'wymeditor/plugins/resizable/jquery.wymeditor.resizable.js',
             'js/wymeditor.placeholdereditor.js',
-            'js/lib/ui.core.js',
+            'js/plugins/jquery.ui.core.js',
             'js/placeholder_editor_registry.js',
         )]
         css = {
@@ -43,7 +43,7 @@ class WYMEditor(Textarea):
         context = {
             'name': name,
             'language': language,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'STATIC_URL': settings.STATIC_URL,
             'WYM_TOOLS': mark_safe(text_settings.WYM_TOOLS),
             'WYM_CONTAINERS': mark_safe(text_settings.WYM_CONTAINERS),
             'WYM_CLASSES': mark_safe(text_settings.WYM_CLASSES),
