@@ -16,7 +16,7 @@
 jQuery(document).ready(function ($) {
 	// if it is an iframe
 	if(window.parent != self) {
-		if (window.parent.CMS === undefined){
+		if (typeof window.parent.CMS === 'undefined'){
 			// backend admin
 			parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
 		} else {
