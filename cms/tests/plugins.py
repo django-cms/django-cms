@@ -4,7 +4,7 @@ from cms.api import create_page, publish_page, add_plugin
 from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
-from cms.models.pluginmodel import CMSPlugin
+from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
@@ -642,3 +642,14 @@ class NoDatabasePluginTests(TestCase):
         self.assertFalse(text._render_meta.text_enabled)
         self.assertTrue(link._render_meta.text_enabled)
     
+    def test_db_table_hack(self):
+        # TODO: Django tests seem to leak models from test methods, somehow
+        # we should clear django.db.models.loading.app_cache in tearDown.
+        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
+        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin')
+    
+    def test_db_table_hack_with_mixin(self):
+        class LeftMixin: pass
+        class RightMixin: pass
+        plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin), {'__module__': 'cms.tests.plugins'})
+        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')
