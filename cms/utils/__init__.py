@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from cms.utils.i18n import get_default_language
+from distutils.version import LooseVersion
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.core.urlresolvers import reverse
@@ -8,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.functional import LazyObject
+import django
 import os
 import urllib
 
@@ -82,9 +84,14 @@ def get_page_from_request(request):
 The following class is taken from https://github.com/jezdez/django/compare/feature/staticfiles-templatetag
 and should be removed and replaced by the django-core version in 1.4
 """
+default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+if LooseVersion(django.get_version()) < LooseVersion('1.3'):
+    default_storage = 'staticfiles.storage.StaticFilesStorage'
+
+
 class ConfiguredStorage(LazyObject):
     def _setup(self):
-        self._wrapped = get_storage_class(settings.STATICFILES_STORAGE)()
+        self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
 
 configured_storage = ConfiguredStorage()
 
