@@ -137,7 +137,7 @@ default Django settings file will not have any)::
 
 Almost there!
 Point your :setting:`django:MEDIA_ROOT` to where the static media should live (that is,
-your images,CSS files, Javascript files...)::
+your images, CSS files, Javascript files...)::
 
     MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
     MEDIA_URL = "/media/"
@@ -337,7 +337,7 @@ Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
 
 To deploy your django CMS project on a production webserver, please refer to the
-`Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
+`Django documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
 
