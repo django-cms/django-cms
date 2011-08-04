@@ -171,13 +171,14 @@ class PageAdmin(ModelAdmin):
                 'css/jquery.dialog.css',
             )]
         }
-        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/jquery.js',
-            'js/lib/jquery.query.js',
-            'js/lib/ui.core.js',
-            'js/lib/ui.dialog.js',
-
-        )]
+        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [
+                os.path.join(settings.CMS_MEDIA_URL, path) for path in [
+                'js/plugins/admincompat.js',
+                'js/libs/jquery.query.js',
+                'js/libs/jquery.ui.core.js',
+                'js/libs/jquery.ui.dialog.js',
+            ]
+        ]
 
 
     def get_urls(self):
