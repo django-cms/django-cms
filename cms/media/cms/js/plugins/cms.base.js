@@ -1,6 +1,4 @@
 /**
- * @author:		Angelo Dini
- * @copyright:	http://www.divio.ch under the BSD Licence
  * @requires:	Classy, jQuery
  *
  * assign Class and CMS namespace */

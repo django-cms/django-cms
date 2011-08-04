@@ -1,7 +1,5 @@
 (function ($) {
 /**
- * @author:		Angelo Dini
- * @copyright:	http://www.divio.ch under the BSD Licence
  * @requires:	Classy, jQuery, jQuery.ui.core, jQuery.ui.draggable, jQuery.ui.droppable
  */
 
