@@ -1,7 +1,5 @@
 (function ($) {
 /**
- * @author:		Angelo Dini
- * @copyright:	http://www.divio.ch under the BSD Licence
  * @requires:	Classy, jQuery, jQuery.cookie
  */
 
@@ -85,6 +83,11 @@ jQuery(document).ready(function ($) {
 				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); });
 				$(window).trigger('resize');
 			}
+		},
+		
+		// Checks whether the toolbar is hidden right now
+		isToolbarHidden: function(){
+			return this.toolbar.data('collapsed');
 		},
 
 		/**
