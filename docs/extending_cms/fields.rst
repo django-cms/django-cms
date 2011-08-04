@@ -11,8 +11,8 @@ Model fields
 .. py:class:: cms.models.fields.PageField
 
     This is a foreign key field to the :class:`cms.models.pagemodel.Page` model
-    that defaults to using the :class:`cms.forms.fields.PageSelectFormField`
-    form field when rendered in forms. It has the same API as the
+    that defaults to the :class:`cms.forms.fields.PageSelectFormField` form
+    field when rendered in forms. It has the same API as the
     :class:`django.db.models.fields.related.ForeignKey` but does not require
     the ``othermodel`` argument.
 
