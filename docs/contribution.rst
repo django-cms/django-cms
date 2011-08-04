@@ -17,7 +17,7 @@ People interested in developing for the django-cms should join the
 the `freenode`_ IRC network for help and to discuss the development.
 
 You may also be interested in following `@djangocmsstatus`_ on twitter to get the
-github commits as well as the hudson build reports. There is also a `@djangocms`_
+GitHub commits as well as the hudson build reports. There is also a `@djangocms`_
 account for less technical announcements.
 
 
@@ -26,14 +26,14 @@ In a nutshell
 *************
 
 Here's what the contribution process looks like, in a bullet-points fashion, and
-only for the stuff we host on github:
+only for the stuff we host on GitHub:
 
-#. django-cms is hosted on `Github`_, at https://github.com/divio/django-cms
+#. django CMS is hosted on `GitHub`_, at https://github.com/divio/django-cms
 #. The best method to contribute back is to create an account there, then fork
    the project. You can use this fork as if it was your own project, and should
    push your changes to it.
 #. When you feel your code is good enough for inclusion, "send us a `pull
-   request`_", by using the nice Github web interface.
+   request`_", by using the nice GitHub web interface.
 
 
 
@@ -58,10 +58,10 @@ not to do any work that will not get merged in anyway.
 - Usually, if unit tests are written, pass, and your change is relevant, then
   it'll be merged.
 
-Since we're hosted on github, django-cms uses `git`_ as a version control system.
+Since we're hosted on GitHub, django-cms uses `git`_ as a version control system.
 
-The `Github help`_ is very well written and will get you started on using git
-and github in a jiffy. It is an invaluable resource for newbies and old timers
+The `GitHub help`_ is very well written and will get you started on using git
+and GitHub in a jiffy. It is an invaluable resource for newbies and old timers
 alike.
 
 
@@ -82,7 +82,7 @@ Process
 
 This is how you fix a bug or add a feature:
 
-#. `fork`_ us on github.
+#. `fork`_ us on GitHub.
 #. Checkout your fork.
 #. Hack hack hack, test test test, commit commit commit, test again.
 #. Push to your fork.
@@ -148,7 +148,7 @@ Documentation should be:
   A brief description of what it does is also welcome. 
 
 Pulling of documentation is pretty fast and painless. Usually somebody goes over
-your text and merges it, since there are no "breaks" and that github parses rst
+your text and merges it, since there are no "breaks" and that GitHub parses rst
 files automagically it's really convenient to work with.
 
 Also, contributing to the documentation will earn you great respect from the
@@ -173,7 +173,7 @@ Translations
 ************
 
 
-For translators we have a `transifex account
+For translators we have a `Transifex account
 <http://www.transifex.net/projects/p/django-cms/>`_ where you can translate
 the .po files and don't need to install git or mercurial to be able to
 contribute. All changes there will be automatically sent to the project.
@@ -182,8 +182,8 @@ contribute. All changes there will be automatically sent to the project.
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
-.. _Github : http://www.github.com
-.. _Github help : http://help.github.com
+.. _GitHub : http://www.github.com
+.. _GitHub help : http://help.github.com
 .. _freenode : http://freenode.net/
 .. _@djangocmsstatus : https://twitter.com/djangocmsstatus
 .. _@djangocms : https://twitter.com/djangocms
