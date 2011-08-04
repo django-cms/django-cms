@@ -4,24 +4,24 @@ from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, cms_static_url
 from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from django.conf import settings
 from django.contrib.admin import ModelAdmin
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import (HttpResponse, Http404, HttpResponseBadRequest, 
+    HttpResponseForbidden)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
-import os
 
 
 class PlaceholderAdmin(ModelAdmin):
       
     class Media:
         css = {
-            'all': [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
+            'all': [cms_static_url(path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
@@ -29,8 +29,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [
-            os.path.join(settings.STATIC_URL, 'cms', path) for path in [
+        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/csrf.js',
                 'js/libs/jquery.query.js',

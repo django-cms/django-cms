@@ -2,7 +2,7 @@
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser, Placeholder
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, cms_static_url
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.forms.widgets import Select, MultiWidget, Widget
@@ -11,7 +11,6 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from os.path import join
 import copy
 
 class PageSelectWidget(MultiWidget):
@@ -130,12 +129,12 @@ class PluginEditor(Widget):
             self.attrs = {}
         
     class Media:
-        js = [join(settings.STATIC_URL, 'cms', path) for path in (
+        js = [cms_static_url(path) for path in (
             'js/libs/jquery.ui.core.js',
             'js/libs/jquery.ui.sortable.js',
         )]
         css = {
-            'all': [join(settings.STATIC_URL, 'cms', path) for path in (
+            'all': [cms_static_url(path) for path in (
                 'css/plugin_editor.css',
             )]
         }
