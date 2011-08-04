@@ -21,15 +21,6 @@ jQuery(document).ready(function ($) {
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 
-	/**
-	 * new concept
-	 * cms.placeholders register basic events like:
-	 * - dimmer
-	 * - frameloader
-	 * - overlay (blue)
-	 * - listshow (show list elements for add)
-	 */
-
 	CMS.Placeholders = CMS.Class.$extend({
 
 		options: {
