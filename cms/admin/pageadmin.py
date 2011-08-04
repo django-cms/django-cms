@@ -2,20 +2,20 @@
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
-from cms.admin.permissionadmin import PAGE_ADMIN_INLINES, \
-    PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
+from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES, 
+    PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
 from cms.forms.widgets import PluginEditor
-from cms.models import Page, Title, CMSPlugin, PagePermission, \
-    PageModeratorState, EmptyTitle, GlobalPagePermission
+from cms.models import (Page, Title, CMSPlugin, PagePermission, 
+    PageModeratorState, EmptyTitle, GlobalPagePermission)
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
-from cms.utils import copy_plugins, helpers, moderator, permissions, plugins, \
-    get_template_from_request, get_language_from_request, \
-    placeholder as placeholder_utils, admin as admin_utils
+from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
+    get_template_from_request, get_language_from_request, 
+    placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
 from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from django import template
@@ -28,20 +28,17 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import transaction, models
 from django.forms import CharField
-from django.http import HttpResponseRedirect, HttpResponse, Http404, \
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
-from django.template.defaultfilters import title, escape, force_escape, \
-    escapejs
+from django.template.defaultfilters import (title, escape, force_escape, 
+    escapejs)
 from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 import django
 import inspect
-import os
-
 
 
 
@@ -164,20 +161,20 @@ class PageAdmin(ModelAdmin):
 
     class Media:
         css = {
-            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [cms_static_url(path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
             )]
         }
-        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/jquery.js',
-            'js/lib/jquery.query.js',
-            'js/lib/ui.core.js',
-            'js/lib/ui.dialog.js',
-
-        )]
+        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+                'js/plugins/admincompat.js',
+                'js/libs/jquery.query.js',
+                'js/libs/jquery.ui.core.js',
+                'js/libs/jquery.ui.dialog.js',
+            ]
+        ]
 
 
     def get_urls(self):

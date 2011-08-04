@@ -12,32 +12,32 @@
 
 {% block coltype %}flex{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/pages.css"/>
-<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}jstree/tree_component.css" />
-<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}css/jquery.dialog.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/pages.css"/>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/tree_component.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/jquery.dialog.css" />
 
 {{ block.super }}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.livequery.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.livequery.js"></script>
 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.bind.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.checkbox.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/effects.core.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/effects.highlight.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.form.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/_lib/_all.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}jstree/tree_component.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/functional.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/classy.min.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/plugins/cms.base.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/change_list.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.ui.core.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.bind.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.ui.checkbox.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.ui.effects.core.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.ui.effects.highlight.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.form.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/jstree/_lib/_all.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/jstree/tree_component.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.ui.dialog.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.functional.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_list.js"></script>
 
 
 {% if cl.is_filtered %}
-<link rel="stylesheet" type="text/css" href="{{ CMS_MEDIA_URL }}jstree/themes/default/style.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/themes/default/style.css" />
 {% endif %}
 {% endblock %}
 

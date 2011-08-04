@@ -43,7 +43,7 @@
 <body>
 	<div id="main">
 		<div class="box-left">
-			<p><img src="{{ CMS_MEDIA_URL }}images/pony.jpg" alt="" />&nbsp;</p>
+			<p><img src="{{ STATIC_URL }}cms/images/pony.jpg" alt="" />&nbsp;</p>
 		</div>
 		<div class="box-right">
 			<h1>Welcome to the django CMS!<br />Here is what to do next:</h1>
@@ -58,8 +58,8 @@
 		</div>
 		<div class="clear"></div>
 		<p class="foot padding-top">
-			If you don't see the django CMS logo at the end of this line make sure you linked the <code>cms/media</code> folder 
-			to your media files: <img src="{{ CMS_MEDIA_URL }}images/logo.jpg" alt="here should be a logo" height="20" /></p>
+			If you don't see the django CMS logo at the end of this line make sure you linked the <code>cms/static</code> folder 
+			to your static files: <img src="{{ STATIC_URL }}cms/images/logo.jpg" alt="here should be a logo" height="20" /></p>
 		<p class="foot">
 			You're seeing this message because you have <code>DEBUG = True</code> in your 
 			django settings file and haven't added any pages yet. Get to work!"

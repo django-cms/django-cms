@@ -14,12 +14,22 @@ class Command(SubcommandsCommand):
         make_option('--noinput', action='store_false', dest='interactive', default=True,
         help='Tells django-cms to NOT prompt the user for input of any kind. '),
     )
+    
+    args = '<subcommand>'
 
     command_name = 'cms'
     
-    help = 'Various django-cms commands'
     subcommands = {
         'uninstall': UninstallCommand,
         'list': ListCommand,
         'moderator': ModeratorCommand,
     }
+    
+    @property
+    def help(self):
+        lines = ['django CMS command line interface.', '', 'Available subcommands:']
+        for subcommand in sorted(self.subcommands.keys()):
+            lines.append('  %s' % subcommand)
+        lines.append('')
+        lines.append('Use `manage.py cms <subcommand> --help` for help about subcommands')
+        return '\n'.join(lines)

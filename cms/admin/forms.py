@@ -176,7 +176,8 @@ class PageForm(PageAddForm):
             if url:
                 if not any_path_re.match(url):
                     raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
-                if get_page_from_path(url.strip('/')):
+                page = get_page_from_path(url.strip('/'))
+                if page and page.pk != self.instance.pk:
                     raise forms.ValidationError(_('Page with redirect url %r already exist') % url)
         return url
 

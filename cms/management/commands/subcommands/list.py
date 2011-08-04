@@ -9,9 +9,9 @@ class ListApphooksCommand(NoArgsCommand):
     
     help = 'Lists all apphooks in pages'
     def handle_noargs(self, **options):
-        urls = Title.objects.values_list("application_urls", flat=True)
+        urls = Title.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
         for url in urls:
-            self.stdout.write(url+'\n')
+            self.stdout.write('%s\n' % url)
             
 class ListPluginsCommand(NoArgsCommand):
 

@@ -4,7 +4,7 @@ include README.rst
 include CHANGELOG.txt
 recursive-include cms/locale *
 recursive-include cms/templates *
-recursive-include cms/media *
+recursive-include cms/static *
 recursive-include cms/plugins *
 recursive-include menus/templates *
 recursive-include docs *
