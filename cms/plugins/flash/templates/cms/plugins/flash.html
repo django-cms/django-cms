@@ -1,5 +1,5 @@
 {% load i18n sekizai_tags %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/swfobject.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/swfobject.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 //<![CDATA[
@@ -12,7 +12,7 @@
 		name: 'flash-plugin-name-{{ object.id }}'
 	};
 	// replace flash_plugin object through swfobject
-	swfobject.embedSWF('{{ object.file.url }}', 'flash-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ CMS_MEDIA_URL }}swf/expressInstall.swf', flashvars, params, attributes);
+	swfobject.embedSWF('{{ object.file.url }}', 'flash-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ STATIC_URL }}cms/swf/expressInstall.swf', flashvars, params, attributes);
 })();
 //]]>
 </script>
@@ -39,7 +39,7 @@
 		<!-- alternate content -->
 		{% trans "Missing flash plugin. Please download the latest Adobe Flash Player: " %}<br />
 		<a href="https://www.adobe.com/go/getflashplayer">
-			<img alt="{% trans 'Get Adobe Flash Player' %}" src="{{ CMS_MEDIA_URL }}images/plugins/get_flash_player.gif" />
+			<img alt="{% trans 'Get Adobe Flash Player' %}" src="{{ STATIC_URL }}cms/images/plugins/get_flash_player.gif" />
 		</a>
 		<!-- /alternate content -->
 			<!--[if !IE]>-->

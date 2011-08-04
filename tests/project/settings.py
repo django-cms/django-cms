@@ -1,4 +1,6 @@
 # Django settings for cms project.
+from distutils.version import LooseVersion
+import django
 import os
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,11 +30,12 @@ SITE_ID = 1
 USE_I18N = True
 
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media/')
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static/')
 
 CMS_MEDIA_ROOT = os.path.join(PROJECT_DIR, '../../cms/media/cms/')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
@@ -46,7 +49,7 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.eggs.Loader',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = [
     "django.core.context_processors.auth",
     "django.core.context_processors.i18n",
     "django.core.context_processors.debug",
@@ -55,7 +58,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.csrf',
     "cms.context_processors.media",
     "sekizai.context_processors.sekizai",
-)
+]
 
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -79,7 +82,7 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_DIR, 'templates'),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -108,7 +111,15 @@ INSTALLED_APPS = (
     'south',
     'reversion',
     'sekizai',
-)
+]
+
+if LooseVersion(django.get_version()) >= LooseVersion('1.3'):
+    INSTALLED_APPS.append('django.contrib.staticfiles')
+    TEMPLATE_CONTEXT_PROCESSORS.append("django.contrib.staticfiles.context_processors.static")
+else:
+    INSTALLED_APPS.append('staticfiles')
+    TEMPLATE_CONTEXT_PROCESSORS.append("staticfiles.context_processors.static")
+
 
 gettext = lambda s: s
 

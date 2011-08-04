@@ -30,12 +30,12 @@ class TinyMCEEditor(TinyMCE):
         
     def _media(self):
         media = super(TinyMCEEditor, self)._media()
-        media.add_js([join(settings.CMS_MEDIA_URL, path) for path in (
+        media.add_js([join(settings.STATIC_URL, 'cms', path) for path in (
                       'js/tinymce.placeholdereditor.js',
                       'js/libs/jquery.ui.core.js',
                       'js/placeholder_editor_registry.js',
                       )])
-        media.add_css({"all":[join(settings.CMS_MEDIA_URL, path) for path in ('css/jquery/cupertino/jquery-ui.css',
+        media.add_css({"all":[join(settings.STATIC_URL, 'cms', path) for path in ('css/jquery/cupertino/jquery-ui.css',
                                                                      'css/tinymce_toolbar.css')]})
         
         return media

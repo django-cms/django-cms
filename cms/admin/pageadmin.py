@@ -164,15 +164,14 @@ class PageAdmin(ModelAdmin):
 
     class Media:
         css = {
-            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [
-                os.path.join(settings.CMS_MEDIA_URL, path) for path in [
+        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [os.path.join(settings.STATIC_URL, 'cms', path) for path in [
                 'js/plugins/admincompat.js',
                 'js/libs/jquery.query.js',
                 'js/libs/jquery.ui.core.js',
