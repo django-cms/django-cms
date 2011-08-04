@@ -34,8 +34,8 @@ class PlaceholderAdmin(ModelAdmin):
                 'js/plugins/admincompat.js',
                 'js/csrf.js',
                 'js/libs/jquery.query.js',
-                'js/libs/ui.core.js',
-                'js/libs/ui.dialog.js',
+                'js/libs/jquery.ui.core.js',
+                'js/libs/jquery.ui.dialog.js',
             ]
         ]
         
