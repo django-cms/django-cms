@@ -219,11 +219,12 @@ class CMSToolbar(Toolbar):
         
     def _request_hook_post(self):
         # login hook
-        login_form = CMSToolbarLoginForm(self.request.POST)
-        if login_form.is_valid():
-            username = login_form.cleaned_data['cms_username']
-            password = login_form.cleaned_data['cms_password']
-            user = authenticate(username=username, password=password)
-            if user:
-                login(self.request, user)
-                self.init()
+        if 'cms-toolbar-login' in self.request.GET:
+            login_form = CMSToolbarLoginForm(self.request.POST)
+            if login_form.is_valid():
+                username = login_form.cleaned_data['cms_username']
+                password = login_form.cleaned_data['cms_password']
+                user = authenticate(username=username, password=password)
+                if user:
+                    login(self.request, user)
+                    self.init()
