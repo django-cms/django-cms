@@ -366,7 +366,7 @@ jQuery(document).ready(function ($) {
 			// add event to body to hide the list needs a timout for late trigger
 			setTimeout(function () {
 				$(document).bind('click', function () {
-					that._hidePluginList.call(that, el);
+					that.hidePluginList.call(that, el);
 				});
 			}, 100);
 
