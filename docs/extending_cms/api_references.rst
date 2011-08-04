@@ -262,7 +262,7 @@ menus.base
                          visible or not.
 
 
-    .. method:: get_descendents
+    .. method:: get_descendants
 
         Returns a list of all children beneath the current menu item.
 
