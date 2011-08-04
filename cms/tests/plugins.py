@@ -334,7 +334,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
-            self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
+            self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
 
     def test_copy_textplugin(self):
         """

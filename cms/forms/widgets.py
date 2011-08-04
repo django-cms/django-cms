@@ -131,9 +131,8 @@ class PluginEditor(Widget):
         
     class Media:
         js = [join(settings.STATIC_URL, 'cms', path) for path in (
-            'js/lib/ui.core.js',
-            'js/lib/ui.sortable.js',
-            'js/plugin_editor.js',
+            'js/libs/jquery.ui.core.js',
+            'js/libs/jquery.ui.sortable.js',
         )]
         css = {
             'all': [join(settings.STATIC_URL, 'cms', path) for path in (

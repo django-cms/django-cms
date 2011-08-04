@@ -29,13 +29,15 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = [os.path.join(settings.STATIC_URL, 'cms', path) for path in (
-            'js/lib/jquery.js',
-            'js/csrf.js',
-            'js/lib/jquery.query.js',
-            'js/lib/ui.core.js',
-            'js/lib/ui.dialog.js',
-        )]
+        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [
+            os.path.join(settings.STATIC_URL, 'cms', path) for path in [
+                'js/plugins/admincompat.js',
+                'js/csrf.js',
+                'js/libs/jquery.query.js',
+                'js/libs/jquery.ui.core.js',
+                'js/libs/jquery.ui.dialog.js',
+            ]
+        ]
         
     def get_fieldsets(self, request, obj=None):
         """
