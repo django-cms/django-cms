@@ -54,6 +54,7 @@ Extending the CMS
     extending_cms/api_references
     extending_cms/placeholders
     extending_cms/searchdocs
+    extending_cms/fields
 
 
 ***********************
