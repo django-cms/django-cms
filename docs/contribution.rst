@@ -1,8 +1,8 @@
 ##########################
-Contributing to Django-CMS
+Contributing to django CMS
 ##########################
 
-Like every open-source project, Django-CMS is always looking for motivated
+Like every open-source project, django CMS is always looking for motivated
 individuals to contribute to it's source code.
 However, to ensure the highest code quality and keep the repository nice and
 tidy, everybody has to follow a few rules (nothing major, I promise :) )
@@ -12,7 +12,7 @@ tidy, everybody has to follow a few rules (nothing major, I promise :) )
 Community
 *********
 
-People interested in developing for the django-cms should join the
+People interested in developing for the django CMS should join the
 `django-cms-developers`_ mailing list as well as heading over to #django-cms on
 the `freenode`_ IRC network for help and to discuss the development.
 
@@ -58,7 +58,7 @@ not to do any work that will not get merged in anyway.
 - Usually, if unit tests are written, pass, and your change is relevant, then
   it'll be merged.
 
-Since we're hosted on GitHub, django-cms uses `git`_ as a version control system.
+Since we're hosted on GitHub, django CMS uses `git`_ as a version control system.
 
 The `GitHub help`_ is very well written and will get you started on using git
 and GitHub in a jiffy. It is an invaluable resource for newbies and old timers

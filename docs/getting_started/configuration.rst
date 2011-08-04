@@ -4,7 +4,7 @@
 Configuration
 #############
 
-The Django-CMS has a lot of settings you can use to customize your installation
+The django CMS has a lot of settings you can use to customize your installation
 of the CMS to be exactly like you want it to be.
 
 *****************
@@ -209,7 +209,7 @@ CMS_HIDE_UNTRANSLATED
 
 Default: ``True``
 
-By default django-cms hides menu items that are not yet translated into the
+By default django CMS hides menu items that are not yet translated into the
 current language. With this setting set to False they will show up anyway.
 
 .. setting:: CMS_LANGUAGES
@@ -219,7 +219,7 @@ CMS_LANGUAGES
 
 Default: Value of :setting:`django:LANGUAGES`
 
-Defines the languages available in the CMS.
+Defines the languages available in django CMS.
 
 Example::
 
@@ -283,7 +283,7 @@ CMS_FRONTEND_LANGUAGES
 
 Default: Value of :setting:`CMS_LANGUAGES`
 
-A list of languages Django CMS uses in the frontend. For example, if
+A list of languages django CMS uses in the frontend. For example, if
 you decide you want to add a new language to your page but don't want to
 show it to the world yet.
 
@@ -330,12 +330,12 @@ CMS_PAGE_MEDIA_PATH
 
 Default: ``'cms_page_media/'``
 
-By default, Django CMS creates a folder called ``cms_page_media`` in your
+By default, django CMS creates a folder called ``cms_page_media`` in your
 static files folder where all uploaded media files are stored. The media files
 are stored in subfolders numbered with the id of the page.
 
 You should take care that the directory to which it points is writable by the
-user under which django will be running.
+user under which Django will be running.
 
 
 ****
