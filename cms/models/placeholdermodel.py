@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-import operator
-
+from cms.utils.helpers import reversion_register
+from cms.utils.placeholder import PlaceholderNoAction
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.utils.translation import ugettext_lazy as _
+import operator
 
-from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import PlaceholderNoAction
+
 
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
@@ -17,6 +18,21 @@ class Placeholder(models.Model):
 
     def __unicode__(self):
         return self.slot
+    
+    def get_add_url(self):
+        return self._get_url('add_plugin')
+    
+    def get_changelist_url(self):
+        return self._get_url('changelist')
+    
+    def _get_url(self, key):
+        model = self._get_attached_model()
+        if not model:
+            return reverse('admin:cms_page_%s' % key)
+        else:
+            app_label = model._meta.app_label
+            model_name = model.__name__.lower()
+            return reverse('admin:%s_%s_%s' % (app_label, model_name, key))
         
     def _get_permission(self, request, key):
         """
