@@ -31,6 +31,7 @@ class PlaceholderAdmin(ModelAdmin):
         }
         js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [
             os.path.join(settings.CMS_MEDIA_URL, path) for path in [
+                'js/plugins/admincompat.js',
                 'js/csrf.js',
                 'js/libs/jquery.query.js',
                 'js/libs/ui.core.js',
