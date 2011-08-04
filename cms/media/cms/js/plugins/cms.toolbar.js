@@ -86,6 +86,11 @@ jQuery(document).ready(function ($) {
 				$(window).trigger('resize');
 			}
 		},
+		
+		// Checks whether the toolbar is hidden right now
+		isToolbarHidden: function(){
+			return this.toolbar.data('collapsed');
+		},
 
 		/**
 		 * Binds the collapsed data element to the toolbar

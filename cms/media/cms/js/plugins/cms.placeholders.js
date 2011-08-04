@@ -110,6 +110,14 @@ jQuery(document).ready(function ($) {
 		editPlugin: function (placeholder_id, plugin_id, url) {
 			var that = this;
 			var frame = this.frame.find('.cms_placeholder-content_inner');
+			var needs_collapsing = false;
+			
+			// If the toolbar is hidden, editPlugin does not work properly,
+			// therefore we show toggle it and save the old state.
+			if (CMS.API.Toolbar.isToolbarHidden()){
+				CMS.API.Toolbar.toggleToolbar();
+				needs_collapsing = true;
+			}
 			
 			// show framebox
 			this.toggleFrame();
@@ -144,12 +152,24 @@ jQuery(document).ready(function ($) {
 				// add cancel button
 				var btn = $(this).contents().find('input[name^="_save"]');
 					btn.addClass('default').css('float', 'none');
+					btn.bind('click', function(){
+						// If the toolbar was hidden before we started editing
+						// this plugin, and it is NOT hidden now, hide it
+						if (needs_collapsing && ! CMS.API.Toolbar.isToolbarHidden()){
+							CMS.API.Toolbar.toggleToolbar();
+						}
+					})
 				var cancel = $(this).contents().find('input[name^="_cancel"]');
 					cancel.bind('click', function (e) {
 						e.preventDefault();
 						// hide frame
 						that.toggleFrame();
 						that.toggleDim();
+						// If the toolbar was hidden before we started editing
+						// this plugin, and it is NOT hidden now, hide it
+						if (needs_collapsing && ! CMS.API.Toolbar.isToolbarHidden()){
+							CMS.API.Toolbar.toggleToolbar();
+						}
 					});
 
 				// do some css changes in template
