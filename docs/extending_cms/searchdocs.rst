@@ -1,5 +1,5 @@
 #########################
-Search and the Django-CMS
+Search and the django CMS
 #########################
 
 For powerful full-text search in with the django CMS, we suggest using

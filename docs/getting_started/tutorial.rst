@@ -98,7 +98,7 @@ instead:
 
 If you opt for core plugins you should take care that directory to which
 :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
-relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which django
+relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which Django
 will be running. If you have opted for django-filer then similar requirement
 exists based on its configuration.
 
@@ -137,7 +137,7 @@ default Django settings file will not have any)::
 
 Almost there!
 Point your :setting:`django:MEDIA_ROOT` to where the static media should live (that is,
-your images,CSS files, Javascript files...)::
+your images, CSS files, Javascript files...)::
 
     MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
     MEDIA_URL = "/media/"
@@ -219,7 +219,7 @@ and `django-appmedia`_ will do all the work for you.
 Creating templates
 ******************
 
-Django CMS uses templates to define how a page should look and what parts of
+django CMS uses templates to define how a page should look and what parts of
 it are editable. Editable areas are called *placeholders*. These templates are
 standard Django templates and you may use them as described in the
 `official documentation`_.
@@ -301,7 +301,7 @@ Initial database setup
 
 This command depends on whether you **upgrade** your installation or do a
 **fresh install**. We recommend that you get familiar with the way `South`_ works, 
-as it is a very powerful, easy and convenient tool. Django CMS uses it extensively.
+as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
 
 Fresh install
 -------------
@@ -337,7 +337,7 @@ Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
 
 To deploy your django CMS project on a production webserver, please refer to the
-`Django Documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
+`Django documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
 
 
 
@@ -375,7 +375,7 @@ pages.
 
 .. |my-first-page| image:: ../images/my-first-page.png
 
-Congratulations! You now have a fully functional Django CMS installation!
+Congratulations! You now have a fully functional django CMS installation!
 
 Publishing a page
 =================
@@ -455,7 +455,7 @@ Template errors
 
 If your placeholder content isn't displayed when you view a CMS Page: change the
 :setting:`CMS_MODERATOR` setting in your ``settings.py`` to ``False``. This bug
-has been recently fixed, so upgrade to the latest version of Django CMS. See:
+has been recently fixed, so upgrade to the latest version of django CMS. See:
 https://github.com/divio/django-cms/issues/issue/430
 
 

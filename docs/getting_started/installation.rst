@@ -90,7 +90,7 @@ On Microsoft Windows
 Databases
 *********
 
-We recommend using `PostgreSQL`_ or `MySQL`_ with Django CMS. Installing and
+We recommend using `PostgreSQL`_ or `MySQL`_ with django CMS. Installing and
 maintaining database systems is outside the scope of this documentation, but is
 very well documented on the system's respective websites.
 

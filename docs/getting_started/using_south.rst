@@ -1,5 +1,5 @@
 ###########################
-Using South with Django-CMS
+Using South with django CMS
 ###########################
 
 South is an incredible piece of software that lets you handle database
