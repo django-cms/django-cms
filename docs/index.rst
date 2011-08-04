@@ -37,6 +37,7 @@ Advanced
     advanced/i18n
     advanced/sitemap
     advanced/templatetags
+    advanced/cli
 
 
 *****************
