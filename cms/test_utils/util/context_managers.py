@@ -170,9 +170,11 @@ class _AssertNumQueriesContext(object):
 
         final_queries = len(self.connection.queries)
         executed = final_queries - self.starting_queries
+        
+        queries = '\n'.join([q['sql'] for q in self.connection.queries[self.starting_queries:]])
 
         self.test_case.assertEqual(
-            executed, self.num, "%d queries executed, %d expected" % (
-                executed, self.num
+            executed, self.num, "%d queries executed, %d expected. Queries executed:\n%s" % (
+                executed, self.num, queries
             )
         )

@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
-import copy
+from cms.exceptions import NoHomeFound
+from cms.models.managers import PageManager, PagePermissionsPermissionManager
+from cms.models.metaclasses import PageMetaClass
+from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
+from cms.publisher.errors import MpttPublisherCantPublish
+from cms.utils import i18n, urlutils, page as page_utils
+from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.helpers import reversion_register
 from datetime import datetime
-from os.path import join
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,20 +18,14 @@ from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language, ugettext_lazy as _
-
-from cms.exceptions import NoHomeFound
-from cms.models.managers import PageManager, PagePermissionsPermissionManager
-from cms.models.metaclasses import PageMetaClass
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
-
-from cms.publisher.errors import MpttPublisherCantPublish
-from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
-from cms.utils import i18n, urlutils, page as page_utils
-
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
+from os.path import join
+import copy
+
+
+
+
 
 
 class Page(MPTTModel):
@@ -713,15 +713,14 @@ class Page(MPTTModel):
         
         if request.user.is_authenticated():
             site = current_site(request)
+            global_perms_q = Q(can_view=True) & Q(
+                Q(sites__in=[site]) | Q(sites__isnull=True)
+            )
             global_view_perms = GlobalPagePermission.objects.with_user(
-                request.user).filter(can_view=True, sites__in=[site]).exists()
+                request.user).filter(global_perms_q).exists()
             # a global permission was given to the request's user
             if global_view_perms:
                 return True
-            # authenticated user, no restriction and public for all fallback
-            if (not is_restricted and not global_view_perms and
-                    not settings.CMS_PUBLIC_FOR == 'all'):
-                return False
             # authenticated user, no restriction and public for all
             if (not is_restricted and not global_view_perms and 
                 settings.CMS_PUBLIC_FOR == 'all'):
