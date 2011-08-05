@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from cms.apphook_pool import apphook_pool
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN)
@@ -31,8 +32,11 @@ def get_visible_pages(request, pages, site=None):
         ) 
         pages_perms_q |= page_q
     pages_perms_q &= Q(can_view=True)
-    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page')
-    restriced_pages = [page_permission.page.pk for page_permission in page_permissions]
+    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
+    
+    restricted_pages = defaultdict(list)
+    for perm in page_permissions:
+        restricted_pages[perm.page.pk].append(perm)
     
     if site is None:
         site = current_site(request)
@@ -50,9 +54,22 @@ def get_visible_pages(request, pages, site=None):
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
     
+    def has_permission(page):
+        """
+        PagePermission tests
+        """
+        for perm in restricted_pages[page.pk]:
+            if perm.user_id == request.user.pk:
+                return True
+        for perm in restricted_pages[page.pk]:
+            if not perm.group_id:
+                continue
+            if request.user.pk in perm.group.user_set.values_list('id', flat=True):
+                return True
+        return False
     
     for page in pages:
-        is_restricted = page.pk in restriced_pages
+        is_restricted = page.pk in restricted_pages
         
         if request.user.is_authenticated():
             # a global permission was given to the request's user
@@ -60,6 +77,8 @@ def get_visible_pages(request, pages, site=None):
                 page_ids.append(page.pk)
             # authenticated user, no restriction and public for all
             elif settings.CMS_PUBLIC_FOR == 'all':
+                page_ids.append(page.pk)
+            elif has_permission(page):
                 page_ids.append(page.pk)
             elif has_global_perm():
                 page_ids.append(page.pk)
