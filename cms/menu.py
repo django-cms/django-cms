@@ -1,32 +1,101 @@
 # -*- coding: utf-8 -*-
-from menus.menu_pool import menu_pool
-from menus.base import Menu, NavigationNode, Modifier
+from cms.apphook_pool import apphook_pool
+from cms.cache.permissions import get_permission_cache, set_permission_cache
+from cms.models.managers import PagePermissionsPermissionManager
+from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
+    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN)
+from cms.models.permissionmodels import PagePermission, GlobalPagePermission
+from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
+from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_page_queryset, get_title_queryset
+from cms.utils.plugins import current_site
 from django.conf import settings
 from django.contrib.sites.models import Site
-from cms.utils.i18n import get_fallback_languages
-from cms.apphook_pool import apphook_pool
-from cms.models.titlemodels import Title
+from django.db.models.query_utils import Q
+from django.utils.functional import lazy
+from menus.base import Menu, NavigationNode, Modifier
+from menus.menu_pool import menu_pool
 
-def populate_ancestors(page_list):
-    ancestors = []
-    populated_pages = []
-    for idx, page in enumerate(page_list):
-        if idx == 0:
-            ancestors = page.get_cached_ancestors(ascending=True)
-        try:
-            next_page = page_list[idx+1]
-        except IndexError:
-            next_page = None
-        page.ancestors_ascending = ancestors
-        if next_page:
-            if next_page.level > page.level:
-                ancestors.append(page)
-            if next_page.level < page.level:
-                ancestors.pop()
-        populated_pages.append(page)
-    return populated_pages
+
+def get_visible_pages(request, pages):
+    # This code is basically a many-pages-at-once version of
+    # Page.has_view_permission, check there to see wtf is going on here.
+    if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
+        return [page.pk for page in pages]
+    page_ids = []
+    
+    pages_perms_q = Q()
+    for page in pages:
+        page_q = Q(page__tree_id=page.tree_id) & (
+            Q(page=page) 
+            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
+            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
+        ) 
+        pages_perms_q |= page_q
+    pages_perms_q &= Q(can_view=True)
+    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page')
+    restriced_pages = [page_permission.page.pk for page_permission in page_permissions]
+    
+    site = current_site(request)
+    
+    if request.user.is_authenticated():
+        #return self.filter(Q(user=user) | Q(group__user=user))
+        global_page_perm_q = Q(
+            Q(user=request.user) | Q(group__user=request.user)
+        ) & Q(can_view=True, sites__in=[site.pk])
+        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+    
+    def get_generic_permissions():
+        if request.user.is_superuser or not settings.CMS_PERMISSION:
+            # got superuser, or permissions aren't enabled? just return grant 
+            # all mark
+            return [page.pk for page in pages]
+        # read from cache if posssible
+        cached = get_permission_cache(request.user, 'can_view')
+        if cached is not None:
+            return cached
+        return []
+    
+    generic_permissions = lazy(get_generic_permissions, list)()
+        
+    has_global_perm = lazy(request.user.has_perm, bool)('cms.view_page')
+    
+    for page in pages:
+        # TODO: needs to be refactored to not contain continue statements
+        is_restricted = page.pk in restriced_pages
+        
+        if request.user.is_authenticated():
+            # a global permission was given to the request's user
+            if global_view_perms:
+                page_ids.append(page.pk)
+                continue
+            # authenticated user, no restriction and public for all fallback
+            if (not is_restricted and not global_view_perms and
+                    not settings.CMS_PUBLIC_FOR == 'all'):
+                continue
+            # authenticated user, no restriction and public for all
+            if (not is_restricted and not global_view_perms and 
+                settings.CMS_PUBLIC_FOR == 'all'):
+                page_ids.append(page.pk)
+                continue
+        else:
+            #anonymous user
+            if is_restricted or not settings.CMS_PUBLIC_FOR == 'all':
+                # anyonymous user, page has restriction and global access is permitted
+                continue
+            else:
+                # anonymous user, no restriction saved in database
+                page_ids.append(page.pk)
+                continue
+        if has_global_perm:
+            page_ids.append(page.pk)
+            continue
+    
+        if page.pk in generic_permissions:
+            page_ids.append(page.pk)
+            continue
+    return page_ids
 
 def page_to_node(page, home, cut):
     '''
@@ -116,11 +185,14 @@ class CMSMenu(Menu):
         home_children = []
         home = None
         actual_pages = []
+        
+        # cache view perms
+        visible_pages = get_visible_pages(request, pages)
 
-        for page in populate_ancestors(pages):
+        for page in pages:
             # Pages are ordered by tree_id, therefore the first page is the root
             # of the page tree (a.k.a "home")
-            if not page.has_view_permission(request):
+            if page.pk not in visible_pages:
                 # Don't include pages the user doesn't have access to
                 continue
             if not home:

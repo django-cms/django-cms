@@ -81,9 +81,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu(self):
         context = self.get_context()
         # test standard show_menu 
-        with self.assertNumQueries(1):
-            tpl = Template("{% load menu_tags %}{% show_menu %}")
-            tpl.render(context)
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(nodes[0].selected, True)
@@ -95,6 +94,20 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].get_absolute_url(), self.get_page(4).get_absolute_url())
         self.assertEqual(nodes[1].sibling, True)
         self.assertEqual(nodes[1].selected, False)
+        
+    def test_show_menu_num_queries(self):
+        context = self.get_context()
+        # test standard show_menu 
+        with self.assertNumQueries(4):
+            """
+            The 4 queries should be:
+                get all pages
+                get all page permissions
+                get all titles
+                set the menu cache key
+            """
+            tpl = Template("{% load menu_tags %}{% show_menu %}")
+            tpl.render(context)
         
     def test_only_active_tree(self):
         context = self.get_context()
@@ -716,12 +729,26 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         page = Page.objects.get(title_set__title='P6')
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
-        with self.assertNumQueries(19):
-            tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
-            tpl.render(context)
+        tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].id, 8)
+        
+    def test_show_submenu_num_queries(self):
+        page = Page.objects.get(title_set__title='P6')
+        context = self.get_context(page.get_absolute_url())
+        # test standard show_menu
+        with self.assertNumQueries(4):
+            """
+            The 4 queries should be:
+                get all pages
+                get all page permissions
+                get all titles
+                set the menu cache key
+            """
+            tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+            tpl.render(context)
 
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
@@ -744,9 +771,8 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
         context = self.get_context(a.get_absolute_url())
-        with self.assertNumQueries(11):
-            tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
-            tpl.render(context)
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1, nodes)
         node = nodes[0]
@@ -755,3 +781,34 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(len(children), 1, repr(children))
         child = children[0]
         self.assertEqual(child.id, c.id)
+        
+    def test_not_in_navigation_num_queries(self):
+        """
+        Test for issue 521
+        
+        Build the following tree:
+        
+            A
+            |-B
+              |-C
+              \-D (not in nav)
+        """
+        a = create_page('A', 'nav_playground.html', 'en', published=True,
+                        in_navigation=True, reverse_id='a')
+        b =create_page('B', 'nav_playground.html', 'en', parent=a,
+                       published=True, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', parent=b,
+                        published=True, in_navigation=True)
+        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
+                    published=True, in_navigation=False)
+        context = self.get_context(a.get_absolute_url())
+        with self.assertNumQueries(4):
+            """
+            The 4 queries should be:
+                get all pages
+                get all page permissions
+                get all titles
+                set the menu cache key
+            """
+            tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+            tpl.render(context)
