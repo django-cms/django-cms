@@ -874,7 +874,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         pages = [page]
         with self.assertNumQueries(2):
             """
-            The two queries are:
+            The queries are:
             PagePermission query for affected pages
             GlobalpagePermission query for user
             """
@@ -935,7 +935,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             with self.assertNumQueries(4):
                 """
-                The two queries are:
+                The queries are:
                 PagePermission query for affected pages
                 GlobalpagePermission query for user
                 Generic django permission lookup
@@ -968,7 +968,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             with self.assertNumQueries(4):
                 """
-                The two queries are:
+                The queries are:
                 PagePermission query for affected pages
                 GlobalpagePermission query for user
                 Generic django permission lookup
@@ -1018,7 +1018,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             with self.assertNumQueries(2):
                 """
-                The two queries are:
+                The queries are:
                 PagePermission query for affected pages
                 GlobalpagePermission query for user
                 """
@@ -1047,7 +1047,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             with self.assertNumQueries(3):
                 """
-                The two queries are:
+                The queries are:
                 PagePermission query for affected pages
                 GlobalpagePermission query for user
                 Group query via PagePermission
@@ -1082,7 +1082,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         pages = [page]
         with self.assertNumQueries(2):
             """
-            The two queries are:
+            The queries are:
             PagePermission query for affected pages
             GlobalpagePermission query for user
             """
