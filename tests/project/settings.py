@@ -115,7 +115,7 @@ INSTALLED_APPS = [
 
 if LooseVersion(django.get_version()) >= LooseVersion('1.3'):
     INSTALLED_APPS.append('django.contrib.staticfiles')
-    TEMPLATE_CONTEXT_PROCESSORS.append("django.contrib.staticfiles.context_processors.static")
+    TEMPLATE_CONTEXT_PROCESSORS.append("django.core.context_processors.static")
 else:
     INSTALLED_APPS.append('staticfiles')
     TEMPLATE_CONTEXT_PROCESSORS.append("staticfiles.context_processors.static")
