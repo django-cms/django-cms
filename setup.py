@@ -4,7 +4,7 @@ import cms
 
         
 CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
+    'Development Status :: 4 - Beta',
     'Environment :: Web Environment',
     'Framework :: Django',
     'Intended Audience :: Developers',
