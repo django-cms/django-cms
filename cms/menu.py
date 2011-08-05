@@ -11,7 +11,6 @@ from cms.utils.plugins import current_site
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models.query_utils import Q
-from django.utils.functional import lazy
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
