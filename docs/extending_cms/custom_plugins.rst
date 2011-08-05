@@ -2,8 +2,8 @@
 Custom Plugins
 ##############
 
-CMS Plugins are reusable content publishers, that can be inserted into Django 
-CMS pages (or indeed into any content that uses Django CMS placeholders) in 
+CMS Plugins are reusable content publishers, that can be inserted into django 
+CMS pages (or indeed into any content that uses django CMS placeholders) in 
 order to publish information automatically, without further intervention.
 
 This means that your published web content, whatever it is, can be kept 
@@ -22,9 +22,9 @@ Why would you need to write a plugin?
 *************************************
 
 A plugin is the most convenient way to integrate content from another Django 
-app into a Django CMS page.
+app into a django CMS page.
 
-For example, suppose you're developing a site for a record company in Django 
+For example, suppose you're developing a site for a record company in django 
 CMS. You might like to have on your site's home page a "Latest releases" box.
 
 Of course, you could every so often edit that page and update the information. 
@@ -32,7 +32,7 @@ However, a sensible record company will manage its catalogue in Django too,
 which means Django already knows what this week's new releases are.
 
 This is an excellent opportunity to make use of that information to make your 
-life easier - all you need to do is create a Django CMS plugin that you can 
+life easier - all you need to do is create a django CMS plugin that you can 
 insert into your home page, and leave it to do the work of publishing information 
 about the latest releases for you.
 
@@ -45,7 +45,7 @@ publish information about recent new releases in that series.
 Overview
 ********
 
-A Django CMS plugin is fundamentally composed of three things.
+A django CMS plugin is fundamentally composed of three things.
 
 * a plugin **editor**, to configure a plugin each time it is deployed
 * a plugin **publisher**, to do the automated work of deciding what to publish
@@ -237,7 +237,10 @@ else clause.
     ``file``, ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
     ``teaser``, ``twittersearch``, ``twitterrecententries`` and ``video``.
 
-
+    Additionally, it is *recommended* that you avoid using ``page`` as a model
+    field, as it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`,
+    and your plugin will not work as intended in the administration without
+    further work.
 
 Handling Relations
 ==================

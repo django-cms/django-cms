@@ -194,7 +194,7 @@ def pre_save_page(instance, raw, **kwargs):
         pass
 
 
-def post_save_page(instance, raw, created, **kwargs):   
+def post_save_page_moderator(instance, raw, created, **kwargs):   
     """Helper post save signal, cleans old_page attribute.
     """
     old_page = instance.old_page
@@ -204,11 +204,12 @@ def post_save_page(instance, raw, created, **kwargs):
         # tell moderator something was happen with this page
         from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
+        
+def post_save_page(instance, **kwargs):
     for page in instance.get_descendants():
         for title in page.title_set.all():
             update_title(title)
             title.save()
-
 
 def update_placeholders(instance, **kwargs):
     instance.rescan_placeholders()
@@ -219,7 +220,8 @@ def invalidate_menu_cache(instance, **kwargs):
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
-    signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
+    signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
+signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)

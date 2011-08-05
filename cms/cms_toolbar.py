@@ -3,6 +3,7 @@ from cms.toolbar.base import Toolbar
 from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List, 
     GetButton)
+from cms.utils import cms_static_url
 from cms.utils.moderator import page_moderator_state, I_APPROVE
 from django import forms
 from django.conf import settings
@@ -124,7 +125,7 @@ class CMSToolbar(Toolbar):
             
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                          'cms/images/toolbar/icons/icon_lock.png')
+                          cms_static_url('images/toolbar/icons/icon_lock.png'))
             )
         elif not self.request.user.is_authenticated():
             items.append(
@@ -133,7 +134,7 @@ class CMSToolbar(Toolbar):
         else:
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                          'cms/images/toolbar/icons/icon_lock.png')
+                          cms_static_url('images/toolbar/icons/icon_lock.png'))
             )
         return items
     
@@ -158,26 +159,27 @@ class CMSToolbar(Toolbar):
         menu_items = [
             ListItem('overview', _('Move/add Pages'),
                      reverse('admin:cms_page_changelist'),
-                     icon='cms/images/toolbar/icons/icon_sitemap.png'),
+                     icon=cms_static_url('images/toolbar/icons/icon_sitemap.png')),
         ]
         menu_items.append(
             ListItem('addchild', _('Add child page'),
                      _get_add_child_url,
-                     icon='cms/images/toolbar/icons/icon_child.png')
+                     icon=cms_static_url('images/toolbar/icons/icon_child.png'))
         )
         
         menu_items.append(
             ListItem('addsibling', _('Add sibling page'),
                      _get_add_sibling_url,
-                     icon='cms/images/toolbar/icons/icon_sibling.png')
+                     icon=cms_static_url('images/toolbar/icons/icon_sibling.png'))
         )
             
         menu_items.append(
             ListItem('delete', _('Delete Page'), _get_delete_url,
-                     icon='cms/images/toolbar/icons/icon_delete.png')
+                     icon=cms_static_url('images/toolbar/icons/icon_delete.png'))
         )
         return List(RIGHT, 'page', _('Page'),
-                    'cms/images/toolbar/icons/icon_page.png', items=menu_items)
+                    cms_static_url('images/toolbar/icons/icon_page.png'),
+                    items=menu_items)
     
     def get_admin_menu(self, context, can_change, is_staff):
         """
@@ -186,21 +188,22 @@ class CMSToolbar(Toolbar):
         admin_items = [
             ListItem('admin', _('Site Administration'),
                      reverse('admin:index'),
-                     icon='cms/images/toolbar/icons/icon_admin.png'),
+                     icon=cms_static_url('images/toolbar/icons/icon_admin.png')),
         ]
         if can_change:
             admin_items.append(
                 ListItem('settings', _('Page Settings'),
                          _get_page_admin_url,
-                         icon='cms/images/toolbar/icons/icon_page.png')
+                         icon=cms_static_url('images/toolbar/icons/icon_page.png'))
             )
             if 'reversion' in settings.INSTALLED_APPS:
                 admin_items.append(
                     ListItem('history', _('View History'),
                              _get_page_history_url,
-                             icon='cms/images/toolbar/icons/icon_history.png')
+                             icon=cms_static_url('images/toolbar/icons/icon_history.png'))
                 )
-        return List(RIGHT, 'admin', _('Admin'), 'cms/images/toolbar/icons/icon_admin.png',
+        return List(RIGHT, 'admin', _('Admin'),
+                    cms_static_url('images/toolbar/icons/icon_admin.png'),
                     items=admin_items)
     
     def request_hook(self):
@@ -216,11 +219,12 @@ class CMSToolbar(Toolbar):
         
     def _request_hook_post(self):
         # login hook
-        login_form = CMSToolbarLoginForm(self.request.POST)
-        if login_form.is_valid():
-            username = login_form.cleaned_data['cms_username']
-            password = login_form.cleaned_data['cms_password']
-            user = authenticate(username=username, password=password)
-            if user:
-                login(self.request, user)
-                self.init()
+        if 'cms-toolbar-login' in self.request.GET:
+            login_form = CMSToolbarLoginForm(self.request.POST)
+            if login_form.is_valid():
+                username = login_form.cleaned_data['cms_username']
+                password = login_form.cleaned_data['cms_password']
+                user = authenticate(username=username, password=password)
+                if user:
+                    login(self.request, user)
+                    self.init()

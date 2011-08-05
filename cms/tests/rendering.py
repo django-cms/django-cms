@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from django.forms.widgets import Media
 from django.http import Http404, HttpResponseRedirect
 from django.template import Template, RequestContext
-from django.template.context import Context
+from sekizai.context import SekizaiContext
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -283,20 +283,20 @@ class RenderingTestCase(SettingsOverrideTestCase):
         placeholder = Placeholder()
         placeholder.slot = 'test'
         placeholder.pk = placeholder.id = 99
-        context = Context()
+        context = SekizaiContext()
         context['request'] = AttributeObject(
-                REQUEST={'language': 'en'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
+            REQUEST={'language': 'en'},
+            GET=[],
+            session={},
+            path='/',
+            user=self.test_user,
+            current_page=None,
+            method='GET',
+        )
         classes = [
-            "cms_placeholder::en::::99::",
+            "cms_placeholder-bar-%s" % placeholder.pk,
             "cms_placeholder_slot::test",
         ]
         output = render_placeholder_toolbar(placeholder, context, '', 'test')
         for cls in classes:
-            self.assertTrue(cls in output)
+            self.assertTrue(cls in output, '%r is not in %r' % (cls, output))

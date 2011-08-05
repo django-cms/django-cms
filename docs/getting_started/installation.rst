@@ -10,7 +10,7 @@ Requirements
 ************
 
 * `Python`_ 2.5 (or a higher release of 2.x).
-* `Django`_ 1.2.5 (or a higher release).
+* `Django`_ 1.2.5 (or a 1.3.x release).
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.2 or higher
@@ -52,7 +52,7 @@ started:
 
     sudo aptitude install python2.6 python-setuptools python-imaging
     sudo easy_install pip
-    sudo pip install django-cms south django-appmedia
+    sudo pip install Django==1.3 django-cms south django-appmedia
 
 Additionally, you need the python driver for your selected database:
 
@@ -70,6 +70,11 @@ This will install PIL and your database's driver globally.
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
+.. note:: This will install Django version 1.3 for use with the CMS. While 
+          later verisons of Django (such as 1.4) are know to work for some
+          people, it is NOT recommended and will not be supported until further
+          notice (and tests)
+
 On Mac OSX
 ==========
 
@@ -85,7 +90,7 @@ On Microsoft Windows
 Databases
 *********
 
-We recommend using `PostgreSQL`_ or `MySQL`_ with Django CMS. Installing and
+We recommend using `PostgreSQL`_ or `MySQL`_ with django CMS. Installing and
 maintaining database systems is outside the scope of this documentation, but is
 very well documented on the system's respective websites.
 

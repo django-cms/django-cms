@@ -30,6 +30,12 @@ running.
 You might consider using `django-filer`_ with `django CMS plugin`_ and its
 ``cmsplugin_filer_file`` component instead.
 
+.. warning::
+
+    The builtin file plugin does only work with local storages. If you need
+    more advanced solutions, please look at alternative file plugins for the
+    django CMS, such as `django-filer`_.
+
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 

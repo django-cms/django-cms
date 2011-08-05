@@ -260,3 +260,23 @@ menus.base
                       this node.
     :param bool visible: Optional, defaults to ``True``, whether this item is
                          visible or not.
+
+
+    .. method:: get_descendants
+
+        Returns a list of all children beneath the current menu item.
+
+    .. method:: get_ancestors
+
+        Returns a list of all parent items, excluding the current menu item.
+
+    .. method:: get_absolute_url
+
+        Utility method to return the URL associated with this menu item,
+        primarily to follow naming convention asserted by Django.
+
+    .. method:: get_menu_title
+
+        Utility method to return the associated title, using the same naming
+        convention used by :class:`cms.models.pagemodel.Page`.
+

@@ -313,7 +313,7 @@ An example use-case
 -------------------
 
 A simple example: you have a news application that publishes pages
-independently of Django CMS. However, you would like to integrate the 
+independently of django CMS. However, you would like to integrate the
 application into the menu structure of your site, so that at appropriate 
 places a *News* node appears in the navigation menu.
 

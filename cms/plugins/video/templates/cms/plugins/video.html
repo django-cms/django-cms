@@ -1,5 +1,5 @@
 {% load i18n sekizai_tags js %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/libs/swfobject.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/swfobject.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 //<![CDATA[
@@ -30,7 +30,7 @@
 	var attributes = { align: 'middle' };
 	
 	// load
-	swfobject.embedSWF('{{ CMS_MEDIA_URL }}swf/player.swf', 'video-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ MEDIA_URL }}swf/expressInstall.swf', flashvars, params, attributes);
+	swfobject.embedSWF('{{ STATIC_URL }}cms/swf/player.swf', 'video-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ STATIC_URL }}cms/swf/expressInstall.swf', flashvars, params, attributes);
 })();
 //]]>
 </script>
@@ -38,7 +38,7 @@
 
 <div class="plugin_video">
 	<object id="video-plugin-{{ object.id }}" width="{{ object.get_width }}" height="{{ object.get_height }}" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" >
-		<param name="movie" value="{{ CMS_MEDIA_URL }}swf/player.swf"/>
+		<param name="movie" value="{{ STATIC_URL }}cms/swf/player.swf"/>
 		<param name="allowFullScreen" value="true" />
 		<param name="allowScriptAccess" value="always" />
 		<param name="allowFullScreen" value="true" />
@@ -47,7 +47,7 @@
 		<param name="bgcolor" value="#{{ object.bgcolor }}" />
 		<param name="flashvars" value="movie={{ object.get_movie }}&amp;{% if object.image %}image={{ object.image.url }}&amp;{% endif %}autoplay={{ object.auto_play|bool }}&amp;loop={{ object.loop|bool }}&amp;autohide={{ object.auto_hide|bool }}&amp;fullscreen={{ object.fullscreen|bool }}&amp;color_text=0x{{ object.textcolor }}&amp;color_seekbar=0x{{ object.seekbarcolor }}&amp;color_loadingbar=0x{{ object.loadingbarcolor }}&amp;color_seekbarbg=0x{{ object.seekbarbgcolor }}&amp;color_button_out=0x{{ object.buttonoutcolor }}&amp;color_button_over=0x{{ object.buttonovercolor }}&amp;color_button_highlight=0x{{ object.buttonhighlightcolor }}" />
 			<!--[if !IE]>-->
-			<object width="{{ object.get_width }}" height="{{ object.get_height }}" data="{{ CMS_MEDIA_URL }}swf/player.swf" type="application/x-shockwave-flash">
+			<object width="{{ object.get_width }}" height="{{ object.get_height }}" data="{{ STATIC_URL }}cms/swf/player.swf" type="application/x-shockwave-flash">
 			<param name="allowFullScreen" value="true" />
 			<param name="allowScriptAccess" value="always" />
 			<param name="allowFullScreen" value="true" />
@@ -59,7 +59,7 @@
 		<!-- alternate content -->
 		{% trans "Missing flash plugin. Please download the latest Adobe Flash Player: " %}<br />
 		<a href="https://www.adobe.com/go/getflashplayer">
-			<img alt="{% trans 'Get Adobe Flash Player' %}" src="{{ CMS_MEDIA_URL }}images/plugins/get_flash_player.gif" />
+			<img alt="{% trans 'Get Adobe Flash Player' %}" src="{{ STATIC_URL }}cms/images/plugins/get_flash_player.gif" />
 		</a>
 		<!-- /alternate content -->
 			<!--[if !IE]>-->

@@ -404,6 +404,7 @@ class Page(MPTTModel):
         """
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
+            transaction.rollback()
             return
 
         # publish, but only if all parents are published!!
@@ -490,7 +491,9 @@ class Page(MPTTModel):
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
+
         transaction.commit()
+
         return published
         
     def delete(self):

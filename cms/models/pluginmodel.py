@@ -19,29 +19,44 @@ from cms.utils.placeholder import get_page_from_placeholder_if_exists
 from mptt.models import MPTTModel, MPTTModelBase
 
 
+class BoundRenderMeta(object):
+    def __init__(self, meta):
+        self.index = 0
+        self.total = 1
+        self.text_enabled = getattr(meta, 'text_enabled', False)
+
+
 class PluginModelBase(MPTTModelBase):
     """
-    Metaclass for all plugins.
+    Metaclass for all CMSPlugin subclasses. This class should not be used for
+    any other type of models.
     """
     def __new__(cls, name, bases, attrs):
-        render_meta = attrs.pop('RenderMeta', None)
-        if render_meta is not None:
-            attrs['_render_meta'] = render_meta()
+        # remove RenderMeta from the plugin class
+        attr_meta = attrs.pop('RenderMeta', None)
+
+        # create a new class (using the super-metaclass)
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
-        found = False
-        bbases = bases
-        while bbases:
-            bcls = bbases[0]
-            if bcls.__name__ == "CMSPlugin":
-                found = True
-                bbases = False
-            else:
-                bbases = bcls.__bases__  
-        if found:
-            if new_class._meta.db_table.startswith("%s_" % new_class._meta.app_label):
-                table = "cmsplugin_" + new_class._meta.db_table.split("%s_" % new_class._meta.app_label, 1)[1]
-                new_class._meta.db_table = table
-        return new_class 
+        
+        # if there is a RenderMeta in attrs, use this one
+        if attr_meta:
+            meta = attr_meta
+        else:
+            # else try to use the one from the superclass (if present)
+            meta = getattr(new_class, '_render_meta', None)
+        
+        # set a new BoundRenderMeta to prevent leaking of state
+        new_class._render_meta = BoundRenderMeta(meta)
+
+        # turn 'myapp_mymodel' into 'cmsplugin_mymodel' by removing the
+        # 'myapp_' bit from the db_table name.
+        if [base for base in bases if isinstance(base, PluginModelBase)]:
+            splitter = '%s_' % new_class._meta.app_label
+            splitted = new_class._meta.db_table.split(splitter, 1)
+            table_name = 'cmsplugin_%s' % splitted[1]
+            new_class._meta.db_table = table_name
+        
+        return new_class
          
     
 class CMSPlugin(MPTTModel):

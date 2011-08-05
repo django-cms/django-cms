@@ -4,18 +4,19 @@ from cms.api import create_page, publish_page, add_plugin
 from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
-from cms.models.pluginmodel import CMSPlugin
+from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
+from cms.plugins.link.models import Link
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD, 
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
+    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -23,6 +24,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
 from project.pluginapp.models import Article, Section
@@ -73,8 +75,6 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-
-
     def test_add_edit_plugin(self):
         """
         Test that you can add a text plugin
@@ -334,38 +334,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
-            self.assertTrue('%sjs/plugins/jquery.tweet.js' % settings.CMS_MEDIA_URL in response.content, response.content)
-        
-    def test_fileplugin_icon_uppercase(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
-        body = page.placeholders.get(slot="body") 
-        plugin = File(
-            plugin_type='FilePlugin',
-            placeholder=body,
-            position=1,
-            language=settings.LANGUAGE_CODE,
-        )
-        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
-        plugin.insert_at(None, position='last-child', save=True)
-        self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
-        with SettingsOverride(DEBUG=True):
-            response = self.client.get(plugin.get_icon_url(), follow=True)
-            self.assertEqual(response.status_code, 200)
-        # Nuke everything in the storage location directory (since removing just
-        # our file would still leave a useless directory structure)
-        #
-        # By the way, plugin.file.storage.delete(plugin.file.name) does not work
-        # since the delete method is a pass... See reversion.storage.delete()
-        storage_location = plugin.file.storage.location # This is ".../media/"
-        for root, dirs, files in os.walk(storage_location, topdown=False):
-            # We need to walk() the directory tree since rmdir() does not allow
-            # to remove non-empty directories...
-            for name in files:
-                # Start by killing all files we walked
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                # Now all directories we walked...
-                os.rmdir(os.path.join(root, name))
+            self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
 
     def test_copy_textplugin(self):
         """
@@ -442,6 +411,39 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         new_plugin = Text.objects.get(pk=6)
         self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
+
+
+class FileSystemPluginTests(PluginsTestBaseCase):
+    def setUp(self):
+        super(FileSystemPluginTests, self).setUp()
+        call_command('collectstatic', interactive=False, verbosity=0, link=True)
+        
+    def tearDown(self):
+        for directory in [settings.STATIC_ROOT, settings.MEDIA_ROOT]:
+            for root, dirs, files in os.walk(directory, topdown=False):
+                # We need to walk() the directory tree since rmdir() does not allow
+                # to remove non-empty directories...
+                for name in files:
+                    # Start by killing all files we walked
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    # Now all directories we walked...
+                    os.rmdir(os.path.join(root, name))
+        super(FileSystemPluginTests, self).tearDown()
+        
+    def test_fileplugin_icon_uppercase(self):
+        page = create_page('testpage', 'nav_playground.html', 'en')
+        body = page.placeholders.get(slot="body") 
+        plugin = File(
+            plugin_type='FilePlugin',
+            placeholder=body,
+            position=1,
+            language=settings.LANGUAGE_CODE,
+        )
+        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
+        plugin.insert_at(None, position='last-child', save=True)
+        self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
 
@@ -620,3 +622,37 @@ class LinkPluginTestCase(PluginsTestBaseCase):
         form = LinkForm(
             {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
         self.assertEquals(form.is_valid(), True)
+
+
+class NoDatabasePluginTests(TestCase):
+    def test_render_meta_is_unique(self):
+        text = Text()
+        link = Link()
+        self.assertNotEqual(id(text._render_meta), id(link._render_meta))
+    
+    def test_render_meta_does_not_leak(self):
+        text = Text()
+        link = Link()
+        
+        text._render_meta.text_enabled = False
+        link._render_meta.text_enabled = False
+        
+        self.assertFalse(text._render_meta.text_enabled)
+        self.assertFalse(link._render_meta.text_enabled)
+        
+        link._render_meta.text_enabled = True
+
+        self.assertFalse(text._render_meta.text_enabled)
+        self.assertTrue(link._render_meta.text_enabled)
+    
+    def test_db_table_hack(self):
+        # TODO: Django tests seem to leak models from test methods, somehow
+        # we should clear django.db.models.loading.app_cache in tearDown.
+        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
+        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin')
+    
+    def test_db_table_hack_with_mixin(self):
+        class LeftMixin: pass
+        class RightMixin: pass
+        plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin), {'__module__': 'cms.tests.plugins'})
+        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')

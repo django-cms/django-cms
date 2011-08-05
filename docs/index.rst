@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 ######################################
-Welcome to django cms's documentation!
+Welcome to django CMS's documentation!
 ######################################
 
 This document refers to version |release|
@@ -37,6 +37,7 @@ Advanced
     advanced/i18n
     advanced/sitemap
     advanced/templatetags
+    advanced/cli
 
 
 *****************
@@ -53,11 +54,12 @@ Extending the CMS
     extending_cms/api_references
     extending_cms/placeholders
     extending_cms/searchdocs
+    extending_cms/fields
 
 
-***********************
-Contributing to the CMS
-***********************
+**************************
+Contributing to django CMS
+**************************
 
 .. toctree::
     :maxdepth: 2
