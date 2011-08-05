@@ -9,6 +9,25 @@ from cms.utils.i18n import get_fallback_languages
 from cms.apphook_pool import apphook_pool
 from cms.models.titlemodels import Title
 
+def populate_ancestors(page_list):
+    ancestors = []
+    populated_pages = []
+    for idx, page in enumerate(page_list):
+        if idx == 0:
+            ancestors = page.get_cached_ancestors(ascending=True)
+        try:
+            next_page = page_list[idx+1]
+        except IndexError:
+            next_page = None
+        page.ancestors_ascending = ancestors
+        if next_page:
+            if next_page.level > page.level:
+                ancestors.append(page)
+            if next_page.level < page.level:
+                ancestors.pop()
+        populated_pages.append(page)
+    return populated_pages
+
 def page_to_node(page, home, cut):
     '''
     Transform a CMS page into a navigation node.
@@ -98,7 +117,7 @@ class CMSMenu(Menu):
         home = None
         actual_pages = []
 
-        for page in pages:
+        for page in populate_ancestors(pages):
             # Pages are ordered by tree_id, therefore the first page is the root
             # of the page tree (a.k.a "home")
             if not page.has_view_permission(request):

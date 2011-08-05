@@ -8,6 +8,7 @@ from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
+from django import db 
 from django.template import Template
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
@@ -16,7 +17,8 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 class BaseMenuTest(SettingsOverrideTestCase):
     settings_overrides = {
-        'CMS_MODERATOR': False
+        'CMS_MODERATOR': False,
+        'DEBUG': True
     }
     
     def _get_nodes(self, path='/'):
@@ -80,8 +82,10 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu(self):
         context = self.get_context()
         # test standard show_menu 
+        db.reset_queries()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
+        self.assertEqual(len(db.connection.queries), 1)
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(nodes[0].selected, True)
@@ -93,7 +97,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].get_absolute_url(), self.get_page(4).get_absolute_url())
         self.assertEqual(nodes[1].sibling, True)
         self.assertEqual(nodes[1].selected, False)
-    
+        
     def test_only_active_tree(self):
         context = self.get_context()
         # test standard show_menu
@@ -463,7 +467,7 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(node3.children, [node2])
         self.assertEqual(node4.children, [node3])
         self.assertEqual(node5.children, [node4])
-        
+
     def test_build_nodes_inner_for_circular_menu(self):
         '''
         TODO: 
@@ -714,12 +718,13 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         page = Page.objects.get(title_set__title='P6')
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
+        db.reset_queries()
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
+        self.assertEqual(len(db.connection.queries), 19) # five less queries as expected
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].id, 8)
-        
 
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
@@ -742,8 +747,10 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
         context = self.get_context(a.get_absolute_url())
+        db.reset_queries()
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
+        self.assertEqual(len(db.connection.queries), 11) # three less queries as expected
         nodes = context['children']
         self.assertEqual(len(nodes), 1, nodes)
         node = nodes[0]
