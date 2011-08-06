@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.api import create_page
 from cms.models.pagemodel import Page
 from cms.test_utils.util.context_managers import SettingsOverride
