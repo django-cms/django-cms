@@ -419,9 +419,11 @@ For more information, see :doc:`i18n`.
 cms_toolbar
 ***********
 
-The ``cms_toolbar`` template tag will add the needed css and javascript for the
-toolbar.
+The ``cms_toolbar`` templatetag will add the needed css and javascript to the
+sekizai blocks in the base template. The templatetag should be placed somewhere
+within the body of the HTML (within ``<body>...</body>``).
 
 Example::
 
+    <body>
     {% cms_toolbar %}
