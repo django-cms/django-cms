@@ -23,7 +23,7 @@ To install it, include
 
     This middleware must be put before ``cms.middleware.page.CurrentPageMiddleware``
 
-    eg. ::
+    Example::
 
         MIDDLEWARE_CLASSES = (
             ...
