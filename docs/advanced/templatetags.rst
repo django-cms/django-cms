@@ -427,3 +427,4 @@ Example::
 
     <body>
     {% cms_toolbar %}
+    ...
