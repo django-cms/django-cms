@@ -412,3 +412,19 @@ the url changes based on the language: You will need to set a language_changer
 function with the set_language_changer function in cms.utils.
 
 For more information, see :doc:`i18n`.
+
+.. templatetag:: cms_toolbar
+
+***********
+cms_toolbar
+***********
+
+The ``cms_toolbar`` templatetag will add the needed css and javascript to the
+sekizai blocks in the base template. The templatetag should be placed somewhere
+within the body of the HTML (within ``<body>...</body>``).
+
+Example::
+
+    <body>
+    {% cms_toolbar %}
+    ...
