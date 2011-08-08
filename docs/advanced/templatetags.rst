@@ -412,3 +412,16 @@ the url changes based on the language: You will need to set a language_changer
 function with the set_language_changer function in cms.utils.
 
 For more information, see :doc:`i18n`.
+
+.. templatetag:: cms_toolbar
+
+***********
+cms_toolbar
+***********
+
+The ``cms_toolbar`` template tag will add the needed css and javascript for the
+toolbar.
+
+Example::
+
+    {% cms_toolbar %}
