@@ -19,6 +19,21 @@ To install it, include
 ``'cms.middleware.multilingual.MultilingualURLMiddleware'`` in your project's
 :setting:`django:MIDDLEWARE_CLASSES` setting.
 
+.. note::
+
+    This middleware must be put before ``cms.middleware.page.CurrentPageMiddleware``
+
+    Example::
+
+        MIDDLEWARE_CLASSES = (
+            ...
+            'cms.middleware.multilingual.MultilingualURLMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware'
+            ...
+        )
+
 ****************
 Language Chooser
 ****************
