@@ -131,6 +131,7 @@ default Django settings file will not have any)::
         'django.core.context_processors.i18n',
         'django.core.context_processors.request',
         'django.core.context_processors.media',
+        'django.core.context_processors.static',
         'cms.context_processors.media',
         'sekizai.context_processors.sekizai',
     )
