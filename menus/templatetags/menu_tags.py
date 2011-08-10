@@ -2,6 +2,7 @@
 from classytags.arguments import IntegerArgument, Argument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
+from classytags.values import StringValue
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -15,6 +16,22 @@ register = template.Library()
 
 
 class NOT_PROVIDED: pass
+
+
+class StrictStringValue(StringValue):
+    errors = {
+        "clean": "%(value)s is not a string",
+    }
+    value_on_error = ""
+
+    def clean(self, value):
+        if not isinstance(value, basestring):
+            return self.error(value, 'type')
+        return value
+
+
+class StrictStringArgument(Argument):
+    value_class = StrictStringValue
 
 
 def cut_after(node, levels, removed):
@@ -104,9 +121,9 @@ class ShowMenu(InclusionTag):
         IntegerArgument('to_level', default=100, required=False),
         IntegerArgument('extra_inactive', default=0, required=False),
         IntegerArgument('extra_active', default=1000, required=False),
-        Argument('template', default='menu/menu.html', required=False),
-        Argument('namespace', default=None, required=False),
-        Argument('root_id', default=None, required=False),
+        StrictStringArgument('template', default='menu/menu.html', required=False),
+        StrictStringArgument('namespace', default=None, required=False),
+        StrictStringArgument('root_id', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
     

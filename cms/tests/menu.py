@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.template import Template
+from django.template import Template, TemplateSyntaxError
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.utils import mark_descendants, find_selected, cut_levels
@@ -70,6 +70,14 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     
     def get_all_pages(self):
         return Page.objects.all()
+    
+    def test_menu_failfast_on_invalid_usage(self):
+        context = self.get_context()
+        context['child'] = self.get_page(1)
+        # test standard show_menu
+        with SettingsOverride(DEBUG=True, TEMPLATE_DEBUG=True):
+            tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
+            self.assertRaises(TemplateSyntaxError, tpl.render, context)
     
     def test_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
