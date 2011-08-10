@@ -12,10 +12,6 @@
 //<![CDATA[
 jQuery(document).ready(function ($) {
 
-	// change template needs to be defined in toolbar
-	// 'change_template': '{% if page %}{% url admin:cms_page_change_template page.pk %}{% else %}null{% endif %}'
-
-
 	// initialize toolbar, pass options, items and allow public access
 	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
