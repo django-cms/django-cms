@@ -142,37 +142,6 @@ Example::
 
     {% show_uncached_placeholder "footer" "footer_container_page" %}
 
-
-.. templatetag:: plugins_media
-
-*************
-plugins_media
-*************
-
-Outputs the appropriate tags to include all media that is used by the plugins
-on a page (defined using the :class:`Media` class in the plugin class).
-
-You normally want to place this in your ``<head>`` tag.
-
-Example::
-
-    {% plugins_media %}
-
-Arguments:
-
-- ``page_lookup`` (optional; see `Page Lookup`_ for more
-  information)
-
-If you need to include the media from another page, for instance if you are
-using a placeholder from another page using the :ttag:`show_placeholder` tag, you
-can supply the ``page_lookup`` attribute to indicate the page in question::
-
-    {% plugins_media "teaser" %}
-
-For a reference on what plugin media is required by a specific plugin, look at
-that plugin's reference.
-
-
 .. templatetag:: page_url
 
 ********
@@ -428,3 +397,4 @@ Example::
     <body>
     {% cms_toolbar %}
     ...
+
