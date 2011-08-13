@@ -1,519 +1,67 @@
-/*
- * jQuery UI 1.7.1
+/*!
+ * jQuery UI 1.8.15
  *
- * Copyright (c) 2009 AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
  *
  * http://docs.jquery.com/UI
  */
-;jQuery.ui || (function($) {
-
-var _remove = $.fn.remove,
-	isFF2 = $.browser.mozilla && (parseFloat($.browser.version) < 1.9);
-
-//Helper functions and ui object
-$.ui = {
-	version: "1.7.1",
-
-	// $.ui.plugin is deprecated.  Use the proxy pattern instead.
-	plugin: {
-		add: function(module, option, set) {
-			var proto = $.ui[module].prototype;
-			for(var i in set) {
-				proto.plugins[i] = proto.plugins[i] || [];
-				proto.plugins[i].push([option, set[i]]);
-			}
-		},
-		call: function(instance, name, args) {
-			var set = instance.plugins[name];
-			if(!set || !instance.element[0].parentNode) { return; }
-
-			for (var i = 0; i < set.length; i++) {
-				if (instance.options[set[i][0]]) {
-					set[i][1].apply(instance.element, args);
-				}
-			}
-		}
-	},
-
-	contains: function(a, b) {
-		return document.compareDocumentPosition
-			? a.compareDocumentPosition(b) & 16
-			: a !== b && a.contains(b);
-	},
-
-	hasScroll: function(el, a) {
-
-		//If overflow is hidden, the element might have extra content, but the user wants to hide it
-		if ($(el).css('overflow') == 'hidden') { return false; }
-
-		var scroll = (a && a == 'left') ? 'scrollLeft' : 'scrollTop',
-			has = false;
-
-		if (el[scroll] > 0) { return true; }
-
-		// TODO: determine which cases actually cause this to happen
-		// if the element doesn't have the scroll set, see if it's possible to
-		// set the scroll
-		el[scroll] = 1;
-		has = (el[scroll] > 0);
-		el[scroll] = 0;
-		return has;
-	},
-
-	isOverAxis: function(x, reference, size) {
-		//Determines when x coordinate is over "b" element axis
-		return (x > reference) && (x < (reference + size));
-	},
-
-	isOver: function(y, x, top, left, height, width) {
-		//Determines when x, y coordinates is over "b" element
-		return $.ui.isOverAxis(y, top, height) && $.ui.isOverAxis(x, left, width);
-	},
-
-	keyCode: {
-		BACKSPACE: 8,
-		CAPS_LOCK: 20,
-		COMMA: 188,
-		CONTROL: 17,
-		DELETE: 46,
-		DOWN: 40,
-		END: 35,
-		ENTER: 13,
-		ESCAPE: 27,
-		HOME: 36,
-		INSERT: 45,
-		LEFT: 37,
-		NUMPAD_ADD: 107,
-		NUMPAD_DECIMAL: 110,
-		NUMPAD_DIVIDE: 111,
-		NUMPAD_ENTER: 108,
-		NUMPAD_MULTIPLY: 106,
-		NUMPAD_SUBTRACT: 109,
-		PAGE_DOWN: 34,
-		PAGE_UP: 33,
-		PERIOD: 190,
-		RIGHT: 39,
-		SHIFT: 16,
-		SPACE: 32,
-		TAB: 9,
-		UP: 38
-	}
-};
-
-// WAI-ARIA normalization
-if (isFF2) {
-	var attr = $.attr,
-		removeAttr = $.fn.removeAttr,
-		ariaNS = "http://www.w3.org/2005/07/aaa",
-		ariaState = /^aria-/,
-		ariaRole = /^wairole:/;
-
-	$.attr = function(elem, name, value) {
-		var set = value !== undefined;
-
-		return (name == 'role'
-			? (set
-				? attr.call(this, elem, name, "wairole:" + value)
-				: (attr.apply(this, arguments) || "").replace(ariaRole, ""))
-			: (ariaState.test(name)
-				? (set
-					? elem.setAttributeNS(ariaNS,
-						name.replace(ariaState, "aaa:"), value)
-					: attr.call(this, elem, name.replace(ariaState, "aaa:")))
-				: attr.apply(this, arguments)));
-	};
-
-	$.fn.removeAttr = function(name) {
-		return (ariaState.test(name)
-			? this.each(function() {
-				this.removeAttributeNS(ariaNS, name.replace(ariaState, ""));
-			}) : removeAttr.call(this, name));
-	};
-}
-
-//jQuery plugins
-$.fn.extend({
-	remove: function() {
-		// Safari has a native remove event which actually removes DOM elements,
-		// so we have to use triggerHandler instead of trigger (#3037).
-		$("*", this).add(this).each(function() {
-			$(this).triggerHandler("remove");
-		});
-		return _remove.apply(this, arguments );
-	},
-
-	enableSelection: function() {
-		return this
-			.attr('unselectable', 'off')
-			.css('MozUserSelect', '')
-			.unbind('selectstart.ui');
-	},
-
-	disableSelection: function() {
-		return this
-			.attr('unselectable', 'on')
-			.css('MozUserSelect', 'none')
-			.bind('selectstart.ui', function() { return false; });
-	},
-
-	scrollParent: function() {
-		var scrollParent;
-		if(($.browser.msie && (/(static|relative)/).test(this.css('position'))) || (/absolute/).test(this.css('position'))) {
-			scrollParent = this.parents().filter(function() {
-				return (/(relative|absolute|fixed)/).test($.curCSS(this,'position',1)) && (/(auto|scroll)/).test($.curCSS(this,'overflow',1)+$.curCSS(this,'overflow-y',1)+$.curCSS(this,'overflow-x',1));
-			}).eq(0);
-		} else {
-			scrollParent = this.parents().filter(function() {
-				return (/(auto|scroll)/).test($.curCSS(this,'overflow',1)+$.curCSS(this,'overflow-y',1)+$.curCSS(this,'overflow-x',1));
-			}).eq(0);
-		}
-
-		return (/fixed/).test(this.css('position')) || !scrollParent.length ? $(document) : scrollParent;
-	}
-});
-
-
-//Additional selectors
-$.extend($.expr[':'], {
-	data: function(elem, i, match) {
-		return !!$.data(elem, match[3]);
-	},
-
-	focusable: function(element) {
-		var nodeName = element.nodeName.toLowerCase(),
-			tabIndex = $.attr(element, 'tabindex');
-		return (/input|select|textarea|button|object/.test(nodeName)
-			? !element.disabled
-			: 'a' == nodeName || 'area' == nodeName
-				? element.href || !isNaN(tabIndex)
-				: !isNaN(tabIndex))
-			// the element and all of its ancestors must be visible
-			// the browser may report that the area is hidden
-			&& !$(element)['area' == nodeName ? 'parents' : 'closest'](':hidden').length;
-	},
-
-	tabbable: function(element) {
-		var tabIndex = $.attr(element, 'tabindex');
-		return (isNaN(tabIndex) || tabIndex >= 0) && $(element).is(':focusable');
-	}
-});
-
-
-// $.widget is a factory to create jQuery plugins
-// taking some boilerplate code out of the plugin code
-function getter(namespace, plugin, method, args) {
-	function getMethods(type) {
-		var methods = $[namespace][plugin][type] || [];
-		return (typeof methods == 'string' ? methods.split(/,?\s+/) : methods);
-	}
-
-	var methods = getMethods('getter');
-	if (args.length == 1 && typeof args[0] == 'string') {
-		methods = methods.concat(getMethods('getterSetter'));
-	}
-	return ($.inArray(method, methods) != -1);
-}
-
-$.widget = function(name, prototype) {
-	var namespace = name.split(".")[0];
-	name = name.split(".")[1];
-
-	// create plugin method
-	$.fn[name] = function(options) {
-		var isMethodCall = (typeof options == 'string'),
-			args = Array.prototype.slice.call(arguments, 1);
-
-		// prevent calls to internal methods
-		if (isMethodCall && options.substring(0, 1) == '_') {
-			return this;
-		}
-
-		// handle getter methods
-		if (isMethodCall && getter(namespace, name, options, args)) {
-			var instance = $.data(this[0], name);
-			return (instance ? instance[options].apply(instance, args)
-				: undefined);
-		}
-
-		// handle initialization and non-getter methods
-		return this.each(function() {
-			var instance = $.data(this, name);
-
-			// constructor
-			(!instance && !isMethodCall &&
-				$.data(this, name, new $[namespace][name](this, options))._init());
-
-			// method call
-			(instance && isMethodCall && $.isFunction(instance[options]) &&
-				instance[options].apply(instance, args));
-		});
-	};
-
-	// create widget constructor
-	$[namespace] = $[namespace] || {};
-	$[namespace][name] = function(element, options) {
-		var self = this;
-
-		this.namespace = namespace;
-		this.widgetName = name;
-		this.widgetEventPrefix = $[namespace][name].eventPrefix || name;
-		this.widgetBaseClass = namespace + '-' + name;
-
-		this.options = $.extend({},
-			$.widget.defaults,
-			$[namespace][name].defaults,
-			$.metadata && $.metadata.get(element)[name],
-			options);
-
-		this.element = $(element)
-			.bind('setData.' + name, function(event, key, value) {
-				if (event.target == element) {
-					return self._setData(key, value);
-				}
-			})
-			.bind('getData.' + name, function(event, key) {
-				if (event.target == element) {
-					return self._getData(key);
-				}
-			})
-			.bind('remove', function() {
-				return self.destroy();
-			});
-	};
-
-	// add widget prototype
-	$[namespace][name].prototype = $.extend({}, $.widget.prototype, prototype);
-
-	// TODO: merge getter and getterSetter properties from widget prototype
-	// and plugin prototype
-	$[namespace][name].getterSetter = 'option';
-};
-
-$.widget.prototype = {
-	_init: function() {},
-	destroy: function() {
-		this.element.removeData(this.widgetName)
-			.removeClass(this.widgetBaseClass + '-disabled' + ' ' + this.namespace + '-state-disabled')
-			.removeAttr('aria-disabled');
-	},
-
-	option: function(key, value) {
-		var options = key,
-			self = this;
-
-		if (typeof key == "string") {
-			if (value === undefined) {
-				return this._getData(key);
-			}
-			options = {};
-			options[key] = value;
-		}
-
-		$.each(options, function(key, value) {
-			self._setData(key, value);
-		});
-	},
-	_getData: function(key) {
-		return this.options[key];
-	},
-	_setData: function(key, value) {
-		this.options[key] = value;
-
-		if (key == 'disabled') {
-			this.element
-				[value ? 'addClass' : 'removeClass'](
-					this.widgetBaseClass + '-disabled' + ' ' +
-					this.namespace + '-state-disabled')
-				.attr("aria-disabled", value);
-		}
-	},
-
-	enable: function() {
-		this._setData('disabled', false);
-	},
-	disable: function() {
-		this._setData('disabled', true);
-	},
-
-	_trigger: function(type, event, data) {
-		var callback = this.options[type],
-			eventName = (type == this.widgetEventPrefix
-				? type : this.widgetEventPrefix + type);
-
-		event = $.Event(event);
-		event.type = eventName;
-
-		// copy original event properties over to the new event
-		// this would happen if we could call $.event.fix instead of $.Event
-		// but we don't have a way to force an event to be fixed multiple times
-		if (event.originalEvent) {
-			for (var i = $.event.props.length, prop; i;) {
-				prop = $.event.props[--i];
-				event[prop] = event.originalEvent[prop];
-			}
-		}
-
-		this.element.trigger(event, data);
-
-		return !($.isFunction(callback) && callback.call(this.element[0], event, data) === false
-			|| event.isDefaultPrevented());
-	}
-};
-
-$.widget.defaults = {
-	disabled: false
-};
-
-
-/** Mouse Interaction Plugin **/
-
-$.ui.mouse = {
-	_mouseInit: function() {
-		var self = this;
-
-		this.element
-			.bind('mousedown.'+this.widgetName, function(event) {
-				return self._mouseDown(event);
-			})
-			.bind('click.'+this.widgetName, function(event) {
-				if(self._preventClickEvent) {
-					self._preventClickEvent = false;
-					event.stopImmediatePropagation();
-					return false;
-				}
-			});
-
-		// Prevent text selection in IE
-		if ($.browser.msie) {
-			this._mouseUnselectable = this.element.attr('unselectable');
-			this.element.attr('unselectable', 'on');
-		}
-
-		this.started = false;
-	},
-
-	// TODO: make sure destroying one instance of mouse doesn't mess with
-	// other instances of mouse
-	_mouseDestroy: function() {
-		this.element.unbind('.'+this.widgetName);
-
-		// Restore text selection in IE
-		($.browser.msie
-			&& this.element.attr('unselectable', this._mouseUnselectable));
-	},
-
-	_mouseDown: function(event) {
-		// don't let more than one widget handle mouseStart
-		// TODO: figure out why we have to use originalEvent
-		event.originalEvent = event.originalEvent || {};
-		if (event.originalEvent.mouseHandled) { return; }
-
-		// we may have missed mouseup (out of window)
-		(this._mouseStarted && this._mouseUp(event));
-
-		this._mouseDownEvent = event;
-
-		var self = this,
-			btnIsLeft = (event.which == 1),
-			elIsCancel = (typeof this.options.cancel == "string" ? $(event.target).parents().add(event.target).filter(this.options.cancel).length : false);
-		if (!btnIsLeft || elIsCancel || !this._mouseCapture(event)) {
-			return true;
-		}
-
-		this.mouseDelayMet = !this.options.delay;
-		if (!this.mouseDelayMet) {
-			this._mouseDelayTimer = setTimeout(function() {
-				self.mouseDelayMet = true;
-			}, this.options.delay);
-		}
-
-		if (this._mouseDistanceMet(event) && this._mouseDelayMet(event)) {
-			this._mouseStarted = (this._mouseStart(event) !== false);
-			if (!this._mouseStarted) {
-				event.preventDefault();
-				return true;
-			}
-		}
-
-		// these delegates are required to keep context
-		this._mouseMoveDelegate = function(event) {
-			return self._mouseMove(event);
-		};
-		this._mouseUpDelegate = function(event) {
-			return self._mouseUp(event);
-		};
-		$(document)
-			.bind('mousemove.'+this.widgetName, this._mouseMoveDelegate)
-			.bind('mouseup.'+this.widgetName, this._mouseUpDelegate);
-
-		// preventDefault() is used to prevent the selection of text here -
-		// however, in Safari, this causes select boxes not to be selectable
-		// anymore, so this fix is needed
-		($.browser.safari || event.preventDefault());
-
-		event.originalEvent.mouseHandled = true;
-		return true;
-	},
-
-	_mouseMove: function(event) {
-		// IE mouseup check - mouseup happened when mouse was out of window
-		if ($.browser.msie && !event.button) {
-			return this._mouseUp(event);
-		}
-
-		if (this._mouseStarted) {
-			this._mouseDrag(event);
-			return event.preventDefault();
-		}
-
-		if (this._mouseDistanceMet(event) && this._mouseDelayMet(event)) {
-			this._mouseStarted =
-				(this._mouseStart(this._mouseDownEvent, event) !== false);
-			(this._mouseStarted ? this._mouseDrag(event) : this._mouseUp(event));
-		}
-
-		return !this._mouseStarted;
-	},
-
-	_mouseUp: function(event) {
-		$(document)
-			.unbind('mousemove.'+this.widgetName, this._mouseMoveDelegate)
-			.unbind('mouseup.'+this.widgetName, this._mouseUpDelegate);
-
-		if (this._mouseStarted) {
-			this._mouseStarted = false;
-			this._preventClickEvent = (event.target == this._mouseDownEvent.target);
-			this._mouseStop(event);
-		}
-
-		return false;
-	},
-
-	_mouseDistanceMet: function(event) {
-		return (Math.max(
-				Math.abs(this._mouseDownEvent.pageX - event.pageX),
-				Math.abs(this._mouseDownEvent.pageY - event.pageY)
-			) >= this.options.distance
-		);
-	},
-
-	_mouseDelayMet: function(event) {
-		return this.mouseDelayMet;
-	},
-
-	// These are placeholder methods, to be overriden by extending plugin
-	_mouseStart: function(event) {},
-	_mouseDrag: function(event) {},
-	_mouseStop: function(event) {},
-	_mouseCapture: function(event) { return true; }
-};
-
-$.ui.mouse.defaults = {
-	cancel: null,
-	distance: 1,
-	delay: 0
-};
-
-})(jQuery);
+(function(c,j){function k(a,b){var d=a.nodeName.toLowerCase();if("area"===d){b=a.parentNode;d=b.name;if(!a.href||!d||b.nodeName.toLowerCase()!=="map")return false;a=c("img[usemap=#"+d+"]")[0];return!!a&&l(a)}return(/input|select|textarea|button|object/.test(d)?!a.disabled:"a"==d?a.href||b:b)&&l(a)}function l(a){return!c(a).parents().andSelf().filter(function(){return c.curCSS(this,"visibility")==="hidden"||c.expr.filters.hidden(this)}).length}c.ui=c.ui||{};if(!c.ui.version){c.extend(c.ui,{version:"1.8.15",
+keyCode:{ALT:18,BACKSPACE:8,CAPS_LOCK:20,COMMA:188,COMMAND:91,COMMAND_LEFT:91,COMMAND_RIGHT:93,CONTROL:17,DELETE:46,DOWN:40,END:35,ENTER:13,ESCAPE:27,HOME:36,INSERT:45,LEFT:37,MENU:93,NUMPAD_ADD:107,NUMPAD_DECIMAL:110,NUMPAD_DIVIDE:111,NUMPAD_ENTER:108,NUMPAD_MULTIPLY:106,NUMPAD_SUBTRACT:109,PAGE_DOWN:34,PAGE_UP:33,PERIOD:190,RIGHT:39,SHIFT:16,SPACE:32,TAB:9,UP:38,WINDOWS:91}});c.fn.extend({propAttr:c.fn.prop||c.fn.attr,_focus:c.fn.focus,focus:function(a,b){return typeof a==="number"?this.each(function(){var d=
+this;setTimeout(function(){c(d).focus();b&&b.call(d)},a)}):this._focus.apply(this,arguments)},scrollParent:function(){var a;a=c.browser.msie&&/(static|relative)/.test(this.css("position"))||/absolute/.test(this.css("position"))?this.parents().filter(function(){return/(relative|absolute|fixed)/.test(c.curCSS(this,"position",1))&&/(auto|scroll)/.test(c.curCSS(this,"overflow",1)+c.curCSS(this,"overflow-y",1)+c.curCSS(this,"overflow-x",1))}).eq(0):this.parents().filter(function(){return/(auto|scroll)/.test(c.curCSS(this,
+"overflow",1)+c.curCSS(this,"overflow-y",1)+c.curCSS(this,"overflow-x",1))}).eq(0);return/fixed/.test(this.css("position"))||!a.length?c(document):a},zIndex:function(a){if(a!==j)return this.css("zIndex",a);if(this.length){a=c(this[0]);for(var b;a.length&&a[0]!==document;){b=a.css("position");if(b==="absolute"||b==="relative"||b==="fixed"){b=parseInt(a.css("zIndex"),10);if(!isNaN(b)&&b!==0)return b}a=a.parent()}}return 0},disableSelection:function(){return this.bind((c.support.selectstart?"selectstart":
+"mousedown")+".ui-disableSelection",function(a){a.preventDefault()})},enableSelection:function(){return this.unbind(".ui-disableSelection")}});c.each(["Width","Height"],function(a,b){function d(f,g,m,n){c.each(e,function(){g-=parseFloat(c.curCSS(f,"padding"+this,true))||0;if(m)g-=parseFloat(c.curCSS(f,"border"+this+"Width",true))||0;if(n)g-=parseFloat(c.curCSS(f,"margin"+this,true))||0});return g}var e=b==="Width"?["Left","Right"]:["Top","Bottom"],h=b.toLowerCase(),i={innerWidth:c.fn.innerWidth,innerHeight:c.fn.innerHeight,
+outerWidth:c.fn.outerWidth,outerHeight:c.fn.outerHeight};c.fn["inner"+b]=function(f){if(f===j)return i["inner"+b].call(this);return this.each(function(){c(this).css(h,d(this,f)+"px")})};c.fn["outer"+b]=function(f,g){if(typeof f!=="number")return i["outer"+b].call(this,f);return this.each(function(){c(this).css(h,d(this,f,true,g)+"px")})}});c.extend(c.expr[":"],{data:function(a,b,d){return!!c.data(a,d[3])},focusable:function(a){return k(a,!isNaN(c.attr(a,"tabindex")))},tabbable:function(a){var b=c.attr(a,
+"tabindex"),d=isNaN(b);return(d||b>=0)&&k(a,!d)}});c(function(){var a=document.body,b=a.appendChild(b=document.createElement("div"));c.extend(b.style,{minHeight:"100px",height:"auto",padding:0,borderWidth:0});c.support.minHeight=b.offsetHeight===100;c.support.selectstart="onselectstart"in b;a.removeChild(b).style.display="none"});c.extend(c.ui,{plugin:{add:function(a,b,d){a=c.ui[a].prototype;for(var e in d){a.plugins[e]=a.plugins[e]||[];a.plugins[e].push([b,d[e]])}},call:function(a,b,d){if((b=a.plugins[b])&&
+a.element[0].parentNode)for(var e=0;e<b.length;e++)a.options[b[e][0]]&&b[e][1].apply(a.element,d)}},contains:function(a,b){return document.compareDocumentPosition?a.compareDocumentPosition(b)&16:a!==b&&a.contains(b)},hasScroll:function(a,b){if(c(a).css("overflow")==="hidden")return false;b=b&&b==="left"?"scrollLeft":"scrollTop";var d=false;if(a[b]>0)return true;a[b]=1;d=a[b]>0;a[b]=0;return d},isOverAxis:function(a,b,d){return a>b&&a<b+d},isOver:function(a,b,d,e,h,i){return c.ui.isOverAxis(a,d,h)&&
+c.ui.isOverAxis(b,e,i)}})}})(jQuery);
+;/*!
+ * jQuery UI Widget 1.8.15
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Widget
+ */
+(function(b,j){if(b.cleanData){var k=b.cleanData;b.cleanData=function(a){for(var c=0,d;(d=a[c])!=null;c++)b(d).triggerHandler("remove");k(a)}}else{var l=b.fn.remove;b.fn.remove=function(a,c){return this.each(function(){if(!c)if(!a||b.filter(a,[this]).length)b("*",this).add([this]).each(function(){b(this).triggerHandler("remove")});return l.call(b(this),a,c)})}}b.widget=function(a,c,d){var e=a.split(".")[0],f;a=a.split(".")[1];f=e+"-"+a;if(!d){d=c;c=b.Widget}b.expr[":"][f]=function(h){return!!b.data(h,
+a)};b[e]=b[e]||{};b[e][a]=function(h,g){arguments.length&&this._createWidget(h,g)};c=new c;c.options=b.extend(true,{},c.options);b[e][a].prototype=b.extend(true,c,{namespace:e,widgetName:a,widgetEventPrefix:b[e][a].prototype.widgetEventPrefix||a,widgetBaseClass:f},d);b.widget.bridge(a,b[e][a])};b.widget.bridge=function(a,c){b.fn[a]=function(d){var e=typeof d==="string",f=Array.prototype.slice.call(arguments,1),h=this;d=!e&&f.length?b.extend.apply(null,[true,d].concat(f)):d;if(e&&d.charAt(0)==="_")return h;
+e?this.each(function(){var g=b.data(this,a),i=g&&b.isFunction(g[d])?g[d].apply(g,f):g;if(i!==g&&i!==j){h=i;return false}}):this.each(function(){var g=b.data(this,a);g?g.option(d||{})._init():b.data(this,a,new c(d,this))});return h}};b.Widget=function(a,c){arguments.length&&this._createWidget(a,c)};b.Widget.prototype={widgetName:"widget",widgetEventPrefix:"",options:{disabled:false},_createWidget:function(a,c){b.data(c,this.widgetName,this);this.element=b(c);this.options=b.extend(true,{},this.options,
+this._getCreateOptions(),a);var d=this;this.element.bind("remove."+this.widgetName,function(){d.destroy()});this._create();this._trigger("create");this._init()},_getCreateOptions:function(){return b.metadata&&b.metadata.get(this.element[0])[this.widgetName]},_create:function(){},_init:function(){},destroy:function(){this.element.unbind("."+this.widgetName).removeData(this.widgetName);this.widget().unbind("."+this.widgetName).removeAttr("aria-disabled").removeClass(this.widgetBaseClass+"-disabled ui-state-disabled")},
+widget:function(){return this.element},option:function(a,c){var d=a;if(arguments.length===0)return b.extend({},this.options);if(typeof a==="string"){if(c===j)return this.options[a];d={};d[a]=c}this._setOptions(d);return this},_setOptions:function(a){var c=this;b.each(a,function(d,e){c._setOption(d,e)});return this},_setOption:function(a,c){this.options[a]=c;if(a==="disabled")this.widget()[c?"addClass":"removeClass"](this.widgetBaseClass+"-disabled ui-state-disabled").attr("aria-disabled",c);return this},
+enable:function(){return this._setOption("disabled",false)},disable:function(){return this._setOption("disabled",true)},_trigger:function(a,c,d){var e=this.options[a];c=b.Event(c);c.type=(a===this.widgetEventPrefix?a:this.widgetEventPrefix+a).toLowerCase();d=d||{};if(c.originalEvent){a=b.event.props.length;for(var f;a;){f=b.event.props[--a];c[f]=c.originalEvent[f]}}this.element.trigger(c,d);return!(b.isFunction(e)&&e.call(this.element[0],c,d)===false||c.isDefaultPrevented())}}})(jQuery);
+;/*!
+ * jQuery UI Mouse 1.8.15
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Mouse
+ *
+ * Depends:
+ *	jquery.ui.widget.js
+ */
+(function(b){b.widget("ui.mouse",{options:{cancel:":input,option",distance:1,delay:0},_mouseInit:function(){var a=this;this.element.bind("mousedown."+this.widgetName,function(c){return a._mouseDown(c)}).bind("click."+this.widgetName,function(c){if(true===b.data(c.target,a.widgetName+".preventClickEvent")){b.removeData(c.target,a.widgetName+".preventClickEvent");c.stopImmediatePropagation();return false}});this.started=false},_mouseDestroy:function(){this.element.unbind("."+this.widgetName)},_mouseDown:function(a){a.originalEvent=
+a.originalEvent||{};if(!a.originalEvent.mouseHandled){this._mouseStarted&&this._mouseUp(a);this._mouseDownEvent=a;var c=this,e=a.which==1,f=typeof this.options.cancel=="string"?b(a.target).closest(this.options.cancel).length:false;if(!e||f||!this._mouseCapture(a))return true;this.mouseDelayMet=!this.options.delay;if(!this.mouseDelayMet)this._mouseDelayTimer=setTimeout(function(){c.mouseDelayMet=true},this.options.delay);if(this._mouseDistanceMet(a)&&this._mouseDelayMet(a)){this._mouseStarted=this._mouseStart(a)!==
+false;if(!this._mouseStarted){a.preventDefault();return true}}true===b.data(a.target,this.widgetName+".preventClickEvent")&&b.removeData(a.target,this.widgetName+".preventClickEvent");this._mouseMoveDelegate=function(d){return c._mouseMove(d)};this._mouseUpDelegate=function(d){return c._mouseUp(d)};b(document).bind("mousemove."+this.widgetName,this._mouseMoveDelegate).bind("mouseup."+this.widgetName,this._mouseUpDelegate);a.preventDefault();return a.originalEvent.mouseHandled=true}},_mouseMove:function(a){if(b.browser.msie&&
+!(document.documentMode>=9)&&!a.button)return this._mouseUp(a);if(this._mouseStarted){this._mouseDrag(a);return a.preventDefault()}if(this._mouseDistanceMet(a)&&this._mouseDelayMet(a))(this._mouseStarted=this._mouseStart(this._mouseDownEvent,a)!==false)?this._mouseDrag(a):this._mouseUp(a);return!this._mouseStarted},_mouseUp:function(a){b(document).unbind("mousemove."+this.widgetName,this._mouseMoveDelegate).unbind("mouseup."+this.widgetName,this._mouseUpDelegate);if(this._mouseStarted){this._mouseStarted=
+false;a.target==this._mouseDownEvent.target&&b.data(a.target,this.widgetName+".preventClickEvent",true);this._mouseStop(a)}return false},_mouseDistanceMet:function(a){return Math.max(Math.abs(this._mouseDownEvent.pageX-a.pageX),Math.abs(this._mouseDownEvent.pageY-a.pageY))>=this.options.distance},_mouseDelayMet:function(){return this.mouseDelayMet},_mouseStart:function(){},_mouseDrag:function(){},_mouseStop:function(){},_mouseCapture:function(){return true}})})(jQuery);
+;/*
+ * jQuery UI Position 1.8.15
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Position
+ */
+(function(c){c.ui=c.ui||{};var n=/left|center|right/,o=/top|center|bottom/,t=c.fn.position,u=c.fn.offset;c.fn.position=function(b){if(!b||!b.of)return t.apply(this,arguments);b=c.extend({},b);var a=c(b.of),d=a[0],g=(b.collision||"flip").split(" "),e=b.offset?b.offset.split(" "):[0,0],h,k,j;if(d.nodeType===9){h=a.width();k=a.height();j={top:0,left:0}}else if(d.setTimeout){h=a.width();k=a.height();j={top:a.scrollTop(),left:a.scrollLeft()}}else if(d.preventDefault){b.at="left top";h=k=0;j={top:b.of.pageY,
+left:b.of.pageX}}else{h=a.outerWidth();k=a.outerHeight();j=a.offset()}c.each(["my","at"],function(){var f=(b[this]||"").split(" ");if(f.length===1)f=n.test(f[0])?f.concat(["center"]):o.test(f[0])?["center"].concat(f):["center","center"];f[0]=n.test(f[0])?f[0]:"center";f[1]=o.test(f[1])?f[1]:"center";b[this]=f});if(g.length===1)g[1]=g[0];e[0]=parseInt(e[0],10)||0;if(e.length===1)e[1]=e[0];e[1]=parseInt(e[1],10)||0;if(b.at[0]==="right")j.left+=h;else if(b.at[0]==="center")j.left+=h/2;if(b.at[1]==="bottom")j.top+=
+k;else if(b.at[1]==="center")j.top+=k/2;j.left+=e[0];j.top+=e[1];return this.each(function(){var f=c(this),l=f.outerWidth(),m=f.outerHeight(),p=parseInt(c.curCSS(this,"marginLeft",true))||0,q=parseInt(c.curCSS(this,"marginTop",true))||0,v=l+p+(parseInt(c.curCSS(this,"marginRight",true))||0),w=m+q+(parseInt(c.curCSS(this,"marginBottom",true))||0),i=c.extend({},j),r;if(b.my[0]==="right")i.left-=l;else if(b.my[0]==="center")i.left-=l/2;if(b.my[1]==="bottom")i.top-=m;else if(b.my[1]==="center")i.top-=
+m/2;i.left=Math.round(i.left);i.top=Math.round(i.top);r={left:i.left-p,top:i.top-q};c.each(["left","top"],function(s,x){c.ui.position[g[s]]&&c.ui.position[g[s]][x](i,{targetWidth:h,targetHeight:k,elemWidth:l,elemHeight:m,collisionPosition:r,collisionWidth:v,collisionHeight:w,offset:e,my:b.my,at:b.at})});c.fn.bgiframe&&f.bgiframe();f.offset(c.extend(i,{using:b.using}))})};c.ui.position={fit:{left:function(b,a){var d=c(window);d=a.collisionPosition.left+a.collisionWidth-d.width()-d.scrollLeft();b.left=
+d>0?b.left-d:Math.max(b.left-a.collisionPosition.left,b.left)},top:function(b,a){var d=c(window);d=a.collisionPosition.top+a.collisionHeight-d.height()-d.scrollTop();b.top=d>0?b.top-d:Math.max(b.top-a.collisionPosition.top,b.top)}},flip:{left:function(b,a){if(a.at[0]!=="center"){var d=c(window);d=a.collisionPosition.left+a.collisionWidth-d.width()-d.scrollLeft();var g=a.my[0]==="left"?-a.elemWidth:a.my[0]==="right"?a.elemWidth:0,e=a.at[0]==="left"?a.targetWidth:-a.targetWidth,h=-2*a.offset[0];b.left+=
+a.collisionPosition.left<0?g+e+h:d>0?g+e+h:0}},top:function(b,a){if(a.at[1]!=="center"){var d=c(window);d=a.collisionPosition.top+a.collisionHeight-d.height()-d.scrollTop();var g=a.my[1]==="top"?-a.elemHeight:a.my[1]==="bottom"?a.elemHeight:0,e=a.at[1]==="top"?a.targetHeight:-a.targetHeight,h=-2*a.offset[1];b.top+=a.collisionPosition.top<0?g+e+h:d>0?g+e+h:0}}}};if(!c.offset.setOffset){c.offset.setOffset=function(b,a){if(/static/.test(c.curCSS(b,"position")))b.style.position="relative";var d=c(b),
+g=d.offset(),e=parseInt(c.curCSS(b,"top",true),10)||0,h=parseInt(c.curCSS(b,"left",true),10)||0;g={top:a.top-g.top+e,left:a.left-g.left+h};"using"in a?a.using.call(b,g):d.css(g)};c.fn.offset=function(b){var a=this[0];if(!a||!a.ownerDocument)return null;if(b)return this.each(function(){c.offset.setOffset(this,b)});return u.call(this)}}})(jQuery);
+;
