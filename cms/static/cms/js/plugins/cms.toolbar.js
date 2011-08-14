@@ -17,6 +17,7 @@ jQuery(document).ready(function ($) {
 	 *	- CMS.API.Toolbar.registerItems(array);
 	 *	- CMS.API.Toolbar.removeItem(id);
 	 *	- CMS.API.Toolbar.registerType(function);
+	 *  - CMS.API.Toolbar.isToolbarHidden();
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 * TODO: login needs special treatment (errors, login on enter)
 	 * TODO: styling of the collapser button needs to be somehow transparent
@@ -78,7 +79,7 @@ jQuery(document).ready(function ($) {
 			// apply csrf patch to toolbar from cms.base.js
 			this.csrf();
 
-			// the toolbar needs to resize depending on the window size on motherfucking ie6
+			// the toolbar needs to resize depending on the window size on ie6
 			if($.browser.msie && $.browser.version <= '6.0') {
 				$(window).bind('resize', function () { that.wrapper.css('width', $(window).width()); });
 				$(window).trigger('resize');
@@ -200,7 +201,7 @@ jQuery(document).ready(function ($) {
 		// requires: type, order, dir, title, url
 		// optional: cls
 		_registerAnchor: function (obj) {
-			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			// take a copy of the template, append it, remove it, copy html. required because of how jquery works.
 			var template = this._processTemplate('#cms_toolbar-item_anchor', obj);
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
@@ -230,7 +231,7 @@ jQuery(document).ready(function ($) {
 		_registerSwitcher: function (obj) {
 			// save reference to this class
 			var that = this;
-			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			// take a copy of the template, append it, remove it, copy html. required because of how jquery works.
 			var template = this._processTemplate('#cms_toolbar-item_switcher', obj);
 			// should btn be shown?
 			var btn = template.find('.cms_toolbar-item_switcher-link span');
@@ -272,7 +273,7 @@ jQuery(document).ready(function ($) {
 		// required: type, order, dir, redirect
 		// optional: cls, icon, action, hidden
 		_registerButton: function (obj) {
-			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			// take a copy of the template, append it, remove it, copy html. required because of how jquery works.
 			var template = this._processTemplate('#cms_toolbar-item_button', obj);
 			// append item
 			this._injectItem(template, obj.dir, obj.order);
@@ -281,7 +282,7 @@ jQuery(document).ready(function ($) {
 		// required: type, order, dir, items (title, url, method (get/post), cls, icon)
 		// optional: cls, icon
 		_registerList: function (obj) {
-			// take a copy of the template, append it, remove it, copy html... because jquery is stupid
+			// take a copy of the template, append it, remove it, copy html. required because of how jquery works.
 			var template = this._processTemplate('#cms_toolbar-item_list', obj);
 
 			// item injection logic

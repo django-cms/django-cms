@@ -129,7 +129,7 @@ jQuery(document).ready(function ($) {
 			// bind load event to injected iframe
 			$('#cms_placeholder-iframe').load(function () {
 				// set new height and animate
-				// cause IE is so awesome, we need a timeout so that slow rendering bitch catches up
+				// set a timeout for slower javascript engines (such as IE)
 				setTimeout(function () {
 					var height = $('#cms_placeholder-iframe').contents().find('body').outerHeight(true)+26;
 					$('#cms_placeholder-iframe').animate({ 'height': height }, 500);
@@ -272,7 +272,8 @@ jQuery(document).ready(function ($) {
 			var current = plugin.attr('class').split('::')[1];
 
 			// lets remove current from array - puke
-			// cause ie is a fucking motherfucker it doesn't support indexOf so use jquerys crap instead
+			// unfortunately, Internet Explorer does not support indexOf, so
+			// we use the jQuery cross browers compatible version
 			var idx = $.inArray(current, array);
 				array.splice(idx, 1);
 
@@ -378,8 +379,8 @@ jQuery(document).ready(function ($) {
 					that.hidePluginList.call(that, el);
 				});
 			}, 100);
-
-			// ie <7 likes to be fucked on top thats cause he doesnt know z-index
+			
+			// Since IE7 (and lower) do not properly support z-index, do a cross browser hack
 			if($.browser.msie && $.browser.version < '8.0') el.parent().parent().css({'position': 'relative','z-index': 999999});
 
 			el.addClass('cms_toolbar-btn-active').data('collapsed', false);
@@ -392,7 +393,7 @@ jQuery(document).ready(function ($) {
 			// remove the body event
 			$(document).unbind('click');
 
-			// ie <7 likes to be fucked on top thats cause he doesnt know z-index
+			// Since IE7 (and lower) do not properly support z-index, do a cross browser hack
 			if($.browser.msie && $.browser.version < '8.0') el.parent().parent().css({'position': '','z-index': ''});
 
 			el.removeClass('cms_toolbar-btn-active').data('collapsed', true);
