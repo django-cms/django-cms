@@ -17,7 +17,8 @@
 
 /* #TOOLBAR/reset# */
 .cms_reset div, .cms_reset p, .cms_reset a, .cms_reset a:hover, .cms_reset a:active, .cms_reset a:focus,
-.cms_reset form, .cms_reset fieldset, .cms_reset label, .cms_reset input, .cms_reset textarea, .cms_reset select {
+.cms_reset form, .cms_reset fieldset, .cms_reset label, .cms_reset input, .cms_reset textarea, .cms_reset select,
+.cms_reset ul, .cms_reset li {
 	font:normal 13px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif; color:#666; font-weight:normal; text-decoration:none;
 	text-align:left; border:none; padding:0; margin:0; outline:none; }
 
