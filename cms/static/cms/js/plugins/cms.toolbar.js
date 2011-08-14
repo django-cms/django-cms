@@ -293,7 +293,7 @@ jQuery(document).ready(function ($) {
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
 				// add icon if available
-				var icon = (value.icon !== '') ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
+				var icon = value.icon ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
@@ -389,8 +389,7 @@ jQuery(document).ready(function ($) {
 			// back to jquery object
 			template = $(template);
 			if(obj.cls) template.addClass(obj.cls);
-			// TODO: backend should return '' or undefined instead of /media/
-			if(obj.icon && obj.icon !== '/media/') {
+			if (obj.icon) {
 				template.find('.cms_toolbar-btn_right .toolbar_icon-prefix')
 						.addClass('cms_toolbar_icon-enabled')
 						.css('background-image', 'url('+obj.icon+')');
