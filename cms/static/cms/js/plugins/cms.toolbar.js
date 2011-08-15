@@ -293,13 +293,14 @@ jQuery(document).ready(function ($) {
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
 				// add icon if available
-				var icon = value.icon ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
+				var icon_value = value.icon ? value.icon : '';
+				var icon_class = value.icon ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
 						   .replace('[list_method]', value.method)
 						   .replace('[list_class]', value.cls)
-						   .replace('<span>', '<span class="'+icon+'" style="background-image:url('+value.icon+');">');
+						   .replace('<span>', '<span class="'+icon_class+'" style="background-image:url('+icon_value+');">');
 			});
 			// add items
 			template.find('.cms_toolbar-item_list').html($(tmp));
