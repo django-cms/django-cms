@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
@@ -391,14 +390,11 @@ class Page(MPTTModel):
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
-    @transaction.commit_manually
     def publish(self):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible. 
 
         IMPORTANT: @See utils.moderator.approve_page for publishing permissions
-                   Also added @transaction.commit_manually decorator as delete() 
-                    was removing both draft and public versions
 
         Returns: True if page was successfully published.
         """
@@ -414,21 +410,18 @@ class Page(MPTTModel):
             self.save()
 
         if self._publisher_can_publish():
-
             ########################################################################
-            # delete the existing public page using transaction block to ensure save() and delete() do not conflict
-            # the draft version was being deleted if I replaced the save() below with a delete()
-            try:
-                old_public = self.get_public_object()
+            # Assign the existing public page in old_public and mark it as
+            # PUBLISHER_STATE_DELETE
+            # the draft version was being deleted if I replaced the save()
+            # below with a delete() directly so the deletion is handle at the end
+            old_public = self.get_public_object()
+            if old_public:
                 old_public.publisher_state = self.PUBLISHER_STATE_DELETE
                 # store old public on self, pass around instead
                 self.old_public = old_public
                 old_public.publisher_public = None  # remove the reference to the publisher_draft version of the page so it does not get deleted
                 old_public.save()
-            except:
-                transaction.rollback()
-            else:
-                transaction.commit()
 
             # we hook into the modified copy_page routing to do the heavy lifting of copying the draft page to a new public page
             new_public = self.copy_page(target=None, site=self.site,
@@ -447,16 +440,15 @@ class Page(MPTTModel):
             self.publisher_public = new_public
             self.moderator_state = Page.MODERATOR_APPROVED
             self.publisher_state = self.PUBLISHER_STATE_DEFAULT
-            self._publisher_keep_state = True        
+            self._publisher_keep_state = True
             published = True
         else:
             self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
 
         self.save(change_state=False)
-        
+
         if not published:
             # was not published, escape
-            transaction.commit()
             return
 
         # clean moderation log
@@ -469,15 +461,12 @@ class Page(MPTTModel):
             for child_page in old_public.children.order_by('lft'):
                 child_page.move_to(new_public, 'last-child')
                 child_page.save(change_state=False)
-            transaction.commit()
             # reload old_public to get correct tree attrs
             old_public = Page.objects.get(pk=old_public.pk)
             old_public.move_to(None, 'last-child')
             # moving the object out of the way berore deleting works, but why?
             # finally delete the old public page    
             old_public.delete()
-        # manually commit the last transaction batch
-        transaction.commit()
 
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
@@ -495,7 +484,7 @@ class Page(MPTTModel):
         transaction.commit()
 
         return published
-        
+
     def delete(self):
         """Mark public instance for deletion and delete draft.
         """
