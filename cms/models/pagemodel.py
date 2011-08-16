@@ -14,7 +14,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
@@ -400,7 +399,6 @@ class Page(MPTTModel):
         """
         # Publish can only be called on moderated and draft pages
         if not self.publisher_is_draft:
-            transaction.rollback()
             return
 
         # publish, but only if all parents are published!!
@@ -465,7 +463,7 @@ class Page(MPTTModel):
             old_public = Page.objects.get(pk=old_public.pk)
             old_public.move_to(None, 'last-child')
             # moving the object out of the way berore deleting works, but why?
-            # finally delete the old public page    
+            # finally delete the old public page
             old_public.delete()
 
         # page was published, check if there are some childs, which are waiting
@@ -480,8 +478,6 @@ class Page(MPTTModel):
         # fire signal after publishing is done
         import cms.signals as cms_signals
         cms_signals.post_publish.send(sender=Page, instance=self)
-
-        transaction.commit()
 
         return published
 
