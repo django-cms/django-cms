@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language, ugettext_lazy as _
