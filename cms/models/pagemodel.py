@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.shortcuts import get_object_or_404
@@ -366,8 +365,6 @@ class Page(Mptt):
         are waiting for parent to publish, so publish them if possible. 
 
         IMPORTANT: @See utils.moderator.approve_page for publishing permissions
-                   Also added @transaction.commit_manually decorator as delete() 
-                    was removing both draft and public versions
 
         Returns: True if page was successfully published.
         """
@@ -382,10 +379,11 @@ class Page(Mptt):
             self.save()
 
         if self._publisher_can_publish():
-
             ########################################################################
-            # delete the existing public page using transaction block to ensure save() and delete() do not conflict
-            # the draft version was being deleted if I replaced the save() below with a delete()
+            # Assign the existing public page in old_public and mark it as
+            # PUBLISHER_STATE_DELETE
+            # the draft version was being deleted if I replaced the save()
+            # below with a delete() directly so the deletion is handle at the end
             old_public = self.get_public_object()
             if old_public:
                 old_public.publisher_state = self.PUBLISHER_STATE_DELETE
