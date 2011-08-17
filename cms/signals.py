@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
-from django.db.models import signals
 from django.conf import settings
-from cms.models import Page, Title, CMSPlugin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import signals
 from django.dispatch import Signal
+
+from cms.cache.permissions import (
+    clear_user_permission_cache, clear_permission_cache)
+from cms.models import (Page, Title, CMSPlugin, PagePermission, 
+    GlobalPagePermission, PageUser, PageUserGroup)
+
 from menus.menu_pool import menu_pool
 
 # fired after page location is changed - is moved from one node to other
@@ -38,6 +43,19 @@ def update_title_paths(instance, **kwargs):
 page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
 
 
+def update_title(title):
+    parent_page_id = title.page.parent_id
+    slug = u'%s' % title.slug
+    
+    if title.page.is_home():
+        title.path = ''
+    else:
+        title.path = u'%s' % slug
+    if parent_page_id:
+        parent_title = Title.objects.get_title(parent_page_id, language=title.language, language_fallback=True)
+        if parent_title:
+            title.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
@@ -59,14 +77,7 @@ def pre_save_title(instance, raw, **kwargs):
     if instance.has_url_overwrite and instance.path:
         instance.path = instance.path.strip(" /")
     else:
-        parent_page = instance.page.parent
-        slug = u'%s' % instance.slug
-        
-        instance.path = u'%s' % slug
-        if parent_page:
-            parent_title = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True)
-            if parent_title:
-                instance.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+        update_title(instance)
         
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
@@ -121,8 +132,6 @@ def post_save_user(instance, raw, created, **kwargs):
     creator = get_current_user()
     if not creator or not created or not hasattr(creator, 'pk'):
         return
-    
-    from cms.models import PageUser
     from django.db import connection
     
     # i'm not sure if there is a workaround for this, somebody any ideas? What
@@ -151,10 +160,8 @@ def post_save_user_group(instance, raw, created, **kwargs):
     from cms.utils.permissions import get_current_user
     # read current user from thread locals
     creator = get_current_user()
-    if not creator or not created:
+    if not creator or not created or creator.is_anonymous():
         return
-    
-    from cms.models import PageUserGroup
     from django.db import connection
     
     # TODO: same as in post_save_user - raw sql is just not nice - workaround...?
@@ -185,9 +192,9 @@ def pre_save_page(instance, raw, **kwargs):
         instance.old_page = Page.objects.get(pk=instance.pk)
     except ObjectDoesNotExist:
         pass
-    
 
-def post_save_page(instance, raw, created, **kwargs):   
+
+def post_save_page_moderator(instance, raw, created, **kwargs):   
     """Helper post save signal, cleans old_page attribute.
     """
     old_page = instance.old_page
@@ -197,25 +204,27 @@ def post_save_page(instance, raw, created, **kwargs):
         # tell moderator something was happen with this page
         from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
-    
+        
+def post_save_page(instance, **kwargs):
+    for page in instance.get_descendants():
+        for title in page.title_set.all():
+            update_title(title)
+            title.save()
+
 def update_placeholders(instance, **kwargs):
     instance.rescan_placeholders()
 
 def invalidate_menu_cache(instance, **kwargs):
-    menu_pool.clear(instance.site_id)    
+    menu_pool.clear(instance.site_id)
 
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
-    signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
+    signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
+signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
- 
-from cms.models import PagePermission, GlobalPagePermission
-from cms.cache.permissions import clear_user_permission_cache,\
-    clear_permission_cache
-
 
 def pre_save_user(instance, raw, **kwargs):
     clear_user_permission_cache(instance)
@@ -225,13 +234,13 @@ def pre_delete_user(instance, **kwargs):
 
 def pre_save_group(instance, raw, **kwargs):
     if instance.pk:
-        for user in instance.user_set.filter(is_staff=True):
+        for user in instance.user_set.all():
             clear_user_permission_cache(user)
 
 def pre_delete_group(instance, **kwargs):
-    for user in instance.user_set.filter(is_staff=True):
+    for user in instance.user_set.all():
         clear_user_permission_cache(user)
-    
+
 def pre_save_pagepermission(instance, raw, **kwargs):
     if instance.user:
         clear_user_permission_cache(instance.user)
@@ -243,6 +252,7 @@ def pre_delete_pagepermission(instance, **kwargs):
 def pre_save_globalpagepermission(instance, raw, **kwargs):
     if instance.user:
         clear_user_permission_cache(instance.user)
+    menu_pool.clear(all=True)
 
 def pre_delete_globalpagepermission(instance, **kwargs):
     if instance.user:
@@ -251,14 +261,18 @@ def pre_delete_globalpagepermission(instance, **kwargs):
 def pre_save_delete_page(instance, **kwargs):
     clear_permission_cache()
 
-
 if settings.CMS_PERMISSION:
-    # TODO: will this work also with PageUser and PageGroup??
     signals.pre_save.connect(pre_save_user, sender=User)
     signals.pre_delete.connect(pre_delete_user, sender=User)
+
+    signals.pre_save.connect(pre_save_user, sender=PageUser)
+    signals.pre_delete.connect(pre_delete_user, sender=PageUser)
     
     signals.pre_save.connect(pre_save_group, sender=Group)
     signals.pre_delete.connect(pre_delete_group, sender=Group)
+
+    signals.pre_save.connect(pre_save_group, sender=PageUserGroup)
+    signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup)
     
     signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission)
     signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission)
@@ -268,5 +282,3 @@ if settings.CMS_PERMISSION:
     
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
-
-

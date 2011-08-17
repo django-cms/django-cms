@@ -1,21 +1,20 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
+"Last-Translator: gleb_chipiga <gleb.chipiga@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -34,7 +33,7 @@ msgstr "Заголовок по умолчанию"
 
 #: admin/forms.py:54
 msgid "Slug"
-msgstr "Slug"
+msgstr "Путь"
 
 #: admin/forms.py:55
 msgid "The part of the title that is used in the URL"
@@ -65,10 +64,10 @@ msgid "Page Title"
 msgstr "Заголовок страницы"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
-"Переписать то, что будет изображено в заголовке браузера или "
-"закладках."
+"Переписать то, что будет изображено в заголовке браузера или закладках."
 
 #: admin/forms.py:132
 msgid "Application"
@@ -101,8 +100,8 @@ msgstr "Описание страницы, иногда используемое
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Список ключевых слов, разделённых запятыми, иногда используемый "
-"поисковыми роботами."
+"Список ключевых слов, разделённых запятыми, иногда используемый поисковыми "
+"роботами."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -159,11 +158,11 @@ msgstr "Уведомить пользователя"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Отправить пользователю email о смене имени или пароля. Требуется email"
-" пользователя."
+"Отправить пользователю email о смене имени или пароля. Требуется email "
+"пользователя."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -179,17 +178,14 @@ msgstr "Уведомление по email требует правильного 
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Право на добавление страницы требует право на изменение страницы!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"Право на добавление пользователя требует право на изменение "
-"пользователя!"
+"Право на добавление пользователя требует право на изменение пользователя!"
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -206,8 +202,7 @@ msgstr "Основные настройки"
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"Страница будет перезагружена, если изменить выбор. Сохраните её "
-"сначала."
+"Страница будет перезагружена, если изменить выбор. Сохраните её сначала."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -290,9 +285,9 @@ msgstr "Скопировано %(language)s плагинов в %(placeholder)s"
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
-msgstr "%(plugin_name)s плагин, редактируемый в %(position)s в %(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr ""
+"%(plugin_name)s плагин, редактируемый в %(position)s в %(placeholder)s"
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -396,7 +391,7 @@ msgstr "путь"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:13
 msgid "slug"
-msgstr "slug"
+msgstr "путь"
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
@@ -611,11 +606,9 @@ msgstr "изменён"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
-msgstr ""
-"Для того, чтобы опубликовать страницу, необходимо статус "
-"\"Опубликовано\""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
+msgstr "Для того, чтобы опубликовать страницу, необходимо статус \"Опубликовано\""
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -627,11 +620,11 @@ msgstr "Все предки не будут показаны в навигаци
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Уникальный идентификатор, который используется с тегом page_url для "
-"связи с данной страницей"
+"Уникальный идентификатор, который используется с тегом page_url для связи с "
+"данной страницей"
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -877,8 +870,8 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Выберите страницу для включения её плагинов в данный placeholder, "
-"пусто означает текущую страницу"
+"Выберите страницу для включения её плагинов в данный placeholder, пусто "
+"означает текущую страницу"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -970,11 +963,10 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
-"Введите имя шаблона (например \"snippets/plugin_xy.html\") который "
-"должен отображаться. "
+"Введите имя шаблона (например \"snippets/plugin_xy.html\") который должен "
+"отображаться. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1077,8 +1069,7 @@ msgstr "подсказка ссылки"
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
-"Если указано, подсказка будет показана как ссылка на ваш профиль "
-"Twitter"
+"Если указано, подсказка будет показана как ссылка на ваш профиль Twitter"
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1090,6 +1081,9 @@ msgid ""
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
 msgstr ""
+"Пример: \"brains AND zombies AND from:umbrella AND to:nemesis\": твиты от "
+"пользователя \"umbrella\" пользователю \"nemesis\" содержащие слова "
+"\"brains\" и \"zombies\""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1113,8 +1107,8 @@ msgstr "URL видео"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 "ссылка на видео с vimeo или youtube. Например: "
 "http://www.youtube.com/watch?v=YFa59lK-kpo"
@@ -1214,11 +1208,10 @@ msgstr "Сохранить и продолжить редактирование"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
-"Страница <a href=\"%(admin_url)s\">%(page)s</a> может требовать "
-"утверждения вами."
+"Страница <a href=\"%(admin_url)s\">%(page)s</a> может требовать утверждения "
+"вами."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1310,7 +1303,6 @@ msgid_plural "Please correct the errors below."
 msgstr[0] "Пожалуйста, исправьте ошибки ниже."
 msgstr[1] "Пожалуйста, исправьте ошибки ниже."
 msgstr[2] "Пожалуйста, исправьте ошибки ниже."
-msgstr[3] "Пожалуйста, исправьте ошибки ниже."
 
 #: templates/admin/cms/page/change_form.html:148
 msgid "All permissions"
@@ -1329,11 +1321,11 @@ msgstr "Статусы страниц"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
-"Страница должна быть модерирована на уровне %(moderation_level)s, "
-"сообщите модератору."
+"Страница должна быть модерирована на уровне %(moderation_level)s, сообщите "
+"модератору."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1568,8 +1560,7 @@ msgstr "Восстановить удалённые %(verbose_name)s"
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
 msgstr ""
-"Нажмите кнопку сохранения ниже для восстановления данной версии "
-"объекта."
+"Нажмите кнопку сохранения ниже для восстановления данной версии объекта."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1784,7 +1775,7 @@ msgstr "три колонки"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
-msgstr ""
+msgstr "примеры навигации"
 
 #: test/run_tests.py:167 test/project/settings.py:148
 msgid "sidebar column"
@@ -1808,19 +1799,19 @@ msgstr "Пример приложения"
 
 #: test/apps/sampleapp/menu.py:17
 msgid "sample root page"
-msgstr ""
+msgstr "пример корневой страницы"
 
 #: test/apps/sampleapp/menu.py:18
 msgid "sample settings page"
-msgstr ""
+msgstr "пример страницы настроек"
 
 #: test/apps/sampleapp/menu.py:19
 msgid "sample account page"
-msgstr ""
+msgstr "пример страницы учётной записи"
 
 #: test/apps/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "пример страницы профиля"
 
 #: test/apps/sampleapp/menu.py:32
 msgid "Static Menu"
@@ -1856,3 +1847,5 @@ msgstr "CMS - ваш аккаунт изменён."
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Для требуемого языка ещё нет перевода."
+
+

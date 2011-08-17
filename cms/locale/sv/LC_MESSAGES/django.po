@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:12+0000\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +64,8 @@ msgid "Page Title"
 msgstr "Sidrubrik"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Anger vad som visas i webbläsarens topp eller i bokmärken"
 
 #: admin/forms.py:132
@@ -119,8 +119,7 @@ msgid ""
 "otherwise added page can't be changed by its creator."
 msgstr ""
 "Tillåtelse att lägga till sida kräver också tillgång till barn eller "
-"efterkommande annars kan inte tillagd sida redigeras av den som skapat"
-" den."
+"efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
@@ -156,8 +155,8 @@ msgstr "Meddela användare"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 "Skicka e-postmeddelande till användare om användarnamn eller "
 "lösenordsförändring. E-postadress på användare krävs."
@@ -176,14 +175,12 @@ msgstr "E-postmeddelande kräver en giltig e-postadress."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Tillåtelse att lägga till sidor kräver tillåtelse att redigera sidor!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
 "Tillåtelse att lägga till användare kröver tillåtelse att redigera "
 "användare!"
@@ -285,8 +282,7 @@ msgstr "%(language)s plugin har kopierats till %(placeholder)s"
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 "%(plugin_name)s plugin har redigerats på plats %(position)s i "
 "%(placeholder)s"
@@ -610,11 +606,11 @@ msgstr "ändrad av"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
-"När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan "
-"ska gå live."
+"När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå"
+" live."
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -626,11 +622,11 @@ msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Ett unikt id som används med mallkommandot page_url för att länka till"
-" denna sida"
+"Ett unikt id som används med mallkommandot page_url för att länka till denna"
+" sida"
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -876,8 +872,8 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Välj en sida för att inkludera dess plugins till denna platshållare, "
-"lämna blankt för nuvarande sida"
+"Välj en sida för att inkludera dess plugins till denna platshållare, lämna "
+"blankt för nuvarande sida"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -969,11 +965,8 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
-msgstr ""
-"Ange en mall (t.ex. \"snippets/plugin_xy.html\") som kommer att "
-"användas."
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr "Ange en mall (t.ex. \"snippets/plugin_xy.html\") som kommer att användas."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1110,8 +1103,8 @@ msgstr "film url"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 "vimeo eller youtube video url. Exampel: http://www.youtube.com/watch?v"
 "=YFa59lK-kpo"
@@ -1211,11 +1204,9 @@ msgstr "Spara och fortsätt redigera"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
-"Sida <a href=\"%(admin_url)s\">%(page)s</a> kan behöva godkännande av "
-"dig."
+"Sida <a href=\"%(admin_url)s\">%(page)s</a> kan behöva godkännande av dig."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1324,8 +1315,8 @@ msgstr "Sidstatus"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 "Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett "
 "meddelande till moderatorn."
@@ -1572,8 +1563,7 @@ msgstr "Återgå till %(verbose_name)s"
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
 msgstr ""
-"Tryck på spara-knappen nedan för att återgå till denna version av "
-"objektet."
+"Tryck på spara-knappen nedan för att återgå till denna version av objektet."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1849,3 +1839,5 @@ msgstr "CMS - ditt användarkonto har ändrats."
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Önskad språk har inte översatts än."
+
+

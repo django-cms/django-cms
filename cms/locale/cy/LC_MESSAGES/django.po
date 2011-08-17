@@ -1,21 +1,20 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-05-20 08:39+0000\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cy\n"
-"Plural-Forms: nplurals=4; plural=(n==2) ? 1 : 0\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -65,7 +64,8 @@ msgid "Page Title"
 msgstr ""
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 
 #: admin/forms.py:132
@@ -153,8 +153,8 @@ msgstr ""
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 
 #: admin/forms.py:316
@@ -171,14 +171,12 @@ msgstr ""
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:343
@@ -278,8 +276,7 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -599,8 +596,8 @@ msgstr ""
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -613,8 +610,8 @@ msgstr ""
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -952,8 +949,7 @@ msgstr ""
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1091,8 +1087,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1188,8 +1184,7 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1301,8 +1296,8 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1822,3 +1817,5 @@ msgstr ""
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr ""
+
+

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import PlaceholderNoAction
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.utils.translation import ugettext_lazy as _
 import operator
+
 
 
 class Placeholder(models.Model):
@@ -16,6 +18,21 @@ class Placeholder(models.Model):
 
     def __unicode__(self):
         return self.slot
+    
+    def get_add_url(self):
+        return self._get_url('add_plugin')
+    
+    def get_changelist_url(self):
+        return self._get_url('changelist')
+    
+    def _get_url(self, key):
+        model = self._get_attached_model()
+        if not model:
+            return reverse('admin:cms_page_%s' % key)
+        else:
+            app_label = model._meta.app_label
+            model_name = model.__name__.lower()
+            return reverse('admin:%s_%s_%s' % (app_label, model_name, key))
         
     def _get_permission(self, request, key):
         """
@@ -50,7 +67,9 @@ class Placeholder(models.Model):
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
-        context.update({'width': width or self.default_width})
+        width = width or self.default_width
+        if width:
+            context.update({'width': width})
         return render_placeholder(self, context)
 
     def get_media(self, request, context):
@@ -66,7 +85,7 @@ class Placeholder(models.Model):
         """
         from cms.models import CMSPlugin
         for rel in self._meta.get_all_related_objects():
-            if isinstance(rel.model, CMSPlugin):
+            if issubclass(rel.model, CMSPlugin):
                 continue
             field = getattr(self, rel.get_accessor_name())
             if field.count():
@@ -77,7 +96,7 @@ class Placeholder(models.Model):
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
             for rel in self._meta.get_all_related_objects():
-                if isinstance(rel.model, CMSPlugin):
+                if issubclass(rel.model, CMSPlugin):
                     continue
                 field = getattr(self, rel.get_accessor_name())
                 if field.count():

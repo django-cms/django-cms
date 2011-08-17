@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +64,8 @@ msgid "Page Title"
 msgstr "عنوان صفحه"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr " عنوان مرورگر یا بوک مارک ها جاینوشت می-شوند"
 
 #: admin/forms.py:132
@@ -99,8 +99,8 @@ msgstr "شرح صفحه که توسط موتورهای جستجو استفاده
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده"
-" می شود."
+"لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده می "
+"شود."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -120,15 +120,14 @@ msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-" اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا "
-"صفحات فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه "
-"قابلیت تغییر آن را نخواهد داشت."
+" اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات "
+"فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن "
+"را نخواهد داشت."
 
 #: admin/forms.py:218
 msgid "Add page permission also requires edit page permission."
 msgstr ""
-"اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را "
-"دارد."
+"اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
@@ -160,11 +159,11 @@ msgstr "هشدار به کاربر"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع "
-"کن. نیاز به ایمیل کاربر دارد."
+"از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز"
+" به ایمیل کاربر دارد."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -180,19 +179,18 @@ msgstr "هشدار از طریق ایمیل به ایمیل معتبر نیاز 
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "اجازه اضافه کردن صفحات جدید نیاز به اجازه ویرایش صفحه دارد!"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr "اجازه ایجاد کاربران نیاز به اجازه تغییر کاربر دارد."
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
-msgstr "برای اضافه کردن دسترسی شما باید دسترسی ویرایش آنها را نیز داشته باشید."
+msgstr ""
+"برای اضافه کردن دسترسی شما باید دسترسی ویرایش آنها را نیز داشته باشید."
 
 #: admin/pageadmin.py:123 admin/pageadmin.py:139
 msgid "Hidden"
@@ -205,8 +203,8 @@ msgstr "تنظیمات پایه"
 #: admin/pageadmin.py:137
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
-"توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن "
-"را ابتدا ذخیره کنید."
+"توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن را "
+"ابتدا ذخیره کنید."
 
 #: admin/pageadmin.py:143
 msgid "Advanced Settings"
@@ -289,11 +287,9 @@ msgstr "افزونه-های زبان(های) %(language)s به %(placeholder)s �
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
-"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر"
-" کرد."
+"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر کرد."
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -305,8 +301,7 @@ msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
-"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف "
-"شد."
+"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف شد."
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -614,11 +609,10 @@ msgstr "تغییریافته به وسیله"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
-"زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ"
-" دهد."
+"زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -630,11 +624,11 @@ msgstr "تمامی اجداد در گردش نمایش داده نمی-شوند.
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده"
-" می-شود."
+"شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده می-"
+"شود."
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -719,8 +713,8 @@ msgstr "می-تواند هر صفحه پاک-شده را بازیابی کند"
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
-"اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را "
-"خواهد داشت."
+"اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را خواهد "
+"داشت."
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -882,8 +876,8 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. "
-"در صورت عدم انتخاب صفحه جاری انتخاب می‌شود."
+"صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. در "
+"صورت عدم انتخاب صفحه جاری انتخاب می‌شود."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -975,8 +969,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "الگویی (مانند \"snippets/plugin_xy.html\") را برای ارزیابی وارد کنید."
 
 #: plugins/snippet/models.py:25
@@ -1080,8 +1073,8 @@ msgstr "راهنمایی پیوند"
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
-"در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر "
-"نمایش داده می‌شود."
+"در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر نمایش "
+"داده می‌شود."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1116,8 +1109,8 @@ msgstr "آدرس اینترنتی ویدیو"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 "آدرس ویدیو در YouTube یا vimeo. مثال: http://www.youtube.com/watch?v"
 "=YFa59lK-kpo"
@@ -1217,11 +1210,10 @@ msgstr "ذخیره و ادامه ویرایش"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
-"صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما "
-"داشته باشد."
+"صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما داشته"
+" باشد."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1329,11 +1321,11 @@ msgstr "حالت‌های صفحه"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
-"این صفحه باید در سطح %(moderation_level)s نظارت شود، پیامی برای ناظر "
-"آن بفرستید."
+"این صفحه باید در سطح %(moderation_level)s نظارت شود، پیامی برای ناظر آن "
+"بفرستید."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1852,3 +1844,5 @@ msgstr "CMS - حساب کاربری شما تغییر کرد."
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr ""
+
+

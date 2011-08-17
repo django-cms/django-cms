@@ -1,15 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-05-11 17:19+0000\n"
+"Last-Translator: vinilios <vinilios@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +29,7 @@ msgstr "Τίτλος"
 
 #: admin/forms.py:53
 msgid "The default title"
-msgstr ""
+msgstr "Προεπιλεγμένος τίτλος"
 
 #: admin/forms.py:54
 msgid "Slug"
@@ -46,7 +45,7 @@ msgstr "Γλώσσα"
 
 #: admin/forms.py:57
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "Η επιλεγμένη γλώσσα των πεδίων περιεχομένου"
 
 #: admin/forms.py:110
 msgid "Another page with this slug already exists"
@@ -58,15 +57,18 @@ msgstr "Τίτλος Μενού"
 
 #: admin/forms.py:129
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Αντικατάσταση στην εμφάνιση του μενού"
 
 #: admin/forms.py:130
 msgid "Page Title"
 msgstr "Τίτλος Σελίδας"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
+"Αντικαθιστά αυτό που εμφανίζεται στο επάνω μέρος του browser σας ή στους "
+"σελιδοδείκτες"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -74,7 +76,7 @@ msgstr "Εφαρμογή"
 
 #: admin/forms.py:134
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Σύνδεση εφαρμογής σε αυτή τη σελίδα."
 
 #: admin/forms.py:135
 msgid "Overwrite URL"
@@ -83,6 +85,7 @@ msgstr "Αντικατάστησε το URL"
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
+"Αφήστε αυτό το πεδίο κενό, για να χρησιμοποιηθεί το πρότυπο μονοπάτι (path)."
 
 #: admin/forms.py:142
 msgid "Redirect"
@@ -90,15 +93,19 @@ msgstr "Ανακατεύθυνση"
 
 #: admin/forms.py:143
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Ανακατεύθυνση στο ακόλουθο URL."
 
 #: admin/forms.py:145
 msgid "A description of the page sometimes used by search engines."
 msgstr ""
+"Μια περιγραφή της σελίδας που μερικές φορές χρησιμοποιείται από τις μηχανές "
+"αναζήτησης."
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
+"Μια λίστα με \"λέξεις κλειδιά\" που χρησιμοποιούνται μερικές φορές από τις "
+"μηχανές αναζήτησης."
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -125,7 +132,7 @@ msgstr ""
 
 #: admin/forms.py:245
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Παρακαλώ επιλέξτε πρώτα το χρήστη ή την ομάδα χρηστών."
 
 #: admin/forms.py:252 admin/forms.py:259 admin/forms.py:263
 #: templates/admin/cms/page/change_form.html:65
@@ -153,8 +160,8 @@ msgstr "Ειδοποίησε το χρήστη"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 
 #: admin/forms.py:316
@@ -168,17 +175,17 @@ msgstr "Επιβεβαίωση νέου κωδικού πρόσβασης"
 #: admin/forms.py:337
 msgid "Email notification requires valid email address."
 msgstr ""
+"Η ειδοποίηση μέσω ηλεκτρονικού ταχυδρομείου απαιτεί έγκυρη διεύθυνση "
+"ηλεκτρονικού ταχυδρομείου."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:343
@@ -278,8 +285,7 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1318
@@ -599,8 +605,8 @@ msgstr ""
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:65
@@ -613,8 +619,8 @@ msgstr ""
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:69
@@ -952,8 +958,7 @@ msgstr ""
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1091,8 +1096,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1188,8 +1193,7 @@ msgstr "Αποθήκευση και παραμονή σε κατάσταση ε�
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1299,8 +1303,8 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1720,19 +1724,19 @@ msgstr ""
 
 #: test/run_tests.py:137 test/project/settings.py:116
 msgid "English"
-msgstr ""
+msgstr "Αγγλικά"
 
 #: test/run_tests.py:138 test/project/settings.py:117
 msgid "French"
-msgstr ""
+msgstr "Γαλλικά"
 
 #: test/run_tests.py:139 test/project/settings.py:118
 msgid "German"
-msgstr ""
+msgstr "Γερμανικά"
 
 #: test/run_tests.py:140 test/project/settings.py:119
 msgid "Brazil"
-msgstr ""
+msgstr "Βραζιλία"
 
 #: test/run_tests.py:141 test/project/settings.py:120
 msgid "Dutch"
@@ -1740,11 +1744,11 @@ msgstr ""
 
 #: test/run_tests.py:158 test/project/settings.py:137
 msgid "two columns"
-msgstr ""
+msgstr "δύο στήλες"
 
 #: test/run_tests.py:159 test/project/settings.py:138
 msgid "three columns"
-msgstr ""
+msgstr "τρεις στήλες"
 
 #: test/run_tests.py:160 test/project/settings.py:139
 msgid "navigation examples"
@@ -1820,3 +1824,5 @@ msgstr ""
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr ""
+
+

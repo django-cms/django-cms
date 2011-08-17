@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +64,8 @@ msgid "Page Title"
 msgstr "Заглавие на страницата"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Напишете показаното отгоре във Вашия браузър или бележки"
 
 #: admin/forms.py:132
@@ -83,8 +83,7 @@ msgstr "Напиши адрес"
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
-"Оставете това поле празно, ако трябва да бъде използван стандартен "
-"път."
+"Оставете това поле празно, ако трябва да бъде използван стандартен път."
 
 #: admin/forms.py:142
 msgid "Redirect"
@@ -157,8 +156,8 @@ msgstr "Предопреди потребителя"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 "Изпращането на имейл предупреждение на потребителя изисква неговото "
 "добавяне."
@@ -177,17 +176,14 @@ msgstr "И-мейл потвърждението изисква валиден �
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "Правото за добавяне изисква и право за редактиране."
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"Правото за добавяне на потребители изисква и правото за тяхното "
-"редактиране."
+"Правото за добавяне на потребители изисква и правото за тяхното редактиране."
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -288,8 +284,7 @@ msgstr ""
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 "%(plugin_name)s плъгин беше редактиран в позиция %(position)s на "
 "%(placeholder)s"
@@ -613,8 +608,8 @@ msgstr "променена от"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "За да се вижда страницата статуса трябва да е \"Публикувана\""
 
 #: models/pagemodel.py:65
@@ -627,11 +622,11 @@ msgstr "Всички прародители няма да бъдат показ�
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Уникален идентификатор, използван с page_url темплейт тага за "
-"създаване на връзка до тази страница."
+"Уникален идентификатор, използван с page_url темплейт тага за създаване на "
+"връзка до тази страница."
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -835,8 +830,7 @@ msgstr "ширина"
 #: plugins/googlemap/models.py:19
 msgid "Use latitude & longitude to fine tune the map possiton."
 msgstr ""
-"Използвайте latitude & longitude за да определите позицията на "
-"картата."
+"Използвайте latitude & longitude за да определите позицията на картата."
 
 #: plugins/googlemap/models.py:20
 msgid "longitude"
@@ -970,8 +964,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1075,8 +1068,8 @@ msgstr "подсказка на връзката"
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
-"Ако бъде предоставено, подсказката ще бъде показана като линк до Вашия"
-" Twitter профил."
+"Ако бъде предоставено, подсказката ще бъде показана като линк до Вашия "
+"Twitter профил."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1111,8 +1104,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1208,8 +1201,7 @@ msgstr "Запази и продължи да редактираш"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 "Страницата <a href=\"%(admin_url)s\">%(page)s</a> може да изисква "
 "потвърждение от Вас."
@@ -1321,8 +1313,8 @@ msgstr "Статуси на страниците"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1842,3 +1834,5 @@ msgstr "CMS — Вашия потребителски профил беше пр
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Желания език все още не е преведен.."
+
+

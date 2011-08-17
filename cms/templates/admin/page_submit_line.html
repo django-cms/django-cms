@@ -12,3 +12,11 @@
 {% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" {{ onclick_attrib }} />{% endif %}
 {% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>{% endif %}
 </div>
+<script type="text/javascript">
+(function ($) {
+	var i = 0;
+	$('form').submit(function () {
+		i++; if(i > 1) { return false; }
+	});
+})(jQuery);
+</script>

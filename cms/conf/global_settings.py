@@ -11,10 +11,10 @@ from django.conf import settings
 # The id of default Site instance to be used for multisite purposes.
 SITE_ID = 1
 
-
 # Which templates should be used for extracting the placeholders?
+# Empty by default, as we don't impose any rigid requirements on users.
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
-CMS_TEMPLATES = None
+CMS_TEMPLATES = ()
 
 # Should pages be allowed to inherit their parent templates?
 CMS_TEMPLATE_INHERITANCE = True
@@ -25,7 +25,19 @@ CMS_PLACEHOLDER_CONF = {}
 
 # Whether to enable permissions.
 CMS_PERMISSION = False
-    
+
+# Decides if pages without any view restrictions are public by default, or staff only
+CMS_PUBLIC_FOR = 'all' # or 'staff'
+
+CMS_CACHE_DURATIONS = {
+     # Menu cache duration
+    'menus': getattr(settings, 'MENU_CACHE_DURATION', 60 * 60),
+    # Defines how long page content should be cached
+    'content': getattr(settings, 'CMS_CONTENT_CACHE_DURATION', 60),
+    # Defines how long user permissions should be cached
+    'permissions': 60 * 60,
+}
+
 # Show the publication date field in the admin, allows for future dating
 # Changing this from True to False could cause some weirdness.  If that is required,
 # you should update your database to correct any future dated pages
@@ -80,9 +92,6 @@ CMS_LANGUAGES = settings.LANGUAGES
 #           3:['en'],}
 CMS_SITE_LANGUAGES = {}
 
-# Defines how long page content should be cached, including navigation
-CMS_CONTENT_CACHE_DURATION = 60
-
 CMS_SITE_CHOICES_CACHE_KEY = 'CMS:site_choices'
 CMS_PAGE_CHOICES_CACHE_KEY = 'CMS:page_choices'
 
@@ -105,20 +114,12 @@ CMS_MODERATOR = False
 # Defines what character will be used for the __unicode__ handling of cms pages
 CMS_TITLE_CHARACTER = '+'
 
-# gettext translation mode -- exports database content for parsing by
-# makemessages, and uses django's normal i18n framework instead of having to
-# create multiple copies of pages for each language.
-# requires 'dbgettext' -- http://bitbucket.org/drmeers/django-dbgettext/
-CMS_DBGETTEXT = 'dbgettext' in settings.INSTALLED_APPS
-
-# Allow gettext translation of slugs (only relevant if CMS_DBGETTEXT used)
-CMS_DBGETTEXT_SLUGS = False # (still experimental)
-
 # Enable non-cms placeholder frontend editing
 PLACEHOLDER_FRONTEND_EDITING = True
 
 # Cache prefix so one can deploy several sites on one cache server
 CMS_CACHE_PREFIX = 'cms-'
 
-# Menu cache duration
-MENU_CACHE_DURATION = 60 * 60
+# they are missing in the permission-merge2 branch
+CMS_PLUGIN_PROCESSORS = tuple()
+CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()

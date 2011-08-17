@@ -3,8 +3,8 @@ branch = True
 source =
     cms
     menus
-    publisher
 omit =
     ../*migrations*
+    ../*tests*
 [report]
 precision = 2

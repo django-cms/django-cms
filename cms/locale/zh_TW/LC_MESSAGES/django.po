@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +64,8 @@ msgid "Page Title"
 msgstr "網頁標題"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "取代在瀏覽器頂端或書籤內的顯示標題"
 
 #: admin/forms.py:132
@@ -153,8 +153,8 @@ msgstr "通知用戶"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr "發送電子郵件通知用戶有關的用戶名稱或密碼的變更。需要用戶的電子郵件地址。"
 
 #: admin/forms.py:316
@@ -171,14 +171,12 @@ msgstr "電子郵件通知需要有效的電子郵件地址。"
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr "新增網頁的權限需要有修改網頁的權限！"
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr "新增用戶的權限需要有修改用戶的權限！"
 
 #: admin/forms.py:343
@@ -278,8 +276,7 @@ msgstr "複製 %(language)s 插件到 %(placeholder)s"
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s 插件於 %(position)s 位置的 %(placeholder)s 內被編輯"
 
 #: admin/pageadmin.py:1318
@@ -599,8 +596,8 @@ msgstr "修改者"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr "何時此網頁要正式發表。狀態必須是\"發佈\"才會使網頁發表出去。"
 
 #: models/pagemodel.py:65
@@ -613,8 +610,8 @@ msgstr "所有的上層網頁將不會顯示在導航中"
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr "一個唯一的識別碼，與 page_url 模板標籤一起用於做連結到此網頁"
 
 #: models/pagemodel.py:69
@@ -952,8 +949,7 @@ msgstr "HEML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr "輸入一個模板（即 \"snippets/plugin_xy.html\"）用來呈現頁面。"
 
 #: plugins/snippet/models.py:25
@@ -1091,8 +1087,8 @@ msgstr "電影網址"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr "vimeo 或 YouTube 影像網址。例如：http://www.youtube.com/watch?v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
@@ -1188,8 +1184,7 @@ msgstr "儲存並繼續編輯"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "網頁<a href=\"%(admin_url)s\">%(page)s</a>可能需要你的核准。"
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1298,8 +1293,8 @@ msgstr "網頁狀態"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr "這個頁面必須在 %(moderation_level)s 層級被管制，請發送訊息給管制者。"
 
 #: templates/admin/cms/page/change_form.html:185
@@ -1819,3 +1814,5 @@ msgstr "CMS - 您的用戶帳號已被更改。"
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr ""
+
+

@@ -1,14 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-02-07 07:20-0600\n"
-"PO-Revision-Date: 2011-02-16 17:11+0000\n"
+"PO-Revision-Date: 2011-05-09 13:13+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -65,10 +64,10 @@ msgid "Page Title"
 msgstr "Seitentitel"
 
 #: admin/forms.py:131
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
-"Überschreiben, was im Titel des Browsers oder in den Lesezeichen "
-"erscheint"
+"Überschreiben, was im Titel des Browsers oder in den Lesezeichen erscheint"
 
 #: admin/forms.py:132
 msgid "Application"
@@ -85,8 +84,7 @@ msgstr "URL-Überschreibung"
 #: admin/forms.py:136
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
-"Lassen Sie dieses Feld leer, wenn der Standardpfad verwendet werden "
-"soll."
+"Lassen Sie dieses Feld leer, wenn der Standardpfad verwendet werden soll."
 
 #: admin/forms.py:142
 msgid "Redirect"
@@ -98,13 +96,14 @@ msgstr "Zu dieser URL umleiten"
 
 #: admin/forms.py:145
 msgid "A description of the page sometimes used by search engines."
-msgstr "Eine Beschreibung der Seite (wird teilweise von Suchmaschinen genutzt)"
+msgstr ""
+"Eine Beschreibung der Seite (wird teilweise von Suchmaschinen genutzt)"
 
 #: admin/forms.py:147
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
-"Eine Liste von mit Kommas getrennten Schlüsselwörtern (wird teilweise "
-"von Suchmaschinen genutzt)"
+"Eine Liste von mit Kommas getrennten Schlüsselwörtern (wird teilweise von "
+"Suchmaschinen genutzt)"
 
 #: admin/forms.py:163
 msgid "A page with this reverse URL id exists already."
@@ -164,12 +163,11 @@ msgstr "Benutzer benachrichtigen"
 
 #: admin/forms.py:296
 msgid ""
-"Send email notification to user about username or password change. "
-"Requires user email."
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
-"Benachrichtigung über Änderungen von Benutzername oder Passwort per "
-"E-Mail an den Benutzer senden. Benötigt die E-Mail-Adresse des "
-"Benutzers."
+"Benachrichtigung über Änderungen von Benutzername oder Passwort per E-Mail "
+"an den Benutzer senden. Benötigt die E-Mail-Adresse des Benutzers."
 
 #: admin/forms.py:316
 msgid "New password"
@@ -185,19 +183,17 @@ msgstr "E-Mail-Benachrichtigung benötigt eine gültige E-Mail-Adresse."
 
 #: admin/forms.py:339
 msgid ""
-"The permission to add new pages requires the permission to change "
-"pages!"
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
-"Die Berechtigung neue Seiten hinzuzufügen benötigt die Berechtigung "
-"Seiten zu ändern."
+"Die Berechtigung neue Seiten hinzuzufügen benötigt die Berechtigung Seiten "
+"zu ändern."
 
 #: admin/forms.py:341
 msgid ""
-"The permission to add new users requires the permission to change "
-"users!"
+"The permission to add new users requires the permission to change users!"
 msgstr ""
-"Die Berechtigung neue Benutzer hinzufügen benötigt die Berechtigung "
-"Benutzer zu ändern."
+"Die Berechtigung neue Benutzer hinzufügen benötigt die Berechtigung Benutzer"
+" zu ändern."
 
 #: admin/forms.py:343
 msgid "To add permissions you also need to edit them!"
@@ -300,11 +296,10 @@ msgstr "Plugins von %(language)s wurden nach %(placeholder)s kopiert."
 #: admin/pageadmin.py:1260
 #, python-format
 msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in "
-"%(placeholder)s"
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
-"%(plugin_name)s-Plugin auf der %(position)s Position in "
-"%(placeholder)s wurde geändert."
+"%(plugin_name)s-Plugin auf der %(position)s Position in %(placeholder)s "
+"wurde geändert."
 
 #: admin/pageadmin.py:1318
 msgid "Plugins where moved"
@@ -316,8 +311,8 @@ msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
-"Das %(plugin_name)s-Plugin auf Position %(position)s in "
-"%(placeholder)s wurde gelöscht."
+"Das %(plugin_name)s-Plugin auf Position %(position)s in %(placeholder)s "
+"wurde gelöscht."
 
 #: admin/permissionadmin.py:114 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -516,19 +511,19 @@ msgstr "Aktuelle Seite"
 
 #: models/moderatormodels.py:26
 msgid "Page children (immediate)"
-msgstr "Untergeordnete Seite (direkt)"
+msgstr "Direkt untergeordnete Seite"
 
 #: models/moderatormodels.py:27
 msgid "Page and children (immediate)"
-msgstr "Aktuelle und untergeordnete Seite (direkt)"
+msgstr "Aktuelle und direkt untergeordnete Seite"
 
 #: models/moderatormodels.py:28
 msgid "Page descendants"
-msgstr "Folgeseiten"
+msgstr "Alle untergeordnete Seiten"
 
 #: models/moderatormodels.py:29
 msgid "Page and descendants"
-msgstr "Aktuelle Seite und Folgeseiten"
+msgstr "Aktuelle Seite und alle untergeordnete Seiten"
 
 #: models/moderatormodels.py:45 templates/admin/cms/page/permissions.html:5
 #: templates/cms/toolbar/toolbar.html:193
@@ -547,11 +542,11 @@ msgstr "Seite moderieren"
 
 #: models/moderatormodels.py:51 templatetags/cms_admin.py:86
 msgid "Moderate children"
-msgstr "Untergeordnete Seiten moderieren"
+msgstr "Direkt untergeordnete Seiten moderieren"
 
 #: models/moderatormodels.py:52 templatetags/cms_admin.py:87
 msgid "Moderate descendants"
-msgstr "Nachfolgende Seiten moderieren"
+msgstr "Untergeordnete Seiten moderieren"
 
 #: models/moderatormodels.py:55 models/moderatormodels.py:56
 msgid "PageModerator"
@@ -625,11 +620,11 @@ msgstr "geändert von"
 
 #: models/pagemodel.py:64
 msgid ""
-"When the page should go live. Status must be \"Published\" for page to go"
-" live."
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
-"Ab wann soll die Seite veröffentlicht werden? Der Status der Seite "
-"muss dazu auf \"veröffentlicht\" sein. "
+"Ab wann soll die Seite veröffentlicht werden? Der Status der Seite muss dazu"
+" auf \"veröffentlicht\" sein. "
 
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
@@ -641,11 +636,11 @@ msgstr "Alle übergeordneten Seiten werden nicht im Menü dargestellt."
 
 #: models/pagemodel.py:68
 msgid ""
-"An unique identifier that is used with the page_url templatetag for "
-"linking to this page"
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
-"Ein einzigartiger Identifikator, der benutzt wird, um mit dem page_url"
-" templatetag auf diese Seite zu verlinken."
+"Ein einzigartiger Identifikator, der benutzt wird, um mit dem page_url "
+"templatetag auf diese Seite zu verlinken."
 
 #: models/pagemodel.py:69
 msgid "attached menu"
@@ -893,8 +888,8 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Wählen Sie eine Seite von der Sie die Plugins erben wollen. Leer wählt"
-" die momentane Seite."
+"Wählen Sie eine Seite von der Sie die Plugins erben wollen. Leer wählt die "
+"momentane Seite."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -986,8 +981,7 @@ msgstr "HTML"
 
 #: plugins/snippet/models.py:15
 msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be "
-"rendered. "
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 "Fügen sie eine Vorlage ein, welche dargestellt werden soll (z.B. "
 "\"snippets/plugin_xy.html\")."
@@ -1093,8 +1087,7 @@ msgstr "Link Tipp"
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
-"Wenn ausgefüllt, wird der Tipp als Link zu Ihrem Twitter-Profil "
-"dargestellt."
+"Wenn ausgefüllt, wird der Tipp als Link zu Ihrem Twitter-Profil dargestellt."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1106,9 +1099,9 @@ msgid ""
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
 msgstr ""
-"Beispiel: \"Gehirne AND Zombies AND from:umbrella AND to:nemesis\": "
-"Tweets vom Benutzer \"umbrella\" an den Benutzer \"nemesis\" mit den "
-"Worten \"Gehirne\" und \"Zombies\"."
+"Beispiel: \"Gehirne AND Zombies AND from:umbrella AND to:nemesis\": Tweets "
+"vom Benutzer \"umbrella\" an den Benutzer \"nemesis\" mit den Worten "
+"\"Gehirne\" und \"Zombies\"."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1132,8 +1125,8 @@ msgstr "Film URL"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v"
-"=YFa59lK-kpo"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
+"kpo"
 msgstr ""
 "Vimeo oder Youtube Video URL. Beispiel: http://www.youtube.com/watch?v"
 "=YFa59lK-kpo"
@@ -1233,8 +1226,7 @@ msgstr "Speichern und weiter bearbeiten"
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
 msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by "
-"you."
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr "Die Seite <a href=\"%(admin_url)s\">%(page)s</a> benötigt Ihre Freigabe."
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1246,8 +1238,8 @@ msgstr "Letzte Änderungen"
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
 msgstr ""
-"Sie können sich <a href=\"%(login_url)s\">hier</a> in die Administration"
-" einloggen."
+"Sie können sich <a href=\"%(login_url)s\">hier</a> in die Administration "
+"einloggen."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1346,11 +1338,11 @@ msgstr "Seitenstatus"
 #: templates/admin/cms/page/change_form.html:183
 #, python-format
 msgid ""
-"This page must be moderated at level %(moderation_level)s, post a "
-"message for moderator."
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
-"Diese Seite muss auf der Ebene %(moderation_level)s moderiert werden. "
-"Senden Sie eine Nachricht an den Moderator."
+"Diese Seite muss auf der Ebene %(moderation_level)s moderiert werden. Senden"
+" Sie eine Nachricht an den Moderator."
 
 #: templates/admin/cms/page/change_form.html:185
 msgid "Request approvemet"
@@ -1623,8 +1615,7 @@ msgstr "Plugins kopieren"
 #: templates/admin/cms/page/widgets/plugin_editor.html:12
 msgid "You must save the page first to add plugins."
 msgstr ""
-"Sie müssen die Seite zuerst speichern, um Plugins hinzufügen zu "
-"können."
+"Sie müssen die Seite zuerst speichern, um Plugins hinzufügen zu können."
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
 msgid "No Plugin selected. Selected one on the left side"
@@ -1633,8 +1624,7 @@ msgstr "Kein Plugin ausgewählt. Wählen Sie eins auf der linken Seite aus."
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr ""
-"Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter "
-"ein."
+"Keine Plugins vorhanden. Fügen Sie ein Plugin in diesen Platzhalter ein."
 
 #: templates/cms/toolbar/add_plugins.html:10
 msgid "Available plugins"
@@ -1753,11 +1743,11 @@ msgstr "Seitenmoderation lösen"
 
 #: templatetags/cms_admin.py:86
 msgid "Unbind children moderation"
-msgstr "Moderation untergeordneter Seiten lösen"
+msgstr "Moderation von direkt untergeordneter Seiten lösen"
 
 #: templatetags/cms_admin.py:87
 msgid "Unbind descendants moderation"
-msgstr "Moderation von Folgeseiten lösen"
+msgstr "Moderation von untergeordneten Seiten lösen"
 
 #: templatetags/cms_tags.py:78
 #, python-format
@@ -1875,3 +1865,5 @@ msgstr "CMS - Ihr Benutzerkonto wurde verändert."
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "Die gesuchte Sprache wurde noch nicht übersetzt."
+
+

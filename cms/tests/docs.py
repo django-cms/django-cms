@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import TemporaryDirectory
-from django.conf import settings
+import cms
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import TemporaryDirectory
 from sphinx.application import Sphinx
 import os
 try:
@@ -10,15 +10,15 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-ROOT_DIR = os.path.join(settings.PROJECT_DIR, '..', '..')
-DOCS_DIR = os.path.join(ROOT_DIR, 'docs')
+ROOT_DIR = os.path.dirname(cms.__file__)
+DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..', 'docs'))
 
 
 class DocsTestCase(CMSTestCase):
     """
     Test docs building correctly for HTML
     """
-    def test_01_html(self):
+    def test_html(self):
         nullout = StringIO()
         with TemporaryDirectory() as OUT_DIR:
             app = Sphinx(
