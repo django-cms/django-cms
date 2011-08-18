@@ -12,8 +12,8 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     from cms.models import Title
     # Exclude the page with the publisher_state == page.PUBLISHER_STATE_DELETE
     qs = Title.objects.filter(page__site=site, slug=slug).exclude(
-        Q(page=page) &
-        Q(page=page.publisher_public) &
+        Q(page=page) |
+        Q(page=page.publisher_public) |
         Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
     )
     
