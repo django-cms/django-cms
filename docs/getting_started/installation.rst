@@ -52,7 +52,7 @@ started:
 
     sudo aptitude install python2.6 python-setuptools python-imaging
     sudo easy_install pip
-    sudo pip install Django==1.3 django-cms south django-appmedia
+    sudo pip install Django==1.3 django-cms south
 
 Additionally, you need the python driver for your selected database:
 
