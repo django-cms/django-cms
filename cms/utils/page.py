@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.db.models import Q
 import re
 
 APPEND_TO_SLUG = "-copy"
@@ -9,7 +10,12 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     """Validates given slug depending on settings.
     """
     from cms.models import Title
-    qs = Title.objects.filter(page__site=site, slug=slug).exclude(page=page).exclude(page=page.publisher_public)
+    # Exclude the page with the publisher_state == page.PUBLISHER_STATE_DELETE
+    qs = Title.objects.filter(page__site=site, slug=slug).exclude(
+        Q(page=page) |
+        Q(page=page.publisher_public) |
+        Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
+    )
     
     if settings.i18n_installed:
         qs = qs.filter(language=lang)
