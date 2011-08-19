@@ -30,7 +30,9 @@ def _extend_blocks(extend_node, blocks):
         else:
             # set this node as the super node (for {{ block.super }})
             block = blocks[node.name]
-            while hasattr(block.super, 'nodelist'):
+            seen_supers = []
+            while hasattr(block.super, 'nodelist') and block.super not in seen_supers:
+                seen_supers.append(block.super)
                 block = block.super
             block.super = node
     # search for further ExtendsNodes
