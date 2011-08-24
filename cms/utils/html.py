@@ -18,14 +18,10 @@ def _get_inner_body(doc):
                 return childfound
         return None
     body = _rec(doc)
-    # if the first element after <body> is a html tag, this returns an Element
-    # instance, otherwise a (unicode) string, this is why we need to check
-    # the output of this and potentially call .toxml() again.
-    out = reduce(lambda x,y:x.toxml()+y.toxml(), body.childNodes)
-    if isinstance(out, basestring):
-        return out
-    return out.toxml()
-
+    out = []
+    for node in body.childNodes:
+        out.append(node.toxml())
+    return u''.join(out)
 
 def clean_html(data, full=True, parser=DEFAULT_PARSER):
     """
