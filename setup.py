@@ -49,6 +49,7 @@ setup(
         'Django>=1.2',
         'django-classy-tags>=0.2.2',
         'south>=0.7.2',
+        'html5lib',
     ],
     packages=find_packages(exclude=["example", "example.*","testdata","testdata.*"]),
     package_data={

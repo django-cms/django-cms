@@ -1,8 +1,10 @@
+from cms.models.pagemodel import Page
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.test.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 
-    URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE)
+    URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_ADD)
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 
@@ -173,3 +175,36 @@ class SecurityTests(CMSTestCase):
         # the user is logged in and the security check fails, so it should 404.
         self.assertEqual(response.status_code, 404)
         self.assertEqual(CMSPlugin.objects.count(), 1)
+        
+    def test_text_plugin_xss(self):
+        super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        super_user.set_password("test")
+        super_user.save()
+        
+        self.login_user(super_user)
+        
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type': "TextPlugin",
+            'language': settings.LANGUAGES[0][0],
+            'placeholder': page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        # ACTUAL TEST STARTS HERE.
+        data = {
+            "body": "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals(txt.body, '<div>divcontent</div><a>acontent</a>')
+        
+        self.client.logout()
+        self.user = None
