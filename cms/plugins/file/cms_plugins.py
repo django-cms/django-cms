@@ -11,7 +11,6 @@ class FilePlugin(CMSPluginBase):
     text_enabled = True
     
     def render(self, context, instance, placeholder):  
-        instance.title = settings.dbgettext(instance.title)
         context.update({
             'object':instance, 
             'placeholder':placeholder
@@ -21,6 +20,6 @@ class FilePlugin(CMSPluginBase):
     def icon_src(self, instance):
         file_icon = instance.get_icon_url()
         if file_icon: return file_icon
-        return settings.CMS_MEDIA_URL + u"images/plugins/file.png"
+        return settings.STATIC_URL + u"cms/images/plugins/file.png"
     
 plugin_pool.register_plugin(FilePlugin)

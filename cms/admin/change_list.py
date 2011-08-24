@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
-from menus.utils import find_children
+from mptt.templatetags import mptt_tags
 
 
 
@@ -50,7 +50,7 @@ class CMSChangeList(ChangeList):
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
             qs = qs.filter(site=self._current_site)
-        qs = qs.order_by('tree_id', 'parent', 'lft')
+        qs = qs.order_by('tree_id',  'lft')
         return qs
     
     def is_filtered(self):
@@ -75,7 +75,8 @@ class CMSChangeList(ChangeList):
         site = self._current_site
         # Get all the pages, ordered by tree ID (it's convenient to build the 
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id', 'parent', 'lft').select_related()
+        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
+        
         
         # Get lists of page IDs for which the current user has 
         # "permission to..." on the current site. 
@@ -111,13 +112,23 @@ class CMSChangeList(ChangeList):
         ids = []
         root_pages = []
         pages = list(pages)
-        all_pages = pages[:]
+        all_pages = pages[:] # That is, basically, a copy.
         try:
             home_pk = Page.objects.drafts().get_home(self.current_site()).pk
         except NoHomeFound:
-            home_pk = 0    
+            home_pk = 0
+            
+        # Make the pages a tree (using MPTT awesomeness).
+        # This is normally a tag filter, but it's really nice in our case too:
+        # It caches children for every page in the list we pass it, so no
+        # further queries are needed.
+
+        mptt_tags.cache_tree_children(pages)
+        
         for page in pages:
-            children = []
+           
+
+            children = page.get_children()
 
             # note: We are using change_list permission here, because we must
             # display also pages which user must not edit, but he haves a 
@@ -133,7 +144,7 @@ class CMSChangeList(ChangeList):
                 # caching the permissions
                 page.permission_edit_cache = perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids
                 page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
-                page.permission_advanced_settings_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
+                page.permission_advanced_settings_cache = perm_advanced_settings_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
                 page.permission_user_cache = request.user
             
             if settings.CMS_MODERATOR:
@@ -155,6 +166,8 @@ class CMSChangeList(ChangeList):
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
+                    # TODO: WTF!?!
+                    # The last one is not the last... wait, what?
                     children[-1].last = False
                 page.menu_level = 0
                 root_pages.append(page)
@@ -163,10 +176,11 @@ class CMSChangeList(ChangeList):
                 else:
                     page.ancestors_ascending = []
                 page.home_pk_cache = home_pk
-                if not self.is_filtered():
-                    find_children(page, pages, 1000, 1000, [], -1, soft_roots=False, request=request, no_extended=True, to_levels=1000)
-                else:
-                    page.childrens = []
+            
+            # childrens is the reverse accessor for the parent foreign key.
+            # We want to set it so the JSTree can display it nicely in admin.
+            # "childrens" is the fully cached version of children.
+            page.childrens = children
         
         # TODO: OPTIMIZE!!
         titles = Title.objects.filter(page__in=ids)

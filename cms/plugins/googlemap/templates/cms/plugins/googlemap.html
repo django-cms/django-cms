@@ -1,27 +1,9 @@
-{% load i18n %}
-<div class="plugin_googlemap">
-	<!--  ATTENTION: set a height for this div in CSS -->
-	<div id="google-map-{{ object.id }}" class="google-map-container"></div>
-
-	{% if object.route_planer %}
-	<form action="http://maps.google.com/" method="get" class="frm google-map-routeplaner">
-		<fieldset>
-			<h2 class="nospace">{{ object.route_planer_title }}:</h2>
-			<p>
-				<label for="saddr-{{ object.id }}">{% trans "Your address: " %}</label>
-				<input type="text" id="saddr-{{ object.id }}" name="saddr" class="input_text" />
-				<span class="btn"><input type="submit" value="{% trans 'Calculate route' %}" /></span>
-				<input type="hidden" name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" />
-			</p>
-		</fieldset>
-	</form>
-	{% endif %}
-</div>
-
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+{% load i18n sekizai_tags %}
+{% addtoblock "js" %}<script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true"></script>{% endaddtoblock %}
+{% addtoblock "js" %}
 <script type="text/javascript">
 //<![CDATA[
-(function(){
+(function () {
 	// save settings form plugin
 	var container = 'google-map-{{ object.id }}';
 	var latlng = new google.maps.LatLng('46.94708', '7.445975'); // default to switzerland
@@ -62,7 +44,7 @@
 		});
 		// prepare info window
 		var infowindow = new google.maps.InfoWindow({
-			content: '<span class="google-map-infowindow"><strong>' + title + '<\/strong><br />' + address {% ifnotequal map.get_content "" %} + '<br /><br /><em>{{ object.get_content }}<\/em>'{% endifnotequal %}
+			content: "<strong>" + title + "<\/strong><br />" + address {% ifnotequal map.get_content "" %} + "<br /><br /><em>{{ object.get_content }}<\/em>"{% endifnotequal %}
 		});
 		// show info window
 		infowindow.open(map, marker);
@@ -70,3 +52,33 @@
 })();
 //]]>
 </script>
+{% endaddtoblock %}
+
+{% addtoblock "css" %}
+<style type="text/css">
+<!--
+	.google-map-container { width:100%; height:400px; }
+-->
+</style>
+{% endaddtoblock %}
+
+<div class="plugin_googlemap">
+	{% if object.get_title %}<h2>{{ object.get_title }}</h2>{% endif %}
+	
+	<!--  ATTENTION: set a height for this div in CSS -->
+	<div id="google-map-{{ object.id }}" class="google-map-container"></div>
+
+	{% if object.route_planer %}
+	<form action="http://maps.google.com/" method="get" class="frm google-map-routeplaner">
+		<fieldset>
+			<h3 class="nospace">{{ object.route_planer_title }}:</h3>
+			<p>
+				<label for="saddr-{{ object.id }}">{% trans "Your address: " %}</label>
+				<input type="text" id="saddr-{{ object.id }}" name="saddr" class="input_text" />
+				<span class="btn"><input type="submit" value="{% trans 'Calculate route' %}" /></span>
+				<input type="hidden" name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" />
+			</p>
+		</fieldset>
+	</form>
+	{% endif %}
+</div>

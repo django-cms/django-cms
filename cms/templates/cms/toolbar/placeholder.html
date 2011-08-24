@@ -1,0 +1,42 @@
+{% load i18n sekizai_tags %}
+{% addtoblock "js" %}
+<script type="text/javascript">
+//<![CDATA[
+jQuery(document).ready(function ($) {
+	new CMS.Placeholder('#cms_placeholder-bar-{{ placeholder.pk }}', {
+		'type': 'bar',
+		'page_id': '{{ page.id }}',
+		'page_language': '{{ language }}',
+		'placeholder_id': '{{ placeholder.pk }}',
+		'urls': {
+			'add_plugin': '{{ placeholder.get_add_url }}',
+			'change_list': '{{ placeholder.get_changelist_url }}'
+		}
+	});
+});
+//]]>
+</script>
+{% endaddtoblock %}
+<div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar cms_reset cms_placeholder_slot::{{ placeholder.slot }}">
+	<div class="cms_placeholder-title">{{ placeholder_label }}</div>
+	<div class="cms_placeholder-btn">
+		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
+			<span class="cms_toolbar-btn_right">
+				<span class="cms_toolbar_title">&nbsp;{% trans "Add" %}</span>
+				<span class="cms_toolbar_icon cms_toolbar_icon-more">-</span>
+			</span>
+		</a>
+		<ul class="cms_placeholder-subnav">
+			{% regroup installed_plugins by module as module_list %}
+			{% for module in module_list %}
+			<li class="cms_placeholder-subnav-title"><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span>
+			<ul>
+				{% for p in module.list %}
+				<li{% if forloop.first %} class="cms_placeholder-first"{% endif %}{% if forloop.last %} class="cms_placeholder-last"{% endif %}><a href="#" rel="type::{{ p.value }}">{{ p.name }}</a></li>
+				{% endfor %}
+			</ul>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>

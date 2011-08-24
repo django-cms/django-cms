@@ -7,7 +7,6 @@ from models import InheritPagePlaceholder
 from django.conf import settings
 from cms.plugins.inherit.forms import InheritForm
 import copy
-from cms.plugins.utils import get_plugin_media
 
 class InheritPagePlaceholderPlugin(CMSPluginBase):
     """
@@ -19,6 +18,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
     render_template = "cms/plugins/inherit_plugins.html"
     form = InheritForm
     admin_preview = False
+    page_only = True
     
     def render(self, context, instance, placeholder):
         template_vars = {
@@ -53,8 +53,6 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
             inst, name = plg.get_plugin_instance()
             outstr = inst.render_plugin(tmpctx, placeholder)
             plugin_output.append(outstr)
-            if request and hasattr(request, 'placeholder_media'):
-                request.placeholder_media += get_plugin_media(request, context, inst)
         template_vars['parent_output'] = plugin_output
         context.update(template_vars)
         return context

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.utils.translation import ugettext_lazy  as _
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy  as _
+from sekizai.helpers import validate_template
 from warnings import warn
 
 def pre_patch():
@@ -27,34 +28,34 @@ def post_patch():
             (settings.CMS_TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')),
         ) 
 
-    if settings.CMS_DBGETTEXT:
-        # untranslated titles are translated using gettext anyway
-        settings.CMS_HIDE_UNTRANSLATED = False
-        settings.dbgettext = _
-    else:
-        # dummy translation
-        settings.dbgettext = lambda x: x
-    if settings.CMS_DBGETTEXT_SLUGS:
-        warn(
-            "CMS_DBGETTEXT_SLUGS (and general support for django-dbggettext "
-            "for CMS contents) will be deprecated in django CMS 2.2.",
-            DeprecationWarning
-        )
-
 
 def post_patch_check():
     """Post patch check, just make sure there isn't any misconfiguration. All
     the code for checking settings should go here.
     """
-    if settings.CMS_TEMPLATES is None:
+
+    # Ensure templates are set, and more than just the inheritance setting.
+    cms_templates_length = len(settings.CMS_TEMPLATES)
+    if (cms_templates_length < 1 or
+        (cms_templates_length == 1 and settings.CMS_TEMPLATES[0][0] == settings.CMS_TEMPLATE_INHERITANCE_MAGIC)):
         raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
     
     # check if is user middleware installed
     if settings.CMS_PERMISSION and not 'cms.middleware.user.CurrentUserMiddleware' in settings.MIDDLEWARE_CLASSES:
         raise ImproperlyConfigured('CMS Permission system requires cms.middleware.user.CurrentUserMiddleware.\n'
             'Please put it into your MIDDLEWARE_CLASSES in settings file')
-    if 'cms.middleware.media.PlaceholderMediaMiddleware' not in settings.MIDDLEWARE_CLASSES:
-        warn("The 'cms.middleware.media.PlaceholderMediaMiddleware' is not in "
-             "your MIDDLEWARE_CLASSES setting, it's your own responsiblity to "
-             "ensure all javascript and css files required by the plugins you "
-             "use are available to them.", Warning)
+    
+    # check sekizai namespaces
+    try:
+        from django.template.loaders.app_directories import Loader
+    except ImportError:
+        return # south...
+    for template in settings.CMS_TEMPLATES:
+        if template[0] == settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
+            continue
+        if not validate_template(template[0], ['js', 'css']):
+            raise ImproperlyConfigured(
+                "All templates defined in CMS_TEMPLATES must have at least the "
+                "'js' and 'css' sekizai namespaces. The template %r does not. "
+                % template[0]
+            )

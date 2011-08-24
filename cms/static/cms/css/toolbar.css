@@ -1,0 +1,851 @@
+/* styles for the frontend editing toolbar */
+
+#cms_toolbar_spacer
+{
+    height:41px;
+}
+
+#cms_toolbar_mini
+{
+    z-index:70010;
+    position:fixed;
+    right:0;
+    top:0;
+    height:41px;
+    padding-top:6px;
+    padding-right:10px;
+}
+
+#cms_toolbar
+{
+    z-index:70011;
+    position:fixed;
+    left:0;
+    top:0;
+    height:41px;
+    width:100%;
+    min-width:960px;
+    zoom:1;
+    border-bottom:2px solid #ddd;
+    background:url(../images/cms_toolbar.png) repeat-x 0 0;
+}
+
+* html #cms_toolbar
+{
+    position:absolute;
+    background-image:url(../images/cms_toolbar.gif);
+    left: expression( ( 0 + ( ignoreMe2 = document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft ) ) + 'px' );
+    top: expression( ( 0 + ( ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop ) ) + 'px' );        
+}
+
+.cms_toolbar a
+{
+    text-decoration:none;
+    color:#656565;
+    outline:none;
+}
+
+.cms_toolbar a:hover
+{
+    text-decoration:none;
+    color:#656565;
+}
+
+#cms_toolbar_col1,#cms_toolbar_col2
+{
+    padding-top:6px;
+    height:35px;
+}
+
+#cms_toolbar_col1
+{
+    float:left;
+    zoom:1;
+    overflow:hidden;
+}
+
+#cms_toolbar_col2
+{
+    float:right;
+    height:100%;
+    padding-right:10px;
+}
+
+/* RESET */
+.cms_toolbar,
+#cms_toolbar,
+.cms_toolbar form,
+.cms_toolbar input,
+.cms_toolbar label
+{
+    font-family:"Lucida Grande", "Lucida Sans Unicode", sans-serif;
+    font-size:12px;
+    color:#656565;
+    zoom:1;
+}
+
+.cms_toolbar strong,
+.cms_toolbar em,
+.cms_toolbar ul,
+.cms_toolbar li,
+.cms_toolbar form,
+.cms_toolbar input,
+.cms_toolbar label
+{
+    margin:0;
+    padding:0;
+}
+
+.cms_toolbar strong,
+.cms_toolbar em
+{
+    font-style:normal;
+    font-weight:400;
+}
+
+.cms_toolbar ul,
+.cms_toolbar li
+{
+    list-style:none;
+    background:none;
+}
+
+/* LOGO */
+#cms_toolbar_logo span
+{
+    display:block;
+    float:left;
+    margin-top:3px;
+    width:110px;
+    height:22px;
+    text-indent:-7777px;
+    background:url(../images/cms_toolbar.png) no-repeat 0 -122px;
+}
+
+/* EDIT MODE */
+#cms_toolbar_editmode_toggle
+{
+    display:block;
+    float:left;
+    line-height:27px;
+    margin-left:15px;
+}
+
+#cms_toolbar_editmode_toggle a
+{
+    display:inline-block;
+    width:63px;
+    height:27px;
+    text-indent:-7777px;
+    margin-left:5px;
+    background:url(../images/cms_toolbar.png) no-repeat;
+}
+
+.cms_toolbar_editmode_toggle_on #cms_toolbar_editmode_toggle a
+{
+    background-position:-110px -122px;
+}
+
+.cms_toolbar_editmode_toggle_off #cms_toolbar_editmode_toggle a
+{
+    background-position:-180px -122px;
+}
+
+/* STATUSBAR */
+#cms_toolbar_statusbar
+{
+    display:block;
+    float:left;
+    margin-left:10px;
+    line-height:26px;
+    padding-right:10px;
+    font-size:11px;
+    background:url(../images/cms_toolbar.png) no-repeat right -95px;
+}
+
+#cms_toolbar_statusbar div
+{
+    padding-left:10px;
+    width:400px;
+    color:#656565;
+    overflow:hidden;
+    height:27px;
+    background:url(../images/cms_toolbar.png) no-repeat left -95px;
+}
+
+#cms_toolbar_statusbar em
+{
+    font-style:normal;
+}
+
+ul.cms_toolbar_status span.cms_toolbar_icon
+{
+    width:18px;
+    height:18px;
+    display:inline-block;
+    background:url(..//images/icons.png) 0 0 no-repeat;
+    margin-top:5px;
+}
+
+span.cms_toolbar_icon.cms_toolbar_state-icon.cha
+{
+    background-position:-40px -20px;
+}
+
+span.cms_toolbar_icon.cms_toolbar_state-icon.add
+{
+    background-position:-40px 0;
+}
+
+span.cms_toolbar_icon.cms_toolbar_state-icon.mov
+{
+    background-position:-60px 0;
+}
+
+span.cms_toolbar_icon.cms_toolbar_state-icon.del
+{
+    background-position:-40px -40px;
+}
+
+/* BUTTON */
+.cms_toolbar_button
+{
+    display:block;
+    float:left;
+    color:#5b81b3;
+    padding-right:10px;
+    margin-left:10px;
+    text-decoration:none;
+    background:url(../images/cms_toolbar.png) no-repeat right -41px;
+}
+
+* html .cms_toolbar_button
+{
+    background-image:url(../images/cms_toolbar.gif);
+    height:27px;
+}
+
+.cms_toolbar_button span
+{
+    display:block;
+    float:left;
+    height:27px;
+    padding-left:10px;
+    line-height:26px;
+    cursor:pointer;
+    background:url(../images/cms_toolbar.png) no-repeat left -41px;
+}
+
+.cms_toolbar_button span em
+{
+    color:#5B81B3;
+}
+
+.cms_toolbar_iconbutton strong
+{
+    margin-top:6px;
+    text-indent:-7777px;
+    display:block;
+    float:left;
+    width:11px;
+    height:14px;
+    line-height:14px;
+    background:url(../images/cms_toolbar.png) no-repeat -260px -158px;
+}
+
+/* SETTINGS BUTTON */
+.cms_toolbar .cms_toolbar_settingsbutton strong
+{
+    margin-top:6px;
+    text-indent:-7777px;
+    width:15px;
+    height:14px;
+    line-height:14px;
+    background:url(../images/cms_toolbar.png) no-repeat -170px -158px;
+}
+
+.cms_toolbar .cms_toolbar_settingsbutton:hover strong
+{
+    background-position:-170px -188px;
+}
+
+/* ADD BUTTON */
+.cms_toolbar .cms_toolbar_addbutton strong
+{
+    margin-top:6px;
+    text-indent:-7777px;
+    width:9px;
+    height:14px;
+    line-height:14px;
+    background:url(../images/cms_toolbar.png) no-repeat -225px -158px;
+}
+
+.cms_toolbar .cms_toolbar_submenubutton strong
+{
+    display:block;
+    float:left;
+}
+
+.cms_toolbar .cms_toolbar_submenubutton em
+{
+    margin-top:6px;
+    text-indent:-7777px;
+    display:block;
+    float:left;
+    width:7px;
+    height:10px;
+    margin-left:5px;
+    line-height:10px;
+    background:url(../images/cms_toolbar.png) no-repeat -190px -158px;
+}
+
+.cms_toolbar .cms_toolbar_submenubutton:hover em
+{
+    background-position:-190px -188px;
+}
+
+.cms_toolbar_submenu
+{
+    z-index:70012;
+    display:none;
+    position:absolute;
+    width:auto;
+    min-width:130px;
+    top:29px;
+    right:0;
+    padding:0;
+}
+
+.open .cms_toolbar_submenu
+{
+    display:block;
+    border:1px solid #E8E8E8;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    background:#fff;
+    white-space:nowrap;
+    padding:5px;
+}
+
+.cms_toolbar_submenu li
+{
+    clear:both;
+    zoom:1;
+    height:27px;
+    width:100%;
+    white-space:nowrap;
+}
+
+.cms_toolbar_submenu a
+{
+    float:left;
+    clear:all;
+    display:block;
+    height:27px;
+    line-height:23px;
+    padding:2px 10px 0;
+}
+
+.cms_toolbar_submenuselect .cms_toolbar_submenu
+{
+    overflow:auto;
+    overflow-x:hidden;
+}
+
+*+html .cms_toolbar_submenuselect .cms_toolbar_submenu{
+	height:200px;
+}
+
+.cms_toolbar_submenu a span
+{
+    text-indent:-7777px;
+    width:9px;
+    height:17px;
+    margin-right:4px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_edit
+{
+    background-position:-9px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_edit
+{
+    background-position:-9px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_move
+{
+    background-position:-30px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_move
+{
+    background-position:-30px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_padeadmin
+{
+    background-position:-47px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_padeadmin
+{
+    background-position:-47px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_pageunpublish
+{
+    background-position:-67px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_pageunpublish
+{
+    background-position:-67px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_history
+{
+    background-position:-88px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_history
+{
+    background-position:-88px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_delete
+{
+    background-position:-108px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_delete
+{
+    background-position:-108px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_add_child
+{
+    background-position:-302px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_add_child
+{
+    background-position:-302px -185px;
+}
+
+.cms_toolbar_submenu a .cms_toolbar_icon_add_sibling
+{
+    background-position:-282px -155px;
+}
+
+.cms_toolbar_submenu a:hover .cms_toolbar_icon_add_sibling
+{
+    background-position:-282px -185px;
+}
+
+/* SETTINGS MENU */
+#cms_toolbar_settings_menu
+{
+    z-index:70012;
+    top:29px;
+    left:-124px;
+}
+
+#cms_toolbar #cms_toolbar_logoutbutton strong
+{
+    margin-top:6px;
+    text-indent:-7777px;
+    display:block;
+    float:left;
+    width:15px;
+    height:14px;
+    line-height:14px;
+    background:url(../images/cms_toolbar.png) no-repeat -150px -158px;
+}
+
+#cms_toolbar #cms_toolbar_logoutbutton:hover strong
+{
+    background-position:-150px -188px;
+}
+
+#cms_toolbar #cms_toolbar_logoutbutton em
+{
+    margin-left:5px;
+}
+
+/* OPEN BUTTON */
+#cms_toolbar_mini #cms_toolbar_openbutton strong
+{
+    margin-top:6px;
+    text-indent:-7777px;
+    display:block;
+    float:left;
+    width:8px;
+    height:14px;
+    background:url(../images/cms_toolbar.png) no-repeat -225px -158px;
+}
+
+/* TOOLBAR PLUGINTOOLS */
+#cms_plugin_overlay,
+#cms_plugin_overlay2
+{
+    position:absolute;
+    z-index:70000;
+    display:none;
+    border:1px solid #5b80b2;
+}
+
+#cms_plugin_overlay .cms_toolbar_button
+{
+    margin-left:0;
+    padding-right:0;
+    border-right:1px solid #DDD;
+}
+
+#cms_plugin_overlay a.cms_toolbar_button span, 
+#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content
+{
+    padding-left:5px;
+    padding-right:5px;
+    background-position:-5px -41px;
+}
+
+#cms_plugin_overlay .cms_toolbar_button .cms_toolbar_submenubutton_content
+{
+    padding-right:0;
+}
+
+#cms_plugin_overlay .cms_plugin_overlay_bg,
+#cms_plugin_overlay2 .cms_plugin_overlay_bg
+{
+    z-index:70001;
+    height:100%;
+}
+
+#cms_plugin_overlay .cms_plugin_overlay_bg
+{
+    background:#5b80b2;
+    opacity:.50;
+    -ms-filter:“alpha(opacity=50)”;
+    filter:alpha(opacity=50);
+    -khtml-opacity:.50;
+    -moz-opacity:.50;
+}
+
+#cms_plugin_overlay2 .cms_plugin_overlay_bg
+{
+    background:#59E140;
+    opacity:.50;
+    -ms-filter:“alpha(opacity=50)”;
+    filter:alpha(opacity=50);
+    -khtml-opacity:.50;
+    -moz-opacity:.50;
+}
+
+#cms_plugin_overlay2
+{
+    border:1px solid #59E140;
+}
+
+.cms_toolbar_plugintools
+{
+    position:relative;
+    z-index:70002;
+}
+
+.cms_toolbar_plugintools_holder
+{
+    position:absolute;
+    right:1px;
+    top:1px;
+    width:106px;
+    height:30px;
+}
+
+#cms_plugin_overlay a.cms_toolbar_plugin_edit span
+{
+    background-position:0 -41px;
+    padding-left:7px;
+}
+
+#cms_plugin_overlay a.cms_toolbar_plugin_edit strong
+{
+    width:12px;
+    height:14px;
+    background-position:-11px -159px;
+}
+
+#cms_plugin_overlay a.cms_toolbar_plugin_edit:hover strong
+{
+    background-position:-11px -189px;
+}
+
+#cms_plugin_overlay .cms_toolbar_upbutton strong
+{
+    width:11px;
+    height:14px;
+    background-position:-240px -158px;
+}
+
+#cms_plugin_overlay .cms_toolbar_upbutton:hover strong
+{
+    background-position:-240px -188px;
+}
+
+#cms_plugin_overlay .cms_toolbar_downbutton strong
+{
+    width:11px;
+    height:14px;
+    background-position:-260px -158px;
+}
+
+#cms_plugin_overlay .cms_toolbar_downbutton:hover strong
+{
+    background-position:-260px -188px;
+}
+
+#cms_plugin_overlay .cms_toolbar_settingsbutton
+{
+    padding-right:5px;
+    border:none;
+}
+
+.cms_toolbar_placeholder_plugins
+{
+    height:40px;
+    border:1px solid #ddd;
+    background:url(../images/cms_toolbar.png) repeat-x 0 0;
+    padding-left:10px;
+    padding-right:10px;
+    position:relative;
+}
+
+.cms_toolbar_placeholder_plugins_title
+{
+    float:left;
+    color:#5b80b2;
+    font-size:12px;
+    margin-top:10px;
+}
+
+.cms_toolbar_placeholder_plugins .cms_toolbar_submenubutton
+{
+    float:right;
+    position:relative;
+    margin-top:6px;
+}
+
+#cms_toolbar_loginform .cms_toolbar_button
+{
+    margin-left:0;
+}
+
+#cms_toolbar_loginform label
+{
+    line-height:20px;
+    padding:3px 5px 0;
+}
+
+.cms_toolbar input.cms_textinput
+{
+    border:1px solid #ccc;
+    margin-top:2px;
+    margin-right:5px;
+    padding:3px;
+}
+
+.cms_toolbar .cms_toolbar_error input.cms_textinput
+{
+    border-color:#900;
+}
+
+/* OVERLAY */
+#nyroModalContent
+{
+    background:#fff;
+}
+
+h1#nyroModalTitle
+{
+    font-size:12px;
+    background:transparent url(../images/cms_toolbar.png) repeat-x scroll 0 0;
+    border:1px solid #DDD;
+    height:40px;
+    position:relative;
+    color:#5B80B2;
+    line-height:40px;
+    font-weight:400;
+    overflow:hidden;
+    margin:0;
+    padding:0 10px;
+}
+
+a#closeBut
+{
+    position:absolute;
+    right:10px;
+    top:-36px;
+    margin:0;
+}
+
+* html #cms_toolbar_spacer, 
+#cms_toolbar_logoutform .cms_submit,
+#cms_toolbar_loginform .cms_submit
+{
+    display:none;
+}
+
+* html #cms_toolbar_logo span,
+* html #cms_toolbar_editmode_toggle a,
+* html #cms_toolbar_statusbar,
+* html #cms_toolbar_statusbar div,
+* html .cms_toolbar_button span,
+* html .cms_toolbar_iconbutton strong,
+* html .cms_toolbar .cms_toolbar_settingsbutton strong,
+* html .cms_toolbar .cms_toolbar_addbutton strong,
+* html .cms_toolbar .cms_toolbar_submenubutton em,
+* html #cms_toolbar #cms_toolbar_logoutbutton strong,
+* html #cms_toolbar_mini #cms_toolbar_openbutton strong
+{
+    background-image:url(../images/cms_toolbar.gif);
+}
+
+ul.cms_toolbar_status,
+ul.cms_toolbar_status li
+{
+    display:inline;
+}
+
+#cms_toolbar_statusbar span,
+.cms_toolbar .cms_toolbar_button
+{
+    color:#5b81b3;
+}
+
+.cms_toolbar .cms_toolbar_button:hover,
+.cms_toolbar_button:hover span em,
+.cms_toolbar_submenu a:hover,
+.cms_toolbar_submenu li.selected a
+{
+    color:#264064;
+}
+
+.cms_toolbar .cms_toolbar_addbutton:hover strong,
+#cms_toolbar_mini #cms_toolbar_openbutton:hover strong
+{
+    background-position:-225px -188px;
+}
+
+.cms_toolbar .cms_toolbar_submenubutton,
+.wrapperIframe
+{
+    position:relative;
+}
+
+#cms_toolbar_logoutform,
+#cms_toolbar_loginform,
+#cms_toolbar_loginform label,
+#cms_toolbar_loginform input
+{
+    float:left;
+}
+
+#cms_toolbar #cms_toolbar_closebutton strong,
+a#closeBut strong
+{
+    width:7px;
+    background-position:-210px -158px;
+}
+
+#cms_toolbar #cms_toolbar_closebutton:hover strong,
+a#closeBut:hover strong
+{
+    background-position:-210px -188px;
+}
+
+#cms_toolbar_logoutform fieldset {
+   margin: 0;
+   padding: 0;
+   border: none;
+}
+
+/* button 
+---------------------------------------------- */
+.cms_toolbar_btn {
+    float:left;
+    display: inline-block;
+    zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
+    *display: inline;
+    vertical-align: baseline;
+    margin: 0 2px;
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font: 14px/100% Arial, Helvetica, sans-serif;
+    padding: .5em 2em .55em;
+    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    -webkit-border-radius: .5em; 
+    -moz-border-radius: .5em;
+    border-radius: .5em;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.cms_toolbar_btn:hover {
+    text-decoration: none;
+}
+.cms_toolbar_btn:active {
+    position: relative;
+    top: 1px;
+}
+a.cms_toolbar_btn {
+    color:white;
+}
+a.cms_toolbar_btn:hover {
+    color:white;
+}
+
+/* green */
+.cms_toolbar_green {
+    color: #e8f0de;
+    border: solid 1px #538312;
+    background: #64991e;
+    background: -webkit-gradient(linear, left top, left bottom, from(#7db72f), to(#4e7d0e));
+    background: -moz-linear-gradient(top,  #7db72f,  #4e7d0e);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#7db72f', endColorstr='#4e7d0e');
+}
+.cms_toolbar_green:hover {
+    background: #538018;
+    background: -webkit-gradient(linear, left top, left bottom, from(#6b9d28), to(#436b0c));
+    background: -moz-linear-gradient(top,  #6b9d28,  #436b0c);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#6b9d28', endColorstr='#436b0c');
+}
+.cms_toolbar_green:active {
+    color: #a9c08c;
+    background: -webkit-gradient(linear, left top, left bottom, from(#4e7d0e), to(#7db72f));
+    background: -moz-linear-gradient(top,  #4e7d0e,  #7db72f);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#4e7d0e', endColorstr='#7db72f');
+}
+/* blue */
+.cms_toolbar_blue {
+    color: #d9eef7;
+    border: solid 1px #0076a3;
+    background: #0095cd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+    background: -moz-linear-gradient(top,  #00adee,  #0078a5);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');
+}
+.cms_toolbar_blue:hover {
+    background: #007ead;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
+    background: -moz-linear-gradient(top,  #0095cc,  #00678e);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0095cc', endColorstr='#00678e');
+}
+.cms_toolbar_blue:active {
+    color: #80bed6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));
+    background: -moz-linear-gradient(top,  #0078a5,  #00adee);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
+}

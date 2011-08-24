@@ -3,14 +3,14 @@
 
 {% block fieldsets %}
 {% for fieldset in adminform %}
-  {% include "cms/plugins/text_plugin_fieldset.html" %}
+	{% include "cms/plugins/text_plugin_fieldset.html" %}
 {% endfor %}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/csrf.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
 <script type="text/javascript">
-(function ($){
-	$(document).ready(function(){
-	    $.fn.cmsPatchCSRF();
-	});
-})(jQuery);
+jQuery(document).ready(function ($) {
+	// initialize security patch
+	CMS.API.Security.csrf();
+});
 </script>
 {% endblock %}
