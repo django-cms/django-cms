@@ -52,6 +52,10 @@
 - Fixed PlaceholderField not respecting limits in CMS_PLACEHOLDER_CONF (thanks to Ben Hockey for reporting this)
 - Fixed the double-monkeypatch check for url reversing (thanks to Benjamin Wohlwend for the patch)
 
+==== 2.1.4 (2011-08-24) ====
+
+- Fixed a XSS issue in Text Plugins
+
 ==== 2.2.0 (In Development) ====
 
 - Replaced the old plugin media framework with django-sekizai. (This changed some plugin templates which might cause problems with your CSS styling).

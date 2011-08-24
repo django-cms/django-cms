@@ -13,7 +13,7 @@ Requirements
 * `Django`_ 1.2.5 (or a 1.3.x release).
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
-* `django-classy-tags`_ 0.3.2 or higher
+* `django-classy-tags`_ 0.3.4.1 or higher
 * `django-mptt`_ 0.4.2 or higher
 * `django-sekizai`_ 0.4.2 or higher
 * An installed and working instance of one of the databases listed in the
@@ -52,7 +52,7 @@ started:
 
     sudo aptitude install python2.6 python-setuptools python-imaging
     sudo easy_install pip
-    sudo pip install Django==1.3 django-cms south django-appmedia
+    sudo pip install Django==1.3 django-cms south
 
 Additionally, you need the python driver for your selected database:
 

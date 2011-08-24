@@ -181,9 +181,9 @@ under "Application". Save the page.
     If at some point you want to remove this apphook after deleting the cms_app.py
     there is a cms management command called uninstall apphooks
     that removes the specified apphook(s) from all pages by name.
-    eg. ``manage.py cmsmanage uninstall apphooks MyApphook``.
+    eg. ``manage.py cms uninstall apphooks MyApphook``.
     To find all names for uninstallable apphooks there is a command for this aswell
-    ``manage.py cmsmanage list apphooks``.
+    ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::

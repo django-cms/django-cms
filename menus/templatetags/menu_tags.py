@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from classytags.arguments import IntegerArgument, Argument
+from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from django import template
@@ -104,9 +104,9 @@ class ShowMenu(InclusionTag):
         IntegerArgument('to_level', default=100, required=False),
         IntegerArgument('extra_inactive', default=0, required=False),
         IntegerArgument('extra_active', default=1000, required=False),
-        Argument('template', default='menu/menu.html', required=False),
-        Argument('namespace', default=None, required=False),
-        Argument('root_id', default=None, required=False),
+        StringArgument('template', default='menu/menu.html', required=False),
+        StringArgument('namespace', default=None, required=False),
+        StringArgument('root_id', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
     
