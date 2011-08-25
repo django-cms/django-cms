@@ -305,8 +305,8 @@ Navigation Modifiers
 
 Navigation Modifiers give your application access to navigation menus.
 
-A modifier can add nodes to a menu, change the properties of existing
-nodes, and even rearrange entire menus.
+A modifier can change the properties of existing nodes or rearrange entire
+menus.
 
 
 An example use-case
