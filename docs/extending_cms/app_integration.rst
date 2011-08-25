@@ -83,6 +83,10 @@ The get_nodes function should return a list of
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
+- visible=True
+
+  Whether or not this menu item should be visible.
+
 
 ************
 Attach Menus
