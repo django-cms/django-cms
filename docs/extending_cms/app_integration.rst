@@ -282,7 +282,7 @@ We would now create a menu out of these categories::
         def get_nodes(self, request):
             nodes = []
             for category in Category.objects.all().order_by("tree_id", "lft"):
-                nodes = NavigationNode(
+                node = NavigationNode(
                     category.name,
                     category.get_absolute_url(),
                     category.pk,
