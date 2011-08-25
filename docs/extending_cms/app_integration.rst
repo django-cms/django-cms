@@ -70,7 +70,7 @@ The get_nodes function should return a list of
 
 - parent_id=None
 
-  If this is a child of an other node give here the id of the parent.
+  If this is a child of another node give here the id of the parent.
 
 - parent_namespace=None
 
@@ -78,11 +78,17 @@ The get_nodes function should return a list of
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-  - attr=None
+- attr=None
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
+- visible=True
+
+  Whether or not this menu item should be visible.
+
+Additionally, each :class:`NavigationNode` provides a number of methods, which are
+detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 ************
 Attach Menus
