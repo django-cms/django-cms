@@ -78,7 +78,7 @@ The get_nodes function should return a list of
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-  - attr=None
+- attr=None
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
