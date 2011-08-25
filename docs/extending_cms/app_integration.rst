@@ -70,7 +70,7 @@ The get_nodes function should return a list of
 
 - parent_id=None
 
-  If this is a child of an other node give here the id of the parent.
+  If this is a child of another node give here the id of the parent.
 
 - parent_namespace=None
 
