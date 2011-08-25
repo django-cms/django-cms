@@ -87,6 +87,8 @@ The get_nodes function should return a list of
 
   Whether or not this menu item should be visible.
 
+Additionally, each :class:`NavigationNode` provides a number of methods, which are
+detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 ************
 Attach Menus
