@@ -282,7 +282,13 @@ We would now create a menu out of these categories::
         def get_nodes(self, request):
             nodes = []
             for category in Category.objects.all().order_by("tree_id", "lft"):
-                nodes.append(NavigationNode(category.name, category.pk, category.parent_id))
+                node = NavigationNode(
+                    category.name,
+                    category.get_absolute_url(),
+                    category.pk,
+                    category.parent_id
+                )                
+                nodes.append(node)
             return nodes
 
     menu_pool.register_menu(CategoryMenu)
@@ -305,8 +311,8 @@ Navigation Modifiers
 
 Navigation Modifiers give your application access to navigation menus.
 
-A modifier can add nodes to a menu, change the properties of existing
-nodes, and even rearrange entire menus.
+A modifier can change the properties of existing nodes or rearrange entire
+menus.
 
 
 An example use-case

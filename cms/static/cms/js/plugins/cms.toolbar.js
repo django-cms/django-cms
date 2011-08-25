@@ -293,13 +293,13 @@ jQuery(document).ready(function ($) {
 			// lets loop through the items
 			$(obj.items).each(function (index, value) {
 				// add icon if available
-				var icon = value.icon ? 'cms_toolbar_icon cms_toolbar_icon-enabled ' : '';
+				var icon_styles = value.icon ? ' class="cms_toolbar_icon cms_toolbar_icon-enabled" style="background-image:url('+value.icon+');"' : '';
 				// replace attributes
 				tmp += list.replace('[list_title]', value.title)
 						   .replace('[list_url]', value.url)
 						   .replace('[list_method]', value.method)
 						   .replace('[list_class]', value.cls)
-						   .replace('<span>', '<span class="'+icon+'" style="background-image:url('+value.icon+');">');
+						   .replace('<span>', '<span'+icon_styles+'>');
 			});
 			// add items
 			template.find('.cms_toolbar-item_list').html($(tmp));

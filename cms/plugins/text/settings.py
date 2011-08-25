@@ -1,4 +1,5 @@
 from django.conf import settings
+from cms.utils import cms_static_url
 
 # Uses TinyMCE as editor (no inline plugins). Requires django-tinymce app. 
 # If false, then WYMEditor is used. 
@@ -60,7 +61,4 @@ WYM_STYLES = getattr(settings, "WYM_STYLES", WYM_STYLES)
 
 #Advantageously replaces WYM_CLASSES and WYM_STYLES
 ##Prepare url for wymeditor.css
-CMS_MEDIA_PATH = getattr(settings, 'CMS_MEDIA_PATH', 'cms/')
-WYM_STYLESHEET_PATH = getattr(settings, 'WYM_STYLESHEET_PATH', ''.join((settings.STATIC_URL, 'cms')) )
-WYM_STYLESHEET = getattr(settings, "WYM_STYLESHEET",  '"%scss/wymeditor.css"' % WYM_STYLESHEET_PATH  )
-
+WYM_STYLESHEET = getattr(settings, "WYM_STYLESHEET",  '"%s"' % cms_static_url('css/wymeditor.css'))
