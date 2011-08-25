@@ -269,7 +269,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         
 
     max_pos = CMSPlugin.objects.filter(language=language,
-        placeholder=placeholder).aggregate(Max('position')).values()[0] or 0
+        placeholder=placeholder).aggregate(Max('position'))['position__max'] or 0
 
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
