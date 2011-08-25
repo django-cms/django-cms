@@ -16,12 +16,13 @@ Requirements
 * `django-classy-tags`_ 0.3.4.1 or higher
 * `django-mptt`_ 0.4.2 or higher
 * `django-sekizai`_ 0.4.2 or higher
+* `html5lib`_ 0.90 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
   
 .. note:: When installing the django CMS using pip, Django, django-mptt
-          django-classy-tags, django-sekizai, south and PIL will be installed
-          automatically.
+          django-classy-tags, django-sekizai, south and html5lib will be
+          installed automatically.
 
 .. _Python: http://www.python.org
 .. _Django: http://www.djangoproject.com
@@ -30,6 +31,7 @@ Requirements
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-mptt: https://github.com/django-mptt/django-mptt
 .. _django-sekizai: https://github.com/ojii/django-sekizai
+.. _html5lib: http://code.google.com/p/html5lib/
 
 Recommended
 ===========
@@ -45,6 +47,13 @@ Recommended
 On Ubuntu
 =========
 
+.. warning::
+
+    The instructions here install certain packages, such as PIL, Django, South
+    and django CMS globally, which is not recommended. We recommend you use
+    `virtualenv`_ to use instead. If you chose to do so, install Django, 
+    django CMS and South inside a virtualenv.
+
 If you're using Ubuntu (tested with 10.10), the following should get you
 started:
 
@@ -59,7 +68,7 @@ Additionally, you need the python driver for your selected database:
 .. code-block:: bash
 
     sudo aptitude python-psycopg2
-    
+
 or
 
 .. code-block:: bash
@@ -71,7 +80,7 @@ This will install PIL and your database's driver globally.
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
 .. note:: This will install Django version 1.3 for use with the CMS. While 
-          later verisons of Django (such as 1.4) are know to work for some
+          later versions of Django (such as 1.4) are know to work for some
           people, it is NOT recommended and will not be supported until further
           notice (and tests)
 
@@ -101,3 +110,4 @@ To use django CMS efficiently, we recommend:
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com
+.. _virtualenv: http://www.virtualenv.org/
