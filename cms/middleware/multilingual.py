@@ -41,6 +41,8 @@ def patch_response(content, pages_root, language):
     ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
     if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
+    if getattr(settings,'MULTILINGUAL_URL_EXCLUDE', False):
+        ignore_paths += settings.MULTILINGUAL_URL_EXCLUDE
         
     HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         quoted_root,
@@ -56,6 +58,8 @@ def patch_response(content, pages_root, language):
     ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
     if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
+    if getattr(settings,'MULTILINGUAL_URL_EXCLUDE', False):
+        ignore_paths += settings.MULTILINGUAL_URL_EXCLUDE
     FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         pages_root,
         "|".join([re.escape(p) for p in ignore_paths]),
