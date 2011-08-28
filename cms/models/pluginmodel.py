@@ -51,10 +51,12 @@ class PluginModelBase(MPTTModelBase):
         # turn 'myapp_mymodel' into 'cmsplugin_mymodel' by removing the
         # 'myapp_' bit from the db_table name.
         if [base for base in bases if isinstance(base, PluginModelBase)]:
-            splitter = '%s_' % new_class._meta.app_label
-            splitted = new_class._meta.db_table.split(splitter, 1)
-            table_name = 'cmsplugin_%s' % splitted[1]
-            new_class._meta.db_table = table_name
+            # alter db_table only if 'myapp_mymodel' isn't already in 'cmsplugin_mymodel' form
+            if 'cmsplugin_' not in new_class._meta.db_table:
+                splitter = '%s_' % new_class._meta.app_label
+                splitted = new_class._meta.db_table.split(splitter, 1)
+                table_name = 'cmsplugin_%s' % splitted[1]
+                new_class._meta.db_table = table_name
         
         return new_class
          
