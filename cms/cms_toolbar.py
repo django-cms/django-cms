@@ -67,7 +67,7 @@ class CMSToolbar(Toolbar):
         self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
                                            _('Edit mode'))
         self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(self.request)
-        
+        self.show_toolbar = self.is_staff or self.edit_mode_switcher.get_state(self.request)
     
     def get_items(self, context, **kwargs):
         """

@@ -405,6 +405,11 @@ class CMSToolbar(InclusionTag):
         request = context.get('request', None)
         if not request:
             return ''
+        toolbar = getattr(request, 'toolbar', None)
+        if not toolbar:
+            return ''
+        if not toolbar.show_toolbar:
+            return ''
         return super(CMSToolbar, self).render(context)
     
     def get_context(self, context):
