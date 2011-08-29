@@ -70,7 +70,7 @@ The get_nodes function should return a list of
 
 - parent_id=None
 
-  If this is a child of an other node give here the id of the parent.
+  If this is a child of another node give here the id of the parent.
 
 - parent_namespace=None
 
@@ -78,11 +78,17 @@ The get_nodes function should return a list of
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-  - attr=None
+- attr=None
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
+- visible=True
+
+  Whether or not this menu item should be visible.
+
+Additionally, each :class:`NavigationNode` provides a number of methods, which are
+detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 ************
 Attach Menus
@@ -282,7 +288,13 @@ We would now create a menu out of these categories::
         def get_nodes(self, request):
             nodes = []
             for category in Category.objects.all().order_by("tree_id", "lft"):
-                nodes.append(NavigationNode(category.name, category.pk, category.parent_id))
+                node = NavigationNode(
+                    category.name,
+                    category.get_absolute_url(),
+                    category.pk,
+                    category.parent_id
+                )                
+                nodes.append(node)
             return nodes
 
     menu_pool.register_menu(CategoryMenu)
@@ -305,8 +317,8 @@ Navigation Modifiers
 
 Navigation Modifiers give your application access to navigation menus.
 
-A modifier can add nodes to a menu, change the properties of existing
-nodes, and even rearrange entire menus.
+A modifier can change the properties of existing nodes or rearrange entire
+menus.
 
 
 An example use-case

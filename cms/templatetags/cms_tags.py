@@ -338,7 +338,12 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         page = _get_page_by_untyped_arg(page_lookup, request, site_id)
         if not page:
             return {'content': ''}
-        placeholder = page.placeholders.get(slot=placeholder_name)
+        try:
+            placeholder = page.placeholders.get(slot=placeholder_name)
+        except Placeholder.DoesNotExist:
+            if settings.DEBUG:
+                raise
+            return {'content': ''}
         baseqs = get_cmsplugin_queryset(request)
         plugins = baseqs.filter(
             placeholder=placeholder,
@@ -399,6 +404,11 @@ class CMSToolbar(InclusionTag):
     def render(self, context):
         request = context.get('request', None)
         if not request:
+            return ''
+        toolbar = getattr(request, 'toolbar', None)
+        if not toolbar:
+            return ''
+        if not toolbar.show_toolbar:
             return ''
         return super(CMSToolbar, self).render(context)
     

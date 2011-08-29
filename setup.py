@@ -31,6 +31,7 @@ setup(
         'Django>=1.2.5',
         'django-classy-tags>=0.3.4.1',
         'south>=0.7.2',
+        'html5lib',
         'django-mptt>=0.4.2',
         'django-sekizai>=0.4.2',
     ],

@@ -3,10 +3,11 @@ from cms.api import create_page
 from cms.cms_toolbar import CMSToolbar
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.request_factory import RequestFactory
-from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem,
+from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
     GetButton)
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
 
 class ToolbarUserMixin(object):
@@ -206,6 +207,36 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         self.assertContains(response, 'cms.placeholders.js')
         self.assertContains(response, 'cms.placeholders.css')
 
+    def test_show_toolbar_to_staff(self):
+        superuser = self.get_superuser()
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True)
+        request = self.request_factory.get(page.get_absolute_url())
+        request.user = self.get_staff()
+        request.current_page = page
+        toolbar = CMSToolbar(request)
+        self.assertTrue(toolbar.show_toolbar)
+
+    def test_show_toolbar_with_edit(self):
+        superuser = self.get_superuser()
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True)
+        request = self.request_factory.get('%s?edit' % page.get_absolute_url())
+        request.current_page = page
+        SessionMiddleware().process_request(request)
+        toolbar = CMSToolbar(request)
+        self.assertTrue(toolbar.show_toolbar)
+
+    def test_show_toolbar_without_edit(self):
+        superuser = self.get_superuser()
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True)
+        request = self.request_factory.get(page.get_absolute_url())
+        request.current_page = page
+        SessionMiddleware().process_request(request)
+        toolbar = CMSToolbar(request)
+        self.assertFalse(toolbar.show_toolbar)
+        
 
 class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
     settings_overrides = {'CMS_MODERATOR': True}
