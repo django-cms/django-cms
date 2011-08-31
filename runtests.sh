@@ -106,7 +106,7 @@ else
 fi
 
 if [ $disable_coverage == false ]; then
-    ./bin/coverage run --rcfile=.coveragerc project/manage.py test $suite $failfast
+    ./bin/coverage run --rcfile=.coveragerc bin/django test $suite $failfast
     retcode=$?
 
     echo "Post test actions..."
