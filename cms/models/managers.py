@@ -118,11 +118,11 @@ class PageManager(PublisherManager):
         qp = Q()
         plugins = plugin_pool.get_all_plugins()
         for plugin in plugins:
-            c = plugin.model
-            if hasattr(c, 'search_fields'):
-                for field in c.search_fields:
+            cmsplugin = plugin.model
+            if hasattr(cmsplugin, 'search_fields'):
+                for field in cmsplugin.search_fields:
                     qp |= Q(**{'placeholders__cmsplugin__%s__%s__icontains' % \
-                                   (c.__name__.lower(), field):q})
+                                   (cmsplugin.__name__.lower(), field):q})
         if language:
             qt &= Q(title_set__language=language)
             qp &= Q(cmsplugin__language=language)
@@ -146,9 +146,9 @@ class TitleManager(PublisherManager):
                 try:
                     titles = self.filter(page=page)
                     fallbacks = get_fallback_languages(language)
-                    for l in fallbacks:
+                    for lang in fallbacks:
                         for title in titles:
-                            if l == title.language:
+                            if lang == title.language:
                                 return title
                     return None
                 except self.model.DoesNotExist:
@@ -336,12 +336,12 @@ class PagePermissionManager(BasicPagePermissionManager):
         from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN,\
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS 
         
-        q = Q(page__tree_id=page.tree_id) & (
+        query = Q(page__tree_id=page.tree_id) & (
             Q(page=page) 
             | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
             | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
         ) 
-        return self.filter(q).order_by('page__level')
+        return self.filter(query).order_by('page__level')
 
 class PagePermissionsPermissionManager(models.Manager):
     """Page permissions permission manager.

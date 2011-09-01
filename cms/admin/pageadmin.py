@@ -308,9 +308,9 @@ class PageAdmin(ModelAdmin):
         if obj: # edit
             given_fieldsets = deepcopy(self.fieldsets)
             if not obj.has_publish_permission(request):
-                l = list(given_fieldsets[0][1]['fields'][2])
-                l.remove('published')
-                given_fieldsets[0][1]['fields'][2] = tuple(l)
+                fields = list(given_fieldsets[0][1]['fields'][2])
+                fields.remove('published')
+                given_fieldsets[0][1]['fields'][2] = tuple(fields)
             for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
                 name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
                 name = _(name)

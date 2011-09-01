@@ -248,11 +248,11 @@ class ShowBreadcrumb(InclusionTag):
             if node.get_absolute_url() == urllib.unquote(reverse("pages-root")):
                 home = node
         if selected and selected != home:
-            n = selected
-            while n:
-                if n.visible or not only_visible:
-                    ancestors.append(n)
-                n = n.parent
+            node = selected
+            while node:
+                if node.visible or not only_visible:
+                    ancestors.append(node)
+                node = node.parent
         if not ancestors or (ancestors and ancestors[-1] != home) and home:
             ancestors.append(home)
         ancestors.reverse()
