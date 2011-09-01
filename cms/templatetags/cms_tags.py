@@ -370,7 +370,6 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
                 raise
             return {'content': ''}
         content = render_placeholder(placeholder, context, placeholder_name)
-
     if cache_result:
         cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
 

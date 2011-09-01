@@ -844,12 +844,11 @@ class Page(MPTTModel):
         from cms.models.moderatormodels import PageModerator
         if not settings.CMS_MODERATOR or not self.tree_id:
             return PageModerator.objects.get_empty_query_set()
-
-        q = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
+        query = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
             Q(page__tree_id=self.tree_id, page__level=self.level - 1, moderate_children=True) | \
             Q(page__pk=self.pk, moderate_page=True)
 
-        return PageModerator.objects.distinct().filter(q).order_by('page__level')
+        return PageModerator.objects.distinct().filter(query).order_by('page__level')
 
     def is_under_moderation(self):
         return bool(self.get_moderator_queryset().count())

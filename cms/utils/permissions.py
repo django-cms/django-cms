@@ -273,19 +273,18 @@ def get_user_sites_queryset(user):
         Q(can_add=True) | Q(can_change=True)
     ).values_list('id', flat=True)
     
-    q = Q()
+    query = Q()
     if global_ids:
-        q = Q(globalpagepermission__id__in=global_ids)
+        query = Q(globalpagepermission__id__in=global_ids)
         # haves some global permissions assigned
-        if not qs.filter(q).exists():
+        if not qs.filter(query).exists():
             # haves global permissions, but none of sites is specified,
             # so he haves access to all sites
             return qs
-    
     # add some pages if he has permission to add / change them
-    q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
+    query |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
         (Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True)))
-    return qs.filter(q).distinct()
+    return qs.filter(query).distinct()
 
 
 def has_plugin_permission(user, plugin_type, permission_type):
