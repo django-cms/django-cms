@@ -307,7 +307,6 @@ class Page(MPTTModel):
         
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
-        
         if self.publisher_is_draft:
             # publisher specific stuff, but only on draft model, this is here 
             # because page initializes publish process
@@ -366,11 +365,6 @@ class Page(MPTTModel):
                 if commit and publish_directly:
                     
                     self.publish()
-                    
-            elif self.publisher_public and self.publisher_public.published:
-                self.publisher_public.published = False
-                self.publisher_public.save()
-                
                 
     def save_base(self, *args, **kwargs):
         """Overriden save_base. If an instance is draft, and was changed, mark
