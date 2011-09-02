@@ -188,12 +188,14 @@ class TitleManager(PublisherManager):
         base_fields = [
             'slug',
             'title',
-            'application_urls',
-            'redirect',
             'meta_description',
             'meta_keywords',
             'page_title',
             'menu_title'
+        ]
+        advanced_fields = [
+            'application_urls',
+            'redirect',
         ]
         cleaned_data = form.cleaned_data
         try:
@@ -210,6 +212,10 @@ class TitleManager(PublisherManager):
                 if overwrite_url:
                     data['has_url_overwrite'] = True
                     data['path'] = overwrite_url
+                for field in advanced_fields:
+                    value = cleaned_data.get(field, None)
+                    if value:
+                        data[field] = value
             return self.create(**data)
         
         for name in base_fields:
@@ -219,6 +225,8 @@ class TitleManager(PublisherManager):
             overwrite_url = cleaned_data.get('overwrite_url', None)
             obj.has_url_overwrite = bool(overwrite_url)
             obj.path = overwrite_url
+            for field in advanced_fields:
+                setattr(obj, field, cleaned_data.get(field, None))
         obj.save()
         return obj
 
