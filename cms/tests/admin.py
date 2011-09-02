@@ -242,7 +242,7 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(page.get_title(), OLD_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
             title = page.get_title_obj()
-            self.assertEqual(title.overwrite_url, None)
+            self.assertEqual(title.application_urls, '')
 
     def test_delete(self):
         admin = self._get_guys(True)
