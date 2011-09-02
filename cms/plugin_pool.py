@@ -77,10 +77,14 @@ class PluginPool(object):
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
         final_plugins = []
+        if page:
+            template = page.get_template()
+        else:
+            template = None
         allowed_plugins = get_placeholder_conf(
             setting_key,
             placeholder,
-            getattr(page, 'template', None)
+            template,
         )
         for plugin in plugins:
             include_plugin = False
