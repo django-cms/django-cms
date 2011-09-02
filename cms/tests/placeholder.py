@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import add_plugin
+from cms.api import add_plugin, create_page
+from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
-from cms.plugins.text.models import Text
+from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
+from cms.plugins.link.cms_plugins import LinkPlugin
 from cms.plugins.text.cms_plugins import TextPlugin
+from cms.plugins.text.models import Text
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, TestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
+from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions, 
+    get_placeholder_conf)
 from cms.utils.plugins import get_placeholders
-from cms.api import create_page, add_plugin
-from cms.models import Placeholder
-from cms.plugins.text.cms_plugins import TextPlugin
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
@@ -494,3 +495,37 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
         # It looks like it breaks here because of a missing csrf token in the request
         # I have no idea how to fix this
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
+
+class PlaceholderConfTests(TestCase):
+    def test_get_all_plugins_single_page(self):
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_two': {
+                'plugins': ['TextPlugin', 'LinkPlugin'],
+            },
+            'col_two.html col_left': {
+                'plugins': ['LinkPlugin'],
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            plugins = plugin_pool.get_all_plugins(placeholder, page)
+            self.assertEqual(len(plugins), 1, plugins)
+            self.assertEqual(plugins[0], LinkPlugin)
+    def test_get_all_plugins_inherit(self):
+        parent = create_page('parent', 'col_two.html', 'en')
+        page = create_page('page', CMS_TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_two': {
+                'plugins': ['TextPlugin', 'LinkPlugin'],
+            },
+            'col_two.html col_left': {
+                'plugins': ['LinkPlugin'],
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            plugins = plugin_pool.get_all_plugins(placeholder, page)
+            self.assertEqual(len(plugins), 1, plugins)
+            self.assertEqual(plugins[0], LinkPlugin)
