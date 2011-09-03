@@ -274,8 +274,8 @@ class CMSMenu(Menu):
 
         if ids: # get fallback languages
             fallbacks = get_fallback_languages(lang)
-            for l in fallbacks:
-                titles = list(get_title_queryset(request).filter(page__in=ids, language=l))
+            for lang in fallbacks:
+                titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
                 for title in titles:
                     for page in actual_pages: # add the title and slugs and some meta data
                         if title.page_id == page.pk:
@@ -305,17 +305,17 @@ class NavExtender(Modifier):
                 for ext in extenders:
                     if not ext in exts:
                         exts.append(ext)
-                    for n in nodes:
-                        if n.namespace == ext and not n.parent_id:# if home has nav extenders but home is not visible
+                    for extnode in nodes:
+                        if extnode.namespace == ext and not extnode.parent_id:# if home has nav extenders but home is not visible
                             if node.attr.get("is_home", False) and not node.visible:
-                                n.parent_id = None
-                                n.parent_namespace = None
-                                n.parent = None
+                                extnode.parent_id = None
+                                extnode.parent_namespace = None
+                                extnode.parent = None
                             else:
-                                n.parent_id = node.id
-                                n.parent_namespace = node.namespace
-                                n.parent = node
-                                node.children.append(n)
+                                extnode.parent_id = node.id
+                                extnode.parent_namespace = node.namespace
+                                extnode.parent = node
+                                node.children.append(extnode)
         removed = []
         # find all not assigned nodes
         for menu in menu_pool.menus.items():
@@ -434,15 +434,15 @@ class SoftRootCutter(Modifier):
         return nodes
     
     def find_and_remove_children(self, node, nodes):
-        for n in node.children:
-            if n.attr.get("soft_root", False):
-                self.remove_children(n, nodes)
+        for child in node.children:
+            if child.attr.get("soft_root", False):
+                self.remove_children(child, nodes)
         return nodes
     
     def remove_children(self, node, nodes):
-        for n in node.children:
-            nodes.remove(n)
-            self.remove_children(n, nodes)
+        for child in node.children:
+            nodes.remove(child)
+            self.remove_children(child, nodes)
         node.children = []
     
     def find_ancestors_and_remove_children(self, node, nodes):
@@ -457,12 +457,12 @@ class SoftRootCutter(Modifier):
             else:
                 nodes = self.find_ancestors_and_remove_children(node.parent, nodes)
         else:
-            for n in nodes:
-                if n != node and not n.parent:
-                    self.find_and_remove_children(n, nodes)
-        for n in node.children:
-            if n != node:
-                self.find_and_remove_children(n, nodes)
+            for newnode in nodes:
+                if newnode != node and not newnode.parent:
+                    self.find_and_remove_children(newnode, nodes)
+        for child in node.children:
+            if child != node:
+                self.find_and_remove_children(child, nodes)
         return nodes
     
 menu_pool.register_modifier(SoftRootCutter)

@@ -83,7 +83,7 @@ def get_page_cache_key(lang):
 
 def _clean_many(prefix):
     keys = []
-    for lang in [l[0] for l in settings.LANGUAGES]:
+    for lang in [language[0] for language in settings.LANGUAGES]:
         keys.append(_get_key(prefix, lang))
     cache.delete_many(keys)
 

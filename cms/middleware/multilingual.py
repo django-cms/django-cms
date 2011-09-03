@@ -10,7 +10,7 @@ import urlparse
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
 
-HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join([re.escape(l[0]) for l in settings.CMS_LANGUAGES]))
+HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join([re.escape(lang[0]) for lang in settings.CMS_LANGUAGES]))
 
 
 def has_lang_prefix(path):
@@ -40,9 +40,9 @@ def patch_response(content, pages_root, language):
     # Notice that (?=...) and (?!=...) do not consume input or produce a group in the match object.
     # If the regex matches, the extracted path we want is stored in the fourth group (\4).
     quoted_root = urllib.quote(pages_root)
-    ignore_paths = ['%s%s/' % (quoted_root, l[0]) for l in settings.CMS_LANGUAGES]
-    ignore_paths += [settings.MEDIA_URL, settings.STATIC_URL]
-    if getattr(settings, 'STATIC_URL', False):
+    ignore_paths = ['%s%s/' % (quoted_root, lang[0]) for lang in settings.CMS_LANGUAGES]
+    ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
+    if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
 
     HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
@@ -55,9 +55,9 @@ def patch_response(content, pages_root, language):
     #
     # For understanding this regex, please read the documentation for HREF_URL_FIX_RE above.
 
-    ignore_paths = ['%s%s/' % (pages_root, l[0]) for l in settings.CMS_LANGUAGES]
-    ignore_paths += [settings.MEDIA_URL, settings.STATIC_URL]
-    if getattr(settings, 'STATIC_URL', False):
+    ignore_paths = ['%s%s/' % (pages_root, lang[0]) for lang in settings.CMS_LANGUAGES]
+    ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
+    if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
     FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         pages_root,
