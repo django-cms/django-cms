@@ -154,7 +154,7 @@ class Page(MPTTModel):
                   public_copy=False):
         """
         copy a page [ and all its descendants to a new location ]
-        Doesn't checks for add page permissions anymore, this is done in PageAdmin.
+        Doesn't check for add page permissions anymore, this is done in PageAdmin.
         
         Note: public_copy was added in order to enable the creation of a copy for creating the public page during
         the publish operation as it sets the publisher_is_draft=False.
@@ -166,7 +166,7 @@ class Page(MPTTModel):
         
         if public_copy:
             # create a copy of the draft page - existing code loops through pages so added it to a list 
-            pages = [copy.copy(self)]            
+            pages = [copy.copy(self)]
         else:
             pages = [self] + list(self.get_descendants().order_by('-rght'))
             
@@ -331,9 +331,9 @@ class Page(MPTTModel):
                     
             elif change_state:
                 self.moderator_state = Page.MODERATOR_CHANGED
-                #publish_directly = True - no publisher, no publishing!! - we just
-                # use draft models in this case
-            
+                # publish_directly = True - no publisher, no publishing!!
+                # we just use draft models in this case
+
             if force_state is not None:
                 self.moderator_state = force_state
             
@@ -367,7 +367,7 @@ class Page(MPTTModel):
                     self.publish()
                 
     def save_base(self, *args, **kwargs):
-        """Overriden save_base. If an instance is draft, and was changed, mark
+        """Overridden save_base. If an instance is draft, and was changed, mark
         it as dirty.
 
         Dirty flag is used for changed nodes identification when publish method
@@ -386,7 +386,7 @@ class Page(MPTTModel):
 
     def publish(self):
         """Overrides Publisher method, because there may be some descendants, which
-        are waiting for parent to publish, so publish them if possible. 
+        are waiting for parent to publish, so publish them if possible.
 
         IMPORTANT: @See utils.moderator.approve_page for publishing permissions
 
@@ -457,15 +457,15 @@ class Page(MPTTModel):
             # reload old_public to get correct tree attrs
             old_public = Page.objects.get(pk=old_public.pk)
             old_public.move_to(None, 'last-child')
-            # moving the object out of the way berore deleting works, but why?
+            # moving the object out of the way before deleting works, but why?
             # finally delete the old public page
             old_public.delete()
 
-        # page was published, check if there are some childs, which are waiting
-        # for publishing (because of the parent)
+        # page was published, check if there are children waiting for publishing
+        # (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         for page in publish_set:
-            # recursive call to all childrens....
+            # recursive call to all children....
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
             page.publish()
@@ -522,13 +522,13 @@ class Page(MPTTModel):
         if not hasattr(self, "all_languages"):
             self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
             self.all_languages = list(self.all_languages)
-            self.all_languages.sort()    
+            self.all_languages.sort()
         return self.all_languages
     
     def get_cached_ancestors(self, ascending=True):
         if ascending:
             if not hasattr(self, "ancestors_ascending"):
-                self.ancestors_ascending = list(self.get_ancestors(ascending)) 
+                self.ancestors_ascending = list(self.get_ancestors(ascending))
             return self.ancestors_ascending
         else:
             if not hasattr(self, "ancestors_descending"):
@@ -537,7 +537,7 @@ class Page(MPTTModel):
     
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for accessing wanted / current title. 
-        If wanted title doesn't exists, EmptyTitle instance will be returned.
+        If wanted title doesn't exist, EmptyTitle instance will be returned.
         """
         
         language = self._get_title_cache(language, fallback, version_id, force_reload)
@@ -628,8 +628,8 @@ class Page(MPTTModel):
                 fallback_langs = i18n.get_fallback_languages(language)
                 for lang in fallback_langs:
                     if lang in self.title_cache:
-                        return lang    
-            load = True 
+                        return lang
+            load = True
         if load:
             from cms.models.titlemodels import Title
             if version_id:
@@ -643,10 +643,10 @@ class Page(MPTTModel):
             else:
                 title = Title.objects.get_title(self, language, language_fallback=fallback)
                 if title:
-                    self.title_cache[title.language] = title 
+                    self.title_cache[title.language] = title
                 language = title.language
         return language
-                
+
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
@@ -674,7 +674,7 @@ class Page(MPTTModel):
         template = self.get_template()
         for t in settings.CMS_TEMPLATES:
             if t[0] == template:
-                return t[1] 
+                return t[1]
         return _("default")
     
     def has_view_permission(self, request):
@@ -857,7 +857,7 @@ class Page(MPTTModel):
         if hasattr(self, 'public_published_cache'):
             # if it was cached in change list, return cached value
             return self.public_published_cache
-        # othervise make db lookup
+        # otherwise make db lookup
         if self.publisher_public_id:
             return self.publisher_public.published
         #return is_public_published(self)
@@ -912,13 +912,13 @@ class Page(MPTTModel):
         inheritance.
 
         eg. Text.objects.get(pk=1).publisher_public returns instance of CMSPlugin
-        instead of instance of Text, thats why this method must be overriden in
+        instead of instance of Text, that's why this method must be overridden in
         CMSPlugin.
         """
         return self.publisher_public
 
     def get_next_filtered_sibling(self, **filters):
-        """Very simillar to original mptt method, but adds support for filters.
+        """Very similar to original mptt method, but adds support for filters.
         Returns this model instance's next sibling in the tree, or
         ``None`` if it doesn't have a next sibling.
         """
@@ -942,7 +942,7 @@ class Page(MPTTModel):
         return sibling
 
     def get_previous_filtered_sibling(self, **filters):
-        """Very simillar to original mptt method, but adds support for filters.
+        """Very similar to original mptt method, but adds support for filters.
         Returns this model instance's previous sibling in the tree, or
         ``None`` if it doesn't have a previous sibling.
         """
@@ -990,7 +990,7 @@ class Page(MPTTModel):
                     obj.insert_at(public_parent, save=False)
         else:
             # check if object was moved / structural tree change
-            prev_public_sibling = self.old_public.get_previous_filtered_sibling()
+            prev_public_sibling = self.old_public.get_previous_filtered_sibling(publisher_is_draft=False)
 
             if not self.level == self.old_public.level or \
                 not (self.level > 0 and self.parent.publisher_public == self.old_public.parent) or \
@@ -1005,12 +1005,14 @@ class Page(MPTTModel):
                     obj.insert_at(target, position='first-child')
                 else:
                     # it is a move from the right side or just save
-                    next_sibling = self.get_next_filtered_sibling()
+                    next_sibling = self.get_next_filtered_sibling(
+                        publisher_is_draft=True, publisher_public__isnull=False
+                    )
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.insert_at(next_sibling.publisher_public, position="left")
             else:
                 # insert at last public position
-                prev_sibling = self.old_public.get_previous_filtered_sibling()
+                prev_sibling = self.old_public.get_previous_filtered_sibling(publisher_is_draft=False)
 
                 if prev_sibling:
                     obj.insert_at(prev_sibling, position="right")
@@ -1020,7 +1022,7 @@ class Page(MPTTModel):
                     obj.insert_at(target, position='first-child')
                 else:
                     # it is a move from the right side or just save
-                    next_sibling = self.old_public.get_next_filtered_sibling()
+                    next_sibling = self.old_public.get_next_filtered_sibling(publisher_is_draft=False)
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.insert_at(next_sibling, position="left")
         # or none structural change, just save
@@ -1046,7 +1048,7 @@ class Page(MPTTModel):
 
 def _reversion():
     exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
-            
+
     reversion_register(
         Page,
         follow=["title_set", "placeholders", "pagepermission_set"],

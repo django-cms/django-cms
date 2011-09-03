@@ -50,10 +50,10 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.placeholders.all().count(), 2)
             
-            # were public instanes created?
+            # were public instances created?
             title = Title.objects.drafts().get(slug=page_data['slug'])
 
-        
+
     def test_slug_collision(self):
         """
         Test a slug collision
@@ -78,8 +78,8 @@ class PagesTestCase(CMSTestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
             # TODO: check for slug collisions after move
-            # TODO: check for slug collisions with different settings         
-  
+            # TODO: check for slug collisions with different settings
+
     def test_details_view(self):
         """
         Test the details view
@@ -150,7 +150,7 @@ class PagesTestCase(CMSTestCase):
             req = HttpRequest()
             page.published = True
             page.save()
-            req.current_page = page 
+            req.current_page = page
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page,cms,stuff")
     
@@ -349,12 +349,12 @@ class PagesTestCase(CMSTestCase):
         placeholder = page.placeholders.all()[0]
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
-            placeholder=placeholder, 
-            position=1, 
+            placeholder=placeholder,
+            position=1,
             language=settings.LANGUAGES[0][0]
         )
         plugin_base.insert_at(None, position='last-child', save=False)
-                
+
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
         plugin.save()
@@ -515,6 +515,21 @@ class PagesTestCase(CMSTestCase):
             resp = self.client.get('/en/page/')
             self.assertEqual(resp.status_code, HttpResponseNotFound.status_code)
 
+    def test_public_home_page_replaced(self):
+        """Test that publishing changes to the home page doesn't move the public version"""
+        home = create_page('home', 'nav_playground.html', 'en', published = True, slug = 'home')
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        home.publish()
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+        other = create_page('other', 'nav_playground.html', 'en', published = True, slug = 'other')
+        other.publish()
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+        home.in_navigation = True
+        home.save()
+        home.publish()
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
 class NoAdminPageTests(CMSTestCase):
     urls = 'project.noadmin_urls'
