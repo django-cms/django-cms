@@ -16,7 +16,7 @@ class PublisherTestCase(CMSTestCase):
     
     def test_simple_publisher(self):
         '''
-        Creates the stuff needed for theses tests.
+        Creates the stuff needed for these tests.
         Please keep this up-to-date (the docstring!)
                 
                 A
