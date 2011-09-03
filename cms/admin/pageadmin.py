@@ -542,9 +542,9 @@ class PageAdmin(ModelAdmin):
         filled_languages = []
         if obj:
             filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
-        allowed_languages = [l[0] for l in self._get_site_languages(obj)]
+        allowed_languages = [lang[0] for lang in self._get_site_languages(obj)]
         context.update({
-            'filled_languages': [l for l in filled_languages if l in allowed_languages],
+            'filled_languages': [lang for lang in filled_languages if lang in allowed_languages],
         })
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
     
@@ -666,7 +666,7 @@ class PageAdmin(ModelAdmin):
         if site_id and site_id in settings.CMS_SITE_LANGUAGES:
             languages = settings.CMS_SITE_LANGUAGES[site_id]
         else:
-            languages = [x[0] for x in settings.CMS_LANGUAGES]
+            languages = [lang[0] for lang in settings.CMS_LANGUAGES]
         
         context = {
             'title': cl.title,
@@ -1122,7 +1122,7 @@ class PageAdmin(ModelAdmin):
             raise Http404
 
         # Sanity check to make sure we're not getting bogus values from JavaScript:
-        if not language or not language in [ l[0] for l in settings.LANGUAGES ]:
+        if not language or not language in [ lang[0] for lang in settings.LANGUAGES ]:
             return HttpResponseBadRequest(ugettext("Language must be set to a supported language!"))
 
         plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
@@ -1154,7 +1154,7 @@ class PageAdmin(ModelAdmin):
 
         if not page.has_change_permission(request):
             return HttpResponseForbidden(ugettext("You do not have permission to change this page"))
-        if not language or not language in [ l[0] for l in settings.CMS_LANGUAGES ]:
+        if not language or not language in [ lang[0] for lang in settings.CMS_LANGUAGES ]:
             return HttpResponseBadRequest(ugettext("Language must be set to a supported language!"))
         if language == copy_from:
             return HttpResponseBadRequest(ugettext("Language must be different than the copied language!"))

@@ -26,13 +26,13 @@ def cut_after(node, levels, removed):
         node.children = []
     else:
         removed_local = []
-        for n in node.children:
-            if n.visible:
-                cut_after(n, levels - 1, removed)
+        for child in node.children:
+            if child.visible:
+                cut_after(child, levels - 1, removed)
             else:
-                removed_local.append(n)
-        for n in removed_local:
-            node.children.remove(n)
+                removed_local.append(child)
+        for removed_child in removed_local:
+            node.children.remove(removed_child)
         removed.extend(removed_local)
 
 def remove(node, removed):
@@ -128,8 +128,8 @@ class ShowMenu(InclusionTag):
                 if id_nodes:
                     node = id_nodes[0]
                     nodes = node.children
-                    for n in nodes:
-                        n.parent = None
+                    for remove_parent in nodes:
+                        remove_parent.parent = None
                     from_level += node.level + 1
                     to_level += node.level + 1
                     nodes = flatten(nodes)
