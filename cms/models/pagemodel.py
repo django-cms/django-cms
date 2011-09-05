@@ -959,7 +959,16 @@ class Page(MPTTModel):
                 '%s__lt' % opts.right_attr: getattr(self, opts.left_attr),
             })
             order_by = '-%s' % opts.right_attr
-
+        
+        # publisher stuff
+        filters.update({
+            'publisher_is_draft': self.publisher_is_draft
+        })
+        # multisite
+        filters.update({
+            'site__id': self.site_id
+        })
+        
         sibling = None
         try:
             sibling = self._tree_manager.filter(**filters).order_by(order_by)[0]
