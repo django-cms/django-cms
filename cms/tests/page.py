@@ -532,3 +532,27 @@ class NoAdminPageTests(CMSTestCase):
         request = self.get_request('/admin/')
         page = get_page_from_request(request)
         self.assertEqual(page, None)
+
+class PreviousFilteredSiblingsTests(CMSTestCase):
+    def test_with_publisher(self):
+        home = create_page('home', 'nav_playground.html', 'en', published=True)
+        home.publish()
+        other = create_page('other', 'nav_playground.html', 'en', published=True)
+        other.publish()
+        other = Page.objects.get(pk=other.pk)
+        home = Page.objects.get(pk=home.pk)
+        self.assertEqual(other.get_previous_filtered_sibling(), home)
+        self.assertEqual(home.get_previous_filtered_sibling(), None)
+        
+    def test_multisite(self):
+        firstsite = Site.objects.create(name='first', domain='first.com')
+        secondsite = Site.objects.create(name='second', domain='second.com')
+        home = create_page('home', 'nav_playground.html', 'en', published=True, site=firstsite)
+        home.publish()
+        other = create_page('other', 'nav_playground.html', 'en', published=True, site=secondsite)
+        other.publish()
+        other = Page.objects.get(pk=other.pk)
+        home = Page.objects.get(pk=home.pk)
+        self.assertEqual(other.get_previous_filtered_sibling(), None)
+        self.assertEqual(home.get_previous_filtered_sibling(), None)
+        
