@@ -2,6 +2,11 @@
     $(document).ready(function() {
         // Add Plugin Handler
     	$.fn.cmsPatchCSRF();
+        $('div.plugin-list-holder').each(function() {
+            // placeholder id is 'placeholder-PK'
+            var my_id = $(this).attr('id').split('-');
+            $(this).data('id', my_id[1]);
+        });
         $('span.add-plugin').click(function(){
          var select = $(this).parent().children("select[name=plugins]");
             var pluginvalue = select.attr('value');
