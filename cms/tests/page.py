@@ -515,6 +515,22 @@ class PagesTestCase(CMSTestCase):
             resp = self.client.get('/en/page/')
             self.assertEqual(resp.status_code, HttpResponseNotFound.status_code)
 
+    def test_public_home_page_replaced(self):
+        """Test that publishing changes to the home page doesn't move the public version"""
+        home = create_page('home', 'nav_playground.html', 'en', published = True, slug = 'home')
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        home.publish()
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+        other = create_page('other', 'nav_playground.html', 'en', published = True, slug = 'other')
+        other.publish()
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+        home = Page.objects.get(pk = home.id)
+        home.in_navigation = True
+        home.save()
+        home.publish()
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
 class NoAdminPageTests(CMSTestCase):
     urls = 'project.noadmin_urls'
