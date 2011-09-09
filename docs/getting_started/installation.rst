@@ -19,7 +19,7 @@ Requirements
 * `html5lib`_ 0.90 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
-  
+
 .. note:: When installing the django CMS using pip, Django, django-mptt
           django-classy-tags, django-sekizai, south and html5lib will be
           installed automatically.
@@ -38,7 +38,7 @@ Recommended
 
 * `django-filer`_ with its `django CMS plugins`_, file and image management
   application to use instead of some core plugins
-* `django-reversion`_, to support versions of your content
+* `django-reversion`_ 1.4, to support versions of your content
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
@@ -51,7 +51,7 @@ On Ubuntu
 
     The instructions here install certain packages, such as PIL, Django, South
     and django CMS globally, which is not recommended. We recommend you use
-    `virtualenv`_ to use instead. If you chose to do so, install Django, 
+    `virtualenv`_ to use instead. If you chose to do so, install Django,
     django CMS and South inside a virtualenv.
 
 If you're using Ubuntu (tested with 10.10), the following should get you
@@ -79,7 +79,7 @@ This will install PIL and your database's driver globally.
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
-.. note:: This will install Django version 1.3 for use with the CMS. While 
+.. note:: This will install Django version 1.3 for use with the CMS. While
           later versions of Django (such as 1.4) are know to work for some
           people, it is NOT recommended and will not be supported until further
           notice (and tests)
