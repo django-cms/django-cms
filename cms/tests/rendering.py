@@ -202,17 +202,30 @@ class RenderingTestCase(SettingsOverrideTestCase):
         output = self.render(template, self.test_page, {'test_page': self.test_page})
         self.assertEqual(output, self.test_data['text_sub'])
         
-    def test_page_url(self):
-        """
-        Tests the {% page_url %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
-        """
-        t = u'{% load cms_tags %}'+ \
-            u'|{% page_url '+str(self.test_page2.pk)+' %}'+ \
-            u'|{% page_url test_dict %}'+ \
-            u'|{% page_url "'+str(self.test_page2.reverse_id)+'" %}'+ \
-            u'|{% page_url test_page %}'
-        r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
-        self.assertEqual(r, (u'|'+self.test_page2.get_absolute_url())*4)
+    def test_page_url_by_pk(self):
+        template = u'{%% load cms_tags %%}{%% page_url %s %%}' % self.test_page2.pk
+        output = self.render(template, self.test_page)
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+        
+    def test_page_url_by_dictionary(self):
+        template = u'{% load cms_tags %}{% page_url test_dict %}'
+        output =  self.render(template, self.test_page, {'test_dict': {'pk': self.test_page2.pk}})
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+        
+    def test_page_url_by_reverse_id(self):
+        template = u'{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
+        output = self.render(template, self.test_page)
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+        
+    def test_page_url_by_reverse_id_not_on_a_page(self):
+        template = u'{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
+        output = self.render(template, None)
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+    
+    def test_page_url_by_page(self):
+        template = u'{% load cms_tags %}{% page_url test_page %}'
+        output = self.render(template, self.test_page, {'test_page': self.test_page2})
+        self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_attribute(self):
         """
