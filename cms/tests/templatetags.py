@@ -47,6 +47,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
     def test_get_page_by_untyped_arg_none(self):
         control = self._getfirst()
         request = self.get_request('/')
+        request.current_page = control
         page = _get_page_by_untyped_arg(None, request, 1)
         self.assertEqual(page, control)
         
