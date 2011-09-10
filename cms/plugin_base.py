@@ -1,107 +1,101 @@
 # -*- coding: utf-8 -*-
+from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
-from cms.exceptions import SubClassNeededError
+from django import forms
 from django.conf import settings
+from django.contrib import admin
+from django.core.exceptions import ImproperlyConfigured
+from django.db.models.options import get_verbose_name
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
-from django.contrib import admin
-from django.forms.widgets import Media, MediaDefiningClass
+from django.utils.translation import ugettext_lazy as _
 
-def pluginmedia_property(cls):
-    def _media(self):
-        # Get the plugin media property of the superclass, if it exists
-        if hasattr(super(cls, self), 'pluginmedia'):
-            base = super(cls, self).pluginmedia
-        else:
-            base = Media()
-
-        # Get the media definition for this class
-        definition = getattr(cls, 'PluginMedia', None)
-        if definition:
-            extend = getattr(definition, 'extend', True)
-            if extend:
-                if extend == True:
-                    m = base
-                else:
-                    m = Media()
-                    for medium in extend:
-                        m = m + base[medium]
-                return m + Media(definition)
-            else:
-                return Media(definition)
-        else:
-            return base
-    return property(_media)
-
-class PluginMediaDefiningClass(MediaDefiningClass):
+class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
+    """
+    Ensure the CMSPlugin subclasses have sane values and set some defaults if 
+    they're not given.
+    """
     def __new__(cls, name, bases, attrs):
-        new_class = super(PluginMediaDefiningClass, cls).__new__(cls, name, bases,
-                                                           attrs)
-        if 'pluginmedia' not in attrs:
-            new_class.pluginmedia = pluginmedia_property(new_class)
-        return new_class
-
+        super_new = super(CMSPluginBaseMetaclass, cls).__new__
+        parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
+        if not parents:
+            # If this is CMSPluginBase itself, and not a subclass, don't do anything
+            return super_new(cls, name, bases, attrs)
+        new_plugin = super_new(cls, name, bases, attrs)
+        # validate model is actually a CMSPlugin subclass.
+        if not issubclass(new_plugin.model, CMSPlugin):
+            raise SubClassNeededError(
+                "The 'model' attribute on CMSPluginBase subclasses must be "
+                "either 'None' or a subclass of CMSPlugin. %r on %r is not."
+                % (new_plugin.model, new_plugin)
+            )
+        # validate the template:
+        if not hasattr(new_plugin, 'render_template'):
+            raise ImproperlyConfigured(
+                "CMSPluginBase subclasses must have a render_template attribute"
+            )
+        # Set the default form
+        if not new_plugin.form:
+            form_meta_attrs = {
+                'model': new_plugin.model,
+                'exclude': ('position', 'placeholder', 'language', 'plugin_type')
+            }
+            form_attrs = {
+                'Meta': type('Meta', (object,), form_meta_attrs)
+            }
+            new_plugin.form = type('%sForm' % name, (ModelForm,), form_attrs)
+        # Set the default fieldsets
+        if not new_plugin.fieldsets:
+            basic_fields = []
+            advanced_fields = []
+            for f in new_plugin.model._meta.fields:
+                if not f.auto_created and f.editable:
+                    if hasattr(f,'advanced'): 
+                        advanced_fields.append(f.name)
+                    else: basic_fields.append(f.name)
+            if advanced_fields:
+                new_plugin.fieldsets = [
+                    (
+                        None,
+                        {
+                            'fields': basic_fields
+                        }
+                    ),
+                    (
+                        _('Advanced options'), 
+                        {
+                            'fields' : advanced_fields, 
+                            'classes' : ('collapse',)
+                        }
+                    )
+                ]
+        # Set default name
+        if not new_plugin.name:
+            new_plugin.name = get_verbose_name(new_plugin.__name__)
+        return new_plugin
 
 
 class CMSPluginBase(admin.ModelAdmin):
-    
-    __metaclass__ = PluginMediaDefiningClass # just define a PluginMedia class to add media
+    __metaclass__ = CMSPluginBaseMetaclass
     
     name = ""
     
     form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
-    admin_preview = True # Should the plugin be rendered in the admin?
+    # Should the plugin be rendered in the admin?
+    admin_preview = True 
     
     render_template = None
-    render_plugin = True # Should the plugin be rendered at all, or doesn't it have any output?
+    # Should the plugin be rendered at all, or doesn't it have any output?
+    render_plugin = True 
     model = CMSPlugin
     text_enabled = False
+    page_only = False
     
     opts = {}
     module = None #track in which module/application belongs
     
     def __init__(self, model=None,  admin_site=None):
-        if self.model:
-            if not CMSPlugin in self.model._meta.parents and self.model != CMSPlugin:
-                found = False
-                bases = self.model.__bases__
-                while bases:
-                    cls = bases[0]
-                    if cls.__name__ == "CMSPlugin":
-                        found = True
-                        bases = False
-                    else:
-                        bases = cls.__bases__  
-                if not found:
-                    raise SubClassNeededError, "plugin model needs to subclass CMSPlugin"
-            if not self.form:
-                class DefaultModelForm(ModelForm):
-                    class Meta:
-                        model = self.model
-                        exclude = ('page', 'position', 'placeholder', 'language', 'plugin_type')
-                self.form = DefaultModelForm
-        
-            # Move 'advanced' fields into separate fieldset.
-            # Currently disabled if fieldsets already set, though
-            # could simply append an additional 'advanced' fieldset -- 
-            # but then the plugin can't customise the advanced fields
-            if not self.__class__.fieldsets:
-                basic_fields = []
-                advanced_fields = []
-                for f in self.model._meta.fields:
-                    if not f.auto_created and f.editable:
-                        if hasattr(f,'advanced'): 
-                            advanced_fields.append(f.name)
-                        else: basic_fields.append(f.name)
-                if advanced_fields: # leave well enough alone otherwise
-                    self.__class__.fieldsets = (
-                        (None, { 'fields' : basic_fields}),
-                        (_('Advanced options'), 
-                         {'fields' : advanced_fields, 
-                          'classes' : ('collapse',)})
-                        )
-
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
         
@@ -113,7 +107,7 @@ class CMSPluginBase(admin.ModelAdmin):
         self.page = None
 
     def render(self, context, instance, placeholder):
-        raise NotImplementedError, "render needs to be implemented"
+        raise NotImplementedError("render needs to be implemented")
     
     @property
     def parent(self):
@@ -131,9 +125,6 @@ class CMSPluginBase(admin.ModelAdmin):
         })
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
-    
-    def get_plugin_media(self, request, context, plugin):
-        return self.pluginmedia
         
     def has_add_permission(self, request, *args, **kwargs):
         """Permission handling change - if user is allowed to change the page
@@ -217,3 +208,19 @@ class CMSPluginBase(admin.ModelAdmin):
     
     def __unicode__(self):
         return self.name
+    
+    #===========================================================================
+    # Deprecated APIs
+    #===========================================================================
+    
+    @property
+    def pluginmedia(self):
+        raise Deprecated(
+            "CMSPluginBase.pluginmedia is deprecated in favor of django-sekizai"
+        )
+        
+    
+    def get_plugin_media(self, request, context, plugin):
+        raise Deprecated(
+            "CMSPluginBase.get_plugin_media is deprecated in favor of django-sekizai"
+        )

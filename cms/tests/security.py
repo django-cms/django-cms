@@ -1,12 +1,11 @@
-from cms.models.pagemodel import Page
+from __future__ import with_statement
+from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
-from cms.test.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 
-    URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_ADD)
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 
+    URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE)
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-
 
 
 class SecurityTests(CMSTestCase):
@@ -14,7 +13,7 @@ class SecurityTests(CMSTestCase):
     Test security issues by trying some naive requests to add/alter/delete data.
     """
     def get_data(self):
-        page = self.create_page()
+        page = create_page("page", "nav_playground.html", "en")
         placeholder = page.placeholders.get(slot='body')
         superuser = self.get_superuser()
         staff = self.get_staff_user_with_no_permissions()
@@ -40,8 +39,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
         
     def test_edit(self):
@@ -50,12 +49,11 @@ class SecurityTests(CMSTestCase):
         """
         page, placeholder, superuser, staff = self.get_data()
         # create the plugin using a superuser
-        plugin_id = self.add_plugin(superuser, page, placeholder, 'en', 'body')
+        plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
         plugin_data = {
-            'plugin_id': plugin_id,
+            'plugin_id': plugin.pk,
             'body': 'newbody',
         }
-        plugin = Text.objects.get(pk=plugin_id)
         self.assertEqual(plugin.body, 'body') # check the body is as expected.
         # log the user out, try to edit the plugin
         self.client.logout()
@@ -63,14 +61,14 @@ class SecurityTests(CMSTestCase):
         response = self.client.post(url, plugin_data)
         # since the user is not logged in, they should be prompted to log in.
         self.assertTemplateUsed(response, 'admin/login.html')
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
-        plugin = Text.objects.get(pk=plugin_id)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
     
     def test_delete(self):
@@ -78,11 +76,11 @@ class SecurityTests(CMSTestCase):
         Test deleting a *PAGE* plugin
         """
         page, placeholder, superuser, staff = self.get_data()
-        plugin_id = self.add_plugin(superuser, page, placeholder, 'en', 'body')
+        plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
         plugin_data = {
-            'plugin_id': plugin_id,
+            'plugin_id': plugin.pk,
         }
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         # log the user out, try to remove the plugin
         self.client.logout()
@@ -90,15 +88,15 @@ class SecurityTests(CMSTestCase):
         # since the user is not logged in, they should be prompted to log in.
         self.assertTemplateUsed(response, 'admin/login.html')
         self.assertEqual(CMSPlugin.objects.count(), 1)
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         
     def test_add_ph(self):
@@ -122,8 +120,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
     
     def test_edit_ph(self):
@@ -131,36 +129,37 @@ class SecurityTests(CMSTestCase):
         Test editing a *NON PAGE* plugin
         """
         page, placeholder, superuser, staff = self.get_data()
-        plugin_id = self.add_plugin(superuser, page, placeholder, 'en', 'body')
-        url = reverse('admin:placeholderapp_example1_edit_plugin', args=(plugin_id,))
+        plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
+        url = reverse('admin:placeholderapp_example1_edit_plugin', args=(plugin.pk,))
         plugin_data = {
             'body': 'newbody',
             'language': 'en',
+            'plugin_id': plugin.pk,
         }
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         # log the user out and try to edit a plugin using PlaceholderAdmin
         self.client.logout()
         response = self.client.post(url, plugin_data)
         # since the user is not logged in, they should be prompted to log in.
         self.assertTemplateUsed(response, 'admin/login.html')
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
-        plugin = Text.objects.get(pk=plugin_id)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
     
     def test_delete_ph(self):
         page, placeholder, superuser, staff = self.get_data()
-        plugin_id = self.add_plugin(superuser, page, placeholder, 'en', 'body')
+        plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
         plugin_data = {
-            'plugin_id': plugin_id,
+            'plugin_id': plugin.pk,
         }
-        plugin = Text.objects.get(pk=plugin_id)
+        plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
         url = reverse('admin:placeholderapp_example1_remove_plugin')
         # log the user out and try to remove a plugin using PlaceholderAdmin
@@ -172,39 +171,20 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)
         
     def test_text_plugin_xss(self):
-        super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-        super_user.set_password("test")
-        super_user.save()
-        
-        self.login_user(super_user)
-        
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
-        plugin_data = {
-            'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-        response = self.client.get(edit_url)
-        self.assertEquals(response.status_code, 200)
-        # ACTUAL TEST STARTS HERE.
-        data = {
-            "body": "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
-        }
-        response = self.client.post(edit_url, data)
-        self.assertEquals(response.status_code, 200)
-        txt = Text.objects.all()[0]
-        self.assertEquals(txt.body, '<div>divcontent</div><a>acontent</a>')
-        
-        self.client.logout()
-        self.user = None
+        page, placeholder, superuser, staff = self.get_data()
+        with self.login_user_context(superuser):
+            plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
+            # ACTUAL TEST STARTS HERE.
+            data = {
+                "body": "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
+            }
+            edit_url = '%s%s/' % (URL_CMS_PLUGIN_EDIT, plugin.pk)
+            response = self.client.post(edit_url, data)
+            self.assertEquals(response.status_code, 200)
+            txt = Text.objects.all()[0]
+            self.assertEquals(txt.body, '<div>divcontent</div><a>acontent</a>')

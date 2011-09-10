@@ -1,109 +1,129 @@
 #-*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.middleware.multilingual import MultilingualURLMiddleware
-from cms.middleware.toolbar import inster_after_tag, ToolbarMiddleware
-from cms.test.testcases import CMSTestCase
-from cms.test.util.context_managers import SettingsOverride
+from cms.middleware.multilingual import MultilingualURLMiddleware, HAS_LANG_PREFIX_RE
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.mock import AttributeObject
+from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
+import django
 
 class MiddlewareTestCase(CMSTestCase):
-    
-    def test_01_toolbar_helpers_insert_after_tag(self):
-        test_string_1 = None
-        test_string_2 = ""
-        test_string_3 = "<a href='test'>A test!</a>"
-        test_string_4 = "<p>A test!</p>"
-        
-        tag = 'a'
-        
-        insertion = '*Insertion*'
-        
-        result = inster_after_tag(test_string_1, tag, insertion)
-        self.assertEqual(result, None)
-        result = inster_after_tag(test_string_2, tag, insertion)
-        self.assertEqual(result, "")
-        result = inster_after_tag(test_string_3, tag, insertion)
-        self.assertEqual(result, "<a href='test'>*Insertion*A test!</a>")
-        result = inster_after_tag(test_string_4, tag, insertion)
-        self.assertEqual(result, "<p>A test!</p>")
-        
-        
-    def test_02_toolbar_middleware_show_toolbar(self):
-        class Mock:
-            pass
-        
-        middle = ToolbarMiddleware()
-        
-        request = Mock()
-        response = Mock()
-        
-        # if request.is_ajax(): 
-        setattr(request,'is_ajax', lambda : True)
-        result = middle.show_toolbar(request, response)
-        self.assertEqual(result, False)
-        
-        #if response.status_code != 200: 
-        setattr(request,'is_ajax', lambda : False)
-        setattr(response, 'status_code', 201)
-        result = middle.show_toolbar(request, response)
-        self.assertEqual(result, False)
-        setattr(response, 'status_code', 200)
-        
-        #if not response['Content-Type'].split(';')[0] in HTML_TYPES:
-        setattr(response, '__getitem__', lambda _: 'Whatever')
-        result = middle.show_toolbar(request, response)
-        self.assertEqual(result, False)
-        setattr(response, '__getitem__', lambda _: 'text/html')
-        
-        #if is_media_request(request):
-        setattr(request, 'path', '/media/')
-        result = middle.show_toolbar(request, response)
-        self.assertEqual(result, False)
-        
-        setattr(request, 'path', '')
-        
-        #if "edit" in request.GET: 
-        setattr(request, 'GET', ["edit"])
-        result = middle.show_toolbar(request, response)
-        self.assertEqual(result, True)
-        setattr(request, 'GET', [])
-        
-        #if not hasattr(request, "user"):
-        result = middle.show_toolbar(request, response)
-        self.assertEqual(result, False)
-        setattr(request, 'user', 'test-user')
-        
-    def test_03_multilingual_middleware_get_lang_from_request(self):
-        class Mock:
-            pass
+    def test_multilingual_middleware_get_lang_from_request(self):
         
         middle = MultilingualURLMiddleware()
         
+        KLINGON = 'x-klingon'
+        ELVISH = 'x-elvish'
         
-        with SettingsOverride(CMS_LANGUAGES = {'klingon':'Klingon'}):
-            request = Mock()
-            setattr(request, 'session', {})
-            setattr(request,'path_info', '/en/whatever')
-            setattr(request,'path', '/en/whatever')
+        with SettingsOverride(CMS_LANGUAGES=((KLINGON, 'Klingon'),)):
+            request = AttributeObject(
+                session={},
+                path_info='/en/whatever',
+                path='/en/whatever'
+            )
             result = middle.get_language_from_request(request)
             self.assertEqual(result, 'en')
-        
-            setattr(request,'path_info', 'whatever')
-            setattr(request,'path', 'whatever')
-            setattr(request,'session', {'django_language':'klingon'})
-            setattr(request,'COOKIES', {})
-            setattr(request,'META', {})
-            result = middle.get_language_from_request(request)
-            self.assertEqual(result, 'klingon') # the session's language. Nerd.
             
-            request = Mock()
-            setattr(request,'path_info', 'whatever')
-            setattr(request,'path', 'whatever')
-            setattr(request,'COOKIES', {'django_language':'klingon'})
-            setattr(request,'META', {})
+            
+            request = AttributeObject(
+                session={
+                    'django_language': KLINGON,
+                },
+                path_info='whatever',
+                path='whatever',
+                COOKIES={},
+                META={},
+            )
             result = middle.get_language_from_request(request)
-            self.assertEqual(result, 'klingon') # the cookies language.
+            self.assertEqual(result, KLINGON) # the session's language. Nerd.
+            
+            
+            request = AttributeObject(
+                path_info='whatever',
+                path='whatever',
+                COOKIES={
+                    'django_language': KLINGON,
+                },
+                META={},
+            )
+            result = middle.get_language_from_request(request)
+            self.assertEqual(result, KLINGON) # the cookies language.
             
             # Now the following should revert to the default language (en)
-            setattr(request,'COOKIES', {'django_language':'elvish'})
+            request.COOKIES['django_language'] = ELVISH
             result = middle.get_language_from_request(request)
             self.assertEqual(result, 'en') # The default
+
+
+    def test_multilingual_middleware_ignores_static_url(self):
+
+        middle = MultilingualURLMiddleware()
+        KLINGON = 'x-klingon'
+        
+        with SettingsOverride(CMS_LANGUAGES=((KLINGON, 'Klingon'),)):
+            request = AttributeObject(
+                session={},
+                path_info='whatever',
+                path='whatever',
+                COOKIES={
+                    'django_language': KLINGON,
+                },
+                META = {},
+                LANGUAGE_CODE = KLINGON
+            )
+            html = """<ul>
+                <li><a href="/some-page/">some page</a></li>
+                <li><a href="%simages/some-media-file.jpg">some media file</a></li>
+                <li><a href="%simages/some-static-file.jpg">some static file</a></li>
+                <li><a href="%simages/some-admin-file.jpg">some admin media file</a></li>
+                <li><a href="%simages/some-other-file.jpg">some static file</a></li>
+                </ul>""" %(
+                    settings.MEDIA_URL,
+                    settings.STATIC_URL,
+                    settings.ADMIN_MEDIA_PREFIX,
+                    '/some-path/',
+                )
+            
+            response = middle.process_response(request,HttpResponse(html))
+            
+            # These paths shall be prefixed
+            self.assertTrue('href="/%s/some-page/' %KLINGON in response.content)
+            self.assertTrue('href="/%s%simages/some-other-file.jpg' %(KLINGON, '/some-path/') in response.content)
+
+            # These shall not
+            self.assertTrue('href="%simages/some-media-file.jpg' %settings.MEDIA_URL in response.content)
+            self.assertTrue('href="%simages/some-static-file.jpg' %settings.STATIC_URL in response.content)            
+            self.assertTrue('href="%simages/some-admin-file.jpg' %settings.ADMIN_MEDIA_PREFIX in response.content)
+            
+    
+    def test_multilingual_middleware_handles_redirections(self):
+
+        middle = MultilingualURLMiddleware()
+
+        request = AttributeObject(
+            session={},
+            path_info='whatever',
+            path='whatever',
+            COOKIES={
+                'django_language': 'en',
+            },
+            META = {},
+            LANGUAGE_CODE = 'en'
+        )
+        
+        # Don't re-prefix
+        response = middle.process_response(request,HttpResponseRedirect('/en/some-path/'))
+        self.assertTrue(response['Location'] == '/en/some-path/')
+
+        response = middle.process_response(request,HttpResponseRedirect('%ssome-path/'%settings.MEDIA_URL))
+        self.assertTrue(response['Location'] == '%ssome-path/' %settings.MEDIA_URL)
+
+        response = middle.process_response(request,HttpResponseRedirect('%ssome-path/'%settings.STATIC_URL))
+        self.assertTrue(response['Location'] == '%ssome-path/' %settings.STATIC_URL)
+        
+
+        # Prefix
+        response = middle.process_response(request,HttpResponseRedirect('/xx/some-path/'))
+        self.assertTrue(response['Location'] == '/en/xx/some-path/')
+

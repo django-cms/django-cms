@@ -5,8 +5,10 @@ class PluginAlreadyRegistered(Exception):
 class PluginNotRegistered(Exception):
     pass
 
-class AppAllreadyRegistered(Exception):
+class AppAlreadyRegistered(Exception):
     pass
+
+AppAllreadyRegistered = AppAlreadyRegistered # backwards compatibility, will be dropped in 2.3
 
 class NotImplemented(Exception):
     pass
@@ -28,6 +30,8 @@ class PermissionsException(Exception):
 class NoPermissionsException(PermissionsException):
     """Can be fired when some violate action is performed on permission system. 
     """
+    
+class Deprecated(Exception): pass
     
 class DuplicatePlaceholderWarning(Warning): pass
 

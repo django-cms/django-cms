@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-VERSION = (2, 1, 4, 'final')
-if VERSION[-1] != "final": # pragma: no cover
-    __version__ = '.'.join(map(str, VERSION))
-else: # pragma: no cover
-    __version__ = '.'.join(map(str, VERSION[:-1]))
-
+__version__ = '2.2'
 
 # patch settings 
 try:

@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db import models
-from django.contrib.sites.models import Site
-from django.db.models import Q
+from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.exceptions import NoPermissionsException
-from publisher import PublisherManager
 from cms.models.query import PageQuerySet
+from cms.publisher import PublisherManager
 from cms.utils.i18n import get_fallback_languages
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.db import models
+from django.db.models import Q
 
 
-try:
-    set
-except NameError:
-    from sets import Set as set
 
-    
 class PageManager(PublisherManager):
     """Use draft() and public() methods for accessing the corresponding
     instances.
@@ -25,6 +21,16 @@ class PageManager(PublisherManager):
         """
         return PageQuerySet(self.model)
     
+    def drafts(self):
+        return super(PageManager, self).drafts().exclude(
+            publisher_state=self.model.PUBLISHER_STATE_DELETE
+        )
+    
+    def public(self):
+        return super(PageManager, self).public().exclude(
+            publisher_state=self.model.PUBLISHER_STATE_DELETE
+        )
+
     
     # !IMPORTANT: following methods always return access to draft instances, 
     # take care on what you do one them. use Page.objects.public() for accessing
@@ -182,12 +188,14 @@ class TitleManager(PublisherManager):
         base_fields = [
             'slug',
             'title',
-            'application_urls',
-            'redirect',
             'meta_description',
             'meta_keywords',
             'page_title',
             'menu_title'
+        ]
+        advanced_fields = [
+            'application_urls',
+            'redirect',
         ]
         cleaned_data = form.cleaned_data
         try:
@@ -204,6 +212,10 @@ class TitleManager(PublisherManager):
                 if overwrite_url:
                     data['has_url_overwrite'] = True
                     data['path'] = overwrite_url
+                for field in advanced_fields:
+                    value = cleaned_data.get(field, None)
+                    if value:
+                        data[field] = value
             return self.create(**data)
         
         for name in base_fields:
@@ -213,6 +225,8 @@ class TitleManager(PublisherManager):
             overwrite_url = cleaned_data.get('overwrite_url', None)
             obj.has_url_overwrite = bool(overwrite_url)
             obj.path = overwrite_url
+            for field in advanced_fields:
+                setattr(obj, field, cleaned_data.get(field, None))
         obj.save()
         return obj
 
@@ -282,7 +296,7 @@ class PagePermissionManager(BasicPagePermissionManager):
             
             User permissions can be assigned to multiple page nodes, so merge of 
             all of them is required. In this case user can see permissions for 
-            users C,X,D,Y,I,J but not A, because A user in higher in hierarchy.            
+            users C,X,D,Y,I,J but not A, because A user in higher in hierarchy.
         
         If permission object holds group, this permission object can be visible 
         to user only if all of the group members are lover in hierarchy. If any 
@@ -304,10 +318,11 @@ class PagePermissionManager(BasicPagePermissionManager):
         try:
             user_level = get_user_permission_level(user)
         except NoPermissionsException:
-            return self.get_empty_query_set()
-        
+            return self.none()
+        # get current site
+        site = Site.objects.get_current()
         # get all permissions
-        page_id_allow_list = Page.permissions.get_change_permissions_id_list(user)
+        page_id_allow_list = Page.permissions.get_change_permissions_id_list(user,site)
         
         # get permission set, but without objects targeting user, or any group 
         # in which he can be
@@ -339,12 +354,11 @@ class PagePermissionManager(BasicPagePermissionManager):
 class PagePermissionsPermissionManager(models.Manager):
     """Page permissions permission manager.
     
-    !IMPORTANT: this actually points to Page model, not to PagePermission. Seems 
-    this will be better approach. Accessible under permissions.
+    !IMPORTANT: this actually points to Page model, not to PagePermission.
+    Seems this will be better approach. Accessible under permissions.
     
     Maybe this even shouldn't be a manager - it mixes different models together.
     """
-    
     # we will return this in case we have a superuser, or permissions are not
     # enabled/configured in settings
     GRANT_ALL = 'All'
@@ -396,7 +410,6 @@ class PagePermissionsPermissionManager(models.Manager):
         """
         return self.__get_id_list(user, site, "can_move_page")
     
-    
     def get_moderate_id_list(self, user, site):
         """Give a list of pages which user can moderate. If moderation isn't 
         installed, nobody can moderate. 
@@ -404,6 +417,11 @@ class PagePermissionsPermissionManager(models.Manager):
         if not settings.CMS_MODERATOR:
             return []
         return self.__get_id_list(user, site, "can_moderate")
+
+    def get_view_id_list(self, user, site):
+        """Give a list of pages which user can view.
+        """
+        return self.__get_id_list(user, site, "can_view")
     
     '''
     def get_change_list_id_list(self, user, site):
@@ -428,29 +446,26 @@ class PagePermissionsPermissionManager(models.Manager):
     '''    
     
     def __get_id_list(self, user, site, attr):
-        # TODO: result of this method should be cached per user, and cache should
-        # be cleaned after some change in permissions / globalpermission
-        
-        if not user.is_authenticated() or not user.is_staff:
-            return []
-        
+        from cms.models import (GlobalPagePermission, PagePermission,
+                                MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
+        if attr != "can_view":
+            if not user.is_authenticated() or not user.is_staff:
+                return []
         if user.is_superuser or not settings.CMS_PERMISSION:
             # got superuser, or permissions aren't enabled? just return grant 
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
-        
         # read from cache if posssible
-        #cached = get_permission_cache(user, attr)
-        #if cached is not None:
-        #    return cached
-        
-        from cms.models import GlobalPagePermission, PagePermission, MASK_PAGE,\
-            MASK_CHILDREN, MASK_DESCENDANTS
+        cached = get_permission_cache(user, attr)
+        if cached is not None:
+            return cached
         # check global permissions
-        in_global_permissions = GlobalPagePermission.objects.with_user(user).filter(**{attr: True, 'sites__in':[site]}).count()
-        if in_global_permissions:
+        global_permissions = GlobalPagePermission.objects.with_user(user)
+        if global_permissions.filter(**{
+                attr: True, 'sites__in':[site]
+            }).exists():
             # user or his group are allowed to do `attr` action
-            # !IMPORTANT: page permissions must not override global permissions 
+            # !IMPORTANT: page permissions must not override global permissions
             return PagePermissionsPermissionManager.GRANT_ALL
         # for standard users without global permissions, get all pages for him or
         # his group/s
@@ -458,9 +473,9 @@ class PagePermissionsPermissionManager(models.Manager):
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
         # default is denny...
         page_id_allow_list = []
+        
         for permission in qs:
-            is_allowed = getattr(permission, attr)
-            if is_allowed:
+            if getattr(permission, attr):
 
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
@@ -469,7 +484,8 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        #set_permission_cache(user, attr, page_id_allow_list)
+        # store value in cache
+        set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list
 
 

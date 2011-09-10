@@ -8,6 +8,7 @@ from cms.plugin_rendering import render_plugins, render_placeholder
 from cms.plugins.utils import get_plugins
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -16,7 +17,6 @@ from django.core.mail import mail_managers
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from itertools import chain
-import operator
 import re
 
 register = template.Library()
@@ -25,8 +25,8 @@ def get_site_id(site):
     if site:
         if isinstance(site, Site):
             site_id = site.id
-        elif isinstance(site, int):
-            site_id = site
+        elif isinstance(site, int) or (isinstance(site, basestring) and site.isdigit()):
+            site_id = int(site)
         else:
             site_id = settings.SITE_ID
     else:
@@ -82,7 +82,8 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            mail_managers(subject, body, fail_silently=True)
+            if settings.SEND_BROKEN_LINK_EMAILS:
+                mail_managers(subject, body, fail_silently=True)
             return None
 
 class PageUrl(InclusionTag):
@@ -111,7 +112,7 @@ class PageUrl(InclusionTag):
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, settings.CMS_CONTENT_CACHE_DURATION)
+                cache.set(cache_key, url, settings.CMS_CACHE_DURATIONS['content'])
         if url:
             return {'content': url}
         return {'content': ''}
@@ -141,9 +142,6 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             continue
         if not get_plugins(request, placeholder):
             continue
-        if hasattr(request, 'placeholder_media'):
-            request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
-        #request.placeholder_media += placeholder.get_media(request, context)
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
@@ -196,6 +194,7 @@ class Placeholder(Tag):
     )
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
+        validate_placeholder_name(name)
         width = None
         inherit = False
         for bit in extra_bits:
@@ -319,6 +318,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
+    validate_placeholder_name(placeholder_name)
+    
     request = context.get('request', False)
     site_id = get_site_id(site)
 
@@ -337,7 +338,12 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         page = _get_page_by_untyped_arg(page_lookup, request, site_id)
         if not page:
             return {'content': ''}
-        placeholder = page.placeholders.get(slot=placeholder_name)
+        try:
+            placeholder = page.placeholders.get(slot=placeholder_name)
+        except Placeholder.DoesNotExist:
+            if settings.DEBUG:
+                raise
+            return {'content': ''}
         baseqs = get_cmsplugin_queryset(request)
         plugins = baseqs.filter(
             placeholder=placeholder,
@@ -349,7 +355,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         content = "".join(c)
 
     if cache_result:
-        cache.set(cache_key, content, settings.CMS_CONTENT_CACHE_DURATION)
+        cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
 
     if content:
         return {'content': mark_safe(content)}
@@ -384,48 +390,29 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
-        kwargs['cache_result'] = True
+        kwargs['cache_result'] = False
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
 
-class PluginsMedia(Tag):
-    """
-    This template node is used to output media for plugins.
 
-    eg: {% plugins_media %}
-
-    You can also pass the object a page_lookup arg if you want to output media tags for a specific
-    page other than the current page.
-
-    eg: {% plugins_media "gallery" %}
-    """
-    name = 'plugins_media'
-    options = Options(
-        Argument('page_lookup', required=False, default=None),
-    )
+class CMSToolbar(InclusionTag):
+    template = 'cms/toolbar/toolbar.html'
+    name = 'cms_toolbar'
     
-    def render_tag(self, context, page_lookup):
-        if not 'request' in context:
+    def render(self, context):
+        request = context.get('request', None)
+        if not request:
             return ''
-        request = context['request']
-        from cms.plugins.utils import get_plugins_media
-        plugins_media = None
-        if page_lookup:
-            page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-            plugins_media = get_plugins_media(request, context, page)
-        else:
-            page = request.current_page
-            if page == "dummy":
-                return ''
-            # make sure the plugin cache is filled
-            plugins_media = get_plugins_media(request, context, request._current_page_cache)
-        if plugins_media:
-            return plugins_media.render()
-        else:
-            return u''
-
-    def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % getattr(self, 'name', '')
-register.tag(PluginsMedia)
+        toolbar = getattr(request, 'toolbar', None)
+        if not toolbar:
+            return ''
+        if not toolbar.show_toolbar:
+            return ''
+        return super(CMSToolbar, self).render(context)
+    
+    def get_context(self, context):
+        context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
+        return context
+register.tag(CMSToolbar)
