@@ -357,13 +357,7 @@ class PlaceholderAdminTest(CMSTestCase):
         return admin.site._registry[Example1]
     
     def get_post_request(self, data):
-        request = self.get_request()
-        request.POST._mutable = True
-        request.POST.update(data)
-        request.POST._mutable = False
-        request.method = 'POST'
-        request.environ['METHOD'] = 'POST'
-        return request
+        return self.get_request(post_data=data)
     
     def test_global_limit(self):
         placeholder = self.get_placeholder()
@@ -470,7 +464,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
 
 
     def test_plugin_edit_requires_permissions(self):
-        """User wants to edi a plugin to the example app placeholder but has no permissions"""
+        """User wants to edit a plugin to the example app placeholder but has no permissions"""
         self._create_example()
         self._create_plugin()
         normal_guy = self._testuser()
@@ -495,7 +489,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
         response = admin.edit_plugin(request, self._plugin.id)
         # It looks like it breaks here because of a missing csrf token in the request
         # I have no idea how to fix this
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code, response)
 
 
 class PlaceholderConfTests(TestCase):
@@ -514,6 +508,7 @@ class PlaceholderConfTests(TestCase):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
+
     def test_get_all_plugins_inherit(self):
         parent = create_page('parent', 'col_two.html', 'en')
         page = create_page('page', CMS_TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
