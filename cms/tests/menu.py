@@ -7,7 +7,8 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
     SoftrootFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.context_managers import (SettingsOverride, 
+    LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
@@ -813,17 +814,19 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
-        context = self.get_context(a.get_absolute_url())
-        with self.assertNumQueries(4):
-            """
-            The 4 queries should be:
-                get all pages
-                get all page permissions
-                get all titles
-                set the menu cache key
-            """
-            tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
-            tpl.render(context)
+        with LanguageOverride('en'):
+            context = self.get_context(a.get_absolute_url())
+            with self.assertNumQueries(4):
+                """
+                The 4 queries should be:
+                    get all pages
+                    get all page permissions
+                    get all titles
+                    set the menu cache key
+                """
+                # Actually seems to run:
+                tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+                tpl.render(context)
 
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):

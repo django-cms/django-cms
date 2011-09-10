@@ -41,8 +41,9 @@ class ToolbarUserMixin(object):
 class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
     settings_overrides = {'CMS_MODERATOR': False}
 
-    def setUp(self):
-        self.request_factory = RequestFactory()
+    @property
+    def request_factory(self):
+        return RequestFactory()
 
     def test_toolbar_no_page_anon(self):
         request = self.request_factory.get('/')
@@ -223,6 +224,7 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
                            created_by=superuser, published=True)
         request = self.request_factory.get('%s?edit' % page.get_absolute_url())
         request.current_page = page
+        request.user = AnonymousUser()
         SessionMiddleware().process_request(request)
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
@@ -233,6 +235,7 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
                            created_by=superuser, published=True)
         request = self.request_factory.get(page.get_absolute_url())
         request.current_page = page
+        request.user = AnonymousUser()
         SessionMiddleware().process_request(request)
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.show_toolbar)
