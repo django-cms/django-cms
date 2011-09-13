@@ -13,17 +13,18 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     CMS_PLACEHOLDER_CONF['placeholder'], if no template is given only the latter
     is checked.
     """
-    keys = []
-    if template:
-        keys.append("%s %s" % (template, placeholder))
-    keys.append(placeholder)
-    for key in keys:
-        conf = settings.CMS_PLACEHOLDER_CONF.get(key)
-        if not conf:
-            continue
-        value = conf.get(setting)
-        if value:
-            return value
+    if placeholder:
+        keys = []
+        if template:
+            keys.append("%s %s" % (template, placeholder))
+        keys.append(placeholder)
+        for key in keys:
+            conf = settings.CMS_PLACEHOLDER_CONF.get(key)
+            if not conf:
+                continue
+            value = conf.get(setting)
+            if value:
+                return value
     return default
 
 def get_page_from_placeholder_if_exists(placeholder):

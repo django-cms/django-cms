@@ -307,7 +307,6 @@ class Page(MPTTModel):
         
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
-        
         if self.publisher_is_draft:
             # publisher specific stuff, but only on draft model, this is here 
             # because page initializes publish process
@@ -366,11 +365,6 @@ class Page(MPTTModel):
                 if commit and publish_directly:
                     
                     self.publish()
-                    
-            elif self.publisher_public and self.publisher_public.published:
-                self.publisher_public.published = False
-                self.publisher_public.save()
-                
                 
     def save_base(self, *args, **kwargs):
         """Overriden save_base. If an instance is draft, and was changed, mark
@@ -940,6 +934,15 @@ class Page(MPTTModel):
                 '%s__gt' % opts.left_attr: getattr(self, opts.right_attr),
             })
 
+        # publisher stuff
+        filters.update({
+            'publisher_is_draft': self.publisher_is_draft
+        })
+        # multisite
+        filters.update({
+            'site__id': self.site_id
+        })
+
         sibling = None
         try:
             sibling = self._tree_manager.filter(**filters)[0]
@@ -965,7 +968,16 @@ class Page(MPTTModel):
                 '%s__lt' % opts.right_attr: getattr(self, opts.left_attr),
             })
             order_by = '-%s' % opts.right_attr
-
+        
+        # publisher stuff
+        filters.update({
+            'publisher_is_draft': self.publisher_is_draft
+        })
+        # multisite
+        filters.update({
+            'site__id': self.site_id
+        })
+        
         sibling = None
         try:
             sibling = self._tree_manager.filter(**filters).order_by(order_by)[0]
@@ -981,7 +993,7 @@ class Page(MPTTModel):
             obj - public variant of `self` to be saved.
 
         """
-        prev_sibling = self.get_previous_filtered_sibling(publisher_is_draft=True, publisher_public__isnull=False)
+        prev_sibling = self.get_previous_filtered_sibling(publisher_public__isnull=False)
 
         if not self.publisher_public_id:
             # is there anybody on left side?

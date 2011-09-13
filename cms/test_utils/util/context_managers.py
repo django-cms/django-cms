@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.core.signals import request_started
 from django.db import reset_queries
+from django.template import context
 from django.utils.translation import get_language, activate
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp, _exists
@@ -24,6 +25,9 @@ class SettingsOverride(object):
     
     def __init__(self, **overrides):
         self.overrides = overrides
+        self.special_handlers = {
+            'TEMPLATE_CONTEXT_PROCESSORS': self.template_context_processors,
+        }
         
     def __enter__(self):
         self.old = {}
@@ -37,6 +41,10 @@ class SettingsOverride(object):
                 setattr(settings, key, value)
             else:
                 delattr(settings,key) # do not pollute the context!
+            self.special_handlers.get(key, lambda:None)()
+    
+    def template_context_processors(self):
+        context._standard_context_processors = None
 
 
 class StdOverride(object):

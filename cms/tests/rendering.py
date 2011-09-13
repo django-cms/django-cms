@@ -10,7 +10,6 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
 from django.contrib.auth.models import User
-from django.forms.widgets import Media
 from django.http import Http404, HttpResponseRedirect
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext
@@ -106,19 +105,13 @@ class RenderingTestCase(SettingsOverrideTestCase):
     def get_request(self, page, *args, **kwargs):
         request = super(RenderingTestCase, self).get_request(*args, **kwargs)
         request.current_page = page
-        request.placeholder_media = Media()
         return request
-
-    def render_settings(self):
-        return dict(
-            CMS_TEMPLATES = ((TEMPLATE_NAME, ''),)
-        )
 
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
 
     def render(self, template, page, context_vars={}):
-        with SettingsOverride(**self.render_settings()):
+        with SettingsOverride(CMS_TEMPLATES=[(TEMPLATE_NAME, '')]):
             c = self.get_context(page, context_vars)
             t = Template(template)
             r = t.render(c)
@@ -128,7 +121,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         """
         Tests that the `detail` view is working.
         """
-        with SettingsOverride(**self.render_settings()):
+        with SettingsOverride(CMS_TEMPLATES=[(TEMPLATE_NAME, '')]):
             from cms.views import details
             response = details(self.get_request(self.test_page), '')
             r = self.strip_rendered(response.content)
@@ -186,29 +179,53 @@ class RenderingTestCase(SettingsOverrideTestCase):
         r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
 
-    def test_show_uncached_placeholder(self):
+    def test_show_uncached_placeholder_by_pk(self):
         """
-        Tests the {% show_uncached_placeholder %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
+        Tests the {% show_uncached_placeholder %} templatetag, using lookup by pk.
         """
-        t = u'{% load cms_tags %}'+ \
-            u'|{% show_uncached_placeholder "main" '+str(self.test_page.pk)+' %}'+ \
-            u'|{% show_uncached_placeholder "main" test_dict %}'+ \
-            u'|{% show_uncached_placeholder "sub" "'+str(self.test_page.reverse_id)+'" %}'+ \
-            u'|{% show_uncached_placeholder "sub" test_page %}'
-        r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
-        self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
+        template = u'{%% load cms_tags %%}{%% show_uncached_placeholder "main" %s %%}' % self.test_page.pk
+        output = self.render(template, self.test_page)
+        self.assertEqual(output, self.test_data['text_main'])
 
-    def test_page_url(self):
-        """
-        Tests the {% page_url %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
-        """
-        t = u'{% load cms_tags %}'+ \
-            u'|{% page_url '+str(self.test_page2.pk)+' %}'+ \
-            u'|{% page_url test_dict %}'+ \
-            u'|{% page_url "'+str(self.test_page2.reverse_id)+'" %}'+ \
-            u'|{% page_url test_page %}'
-        r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
-        self.assertEqual(r, (u'|'+self.test_page2.get_absolute_url())*4)
+    def test_show_uncached_placeholder_by_lookup_dict(self):
+        template = u'{% load cms_tags %}{% show_uncached_placeholder "main" test_dict %}'
+        output = self.render(template, self.test_page, {'test_dict': {'pk': self.test_page.pk}})
+        self.assertEqual(output, self.test_data['text_main'])
+
+    def test_show_uncached_placeholder_by_reverse_id(self):
+        template = u'{%% load cms_tags %%}{%% show_uncached_placeholder "sub" "%s" %%}' % self.test_page.reverse_id
+        output = self.render(template, self.test_page)
+        self.assertEqual(output, self.test_data['text_sub'])
+
+    def test_show_uncached_placeholder_by_page(self):
+        template = u'{% load cms_tags %}{% show_uncached_placeholder "sub" test_page %}'
+        output = self.render(template, self.test_page, {'test_page': self.test_page})
+        self.assertEqual(output, self.test_data['text_sub'])
+        
+    def test_page_url_by_pk(self):
+        template = u'{%% load cms_tags %%}{%% page_url %s %%}' % self.test_page2.pk
+        output = self.render(template, self.test_page)
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+        
+    def test_page_url_by_dictionary(self):
+        template = u'{% load cms_tags %}{% page_url test_dict %}'
+        output =  self.render(template, self.test_page, {'test_dict': {'pk': self.test_page2.pk}})
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+        
+    def test_page_url_by_reverse_id(self):
+        template = u'{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
+        output = self.render(template, self.test_page)
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+        
+    def test_page_url_by_reverse_id_not_on_a_page(self):
+        template = u'{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
+        output = self.render(template, None)
+        self.assertEqual(output, self.test_page2.get_absolute_url())
+    
+    def test_page_url_by_page(self):
+        template = u'{% load cms_tags %}{% page_url test_page %}'
+        output = self.render(template, self.test_page, {'test_page': self.test_page2})
+        self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_attribute(self):
         """

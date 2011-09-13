@@ -515,6 +515,22 @@ class PagesTestCase(CMSTestCase):
             resp = self.client.get('/en/page/')
             self.assertEqual(resp.status_code, HttpResponseNotFound.status_code)
 
+    def test_public_home_page_replaced(self):
+        """Test that publishing changes to the home page doesn't move the public version"""
+        home = create_page('home', 'nav_playground.html', 'en', published = True, slug = 'home')
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        home.publish()
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+        other = create_page('other', 'nav_playground.html', 'en', published = True, slug = 'other')
+        other.publish()
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+        home = Page.objects.get(pk = home.id)
+        home.in_navigation = True
+        home.save()
+        home.publish()
+        self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
+        self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
 class NoAdminPageTests(CMSTestCase):
     urls = 'project.noadmin_urls'
@@ -532,3 +548,27 @@ class NoAdminPageTests(CMSTestCase):
         request = self.get_request('/admin/')
         page = get_page_from_request(request)
         self.assertEqual(page, None)
+
+class PreviousFilteredSiblingsTests(CMSTestCase):
+    def test_with_publisher(self):
+        home = create_page('home', 'nav_playground.html', 'en', published=True)
+        home.publish()
+        other = create_page('other', 'nav_playground.html', 'en', published=True)
+        other.publish()
+        other = Page.objects.get(pk=other.pk)
+        home = Page.objects.get(pk=home.pk)
+        self.assertEqual(other.get_previous_filtered_sibling(), home)
+        self.assertEqual(home.get_previous_filtered_sibling(), None)
+        
+    def test_multisite(self):
+        firstsite = Site.objects.create(name='first', domain='first.com')
+        secondsite = Site.objects.create(name='second', domain='second.com')
+        home = create_page('home', 'nav_playground.html', 'en', published=True, site=firstsite)
+        home.publish()
+        other = create_page('other', 'nav_playground.html', 'en', published=True, site=secondsite)
+        other.publish()
+        other = Page.objects.get(pk=other.pk)
+        home = Page.objects.get(pk=home.pk)
+        self.assertEqual(other.get_previous_filtered_sibling(), None)
+        self.assertEqual(home.get_previous_filtered_sibling(), None)
+        

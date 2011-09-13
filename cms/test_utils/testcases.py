@@ -2,23 +2,21 @@
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext, 
     SettingsOverride, _AssertNumQueriesContext)
+from cms.test_utils.util.request_factory import RequestFactory
 from django.conf import settings
-from django.db.utils import DEFAULT_DB_ALIAS
-from django.db import connections
-
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
+from django.db import connections
+from django.db.utils import DEFAULT_DB_ALIAS
 from django.template.context import Context
-from django.test.client import (encode_multipart, BOUNDARY, MULTIPART_CONTENT, 
-    FakePayload)
 from django.test import testcases
+from django.test.client import Client
 from menus.menu_pool import menu_pool
-from urlparse import urlparse
 import sys
 import urllib
 import warnings
+
 
 
 URL_CMS_PAGE = "/admin/cms/page/"
@@ -107,6 +105,7 @@ class CMSTestCase(TestCase):
     def _fixture_setup(self):
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
+        self.client = Client()
     
     def create_fixtures(self):
         pass
@@ -238,50 +237,22 @@ class CMSTestCase(TestCase):
         return Context(context)   
         
     def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False):
+        factory = RequestFactory()
+        
         if not path:
             path = self.get_pages_root()
         
         if not language:
             language = settings.LANGUAGES[0][0]
         
-        parsed_path = urlparse(path)
-        host = parsed_path.netloc or 'testserver'
-        port = 80
-        if ':' in host:
-            host, port = host.split(':', 1)
-        
-        environ = {
-            'HTTP_COOKIE':       self.client.cookies,
-            'PATH_INFO':         parsed_path.path,
-            'QUERY_STRING':      parsed_path.query,
-            'REMOTE_ADDR':       '127.0.0.1',
-            'REQUEST_METHOD':    'GET',
-            'SCRIPT_NAME':       '',
-            'SERVER_NAME':       host,
-            'SERVER_PORT':       port,
-            'SERVER_PROTOCOL':   'HTTP/1.1',
-            'wsgi.version':      (1,0),
-            'wsgi.url_scheme':   'http',
-            'wsgi.errors':       self.client.errors,
-            'wsgi.multiprocess': True,
-            'wsgi.multithread':  False,
-            'wsgi.run_once':     False,
-            'wsgi.input':        ''
-        }
         if post_data:
-            post_data = encode_multipart(BOUNDARY, post_data)
-            environ.update({
-                    'CONTENT_LENGTH': len(post_data),
-                    'CONTENT_TYPE':   MULTIPART_CONTENT,
-                    'REQUEST_METHOD': 'POST',
-                    'wsgi.input':     FakePayload(post_data),
-            })
-        request = WSGIRequest(environ)
+            request = factory.post(path, post_data)
+        else:
+            request = factory.get(path)
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
-        if not enforce_csrf_checks:
-            request.csrf_processing_done = True 
+        request._dont_enforce_csrf_checks = not enforce_csrf_checks
         return request
     
     def check_published_page_attributes(self, page):
