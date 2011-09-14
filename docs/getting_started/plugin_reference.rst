@@ -135,10 +135,10 @@ create a file called ``picture.html`` in there. Here is an example
 
     {% if picture.url %}<a href="{{ picture.url }}">{% endif %}
     {% ifequal placeholder "content" %}
-        <img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
+        <img src="{% thumbnail picture.image.name "484x1500" upscale as im %}{{ im.url }}{% endthumbnail %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
     {% endifequal %}
     {% ifequal placeholder "teaser" %}
-        <img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
+        <img src="{% thumbnail picture.image.name "484x1500" upscale as im %}{{ im.url }}{% endthumbnail %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
     {% endifequal %}
     {% if picture.url %}</a>{% endif %}
 
