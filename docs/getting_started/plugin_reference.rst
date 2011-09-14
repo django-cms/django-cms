@@ -122,7 +122,7 @@ setting in your project's ``settings.py`` file::
     )
 
 If you want to resize the picture you can get a thumbnail library. We
-recommend `sorl.thumbnail <http://code.google.com/p/sorl-thumbnail/>`_.
+recommend `sorl.thumbnail <http://thumbnail.sorl.net/>`_.
 
 In your project template directory create a folder called ``cms/plugins`` and
 create a file called ``picture.html`` in there. Here is an example
