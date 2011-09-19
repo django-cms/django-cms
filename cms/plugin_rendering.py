@@ -6,6 +6,7 @@ from cms.utils import get_language_from_request
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
     get_placeholder_conf)
+from cms.utils.i18n import get_fallback_languages, get_default_language
 from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import title
@@ -91,7 +92,15 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context = context_to_copy 
     context.push()
     request = context['request']
+    lang = get_language_from_request(request)
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
+    if not plugins and settings.CMS_LANGUAGE_FALLBACK and lang != get_default_language():
+        fallbacks = get_fallback_languages(lang)
+        for l in fallbacks:
+            plugins = [plugin for plugin in get_plugins(request, placeholder, l)]
+            if plugins:
+                break
+
     page = get_page_from_placeholder_if_exists(placeholder)
     if page:
         template = page.template
