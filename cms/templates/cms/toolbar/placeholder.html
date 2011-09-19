@@ -3,18 +3,15 @@
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
-	new CMS.Placeholder('#cms_placeholder-bar-{{ placeholder.pk }}', {
-		'type': 'bar',
-		'page_id': '{{ page.id }}',
-		'page_language': '{{ language }}',
-		'placeholder_id': '{{ placeholder.pk }}',
-		'urls': {
-			'add_plugin': '{{ placeholder.get_add_url }}',
-		    'remove_plugin': '{{ placeholder.get_remove_url }}', 
-		    'move_plugin': '{{ placeholder.get_move_url }}',
-			'change_list': '{{ placeholder.get_changelist_url }}'
-		}
-	});
+    new CMS.Placeholder('#cms_placeholder-bar-{{ placeholder.pk }}', {
+        'type': 'bar',
+        'page_id': '{{ page.id }}',
+        'page_language': '{{ language }}',
+        'placeholder_id': '{{ placeholder.pk }}',
+        'urls': {
+            'add_plugin': '{{ placeholder.get_add_url }}'
+        }
+    });
 });
 //]]>
 </script>

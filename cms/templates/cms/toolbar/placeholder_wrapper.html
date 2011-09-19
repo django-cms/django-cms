@@ -10,9 +10,9 @@ jQuery(document).ready(function ($) {
 		'placeholder_id': '{{ instance.placeholder.id }}',
 		'placeholder_slot': '{{ instance.placeholder.slot }}',
 		'urls': {
-			'move_plugin': '{% url admin:cms_page_move_plugin %}',
-			'remove_plugin': '{% url admin:cms_page_remove_plugin %}',
-			'change_list': '{% url admin:cms_page_changelist %}'
+            'remove_plugin': '{{ placeholder.get_remove_url }}', 
+            'move_plugin': '{{ placeholder.get_move_url }}',
+            'change_list': '{{ placeholder.get_changelist_url }}'
 		}
 	});
 });
