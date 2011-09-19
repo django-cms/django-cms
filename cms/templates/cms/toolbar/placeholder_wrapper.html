@@ -10,9 +10,9 @@ jQuery(document).ready(function ($) {
 		'placeholder_id': '{{ instance.placeholder.id }}',
 		'placeholder_slot': '{{ instance.placeholder.slot }}',
 		'urls': {
-            'remove_plugin': '{{ placeholder.get_remove_url }}', 
-            'move_plugin': '{{ placeholder.get_move_url }}',
-            'change_list': '{{ placeholder.get_changelist_url }}'
+            'remove_plugin': '{{ instance.placeholder.get_remove_url }}', 
+            'move_plugin': '{{ instance.placeholder.get_move_url }}',
+            'change_list': '{{ instance.placeholder.get_changelist_url }}'
 		}
 	});
 });
