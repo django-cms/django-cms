@@ -10,6 +10,8 @@ jQuery(document).ready(function ($) {
 		'placeholder_id': '{{ placeholder.pk }}',
 		'urls': {
 			'add_plugin': '{{ placeholder.get_add_url }}',
+		    'remove_plugin': '{{ placeholder.get_remove_url }}', 
+		    'move_plugin': '{{ placeholder.get_move_url }}',
 			'change_list': '{{ placeholder.get_changelist_url }}'
 		}
 	});
