@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.2-1' #will confilct on next merge
+__version__ = '2.2.post0'
 
 # patch settings 
 try:
