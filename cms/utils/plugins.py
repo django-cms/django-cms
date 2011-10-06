@@ -36,11 +36,9 @@ def _extend_blocks(extend_node, blocks):
                 block = block.super
             block.super = node
     # search for further ExtendsNodes
-    for node in parent.nodelist:
-        if not isinstance(node, TextNode):
-            if isinstance(node, ExtendsNode):
-                _extend_blocks(node, blocks)
-            break
+    for node in parent.nodelist.get_nodes_by_type(ExtendsNode):
+        _extend_blocks(node, blocks)
+        break
 
 def _extend_nodelist(extend_node):
     """
