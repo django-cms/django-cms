@@ -287,6 +287,7 @@ your base template, and add extra content to it:
   {% load cms_tags %}
 
   {% block base_content %}
+    {% cms_toolbar %}
     {% placeholder template_1_content %}
   {% endblock %}
 
