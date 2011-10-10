@@ -35,6 +35,12 @@ Example::
     ``js`` and ``css`` sekizai namespaces, for more information, see 
     :ref:`sekizai-namespaces`.
 
+.. warning::
+
+    django-CMS relies on a number of templates to function correctly; using a
+    template name that clashes with them may lead to issues. Thus, it is
+    recommended you avoid using ``cms/content.html``, ``cms/dummy.html``, and
+    ``cms/new.html`` as options for :setting:`CMS_TEMPLATES`
 
 *******************
 Basic Customization
