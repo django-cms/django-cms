@@ -319,7 +319,7 @@ msgstr "Sólo existe una traducción para esta página."
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
-"El título y los 'plugins' con el lenguaje %(language)s fueron eliminados."
+"El título y los \'plugins\' con el lenguaje %(language)s fueron eliminados."
 
 #: admin/pageadmin.py:991
 msgid "Are you sure?"
@@ -364,7 +364,7 @@ msgstr "No tiene permisos para cambiar esta página"
 #: admin/pageadmin.py:1173
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "'plugins' en %(language)s copiados a %(placeholder)s"
+msgstr "\'plugins\' en %(language)s copiados a %(placeholder)s"
 
 #: admin/pageadmin.py:1186 admin/pageadmin.py:1294 admin/pageadmin.py:1316
 #, fuzzy
@@ -390,7 +390,7 @@ msgstr "No tiene permisos para cambiar esta página"
 
 #: admin/pageadmin.py:1329
 msgid "Plugins where moved"
-msgstr "Los 'plugins' fueron movidos"
+msgstr "Los \'plugins\' fueron movidos"
 
 #: admin/pageadmin.py:1343
 #, fuzzy
@@ -1017,7 +1017,7 @@ msgstr "Calcular la ruta"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr "Hereda 'Plugins' de la Página"
+msgstr "Hereda \'plugins\' de la Página"
 
 #: plugins/inherit/forms.py:23
 msgid "Language or Page must be filled out"
@@ -1028,12 +1028,12 @@ msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
 msgstr ""
-"Elija una página para incluir sus 'plugins' en este 'placeholder'. Si la "
+"Elija una página para incluir sus \'plugins\' en este 'placeholder'. Si la "
 "deja vacía elegirá la página actual"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
-msgstr "Opcional: el idioma de los 'plugins' que desee"
+msgstr "Opcional: el idioma de los \'plugins\' que desee"
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
@@ -1774,7 +1774,7 @@ msgstr "Desde el idioma"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
 msgid "Copy Plugins"
-msgstr "Copiar 'Plugins'"
+msgstr "Copiar \'plugins\'"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:12
 msgid "You must save the page first to add plugins."
@@ -1787,7 +1787,7 @@ msgstr "No ha seleccionado ningún 'Plugin'. Seleccione uno de la izquierda"
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
 msgstr ""
-"No hay 'Plugins' presentes. Añada un 'plugin' en el slot del placeholder."
+"No hay \'plugins\' presentes. Añada un 'plugin' en el slot del placeholder."
 
 #: templates/cms/toolbar/placeholder.html:32
 msgid "Available plugins"
