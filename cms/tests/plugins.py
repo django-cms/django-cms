@@ -658,7 +658,7 @@ class PluginsMetaOptionsTests(TestCase):
                 db_table = 'or_another'
 
         plugin = TestPlugin4()
-        self.assertEqual(plugin._meta.db_table, 'or_another')
+        self.assertEqual(plugin._meta.db_table, 'cmsplugin_or_another')
         self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
 
     def test_meta_options_custom_both(self):
@@ -669,7 +669,7 @@ class PluginsMetaOptionsTests(TestCase):
                 db_table = 'or_another'
 
         plugin = TestPlugin5()
-        self.assertEqual(plugin._meta.db_table, 'or_another')
+        self.assertEqual(plugin._meta.db_table, 'cmsplugin_or_another')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
 class SekizaiTests(TestCase):
