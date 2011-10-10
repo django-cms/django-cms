@@ -86,11 +86,11 @@ Example::
             },
         },
         'base.html content': {
-            "plugins": {'TextPlugin', 'PicturePlugin', 'TeaserPlugin'}
+            "plugins": ('TextPlugin', 'PicturePlugin', 'TeaserPlugin')
         },
     }
 
-You can combine template names and placeholder names to granually define
+You can combine template names and placeholder names to granularly define
 plugins, as shown above with ''base.html content''.
 
 **plugins**
