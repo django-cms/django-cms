@@ -19,9 +19,9 @@ jQuery(document).ready(function ($) {
 	CMS.API.Placeholders = new CMS.Placeholders('#cms_toolbar', {
 		{% if request.toolbar.edit_mode %}'edit_mode': true,{% endif %}
 		'lang': {
-			'move_warning': '{% filter js %}{% trans "The selected element can not be moved to the desired location." %}{% endfilter %}',
-			'delete_request': '{% filter js %}{% trans "Are you sure you want to delete this plugin?" %}{% endfilter %}',
-			'cancel': '{% filter js %}{% trans "Cancel" %}{% endfilter %}'
+			'move_warning': '{% filter js_string %}{% trans "The selected element can not be moved to the desired location." %}{% endfilter %}',
+			'delete_request': '{% filter js_string %}{% trans "Are you sure you want to delete this plugin?" %}{% endfilter %}',
+			'cancel': '{% filter js_string %}{% trans "Cancel" %}{% endfilter %}'
 		}
 	});
 });
