@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.core.exceptions import ImproperlyConfigured
-from cms.conf.patch import post_patch, post_patch_check
 from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.conf.patch import post_patch, post_patch_check
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
+from django.core.exceptions import ImproperlyConfigured
+from django.template.loader import render_to_string
 
 class SettingsTests(CMSTestCase):
     def test_cms_templates_length(self):
@@ -39,6 +40,12 @@ class SettingsTests(CMSTestCase):
         # without CMS_TEMPLATE_INHERITANCE enabled, the function should return nothing
         with SettingsOverride(DEBUG=True, CMS_TEMPLATE_INHERITANCE=False, CMS_TEMPLATES=None):
             self.assertEqual(None, post_patch())
+            
+    def test_cms_templates_with_pathsep(self):
+        from sekizai.context import SekizaiContext
+        with SettingsOverride(CMS_TEMPLATES=[('subdir/template.html', 'Subdir')], DEBUG=True, TEMPLATE_DEBUG=True):
+            context = SekizaiContext()
+            self.assertEqual(render_to_string('subdir/template.html', context).strip(), 'test')
 
     def test_cms_templates_valid(self):
         '''
