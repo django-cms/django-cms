@@ -67,9 +67,9 @@
 .cms_toolbar-item_logo .cms_toolbar-item_logo-link:hover { background-position:-120px top; }
 
 /* #TOOLBAR/items/login# */
-#cms_toolbar-item_login label { float:left; cursor:pointer; padding:4px 10px 0 0; }
+#cms_toolbar-item_login label { float:left; cursor:pointer; padding:4px 10px 0 0; width: auto; }
 #cms_toolbar-item_login div { float:left; }
-#cms_toolbar-item_login div input { color:#000; width:150px; border:1px solid #ddd; padding:4px 5px; margin-right:10px;
+#cms_toolbar-item_login div input { color:#000; width:150px; border:1px solid #ddd; padding:4px 5px; margin-right:10px; margin-top:0;
 	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
 #cms_toolbar-item_login div input:hover { border:1px solid #999; }
 .cms_toolbar_error input[type=text], .cms_toolbar_error input[type=password] { border:1px solid #f99 !important; }
