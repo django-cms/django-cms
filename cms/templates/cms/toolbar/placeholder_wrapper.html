@@ -3,18 +3,18 @@
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
-    new CMS.Placeholder('#cms_placeholder-{{ instance.pk }}', {
-        'type': 'holder',
-        'plugin_id': '{{ instance.pk }}',
-        'plugin_type': '{{ instance.plugin_type }}',
-        'placeholder_id': '{{ instance.placeholder.id }}',
-        'placeholder_slot': '{{ instance.placeholder.slot }}',
-        'urls': {
-            'remove_plugin': '{{ instance.placeholder.get_remove_url }}', 
-            'move_plugin': '{{ instance.placeholder.get_move_url }}',
-            'change_list': '{{ instance.placeholder.get_changelist_url }}'
-        }
-    });
+  new CMS.Placeholder('#cms_placeholder-{{ instance.pk }}', {
+    'type': 'holder',
+    'plugin_id': '{{ instance.pk }}',
+    'plugin_type': '{{ instance.plugin_type }}',
+    'placeholder_id': '{{ instance.placeholder.id }}',
+    'placeholder_slot': '{{ instance.placeholder.slot }}',
+    'urls': {
+      'remove_plugin': '{{ instance.placeholder.get_remove_url }}', 
+      'move_plugin': '{{ instance.placeholder.get_move_url }}',
+      'change_list': '{{ instance.placeholder.get_changelist_url }}'
+    }
+  });
 });
 //]]>
 </script>
