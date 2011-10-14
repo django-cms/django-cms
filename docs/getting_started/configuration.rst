@@ -37,7 +37,7 @@ Example::
 
 .. warning::
 
-    django-CMS internally relies on a number of templates to function correctly;
+    django CMS internally relies on a number of templates to function correctly;
     these exist beneath ``cms`` within the templates directory. As such, it
     is highly recommended you avoid using the same directory name for your own
     project templates.
