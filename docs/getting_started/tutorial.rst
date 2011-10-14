@@ -272,6 +272,7 @@ Here is a simple example for a base template called ``base.html``:
         {% render_block "css" %}
     </head>
     <body>
+        {% cms_toolbar %}
         {% placeholder base_content %}
         {% block base_content%}{% endblock %}
         {% render_block "js" %}
