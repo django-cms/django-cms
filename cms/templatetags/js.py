@@ -13,3 +13,7 @@ def js(value):
 def bool(value):
     return value and "true" or "false" 
         
+@register.filter
+def js_string(value):
+    """Escape `value` to get a safe string for javascript"""
+    return simplejson.dumps('%s' % value).replace("'", "\\'").replace('"', '\\"')
