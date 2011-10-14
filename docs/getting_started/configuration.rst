@@ -70,13 +70,13 @@ Example::
 
     CMS_PLACEHOLDER_CONF = {
         'content': {
-            'plugins': ('TextPlugin', 'PicturePlugin'),
-            'text_only_plugins': ('LinkPlugin',)
+            'plugins': ['TextPlugin', 'PicturePlugin'],
+            'text_only_plugins': ['LinkPlugin']
             'extra_context': {"width":640},
             'name':gettext("Content"),
         },
         'right-column': {
-            "plugins": ('TeaserPlugin', 'LinkPlugin'),
+            "plugins": ['TeaserPlugin', 'LinkPlugin'],
             "extra_context": {"width":280},
             'name':gettext("Right Column"),
             'limits': {
@@ -86,11 +86,11 @@ Example::
             },
         },
         'base.html content': {
-            "plugins": {'TextPlugin', 'PicturePlugin', 'TeaserPlugin'}
+            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
         },
     }
 
-You can combine template names and placeholder names to granually define
+You can combine template names and placeholder names to granularly define
 plugins, as shown above with ''base.html content''.
 
 **plugins**
