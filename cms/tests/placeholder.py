@@ -73,7 +73,7 @@ class PlaceholderTestCase(CMSTestCase):
         placeholders = get_placeholders('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
-    def test_placeholder_scanning_extend_outside_block_nested(self)
+    def test_placeholder_scanning_extend_outside_block_nested(self):
         placeholders = get_placeholders('placeholder_tests/outside_nested.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
     
