@@ -3,20 +3,20 @@
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
-	new CMS.Placeholder('#cms_placeholder-{{ instance.pk }}', {
-		'type': 'holder',
-		'plugin_id': '{{ instance.pk }}',
-		'plugin_type': '{{ instance.plugin_type }}',
-		'placeholder_id': '{{ instance.placeholder.id }}',
-		'placeholder_slot': '{{ instance.placeholder.slot }}',
-		'urls': {
-			'move_plugin': '{% url admin:cms_page_move_plugin %}',
-			'remove_plugin': '{% url admin:cms_page_remove_plugin %}',
-			'change_list': '{% url admin:cms_page_changelist %}'
-		}
-	});
+  new CMS.Placeholder('#cms_placeholder-{{ instance.pk }}', {
+    'type': 'holder',
+    'plugin_id': '{{ instance.pk }}',
+    'plugin_type': '{{ instance.plugin_type }}',
+    'placeholder_id': '{{ instance.placeholder.id }}',
+    'placeholder_slot': '{{ instance.placeholder.slot }}',
+    'urls': {
+      'remove_plugin': '{{ instance.placeholder.get_remove_url }}', 
+      'move_plugin': '{{ instance.placeholder.get_move_url }}',
+      'change_list': '{{ instance.placeholder.get_changelist_url }}'
+    }
+  });
 });
 //]]>
 </script>
 {% endaddtoblock %}
-<div id="cms_placeholder-{{ instance.pk }}" class="cms_placeholder">{{ rendered_content }}</div>
+<div id="cms_placeholder-{{ instance.pk }}" class="cms_placeholder cms_placeholder_slot::{{ instance.placeholder.slot }}">{{ rendered_content }}</div>
