@@ -967,3 +967,24 @@ class AdminFormsTests(TestCase):
             Title.objects.set_or_create(request, instance, form, 'en')
             form = PageForm(data, instance=instance)
             self.assertTrue(form.is_valid(), form.errors.as_text())
+    
+    def test_infinite_redirect(self):
+        user = AnonymousUser()
+        user.is_superuser = True
+        user.pk = 1
+        site = Site.objects.get_current()
+        template = settings.CMS_TEMPLATES[0][0]
+        instance = create_page('Test Page', template, 'en', site=site, published=True)
+        with SettingsOverride(CMS_MODERATOR=False):
+            data = {
+                'title': 'TestPage',
+                'slug': 'test-page',
+                'language': 'en',
+                'redirect': '/',
+                'site': site.pk,
+                'template': template,
+                'published': True
+            }
+            
+            form = PageForm(data, instance=instance)
+            self.assertFalse(form.is_valid(), form.errors.as_text())
