@@ -505,7 +505,34 @@ class PagesTestCase(CMSTestCase):
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'test-page-4/test-page-3/')
-    
+
+    def test_page_overwrite_urls(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+            published=True)
+
+        page2 = create_page('test page 2', 'nav_playground.html', 'en',
+            published=True, parent=page1)
+
+        page3 = create_page('test page 3', 'nav_playground.html', 'en',
+            published=True, parent=page2, overwrite_url='i-want-another-url')
+
+        self.assertEqual(page2.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
+        title2 = page2.title_set.get()
+        title2.slug = 'page-test-2'
+        title2.save()
+
+        page2 = Page.objects.get(pk=page2.pk)
+        page3 = Page.objects.get(pk=page3.pk)
+
+        self.assertEqual(page2.get_absolute_url(),
+            self.get_pages_root()+'page-test-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
