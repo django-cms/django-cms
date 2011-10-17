@@ -607,6 +607,70 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
         
+class PluginsMetaOptionsTests(TestCase):
+    ''' TestCase set for ensuring that bugs like #992 are caught '''
+
+    # these plugins are inlined because, due to the nature of the #992
+    # ticket, we cannot actually import a single file with all the
+    # plugin variants in, because that calls __new__, at which point the
+    # error with splitted occurs.
+
+    def test_meta_options_as_defaults(self):
+        ''' handling when a CMSPlugin meta options are computed defaults '''
+        # this plugin relies on the base CMSPlugin and Model classes to
+        # decide what the app_label and db_table should be
+        class TestPlugin(CMSPlugin):
+            pass
+
+        plugin = TestPlugin()
+        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin')
+        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+
+    def test_meta_options_as_declared_defaults(self):
+        ''' handling when a CMSPlugin meta options are declared as per defaults '''
+        # here, we declare the db_table and app_label explicitly, but to the same
+        # values as would be computed, thus making sure it's not a problem to
+        # supply options.
+        class TestPlugin2(CMSPlugin):
+            class Meta:
+                db_table = 'cmsplugin_testplugin2'
+                app_label = 'tests'
+
+        plugin = TestPlugin2()
+        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin2')
+        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+
+    def test_meta_options_custom_app_label(self):
+        ''' make sure customised meta options on CMSPlugins don't break things '''
+
+        class TestPlugin3(CMSPlugin):
+            class Meta:
+                app_label = 'one_thing'
+
+        plugin = TestPlugin3()
+        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin3') # because it's inlined
+        self.assertEqual(plugin._meta.app_label, 'one_thing')
+
+    def test_meta_options_custom_db_table(self):
+        ''' make sure custom database table names are OK. '''
+        class TestPlugin4(CMSPlugin):
+            class Meta:
+                db_table = 'or_another'
+
+        plugin = TestPlugin4()
+        self.assertEqual(plugin._meta.db_table, 'or_another')
+        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+
+    def test_meta_options_custom_both(self):
+        ''' We should be able to customise app_label and db_table together '''
+        class TestPlugin5(CMSPlugin):
+            class Meta:
+                app_label = 'one_thing'
+                db_table = 'or_another'
+
+        plugin = TestPlugin5()
+        self.assertEqual(plugin._meta.db_table, 'or_another')
+        self.assertEqual(plugin._meta.app_label, 'one_thing')
 
 class SekizaiTests(TestCase):
     def test_post_patch_check(self):
