@@ -1,4 +1,4 @@
-{% load i18n adminmedia sekizai_tags %}
+{% load i18n adminmedia sekizai_tags cms_js_tags %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.cookie.js"></script>{% endaddtoblock %}
@@ -17,11 +17,11 @@ jQuery(document).ready(function ($) {
 
 	// initialize placeholders, pass options and allow public access
 	CMS.API.Placeholders = new CMS.Placeholders('#cms_toolbar', {
-		{% if request.toolbar.edit_mode %}'edit_mode': true,{% endif %}
+		'edit_mode': {{ request.toolbar.edit_mode|bool }},
 		'lang': {
-			'move_warning': '{% trans "The selected element can not be moved to the desired location." %}',
-			'delete_request': '{% trans "Are you sure you want to delete this plugin?" %}',
-			'cancel': '{% trans "Cancel" %}'
+			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
+			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
+			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %}
 		}
 	});
 });

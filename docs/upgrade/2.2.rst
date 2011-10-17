@@ -85,10 +85,15 @@ shouldn't.
 Static files moved to /static/
 ==============================
 
-The static files (css/javascript/images) were moved to from ``/media/`` to 
+The static files (css/javascript/images) were moved from ``/media/`` to 
 ``/static/`` to work with the new ``django.contrib.staticfiles`` app in Django
 1.3. This means you will have to make sure you serve static files as well as
 media files on your server.
+
+.. warning::
+
+    If you use Django 1.2.x you will not have a ``django.contrib.staticfiles``
+    app. Instead you need the `django-staticfiles`_ backport.
 
 
 **************************
@@ -100,3 +105,6 @@ Features deprecated in 2.2
 
 The django-dbgettext support has been fully dropped in 2.2 in favor of the
 built-in mechanisms to achieve multilinguality.
+
+
+.. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/
