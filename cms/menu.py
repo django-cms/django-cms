@@ -277,7 +277,70 @@ menu_pool.register_modifier(NavExtender)
 
 class SoftRootCutter(Modifier):
     """
-    If anyone understands this, PLEASE write a meaningful description here!
+    Ask evildmp/superdmp if you don't understand softroots!
+    
+    Softroot description from the docs:
+    
+        A soft root is a page that acts as the root for a menu navigation tree.
+    
+        Typically, this will be a page that is the root of a significant new
+        section on your site.
+    
+        When the soft root feature is enabled, the navigation menu for any page
+        will start at the nearest soft root, rather than at the real root of
+        the site’s page hierarchy.
+    
+        This feature is useful when your site has deep page hierarchies (and
+        therefore multiple levels in its navigation trees). In such a case, you
+        usually don’t want to present site visitors with deep menus of nested
+        items.
+    
+        For example, you’re on the page “Introduction to Bleeding”, so the menu
+        might look like this:
+    
+            School of Medicine
+                Medical Education
+                Departments
+                    Department of Lorem Ipsum
+                    Department of Donec Imperdiet
+                    Department of Cras Eros
+                    Department of Mediaeval Surgery
+                        Theory
+                        Cures
+                        Bleeding
+                            Introduction to Bleeding <this is the current page>
+                            Bleeding - the scientific evidence
+                            Cleaning up the mess
+                            Cupping
+                            Leaches
+                            Maggots
+                        Techniques
+                        Instruments
+                    Department of Curabitur a Purus
+                    Department of Sed Accumsan
+                    Department of Etiam
+                Research
+                Administration
+                Contact us
+                Impressum
+    
+        which is frankly overwhelming.
+    
+        By making “Department of Mediaeval Surgery” a soft root, the menu
+        becomes much more manageable:
+    
+            Department of Mediaeval Surgery
+                Theory
+                Cures
+                    Bleeding
+                        Introduction to Bleeding <current page>
+                        Bleeding - the scientific evidence
+                        Cleaning up the mess
+                    Cupping
+                    Leaches
+                    Maggots
+                Techniques
+                Instruments
     """
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
@@ -305,13 +368,7 @@ class SoftRootCutter(Modifier):
             else:
                 # if it's not a soft root, walk ancestors (upwards!)
                 nodes = self.find_ancestors_and_remove_children(selected, nodes)
-            # remove child-softroots from descendants (downwards!)
-            nodes = self.find_and_remove_children(selected, nodes)
-        else:
-            # for all nodes in root, remove child-sofroots (downwards!)
-            for node in root_nodes:
-                self.find_and_remove_children(node, nodes)
-        return nodes   
+        return nodes
     
     def find_and_remove_children(self, node, nodes):
         for n in node.children:
