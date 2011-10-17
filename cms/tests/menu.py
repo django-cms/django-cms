@@ -319,93 +319,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         
-    def test_softroot(self):
-        """
-        What is a soft root?
-        
-            If a page is a soft root, it becomes the root page in the menu if
-            we are currently on or under that page.
-            
-            If we are above that page, the children of this page are not shown.
-
-        Tree from fixture:
-            
-            + P1
-            | + P2 <- SOFTROOT
-            |   + P3
-            + P4
-            | + P5
-            + P6 (not in menu)
-              + P7
-              + P8
-        """
-        page2 = Page.objects.get(pk=self.get_page(2).pk)
-        page2.soft_root = True
-        page2.save()
-        # current page: P2
-        context = self.get_context(path=page2.get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
-        nodes = context['children']
-        """
-        Assert that the top level contains only ONE page (P2), not 2: P1 and P4!
-        """
-        self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].get_absolute_url(), page2.get_absolute_url())
-        # current page: P3
-        page3 = Page.objects.get(pk=self.get_page(3).pk)
-        context = self.get_context(path=page3.get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
-        nodes = context['children']
-        """
-        Assert that the top level contains only ONE page (P2), not 2: P1 and P4!
-        """
-        self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].get_absolute_url(), page2.get_absolute_url())
-        
-        # current page: P1
-        page1 = Page.objects.get(pk=self.get_page(1).pk)
-        context = self.get_context(path=page1.get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
-        nodes = context['children']
-        """
-        Assert that we have two pages in root level: P1 and P4, because the
-        softroot is below this level.
-        """
-        self.assertEqual(len(nodes), 2)
-        # check that the first page is P1
-        self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
-        # check that we don't show the children of P2, which is a soft root!
-        self.assertEqual(len(nodes[0].children[0].children), 0)
-        
-        # current page: NO PAGE
-        context = self.get_context(path="/no/real/path/")
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
-        """
-        Check behavior is the same as on P1
-        """
-        nodes = context['children']
-        self.assertEqual(len(nodes), 2)
-        self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
-        self.assertEqual(len(nodes[0].children[0].children), 0)
-        
-        # current page: P5
-        page5 = Page.objects.get(pk=self.get_page(5).pk)
-        context = self.get_context(path=page5.get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context)
-        """
-        Again, check the behavior is the same as on P1, because we're not under
-        a soft root! 
-        """
-        nodes = context['children']
-        self.assertEqual(len(nodes), 2)
-        self.assertEqual(nodes[0].get_absolute_url(), page1.get_absolute_url())
-        self.assertEqual(len(nodes[0].children[0].children), 0)
-        
     def test_show_submenu_from_non_menu_page(self):
         """
         Here's the structure bit we're interested in:
@@ -1098,3 +1011,262 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             GlobalpagePermission query for user
             """
             get_visible_pages(request, pages, site)
+
+class SoftrootTests(SettingsOverrideTestCase):
+    """
+    Ask evildmp/superdmp if you don't understand softroots!
+    
+    Softroot description from the docs:
+    
+        A soft root is a page that acts as the root for a menu navigation tree.
+    
+        Typically, this will be a page that is the root of a significant new
+        section on your site.
+    
+        When the soft root feature is enabled, the navigation menu for any page
+        will start at the nearest soft root, rather than at the real root of
+        the site’s page hierarchy.
+    
+        This feature is useful when your site has deep page hierarchies (and
+        therefore multiple levels in its navigation trees). In such a case, you
+        usually don’t want to present site visitors with deep menus of nested
+        items.
+    
+        For example, you’re on the page “Introduction to Bleeding”, so the menu
+        might look like this:
+    
+            School of Medicine
+                Medical Education
+                Departments
+                    Department of Lorem Ipsum
+                    Department of Donec Imperdiet
+                    Department of Cras Eros
+                    Department of Mediaeval Surgery
+                        Theory
+                        Cures
+                        Bleeding
+                            Introduction to Bleeding <this is the current page>
+                            Bleeding - the scientific evidence
+                            Cleaning up the mess
+                            Cupping
+                            Leaches
+                            Maggots
+                        Techniques
+                        Instruments
+                    Department of Curabitur a Purus
+                    Department of Sed Accumsan
+                    Department of Etiam
+                Research
+                Administration
+                Contact us
+                Impressum
+    
+        which is frankly overwhelming.
+    
+        By making “Department of Mediaeval Surgery” a soft root, the menu
+        becomes much more manageable:
+    
+            Department of Mediaeval Surgery
+                Theory
+                Cures
+                    Bleeding
+                        Introduction to Bleeding <current page>
+                        Bleeding - the scientific evidence
+                        Cleaning up the mess
+                    Cupping
+                    Leaches
+                    Maggots
+                Techniques
+                Instruments
+    """
+    settings_overrides = {
+        'CMS_MODERATOR': False,
+        'CMS_SOFTROOT': True,
+        'CMS_PERMISSION': False
+    }
+    
+    def test_basic_home(self):
+        """
+        Given the tree:
+        
+        |- Home
+        | |- Projects (SOFTROOT)
+        | | |- django CMS
+        | | |- django Shop
+        | |- People
+        
+        Expected menu when on "Home" (0 100 100 100):
+        
+        |- Home
+        | |- Projects (SOFTROOT)
+        | | |- django CMS
+        | | |- django Shop
+        | |- People
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        home = create_page("Home", **stdkwargs)
+        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        # On Home
+        context = self.get_context(home.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check everything
+        self.assertEqual(len(nodes), 1)
+        homenode = nodes[0]
+        self.assertEqual(homenode.id, home.pk)
+        self.assertEqual(len(homenode.children), 2)
+        projectsnode, peoplenode = homenode.children
+        self.assertEqual(projectsnode.id, projects.pk)
+        self.assertEqual(peoplenode.id, people.pk)
+        self.assertEqual(len(projectsnode.children), 2)
+        cmsnode, shopnode = projectsnode.children
+        self.assertEqual(cmsnode.id, djangocms.pk)
+        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(len(cmsnode.children), 0)
+        self.assertEqual(len(shopnode.children), 0)
+        self.assertEqual(len(peoplenode.children), 0)
+        
+    def test_basic_projects(self):
+        """
+        Given the tree:
+        
+        |- Home
+        | |- Projects (SOFTROOT)
+        | | |- django CMS
+        | | |- django Shop
+        | |- People
+        
+        Expected menu when on "Projects" (0 100 100 100):
+        
+        |- Projects (SOFTROOT)
+        | |- django CMS
+        | |- django Shop
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        home = create_page("Home", **stdkwargs)
+        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        # On Projects
+        context = self.get_context(projects.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check everything
+        self.assertEqual(len(nodes), 1)
+        projectsnode = nodes[0]
+        self.assertEqual(projectsnode.id, projects.pk)
+        self.assertEqual(len(projectsnode.children), 2)
+        cmsnode, shopnode = projectsnode.children
+        self.assertEqual(cmsnode.id, djangocms.pk)
+        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(len(cmsnode.children), 0)
+        self.assertEqual(len(shopnode.children), 0)
+        
+    def test_basic_djangocms(self):
+        """
+        Given the tree:
+        
+        |- Home
+        | |- Projects (SOFTROOT)
+        | | |- django CMS
+        | | |- django Shop
+        | |- People
+        
+        Expected menu when on "django CMS" (0 100 100 100):
+        
+        |- Projects (SOFTROOT)
+        | |- django CMS
+        | |- django Shop
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        home = create_page("Home", **stdkwargs)
+        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        # On django CMS
+        context = self.get_context(djangocms.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check everything
+        self.assertEqual(len(nodes), 1)
+        projectsnode = nodes[0]
+        self.assertEqual(projectsnode.id, projects.pk)
+        self.assertEqual(len(projectsnode.children), 2)
+        cmsnode, shopnode = projectsnode.children
+        self.assertEqual(cmsnode.id, djangocms.pk)
+        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(len(cmsnode.children), 0)
+        self.assertEqual(len(shopnode.children), 0)
+        
+    def test_basic_people(self):
+        """
+        Given the tree:
+        
+        |- Home
+        | |- Projects (SOFTROOT)
+        | | |- django CMS
+        | | |- django Shop
+        | |- People
+        
+        Expected menu when on "People" (0 100 100 100):
+        
+        |- Home
+        | |- Projects (SOFTROOT)
+        | | |- django CMS
+        | | |- django Shop
+        | |- People
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        home = create_page("Home", **stdkwargs)
+        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
+        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        # On People
+        context = self.get_context(home.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check everything
+        self.assertEqual(len(nodes), 1)
+        homenode = nodes[0]
+        self.assertEqual(homenode.id, home.pk)
+        self.assertEqual(len(homenode.children), 2)
+        projectsnode, peoplenode = homenode.children
+        self.assertEqual(projectsnode.id, projects.pk)
+        self.assertEqual(peoplenode.id, people.pk)
+        self.assertEqual(len(projectsnode.children), 2)
+        cmsnode, shopnode = projectsnode.children
+        self.assertEqual(cmsnode.id, djangocms.pk)
+        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(len(cmsnode.children), 0)
+        self.assertEqual(len(shopnode.children), 0)
+        self.assertEqual(len(peoplenode.children), 0)

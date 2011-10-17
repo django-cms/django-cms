@@ -152,13 +152,11 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     name = get_placeholder_conf(slot, template, "name", title(slot))
     name = _(name)
     context.push()
-    context.update({
-        'installed_plugins': installed_plugins,
-        'language': get_language_from_request(request),
-        'placeholder_label': name,
-        'placeholder': placeholder,
-        'page': page,
-    })
+    context['installed_plugins'] = installed_plugins
+    context['language'] = get_language_from_request(request)
+    context['placeholder_label'] = name
+    context['placeholder'] = placeholder
+    context['page'] = page
     toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return "".join([toolbar, content])
