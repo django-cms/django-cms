@@ -170,6 +170,35 @@ class PageForm(PageAddForm):
                     raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
         return cleaned_data
 
+    def clean_redirect(self):
+        """
+        Prevent infinite redirects
+        """
+        redirect = self.cleaned_data.get('redirect', None)
+        if not redirect:
+            return redirect
+        slug = self.cleaned_data.get('slug', None)
+        if not slug:
+            return redirect
+        parent_id = self.cleaned_data.get('parent', None)
+        old_slug = self.instance.get_slug()
+        if old_slug == slug and self.instance.parent_id == parent_id:
+            url = self.instance.get_absolute_url()
+        else:
+            if parent_id:
+                url = Page.objects.get(pk=parent_id).get_absolute_url()
+            else:
+                url = '/'
+            if parent_id:
+                url += slug
+            elif not self.instance.is_home():
+                url += slug
+            if not url.endswith('/'):
+                url += '/'
+        if url == redirect:
+            raise forms.ValidationError("Inifinite redirect, please chose a different redirect")
+        return redirect
+
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']

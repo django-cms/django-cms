@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from cms.api import (_generate_valid_slug, create_page, _verify_plugin_type, 
-    assign_user_to_page, publish_page)
+    assign_user_to_page, InfiniteRedirectLoop)
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
@@ -186,3 +186,8 @@ class PythonAPITests(TestCase):
         page = create_page(**page_attrs)
         self.assertTrue(page.get_title_obj_attribute('has_url_overwrite'))
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')
+        
+    def test_create_page_infinite_redirect(self):
+        self.assertRaises(InfiniteRedirectLoop, create_page, "one",
+                          "nav_playground.html", "en", published=True,
+                          redirect='/')

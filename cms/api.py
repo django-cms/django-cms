@@ -30,6 +30,12 @@ from cms.utils import moderator
 from cms.utils.permissions import _thread_locals
 
 
+#==============================================================================
+# Exceptions
+#==============================================================================
+
+class InfiniteRedirectLoop(Exception): pass
+
 #===============================================================================
 # Constants 
 #===============================================================================
@@ -193,7 +199,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if settings.CMS_MODERATOR and _thread_locals.user:
         page.pagemoderator_set.create(user=_thread_locals.user)
     
-    create_title(
+    title = create_title(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -207,8 +213,15 @@ def create_page(title, template, language, menu_title=None, slug=None,
     )
         
     del _thread_locals.user
-    return page
     
+    redirect = page.get_redirect(language)
+    if redirect and redirect == page.get_absolute_url(language):
+        title.delete()
+        page.delete()
+        raise InfiniteRedirectLoop()
+    
+    return page
+
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
                  meta_keywords=None, parent=None, overwrite_url=None):
