@@ -109,6 +109,14 @@ class ViewTests(SettingsOverrideTestCase):
         request = self.get_request(url)
         response = details(request, url.strip('/'))
         self.assertEqual(response.status_code, HttpResponse.status_code)
+        
+    def test_redirect_to_self_with_host(self):
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect='http://testserver/')
+        url = one.get_absolute_url()
+        request = self.get_request(url)
+        response = details(request, url.strip('/'))
+        self.assertEqual(response.status_code, HttpResponse.status_code)
     
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
