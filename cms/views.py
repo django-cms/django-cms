@@ -80,9 +80,16 @@ def details(request, slug):
     if redirect_url:
         if (settings.i18n_installed and redirect_url[0] == "/"
             and not redirect_url.startswith('/%s/' % current_language)):
+            # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
-        # add language prefix to url
-        return HttpResponseRedirect(redirect_url)
+        # prevent redirect to self
+        own_urls = [
+            'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
+            '/%s%s' % (current_language, request.path),
+            request.path,
+        ]
+        if redirect_url not in own_urls:
+            return HttpResponseRedirect(redirect_url)
     
     # permission checks
     if page.login_required and not request.user.is_authenticated():
