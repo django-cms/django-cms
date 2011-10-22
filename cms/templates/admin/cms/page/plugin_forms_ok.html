@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia %}
+{% load i18n admin_modify adminmedia cms_js_tags %}
 
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
@@ -18,13 +18,13 @@ jQuery(document).ready(function ($) {
 	if(window.parent != self) {
 		if (typeof window.parent.CMS === 'undefined'){
 			// backend admin
-			parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
+        parent.hide_iframe({{ plugin.pk }}, {% javascript_string %}{{ type }}{% end_javascript_string %}, {% javascript_string %}{{ name }}{% end_javascript_string %}, {% javascript_string %}{% trans "Plugin saved successfully." %}{% end_javascript_string %});
 		} else {
 			// frontend edit
 			setTimeout(function () { window.parent.CMS.API.Helpers.reloadBrowser(); }, 1000);
 		}
 	} else {
-		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
+        opener.dismissEditPluginPopup(window, {% javascript_string %}{{ plugin_id }}{% end_javascript_string %}, {% javascript_string %}{{ icon }}{% end_javascript_string %}, {% javascript_string %}{{ alt }}{% end_javascript_string %});
 	}
 });
 //]]>
