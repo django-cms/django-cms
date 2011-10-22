@@ -18,7 +18,7 @@ jQuery(document).ready(function ($) {
 	if(window.parent != self) {
 		if (typeof window.parent.CMS === 'undefined'){
 			// backend admin
-			parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
+			parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", {% javascript_string %}{% trans "Plugin saved successfully." %}{% end_javascript_string %});
 		} else {
 			// frontend edit
 			setTimeout(function () { window.parent.CMS.API.Helpers.reloadBrowser(); }, 1000);
