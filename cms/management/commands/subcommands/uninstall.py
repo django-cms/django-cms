@@ -47,7 +47,13 @@ Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
             else:
                 confirm = 'yes'
-            queryset.delete()
+            if confirm == 'yes':
+                for plugin in queryset:
+                    instance, pluginclass = plugin.get_plugin_instance()
+                    if instance:
+                        instance.delete()
+                    else:
+                        plugin.delete()
             self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
             self.stdout.write('no %r plugins found\n' % label)            
