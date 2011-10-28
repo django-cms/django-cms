@@ -2,6 +2,7 @@
 from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
+from django.db.models.loading import get_models
 from django.core.management.base import LabelCommand
 
 
@@ -47,8 +48,22 @@ Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
             else:
                 confirm = 'yes'
-            queryset.delete()
-            self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
+            if confirm == 'yes':
+                try_models = []
+                for model in get_models():
+                    if issubclass(model, CMSPlugin):
+                        try_models.append((model, model.__name__.lower()))
+                for plugin in queryset:
+                    deleted=False
+                    for model, attr in try_models:
+                        try:
+                            getattr(plugin, attr).delete()
+                            deleted=True
+                        except (AttributeError, model.DoesNotExist):
+                            pass
+                    if not deleted:
+                        plugin.delete()
+                self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
             self.stdout.write('no %r plugins found\n' % label)            
 
