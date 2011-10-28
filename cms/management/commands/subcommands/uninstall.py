@@ -54,11 +54,15 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
                     if issubclass(model, CMSPlugin):
                         try_models.append((model, model.__name__.lower()))
                 for plugin in queryset:
+                    deleted=False
                     for model, attr in try_models:
                         try:
                             getattr(plugin, attr).delete()
+                            deleted=True
                         except (AttributeError, model.DoesNotExist):
                             pass
+                    if not deleted:
+                        plugin.delete()
                 self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
             self.stdout.write('no %r plugins found\n' % label)            
