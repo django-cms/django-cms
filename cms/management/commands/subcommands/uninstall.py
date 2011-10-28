@@ -54,7 +54,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
                         instance.delete()
                     else:
                         plugin.delete()
-            self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
+                self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
             self.stdout.write('no %r plugins found\n' % label)            
 
