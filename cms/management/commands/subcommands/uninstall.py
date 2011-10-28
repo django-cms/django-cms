@@ -46,7 +46,7 @@ class UninstallPluginsCommand(LabelCommand):
 You have requested to remove %d %r plugins.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
-            else
+            else:
                 confirm = 'yes'
             if confirm == 'yes':
                 try_models = []
