@@ -2,6 +2,7 @@
 from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
+from django.db.models.loading import get_models
 from django.core.management.base import LabelCommand
 
 
@@ -45,15 +46,19 @@ class UninstallPluginsCommand(LabelCommand):
 You have requested to remove %d %r plugins.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
-            else:
+            else
                 confirm = 'yes'
             if confirm == 'yes':
+                try_models = []
+                for model in get_models():
+                    if issubclass(model, CMSPlugin):
+                        try_models.append((model, model.__name__.lower()))
                 for plugin in queryset:
-                    instance, pluginclass = plugin.get_plugin_instance()
-                    if instance:
-                        instance.delete()
-                    else:
-                        plugin.delete()
+                    for model, attr in try_models:
+                        try:
+                            getattr(plugin, attr).delete()
+                        except (AttributeError, model.DoesNotExist):
+                            pass
                 self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
             self.stdout.write('no %r plugins found\n' % label)            
