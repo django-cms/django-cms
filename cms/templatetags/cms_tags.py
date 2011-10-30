@@ -331,7 +331,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     content = None
 
     if cache_result:
-        cache_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)+'_placeholder:'+placeholder_name
+        base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
+        cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         content = cache.get(cache_key)
 
     if not content:
