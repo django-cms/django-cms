@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
+from cms.models.pageflags_field import NamedFlagsField
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -82,6 +83,8 @@ class Page(MPTTModel):
     
     login_required = models.BooleanField(_("login required"), default=False)
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, help_text=_("limit when this page is visible in the menu"))
+    
+    page_flags = NamedFlagsField()
     
     # Placeholders (plugins)
     placeholders = models.ManyToManyField(Placeholder, editable=False)
@@ -1061,6 +1064,13 @@ class Page(MPTTModel):
                 placeholder = Placeholder.objects.create(slot=placeholder_name)
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
+    
+    @property
+    def flags(self):
+        r = {}
+        for flag, desc in settings.CMS_PAGE_FLAGS:
+            r[flag] = flag in self.page_flags
+        return r
 
 def _reversion():
     exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
