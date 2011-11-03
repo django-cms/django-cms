@@ -85,7 +85,7 @@ Also add any (or all) of the following plugins, depending on your needs:
 .. warning::
 
     Adding the ``'cms.plugins.snippet'`` plugin is a potential security hazard.
-    For more information, refer to :class:`cms.plugins.snippet.cms_plugins.SnippetPlugin`.
+    For more information, refer to :ref:`snippets-plugin`.
 
 They are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
 There is even more plugins available on django CMS `extensions page`_.

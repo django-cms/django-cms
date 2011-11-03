@@ -164,6 +164,8 @@ running.
 
 .. :class:: cms.plugins.snippet.cms_plugins.SnippetPlugin
 
+.. _snippets-plugin:
+
 *******
 Snippet
 *******
