@@ -105,7 +105,6 @@ setting in your project's ``settings.py`` file::
 
 .. :class:: cms.plugins.picture.cms_plugins.PicturePlugin
 
-
 *******
 Picture
 *******
@@ -184,6 +183,13 @@ setting in your project's ``settings.py`` file::
 .. note:: This plugin should mainly be used during development to quickly test
           HTML snippets.
 
+.. warning::
+
+    This plugin is a potential security hazard, since it allows admins to place
+    custom JavaScript on pages. This may allow administrators with the right to
+    add snippets to elevate their privileges to superusers. This plugin should
+    only be used during the initial development phase for rapid prototyping and
+    should be disabled on production sites.
 
 .. :module:: cms.plugins.teaser
 
