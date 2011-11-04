@@ -1799,7 +1799,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:23
 msgid "Are you sure you want to delete this plugin?"
-msgstr "¿Seguro que desea eliminar este 'plugin'?"
+msgstr "¿Seguro que desea eliminar este plugin?"
 
 #: templates/cms/toolbar/toolbar.html:55
 msgid "up"
