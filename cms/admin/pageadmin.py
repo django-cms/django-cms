@@ -70,7 +70,6 @@ def contribute_fieldsets(cls):
     seo_fields = []
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
-        list_filter.append('soft_root')
     if settings.CMS_PAGE_FLAGS:
         general_fields.append('page_flags')
     if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
