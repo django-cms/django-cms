@@ -1078,7 +1078,7 @@ class PageAdmin(ModelAdmin):
             raise Http404
         plugin_type = request.POST['plugin_type']
         if not has_plugin_permission(request.user, plugin_type, "add"):
-            return HttpResponseForbidden(ugettext('You have no permission to add a plugin'))
+            return HttpResponseForbidden(ugettext('You do not have permission to add a plugin of type "%s"') % plugin_type )
         placeholder_id = request.POST.get('placeholder', None)
         parent_id = request.POST.get('parent_id', None)
         if placeholder_id:
