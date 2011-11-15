@@ -52,3 +52,10 @@ ul#page_form_lang_tabs a:hover {
 }
 
 .deletetranslation { margin-left: 30px; }
+
+.page_flags ul li {
+	list-style: none;
+}
+.page_flags ul li label {
+	width: auto;
+}

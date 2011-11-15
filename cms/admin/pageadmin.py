@@ -70,6 +70,8 @@ def contribute_fieldsets(cls):
     seo_fields = []
     if settings.CMS_SOFTROOT:
         advanced_fields.append('soft_root')
+    if settings.CMS_PAGE_FLAGS:
+        general_fields.append('page_flags')
     if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
         general_fields.append(('publication_date', 'publication_end_date'))
     elif settings.CMS_SHOW_START_DATE:
@@ -1076,7 +1078,7 @@ class PageAdmin(ModelAdmin):
             raise Http404
         plugin_type = request.POST['plugin_type']
         if not has_plugin_permission(request.user, plugin_type, "add"):
-            return HttpResponseForbidden(ugettext('You have no permission to add a plugin'))
+            return HttpResponseForbidden(ugettext('You do not have permission to add a plugin of type "%s"') % plugin_type )
         placeholder_id = request.POST.get('placeholder', None)
         parent_id = request.POST.get('parent_id', None)
         if placeholder_id:

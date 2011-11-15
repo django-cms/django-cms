@@ -123,3 +123,6 @@ CMS_CACHE_PREFIX = 'cms-'
 # they are missing in the permission-merge2 branch
 CMS_PLUGIN_PROCESSORS = tuple()
 CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
+
+# Custom Pageflags
+CMS_PAGE_FLAGS = getattr(settings, 'CMS_PAGE_FLAGS', ())
