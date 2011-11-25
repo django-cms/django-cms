@@ -31,6 +31,7 @@ from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, 
     HttpResponse)
 from django.test.client import Client
+from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
@@ -967,3 +968,50 @@ class AdminFormsTests(TestCase):
             Title.objects.set_or_create(request, instance, form, 'en')
             form = PageForm(data, instance=instance)
             self.assertTrue(form.is_valid(), form.errors.as_text())
+
+
+class AdminPageEditContentSizeTests(AdminTestsBase):
+    """
+    System user count influences the size of the page edit page,
+    but the users are only 2 times present on the page
+    
+    The test relates to extra=0 
+    at PagePermissionInlineAdminForm and ViewRestrictionInlineAdmin
+    """
+    
+    def test_editpage_contentsize(self):
+        """
+        Expected a username only 2 times in the content, but a relationship
+        between usercount and pagesize
+        """
+        with SettingsOverride(CMS_MODERATOR = False, CMS_PERMISSIONS = True):
+            admin = self.get_superuser()
+            PAGE_NAME = 'TestPage'
+            USER_NAME = 'test_size_user_0'
+            site = Site.objects.get(pk = 1)
+            page = create_page(PAGE_NAME, "nav_playground.html", "en", site = site, created_by = admin)
+            page.save()
+            self._page = page
+            with self.login_user_context(admin):
+                url = base.URL_CMS_PAGE_CHANGE % self._page.pk
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                old_response_size = len(response.content)
+                old_user_count = User.objects.count()
+                # create additionals user and reload the page
+                obj = User.objects.create(username = USER_NAME, is_active = True)
+                user_count = User.objects.count()
+                more_users_in_db = old_user_count < user_count 
+                # we have more users
+                self.assertTrue(more_users_in_db,"New users got NOT created")
+                response = self.client.get(url)
+                new_response_size = len(response.content)
+                page_size_grown = old_response_size < new_response_size
+                # expect that the pagesize gets influenced by the useramount of the system
+                self.assertTrue(page_size_grown,"Page size has not grown after user creation")
+                # usernames are only 2 times in content
+                text = smart_str(response.content, response._charset)
+                foundcount = text.count(USER_NAME)
+                # 2 forms contain usernames as options
+                self.assertEqual(foundcount, 2, "Username %s appeared %s times in response.content, expected 2 times" % (USER_NAME, foundcount))
+            
