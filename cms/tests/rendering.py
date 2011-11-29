@@ -31,7 +31,7 @@ def test_plugin_context_processor(instance, placeholder):
 class RenderingTestCase(SettingsOverrideTestCase):
     
     settings_overrides = {
-        'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME)],
+        'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html')],
         'CMS_MODERATOR': False,
     }
 
@@ -59,6 +59,12 @@ class RenderingTestCase(SettingsOverrideTestCase):
                 'slug': u'RenderingTestCase-slug3',
                 'reverse_id': u'renderingtestcase-reverse-id3',
                 'text_sub': u'RenderingTestCase-sub3',
+            }
+            self.test_data4 = {
+                'title': u'RenderingTestCase-title3',
+                'no_extra': u'no extra var!',
+                'placeholderconf': {'extra_context': {'extra_context': {'extra_var': 'found extra var'}}},
+                'extra': u'found extra var',
             }
             self.insert_test_content()
 
@@ -92,11 +98,21 @@ class RenderingTestCase(SettingsOverrideTestCase):
         # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
                    body=self.test_data3['text_sub'])
+                   
+        # Insert another page that is not the home
+        p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
+        # Placeholders have been inserted on post_save signal:
+        self.test_placeholders4 = {}
+        for placeholder in p4.placeholders.all():
+            self.test_placeholders4[placeholder.slot] = placeholder
+        # Insert some test plugins
+        add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')        
 
         # Reload test pages
         self.test_page = self.reload(p)
         self.test_page2 = self.reload(p2)
         self.test_page3 = self.reload(p3)
+        self.test_page4 = self.reload(p4)
         
     def get_context(self, page, context_vars={}):
         request = self.get_request(page)
@@ -157,6 +173,15 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% placeholder "main" %}|{% placeholder "empty" %}'
         r = self.render(t, self.test_page)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|')
+        
+
+    def test_placeholder_extra_context(self):
+        t = u'{% load cms_tags %}{% placeholder "extra_context" %}'
+        r = self.render(t, self.test_page4)
+        self.assertEqual(r, self.test_data4['no_extra'])
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
+            r = self.render(t, self.test_page4)
+        self.assertEqual(r, self.test_data4['extra'])
 
     def test_placeholderor(self):
         """
@@ -178,7 +203,15 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% show_placeholder "sub" test_page %}'
         r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
-
+        
+    def test_show_placeholder_extra_context(self):
+        t = u'{% load cms_tags %}{% show_placeholder "extra_context" '+str(self.test_page4.pk)+' %}'
+        r = self.render(t, self.test_page4)
+        self.assertEqual(r, self.test_data4['no_extra'])
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
+            r = self.render(t, self.test_page4)
+        self.assertEqual(r, self.test_data4['extra'])
+            
     def test_show_uncached_placeholder_by_pk(self):
         """
         Tests the {% show_uncached_placeholder %} templatetag, using lookup by pk.

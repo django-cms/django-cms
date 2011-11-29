@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     'project.placeholderapp',
     'project.pluginapp',
     'project.pluginapp.plugins.manytomany_rel',
+    'project.pluginapp.plugins.extra_context',
     'project.fakemlng',
     'project.fileapp',
     'south',
