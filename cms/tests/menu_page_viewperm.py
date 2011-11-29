@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
 from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page, ACCESS_CHOICES
@@ -12,23 +13,23 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
+
+from menus.base import NavigationNode
+from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
+from menus.utils import mark_descendants, find_selected, cut_levels
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.template import Template, TemplateSyntaxError
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.utils import mark_descendants, find_selected, cut_levels
-
 
         
 class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
     """
     Test various combinations of view permissions pages and menus
     Focus on the different grant types and inheritance options of grant on
-    
     Given the tree:
         
         |- Page_a
@@ -48,23 +49,18 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         | |- Page_d_a
         | |- Page_d_b
         | |- Page_d_c
-        
     """
     settings_overrides = {
         'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
         'USE_I18N': False,
-        'CMS_LANGUAGES':(('en', 'English'),),
-        
     }
-    
     GROUPNAME_1 = 'group_b_ACCESS_PAGE_AND_CHILDREN'
     GROUPNAME_2 = 'group_b_b_ACCESS_CHILDREN'
     GROUPNAME_3 = 'group_b_ACCESS_PAGE_AND_DESCENDANTS'
     GROUPNAME_4 = 'group_b_ACCESS_DESCENDANTS'
     GROUPNAME_5 = 'group_d_ACCESS_PAGE'
-    
     
     def _setup_tree_pages(self):
         stdkwargs = {
@@ -238,8 +234,6 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         self.assertContains( response, "href=\"/en/page_d/page_d_b/\"" )
         self.assertContains( response, "href=\"/en/page_d/page_d_c/\"" )
         self.assertContains( response, "href=\"/en/page_d/page_d_d/\"" )
-        
-        
     
     def test_grant_types_menu_anonymous_user(self):
         """
@@ -277,9 +271,8 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         self.assertNotContains( response, "href=\"/en/page_d/page_d_b/\"" )
         self.assertNotContains( response, "href=\"/en/page_d/page_d_c/\"" )
         self.assertNotContains( response, "href=\"/en/page_d/page_d_d/\"" )
-        
     
-    def test_grant_types_pages_anonymous_user(self):
+    def test_access_types_pages_anonymous_user(self):
         """
         Anonymous user should only see the pages in the rendered menu
         that have no permissions assigned, directly or indirectly
@@ -342,9 +335,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
     def test_menu_access_page_and_children_group_1(self):
         """
         simulate behaviour of group b member
-        group_b_ACCESS_PAGE_AND_CHILDREN
-        to page_b
-        
+        group_b_ACCESS_PAGE_AND_CHILDREN to page_b
         """
         self._setup_user_groups()
         self._setup_tree_pages()
@@ -380,6 +371,11 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         
         # verified - the page has a view restriction
         page_to_check = Page.objects.get(title_set__title= "page_b_a")
+        is_restricted = self._check_is_view_restricted_check(page_to_check)
+        self.assertEquals(is_restricted, True)
+        
+        # verified - the page has a view restriction
+        page_to_check = Page.objects.get(title_set__title= "page_b_b_a")
         is_restricted = self._check_is_view_restricted_check(page_to_check)
         self.assertEquals(is_restricted, True)
         
@@ -471,9 +467,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
     def test_menu_access_page_and_descendants_group_3(self):
         """
         simulate behaviour of group 3 member
-        group_b_ACCESS_PAGE_AND_DESCENDANTS
-        to page_b
-        
+        group_b_ACCESS_PAGE_AND_DESCENDANTS to page_b
         """
         self._setup_user_groups()
         self._setup_tree_pages()
@@ -542,9 +536,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
     def test_menu_access_descendants_group_4(self):
         """
         simulate behaviour of group 4 member
-        group_b_b_ACCESS_DESCENDANTS
-        to page_b_b
-        
+        group_b_b_ACCESS_DESCENDANTS to page_b_b
         """
         self._setup_user_groups()
         self._setup_tree_pages()
