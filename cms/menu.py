@@ -2,7 +2,7 @@
 from collections import defaultdict
 from cms.apphook_pool import apphook_pool
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
-    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN)
+    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
@@ -20,58 +20,72 @@ def get_visible_pages(request, pages, site=None):
     # This code is basically a many-pages-at-once version of
     # Page.has_view_permission, check there to see wtf is going on here.
     # pages contains all published pages
-    #@FIXME:
-    # the block below is not true as the setting CMS_PUBLIC_FOR
-    # deals with the unrestricted pages only
-    # at least this is the intention of this setting
-    #if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
-    #    return [page.pk for page in pages]
     
+    
+    # check if there is ANY restriction
+    # that needs a permission pages visibility calculation
+    
+    #edgecase
+    #anonymous user public for all, no pageperm objects
+    if (not request.user.is_authenticated() and 
+        settings.CMS_PUBLIC_FOR == 'all' and 
+        PagePermission.objects.filter(can_view = True).count() == 0):
+        return [page.pk for page in pages]
+
+    #auth user but no page perms
+    if (request.user.is_authenticated() and 
+        settings.CMS_PUBLIC_FOR == 'all' and 
+        PagePermission.objects.filter(can_view = True).count() == 0 and
+        GlobalPagePermission.objects.filter(can_view = True).count() == 0):
+        return [page.pk for page in pages]
+    
+    #auth user but no page perms
+    if (request.user.is_staff and 
+        settings.CMS_PUBLIC_FOR == 'staff' and 
+        PagePermission.objects.filter(can_view = True).count() == 0 and 
+        GlobalPagePermission.objects.filter(can_view = True).count() == 0):
+        return [page.pk for page in pages]
+    
+    ## edgecases covered now dive into the real calculation##
     
     visible_page_ids = []
     restricted_pages = defaultdict(list)
     pages_perms_q = Q()
 
-#@FIXME: many-pages at onece version needed    
-#   many to one solutions currently not working
-#   backport of old solution
-#    for page in pages:
-#        page_q = Q(page__tree_id=page.tree_id) & (
-#            Q(page=page) 
-#            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-#            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
-#        ) 
-#        pages_perms_q |= page_q
-#    pages_perms_q &= Q(can_view=True)
-#    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
-#
-
-	# iterate over every page and check if there is an inherited restriction
-	# and store the perm related to the page
     for page in pages:
-        page_q = Q(page__tree_id = page.tree_id) & (
+        page_q = Q(page__tree_id=page.tree_id) & (
             Q(page=page) 
-            | (Q(page__level__lt = page.level)  & (Q(grant_on = ACCESS_DESCENDANTS) | Q(grant_on = ACCESS_PAGE_AND_DESCENDANTS)))
-            | (Q(page__level = page.level - 1) & (Q(grant_on = ACCESS_CHILDREN) | Q(grant_on = ACCESS_PAGE_AND_CHILDREN)))  
+            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
+            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
         ) 
-        pages_perms_q = page_q
-        pages_perms_q &= Q(can_view=True)
-        page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
-        for perm in page_permissions:
-            if perm is not None and perm not in restricted_pages[page.id]:
-                restricted_pages[page.pk].append(perm)
-    
-	#@FIXME: cleanup    
-    # the permissions are assigned directly to this pages
-    # the restriction effect of chilren descendants etc is not taken into account
-    #for perm in page_permissions:
-    #    restricted_pages[perm.page.pk].append(perm)
+        pages_perms_q |= page_q
+    pages_perms_q &= Q(can_view=True)
+    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
+
+    for perm in page_permissions:
+        # collect the pages that are effected by permissions
+        if perm is not None and perm not in restricted_pages[perm.page.pk]:
+            # effective restricted pages gathering
+            # using mptt functions 
+            # add the page with the perm itself
+            if perm.grant_on in [ACCESS_PAGE,ACCESS_PAGE_AND_CHILDREN,ACCESS_PAGE_AND_DESCENDANTS]:
+                restricted_pages[perm.page.pk].append(perm)
+            # add children    
+            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]: 
+                child_ids = perm.page.get_children().values_list('id', flat=True)
+                for id in child_ids:
+                    restricted_pages[id].append(perm)
+            # add descendants
+            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]: 
+                child_ids = perm.page.get_descendants().values_list('id', flat=True)
+                for id in child_ids:
+                    restricted_pages[id].append(perm)
+            
 
     if site is None:
         site = current_site(request)
     
     if request.user.is_authenticated():
-        #return self.filter(Q(user=user) | Q(group__user=user))
         global_page_perm_q = Q(
             Q(user=request.user) | Q(group__user=request.user)
         ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
@@ -102,9 +116,9 @@ def get_visible_pages(request, pages, site=None):
         return False
     
     for page in pages:
-    	#restricted_pages contains as key any pk that inherites a perm
+        #restricted_pages contains as key any page.pk that is 
+        #effected by a permission grant_on
         is_restricted = page.pk in restricted_pages
-        
         if request.user.is_authenticated():
             # a global permission was given to the request's user
             if global_view_perms:
@@ -119,6 +133,7 @@ def get_visible_pages(request, pages, site=None):
             # if no restriction applied
             elif settings.CMS_PUBLIC_FOR == 'staff' and not is_restricted and request.user.is_staff:
                 visible_page_ids.append(page.pk)
+                
             elif is_restricted and has_permission_membership(page):
                 visible_page_ids.append(page.pk)
             elif has_global_perm():
@@ -336,7 +351,7 @@ class SoftRootCutter(Modifier):
         usually don’t want to present site visitors with deep menus of nested
         items.
     
-        For example, you’re on the page “Introduction to Bleeding�?, so the menu
+        For example, you’re on the page “Introduction to Bleeding�?, so the menu
         might look like this:
     
             School of Medicine
@@ -367,7 +382,7 @@ class SoftRootCutter(Modifier):
     
         which is frankly overwhelming.
     
-        By making “Department of Mediaeval Surgery�? a soft root, the menu
+        By making “Department of Mediaeval Surgery�? a soft root, the menu
         becomes much more manageable:
     
             Department of Mediaeval Surgery

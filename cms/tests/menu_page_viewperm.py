@@ -2,28 +2,14 @@
 from __future__ import with_statement
 
 from cms.api import create_page
-from cms.menu import CMSMenu, get_visible_pages
-from cms.models import Page, ACCESS_CHOICES
+from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS 
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
-    SoftrootFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride, 
-    LanguageOverride)
-from cms.test_utils.util.mock import AttributeObject
 
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.utils import mark_descendants, find_selected, cut_levels
-
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User, Permission, Group
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
+from django.contrib.auth.models import User, Group
 from django.db.models import Q
-from django.template import Template, TemplateSyntaxError
 
         
 class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
@@ -54,7 +40,6 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
-        'USE_I18N': False,
     }
     GROUPNAME_1 = 'group_b_ACCESS_PAGE_AND_CHILDREN'
     GROUPNAME_2 = 'group_b_b_ACCESS_CHILDREN'
@@ -206,10 +191,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         )
         
         return PagePermission.objects.filter(q).order_by('page__level').filter(can_view=True).exists()
-        
-#
-# TESTS START
-#                
+
     def test_public_pages_anonymous_norestrictions(self):
         """
         All pages are rendered as menuitems to an anonymous user
@@ -519,6 +501,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         # page d is not associated with this group
         url = "/en/page_d/"
         self.assertNotContains( response, "href=\"%s\"" % url )
+        
         page_to_check = Page.objects.get(title_set__title= "page_d")
         is_restricted = self._check_is_view_restricted_check(page_to_check)
         self.assertEquals(is_restricted, True)

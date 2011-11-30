@@ -772,7 +772,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         page = Page()
         page.pk = 1
         pages = [page]
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(1):
+            """
+                The queries are:
+                PagePermission count query
+            """    
             get_visible_pages(request, pages)
     
     def test_public_for_all(self):
@@ -1004,9 +1008,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         page.level = 0
         page.tree_id = 1
         pages = [page]
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4):
             """
             The queries are:
+            PagePermission count
+            GlobalPagePermission count
             PagePermission query for affected pages
             GlobalpagePermission query for user
             """
