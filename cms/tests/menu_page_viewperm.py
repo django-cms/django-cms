@@ -11,8 +11,8 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
 
-        
-class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
+
+class ViewPermissionTests(SettingsOverrideTestCase):
     """
     Test various combinations of view permissions pages and menus
     Focus on the different grant types and inheritance options of grant on
@@ -36,11 +36,6 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         | |- Page_d_b
         | |- Page_d_c
     """
-    settings_overrides = {
-        'CMS_MODERATOR': False,
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
-    }
     GROUPNAME_1 = 'group_b_ACCESS_PAGE_AND_CHILDREN'
     GROUPNAME_2 = 'group_b_b_ACCESS_CHILDREN'
     GROUPNAME_3 = 'group_b_ACCESS_PAGE_AND_DESCENDANTS'
@@ -100,7 +95,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         """
         Setup a group for every grant on ACCESS TYPE
         """
-        user = User.objects.create(username='user_1', email='user_1@domain.com', is_active = True, is_staff = True)
+        user = User.objects.create(username='user_1', email='user_1@domain.com', is_active = True, is_staff = False)
         user.set_password(user.username)
         user.save()
         group = Group.objects.create(name=self.GROUPNAME_1)
@@ -135,9 +130,11 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         group.user_set.add(user)
         group.save()
         
-        user = User.objects.create(username='user_6', email='user_6@domain.com', is_active = True, is_staff = False)
+        user = User.objects.create(username='user_staff', email='user_staff@domain.com', is_active = True, is_staff = True)
         user.set_password(user.username)
         user.save()
+        
+        self.assertEquals(6,User.objects.all().count())
         
         
     def _setup_view_restrictions(self):
@@ -201,6 +198,14 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         page_to_check = Page.objects.get(title_set__title = page_title)
         is_restricted = self._check_is_view_restricted_check(page_to_check)
         self.assertEquals(is_restricted, expected_result)
+
+        
+class ViewPermissionComplexMenuAllTests(ViewPermissionTests):
+    settings_overrides = {
+        'CMS_MODERATOR': False,
+        'CMS_PERMISSION': True,
+        'CMS_PUBLIC_FOR': 'all',
+    }
 
     def test_public_pages_anonymous_norestrictions(self):
         """
@@ -324,7 +329,7 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         url = "/en/page_d/page_d_d/"
         self._check_url_page_found(url)
         
-    def test_menu_access_page_and_children_group_1(self):
+    def test_menu_access_page_and_children_group_1_nostaff(self):
         """
         simulate behaviour of group b member
         group_b_ACCESS_PAGE_AND_CHILDREN to page_b
@@ -342,8 +347,12 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         
+        
+        
+        self._check_db_view_restriction_to_page("page_b",True)
         url ="/en/page_b/"
         self.assertContains( response, "href=\"%s\"" % url )
+        
         url ="/en/page_b/page_b_a/"
         self.assertContains( response, "href=\"%s\"" % url )
         url ="/en/page_b/page_b_b/"
@@ -561,8 +570,218 @@ class ViewPermissionComplexMenuAllTests(SettingsOverrideTestCase):
         url = "/en/page_d/page_d_d/"
         self.assertNotContains( response, "href=\"%s\"" % url )
         self._check_db_view_restriction_to_page("page_d_d",False)
+
+
+class ViewPermissionComplexMenuStaffTests(ViewPermissionTests):
+    """
+    CMS_PUBLIC_FOR: staff
+    no anonymous access for pages that have no restriction applied
+    only loggedin users with staff see something
+    """
+    
+    settings_overrides = {
+        'CMS_MODERATOR': False,
+        'CMS_PERMISSION': True,
+        'CMS_PUBLIC_FOR': 'staff',
+    }   
+         
+    def test_menu_public_pages_anonymous_norestrictions(self):
+        """
+        All pages are rendered as menuitems to an anonymous user
+        """
+        self._setup_tree_pages()
+        response = self.client.get(self.get_pages_root())
+        
+        self._check_db_view_restriction_to_page("page_a",False)
+        url = self.get_pages_root()
+        #response = self.client.get(url)
+        self._check_url_page_not_found(url)
         
         
+    def test_menu_public_pages_staff_norestrictions(self):
+        """
+        Logged in Staff user, pages have no restrictions at all
+        """
+        self._setup_user_groups()
+        self._setup_tree_pages()
+        self.client.logout()
+        # login a staff user without any restriction applied to pages
+        login_ok = self.client.login(username='user_staff', password='user_staff')
+        self.assertEqual(login_ok , True)
+        url = self.get_pages_root()
+        response = self.client.get(url)
+        self._check_url_page_found(url)
+        self.assertContains( response, "href=\"/en/\"" )
+        self.assertContains( response, "href=\"/en/page_b/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_a/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_b/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_b/page_b_b_a/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_b/page_b_b_b/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_b/page_b_b_c/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_c/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_d/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_d/page_b_d_a/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_d/page_b_d_b/\"" )
+        self.assertContains( response, "href=\"/en/page_b/page_b_d/page_b_d_c/\"" )
+        self.assertContains( response, "href=\"/en/page_c/\"" )
+        self.assertContains( response, "href=\"/en/page_d/\"" )
+        self.assertContains( response, "href=\"/en/page_d/page_d_a/\"" )
+        self.assertContains( response, "href=\"/en/page_d/page_d_b/\"" )
+        self.assertContains( response, "href=\"/en/page_d/page_d_c/\"" )
+        self.assertContains( response, "href=\"/en/page_d/page_d_d/\"" )
+    
+    def test_menu_staff_without_perm_membership(self):
+        """
+        Logged in Staff user, pages have no restrictions at all
+        """
+        self._setup_user_groups()
+        self._setup_tree_pages()
+        self._setup_view_restrictions()
+        self.client.logout()
+        # login a staff user without any restriction applied to pages
+        login_ok = self.client.login(username='user_staff', password='user_staff')
+        self.assertEqual(login_ok , True)
+        url = self.get_pages_root()
+        response = self.client.get(url)
+        self._check_url_page_found(url)
+        self.assertContains( response, "href=\"/en/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_a/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_b/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_b/page_b_b_a/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_b/page_b_b_b/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_b/page_b_b_c/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_c/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_d/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_d/page_b_d_a/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_d/page_b_d_b/\"" )
+        self.assertNotContains( response, "href=\"/en/page_b/page_b_d/page_b_d_c/\"" )
+        self.assertContains( response, "href=\"/en/page_c/\"" )
+        self.assertNotContains( response, "href=\"/en/page_d/\"" )
+        self.assertNotContains( response, "href=\"/en/page_d/page_d_a/\"" )
+        self.assertNotContains( response, "href=\"/en/page_d/page_d_b/\"" )
+        self.assertNotContains( response, "href=\"/en/page_d/page_d_c/\"" )
+        self.assertNotContains( response, "href=\"/en/page_d/page_d_d/\"" )
+
+    def test_menu_access_page_and_children_group_1(self):
+        """
+        simulate behaviour of group b member
+        group_b_ACCESS_PAGE_AND_CHILDREN to page_b
+        """
+        self._setup_user_groups()
+        self._setup_tree_pages()
+        self._setup_view_restrictions()
+        self.client.logout()
+        # fresh login
+        # user 1 is member of group_b_access_page_and_children
+        login_ok = self.client.login(username='user_1', password='user_1')
+        self.assertEqual(login_ok , True)
+        # call /
+        url = self.get_pages_root()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self._check_db_view_restriction_to_page("page_b",True)
+        self._check_db_view_restriction_to_page("page_b_a",True)
+        self._check_db_view_restriction_to_page("page_b_b_a",True)
+
+        
+        url ="/en/page_b/"
+        self.assertContains( response, "href=\"%s\"" % url )
+        url ="/en/page_b/page_b_a/"
+        self.assertContains( response, "href=\"%s\"" % url )
+        url ="/en/page_b/page_b_b/"
+        self.assertContains( response, "href=\"%s\"" % url )
+        url ="/en/page_b/page_b_c/"
+        self.assertContains( response, "href=\"%s\"" % url )
+        url ="/en/page_b/page_b_d/"
+        self.assertContains( response, "href=\"%s\"" % url )
+        # not a direct child
+        url ="/en/page_b/page_b_b/page_b_b_a/"
+        self.assertNotContains( response, "href=\"%s\"" % url )
+        
+        # verified - the page has a view restriction
+        self._check_db_view_restriction_to_page("page_b",True)
+        self._check_db_view_restriction_to_page("page_b_a",True)
+        self._check_db_view_restriction_to_page("page_b_b_a",True)
+        
+        # no restrictions
+        url ="/en/page_c/"
+        self.assertContains( response, "href=\"%s\"" % url )
+        self._check_db_view_restriction_to_page("page_c",False)
+        
+        # page d is not associated with this group
+        url = "/en/page_d/"
+        self.assertNotContains( response, "href=\"%s\"" % url )
+        # as the page_d is restricted and 
+        
+        # but not the children
+        url = "/en/page_d/page_d_a/"
+        self.assertNotContains( response, "href=\"%s\"" % url )
+        url = "/en/page_d/page_d_b/"
+        self.assertNotContains( response, "href=\"%s\"" % url )
+        url = "/en/page_d/page_d_c/"
+        self.assertNotContains( response, "href=\"%s\"" % url )
+        url = "/en/page_d/page_d_d/"
+        
+#    def test_access_types_pages_anonymous_user(self):
+#        """
+#        Anonymous user should only see the pages in the rendered menu
+#        that have no permissions assigned, directly or indirectly
+#        but should have access to some of the not shown ones
+#        """
+#        self._setup_user_groups()
+#        self._setup_tree_pages()
+#        self._setup_view_restrictions()
+#        response = self.client.get(self.get_pages_root())
+#        self.assertContains( response, "href=\"/en/\"" )
+#        url ="/en/"
+#        self._check_url_page_found(url)
+#        #page b has page and children restricted - group 1
+#        url ="/en/page_b/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_a/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_b/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_b/page_b_b_a/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_b/page_b_b_b/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_b/page_b_b_c/"
+#        self._check_url_page_not_found(url)
+#        
+#        #page b_b children restricted - group 2
+#        #page b_b page and descendants restricted - group 3
+#        #page b_b descendants restricted - group 4
+#        
+#        url ="/en/page_b/page_b_c/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_d/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_d/page_b_d_a/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_d/page_b_d_b/"
+#        self._check_url_page_not_found(url)
+#        url ="/en/page_b/page_b_d/page_b_d_c/"
+#        self._check_url_page_not_found(url)
+#        
+#        # no restrictions
+#        url ="/en/page_c/"
+#        self._check_url_page_found(url)
+#        
+#        #page d page restricted - group 5
+#        url ="/en/page_d/"
+#        self._check_url_page_not_found(url)
+#        # as the page_d is restricted and 
+#        # but not the children
+#        url = "/en/page_d/page_d_a/"
+#        self._check_url_page_found(url)
+#        url = "/en/page_d/page_d_b/"
+#        self._check_url_page_found(url)
+#        url = "/en/page_d/page_d_c/"
+#        self._check_url_page_found(url)
+#        url = "/en/page_d/page_d_d/"
+#        self._check_url_page_found(url)    
 #    def test_access_togrant_access_page_and_children_group_b(self):
 #        """
 #        simulate behaviour of group b member
