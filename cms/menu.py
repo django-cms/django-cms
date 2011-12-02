@@ -9,12 +9,13 @@ from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_page_queryset, get_title_queryset
 from cms.utils.plugins import current_site
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.db.models.query_utils import Q
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.db.models.query_utils import Q
+from django.contrib.auth.models import Permission
 
 def get_visible_pages(request, pages, site=None):
     # This code is basically a many-pages-at-once version of
@@ -40,19 +41,25 @@ def get_visible_pages(request, pages, site=None):
             GlobalPagePermission.objects.filter(can_view = True).count() == 0):
             return [page.pk for page in pages] 
     
+# this edg casese are to rare to justify 3 additional queries
+
         #auth user staff but no page perms 
-        if (request.user.is_staff and  
-            settings.CMS_PUBLIC_FOR == 'staff' and 
-            PagePermission.objects.filter(can_view = True).count() == 0 and 
-            GlobalPagePermission.objects.filter(can_view = True).count() == 0):
-            return [page.pk for page in pages]
+#        if (request.user.is_staff and  
+#            settings.CMS_PUBLIC_FOR == 'staff' and 
+#            PagePermission.objects.filter(can_view = True).count() == 0 and 
+#            GlobalPagePermission.objects.filter(can_view = True).count() == 0 and
+#            Permission.objects.filter(codename='view_page').count() == 0):
+#            return [page.pk for page in pages]
+
+# this edg casese are to rare to justify 3 additional queries        
         
         #auth user none staff but no page perms
-        if (not request.user.is_staff and 
-            settings.CMS_PUBLIC_FOR == 'staff' and 
-            PagePermission.objects.filter(can_view = True).count() == 0 and 
-            GlobalPagePermission.objects.filter(can_view = True).count() == 0):
-            return []
+#        if (not request.user.is_staff and 
+#            settings.CMS_PUBLIC_FOR == 'staff' and 
+#            PagePermission.objects.filter(can_view = True).count() == 0 and 
+#            GlobalPagePermission.objects.filter(can_view = True).count() == 0 and
+#            Permission.objects.filter(codename='view_page').count() == 0):
+#            return []
 
     ##
     ## edgecases covered now dive into the real calculation##
