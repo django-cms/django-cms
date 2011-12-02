@@ -98,11 +98,18 @@ def has_page_change_permission(request):
     return False
 
 def get_any_page_view_permissions(request, page):
-    from cms.utils.plugins import current_site
-    return PagePermission.objects.filter(
-            page__pk=page.pk,
-            page__site=current_site(request),
-            can_view=True)
+    """
+    Used by the admin template tag is_restricted
+    """
+    #this block covers only the direct associated pages
+    #and do not show the inherited grant view permissions
+    #from cms.utils.plugins import current_site
+    #return PagePermission.objects.filter(
+    #        page__pk=page.pk,
+    #        page__site=current_site(request),
+    #        can_view=True)
+    return PagePermission.objects.for_page(page=page).filter(can_view=True)
+
 
 
 def get_user_permission_level(user):
