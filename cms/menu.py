@@ -132,8 +132,6 @@ def get_visible_pages(request, pages, site=None):
             if user_pk in group_user_ids and len(group_user_ids) > 0 :
                 has_perm = True
         
-        if request.user.username == 'user_2_nostaff':
-            print "page.id %s has perm %s" % (page_pk, has_perm)
         return has_perm
     
     is_auth_user = request.user.is_authenticated() 
