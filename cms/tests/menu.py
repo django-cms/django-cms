@@ -10,14 +10,15 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
+from menus.base import NavigationNode
+from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
+from menus.utils import mark_descendants, find_selected, cut_levels
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.utils import mark_descendants, find_selected, cut_levels
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
@@ -840,6 +841,8 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
+            user.is_staff = True
+            user.save()
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -861,13 +864,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page.level = 0
             page.tree_id = 1
             pages = [page]
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(2):
                 """
                 The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                Generic django permission lookup
-                content type lookup by permission lookup
+                PagePermission count query 
+                GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
     
@@ -894,13 +895,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page.level = 0
             page.tree_id = 1
             pages = [page]
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(2):
                 """
                 The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                Generic django permission lookup
-                content type lookup by permission lookup
+                View Permission Calculation Query
+                globalpagepermissino calculation
                 """
                 get_visible_pages(request, pages, site)
     
