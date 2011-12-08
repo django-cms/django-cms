@@ -12,7 +12,7 @@ Upgrading a django CMS installation
     2.2
 
 ******************
-Upgrade from 2.1.3
+Upgrade from 2.1.x
 ******************
 
 .. toctree::

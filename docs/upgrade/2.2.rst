@@ -35,6 +35,8 @@ View permissions
 
 You can now give view permissions for django CMS pages to groups and users.
 
+.. _backwards-incompatible-changes:
+
 ******************************
 Backwards incompatible changes
 ******************************

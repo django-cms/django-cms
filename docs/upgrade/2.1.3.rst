@@ -1,18 +1,18 @@
 *************************************
-Upgrading from 2.1.3 and django 1.2.5
+Upgrading from 2.1.x and Django 1.2.x
 *************************************
 
-Upgrading dependancies
+Upgrading dependencies
 ======================
 
-Upgrade both your version of django CMS and django by running
+Upgrade both your version of django CMS and Django by running
 the following commands.
 
 .. code-block:: bash
 
     pip install --upgrade django-cms==2.2 django==1.3.1
 
-If you are using django-revision make sure to have atleast
+If you are using django-reversion make sure to have atleast
 version 1.4 installed
 
 .. code-block:: bash
@@ -34,25 +34,21 @@ The following changes will need to be made in your settings.py file::
     ADMIN_MEDIA_PREFIX = '/static/admin'
     STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
     STATIC_URL = "/static/"
+   
+.. note::
+
+    These are not django CMS settings.  Refer to the Django documentation on `staticfiles`_ for more information.
+
+.. _staticfiles: http://readthedocs.org/docs/django/en/latest/ref/contrib/staticfiles.html
     
 .. note::
 
-    Please make sure the ``static`` subfolder exist in your
+    Please make sure the ``static`` subfolder exists in your
     project and is writable.
     
 .. note::
 
-    PROJECT_PATH is the absolute path to your project
-    
-**Remove** the following from :setting:`django:TEMPLATE_LOADERS`::
-
-    django.template.loaders.filesystem.load_template_source
-    django.template.loaders.app_directories.load_template_source
-    
-**Add** the following to :setting:`django:TEMPLATE_LOADERS`::
-
-    django.template.loaders.filesystem.Loader
-    django.template.loaders.app_directories.Loader
+    PROJECT_PATH is the absolute path to your project.  See :ref:`configure-django-cms` for instructions on how to set PROJECT_PATH.
 
 **Remove** the following from :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
@@ -81,6 +77,10 @@ Template Updates
 ================
 
 Make sure to add sekizai tags and ``cms_toolbar`` to your CMS templates.
+
+.. note::
+
+  ``cms_toolbar`` is only needed if you wish to use the front-end editing.  See :ref:`backwards-incompatible-changes` for more information  
 
 Here is a simple example for a base template called ``base.html``:
 
@@ -112,7 +112,7 @@ Run the following commands to upgrade your database
 Static Media
 ============
 
-Add the following to ``urls.py`` to server static media with developing::
+Add the following to ``urls.py`` to serve static media when developing::
 
     if settings.DEBUG:
         urlpatterns = patterns('',
