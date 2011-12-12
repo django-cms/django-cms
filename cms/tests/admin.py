@@ -942,7 +942,7 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
-class AdminFormsTests(TestCase):
+class AdminFormsTests(AdminTestsBase):
     def test_clean_overwrite_url(self):
         user = AnonymousUser()
         user.is_superuser = True
@@ -968,6 +968,57 @@ class AdminFormsTests(TestCase):
             Title.objects.set_or_create(request, instance, form, 'en')
             form = PageForm(data, instance=instance)
             self.assertTrue(form.is_valid(), form.errors.as_text())
+
+    def test_reverse_id_error_location(self):
+        ''' Test moving the reverse_id validation error to a field specific one '''
+
+        # this is the Reverse ID we'll re-use to break things.
+        dupe_id = 'p1'
+        site = Site.objects.get_current()
+        page1 = create_page('Page 1', 'nav_playground.html', 'en', reverse_id=dupe_id)
+        # Assemble a bunch of data to test the page form
+        page2_data = {
+            'title': 'Page 2',
+            'slug': 'page-2',
+            'language': 'en',
+            'site': site.pk,
+            'template': settings.CMS_TEMPLATES[0][0],
+            'reverse_id': dupe_id,
+        }
+        form = PageForm(data=page2_data, files=None)
+        self.assertTrue(not form.is_valid())
+        # reverse_id is the only item that is in __all__ as every other field
+        # has it's own clean method. Moving it to be a field error means
+        # __all__ is now not available.
+        self.assertTrue('__all__' not in form.errors)
+        # In moving it to it's own field, it should be in form.errors, and
+        # the values contained therein should match these.
+        self.assertTrue('reverse_id' in form.errors)
+        self.assertEqual(1, len(form.errors['reverse_id']))
+        self.assertEqual([u'A page with this reverse URL id exists already.'],
+            form.errors['reverse_id'])
+
+        admin = self._get_guys(admin_only=True)
+        # reset some of page2_data so we can use cms.api.create_page
+        page2_data['reverse_id'] = None
+        page2_data['site'] = site
+        page2 = create_page(**page2_data)
+        with self.login_user_context(admin):
+            # re-reset the page2_data for the admin form instance.
+            page2_data['reverse_id'] = dupe_id
+            page2_data['site'] = site.pk
+            # This is needed to avoid management form tampering errors.
+            page2_data['pagepermission_set-TOTAL_FORMS'] = 0
+            page2_data['pagepermission_set-INITIAL_FORMS'] = 0
+            page2_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+            page2_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+            page2_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+            page2_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+            # post to the admin change form for page 2, and test that the
+            # reverse_id form row has an errors class. Django's admin avoids
+            # collapsing these, so that the error is visible.
+            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page2.pk, page2_data)
+            self.assertTrue('<div class="form-row errors reverse_id">' in resp.content)
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
