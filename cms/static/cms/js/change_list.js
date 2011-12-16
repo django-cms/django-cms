@@ -36,7 +36,7 @@
 				theme_name: "default",
 				a_class: "title"
 			},
-			cookies : {},
+			cookies : MENU_COOKIES,
 			callback: {
 				beforemove  : function(what, where, position, tree) {
 					item_id = what.id.split("page_")[1];

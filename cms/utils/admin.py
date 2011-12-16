@@ -71,11 +71,14 @@ def get_admin_menu_item_context(request, page, filtered=False):
     return context
 
 
-def render_admin_menu_item(request, page):
+def render_admin_menu_item(request, page, template=None):
     """
     Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
     """
+    if not template:
+        template = "admin/cms/page/menu_item.html"
+
     if not page.pk:
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
         
@@ -93,4 +96,4 @@ def render_admin_menu_item(request, page):
     
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered))
-    return render_to_response('admin/cms/page/menu_item.html', context)
+    return render_to_response(template, context)

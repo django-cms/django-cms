@@ -204,6 +204,7 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/load-nav/$', self.load_nav), # lazy load navigation
             pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
@@ -683,6 +684,7 @@ class PageAdmin(ModelAdmin):
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
+            'CMS_LAZY_LOAD_MENU': settings.CMS_LAZY_LOAD_MENU,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)
@@ -1065,6 +1067,19 @@ class PageAdmin(ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 
+    def load_nav(self, request, page_id):
+        """
+        Lazy load navigation tree for given page
+        """
+        page = get_object_or_404(Page, pk=page_id)
+        return admin_utils.render_admin_menu_item(request, page,
+                template="admin/cms/page/lazy_menu.html")
+        # return render_to_response("admin/cms/page/lazy_menu.html", {
+        #         "page":page,
+        #         "children":page.children.all(),
+        #         "filtered":False, #need to actually set this
+        #     }, context_instance=RequestContext(request))
+                
     @create_on_success
     def add_plugin(self, request):
         '''
