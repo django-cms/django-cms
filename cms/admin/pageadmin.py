@@ -1074,11 +1074,6 @@ class PageAdmin(ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
                 template="admin/cms/page/lazy_menu.html")
-        # return render_to_response("admin/cms/page/lazy_menu.html", {
-        #         "page":page,
-        #         "children":page.children.all(),
-        #         "filtered":False, #need to actually set this
-        #     }, context_instance=RequestContext(request))
                 
     @create_on_success
     def add_plugin(self, request):
