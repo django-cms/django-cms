@@ -684,7 +684,6 @@ class PageAdmin(ModelAdmin):
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
-            'CMS_LAZY_LOAD_MENU': settings.CMS_LAZY_LOAD_MENU,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)

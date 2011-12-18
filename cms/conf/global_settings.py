@@ -123,4 +123,3 @@ CMS_CACHE_PREFIX = 'cms-'
 # they are missing in the permission-merge2 branch
 CMS_PLUGIN_PROCESSORS = tuple()
 CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
-CMS_LAZY_LOAD_MENU = False

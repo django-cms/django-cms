@@ -179,15 +179,6 @@ Default: ``True``
 If set to ``False``, frontend editing is not available for models using
 :class:`cms.models.fields.PlaceholderField`.
 
-CMS_LAZY_LOAD_MENU
-==================
-
-Default: ``False``
-
-If set to ``True``, it will enabled lazy loading of the menu in the page
-change list in the admin.  This is useful for sites with a lot of menu items as loading a large menu tree affects site performance
-
-********************
 Editor configuration
 ********************
 
