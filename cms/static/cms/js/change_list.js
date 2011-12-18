@@ -276,7 +276,7 @@
 	        	if($(jtarget).find('ul > li').length == 0) {
                     var pageId = $(jtarget).attr("id").split("page_")[1];
 
-                    $.get(admin_base_url + "cms/page/" + pageId + "/load-nav/", {}, function(r, status) {
+                    $.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
                         $(jtarget).children('ul').append(r);    
                         // show move targets if needed
                         if($('span.move-target-container:visible').length > 0) {

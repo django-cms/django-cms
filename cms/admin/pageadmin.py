@@ -204,7 +204,7 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-            pat(r'^([0-9]+)/load-nav/$', self.load_nav), # lazy load navigation
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
             pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
@@ -1066,9 +1066,10 @@ class PageAdmin(ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 
-    def load_nav(self, request, page_id):
+    def descendants(self, request, page_id):
         """
-        Lazy load navigation tree for given page
+        Get html for descendants of given page
+        Used for lazy loading pages in change_list.js
         """
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
