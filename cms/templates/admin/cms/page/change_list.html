@@ -12,13 +12,6 @@
 
 {% block coltype %}flex{% endblock %}
 {% block extrahead %}
-<script type="text/javascript">
-	{% if CMS_LAZY_LOAD_MENU %}
-	MENU_COOKIES = false;
-	{% else %}
-	MENU_COOKIES = true;
-	{% endif %}
-</script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/pages.css"/>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/tree_component.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/jquery.dialog.css" />
@@ -41,7 +34,6 @@
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_list.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/lazyloadmenu.js"></script>
 
 
 {% if cl.is_filtered %}

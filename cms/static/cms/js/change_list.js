@@ -36,7 +36,7 @@
 				theme_name: "default",
 				a_class: "title"
 			},
-			cookies : MENU_COOKIES,
+			cookies : false,
 			callback: {
 				beforemove  : function(what, where, position, tree) {
 					item_id = what.id.split("page_")[1];
@@ -268,6 +268,18 @@
 	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
 	            return false;
+	        }
+
+	        // lazy load descendants on tree open
+	        if(jtarget.hasClass("closed")) {
+	        	// only load them once
+	        	if($(jtarget).find('ul > li').length == 0) {
+                    var pageId = $(jtarget).attr("id").split("page_")[1];
+
+                    $.get(admin_base_url + "cms/page/" + pageId + "/load-nav/", {}, function(r, status) {
+                        $(jtarget).children('ul').append(r);    
+                    });
+                }
 	        }
 			
 	        if(jtarget.hasClass("move-target")) {
