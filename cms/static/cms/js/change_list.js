@@ -278,6 +278,10 @@
 
                     $.get(admin_base_url + "cms/page/" + pageId + "/load-nav/", {}, function(r, status) {
                         $(jtarget).children('ul').append(r);    
+                        // show move targets if needed
+                        if($('span.move-target-container:visible').length > 0) {
+                        	$(jtarget).children('ul').find('a.move-target, span.move-target-container, span.line').show();
+                        }
                     });
                 }
 	        }
