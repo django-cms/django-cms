@@ -296,7 +296,7 @@ class PageAdmin(ModelAdmin):
             else:
                 return HttpResponseBadRequest("template not valid")
         else:
-            return HttpResponseForbidden(_("You have no permission to change the template"))
+            return HttpResponseForbidden(_("You do not have permission to change the template"))
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -1076,7 +1076,7 @@ class PageAdmin(ModelAdmin):
             raise Http404
         plugin_type = request.POST['plugin_type']
         if not has_plugin_permission(request.user, plugin_type, "add"):
-            return HttpResponseForbidden(ugettext('You have no permission to add a plugin'))
+            return HttpResponseForbidden(ugettext('You do not have permission to add plugins of type "%s"') % plugin_type )
         placeholder_id = request.POST.get('placeholder', None)
         parent_id = request.POST.get('parent_id', None)
         if placeholder_id:
@@ -1183,7 +1183,7 @@ class PageAdmin(ModelAdmin):
             page = placeholder_utils.get_page_from_placeholder_if_exists(cms_plugin.placeholder)
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
             if page and not page.has_change_permission(request):
-                return HttpResponseForbidden(ugettext("You have no permission to change this page"))
+                return HttpResponseForbidden(ugettext("You do not have permission to change this page"))
         else:
             # history view with reversion
             from reversion.models import Version
@@ -1218,7 +1218,7 @@ class PageAdmin(ModelAdmin):
                 raise Http404("This plugin is not saved in a revision")
 
         if not has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
-            return HttpResponseForbidden(ugettext("You have no permission to edit a plugin"))
+            return HttpResponseForbidden(ugettext('You do not have permission to edit plugins of type "%s"') % plugin_type )
 
         plugin_admin.cms_plugin_instance = cms_plugin
         try:
@@ -1291,7 +1291,7 @@ class PageAdmin(ModelAdmin):
 
             page = plugins.get_page_from_plugin_or_404(plugin)
             if not page.has_change_permission(request):
-                return HttpResponseForbidden(ugettext("You have no permission to change this page"))
+                return HttpResponseForbidden(ugettext("You do not have permission to change this page"))
 
             placeholder_slot = request.POST['placeholder']
             placeholders = plugins.get_placeholders(page.get_template())
@@ -1308,12 +1308,12 @@ class PageAdmin(ModelAdmin):
             for plugin_id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=plugin_id)
                 if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
-                    return HttpResponseForbidden(ugettext("You have no permission to move a plugin"))
+                    return HttpResponseForbidden(ugettext('You do not have permission to move plugins of type "%s"') % plugin_type )
                 page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
                 if not page: # use placeholderadmin instead!
                     raise Http404
                 if not page.has_change_permission(request):
-                    return HttpResponseForbidden(ugettext("You have no permission to change this page"))
+                    return HttpResponseForbidden(ugettext("You do not have permission to change this page"))
 
                 if plugin.position != pos:
                     plugin.position = pos
@@ -1340,7 +1340,7 @@ class PageAdmin(ModelAdmin):
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
 
         if not has_plugin_permission(request.user, plugin.plugin_type, "delete"):
-            return HttpResponseForbidden(ugettext("You have no permission to remove a plugin"))
+            return HttpResponseForbidden(ugettext('You do not have permission to delete plugins of type "%s"') % plugin_type )
 
         placeholder = plugin.placeholder
         page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
