@@ -9,8 +9,9 @@ from cms.utils.placeholder import (get_page_from_placeholder_if_exists,
 from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import title
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, select_template
 from django.utils.translation import ugettext_lazy as _
+import os
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -50,8 +51,9 @@ def render_plugin(context, instance, placeholder, template, processors=None,
     if not processors:
         processors = []
     if isinstance(template, basestring):
-        content = render_to_string(template, context)
-    elif isinstance(template, Template):
+        template = select_template((os.path.join('by_placeholder', placeholder.slot, template),
+            template))
+    if isinstance(template, Template):
         content = template.render(context)
     else:
         content = ''
