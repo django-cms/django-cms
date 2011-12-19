@@ -669,6 +669,13 @@ class PageAdmin(ModelAdmin):
         else:
             languages = [x[0] for x in settings.CMS_LANGUAGES]
         
+        # parse the cookie that saves which page trees have
+        # been opened already and extracts the page ID
+        open_menu_trees = []
+        if request.COOKIES.get("undefined_open", False):
+            open_menu_trees = [int(c.split("page_")[1]) for c in \
+                    request.COOKIES["undefined_open"].split("%2C")]
+
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -684,6 +691,7 @@ class PageAdmin(ModelAdmin):
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
+            'open_menu_trees': open_menu_trees,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)

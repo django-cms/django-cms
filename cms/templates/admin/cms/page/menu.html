@@ -4,7 +4,13 @@
 	
 	{% with page.childrens as children %}
 		{% if children %}
-        <ul{% if page.last %} class="last"{% endif %}></ul>
+        <ul{% if page.last %} class="last"{% endif %}>
+            {% if page.id in open_menu_trees %}
+            {% for child in children %}
+                {% show_admin_menu child %}
+            {% endfor %}
+            {% endif %}
+        </ul>
         {% endif %}
 	{% endwith %}
 </li>
