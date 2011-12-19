@@ -672,9 +672,9 @@ class PageAdmin(ModelAdmin):
         # parse the cookie that saves which page trees have
         # been opened already and extracts the page ID
         open_menu_trees = []
-        if request.COOKIES.get("undefined_open", False):
+        if request.COOKIES.get("djangocms_nodes_open", False):
             open_menu_trees = [int(c.split("page_")[1]) for c in \
-                    request.COOKIES["undefined_open"].split("%2C")]
+                    request.COOKIES["djangocms_nodes_open"].split("%2C")]
 
         context = {
             'title': cl.title,

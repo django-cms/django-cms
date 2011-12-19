@@ -36,7 +36,9 @@
 				theme_name: "default",
 				a_class: "title"
 			},
-			cookies : true,
+			cookies : {
+				prefix: "djangocms_nodes"
+			},
 			callback: {
 				beforemove  : function(what, where, position, tree) {
 					item_id = what.id.split("page_")[1];
