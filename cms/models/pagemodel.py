@@ -680,18 +680,10 @@ class Page(MPTTModel):
     def has_view_permission(self, request):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
         from cms.utils.plugins import current_site
-        
-        # staff is not allowed to see everything
-        # only the not restricted pages
-        # so this block is useless
-        #@FIXME: cleanup
-        #if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
-        #    return True
-        
+                        
         if not self.publisher_is_draft and self.publisher_public:
             return self.publisher_public.has_view_permission(request)
         # does any restriction exist?
-        # direct
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
         if request.user.is_authenticated():

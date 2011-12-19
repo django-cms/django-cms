@@ -839,10 +839,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
     
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
-            user.user_permissions.add(Permission.objects.get(codename='view_page'))
+            user = User()
+            user.username="test"
             user.is_staff = True
             user.save()
+            user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -856,7 +857,10 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = User()
+            user.username="test"
+            user.is_staff = True
+            user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
             page = Page()
@@ -1007,11 +1011,9 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         page.level = 0
         page.tree_id = 1
         pages = [page]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             """
             The queries are:
-            PagePermission count
-            GlobalPagePermission count
             PagePermission query for affected pages
             GlobalpagePermission query for user
             """
