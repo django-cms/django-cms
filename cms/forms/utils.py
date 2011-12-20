@@ -10,7 +10,6 @@ from django.db.models.signals import post_save, post_delete
 from django.utils import translation
 from django.utils.safestring import mark_safe
 
-
 def update_site_and_page_choices(lang=None):
     lang = lang or translation.get_language()
     SITE_CHOICES_KEY = get_site_cache_key(lang)
@@ -24,21 +23,25 @@ def update_site_and_page_choices(lang=None):
     sites = {}
     for title in title_queryset:
         pages[title.page.site.pk][title.page.pk][title.language] = title
+        pages[title.page.site.pk][title.page.pk]["tree_id"] = title.page.tree_id
+        pages[title.page.site.pk][title.page.pk]["lft"] = title.page.lft
         sites[title.page.site.pk] = title.page.site.name
     
     site_choices = []
     page_choices = [('', '----')]
     
     language_order = [lang] + i18n.get_fallback_languages(lang)
-    
+
     for sitepk, sitename in sites.items():
         site_choices.append((sitepk, sitename))
         
+        sorted_pages = sorted(pages[sitepk].iteritems(),
+                    key=lambda x: (x[1]["tree_id"],x[1]["lft"]))
         site_page_choices = []
-        for titles in pages[sitepk].values():
+        for titles in sorted_pages:
             title = None
             for language in language_order:
-                title = titles.get(language)
+                title = titles[1].get(language)
                 if title:
                     break
             if not title:
