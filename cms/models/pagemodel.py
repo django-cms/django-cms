@@ -692,12 +692,9 @@ class Page(MPTTModel):
         is_restricted = PagePermission.objects.for_page(self).filter(can_view=True).exists()
         
         if request.user.is_authenticated():
-            site = current_site(request)
-            global_perms_q = Q(can_view=True) & Q(
-                Q(sites__in=[site]) | Q(sites__isnull=True)
-            )
-            global_view_perms = GlobalPagePermission.objects.with_user(
-                request.user).filter(global_perms_q).exists()
+
+            global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
+                request.user, current_site(request)).exists()
             # a global permission was given to the request's user
             if global_view_perms:
                 return True
