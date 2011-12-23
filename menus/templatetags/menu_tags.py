@@ -371,7 +371,7 @@ class PageLanguageUrl(InclusionTag):
                 url = page.get_absolute_url(language=lang, fallback=False)
                 url = "/" + lang + url
             except:
-                # no localized path/slug. 
-                url = ''
+                # no localized path/slug, redirect to root url
+                url = '/' + lang + '/'
         return {'content':url}
 register.tag(PageLanguageUrl)
