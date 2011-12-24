@@ -45,14 +45,10 @@
 		</div>	
 		
 		<div class="col-navigation">
-			{% if page.in_navigation %}<label>
-				<img alt="True" src="{% admin_media_prefix %}img/admin/icon-yes.gif"/>	
-				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" checked="checked" value="1" />{% endif %}
+			<label>
+                <img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{% admin_media_prefix %}img/admin/icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
+                {% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" {% if page.in_navigation %}checked="checked"{% endif %} value="{{ page.in_navigation|yesno:"1,0" }}" />{% endif %}
 			</label>
-			{% else %}<label>
-				<img alt="False" src="{% admin_media_prefix %}img/admin/icon-no.gif" />
-				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" value="0" />{% endif %}
-			</label>{% endif %}				
 		</div>
 		
 		{% if CMS_MODERATOR %}<div class="col-moderator">

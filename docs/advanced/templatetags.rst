@@ -378,7 +378,7 @@ as "Japanisch"). "Short" mode takes the language code (eg. "en") to display.
 
 If the current url has no cms-page and is handled by a navigation extender and
 the url changes based on the language: You will need to set a language_changer
-function with the set_language_changer function in cms.utils.
+function with the set_language_changer function in menus.utils.
 
 For more information, see :doc:`i18n`.
 
