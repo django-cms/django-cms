@@ -1035,12 +1035,12 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
         Expected a username only 2 times in the content, but a relationship
         between usercount and pagesize
         """
-        with SettingsOverride(CMS_MODERATOR = False, CMS_PERMISSIONS = True):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
             admin = self.get_superuser()
             PAGE_NAME = 'TestPage'
             USER_NAME = 'test_size_user_0'
             site = Site.objects.get(pk = 1)
-            page = create_page(PAGE_NAME, "nav_playground.html", "en", site = site, created_by = admin)
+            page = create_page(PAGE_NAME, "nav_playground.html", "en", site=site, created_by=admin)
             page.save()
             self._page = page
             with self.login_user_context(admin):
@@ -1050,7 +1050,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 old_response_size = len(response.content)
                 old_user_count = User.objects.count()
                 # create additionals user and reload the page
-                obj = User.objects.create(username = USER_NAME, is_active = True)
+                User.objects.create(username=USER_NAME, is_active=True)
                 user_count = User.objects.count()
                 more_users_in_db = old_user_count < user_count 
                 # we have more users
