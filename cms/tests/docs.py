@@ -29,7 +29,7 @@ class DocsTestCase(CMSTestCase):
     """
     Test docs building correctly for HTML
     """
-    @unittest.skipIf(has_no_internet, "No internet")
+    @unittest.skipIf(has_no_internet(), "No internet")
     def test_html(self):
         nullout = StringIO()
         with TemporaryDirectory() as OUT_DIR:
