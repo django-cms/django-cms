@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.admin.forms import save_permissions
 from cms.api import (create_page, publish_page, approve_page, add_plugin, 
     create_page_user, assign_user_to_page)
 from cms.models import Page, CMSPlugin
@@ -9,8 +10,11 @@ from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
     SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.request_factory import RequestFactory
 from cms.utils.page_resolver import get_page_from_path
-from cms.utils.permissions import has_generic_permission
+from cms.utils.permissions import (has_page_add_permission, has_page_change_permission,
+    has_generic_permission)
+from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
@@ -982,3 +986,67 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             page.level = 0
             page.tree_id = 1
             self.assertTrue(page.has_view_permission(request))
+
+class GlobalPermissionTests(SettingsOverrideTestCase):
+
+    def test_sanity_check(self):
+        ''' Because we have a new manager, we'll do some basic checks.
+        '''
+        # manager is still named the same.
+        self.assertTrue(hasattr(GlobalPagePermission, 'objects'))
+        self.assertEqual(0, GlobalPagePermission.objects.all().count())
+
+        # we are correctly inheriting from BasicPagePermissionManager
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'with_user'))
+
+        # If we're using the new manager, we have extra methods which ensure
+        # This site access OR all site access.
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_permission'))
+        # these are just convienence methods for the above.
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_add_permission'))
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_change_permission'))
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_view_permission'))
+
+    def test_emulate_admin_index(self):
+        ''' Call methods that emulate the adminsite instance's index.
+        This test was basically the reason for the new manager, in light of the
+        problem highlighted in ticket #1120.
+        '''
+        # create and then ignore this user.
+        superuser = User(username="super", is_staff=True, is_active=True,
+            is_superuser=True)
+        superuser.set_password("super")
+        superuser.save()
+        # create staff user
+        staffuser = User(username="staff", is_staff=True, is_active=True)
+        staffuser.set_password("staff")
+        # re-use the same methods the UserPage form does.
+        # Note that it internally calls .save(), as we've not done so.
+        save_permissions({
+            'can_add_page': True,
+            'can_change_page': True,
+            'can_delete_page': False
+        }, staffuser)
+
+        gpp = GlobalPagePermission.objects.create(can_add=True, can_change=True,
+            can_delete=False, user=staffuser)
+        # we're querying here to ensure that even though we've created two users
+        # above, we should have successfully filtered to just one perm.
+        self.assertEqual(1, GlobalPagePermission.objects.with_user(staffuser).count())
+
+        # assemble some basic requirements
+        self.req = RequestFactory().get('/')
+        self.req.user = staffuser
+        # this is copying usage in CMSTestCase.
+        self.req.session = self.client.session
+        # this may not even be required ...
+        the_page = create_page("master", "nav_playground.html", "en")
+
+        with SettingsOverride(CMS_PERMISSION=True):
+            # pageadmin swaps out the methods called for permissions
+            # if the setting is true, it makes use of cms.utils.permissions
+            self.assertTrue(has_page_add_permission(self.req))
+            self.assertTrue(has_page_change_permission(self.req))
+            # internally this calls PageAdmin.has_[add|change|delete]_permission()
+            self.assertEqual({'add': True, 'change': True, 'delete': False},
+                site._registry[Page].get_model_perms(self.req))
