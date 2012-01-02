@@ -1034,19 +1034,25 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
         # above, we should have successfully filtered to just one perm.
         self.assertEqual(1, GlobalPagePermission.objects.with_user(staffuser).count())
 
-        # assemble some basic requirements
-        self.req = RequestFactory().get('/')
-        self.req.user = staffuser
-        # this is copying usage in CMSTestCase.
-        self.req.session = self.client.session
         # this may not even be required ...
-        the_page = create_page("master", "nav_playground.html", "en")
+        homepage = create_page(title="master", template="nav_playground.html",
+            language="en", in_navigation=True, slug='/')
+        homepage = publish_page(page=homepage, user=superuser, approve=True)
 
         with SettingsOverride(CMS_PERMISSION=True):
-            # pageadmin swaps out the methods called for permissions
+            # assemble some basic requirements
+            request = RequestFactory().get('/')
+            # has_page_add_permission and has_page_change_permission both test
+            # for this explicitly, to see if it's a superuser.
+            request.user = staffuser
+            # we need a session attribute for current_site(request), which is
+            # used by has_page_add_permission and has_page_change_permission
+            request.session = {}
+
+            # PageAdmin swaps out the methods called for permissions
             # if the setting is true, it makes use of cms.utils.permissions
-            self.assertTrue(has_page_add_permission(self.req))
-            self.assertTrue(has_page_change_permission(self.req))
+            self.assertTrue(has_page_add_permission(request))
+            self.assertTrue(has_page_change_permission(request))
             # internally this calls PageAdmin.has_[add|change|delete]_permission()
             self.assertEqual({'add': True, 'change': True, 'delete': False},
-                site._registry[Page].get_model_perms(self.req))
+                site._registry[Page].get_model_perms(request))
