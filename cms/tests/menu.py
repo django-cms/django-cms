@@ -763,6 +763,8 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
+        page.level = 0
+        page.tree_id = 1
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
@@ -772,6 +774,8 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
+        page.level = 0
+        page.tree_id = 1
         pages = [page]
         with self.assertNumQueries(1):
             """
