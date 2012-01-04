@@ -494,3 +494,118 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._check_url_page_found(url)
         url = "/en/page_d/page_d_a/"
         self._check_url_page_found(url)
+        
+
+
+
+class ViewPermissionTreeBugTests(ViewPermissionTests):
+    """Test issue 1113
+    https://github.com/divio/django-cms/issues/1113
+    Wrong view permission calculation in PagePermission.objects.for_page
+    Assign only: grant_on=ACCESS_PAGE to page
+    Test if this affects the menu entries
+    """
+    settings_overrides = {
+        'CMS_MODERATOR': False,
+        'CMS_PERMISSION': True,
+        'CMS_PUBLIC_FOR': 'all',
+    }
+    GROUPNAME_6 = 'group_6_ACCESS_PAGE'  
+    
+    def setUp(self):
+        super(ViewPermissionTreeBugTests, self).setUp()
+        self.site = Site()
+        self.site.pk = 1
+       
+    def tearDown(self):
+        super(ViewPermissionTreeBugTests, self).tearDown()
+        self.site = None
+        
+    def _setup_pages(self):
+        """
+        Tree Structure
+            |- Page_1
+            |  |- Page_2
+            |    |- Page_3
+            |      |- Page_4 (false positive)
+            |  |- Page_5
+            |  |  |- Page_6 (group 6 page access)
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        page_1 = create_page("page_1", **stdkwargs) # first page slug is /
+        page_2 = create_page("page_2", parent=page_1, **stdkwargs)
+        page_3 = create_page("page_3", parent=page_2, **stdkwargs)
+        page_4 = create_page("page_4", parent=page_3, **stdkwargs)
+        page_5 = create_page("page_5", parent=page_1, **stdkwargs)
+        page_6 = create_page("page_6", parent=page_5, **stdkwargs)
+        return [page_1,
+                page_2,
+                page_3,
+                page_4,
+                page_5,
+                page_6,
+        ]
+    
+    def _setup_user(self):
+        user = User.objects.create(username='user_6', email='user_6@domain.com', is_active=True, is_staff=True)
+        user.set_password(user.username)
+        user.save()
+        group = Group.objects.create(name=self.GROUPNAME_6)
+        group.user_set.add(user)
+        group.save()
+        
+    def _setup_permviewbug(self):
+        """
+        Setup group_6_ACCESS_PAGE view restriction 
+        """
+        page = Page.objects.get(title_set__title="page_6")
+        group = Group.objects.get(name__iexact=self.GROUPNAME_6)
+        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE)
+            
+    def test_pageforbug(self):
+        all_pages=self._setup_pages()
+        self._setup_user()
+        self._setup_permviewbug()
+        for page in all_pages:
+            perm = PagePermission.objects.for_page(page=page)
+            # only page_6 has a permission assigned
+            if page.get_title() == 'page_6':
+                self.assertTrue(len(perm)==1)
+            else:
+                self.assertTrue(len(perm)==0)
+        granted = [ 'page_1',
+                    'page_2',
+                    'page_3',
+                    'page_4',
+                    'page_5',
+        ]
+        # anonymous sees page_6 not
+        self._check_grant_visiblity(all_pages, granted)
+        url = "/en/page_2/page_3/page_4/"
+        self._check_url_page_found(url)
+        url = "/en/page_5/"
+        self._check_url_page_found(url)
+        url = "/en/page_5/page_6/"
+        self._check_url_page_not_found(url)
+        # group member
+        granted = [ 'page_1',
+                    'page_2',
+                    'page_3',
+                    'page_4',
+                    'page_5',
+                    'page_6',
+        ]
+        self._check_grant_visiblity(all_pages, granted,username='user_6')
+        login_ok = self.client.login(username='user_6', password='user_6')
+        self.assertEqual(login_ok , True)
+        url = "/en/page_2/page_3/page_4/"
+        self._check_url_page_found(url)
+        url = "/en/page_5/page_6/"
+        self._check_url_page_found(url)
+        
+        

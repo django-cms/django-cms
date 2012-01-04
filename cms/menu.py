@@ -34,9 +34,12 @@ def get_visible_pages(request, pages, site=None):
     pages_perms_q = Q()
 
     for page in pages:
-        # taken from for_page as multipe at once version
+        # taken from for_page as multiple at once version
         if page.level == None:
-            # page.level might be None, set it to an invalid value
+            # page.level might be None if the page is not saved yet
+            # see - test.menu test_public_for_all_staff
+            
+            # set it to an invalid value
             page.level = -1
             
         page_q = Q(page__tree_id=page.tree_id) & (
