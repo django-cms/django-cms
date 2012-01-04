@@ -1,24 +1,32 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia %}
+{% load i18n admin_modify adminmedia cms_js_tags %}
+
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.js"></script>
-{{ media }}
+	<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+	{{ media }}
 {% endblock %}
 
 {% block content_title %}{% endblock %}
 
 {% block content %}
 <script type="text/javascript">
-//<![CDATA[	
-(function($) {
-	if(parent != self){
-		parent.hide_iframe({{ plugin.pk }}, "{{ type }}", "{{ name }}", "{% trans "Plugin saved successfully." %}");
-	}else{
-		opener.dismissEditPluginPopup(window, "{{ plugin_id }}", "{{ icon }}", "{{ alt }}");
+//<![CDATA[
+jQuery(document).ready(function ($) {
+	// if it is an iframe
+	if(window.parent != self) {
+		if (typeof window.parent.CMS === 'undefined'){
+			// backend admin
+        parent.hide_iframe({{ plugin.pk }}, {% javascript_string %}{{ type }}{% end_javascript_string %}, {% javascript_string %}{{ name }}{% end_javascript_string %}, {% javascript_string %}{% trans "Plugin saved successfully." %}{% end_javascript_string %});
+		} else {
+			// frontend edit
+			setTimeout(function () { window.parent.CMS.API.Helpers.reloadBrowser(); }, 1000);
+		}
+	} else {
+        opener.dismissEditPluginPopup(window, {% javascript_string %}{{ plugin_id }}{% end_javascript_string %}, {% javascript_string %}{{ icon }}{% end_javascript_string %}, {% javascript_string %}{{ alt }}{% end_javascript_string %});
 	}
-})(jQuery);
+});
 //]]>
 </script>
 {% endblock %}

@@ -1,25 +1,27 @@
+# -*- coding: utf-8 -*-
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, cms_static_url
+from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from django.conf import settings
 from django.contrib.admin import ModelAdmin
-from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.http import (HttpResponse, Http404, HttpResponseBadRequest, 
+    HttpResponseForbidden)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
-from django.utils.translation import ugettext_lazy as _
-import os
+from django.utils.translation import ugettext as _
 
 
 class PlaceholderAdmin(ModelAdmin):
       
     class Media:
         css = {
-            'all': [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [cms_static_url(path) for path in (
                 'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
@@ -27,12 +29,14 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = [os.path.join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/jquery.js',
-            'js/lib/jquery.query.js',
-            'js/lib/ui.core.js',
-            'js/lib/ui.dialog.js',
-        )]
+        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+                'js/plugins/admincompat.js',
+                'js/csrf.js',
+                'js/libs/jquery.query.js',
+                'js/libs/jquery.ui.core.js',
+                'js/libs/jquery.ui.dialog.js',
+            ]
+        ]
         
     def get_fieldsets(self, request, obj=None):
         """
@@ -120,29 +124,72 @@ class PlaceholderAdmin(ModelAdmin):
         return url_patterns + super(PlaceholderAdmin, self).get_urls()
     
     def add_plugin(self, request):
+        # only allow POST
         if request.method != "POST":
             raise Http404
         plugin_type = request.POST['plugin_type']
+        if not has_plugin_permission(request.user, plugin_type, "add"):
+            return HttpResponseForbidden("You don't have permission to add plugins")
+
         placeholder_id = request.POST.get('placeholder', None)
         position = None
         language = get_language_from_request(request)
-        if not placeholder_id:
+        parent = None
+        # check if we got a placeholder (id)
+        if placeholder_id:
+            placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+        else: # else get the parent_id
             parent_id = request.POST.get('parent_id', None)
-            if not parent_id:
+            if not parent_id: # if we get neither a placeholder nor a parent, bail out
                 raise Http404
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
-            plugin = CMSPlugin(language=language, plugin_type=plugin_type,
-                position=position, parent=parent, placeholder=parent.placeholder)
-        else:
-            placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-            plugin = CMSPlugin(language=language, plugin_type=plugin_type,
-                position=position, placeholder=placeholder) 
+            placeholder = parent.placeholder
+        
+        # check add permissions on placeholder
+        if not placeholder.has_add_permission(request):
+            return HttpResponseForbidden(_("You don't have permission to add content here."))
+        
+        # check the limits defined in CMS_PLACEHOLDER_CONF for this placeholder
+        limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get('limits', None)
+        if limits:
+            count = placeholder.cmsplugin_set.count()
+            global_limit = limits.get("global", None)
+            type_limit = limits.get(plugin_type, None)
+            # check the global limit first
+            if global_limit and count >= global_limit:
+                return HttpResponseBadRequest(
+                    "This placeholder already has the maximum number of plugins."
+                )
+            elif type_limit: # then check the type specific limit
+                type_count = CMSPlugin.objects.filter(
+                    language=language, placeholder=placeholder, plugin_type=plugin_type
+                ).count()
+                if type_count >= type_limit:
+                    return HttpResponseBadRequest(
+                        "This placeholder already has the maximum number (%s) "
+                        "of %s plugins." % (type_limit, plugin_type)
+                    )
+        
+        # actually add the plugin
+        plugin = CMSPlugin(language=language, plugin_type=plugin_type,
+            position=position, placeholder=placeholder, parent=parent) 
         plugin.save()
+        
+        # returns it's ID as response
         return HttpResponse(str(plugin.pk))
     
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
+        # get the plugin to edit of bail out
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+
+        if not has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
+            return HttpResponseForbidden(_("You don't have permission to add plugins"))
+
+        # check that the user has permission to change this plugin
+        if not cms_plugin.placeholder.has_change_permission(request):
+            return HttpResponseForbidden(_("You don't have permission to add content here."))
+        
         instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
         
         plugin_admin.cms_plugin_instance = cms_plugin
@@ -151,7 +198,9 @@ class PlaceholderAdmin(ModelAdmin):
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
             # view, which actually does'nt exists
-            request.POST['_continue'] = True
+            post_request = request.POST.copy()
+            post_request['_continue'] = True
+            request.POST = post_request
         
         if not instance:
             # instance doesn't exist, call add view
@@ -183,46 +232,79 @@ class PlaceholderAdmin(ModelAdmin):
         return response
 
     def move_plugin(self, request):
-        if request.method == "POST":
-            pos = 0
-            if 'ids' in request.POST:
-                for id in request.POST['ids'].split("_"):
-                    plugin = CMSPlugin.objects.get(pk=id)
-                    if plugin.position != pos:
-                        plugin.position = pos
-                        plugin.save()
-                    pos += 1
-            elif 'plugin_id' in request.POST:
-                plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-                placeholder = plugin.placeholder
-                # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
-                position = CMSPlugin.objects.filter(placeholder=placeholder).count()
-                plugin.position = position
-                plugin.save()
-            else:
-                HttpResponse(str("error"))
-            return HttpResponse(str("ok"))
-        else:
+        # only allow POST
+        if request.method != "POST":
             return HttpResponse(str("error"))
+            
+        if 'plugin_id' in request.POST: # single plugin moving
+            plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
+            
+            if 'placeholder_id' in request.POST:
+                placeholder = Placeholder.objects.get(pk=int(request.POST['placeholder_id']))
+            else:
+                placeholder = plugin.placeholder
+                
+            # check permissions
+            if not placeholder.has_change_permission(request):
+                raise Http404
+
+            # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
+            position = CMSPlugin.objects.filter(placeholder=placeholder).count()
+            plugin.placeholder = placeholder
+            plugin.position = position
+            plugin.save()
+        pos = 0
+        if 'ids' in request.POST: # multiple plugins/ reordering
+            whitelisted_placeholders = []
+            for id in request.POST['ids'].split("_"):
+                plugin = CMSPlugin.objects.get(pk=id)
+                
+                # check the permissions for *each* plugin, but cache them locally
+                # per placeholder
+                if plugin.placeholder.pk not in whitelisted_placeholders:
+                    if plugin.placeholder.has_change_permission(request):
+                        whitelisted_placeholders.append(plugin.placeholder.pk)
+                    else:
+                        raise Http404
+                
+                # actually do the moving
+                if plugin.position != pos:
+                    plugin.position = pos
+                    plugin.save()
+                pos += 1
+
+        else:
+            HttpResponse(str("error"))
+        return HttpResponse(str("ok"))
     
     def remove_plugin(self, request):
-        if request.method == "POST":
-            plugin_id = request.POST['plugin_id']
-            plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-            placeholder = plugin.placeholder
-            plugin.delete_with_public()
-            plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
-            comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
-            return HttpResponse("%s,%s" % (plugin_id, comment))
-        raise Http404
+        if request.method != "POST": # only allow POST
+            raise Http404
+        plugin_id = request.POST['plugin_id']
+        plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+    
+        # check the permissions!
+        if not plugin.placeholder.has_delete_permission(request):
+            return HttpResponseForbidden(_("You don't have permission to delete a plugin"))
+        
+        plugin.delete_with_public()
+        plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+        comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
+        return HttpResponse("%s,%s" % (plugin_id, comment))
     
     def copy_plugins(self, request):
+        # only allow POST
         if request.method != "POST":
             raise Http404
         placeholder_id = request.POST['placeholder']
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         
+        # check permissions
+        if not placeholder.has_add_permission(request):
+            raise Http404
         
+        # the placeholder actions are responsible for copying, they should return
+        # a list of plugins if successful.
         plugins = placeholder.actions.copy(
             target_placeholder=placeholder,
             source_language=request.POST['copy_from'],

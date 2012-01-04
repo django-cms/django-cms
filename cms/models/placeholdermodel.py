@@ -1,52 +1,79 @@
+# -*- coding: utf-8 -*-
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import PlaceholderNoAction
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.utils.translation import ugettext_lazy as _
 import operator
 
-
-class PlaceholderManager(models.Manager):
-    def _orphans(self):
-        """
-        Private method because it should never actually return anything.
-        """
-        from cms.models import CMSPlugin
-        m2m = self.model._meta.get_all_related_many_to_many_objects()
-        fks = self.model._meta.get_all_related_objects()
-        kwargs = {}
-        for rel in m2m:
-            kwargs[rel.var_name] = None
-        for rel in fks:
-            if rel.model == CMSPlugin:
-                continue
-            kwargs[rel.var_name] = None
-        return self.filter(**kwargs)
- 
-
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
 
-    objects = PlaceholderManager()
-
-    def __unicode__(self):
-        return self.slot
-
     class Meta:
         app_label = 'cms'
 
-    def has_change_permission(self, request):
-        opts = self._meta
+    def __unicode__(self):
+        return self.slot
+    
+    def get_add_url(self):
+        return self._get_url('add_plugin')
+    
+    def get_move_url(self):
+        return self._get_url('move_plugin')
+        
+    def get_remove_url(self):
+        return self._get_url('remove_plugin')
+                
+    def get_changelist_url(self):
+        return self._get_url('changelist')
+        
+    def _get_url(self, key):
+        model = self._get_attached_model()
+        if not model:
+            return reverse('admin:cms_page_%s' % key)
+        else:
+            app_label = model._meta.app_label
+            model_name = model.__name__.lower()
+            return reverse('admin:%s_%s_%s' % (app_label, model_name, key))
+        
+    def _get_permission(self, request, key):
+        """
+        Generic method to check the permissions for a request for a given key,
+        the key can be: 'add', 'change' or 'delete'.
+        """
         if request.user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        found = False
+        # check all attached models for change permissions
+        for model in self._get_attached_models():
+            opts = model._meta
+            perm_accessor = getattr(opts, 'get_%s_permission' % key)
+            perm_code = '%s.%s' % (opts.app_label, perm_accessor())
+            # if they don't have the permission for this attached model, bail out
+            if not request.user.has_perm(perm_code):
+                return False
+            else:
+                found = True
+        return found
+
+    def has_change_permission(self, request):
+        return self._get_permission(request, 'change')
+
+    def has_add_permission(self, request):
+        return self._get_permission(request, 'add')
+
+    def has_delete_permission(self, request):
+        return self._get_permission(request, 'delete')
 
     def render(self, context, width):
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
-        context.update({'width': width or self.default_width})
+        width = width or self.default_width
+        if width:
+            context.update({'width': width})
         return render_placeholder(self, context)
 
     def get_media(self, request, context):
@@ -56,12 +83,24 @@ class Placeholder(models.Model):
             return reduce(operator.add, media_classes)
         return Media()
     
+    def _get_attached_fields(self):
+        """
+        Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
+        """
+        from cms.models import CMSPlugin
+        for rel in self._meta.get_all_related_objects():
+            if issubclass(rel.model, CMSPlugin):
+                continue
+            field = getattr(self, rel.get_accessor_name())
+            if field.count():
+                yield rel.field
+    
     def _get_attached_field(self):
         from cms.models import CMSPlugin
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
             for rel in self._meta.get_all_related_objects():
-                if isinstance(rel.model, CMSPlugin):
+                if issubclass(rel.model, CMSPlugin):
                     continue
                 field = getattr(self, rel.get_accessor_name())
                 if field.count():
@@ -79,6 +118,12 @@ class Placeholder(models.Model):
         if field:
             return field.model
         return None
+    
+    def _get_attached_models(self):
+        """
+        Returns a list of models of attached to this placeholder.
+        """
+        return [field.model for field in self._get_attached_fields()]
 
     def get_plugins_list(self):
         return list(self.get_plugins())

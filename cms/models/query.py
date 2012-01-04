@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.db.models import Q
 from django.contrib.sites.models import Site
-from publisher.query import PublisherQuerySet
+from cms.publisher.query import PublisherQuerySet
 from django.conf import settings
 from cms.exceptions import NoHomeFound
 

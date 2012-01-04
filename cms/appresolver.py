@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoHomeFound
+from cms.utils.moderator import get_page_queryset
+
 from django.conf import settings
 from django.conf.urls.defaults import patterns
 from django.contrib.sites.models import Site
@@ -10,11 +13,14 @@ from django.utils.importlib import import_module
 
 APP_RESOLVERS = []
 
+def clear_app_resolvers():
+    global APP_RESOLVERS
+    APP_RESOLVERS = []
+
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application. 
     Applications have higher priority than other cms pages. 
     """
-    from cms.utils.moderator import get_page_queryset
     if current_page:
         return current_page
     if path is None:
@@ -24,7 +30,7 @@ def applications_page_check(request, current_page=None, path=None):
     # check if application resolver can resolve this
     for resolver in APP_RESOLVERS:
         try:
-            page_id = resolver.resolve_page_id(path+"/")
+            page_id = resolver.resolve_page_id(path)
             # yes, it is application page
             page = get_page_queryset(request).get(id=page_id)
             # If current page was matched, then we have some override for content
@@ -171,7 +177,7 @@ def get_app_patterns():
         hooked_applications = []
     
     # Loop over all titles with an application hooked to them
-    for title in title_qs.filter(application_urls__gt="").select_related():
+    for title in title_qs.exclude(application_urls=None).exclude(application_urls='').select_related():
         if settings.CMS_FLAT_URLS:
             if title.language in home_slugs:
                 path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]

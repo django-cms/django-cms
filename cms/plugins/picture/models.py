@@ -4,15 +4,15 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
 from os.path import basename
 
-from django.conf import settings
-
 class Picture(CMSPlugin):
     """
     A Picture with or without a link
     """
+    CENTER = "center"
     LEFT = "left"
     RIGHT = "right"
-    FLOAT_CHOICES = ((LEFT, _("left")),
+    FLOAT_CHOICES = ((CENTER, _("center")),
+                     (LEFT, _("left")),
                      (RIGHT, _("right")),
                      )
     

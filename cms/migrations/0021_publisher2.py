@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from south.db import db
 from cms.models import *
 from django.db import models

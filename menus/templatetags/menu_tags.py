@@ -1,4 +1,5 @@
-from classytags.arguments import IntegerArgument, Argument
+# -*- coding: utf-8 -*-
+from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from django import template
@@ -9,6 +10,9 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
 import urllib
+
+register = template.Library()
+
 
 class NOT_PROVIDED: pass
 
@@ -21,8 +25,15 @@ def cut_after(node, levels, removed):
         removed.extend(node.children)
         node.children = []
     else:
+        removed_local = []
         for n in node.children:
-            cut_after(n, levels - 1, removed)
+            if n.visible:
+                cut_after(n, levels - 1, removed)
+            else:
+                removed_local.append(n)
+        for n in removed_local:
+            node.children.remove(n)
+        removed.extend(removed_local)
 
 def remove(node, removed):
     removed.append(node)
@@ -65,7 +76,13 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             if node in final:
                 final.remove(node)
     return final
-register = template.Library()
+
+def flatten(nodes):
+    flat = []
+    for node in nodes:
+        flat.append(node)
+        flat.extend(flatten(node.children))
+    return flat
 
 
 class ShowMenu(InclusionTag):
@@ -87,9 +104,9 @@ class ShowMenu(InclusionTag):
         IntegerArgument('to_level', default=100, required=False),
         IntegerArgument('extra_inactive', default=0, required=False),
         IntegerArgument('extra_active', default=1000, required=False),
-        Argument('template', default='menu/menu.html', required=False),
-        Argument('namespace', default=None, required=False),
-        Argument('root_id', default=None, required=False),
+        StringArgument('template', default='menu/menu.html', required=False),
+        StringArgument('namespace', default=None, required=False),
+        StringArgument('root_id', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
     
@@ -110,14 +127,14 @@ class ShowMenu(InclusionTag):
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
-                    new_nodes = node.children
-                    for n in new_nodes:
+                    nodes = node.children
+                    for n in nodes:
                         n.parent = None
                     from_level += node.level + 1
                     to_level += node.level + 1
+                    nodes = flatten(nodes)
                 else:
-                    new_nodes = []
-                nodes = new_nodes
+                    nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
     
@@ -294,20 +311,19 @@ class LanguageChooser(InclusionTag):
             template = "menu/language_chooser.html"
         if not i18n_mode in MARKERS:
             i18n_mode = 'raw'
-        try:
+        if 'request' not in context:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
-        except KeyError:
             return {'template': 'cms/content.html'}
         marker = MARKERS[i18n_mode]
         cms_languages = dict(settings.CMS_LANGUAGES)
         current_lang = get_language()
         site = Site.objects.get_current()
+        site_languages = settings.CMS_SITE_LANGUAGES.get(site.pk, cms_languages.keys())
         cache_key = '%s-language-chooser-%s-%s-%s' % (settings.CMS_CACHE_PREFIX, site.pk, current_lang, i18n_mode)
         languages = cache.get(cache_key, [])
         if not languages:
             for lang in settings.CMS_FRONTEND_LANGUAGES:
-                if lang in cms_languages:
+                if lang in cms_languages and lang in site_languages:
                     languages.append((lang, marker(cms_languages[lang], lang)))
             if current_lang != get_language():
                 activate(current_lang)
@@ -350,7 +366,7 @@ class PageLanguageUrl(InclusionTag):
         else:
             page = request.current_page
             if page == "dummy":
-                return ''
+                return {'content': ''}
             try:
                 url = page.get_absolute_url(language=lang, fallback=False)
                 url = "/" + lang + url

@@ -1,25 +1,23 @@
+# -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, get_app_urls
+from cms.appresolver import get_app_urls
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.page_resolver import get_page_from_request
-from django.conf import settings, settings as django_settings
-from django.conf.urls.defaults import patterns, include
-from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
+from django.conf.urls.defaults import patterns
 from django.core.urlresolvers import resolve, Resolver404
-from django.db.models.query_utils import Q
+
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.http import urlquote
-from django.utils.importlib import import_module
-
 
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
-        CMS_MEDIA_URL = settings.CMS_MEDIA_URL
-        return render_to_response("cms/new.html", locals())
+        return render_to_response("cms/new.html", RequestContext(request))
     raise Http404('CMS: Page not found for "%s"' % slug)
+
 
 def details(request, slug):
     """
@@ -41,7 +39,7 @@ def details(request, slug):
     # We resolve an alternate language for the page if it's not available.
     # Since the "old" details view had an exception for the root page, it is
     # ported here. So no resolution if the slug is ''.
-    if (current_language not in available_languages) and (slug != ''):
+    if (current_language not in available_languages):
         if settings.CMS_LANGUAGE_FALLBACK:
             # If we didn't find the required page in the requested (current) 
             # language, let's try to find a suitable fallback in the list of 
@@ -80,10 +78,18 @@ def details(request, slug):
     # Check if the page has a redirect url defined for this language. 
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        if settings.i18n_installed and redirect_url[0] == "/":
+        if (settings.i18n_installed and redirect_url[0] == "/"
+            and not redirect_url.startswith('/%s/' % current_language)):
+            # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
-        # add language prefix to url
-        return HttpResponseRedirect(redirect_url)
+        # prevent redirect to self
+        own_urls = [
+            'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
+            '/%s%s' % (current_language, request.path),
+            request.path,
+        ]
+        if redirect_url not in own_urls:
+            return HttpResponseRedirect(redirect_url)
     
     # permission checks
     if page.login_required and not request.user.is_authenticated():
@@ -91,7 +97,7 @@ def details(request, slug):
             path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
         else:
             path = urlquote(request.get_full_path())
-        tup = django_settings.LOGIN_URL , "next", path
+        tup = settings.LOGIN_URL , "next", path
         return HttpResponseRedirect('%s?%s=%s' % tup)
     
     template_name = get_template_from_request(request, page, no_current_page=True)
@@ -99,4 +105,9 @@ def details(request, slug):
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
+    context['has_view_permissions'] = page.has_view_permission(request)
+    
+    if not context['has_view_permissions']:
+        return _handle_no_page(request, slug)
+    
     return render_to_response(template_name, context)

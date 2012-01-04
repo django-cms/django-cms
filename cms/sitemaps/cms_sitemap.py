@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.sitemaps import Sitemap
 
 class CMSSitemap(Sitemap):

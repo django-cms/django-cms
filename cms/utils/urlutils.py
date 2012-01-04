@@ -1,5 +1,7 @@
-import re
+# -*- coding: utf-8 -*-
 from django.conf import settings
+from urlparse import urlparse
+import re
 
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$') 
@@ -44,3 +46,16 @@ def urljoin(*segments):
     if settings.APPEND_SLASH and not url.endswith("/"):
         url += "/"
     return url
+
+def is_media_request(request):
+    """
+    Check if a request is a media request.
+    """
+    parsed_media_url = urlparse(settings.MEDIA_URL)
+    if request.path.startswith(parsed_media_url.path):
+        if parsed_media_url.netloc:
+            if request.get_host() == parsed_media_url.netloc:
+                return True
+        else:
+            return True
+    return False 

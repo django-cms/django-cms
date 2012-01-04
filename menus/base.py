@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.utils.translation import get_language
 from django.utils.encoding import smart_str
 
@@ -21,26 +22,22 @@ class Modifier(object):
         pass
     
 class NavigationNode(object):
-    title = None
-    url = None
-    attr = {}
-    namespace = None
-    id = None
-    parent_id = None
-    parent_namespace = None
-    parent = None # do not touch
-    visible = True
     
     def __init__(self, title, url, id, parent_id=None, parent_namespace=None, attr=None, visible=True):
         self.children = [] # do not touch
+        self.parent = None # do not touch, code depends on this
+        self.namespace = None # TODO: Assert why we need this and above
         self.title = title
         self.url = self._remove_current_root(url)
         self.id = id
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
         self.visible = visible
+        
         if attr:
             self.attr = attr
+        else:
+            self.attr = {} # To avoid declaring a dict in defaults...
             
     def __repr__(self):
         return "<Navigation Node: %s>" % smart_str(self.title)
@@ -65,4 +62,11 @@ class NavigationNode(object):
         for node in self.children:
             nodes.append(node)
             nodes += node.get_descendants()
+        return nodes
+
+    def get_ancestors(self):
+        nodes = []
+        if getattr(self, 'parent', None):
+            nodes.append(self.parent)
+            nodes += self.parent.get_ancestors()
         return nodes

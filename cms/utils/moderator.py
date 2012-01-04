@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -179,12 +180,9 @@ def approve_page(request, page):
     moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
     if not moderator_should_approve(request, page):
         # escape soon if there isn't any approval required by this user
-        try:    # it is possible publisher_public doesn't exist - first time publish
-            if page.get_absolute_url() != page.publisher_public.get_absolute_url():
-                page.publish()
-            else:
-                return
-        except:
+        if not page.publisher_public or page.get_absolute_url() != page.publisher_public.get_absolute_url():
+            page.publish()
+        else:
             return
     if not moderation_required:
         # this is a second case - user can publish changes
@@ -195,7 +193,8 @@ def approve_page(request, page):
             page.publish()
     else:
         # first case - just mark page as approved from this user
-        PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save() 
+        PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save()
+    page.save(change_state=False)
 
 
 def get_model_queryset(model, request=None):

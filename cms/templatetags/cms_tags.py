@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from classytags.parser import Parser
-from cms.models import Page
+from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_plugins, render_placeholder
 from cms.plugins.utils import get_plugins
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -15,7 +17,7 @@ from django.core.mail import mail_managers
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from itertools import chain
-import operator
+import re
 
 register = template.Library()
 
@@ -23,8 +25,8 @@ def get_site_id(site):
     if site:
         if isinstance(site, Site):
             site_id = site.id
-        elif isinstance(site, int):
-            site_id = site
+        elif isinstance(site, int) or (isinstance(site, basestring) and site.isdigit()):
+            site_id = int(site)
         else:
             site_id = settings.SITE_ID
     else:
@@ -35,11 +37,17 @@ def has_permission(page, request):
     return page.has_change_permission(request)
 register.filter(has_permission)
 
+CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
+
+def _clean_key(key):
+    return CLEAN_KEY_PATTERN.sub('-', key)
+
 def _get_cache_key(name, page_lookup, lang, site_id):
     if isinstance(page_lookup, Page):
         page_key = str(page_lookup.pk)
     else:
         page_key = str(page_lookup)
+    page_key = _clean_key(page_key)
     return name+'__page_lookup:'+page_key+'_site:'+str(site_id)+'_lang:'+str(lang)
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
@@ -74,25 +82,26 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            mail_managers(subject, body, fail_silently=True)
+            if settings.SEND_BROKEN_LINK_EMAILS:
+                mail_managers(subject, body, fail_silently=True)
             return None
 
 class PageUrl(InclusionTag):
     template = 'cms/content.html'
     name = 'page_url'
-    
+
     options = Options(
         Argument('page_lookup'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
     )
-    
+
     def get_context(self, context, page_lookup, lang, site):
         site_id = get_site_id(site)
         request = context.get('request', False)
         if not request:
             return {'content': ''}
-    
+
         if request.current_page == "dummy":
             return {'content': ''}
         if lang is None:
@@ -103,7 +112,7 @@ class PageUrl(InclusionTag):
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, settings.CMS_CONTENT_CACHE_DURATION)
+                cache.set(cache_key, url, settings.CMS_CACHE_DURATIONS['content'])
         if url:
             return {'content': url}
         return {'content': ''}
@@ -133,9 +142,6 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             continue
         if not get_plugins(request, placeholder):
             continue
-        if hasattr(request, 'placeholder_media'):
-            request.placeholder_media = reduce(operator.add, [request.placeholder_media, placeholder.get_media(request, context)])
-        #request.placeholder_media += placeholder.get_media(request, context)
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
@@ -149,8 +155,8 @@ class PlaceholderParser(Parser):
             if getattr(bit, 'value', bit.var.value) == 'or':
                 return super(PlaceholderParser, self).parse_blocks()
         return
-                
-    
+
+
 class PlaceholderOptions(Options):
     def get_parser_class(self):
         return PlaceholderParser
@@ -188,6 +194,7 @@ class Placeholder(Tag):
     )
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
+        validate_placeholder_name(name)
         width = None
         inherit = False
         for bit in extra_bits:
@@ -209,12 +216,12 @@ class Placeholder(Tag):
         page = request.current_page
         if not page or page == 'dummy':
             return ''
-        
+
         content = get_placeholder_content(context, request, page, name, inherit)
         if not content and nodelist:
             return nodelist.render(context)
         return content
-    
+
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 register.tag(Placeholder)
@@ -255,7 +262,7 @@ class PageAttribute(Tag):
         Argument('name', resolve=False),
         Argument('page_lookup', required=False, default=None)
     )
-    
+
     valid_attributes = [
         "title",
         "slug",
@@ -264,7 +271,7 @@ class PageAttribute(Tag):
         "page_title",
         "menu_title"
     ]
-    
+
     def render_tag(self, context, name, page_lookup):
         if not 'request' in context:
             return ''
@@ -283,12 +290,12 @@ register.tag(PageAttribute)
 class CleanAdminListFilter(InclusionTag):
     template = 'admin/filter.html'
     name = 'clean_admin_list_filter'
-    
+
     options = Options(
         Argument('cl'),
         Argument('spec'),
     )
-    
+
     def get_context(self, context, cl, spec):
         choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
         query_string = None
@@ -311,6 +318,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
+    validate_placeholder_name(placeholder_name)
+
     request = context.get('request', False)
     site_id = get_site_id(site)
 
@@ -322,14 +331,20 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     content = None
 
     if cache_result:
-        cache_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)+'_placeholder:'+placeholder_name
+        base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
+        cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         content = cache.get(cache_key)
 
     if not content:
         page = _get_page_by_untyped_arg(page_lookup, request, site_id)
         if not page:
             return {'content': ''}
-        placeholder = page.placeholders.get(slot=placeholder_name)
+        try:
+            placeholder = page.placeholders.get(slot=placeholder_name)
+        except PlaceholderModel.DoesNotExist:
+            if settings.DEBUG:
+                raise
+            return {'content': ''}
         baseqs = get_cmsplugin_queryset(request)
         plugins = baseqs.filter(
             placeholder=placeholder,
@@ -341,7 +356,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         content = "".join(c)
 
     if cache_result:
-        cache.set(cache_key, content, settings.CMS_CONTENT_CACHE_DURATION)
+        cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
 
     if content:
         return {'content': mark_safe(content)}
@@ -350,17 +365,17 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
 class ShowPlaceholderById(InclusionTag):
     template = 'cms/content.html'
     name = 'show_placeholder_by_id'
-    
+
     options = Options(
         Argument('placeholder_name'),
         Argument('reverse_id'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
     )
-    
+
     def get_context(self, *args, **kwargs):
         return _show_placeholder_for_page(**self.get_kwargs(*args, **kwargs))
-    
+
     def get_kwargs(self, context, placeholder_name, reverse_id, lang, site):
         return {
             'context': context,
@@ -376,48 +391,29 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
-        kwargs['cache_result'] = True
+        kwargs['cache_result'] = False
         return kwargs
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
 
-class PluginsMedia(Tag):
-    """
-    This template node is used to output media for plugins.
 
-    eg: {% plugins_media %}
+class CMSToolbar(InclusionTag):
+    template = 'cms/toolbar/toolbar.html'
+    name = 'cms_toolbar'
 
-    You can also pass the object a page_lookup arg if you want to output media tags for a specific
-    page other than the current page.
-
-    eg: {% plugins_media "gallery" %}
-    """
-    name = 'plugins_media'
-    options = Options(
-        Argument('page_lookup', required=False, default=None),
-    )
-    
-    def render_tag(self, context, page_lookup):
-        if not 'request' in context:
+    def render(self, context):
+        request = context.get('request', None)
+        if not request:
             return ''
-        request = context['request']
-        from cms.plugins.utils import get_plugins_media
-        plugins_media = None
-        if page_lookup:
-            page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-            plugins_media = get_plugins_media(request, context, page)
-        else:
-            page = request.current_page
-            if page == "dummy":
-                return ''
-            # make sure the plugin cache is filled
-            plugins_media = get_plugins_media(request, context, request._current_page_cache)
-        if plugins_media:
-            return plugins_media.render()
-        else:
-            return u''
+        toolbar = getattr(request, 'toolbar', None)
+        if not toolbar:
+            return ''
+        if not toolbar.show_toolbar:
+            return ''
+        return super(CMSToolbar, self).render(context)
 
-    def __repr__(self):
-        return "<PluginsMediaNode Node: %s>" % getattr(self, 'name', '')
-register.tag(PluginsMedia)
+    def get_context(self, context):
+        context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
+        return context
+register.tag(CMSToolbar)

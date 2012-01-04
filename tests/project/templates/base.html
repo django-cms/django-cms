@@ -1,0 +1,43 @@
+{% load i18n cms_tags menu_tags sekizai_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ LANGUAGE_CODE }}" lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>{% page_attribute page_title %}</title>
+	<meta name="description" content="{% page_attribute meta_description %}"/>
+	<meta name="keywords" content="{% page_attribute meta_keywords %}"/>
+	<link href="{{ STATIC_URL }}css/style.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="{{ STATIC_URL }}css/print.css" media="print"	rel="stylesheet" type="text/css" />
+    {% render_block "css" %}
+	{% render_block "js" %}
+</head>
+<body id="{% block tpl_id %}none{% endblock %}" class="{{ LANGUAGE_CODE }}">
+{% cms_toolbar %}
+	<div id="page" class="container_16 ">
+		<div id="header">
+			<div id="logo">
+				<a href="/">Company name</a>
+			</div>
+			<div id="nav_lang">
+				{% spaceless %}
+				<ul>
+					{% language_chooser %}
+				</ul>
+				{% endspaceless %}
+			</div>		
+			<div id="nav_main" class="clearfix">
+				{% spaceless %}
+				<ul> 
+					 {% show_menu 0 0 100 100 %}
+				</ul>
+				{% endspaceless %}
+			</div>
+		</div>
+		<ul class="breadcrumb clearfix">
+			{% show_breadcrumb %}
+		</ul>
+		<div id="main">
+			  {% block content %}{% endblock content %}
+		</div>
+	</div>
+</body>
+</html> 

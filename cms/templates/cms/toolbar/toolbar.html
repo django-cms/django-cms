@@ -1,251 +1,86 @@
-{% load i18n %}
-<style type="text/css">    
-    @import "{{ CMS_MEDIA_URL }}css/toolbar.css";
-    @import "{{ CMS_MEDIA_URL }}css/jquery.dialog.css";
-</style>
-<script type="text/javascript" charset="utf-8">
-    //<![CDATA[
-    // When jQuery is sourced, it's going to overwrite whatever might be in the
-    // '$' variable, so store a reference of it in a temporary variable...
-    var _$ = window.$;
-    if (typeof jQuery == 'undefined') {
-        var jquery_url = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';
-        document.write(unescape('%3Cscript src="' + jquery_url + '" type="text/javascript"%3E%3C/script%3E'));
-    }
-    //]]>
-</script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.cookie.js"></script> 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.backgroundposition.js"></script> 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/tools.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.nyroModal-1.6.2.pack.js"></script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.core.js"></script> 
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/ui.dialog.js"></script> 
-<script type="text/javascript" charset="utf-8">
-    //<![CDATA[
-    // dynamic variables for the toolbar js file
-    var placeholder_data = {{ placeholder_data }};
-    var page_is_defined = {% if page %}true{% else %}false{% endif %};
-    var translations = {
-        move_slot: "{% trans 'Move to %(name)s' %}",
-        question: "{% trans "Are you sure you want to delete this plugin?" %}"
-    };
-    var urls = {
-        cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}",
-        cms_page_changelist: "{% url admin:cms_page_changelist %}",              
-        cms_page_change_template: {% if page %}"{% url admin:cms_page_change_template page.pk %}"{% else %}null{% endif %},
-        cms_page_add_plugin: "{% url admin:cms_page_add_plugin %}",
-        cms_page_remove_plugin: "{% url admin:cms_page_remove_plugin %}",
-        cms_page_move_plugin: "{% url admin:cms_page_move_plugin %}"
-    }
-    //]]>
-</script>
+{% load i18n adminmedia sekizai_tags cms_js_tags %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.cookie.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.toolbar.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.placeholders.js"></script>{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.toolbar.css?v1" media="all" />{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.placeholders.css?v1" media="all" />{% endaddtoblock %}
+{% addtoblock "js" %}
 <script type="text/javascript">
-    //<![CDATA[ 
-    (function($) {
-        $(document).ready(function() {
-        
-            var submitActor;
-            var forceSubmit = false;
-            var seen = false;
+//<![CDATA[
+jQuery(document).ready(function ($) {
 
-            // change submit states, open dialog
-            $('#cms_toolbar_requestapproval').click(function(event){
-                return showDialog(event);
-            });
+	// initialize toolbar, pass options, items and allow public access
+	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
-            function showDialog(event, actor) {
-                if (forceSubmit) return true; // escape sequence
-
-                if (!seen) {
-                    // show previously posted message if there were an error
-                    //$('#id_df_moderator_message').val($('#id_moderator_message').val());
-                }
-                seen = true
-                event.preventDefault();
-                submitActor = actor;
-                $('#dialog').dialog('open');
-                return false;
-            }
-
-            function dialogSave(){
-                // assign values from dialog form to real form
-                $('#id_moderator_message').val($('#id_df_moderator_message').val());
-                $('#id_moderator_state').val(
-                    $('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
-                );
-                $('#dialog').dialog('close');
-                forceSubmit = true;
-                
-                // we need to post an updated to server-side to send the email!
-                $(submitActor || '#page_form input[name=_save]').click();
-                return false;
-            }
-
-            $('#dialog').dialog({
-                bgiframe: true,
-                autoOpen: false,
-                height: 200,
-                width: 400,
-                modal: true,
-                buttons: {
-                    Cancel: function() {
-                        $(this).dialog('close');
-                    },
-                    Save: function() {
-                        dialogSave();
-                    }
-                },
-                open: function(){
-                    var val = $('#id_moderator_state').val();
-                    $('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
-                    $('#id_df_moderator_message')
-                        .focus()
-                        .keydown(function(event) { if (event.keyCode == 13) dialogSave()});
-
-                    // add default button class to last rendered button (Save)
-                    $(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
-                },
-                close: function(){
-                    forceSubmit = false;
-                }
-            });
-        });
-    })(jQuery);
-    //]]>
+	// initialize placeholders, pass options and allow public access
+	CMS.API.Placeholders = new CMS.Placeholders('#cms_toolbar', {
+		'edit_mode': {{ request.toolbar.edit_mode|bool }},
+		'lang': {
+			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
+			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
+			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %}
+		}
+	});
+});
+//]]>
 </script>
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/toolbar.js"></script>
-<script type="text/javascript" charset="utf-8">
-    //<![CDATA[
-    // Now that jQuery is done loading, put the '$' variable back to what it was...
-    var $ = _$;
-    //]]>
-</script>
+{% endaddtoblock %}
 
-<div id="cms_toolbar_mini">
-    <a href="#" id="cms_toolbar_openbutton" class="cms_toolbar_button"><span><strong>Open</strong></span></a>
-</div>
-<div id="cms_toolbar" class="cms_toolbar cms_toolbar_editmode_toggle_{% if edit %}on{% else %}off{% endif%}">
-    <div id="cms_toolbar_col1">
-        <a href="http://www.django-cms.org/" id="cms_toolbar_logo"><span>django CMS</span></a>
-        {% if auth %}
-            {% if page %}
-            <div id="cms_toolbar_editmode_toggle">
-                <span>{% trans "Edit mode" %}</span>
-                <a id="cms_toolbar_edit_button_{% if edit %}on{% else %}off{% endif%}" href="#">toggle</a>
-            </div>
-            {% endif %}
-            {% if page.last_page_states %}
-            <div id="cms_toolbar_statusbar">
-                <div>
-                    <span>{% trans "Status" %}:</span>
-                    <em>
-                        {% for state in page.last_page_states %}                    
-                            {{ state.get_action_display }}    
-                        {% endfor %}                
-                    </em>
-                </div>
-            </div>        
-            {% endif %}
-        {% else %}
-        <form method="post" action="" id="cms_toolbar_loginform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
-            <label for="cms_username">{% trans "Username" %}</label>
-            <input type="text" name="cms_username" class="cms_textinput"></input>
-            <label for="cms_password">{% trans "Password" %}</label>
-            <input type="password" name="cms_password" class="cms_textinput"></input>
-            <input type="submit" name="submit" value="{% trans "login" %}" class="cms_submit"></input>
-            <a href="#" class="cms_toolbar_button"><span>{% trans "login" %}</span></a>        
-        </form>
-        {% endif %}    
-    </div>
-    <div id="cms_toolbar_col2">
-        {% if edit and page %}
-        {% if auth %}
-            {% if moderator_should_approve and has_moderate_permission %}
-            <a id="cms_toolbar_approvebutton" href="{% url admin:cms_page_approve_page page.pk %}" class="button green" title="{% trans 'Approve directly' %}">
-                <span class="state">{{ page_moderator_state.label }}</span>
-            </a>
-            {% else %}
-                {% if has_publish_permission %}
-                <a id="cms_toolbar_publishbutton" href="{% url admin:cms_page_publish_page page.pk %}" class="button blue" title="{% trans 'Publish' %}">
-                    <span class="state">Publish</span>
-                </a>
-                {% else %}
-                    <a id="cms_toolbar_requestapproval" href="{% url admin:cms_page_approve_page page.pk %}" class="button blue" title="{% trans 'Request Approval' %}">
-                        <span class="state">Request Approval</span>
-                    </a>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-        {% endif %}
-        <!-- a href="#" id="cms_toolbar_savebutton" class="cms_toolbar_button"><span>Save</span></a-->
-        {% if auth and has_change_permission %}
-        <div id="cms_toolbar_templatebutton" class="cms_toolbar_templatebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>{% trans "Template" %}</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_template_menu" class="cms_toolbar_submenu">
-                {% for template in templates %}
-                <li class="{% ifequal template.0 page.template %}selected {% endifequal %}{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}"><a href="#{{ template.0 }}">{{ template.1 }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-        {% if auth %}
-        <div id="cms_toolbar_pagebutton" class="cms_toolbar_pagebutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Page</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_page_menu" class="cms_toolbar_submenu">                
-                <li class="first"><a href="{% url admin:cms_page_changelist %}"><span class="cms_toolbar_icon_move">{% trans "move" %}</span>{% trans "Move/add Pages" %}</a></li>
-                {% if has_add_page_permission %}
-                <li><a href="{% url admin:cms_page_add %}?target={{ page.pk }}&amp;position=last-child"><span class="cms_toolbar_icon_add_child">{% trans "add child" %}</span>{% trans "Add child page" %}</a></li>
-                <li><a href="{% url admin:cms_page_add %}?{% if page.parent_id %}target={{ page.parent_id }}&amp;position=last-child{% endif %}"><span class="cms_toolbar_icon_add_sibling">{% trans "add sibling" %}</span>{% trans "Add sibling page" %}</a></li>
-                {% endif %}
-                {% if has_delete_permission %}<li class="last"><a href="{% url admin:cms_page_delete page.pk %}"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Page" %}</a></li>{% endif %}
-            </ul>
-        </div>
-        {% endif %}
-        <div id="cms_toolbar_settingsbutton" class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span><strong>Settings</strong><em>arrow</em></span>        
-            <ul id="cms_toolbar_settings_menu" class="cms_toolbar_submenu">                
-                <li class="first"><a href="{% url admin:index %}"><span class="cms_toolbar_icon_edit">{% trans "edit" %}</span>{% trans "Site Administration" %}</a></li>
-                {% if auth %}
-                {% if has_change_permission %}<li><a href="{% url admin:cms_page_change page.pk %}"><span class="cms_toolbar_icon_padeadmin">Icon</span>{% trans "Page Settings" %}</a></li>
-                <!--li><a href="#"><span class="cms_toolbar_icon_pageunpublish">Icon</span>Unpublish Page</a></li-->
-                <li><a href="{% url admin:cms_page_history page.pk %}"><span class="cms_toolbar_icon_history">{% trans "history" %}</span>{% trans "View History" %}</a></li>
-                {% endif %}
-                {% endif %}            
-            </ul>
-        </div>
-        {% if auth %}
-        <form method="post" action="" id="cms_toolbar_logoutform" {% if auth_error %}class="cms_toolbar_error"{% endif %}>{% csrf_token %}
-            <input type="submit" name="logout_submit" value="{% trans "Logout" %}" class="cms_submit" />
-            <a href="#" class="cms_toolbar_button" id="cms_toolbar_logoutbutton" ><span><strong>{% trans "Lock" %}</strong><em>{% trans "Logout" %}</em></span></a>
-        </form>
-        {% endif %}
-        <a href="#" id="cms_toolbar_closebutton" class="cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "Close" %}</strong></span></a>
-    </div>
+<div id="cms_toolbar" class="cms_reset" style="display:none;">
+	<!-- start: toolbar -->
+	<div class="cms_toolbar">
+		<div id="cms_toolbar-toggle">
+			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
+				<span class="cms_toolbar-btn_right cms_toolbar_icon-toggle">
+					<span class="cms_toolbar_icon">&nbsp;</span>
+				</span>
+			</a>
+		</div>
+		<div id="cms_toolbar-toolbar">
+			<div class="cms_toolbar-left"></div>
+			<div class="cms_toolbar-right"></div>
+		</div>
+	</div>
+	<!-- end: toolbar -->
 
-</div>
-<div id="cms_toolbar_spacer">&nbsp;</div>
+	<!-- start: placeholders -->
+	<div id="cms_placeholder-dim"></div>
+	<div id="cms_placeholder-content"><div class="cms_placeholder-content_zone"></div><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
+	<div id="cms_placeholder-overlay">
+		<ul class="cms_placeholder-options">
+			<li class="first"><a href="#" class="cms_placeholder-icon cms_placeholder-icon_edit" rel="edit">{% trans "edit" %}</a></li>
+			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_up" rel="moveup">{% trans "up" %}</a></li>
+			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_down" rel="movedown">{% trans "down" %}</a></li>
+			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_delete" rel="delete">{% trans "delete" %}</a></li>
+			<li>
+				<a href="#" class="cms_placeholder-icon cms_placeholder-icon_more" rel="more">{% trans "more" %}</a>
+				<ul class="cms_placeholder-options_more cms_placeholder-subnav">
+					<li class="cms_placeholder-subnav-title"><span>{% trans "Move to placeholder" %}</span>
+						<ul><li><span>&nbsp;</span></li></ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<div class="cms_placeholder-overlay_bg"></div>
+	</div>
+	<div id="cms_placeholder-success"><div class="cms_placeholder-success_inner"></div></div>
+	<!-- end: placeholders -->
 
-<div id="cms_plugin_overlay">
-    <div class="cms_toolbar_plugintools cms_toolbar">
-        <div class="cms_toolbar_plugintools_holder">
-            <a href="#" class="cms_toolbar_plugin_edit cms_toolbar_button cms_toolbar_iconbutton"><span><strong class="cms_toolbar_icon_edit">{% trans "edit" %}</strong></span></a>            
-            
-            <a href="#" class="cms_toolbar_upbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "up" %}</strong></span></a>
-            <a href="#" class="cms_toolbar_downbutton cms_toolbar_button cms_toolbar_iconbutton"><span><strong>{% trans "down" %}</strong></span></a>                
-            
-            <div class="cms_toolbar_settingsbutton cms_toolbar_button cms_toolbar_submenubutton"><span class="cms_toolbar_submenubutton_content"><strong>{% trans "Settings" %}</strong><em>arrow</em></span>        
-                <ul class="cms_toolbar_submenu">
-                    <li class="last"><a href="#" class="cms_toolbar_plugin_delete"><span class="cms_toolbar_icon_delete">{% trans "delete" %}</span>{% trans "Delete Plugin" %}</a></li>            
-                </ul>
-            </div>
-        </div>    
-    </div>
-    <div class="cms_plugin_overlay_bg">&nbsp;</div>
-    
-    <div id="dialog" title="Approve dialog">
-        <p>This page must be moderated at level 0, post a message for moderator.</p>
-        <div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
-        <div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">Request approval</label></div>
-    </div>
+	<!-- template: anchor -->
+	{% include "cms/toolbar/items/anchor.html" %}
 
-</div>
-<div id="cms_plugin_overlay2">
-    <div class="cms_plugin_overlay_bg">&nbsp;</div>
+	<!-- template: switcher -->
+	{% include "cms/toolbar/items/switcher.html" %}
+
+	<!-- template: button -->
+	{% include "cms/toolbar/items/button.html" %}
+
+	<!-- template: list -->
+	{% include "cms/toolbar/items/list.html" %}
+
+	<!-- item: html - login -->
+	{% include "cms/toolbar/items/login.html" %}
 </div>

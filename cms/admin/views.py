@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models import Page, Title, CMSPlugin, Placeholder
 from cms.utils import get_language_from_request
 from django.http import Http404

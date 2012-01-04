@@ -1,153 +1,229 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-09 01:54+0200\n"
-"PO-Revision-Date: 2010-05-17 13:50+0900\n"
-"Last-Translator: zundoya <zundoya@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2011-08-14 09:47-0500\n"
+"PO-Revision-Date: 2011-03-22 15:24+0000\n"
+"Last-Translator: ojii <me@ojii.ch>\n"
+"Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
 
-#: plugin_base.py:100
+#: cms_toolbar.py:68
+msgid "Edit mode"
+msgstr "編集モード"
+
+#: cms_toolbar.py:77
+msgid "django CMS"
+msgstr ""
+
+#: cms_toolbar.py:108 templates/admin/cms/page/menu_item.html:73
+msgid "Publish"
+msgstr ""
+
+#: cms_toolbar.py:112
+msgid "Request Approval"
+msgstr ""
+
+#: cms_toolbar.py:127 cms_toolbar.py:136
+msgid "Logout"
+msgstr "ログアウト"
+
+#: cms_toolbar.py:152
+msgid "Template"
+msgstr "テンプレート"
+
+#: cms_toolbar.py:160
+msgid "Move/add Pages"
+msgstr ""
+
+#: cms_toolbar.py:165
+msgid "Add child page"
+msgstr "子ページを追加"
+
+#: cms_toolbar.py:171
+msgid "Add sibling page"
+msgstr ""
+
+#: cms_toolbar.py:177
+msgid "Delete Page"
+msgstr "ページを削除して"
+
+#: cms_toolbar.py:180 models/moderatormodels.py:45
+#: templates/admin/cms/page/permissions.html:5
+msgid "Page"
+msgstr "ページ"
+
+#: cms_toolbar.py:189
+msgid "Site Administration"
+msgstr "サイト管理"
+
+#: cms_toolbar.py:195
+msgid "Page Settings"
+msgstr "ページ設定"
+
+#: cms_toolbar.py:201
+msgid "View History"
+msgstr ""
+
+#: cms_toolbar.py:205
+msgid "Admin"
+msgstr ""
+
+#: plugin_base.py:65
 msgid "Advanced options"
 msgstr "詳細設定"
 
-#: admin/forms.py:28
+#: admin/forms.py:59
 msgid "Title"
 msgstr "タイトル"
 
-#: admin/forms.py:29
+#: admin/forms.py:60
 msgid "The default title"
 msgstr "デフォルトタイトル"
 
-#: admin/forms.py:30
+#: admin/forms.py:61
 msgid "Slug"
 msgstr "スラグ"
 
-#: admin/forms.py:31
+#: admin/forms.py:62
 msgid "The part of the title that is used in the URL"
 msgstr "URLに使うタイトルの一部"
 
-#: admin/forms.py:32
+#: admin/forms.py:63
 msgid "Language"
 msgstr "言語"
 
-#: admin/forms.py:33
+#: admin/forms.py:64
 msgid "The current language of the content fields."
 msgstr "現在のコンテンツの言語"
 
-#: admin/forms.py:82
+#: admin/forms.py:117
 msgid "Another page with this slug already exists"
 msgstr "このスラグを使っているページが存在します。"
 
-#: admin/forms.py:100
+#: admin/forms.py:135
 msgid "Menu Title"
 msgstr "メニュータイトル"
 
-#: admin/forms.py:101
+#: admin/forms.py:136
 msgid "Overwrite what is displayed in the menu"
 msgstr "メニューに表示されているテキストを上書きします。"
 
-#: admin/forms.py:102
+#: admin/forms.py:137
 msgid "Page Title"
 msgstr "ページタイトル"
 
-#: admin/forms.py:103
+#: admin/forms.py:138
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
 
-#: admin/forms.py:104
+#: admin/forms.py:139
 msgid "Application"
 msgstr "アプリケーション"
 
-#: admin/forms.py:106
+#: admin/forms.py:141
 msgid "Hook application to this page."
 msgstr "このページとアプリケーションを関連付ける。"
 
-#: admin/forms.py:107
+#: admin/forms.py:142
 msgid "Overwrite URL"
 msgstr "URLを上書き"
 
-#: admin/forms.py:108
+#: admin/forms.py:143
 msgid "Keep this field empty if standard path should be used."
 msgstr "標準のパスを使う場合は、このフィールドを空のままにしてください。"
 
-#: admin/forms.py:114
+#: admin/forms.py:149
 msgid "Redirect"
 msgstr "リダイレクト"
 
-#: admin/forms.py:115
+#: admin/forms.py:150
 msgid "Redirects to this URL."
 msgstr "このURLにリダイレクトします。"
 
-#: admin/forms.py:117
+#: admin/forms.py:152
 msgid "A description of the page sometimes used by search engines."
 msgstr "検索エンジンが使うメモ"
 
-#: admin/forms.py:119
+#: admin/forms.py:154
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "検索エンジンが使う、カンマ区切りのキーワード"
 
-#: admin/forms.py:134
+#: admin/forms.py:170
 msgid "A page with this reverse URL id exists already."
 msgstr "この逆URLを持っているページが存在します。"
 
-#: admin/forms.py:141
+#: admin/forms.py:178
 msgid "Invalid URL, use /my/url format."
 msgstr "無効なURLです。 /my/url のように入力してください。"
 
-#: admin/forms.py:152 admin/forms.py:153 migrations/0001_initial.py:41
+#: admin/forms.py:181
+#, fuzzy, python-format
+msgid "Page with redirect url %r already exist"
+msgstr "このスラグを使っているページが存在します。"
+
+#: admin/forms.py:191 admin/forms.py:192 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
 msgid "user"
 msgstr "ユーザ"
 
-#: admin/forms.py:185
+#: admin/forms.py:216
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "ページの権限を設定するには、子ページのアクセス権限も必要です。"
 
-#: admin/forms.py:188
+#: admin/forms.py:221
 msgid "Add page permission also requires edit page permission."
 msgstr "ページ追加権限は編集権限も必要です。"
 
-#: admin/forms.py:215
+#: admin/forms.py:248
+#, fuzzy
+msgid "can_view"
+msgstr "見る"
+
+#: admin/forms.py:260
 msgid "Please select user or group first."
 msgstr "ユーザかグループを選択してください。"
 
-#: admin/forms.py:222 admin/forms.py:229 admin/forms.py:233
-#: templates/admin/cms/page/change_form.html:65
+#: admin/forms.py:267 admin/forms.py:274 admin/forms.py:278
+#: templates/admin/cms/page/change_form.html:67
 #: templates/admin/cms/page/plugin_change_form.html:70
+#: templates/cms/toolbar/placeholder.html:25
 msgid "Add"
 msgstr "追加"
 
-#: admin/forms.py:223 admin/forms.py:230 admin/forms.py:234
+#: admin/forms.py:268 admin/forms.py:275 admin/forms.py:279
 msgid "Change"
 msgstr "変更"
 
-#: admin/forms.py:224 admin/forms.py:231 admin/forms.py:235
+#: admin/forms.py:269 admin/forms.py:276 admin/forms.py:280
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
 msgstr "変更"
 
-#: admin/forms.py:225
+#: admin/forms.py:270
 msgid "Recover (any) pages"
 msgstr "ページを復元"
 
-#: admin/forms.py:288
+#: admin/forms.py:297
 msgid "Notify user"
 msgstr "ユーザに通知"
 
-#: admin/forms.py:289
+#: admin/forms.py:298
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
@@ -155,379 +231,278 @@ msgstr ""
 "パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザ"
 "メールが必要です。"
 
-#: admin/forms.py:309
+#: admin/forms.py:318
 msgid "New password"
 msgstr "新しいパスワード"
 
-#: admin/forms.py:311
+#: admin/forms.py:320
 msgid "New password confirmation"
 msgstr "パスワード入力確認"
 
-#: admin/forms.py:330
+#: admin/forms.py:339
 msgid "Email notification requires valid email address."
 msgstr "メール通知はメールアドレスが必要です。"
 
-#: admin/forms.py:332
+#: admin/forms.py:341
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "新しいページの権限はページ変更の権限が必要です。"
 
-#: admin/forms.py:334
+#: admin/forms.py:343
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "新しいユーザの権限はページ変更の権限が必要です。"
 
-#: admin/forms.py:336
+#: admin/forms.py:345
 msgid "To add permissions you also need to edit them!"
 msgstr ""
 
-#: admin/pageadmin.py:118 admin/pageadmin.py:134
-msgid "Hidden"
-msgstr "非表示"
-
-#: admin/pageadmin.py:129
+#: admin/pageadmin.py:97
 msgid "Basic Settings"
 msgstr "基本設定"
 
-#: admin/pageadmin.py:132
-#, fuzzy
+#: admin/pageadmin.py:100
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "注意: 変更済みの時は保存してください。このページを再読み込みします。"
+msgstr ""
 
-#: admin/pageadmin.py:138
+#: admin/pageadmin.py:102 admin/pageadmin.py:154
+msgid "Hidden"
+msgstr "非表示"
+
+#: admin/pageadmin.py:106
 msgid "Advanced Settings"
 msgstr "詳細設定"
 
-#: admin/pageadmin.py:147
+#: admin/pageadmin.py:113
 msgid "SEO Settings"
 msgstr "SEO設定"
 
-#: admin/pageadmin.py:477
+#: admin/pageadmin.py:299
+#, fuzzy
+msgid "You have no permission to change the template"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/pageadmin.py:485
 msgid "higher"
 msgstr ""
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:655
 msgid "Database error"
 msgstr "データベースエラー"
 
-#: admin/pageadmin.py:748 migrations/0001_initial.py:13
-#: migrations/0001_initial.py:26 migrations/0001_initial.py:40
-#: migrations/0001_initial.py:78 migrations/0003_remove_placeholder.py:21
-#: models/pagemodel.py:82 models/permissionmodels.py:68
-#: models/titlemodels.py:22 plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:13 plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22 plugins/teaser/models.py:15
-msgid "page"
-msgstr "ページ"
-
-#: admin/pageadmin.py:873
+#: admin/pageadmin.py:855
 msgid "Page was successfully approved."
 msgstr "ページを承認しました。"
 
-#: admin/pageadmin.py:928
+#: admin/pageadmin.py:927
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 "プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
 
-#: admin/pageadmin.py:931
+#: admin/pageadmin.py:933
 msgid "There only exists one translation for this page"
 msgstr "このページは一つの翻訳しかありません。"
 
-#: admin/pageadmin.py:946
+#: admin/pageadmin.py:969
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
 
-#: admin/pageadmin.py:969
+#: admin/pageadmin.py:991
 msgid "Are you sure?"
 msgstr "続けてもよろしいですか？"
 
-#: admin/pageadmin.py:1029
+#: admin/pageadmin.py:1052
 msgid "You do not have permission to publish this page"
 msgstr "このページを発表する権限がありません。"
 
-#: admin/pageadmin.py:1047
+#: admin/pageadmin.py:1066
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "メニューステータスを変更する権限がありません。"
 
-#: admin/pageadmin.py:1092 admin/pageadmin.py:1125
-msgid "You do not have permission to change this page"
+#: admin/pageadmin.py:1079
+#, fuzzy
+msgid "You have no permission to add a plugin"
 msgstr "このページを変更する権限がありません。"
 
-#: admin/pageadmin.py:1096 admin/pageadmin.py:1127
+#: admin/pageadmin.py:1126 admin/pageadmin.py:1158
 msgid "Language must be set to a supported language!"
 msgstr ""
 
-#: admin/pageadmin.py:1108
+#: admin/pageadmin.py:1138
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1129
+#: admin/pageadmin.py:1156
+msgid "You do not have permission to change this page"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/pageadmin.py:1160
 msgid "Language must be different than the copied language!"
 msgstr ""
 
-#: admin/pageadmin.py:1139
+#: admin/pageadmin.py:1166
+#, fuzzy
+msgid "You do not have permission to add plugins"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/pageadmin.py:1173
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1213
-#, fuzzy, python-format
+#: admin/pageadmin.py:1186 admin/pageadmin.py:1294 admin/pageadmin.py:1316
+#, fuzzy
+msgid "You have no permission to change this page"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/pageadmin.py:1221
+#, fuzzy
+msgid "You have no permission to edit a plugin"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/pageadmin.py:1256
+#, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
-"%(placeholder)s の中の %(position)s 番の %(plugin_name)s プラグインを削除しま"
-"した。"
 
-#: admin/pageadmin.py:1271
+#: admin/pageadmin.py:1311
 #, fuzzy
-msgid "Plugins where moved"
-msgstr "プラグインを移動しました。"
+msgid "You have no permission to move a plugin"
+msgstr "このページを変更する権限がありません。"
 
-#: admin/pageadmin.py:1293 admin/placeholderadmin.py:207
-#, fuzzy, python-format
+#: admin/pageadmin.py:1329
+msgid "Plugins where moved"
+msgstr ""
+
+#: admin/pageadmin.py:1343
+#, fuzzy
+msgid "You have no permission to remove a plugin"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/pageadmin.py:1361 admin/placeholderadmin.py:292
+#, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
-"%(placeholder)s の中の %(position)s 番の %(plugin_name)s プラグインを削除しま"
-"した。"
 
-#: admin/permissionadmin.py:113 models/permissionmodels.py:74
+#: admin/permissionadmin.py:72
+msgid "View restriction"
+msgstr ""
+
+#: admin/permissionadmin.py:73
+msgid "View restrictions"
+msgstr ""
+
+#: admin/permissionadmin.py:133 models/permissionmodels.py:75
 msgid "Page permissions"
 msgstr "ページ権限"
 
-#: admin/permissionadmin.py:114
+#: admin/permissionadmin.py:134
 msgid "User & Group permissions"
 msgstr "ユーザとグループ権限"
 
-#: admin/permissionadmin.py:115
+#: admin/permissionadmin.py:135
 msgid "Page permissions management"
 msgstr "ページ権限管理"
 
-#: admin/useradmin.py:22
+#: admin/placeholderadmin.py:150 admin/placeholderadmin.py:191
+#, fuzzy
+msgid "You don't have permission to add content here."
+msgstr "このページを変更する権限がありません。"
+
+#: admin/placeholderadmin.py:187
+#, fuzzy
+msgid "You don't have permission to add plugins"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/placeholderadmin.py:288
+#, fuzzy
+msgid "You don't have permission to delete a plugin"
+msgstr "このページを変更する権限がありません。"
+
+#: admin/useradmin.py:25
 msgid "User details"
 msgstr "ユーザ詳細"
 
-#: admin/useradmin.py:23
+#: admin/useradmin.py:26
 msgid "Groups"
 msgstr "グループ"
 
-#: admin/useradmin.py:33 templates/cms/toolbar/toolbar.html:76
+#: admin/useradmin.py:36 templates/cms/toolbar/items/login.html:7
 msgid "Password"
 msgstr "パスワード"
 
-#: admin/dialog/forms.py:8
+#: admin/dialog/forms.py:9
 msgid "Copy permissions"
 msgstr "コピー権限"
 
-#: admin/dialog/forms.py:11
-#, fuzzy
+#: admin/dialog/forms.py:16
 msgid "Copy moderation"
-msgstr "コピー権限"
+msgstr ""
 
-#: conf/patch.py:26
+#: conf/patch.py:28
 msgid "Inherit the template of the nearest ancestor"
 msgstr ""
 
-#: docs/templates/defindex.html:2
-#, fuzzy
-msgid "Overview"
-msgstr "概要"
-
-#: docs/templates/defindex.html:11
-#, fuzzy
-msgid "Indices and tables:"
-msgstr "索引と表一覧:"
-
-#: docs/templates/defindex.html:14
-#, fuzzy
-msgid "Complete Table of Contents"
-msgstr "総合目次"
-
-#: docs/templates/defindex.html:15
-#, fuzzy
-msgid "lists all sections and subsections"
-msgstr "章／節一覧"
-
-#: docs/templates/defindex.html:16
-msgid "Search Page"
-msgstr "検索ページ"
-
-#: docs/templates/defindex.html:17
-#, fuzzy
-msgid "search this documentation"
-msgstr "ドキュメントを検索"
-
-#: docs/templates/defindex.html:19 docs/templates/modindex.html:2
-#: docs/templates/modindex.html.py:13
-#, fuzzy
-msgid "Global Module Index"
-msgstr "モジュール総索引"
-
-#: docs/templates/defindex.html:20
-#, fuzzy
-msgid "quick access to all modules"
-msgstr "全モジュール早見表"
-
-#: docs/templates/defindex.html:21
-#, fuzzy
-msgid "General Index"
-msgstr "総合索引"
-
-#: docs/templates/defindex.html:22
-#, fuzzy
-msgid "all functions, classes, terms"
-msgstr "関数、クラスおよび用語総覧"
-
-#: docs/templates/genindex-single.html:2 docs/templates/genindex-split.html:2
-#: docs/templates/genindex-split.html:5 docs/templates/genindex.html:2
-#: docs/templates/genindex.html.py:5 docs/templates/genindex.html:48
-#: docs/templates/layout.html:131
-#, fuzzy
-msgid "Index"
-msgstr "目次"
-
-#: docs/templates/genindex-single.html:44
-#: docs/templates/genindex-split.html:14 docs/templates/genindex-split.html:27
-#: docs/templates/genindex.html:54
-#, fuzzy
-msgid "Full index on one page"
-msgstr "総索引"
-
-#: docs/templates/genindex-split.html:7
-#, fuzzy
-msgid "Index pages by letter"
-msgstr "頭文字別索引"
-
-#: docs/templates/genindex-split.html:15
-#, fuzzy
-msgid "can be huge"
-msgstr "大きい場合があるので注意"
-
-#: docs/templates/layout.html:10
-msgid "Navigation"
-msgstr "ナビゲーション"
-
-#: docs/templates/layout.html:42
-msgid "Table Of Contents"
-msgstr "目次"
-
-#: docs/templates/layout.html:48
-msgid "Previous topic"
-msgstr "前のトピック"
-
-#: docs/templates/layout.html:50
-msgid "previous chapter"
-msgstr "前章"
-
-#: docs/templates/layout.html:53
-msgid "Next topic"
-msgstr "次のトピック"
-
-#: docs/templates/layout.html:55
-msgid "next chapter"
-msgstr "次章"
-
-#: docs/templates/layout.html:60
-msgid "This Page"
-msgstr "このページ"
-
-#: docs/templates/layout.html:63
-msgid "Show Source"
-msgstr "ソースを表示"
-
-#: docs/templates/layout.html:73
-msgid "Quick search"
-msgstr "クイックサーチ"
-
-#: docs/templates/layout.html:76
-msgid "Go"
-msgstr "移動"
-
-#: docs/templates/layout.html:81
-msgid "Enter search terms or a module, class or function name."
-msgstr ""
-
-#: docs/templates/layout.html:128
-msgid "About these documents"
-msgstr "このドキュメントについて"
-
-#: docs/templates/layout.html:134 docs/templates/search.html:2
-#: docs/templates/search.html.py:5
-msgid "Search"
-msgstr "検索"
-
-#: docs/templates/layout.html:137
-msgid "Copyright"
-msgstr "著作権"
-
-#: docs/templates/modindex.html:36
-msgid "Deprecated"
-msgstr "廃止予定"
-
-#: docs/templates/search.html:21
-msgid "search"
-msgstr "検索"
-
-#: docs/templates/search.html:25
-msgid "Search Results"
-msgstr "検索結果"
-
-#: docs/templates/search.html:27
-#, fuzzy
-msgid "Your search did not match any results."
-msgstr "検索条件に一致する項目がありませんでした。"
-
-#: forms/fields.py:18
+#: forms/fields.py:19
 msgid "Select a valid site"
 msgstr ""
 
-#: forms/fields.py:19
-#, fuzzy
+#: forms/fields.py:20
 msgid "Select a valid page"
-msgstr "このページを選択"
+msgstr ""
 
-#: forms/widgets.py:172
-#, fuzzy
+#: forms/widgets.py:173
 msgid "Add Another"
-msgstr "追加"
+msgstr ""
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
 #: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
 #: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:44 models/titlemodels.py:11
+#: models/pluginmodel.py:79 models/titlemodels.py:10
 #: plugins/inherit/models.py:11
 msgid "language"
 msgstr "言語"
 
+#: migrations/0001_initial.py:13 migrations/0001_initial.py:26
+#: migrations/0001_initial.py:40 migrations/0001_initial.py:78
+#: migrations/0003_remove_placeholder.py:21 models/pagemodel.py:104
+#: models/permissionmodels.py:69 models/titlemodels.py:21
+#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
+#: plugins/picture/models.py:22 plugins/teaser/models.py:13
+msgid "page"
+msgstr "ページ"
+
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:43
-#, fuzzy
+#: migrations/0004_textobjects.py:22 models/pluginmodel.py:78
 msgid "position"
-msgstr "カーソル位置"
+msgstr "位置"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:46 models/titlemodels.py:23
+#: models/pluginmodel.py:81 models/titlemodels.py:22
 msgid "creation date"
 msgstr "作成日"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:27
+#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:13
 msgid "slot"
-msgstr ""
+msgstr "スロット"
 
-#: migrations/0001_initial.py:18 models/pluginmodel.py:45
+#: migrations/0001_initial.py:18 models/pluginmodel.py:80
 msgid "plugin_name"
 msgstr "プラグイン名"
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
-#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:26
-#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:11
+#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:11
+#: models/titlemodels.py:12 models/titlemodels.py:20 plugins/file/models.py:25
+#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:9
 #: plugins/twitter/models.py:6 plugins/twitter/models.py:15
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
@@ -537,7 +512,7 @@ msgstr "タイトル"
 msgid "path"
 msgstr "パス"
 
-#: migrations/0001_initial.py:30 models/titlemodels.py:14
+#: migrations/0001_initial.py:30 models/titlemodels.py:13
 msgid "slug"
 msgstr "スラグ"
 
@@ -562,9 +537,8 @@ msgid "type"
 msgstr "タイプ"
 
 #: migrations/0001_initial.py:44
-#, fuzzy
 msgid "can change soft-root"
-msgstr "詳細設定変更可能"
+msgstr ""
 
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
@@ -572,271 +546,242 @@ msgid "status"
 msgstr "ステータス"
 
 #: migrations/0001_initial.py:53
-#, fuzzy
 msgid "navigation extenders"
-msgstr "ナビゲーション"
+msgstr ""
 
 #: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46 models/titlemodels.py:16
-#, fuzzy
+#: migrations/0006_apphook.py:46 models/titlemodels.py:15
 msgid "has url overwrite"
-msgstr "既存のファイルを上書きする"
+msgstr ""
 
 #: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
-#, fuzzy
 msgid "url overwrite"
-msgstr "URLを上書き"
+msgstr ""
 
 #: migrations/0001_initial.py:57
 msgid "author"
 msgstr "作者"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
-#, fuzzy
 msgid "reverse url id"
-msgstr "オブジェクト ID を表示"
+msgstr ""
 
-#: migrations/0001_initial.py:59 models/pagemodel.py:71
+#: migrations/0001_initial.py:59 models/pagemodel.py:84
 msgid "login required"
 msgstr "ログインが必要"
 
-#: migrations/0001_initial.py:60 models/pagemodel.py:56
-#, fuzzy
+#: migrations/0001_initial.py:60 models/pagemodel.py:69
 msgid "soft root"
-msgstr "ルートユーザでない"
+msgstr "ソフト　ルート"
 
-#: migrations/0001_initial.py:63 models/pagemodel.py:54
-#, fuzzy
+#: migrations/0001_initial.py:63 models/pagemodel.py:67
 msgid "publication end date"
-msgstr "日時"
+msgstr ""
 
-#: migrations/0001_initial.py:64 models/pagemodel.py:61
+#: migrations/0001_initial.py:64 models/pagemodel.py:74
 #: plugins/snippet/models.py:14
 msgid "template"
 msgstr "テンプレート"
 
-#: migrations/0001_initial.py:66 models/pagemodel.py:53
+#: migrations/0001_initial.py:66 models/pagemodel.py:66
 msgid "publication date"
 msgstr "公開日時"
 
-#: migrations/0001_initial.py:67 models/pagemodel.py:55
+#: migrations/0001_initial.py:67 models/pagemodel.py:68
 #: templates/admin/cms/page/change_list_tree.html:9
-#, fuzzy
 msgid "in navigation"
-msgstr "ナビゲーション"
+msgstr ""
 
 #: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
+#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:16
 msgid "application"
 msgstr "アプリケーション"
 
-#: migrations/0006_apphook.py:65 models/pagemodel.py:57
+#: migrations/0006_apphook.py:65 models/pagemodel.py:70
 msgid "id"
 msgstr "ID"
 
-#: migrations/0008_redirects.py:11 models/titlemodels.py:18
+#: migrations/0008_redirects.py:11 models/titlemodels.py:17
 msgid "redirect"
 msgstr "リダイレクト"
 
-#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
+#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:19
 msgid "keywords"
 msgstr "キーワード"
 
-#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
-#: plugins/teaser/models.py:22
+#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:18
+#: plugins/teaser/models.py:20
 msgid "description"
 msgstr "説明"
 
-#: models/moderatormodels.py:24
+#: models/moderatormodels.py:25
 msgid "Current page"
 msgstr "現在のページ"
 
-#: models/moderatormodels.py:25
-#, fuzzy
-msgid "Page children (immediate)"
-msgstr "ページが見つかりません"
-
 #: models/moderatormodels.py:26
-msgid "Page and children (immediate)"
+msgid "Page children (immediate)"
 msgstr ""
 
 #: models/moderatormodels.py:27
-#, fuzzy
-msgid "Page descendants"
-msgstr "フラットページ"
+msgid "Page and children (immediate)"
+msgstr ""
 
 #: models/moderatormodels.py:28
-#, fuzzy
+msgid "Page descendants"
+msgstr ""
+
+#: models/moderatormodels.py:29
 msgid "Page and descendants"
-msgstr "Castile and Leon"
+msgstr ""
 
-#: models/moderatormodels.py:44 templates/admin/cms/page/permissions.html:5
-msgid "Page"
-msgstr "ページ"
-
-#: models/moderatormodels.py:45
+#: models/moderatormodels.py:46
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
 msgstr "ユーザ"
 
-#: models/moderatormodels.py:49 templatetags/cms_admin.py:65
-#, fuzzy
+#: models/moderatormodels.py:50 templatetags/cms_admin.py:99
 msgid "Moderate page"
-msgstr "フラットページ"
+msgstr ""
 
-#: models/moderatormodels.py:50 templatetags/cms_admin.py:66
-#, fuzzy
+#: models/moderatormodels.py:51 templatetags/cms_admin.py:100
 msgid "Moderate children"
-msgstr "適度なフィルタリングを行う"
+msgstr ""
 
-#: models/moderatormodels.py:51 templatetags/cms_admin.py:67
-#, fuzzy
+#: models/moderatormodels.py:52 templatetags/cms_admin.py:101
 msgid "Moderate descendants"
-msgstr "適度なフィルタリングを行う"
+msgstr ""
 
-#: models/moderatormodels.py:54 models/moderatormodels.py:55
+#: models/moderatormodels.py:55 models/moderatormodels.py:56
 msgid "PageModerator"
 msgstr ""
 
-#: models/moderatormodels.py:97
-#, fuzzy
+#: models/moderatormodels.py:99
 msgid "created"
-msgstr "作成済み"
+msgstr "作った"
 
-#: models/moderatormodels.py:98 models/pagemodel.py:35
+#: models/moderatormodels.py:100 models/pagemodel.py:44
 msgid "changed"
 msgstr "変更済み"
 
-#: models/moderatormodels.py:99
-#, fuzzy
-msgid "delete req."
-msgstr "削除の承認"
-
-#: models/moderatormodels.py:100
-#, fuzzy
-msgid "move req."
-msgstr "移動可能"
-
 #: models/moderatormodels.py:101
-#, fuzzy
-msgid "publish req."
-msgstr "公開可能"
+msgid "delete req."
+msgstr ""
 
 #: models/moderatormodels.py:102
+msgid "move req."
+msgstr ""
+
+#: models/moderatormodels.py:103
+msgid "publish req."
+msgstr ""
+
+#: models/moderatormodels.py:104
 msgid "unpublish req."
 msgstr ""
 
-#: models/moderatormodels.py:103 models/pagemodel.py:38
+#: models/moderatormodels.py:105 models/pagemodel.py:47
 msgid "approved"
 msgstr "承認"
 
-#: models/moderatormodels.py:115
-#, fuzzy
+#: models/moderatormodels.py:117
 msgid "Page moderator state"
-msgstr "状態情報を読み取っています"
+msgstr ""
 
-#: models/moderatormodels.py:116
-#, fuzzy
+#: models/moderatormodels.py:118
 msgid "Page moderator states"
-msgstr "ミクロネシア連邦国"
+msgstr ""
 
-#: models/pagemodel.py:36
-#, fuzzy
+#: models/pagemodel.py:45
 msgid "req. app."
-msgstr "アプリケーション %r が見つかりません"
+msgstr ""
 
-#: models/pagemodel.py:37 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:106
-#: templates/cms/toolbar/toolbar.html:143 utils/moderator.py:89
+#: models/pagemodel.py:46 templates/admin/cms/page/menu_item.html:44
+#: templates/cms/toolbar/toolbar.html:57 utils/moderator.py:90
 msgid "delete"
 msgstr "削除"
 
-#: models/pagemodel.py:39
-#, fuzzy
+#: models/pagemodel.py:48
 msgid "app. par."
-msgstr "アプリケーション %r が見つかりません"
+msgstr ""
 
-#: models/pagemodel.py:43
+#: models/pagemodel.py:52
 msgid "for logged in users only"
 msgstr ""
 
-#: models/pagemodel.py:44
+#: models/pagemodel.py:53
 msgid "for anonymous users only"
 msgstr ""
 
-#: models/pagemodel.py:49
+#: models/pagemodel.py:61
 msgid "created by"
 msgstr "作成者"
 
-#: models/pagemodel.py:50 templates/admin/cms/page/change_list_tree.html:19
+#: models/pagemodel.py:62 templates/admin/cms/page/change_list_tree.html:20
 msgid "changed by"
 msgstr "変更者"
 
-#: models/pagemodel.py:53
+#: models/pagemodel.py:66
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr ""
 
-#: models/pagemodel.py:54
+#: models/pagemodel.py:67
 msgid "When to expire the page. Leave empty to never expire."
 msgstr ""
 
-#: models/pagemodel.py:56
+#: models/pagemodel.py:69
 msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
-#: models/pagemodel.py:57
+#: models/pagemodel.py:70
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
 
-#: models/pagemodel.py:58
+#: models/pagemodel.py:71
 msgid "attached menu"
 msgstr ""
 
-#: models/pagemodel.py:59
+#: models/pagemodel.py:72
 msgid "is published"
 msgstr "公開"
 
-#: models/pagemodel.py:61
-#, fuzzy
+#: models/pagemodel.py:74
 msgid "The template used to render the content."
-msgstr "使用するテンプレート"
+msgstr ""
 
-#: models/pagemodel.py:62
+#: models/pagemodel.py:75
 msgid "The site the page is accessible at."
 msgstr ""
 
-#: models/pagemodel.py:62
+#: models/pagemodel.py:75
 msgid "site"
 msgstr "サイト"
 
-#: models/pagemodel.py:64
-#, fuzzy
+#: models/pagemodel.py:77
 msgid "moderator state"
-msgstr "Free State"
+msgstr ""
 
-#: models/pagemodel.py:72
+#: models/pagemodel.py:85
 msgid "menu visibility"
 msgstr ""
 
-#: models/pagemodel.py:72
-#, fuzzy
+#: models/pagemodel.py:85
 msgid "limit when this page is visible in the menu"
-msgstr "メニューに表示されているテキストを上書きします。"
+msgstr ""
 
-#: models/pagemodel.py:83
+#: models/pagemodel.py:105
 msgid "pages"
 msgstr "ページ"
 
-#: models/pagemodel.py:190
+#: models/pagemodel.py:267
 msgid "Page was copied."
 msgstr "ページをコピーしました。"
 
-#: models/pagemodel.py:495
+#: models/pagemodel.py:698
 msgid "default"
 msgstr "デフォルト"
 
@@ -857,23 +802,28 @@ msgid "can change permissions"
 msgstr "権限変更可能"
 
 #: models/permissionmodels.py:25
-#, fuzzy
 msgid "on page level"
-msgstr "総索引"
+msgstr ""
 
 #: models/permissionmodels.py:26
 msgid "can move"
 msgstr "移動可能"
 
 #: models/permissionmodels.py:27
-#, fuzzy
 msgid "can moderate"
-msgstr "追加可能"
+msgstr ""
+
+#: models/permissionmodels.py:28
+msgid "view restricted"
+msgstr ""
+
+#: models/permissionmodels.py:28
+msgid "frontend view restriction"
+msgstr ""
 
 #: models/permissionmodels.py:51
-#, fuzzy
 msgid "can recover pages"
-msgstr "ページ復活可能"
+msgstr ""
 
 #: models/permissionmodels.py:51
 msgid "can recover any deleted page"
@@ -895,19 +845,19 @@ msgstr "ページグロバール権限"
 msgid "Pages global permissions"
 msgstr "ページグロバール権限"
 
-#: models/permissionmodels.py:67 templates/admin/cms/page/permissions.html:14
+#: models/permissionmodels.py:68 templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "権限を付与"
 
-#: models/permissionmodels.py:73
+#: models/permissionmodels.py:74
 msgid "Page permission"
 msgstr "ページ権限"
 
-#: models/permissionmodels.py:87
+#: models/permissionmodels.py:89
 msgid "User (page)"
 msgstr "ユーザ (ページ)"
 
-#: models/permissionmodels.py:88
+#: models/permissionmodels.py:90
 msgid "Users (page)"
 msgstr "ユーザ (ページ)"
 
@@ -919,21 +869,24 @@ msgstr "ユーザ グループ(ページ)"
 msgid "User groups (page)"
 msgstr "ユーザ グループ(ページ)"
 
-#: models/placeholdermodel.py:28 plugins/flash/models.py:10
-#: plugins/flash/migrations/0001_initial.py:16 plugins/video/models.py:14
+#: models/placeholdermodel.py:14 plugins/flash/models.py:9
+#: plugins/flash/migrations/0001_initial.py:16 plugins/video/models.py:13
 msgid "width"
 msgstr "幅"
 
-#: models/titlemodels.py:13
-#, fuzzy
-msgid "overwrite the title in the menu"
-msgstr "メニューに表示されているテキストを上書きします。"
+#: models/pluginmodel.py:140
+msgid "<Empty>"
+msgstr ""
 
-#: models/titlemodels.py:15
+#: models/titlemodels.py:12
+msgid "overwrite the title in the menu"
+msgstr "メニューのタイトルを書き替える"
+
+#: models/titlemodels.py:14
 msgid "Path"
 msgstr "ページ"
 
-#: models/titlemodels.py:21
+#: models/titlemodels.py:20
 msgid "overwrite the title (html title tag)"
 msgstr ""
 
@@ -941,33 +894,41 @@ msgstr ""
 msgid "File"
 msgstr "ファイル"
 
-#: plugins/file/models.py:25 plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:9 plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:24 plugins/file/migrations/0001_initial.py:17
+#: plugins/flash/models.py:8 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
 msgstr "ファイル"
 
-#: plugins/flash/cms_plugins.py:11
+#: plugins/file/templates/cms/plugins/file.html:6
+msgid "file missing!"
+msgstr ""
+
+#: plugins/flash/cms_plugins.py:9
 msgid "Flash"
 msgstr "Flash"
 
-#: plugins/flash/models.py:9
+#: plugins/flash/models.py:8
 msgid "use swf file"
 msgstr "swf ファイルを使う"
 
-#: plugins/flash/models.py:11 plugins/flash/migrations/0001_initial.py:19
-#: plugins/video/models.py:15
+#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:19
+#: plugins/video/models.py:14
 msgid "height"
 msgstr "高さ"
 
-#: plugins/flash/templates/cms/plugins/flash.html:2
-#, fuzzy
-msgid "Missing flash plugin."
-msgstr "選択したプラグインの編集"
+#: plugins/flash/templates/cms/plugins/flash.html:40
+#: plugins/video/templates/cms/plugins/video.html:60
+msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
+msgstr ""
 
-#: plugins/googlemap/cms_plugins.py:11
-#, fuzzy
+#: plugins/flash/templates/cms/plugins/flash.html:42
+#: plugins/video/templates/cms/plugins/video.html:62
+msgid "Get Adobe Flash Player"
+msgstr ""
+
+#: plugins/googlemap/cms_plugins.py:10
 msgid "Google Map"
-msgstr "地図タイトル"
+msgstr "Googleマップ"
 
 #: plugins/googlemap/models.py:9
 msgid "map title"
@@ -986,64 +947,54 @@ msgid "city"
 msgstr "市"
 
 #: plugins/googlemap/models.py:15
-#, fuzzy
 msgid "additional content"
-msgstr "追加のコンテンツ"
+msgstr ""
 
 #: plugins/googlemap/models.py:16
-#, fuzzy
 msgid "zoom level"
 msgstr "ズームレベル"
 
 #: plugins/googlemap/models.py:18
-#, fuzzy
 msgid "latitude"
-msgstr "緯度"
+msgstr ""
 
 #: plugins/googlemap/models.py:19
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map possiton."
-msgstr "地図の位置を詳細にするには緯度と経度を使用してください。"
+msgstr ""
 
 #: plugins/googlemap/models.py:20
-#, fuzzy
 msgid "longitude"
-msgstr "経度"
+msgstr ""
 
 #: plugins/googlemap/models.py:22
-#, fuzzy
 msgid "route planer title"
-msgstr "路線検索タイトル"
+msgstr ""
 
 #: plugins/googlemap/models.py:22
-#, fuzzy
 msgid "Calculate your fastest way to here"
-msgstr "最短路線検索"
+msgstr ""
 
 #: plugins/googlemap/models.py:23
-#, fuzzy
 msgid "route planer"
-msgstr "路線検索"
+msgstr ""
 
 #: plugins/googlemap/models.py:30
 msgid "Map"
 msgstr "地図"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:72
-msgid "Your address"
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:76
+msgid "Your address: "
 msgstr "あなたの住所"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:75
-#, fuzzy
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:78
 msgid "Calculate route"
-msgstr "路線検索"
+msgstr ""
 
 #: plugins/inherit/cms_plugins.py:17
-#, fuzzy
 msgid "Inherit Plugins from Page"
-msgstr "ページはいかなるパーミッションも継承しない。"
+msgstr ""
 
-#: plugins/inherit/forms.py:19
+#: plugins/inherit/forms.py:23
 msgid "Language or Page must be filled out"
 msgstr "言語かページを入力してください。"
 
@@ -1061,98 +1012,87 @@ msgstr ""
 msgid "Link"
 msgstr "リンク"
 
-#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:18
+#: plugins/link/models.py:10 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
 #: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
-#, fuzzy
 msgid "name"
-msgstr "名前"
+msgstr "名"
 
-#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:16
+#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:16
 #: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
-#: plugins/teaser/models.py:21
-#, fuzzy
+#: plugins/teaser/models.py:19
 msgid "link"
 msgstr "リンク"
 
-#: plugins/link/models.py:13
+#: plugins/link/models.py:12
 msgid "A link to a page has priority over a text link."
 msgstr ""
 
-#: plugins/link/models.py:14
-#, fuzzy
+#: plugins/link/models.py:13
 msgid "mailto"
-msgstr "メール送り先"
+msgstr "メール"
 
-#: plugins/link/models.py:14
+#: plugins/link/models.py:13
 msgid "An email adress has priority over a text link."
 msgstr ""
 
 #: plugins/picture/cms_plugins.py:9
-#, fuzzy
 msgid "Picture"
-msgstr "画像"
+msgstr "絵"
+
+#: plugins/picture/models.py:14
+msgid "center"
+msgstr ""
 
 #: plugins/picture/models.py:15
-#, fuzzy
 msgid "left"
 msgstr "左"
 
 #: plugins/picture/models.py:16
-#, fuzzy
 msgid "right"
 msgstr "右"
 
 #: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:12 plugins/video/models.py:12
-#, fuzzy
+#: plugins/teaser/models.py:10 plugins/video/models.py:11
 msgid "image"
-msgstr "画像"
+msgstr "絵"
 
 #: plugins/picture/models.py:21 plugins/picture/models.py:22
-#, fuzzy
 msgid "if present image will be clickable"
-msgstr "もし現在の画像がクリック加能なら"
+msgstr ""
 
 #: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
-#, fuzzy
 msgid "alternate text"
-msgstr "代替テキスト"
+msgstr ""
 
 #: plugins/picture/models.py:23
-#, fuzzy
 msgid "textual description of the image"
-msgstr "画像の追加説明"
+msgstr ""
 
 #: plugins/picture/models.py:24
-#, fuzzy
 msgid "long description"
-msgstr "詳細な説明"
+msgstr ""
 
 #: plugins/picture/models.py:24
-#, fuzzy
 msgid "additional description of the image"
-msgstr "画像の追加説明"
+msgstr ""
 
 #: plugins/picture/models.py:25
-#, fuzzy
 msgid "side"
-msgstr "側"
+msgstr ""
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
-#, fuzzy
 msgid "Snippet"
-msgstr "スニペット"
+msgstr ""
 
 #: plugins/snippet/cms_plugins.py:30
-#, fuzzy, python-format
+#, python-format
 msgid "Template %(template)s does not exist."
-msgstr "%(template)s テンプレートは存在しません。"
+msgstr ""
 
 #: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
-#, fuzzy
 msgid "HTML"
 msgstr "HTML"
 
@@ -1165,117 +1105,99 @@ msgstr ""
 msgid "Snippets"
 msgstr ""
 
-#: plugins/teaser/cms_plugins.py:9
+#: plugins/teaser/cms_plugins.py:8
 msgid "Teaser"
 msgstr ""
 
-#: plugins/teaser/models.py:16
-#, fuzzy
+#: plugins/teaser/models.py:14
 msgid "If present image will be clickable"
-msgstr "もし現在の画像がクリック加能なら"
+msgstr ""
 
-#: plugins/teaser/models.py:21
-#, fuzzy
+#: plugins/teaser/models.py:19
 msgid "If present image will be clickable."
-msgstr "もし現在の画像がクリック加能なら"
+msgstr ""
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
-#, fuzzy
+#: templates/cms/toolbar/toolbar.html:59
 msgid "more"
-msgstr "さらに"
+msgstr "もと"
 
 #: plugins/text/cms_plugins.py:15
-#, fuzzy
 msgid "Text"
 msgstr "テキスト"
 
-#: plugins/text/models.py:15 plugins/text/migrations/0001_initial.py:16
-#, fuzzy
+#: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr "ボディ"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
-#, fuzzy
 msgid "Plugins"
-msgstr "プラグイン"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:67
 msgid "Please select a plugin type."
-msgstr "プラグインを選択してください。"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:114
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
 msgid "Edit selected plugin"
-msgstr "選択したプラグインの編集"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:85
 msgid "Text editor does not support editing objects."
-msgstr "テキストエディタはオブジェクトを編集出来ません。"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:90
 msgid "No object selected."
-msgstr "オブジェクトが選択されていません。"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:73
 msgid "Text editor does not support inserting objects."
-msgstr "テキストエディタはオブジェクトを挿入出来ません。"
+msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:94
 msgid "Not a plugin object"
-msgstr "プラグインオブジェクトではない"
+msgstr ""
 
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:106
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
-#, fuzzy
 msgid "Available Plugins"
-msgstr "追加可能なプラグイン"
+msgstr ""
 
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:113
-#, fuzzy
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:109
 msgid "Insert plugin"
-msgstr "プラグインを挿入"
+msgstr ""
 
 #: plugins/twitter/cms_plugins.py:10
-#, fuzzy
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:27
 msgid "Twitter"
-msgstr "Twitterユーザー"
+msgstr "TWITTER"
 
-#: plugins/twitter/cms_plugins.py:31
-#, fuzzy
+#: plugins/twitter/cms_plugins.py:23
 msgid "Twitter Search"
-msgstr "Twitterユーザー"
+msgstr "TWITTER検索"
 
 #: plugins/twitter/models.py:7
-#, fuzzy
 msgid "twitter user"
-msgstr "Twitterユーザー"
+msgstr "TWITTERのユーザー"
 
 #: plugins/twitter/models.py:8 plugins/twitter/models.py:17
-#, fuzzy
 msgid "count"
-msgstr "個"
+msgstr "数"
 
 #: plugins/twitter/models.py:8 plugins/twitter/models.py:17
-#, fuzzy
 msgid "Number of entries to display"
-msgstr "表示するエントリーの数"
+msgstr ""
 
 #: plugins/twitter/models.py:9
-#, fuzzy
 msgid "link hint"
 msgstr "リンクのヒント"
 
@@ -1284,9 +1206,8 @@ msgid "If given, the hint is displayed as link to your Twitter profile."
 msgstr ""
 
 #: plugins/twitter/models.py:16
-#, fuzzy
 msgid "query"
-msgstr "ユーザ"
+msgstr ""
 
 #: plugins/twitter/models.py:16
 msgid ""
@@ -1295,140 +1216,142 @@ msgid ""
 "\"brains\" and \"zombies\""
 msgstr ""
 
-#: plugins/video/cms_plugins.py:10
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:12
+msgid "we said,"
+msgstr ""
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:13
+msgid "we"
+msgstr ""
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
+msgid "we were"
+msgstr ""
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
+msgid "we replied to"
+msgstr ""
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
+msgid "we were checking out"
+msgstr ""
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
 #, fuzzy
+msgid "loading tweets..."
+msgstr "ちょっと待って下さい"
+
+#: plugins/video/cms_plugins.py:10
 msgid "Video"
-msgstr "動画"
+msgstr "ビデオ"
 
 #: plugins/video/cms_plugins.py:42
-#, fuzzy
 msgid "Color Settings"
-msgstr "詳細設定"
+msgstr "色設定"
 
-#: plugins/video/models.py:10
-#, fuzzy
+#: plugins/video/models.py:9
 msgid "movie file"
-msgstr "ファイルの場所"
+msgstr "ムービーファイル"
+
+#: plugins/video/models.py:9
+msgid "use .flv file or h264 encoded video file"
+msgstr "FLVやH264のビデオファイルを使って下さい。"
 
 #: plugins/video/models.py:10
-msgid "use .flv file or h264 encoded video file"
-msgstr ""
-
-#: plugins/video/models.py:11
-#, fuzzy
 msgid "movie url"
-msgstr "URL"
+msgstr "ムービーのURL"
+
+#: plugins/video/models.py:10
+#, fuzzy
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
+msgstr ""
+"VIMEOやYOUTUBEのURLを使って下さい。例えば：http://www.youtube.com/watch?"
+"v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
-msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
-msgstr ""
-
-#: plugins/video/models.py:12
-#, fuzzy
 msgid "preview image file"
-msgstr "swf ファイルを使う"
+msgstr "プレビューの絵"
+
+#: plugins/video/models.py:16
+msgid "auto play"
+msgstr ""
 
 #: plugins/video/models.py:17
-#, fuzzy
-msgid "auto play"
-msgstr "オートスナップ(_N)"
+msgid "auto hide"
+msgstr ""
 
 #: plugins/video/models.py:18
-#, fuzzy
-msgid "auto hide"
-msgstr "自動的に隠す"
+msgid "fullscreen"
+msgstr ""
 
 #: plugins/video/models.py:19
-#, fuzzy
-msgid "fullscreen"
-msgstr "フルスクリーン表示(&F)"
-
-#: plugins/video/models.py:20
 msgid "loop"
 msgstr ""
 
-#: plugins/video/models.py:23
-#, fuzzy
+#: plugins/video/models.py:22
 msgid "background color"
-msgstr "背景色:"
+msgstr ""
 
-#: plugins/video/models.py:23 plugins/video/models.py:24
-#: plugins/video/models.py:25 plugins/video/models.py:26
-#: plugins/video/models.py:27 plugins/video/models.py:28
-#: plugins/video/models.py:29 plugins/video/models.py:30
+#: plugins/video/models.py:22 plugins/video/models.py:23
+#: plugins/video/models.py:24 plugins/video/models.py:25
+#: plugins/video/models.py:26 plugins/video/models.py:27
+#: plugins/video/models.py:28 plugins/video/models.py:29
 msgid "Hexadecimal, eg ff00cc"
 msgstr ""
 
-#: plugins/video/models.py:24
-#, fuzzy
+#: plugins/video/models.py:23
 msgid "text color"
-msgstr "背景色:"
+msgstr "分の色"
+
+#: plugins/video/models.py:24
+msgid "seekbar color"
+msgstr ""
 
 #: plugins/video/models.py:25
-#, fuzzy
-msgid "seekbar color"
-msgstr "背景色:"
+msgid "seekbar bg color"
+msgstr ""
 
 #: plugins/video/models.py:26
-#, fuzzy
-msgid "seekbar bg color"
-msgstr "フォントの色を選択してください"
+msgid "loadingbar color"
+msgstr ""
 
 #: plugins/video/models.py:27
-#, fuzzy
-msgid "loadingbar color"
-msgstr "背景色:"
+msgid "button out color"
+msgstr "バタンの色"
 
 #: plugins/video/models.py:28
-#, fuzzy
-msgid "button out color"
-msgstr "フォントの色を選択してください"
+msgid "button over color"
+msgstr ""
 
 #: plugins/video/models.py:29
-#, fuzzy
-msgid "button over color"
-msgstr "フォントの色を選択してください"
-
-#: plugins/video/models.py:30
-#, fuzzy
 msgid "button highlight color"
-msgstr "フォントの色を選択してください"
-
-#: plugins/video/templates/cms/plugins/video.html:3
-msgid ""
-"Missing flash plugin. Download <a href=\"http://adobe.com/flashplayer"
-"\">here</a>"
 msgstr ""
 
 #: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:273
-#: templates/admin/cms/page/plugin_change_form.html:112
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:274
+#: templates/admin/cms/page/plugin_change_form.html:113
 msgid "Save"
-msgstr "保存"
+msgstr "セーブして"
 
 #: templates/admin/page_submit_line.html:7
-#, fuzzy, python-format
+#, python-format
 msgid "Delete %(language)s translation"
-msgstr "%(language)s 分を削除"
+msgstr "%(language)sをデリートする"
 
 #: templates/admin/page_submit_line.html:11
-#, fuzzy
 msgid "Save as new"
-msgstr "新規保存"
+msgstr ""
 
 #: templates/admin/page_submit_line.html:12
-#, fuzzy
 msgid "Save and add another"
-msgstr "保存してもう一つ追加"
+msgstr ""
 
 #: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:274
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:275
 msgid "Save and continue editing"
-msgstr "保存して編集を続ける"
+msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:5
 #, python-format
@@ -1437,248 +1360,212 @@ msgid ""
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
-#, fuzzy
 msgid "Last changes"
-msgstr "最終変更"
+msgstr "さいごの変更"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "<a href=\"%(login_url)s\">管理ページ</a>.にログインして下さい"
 
 #: templates/admin/cms/mail/page_user_change.html:7
-#, fuzzy
 msgid "Username:"
-msgstr "ユーザ名:"
+msgstr "ユーザ名"
 
 #: templates/admin/cms/mail/page_user_change.html:11
-#, fuzzy
 msgid "Password:"
-msgstr "パスワード:"
+msgstr "パスワード"
 
 #: templates/admin/cms/page/change_form.html:3
 #: templates/admin/cms/page/plugin_forms_history.html:3
-#: templates/admin/cms/page/plugin_forms_ok.html:3
-#, fuzzy
+#: templates/admin/cms/page/plugin_forms_ok.html:4
 msgid "Change a page"
-msgstr "フラットページ"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:62
+#: templates/admin/cms/page/change_form.html:64
 #: templates/admin/cms/page/change_list.html:8
 #: templates/admin/cms/page/plugin_change_form.html:67
 #: templates/admin/cms/page/recover_form.html:14
 #: templates/admin/cms/page/revision_form.html:6
-#, fuzzy
 msgid "Home"
 msgstr "ホーム"
 
-#: templates/admin/cms/page/change_form.html:71
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:73
 msgid "Approve page deletion"
-msgstr "ページが見つかりません"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:77
+#: templates/admin/cms/page/change_form.html:79
 #, python-format
 msgid "(requires approvement at %(moderation_level)s level)"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:78
+#: templates/admin/cms/page/change_form.html:80
 msgid "(you can perform actions on this page directly)"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:91
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:93
 msgid "Remove delete request"
-msgstr "複数のオブジェクトを削除します"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:93
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:95
 msgid "Approve delete"
-msgstr "削除の承認"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:93
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:95
 msgid "Approve"
-msgstr "承認"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:93
-#: templates/admin/cms/page/change_form.html:94
+#: templates/admin/cms/page/change_form.html:95
+#: templates/admin/cms/page/change_form.html:96
 #: templates/admin/cms/page/change_list_tree.html:12
-#, fuzzy
 msgid "draft"
-msgstr "ドラフト"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:94
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:96
 msgid "Preview"
 msgstr "プレビュー"
 
-#: templates/admin/cms/page/change_form.html:97
+#: templates/admin/cms/page/change_form.html:99
 #: templates/admin/cms/page/revision_form.html:10
-#, fuzzy
 msgid "History"
-msgstr "履歴"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:98
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:100
 msgid "View on site"
-msgstr "サイト上で表示"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:128
+#: templates/admin/cms/page/change_form.html:130
 #: templates/admin/cms/page/plugin_change_form.html:84
-#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "下記のエラーを修正してください。"
-msgstr[1] ""
+msgstr[0] ""
 
-#: templates/admin/cms/page/change_form.html:148
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:150
 msgid "All permissions"
-msgstr "ユーザパーミッション"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:149
-#: templates/admin/cms/page/change_form.html:161
+#: templates/admin/cms/page/change_form.html:151
+#: templates/admin/cms/page/change_form.html:163
 #: templates/admin/cms/page/loading.html:2
-#, fuzzy
 msgid "Loading..."
-msgstr "読込中..."
+msgstr "ちょっと待って下さい"
 
-#: templates/admin/cms/page/change_form.html:160
-#, fuzzy
+#: templates/admin/cms/page/change_form.html:162
 msgid "Page states"
-msgstr "アメリカ合衆国"
+msgstr ""
 
-#: templates/admin/cms/page/change_form.html:183
+#: templates/admin/cms/page/change_form.html:185
 #, python-format
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:185
+#: templates/admin/cms/page/change_form.html:187
 msgid "Request approvemet"
 msgstr ""
 
 #: templates/admin/cms/page/change_list.html:3
-#, fuzzy
 msgid "List of pages"
-msgstr "フラットページ"
+msgstr ""
 
-#: templates/admin/cms/page/change_list.html:56
-#, fuzzy
+#: templates/admin/cms/page/change_list.html:58
 msgid "Successfully moved"
-msgstr "移動成功"
+msgstr ""
 
-#: templates/admin/cms/page/change_list.html:61
-#, fuzzy
+#: templates/admin/cms/page/change_list.html:63
 msgid "An error occured. Please reload the page"
-msgstr "エラーが起こりました。ページを再読込してください。"
+msgstr ""
 
-#: templates/admin/cms/page/change_list.html:82
-#, fuzzy, python-format
+#: templates/admin/cms/page/change_list.html:84
+#, python-format
 msgid "Recover deleted %(name)s"
-msgstr "削除された %(name)sを復活"
+msgstr ""
 
-#: templates/admin/cms/page/change_list.html:85
-#, fuzzy, python-format
+#: templates/admin/cms/page/change_list.html:87
+#, python-format
 msgid "Add %(name)s"
-msgstr "%(name)s を追加"
+msgstr ""
 
-#: templates/admin/cms/page/change_list.html:97
-#, fuzzy
+#: templates/admin/cms/page/change_list.html:99
 msgid "Pages on:"
-msgstr "権限を付与"
-
-#: templates/admin/cms/page/change_list.html:114
-#, fuzzy
-msgid "Filter:"
-msgstr "フィルター:"
-
-#: templates/admin/cms/page/change_list.html:114
-#, fuzzy
-msgid "on"
-msgstr "ON"
-
-#: templates/admin/cms/page/change_list.html:114
-#, fuzzy
-msgid "off"
-msgstr "OFF"
+msgstr ""
 
 #: templates/admin/cms/page/change_list.html:116
-#, fuzzy
+msgid "Filter:"
+msgstr ""
+
+#: templates/admin/cms/page/change_list.html:116
+msgid "on"
+msgstr ""
+
+#: templates/admin/cms/page/change_list.html:116
+msgid "off"
+msgstr ""
+
+#: templates/admin/cms/page/change_list.html:118
 msgid "Filter"
-msgstr "フィルタ"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:8
-#, fuzzy
 msgid "actions"
-msgstr "アクション"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:10
-#, fuzzy
 msgid "moderate"
-msgstr "適度なフィルタリングを行う"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:13
-#, fuzzy
 msgid "published"
-msgstr "公開"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:15
-#, fuzzy
 msgid "start"
-msgstr "新しい比較を開始します"
+msgstr ""
 
 #: templates/admin/cms/page/change_list_tree.html:16
-#, fuzzy
 msgid "end"
-msgstr "カーソルの終端です"
+msgstr ""
 
-#: templates/admin/cms/page/change_list_tree.html:18
-#, fuzzy
+#: templates/admin/cms/page/change_list_tree.html:17
+msgid "restricted"
+msgstr ""
+
+#: templates/admin/cms/page/change_list_tree.html:19
 msgid "last changes"
-msgstr "最終変更"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:5
-#, fuzzy
 msgid "select this page"
-msgstr "このページを選択"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:5
 #: templates/admin/cms/page/menu_item.html:6
-#, fuzzy
 msgid "edit this page"
-msgstr "このページを編集"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:6
-#: templates/cms/toolbar/toolbar.html:112
-#: templates/cms/toolbar/toolbar.html:136
-#, fuzzy
+#: templates/cms/toolbar/toolbar.html:54
 msgid "edit"
-msgstr "編集"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:16
-#, fuzzy
 msgid "insert above"
-msgstr "上に挿入"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:17
-#, fuzzy
 msgid "insert below"
-msgstr "下に挿入"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:19
-#, fuzzy
 msgid "insert inside"
-msgstr "プラグインを挿入"
-
-#: templates/admin/cms/page/menu_item.html:23
-msgid "softroot"
 msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:23
-#, fuzzy
+msgid "softroot"
+msgstr "ソフトロート"
+
+#: templates/admin/cms/page/menu_item.html:23
 msgid "home"
 msgstr "ホーム"
 
@@ -1688,385 +1575,312 @@ msgid "Edit this page in %(language)s "
 msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:33
-#, fuzzy
 msgid "Cut"
-msgstr "%sの切り取り"
+msgstr "カット"
 
 #: templates/admin/cms/page/menu_item.html:33
-#, fuzzy
 msgid "cut"
-msgstr "%sの切り取り"
+msgstr "カット"
 
 #: templates/admin/cms/page/menu_item.html:34
-#, fuzzy
 msgid "Copy"
-msgstr "コピー"
+msgstr "コピーして"
 
 #: templates/admin/cms/page/menu_item.html:34
-#, fuzzy
 msgid "copy"
-msgstr "コピー"
+msgstr "コピーして"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
-#, fuzzy
 msgid "Add Child"
-msgstr "子ページを追加"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
-#, fuzzy
 msgid "add"
-msgstr "追加する"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:65
-#: templates/cms/toolbar/toolbar.html:85
-#, fuzzy
 msgid "Approve directly"
-msgstr "コメントを承認する"
+msgstr ""
 
 #: templates/admin/cms/page/menu_item.html:67
 #: templates/admin/cms/page/menu_item.html:79
 #: templates/admin/cms/page/menu_item.html:81
-#, fuzzy
 msgid "view"
-msgstr "ビュー"
+msgstr "見る"
 
 #: templates/admin/cms/page/menu_item.html:72
 msgid "Unpublish"
 msgstr ""
 
-#: templates/admin/cms/page/menu_item.html:73
-#, fuzzy
-msgid "Publish"
-msgstr "公開可能"
-
 #: templates/admin/cms/page/menu_item.html:79
-#, fuzzy
 msgid "View on page"
-msgstr "サイト上で表示"
+msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:4
-#, fuzzy
 msgid "Action"
-msgstr "操作"
+msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:5
-#, fuzzy
 msgid "Created"
-msgstr "作成済み"
+msgstr ""
 
 #: templates/admin/cms/page/moderation_messages.html:7
-#, fuzzy
 msgid "Message"
 msgstr "メッセージ"
 
 #: templates/admin/cms/page/permissions.html:7
-#, fuzzy
 msgid "Group"
 msgstr "グループ"
 
 #: templates/admin/cms/page/permissions.html:8
-#, fuzzy
 msgid "Can edit"
-msgstr "編集可能"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:9
-#, fuzzy
 msgid "Can add"
-msgstr "追加可能"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:10
-#, fuzzy
 msgid "Can delete"
-msgstr "削除可能"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:11
-#, fuzzy
 msgid "Can publish"
-msgstr "公開可能"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:12
-#, fuzzy
 msgid "Can change permissions"
-msgstr "パーミッション変更可能"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:13
-#, fuzzy
 msgid "Can move"
-msgstr "移動可能"
+msgstr ""
 
-#: templates/admin/cms/page/permissions.html:20
+#: templates/admin/cms/page/permissions.html:14
+#, fuzzy
+msgid "Can view"
+msgstr "見る"
+
 #: templates/admin/cms/page/permissions.html:21
-#, fuzzy
+#: templates/admin/cms/page/permissions.html:22
 msgid "(global)"
-msgstr "(グローバル)"
+msgstr ""
 
-#: templates/admin/cms/page/permissions.html:25
-#, fuzzy
+#: templates/admin/cms/page/permissions.html:26
 msgid "(current)"
-msgstr "(現在)"
+msgstr ""
 
-#: templates/admin/cms/page/permissions.html:41
+#: templates/admin/cms/page/permissions.html:43
 msgid "All"
 msgstr "すべて"
 
-#: templates/admin/cms/page/permissions.html:49
-#, fuzzy
+#: templates/admin/cms/page/permissions.html:51
 msgid "Page doesn't inherit any permissions."
-msgstr "ページはいかなるパーミッションも継承しない。"
+msgstr ""
+
+#: templates/admin/cms/page/plugin_change_form.html:114
+#: templates/cms/toolbar/toolbar.html:24
+msgid "Cancel"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
 msgstr ""
 
-#: templates/admin/cms/page/plugin_forms_ok.html:17
-#, fuzzy
+#: templates/admin/cms/page/plugin_forms_ok.html:21
 msgid "Plugin saved successfully."
-msgstr "設定が正しく保存されました"
+msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:17
-#, fuzzy, python-format
+#, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr "削除された %(verbose_name)s を復活"
+msgstr ""
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
 msgstr ""
 
 #: templates/admin/cms/page/revision_form.html:11
-#, fuzzy, python-format
+#, python-format
 msgid "Revert %(verbose_name)s"
-msgstr " %(verbose_name)s を削除しました。"
+msgstr ""
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
 msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:4
-#, fuzzy
 msgid "Copy options"
-msgstr "詳細設定"
+msgstr ""
 
 #: templates/admin/cms/page/dialog/copy.html:6
-#, fuzzy
 msgid "Choose copy options"
-msgstr "%s プラグインのオプションを検索"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
 msgstr ""
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
-#: templates/cms/toolbar/add_plugins.html:6
 msgid "Add Plugin"
 msgstr "プラグインを追加"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:18
-#, fuzzy
 msgid "From Language"
-msgstr "言語を選択："
+msgstr "言語から"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
 msgid "Copy Plugins"
 msgstr "プラグインをコピー"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:12
-#, fuzzy
 msgid "You must save the page first to add plugins."
-msgstr "プラグインを追加する前に、まず保存してください。"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:15
-#, fuzzy
 msgid "No Plugin selected. Selected one on the left side"
-msgstr "プラグインが選択されていません。プラグインを選択してください。"
+msgstr ""
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
-#, fuzzy
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr "プラグインがありません。プラグインを追加してください。"
+msgstr ""
 
-#: templates/cms/toolbar/add_plugins.html:10
-#, fuzzy
+#: templates/cms/toolbar/placeholder.html:32
 msgid "Available plugins"
-msgstr "追加可能なプラグイン"
+msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:26
-#, python-format
-msgid "Move to %(name)s"
-msgstr "%(name)s へ移動"
+#: templates/cms/toolbar/toolbar.html:22
+msgid "The selected element can not be moved to the desired location."
+msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:27
-#, fuzzy
+#: templates/cms/toolbar/toolbar.html:23
 msgid "Are you sure you want to delete this plugin?"
-msgstr "本当にこのプラグインを削除しますか？"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:55
+msgid "up"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:56
-msgid "Edit mode"
-msgstr "編集モード"
-
-#: templates/cms/toolbar/toolbar.html:63
-msgid "Status"
-msgstr "状態"
-
-#: templates/cms/toolbar/toolbar.html:74
-msgid "Username"
-msgstr "ユーザ名"
-
-#: templates/cms/toolbar/toolbar.html:78 templates/cms/toolbar/toolbar.html:79
-#, fuzzy
-msgid "login"
-msgstr "ログイン..."
-
-#: templates/cms/toolbar/toolbar.html:90
-#, fuzzy
-msgid "Template"
-msgstr "テンプレート"
-
-#: templates/cms/toolbar/toolbar.html:101
-msgid "move"
-msgstr "移動"
-
-#: templates/cms/toolbar/toolbar.html:101
-#, fuzzy
-msgid "Move/add Pages"
-msgstr "ページグロバール権限"
-
-#: templates/cms/toolbar/toolbar.html:103
-#, fuzzy
-msgid "add child"
-msgstr "子ページを追加"
-
-#: templates/cms/toolbar/toolbar.html:103
-msgid "Add child page"
-msgstr "子ページを追加"
-
-#: templates/cms/toolbar/toolbar.html:104
-#, fuzzy
-msgid "add sibling"
-msgstr "%(name)s を追加"
-
-#: templates/cms/toolbar/toolbar.html:104
-#, fuzzy
-msgid "Add sibling page"
-msgstr "子ページを追加"
-
-#: templates/cms/toolbar/toolbar.html:106
-#, fuzzy
-msgid "Delete Page"
-msgstr "フラットページ"
-
-#: templates/cms/toolbar/toolbar.html:112
-#, fuzzy
-msgid "Site Administration"
-msgstr "サイト管理"
-
-#: templates/cms/toolbar/toolbar.html:114
-#, fuzzy
-msgid "Page Settings"
-msgstr "詳細設定"
-
-#: templates/cms/toolbar/toolbar.html:116
-msgid "history"
-msgstr "履歴"
-
-#: templates/cms/toolbar/toolbar.html:116
-#, fuzzy
-msgid "View History"
-msgstr "変更履歴: %s"
-
-#: templates/cms/toolbar/toolbar.html:123
-#: templates/cms/toolbar/toolbar.html:124
-#, fuzzy
-msgid "Logout"
-msgstr "ログアウト"
-
-#: templates/cms/toolbar/toolbar.html:124
-#, fuzzy
-msgid "Lock"
-msgstr "画面ロック"
-
-#: templates/cms/toolbar/toolbar.html:127
-#, fuzzy
-msgid "Close"
-msgstr "閉じる(&C)"
-
-#: templates/cms/toolbar/toolbar.html:138
-#, fuzzy
-msgid "up"
-msgstr "上に移動(_U)"
-
-#: templates/cms/toolbar/toolbar.html:139
 msgid "down"
 msgstr "下へ"
 
-#: templates/cms/toolbar/toolbar.html:141
-msgid "Settings"
-msgstr "設定"
+#: templates/cms/toolbar/toolbar.html:61
+msgid "Move to placeholder"
+msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:143
-msgid "Delete Plugin"
-msgstr "プラグイン削除"
+#: templates/cms/toolbar/items/login.html:5
+msgid "Username"
+msgstr "ユーザ名"
 
-#: templatetags/cms_admin.py:65
+#: templates/cms/toolbar/items/login.html:10
+#: templates/cms/toolbar/items/login.html:12
 #, fuzzy
+msgid "Login"
+msgstr "ログイン"
+
+#: templates/cms/toolbar/items/status.html:2
+msgid "Status"
+msgstr "状態"
+
+#: templates/cms/toolbar/items/switcher.html:4
+msgid "Switch on/off"
+msgstr ""
+
+#: templatetags/cms_admin.py:86
+#, python-format
+msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
+msgstr ""
+
+#: templatetags/cms_admin.py:99
 msgid "Unbind page moderation"
-msgstr "コメントのモデレーションキュー"
+msgstr ""
 
-#: templatetags/cms_admin.py:66
-#, fuzzy
+#: templatetags/cms_admin.py:100
 msgid "Unbind children moderation"
-msgstr "コメントのモデレーションキュー"
+msgstr ""
 
-#: templatetags/cms_admin.py:67
-#, fuzzy
+#: templatetags/cms_admin.py:101
 msgid "Unbind descendants moderation"
-msgstr "コメントのモデレーションキュー"
+msgstr ""
 
-#: templatetags/cms_tags.py:69
+#: templatetags/cms_tags.py:78
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:70
+#: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)"
-"s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: utils/moderator.py:82
-#, fuzzy
-msgid "parent first"
-msgstr "名"
+#: utils/mail.py:38
+msgid "CMS - your user account was created."
+msgstr "CMS - アカウントが作成されました。"
 
-#: utils/moderator.py:89
+#: utils/mail.py:40
+msgid "CMS - your user account was changed."
+msgstr "CMS - アカウントが変更されました。"
+
+#: utils/moderator.py:83
+msgid "parent first"
+msgstr ""
+
+#: utils/moderator.py:90
 msgid "approve"
 msgstr "承認"
 
-#: utils/moderator.py:240
+#: utils/moderator.py:251
 #, python-format
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Page %s は承認が必要です。"
 
-#: utils/permissions.py:206
-msgid "CMS - your user account was created."
-msgstr "CMS - アカウントが作成されました。"
+#~ msgid "Move to %(name)s"
+#~ msgstr "%(name)s へ移動"
 
-#: utils/permissions.py:208
-msgid "CMS - your user account was changed."
-msgstr "CMS - アカウントが変更されました。"
+#~ msgid "move"
+#~ msgstr "移動"
 
-#, fuzzy
-#~ msgid "menu login required"
-#~ msgstr "セッションの再起動が必要です"
+#~ msgid "history"
+#~ msgstr "履歴"
 
-#~ msgid "Sublevel"
-#~ msgstr "サブレベル"
+#~ msgid "Lock"
+#~ msgstr "ロック"
 
-#~ msgid "Sublevel3"
-#~ msgstr "サブレベル３"
+#~ msgid "Close"
+#~ msgstr "閉める"
 
-#~ msgid "Sublevel 2"
-#~ msgstr "サブレベル２"
+#~ msgid "Settings"
+#~ msgstr "設定"
+
+#~ msgid "Delete Plugin"
+#~ msgstr "プラグイン削除"
+
+#~ msgid "English"
+#~ msgstr "英語"
+
+#~ msgid "French"
+#~ msgstr "フランス語"
+
+#~ msgid "German"
+#~ msgstr "ドイツ語"
+
+#~ msgid "Dutch"
+#~ msgstr "オランダ語"
+
+#~ msgid "two columns"
+#~ msgstr "二つ列"
+
+#~ msgid "three columns"
+#~ msgstr "三つ列"
+
+#~ msgid "left column"
+#~ msgstr "左列"
+
+#~ msgid "right column"
+#~ msgstr "右列"

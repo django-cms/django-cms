@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+	<h2>Sample application home page - on page {% page_attribute page_title %}</h2>
+	<h3>{{ message }}</h3>
+	{{ block.super }}
+	<ul>
+		<li>
+			<a href="{% url sample-root %}">Sample app root reverse test</a>
+		</li>
+		<li>
+			<a href="{% url de:sample-account %}">Sample app account reverse test german</a>
+		</li>
+		<li>
+			<a href="{% url en:sample-account %}">Sample app account reverse test english</a>
+		</li>
+	</ul>
+	<h4>Sample image  - appmedia works?</h4>
+	<img src="{{ MEDIA_URL }}sampleapp/img/gift.jpg" alt="gift">
+{% endblock content %}

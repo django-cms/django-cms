@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 from classytags.arguments import Argument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from cms.utils.permissions import get_any_page_view_permissions
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 register = template.Library()
 
@@ -21,11 +23,14 @@ class ShowAdminMenu(InclusionTag):
     
     def get_context(self, context, page):
         request = context['request']
+
         
         if context.has_key("cl"):
             filtered = context['cl'].is_filtered()
         elif context.has_key('filtered'):
             filtered = context['filtered']
+        
+        
         
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
@@ -72,6 +77,24 @@ register.tag(CleanAdminListFilter)
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[value], value))
+
+@register.filter
+def is_restricted(page, request):
+    if settings.CMS_PERMISSION:
+        all_perms = list(get_any_page_view_permissions(request, page))
+        icon = boolean_icon(bool(all_perms))
+        return mark_safe(
+            ugettext('<span title="Restrictions: %(title)s">%(icon)s</span>') % {
+                'title': u', '.join((perm.get_grant_on_display() for perm in all_perms)) or None,
+                'icon': icon,
+            })
+    else:
+        icon = boolean_icon(None)
+        return mark_safe(
+            ugettext('<span title="Restrictions: %(title)s">%(icon)s</span>') % {
+                'title': None,
+                'icon': icon,
+            })
 
 @register.filter
 def moderator_choices(page, user):    

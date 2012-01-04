@@ -1,10 +1,7 @@
-from cms.models.managers import TitleManager
-from cms.models.pagemodel import Page
-from cms.utils.helpers import reversion_register
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register

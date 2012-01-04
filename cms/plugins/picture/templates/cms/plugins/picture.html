@@ -1,3 +1,5 @@
+<span class="plugin_picture{% if picture.float %} align-{{ picture.float }}{% endif %}">
 {% if link %}<a href="{{ link }}">{% endif %}
-<img {% if picture.float %}class="{{ picture.float }}" {% endif %}alt="{{ picture.alt }}" src="{{ picture.image.url }}" />
+<img src="{{ picture.image.url }}" alt="{{ picture.alt }}"{% if picture.longdesc %} title="{{ picture.longdesc }}"{% endif %} />
 {% if link %}</a>{% endif %}
+</span>
