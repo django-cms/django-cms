@@ -68,7 +68,7 @@ def get_visible_pages(request, pages, site=None):
     # no restriction applied at all
     if (not is_auth_user and 
         is_setting_public_all and 
-        len(restricted_pages) == 0):
+        not restricted_pages):
         return [page.pk for page in pages] 
     
    
@@ -85,14 +85,14 @@ def get_visible_pages(request, pages, site=None):
         #no page perms edgcase - all visible
         if ((is_setting_public_all or (
             is_setting_public_staff and request.user.is_staff))and 
-            len(restricted_pages) == 0 and
-            global_view_perms == False):
+            not restricted_pages and
+            not global_view_perms):
             return [page.pk for page in pages]
         #no page perms edgcase - none visible
         elif (is_setting_public_staff and 
             not request.user.is_staff and 
-            len(restricted_pages) == 0 and
-            global_view_perms == False):
+            not restricted_pages and
+            not global_view_perms):
             return []
            
         
@@ -112,14 +112,11 @@ def get_visible_pages(request, pages, site=None):
         for perm in restricted_pages[page_pk]:
             if perm.user_id == user_pk:
                 has_perm = True
-                
-        for perm in restricted_pages[page_pk]:
             if not perm.group_id:
                 continue
             group_user_ids = perm.group.user_set.values_list('pk', flat=True)
-            if user_pk in group_user_ids and len(group_user_ids) > 0 :
+            if user_pk in group_user_ids:
                 has_perm = True
-        
         return has_perm
     
     for page in pages:
