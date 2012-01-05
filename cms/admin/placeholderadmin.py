@@ -169,7 +169,10 @@ class PlaceholderAdmin(ModelAdmin):
                         "This placeholder already has the maximum number (%s) "
                         "of %s plugins." % (type_limit, plugin_type)
                     )
-        
+
+        # position plugin at the end of the list
+        position = CMSPlugin.objects.filter(placeholder=placeholder).count()
+
         # actually add the plugin
         plugin = CMSPlugin(language=language, plugin_type=plugin_type,
             position=position, placeholder=placeholder, parent=parent) 

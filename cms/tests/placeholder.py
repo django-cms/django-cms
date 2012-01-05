@@ -3,6 +3,7 @@ from __future__ import with_statement
 from cms.api import add_plugin, create_page
 from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
@@ -397,6 +398,26 @@ class PlaceholderAdminTest(CMSTestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")
 
+    def test_position_set_on_addition(self):
+        placeholder = self.get_placeholder()
+        placeholderconf = {'test': {}}
+        admin = self.get_admin()
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': placeholder.pk,
+            'language': 'en',
+        }
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=placeholderconf):
+                request = self.get_post_request(data)
+                response = admin.add_plugin(request) # first
+                response = admin.add_plugin(request) # second
+                response = admin.add_plugin(request) # third
+
+        plugins = CMSPlugin.objects.filter(placeholder=placeholder)
+        positions = [plugin.position for plugin in plugins]
+        self.assertEqual(positions, [0, 1, 2])
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
 
