@@ -7,14 +7,13 @@ from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS 
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.models.titlemodels import Title
 from cms.test_utils.testcases import SettingsOverrideTestCase
-
 
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
 from django.db.models import Q
 from django.test.client import Client
-from cms.models.titlemodels import Title
 
 
 class ViewPermissionTests(SettingsOverrideTestCase):
@@ -47,6 +46,14 @@ class ViewPermissionTests(SettingsOverrideTestCase):
     GROUPNAME_3 = 'group_b_ACCESS_PAGE_AND_DESCENDANTS'
     GROUPNAME_4 = 'group_b_b_ACCESS_DESCENDANTS'
     GROUPNAME_5 = 'group_d_ACCESS_PAGE'
+    
+    def setUp(self):
+        self.site = Site()
+        self.site.pk = 1
+        super(ViewPermissionTests, self).setUp()
+       
+    def tearDown(self):
+        super(ViewPermissionTests, self).tearDown()
     
     def _setup_tree_pages(self):
         stdkwargs = {
@@ -207,36 +214,24 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         
         self.assertEquals(5, PagePermission.objects.all().count())
         self.assertEquals(0, GlobalPagePermission.objects.all().count())
-        
-        
-    def _check_url_page_found(self, url):
-        response = self.client.get(url)
+    
+    def assertPageFound(self, url, client=None):
+        if not client:
+            client = Client()
+        response = client.get(url)
         self.assertEquals(response.status_code, 200)
     
-    def _check_url_page_not_found(self, url):
-        response = self.client.get(url)
+    def assertPageNotFound(self, url, client=None):
+        if not client:
+            client = Client()
+        response = client.get(url)
         self.assertEquals(response.status_code, 404)
         
-    def _check_is_view_restricted_check(self, check_page):
+    def assertNodeMemberships(self, visible_page_ids, restricted_pages, public_page_ids):
         """
-        Manually check the single page if there is any restriction applied
-        code taken from 2.1.3 permissionmerge2
+        test all visible page ids are either in_public and not in_restricted
+        or not in_public and in_restricted
         """
-        anchestor_ids = check_page.get_ancestors().values_list('id', flat=True)
-        q = (Q(page__tree_id=check_page.tree_id) & (Q(page__id__in=anchestor_ids) | Q(page__id=check_page.id)) & (
-            Q(page=check_page) 
-            | (Q(page__level__lt=check_page.level) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-            | (Q(page__level=check_page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
-            )
-        )
-        return PagePermission.objects.filter(q).order_by('page__level').filter(can_view=True).exists()
-    
-    def _check_db_view_restriction_to_page(self, page_title, expected_result):
-        page_to_check = Page.objects.get(title_set__title=page_title)
-        is_restricted = self._check_is_view_restricted_check(page_to_check)
-        self.assertEquals(is_restricted, expected_result)
-        
-    def _check_node_memberships(self, visible_page_ids, restricted_pages, public_page_ids):
         for page_id in visible_page_ids:
             in_restricted = False
             in_public = False
@@ -248,7 +243,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
                              (not in_public and in_restricted),
                               msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted))
                               
-    def _check_grant_visiblity(self, all_pages, expected_granted_pages, username=None):
+    def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """
         helper function to check the expected_granted_pages are 
         not in the restricted_pages list and 
@@ -260,19 +255,20 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             user = User.objects.get(username__iexact=username)
         request = self.get_request(user)
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
-    	self.assertTrue(len(visible_page_ids) == len(expected_granted_pages))
+    	self.assertEquals(len(visible_page_ids), len(expected_granted_pages))
         public_page_ids = Page.objects.filter(title_set__title__in=expected_granted_pages).values_list('id', flat=True)
         restricted_pages = Page.objects.exclude(title_set__title__in=expected_granted_pages).values_list('id', flat=True)
-        self._check_node_memberships(visible_page_ids, restricted_pages, public_page_ids)
+        self.assertNodeMemberships(visible_page_ids, restricted_pages, public_page_ids)
         
     def get_request(self, user=None):
+        # see tests/menu.py line 753
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
             'session': {},
         }
         return type('Request', (object,), attrs)
-
+        
 
 class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
     """
@@ -283,13 +279,6 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
-    def setUp(self):
-        super(ViewPermissionComplexMenuAllNodesTests, self).setUp()
-        self.site = Site()
-        self.site.pk = 1
-       
-    def tearDown(self):
-        super(ViewPermissionComplexMenuAllNodesTests, self).tearDown()    
     
     def test_public_pages_anonymous_norestrictions(self):
         """
@@ -298,8 +287,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         all_pages = self._setup_tree_pages()
         request = self.get_request()
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
-        is_same = (len(all_pages) == len(visible_page_ids))
-        self.assertTrue(is_same)
+        self.assertEquals(len(all_pages), len(visible_page_ids))
         
     def test_public_menu_anonymous_user(self):
         """
@@ -309,14 +297,14 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a', 
-                   'page_c', 
+        granted = ['page_a',
+                   'page_c',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
                    'page_d_d'
         ]
-        self._check_grant_visiblity( all_pages, granted)
+        self.assertGrantedVisibility(all_pages, granted)
  
     def test_menu_access_page_and_children_group_1(self):
         """
@@ -335,27 +323,28 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
                    'page_b_c',
                    'page_b_d',
                    # not restricted
-                   'page_d_a', 
-                   'page_d_b', 
-                   'page_d_c', 
+                   'page_d_a',
+                   'page_d_b',
+                   'page_d_c',
                    'page_d_d'
         ]
-        self._check_grant_visiblity(all_pages, granted,username='user_1')
-        login_ok = self.client.login(username='user_1', password='user_1')
+        self.assertGrantedVisibility(all_pages, granted, username='user_1')
+        client = Client()
+        login_ok = client.login(username='user_1', password='user_1')
         self.assertEqual(login_ok , True)
         url = "/en/page_b/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_b/page_b_b/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         # descendant
         url = "/en/page_b/page_b_b/page_b_b_a/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         # group 5
         url = "/en/page_d/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         # should be public as only page_d is restricted
         url = "/en/page_d/page_d_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         
     def test_menu_access_children_group_2(self):
         """
@@ -378,19 +367,20 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
                  'page_d_c',
                  'page_d_d',
         ]
-        self._check_grant_visiblity(all_pages, granted, username='user_2')
-        login_ok = self.client.login(username='user_2', password='user_2')
+        self.assertGrantedVisibility(all_pages, granted, username='user_2')
+        client = Client()
+        login_ok = client.login(username='user_2', password='user_2')
         self.assertEqual(login_ok , True)
         url = "/en/page_b/page_b_b/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_b/page_b_b/page_b_b_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_b/page_b_b/page_b_b_a/page_b_b_a_a/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_d/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_d/page_d_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         
     def test_menu_access_page_and_descendants_group_3(self):
         """
@@ -419,17 +409,18 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
                     'page_d_c',
                     'page_d_d',
         ]
-        self._check_grant_visiblity(all_pages, granted, username='user_3')
-        login_ok = self.client.login(username='user_3', password='user_3')
+        self.assertGrantedVisibility(all_pages, granted, username='user_3')
+        client = Client()
+        login_ok = client.login(username='user_3', password='user_3')
         self.assertEqual(login_ok , True)
         url = "/en/page_b/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_b/page_b_d/page_b_d_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_d/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_d/page_d_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         
     def test_menu_access_descendants_group_4(self):
         """
@@ -450,19 +441,20 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
                    'page_d_c',
                    'page_d_d',
         ]
-        self._check_grant_visiblity(all_pages, granted, username='user_4')
-        login_ok = self.client.login(username='user_4', password='user_4')
-        self.assertEqual(login_ok , True)
+        self.assertGrantedVisibility(all_pages, granted, username='user_4')
+        client = Client()
+        login_ok = client.login(username='user_4', password='user_4')
+        self.assertTrue(login_ok)
         url = "/en/page_b/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_b/page_b_b/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_b/page_b_b/page_b_b_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_d/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_d/page_d_a/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         
     def test_menu_access_page_group_5(self):
         """
@@ -480,22 +472,21 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
                     'page_d_c',
                     'page_d_d',
         ]
-        self._check_grant_visiblity(all_pages, granted, username='user_5')
-        login_ok = self.client.login(username='user_5', password='user_5')
-        self.assertEqual(login_ok , True)
+        self.assertGrantedVisibility(all_pages, granted, username='user_5')
+        client = Client()
+        login_ok = client.login(username='user_5', password='user_5')
+        self.assertTrue(login_ok)
         # call /
         url = "/en/page_b/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_b/page_b_b/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_b/page_b_b/page_b_b_a/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url, client)
         url = "/en/page_d/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_d/page_d_a/"
-        self._check_url_page_found(url)
-        
-
+        self.assertPageFound(url, client)
 
 
 class ViewPermissionTreeBugTests(ViewPermissionTests):
@@ -511,15 +502,6 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         'CMS_PUBLIC_FOR': 'all',
     }
     GROUPNAME_6 = 'group_6_ACCESS_PAGE'  
-    
-    def setUp(self):
-        super(ViewPermissionTreeBugTests, self).setUp()
-        self.site = Site()
-        self.site.pk = 1
-       
-    def tearDown(self):
-        super(ViewPermissionTreeBugTests, self).tearDown()
-        self.site = None
         
     def _setup_pages(self):
         """
@@ -568,16 +550,16 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE)
             
     def test_pageforbug(self):
-        all_pages=self._setup_pages()
+        all_pages = self._setup_pages()
         self._setup_user()
         self._setup_permviewbug()
         for page in all_pages:
             perm = PagePermission.objects.for_page(page=page)
             # only page_6 has a permission assigned
             if page.get_title() == 'page_6':
-                self.assertTrue(len(perm)==1)
+                self.assertEquals(len(perm), 1)
             else:
-                self.assertTrue(len(perm)==0)
+                self.assertEquals(len(perm), 0)
         granted = [ 'page_1',
                     'page_2',
                     'page_3',
@@ -585,13 +567,13 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
                     'page_5',
         ]
         # anonymous sees page_6 not
-        self._check_grant_visiblity(all_pages, granted)
+        self.assertGrantedVisibility(all_pages, granted)
         url = "/en/page_2/page_3/page_4/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url)
         url = "/en/page_5/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url)
         url = "/en/page_5/page_6/"
-        self._check_url_page_not_found(url)
+        self.assertPageNotFound(url)
         # group member
         granted = [ 'page_1',
                     'page_2',
@@ -600,12 +582,13 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
                     'page_5',
                     'page_6',
         ]
-        self._check_grant_visiblity(all_pages, granted,username='user_6')
-        login_ok = self.client.login(username='user_6', password='user_6')
-        self.assertEqual(login_ok , True)
+        self.assertGrantedVisibility(all_pages, granted, username='user_6')
+        client = Client()
+        login_ok = client.login(username='user_6', password='user_6')
+        self.assertTrue(login_ok)
         url = "/en/page_2/page_3/page_4/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         url = "/en/page_5/page_6/"
-        self._check_url_page_found(url)
+        self.assertPageFound(url, client)
         
         
