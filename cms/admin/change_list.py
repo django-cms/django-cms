@@ -192,10 +192,10 @@ class CMSChangeList(ChangeList):
                 
             if page.root_node or self.is_filtered():
                 page.last = True
-                if len(children):
+                if children.count():
                     # TODO: WTF!?!
                     # The last one is not the last... wait, what?
-                    children[-1].last = False
+                    children[children.count() - 1].last = False
                 page.menu_level = 0
                 root_pages.append(page)
                 if page.parent_id:
