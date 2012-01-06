@@ -493,8 +493,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     """Test issue 1113
     https://github.com/divio/django-cms/issues/1113
     Wrong view permission calculation in PagePermission.objects.for_page
-    Assign only: grant_on=ACCESS_PAGE to page
-    Test if this affects the menu entries
+    grant_on=ACCESS_PAGE_AND_CHILDREN or ACCESS_PAGE_AND_DESCENDANTS to page 6
+    Test if this affects the menu entries and page visibility
     """
     settings_overrides = {
         'CMS_MODERATOR': False,
@@ -547,7 +547,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         """
         page = Page.objects.get(title_set__title="page_6")
         group = Group.objects.get(name__iexact=self.GROUPNAME_6)
-        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE)
+        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_CHILDREN)
+        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
             
     def test_pageforbug(self):
         all_pages = self._setup_pages()
@@ -557,9 +558,10 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             perm = PagePermission.objects.for_page(page=page)
             # only page_6 has a permission assigned
             if page.get_title() == 'page_6':
-                self.assertEquals(len(perm), 1)
+                self.assertEquals(len(perm), 2)
             else:
-                self.assertEquals(len(perm), 0)
+                msg="Permission wrong at page %s" % (page.get_title())
+                self.assertEquals(len(perm), 0,msg)
         granted = [ 'page_1',
                     'page_2',
                     'page_3',
