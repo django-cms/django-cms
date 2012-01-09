@@ -352,8 +352,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             placeholder__slot__iexact=placeholder_name,
             parent__isnull=True
         ).order_by('position').select_related()
-        c = render_plugins(plugins, context, placeholder)
-        content = "".join(c)
+        content = render_plugins(plugins, context, placeholder)
+        content = "".join(content)
 
     if cache_result:
         cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])

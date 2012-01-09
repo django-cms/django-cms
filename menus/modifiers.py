@@ -26,17 +26,17 @@ class Marker(Modifier):
                 root_nodes.append(node)
             if node.selected: 
                 if node.parent:
-                    n = node
-                    while n.parent:
-                        n = n.parent
-                        n.ancestor = True
+                    newnode = node
+                    while newnode.parent:
+                        newnode = newnode.parent
+                        newnode.ancestor = True
                     for sibling in node.parent.children:
                         if not sibling.selected:
                             sibling.sibling = True
                 else:
-                    for n in root_nodes:
-                        if not n.selected:
-                            n.sibling = True
+                    for root_node in root_nodes:
+                        if not root_node.selected:
+                            root_node.sibling = True
                 if node.children:                    
                     self.mark_descendants(node.children)
                 selected = node

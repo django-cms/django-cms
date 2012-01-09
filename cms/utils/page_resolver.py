@@ -62,11 +62,11 @@ def get_page_from_path(path, preview=False):
     # title_set__path=path should be clear, get the pages where the path of the
     # title object is equal to our path.
     if settings.CMS_FLAT_URLS:
-        q = Q(title_set__slug=path)
+        query = Q(title_set__slug=path)
     else:
-        q = Q(title_set__path=path)
+        query = Q(title_set__path=path)
     try:
-        page = pages.filter(q).distinct().get()
+        page = pages.filter(query).distinct().get()
     except Page.DoesNotExist:
         return None
         
