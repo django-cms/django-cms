@@ -167,7 +167,7 @@ class PageForm(PageAddForm):
             site_id = cleaned_data['site']
             if id:
                 if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
-                    raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
+                    self._errors['reverse_id'] = self.error_class([_('A page with this reverse URL id exists already.')])
         return cleaned_data
 
     def clean_overwrite_url(self):
