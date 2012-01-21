@@ -114,7 +114,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # test standard show_menu 
         with self.assertNumQueries(5):
             """
-            The 4 queries should be:
+            The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
@@ -678,7 +678,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         # test standard show_menu
         with self.assertNumQueries(5):
             """
-            The 4 queries should be:
+            The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
@@ -702,7 +702,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         """
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
-        b =create_page('B', 'nav_playground.html', 'en', parent=a,
+        b = create_page('B', 'nav_playground.html', 'en', parent=a,
                        published=True, in_navigation=True)
         c = create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
@@ -743,7 +743,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             context = self.get_context(a.get_absolute_url())
             with self.assertNumQueries(5):
                 """
-                The 4 queries should be:
+                The queries should be:
                     get all pages
                     get all page permissions
                     get all titles
