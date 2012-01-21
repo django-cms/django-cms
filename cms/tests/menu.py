@@ -10,15 +10,15 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.utils import mark_descendants, find_selected, cut_levels
-
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
+from menus.base import NavigationNode
+from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
+from menus.models import CacheKey
+from menus.utils import mark_descendants, find_selected, cut_levels
+
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
@@ -112,16 +112,26 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             """
             The 4 queries should be:
                 get all pages
                 get all page permissions
                 get all titles
+                get the menu cache key
                 set the menu cache key
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
+            
+    def test_show_menu_cache_key_leak(self):
+        context = self.get_context()
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        self.assertEqual(CacheKey.objects.count(), 0)
+        tpl.render(context)
+        self.assertEqual(CacheKey.objects.count(), 1)
+        tpl.render(context)
+        self.assertEqual(CacheKey.objects.count(), 1)
         
     def test_only_active_tree(self):
         context = self.get_context()
@@ -666,12 +676,13 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         page = Page.objects.get(title_set__title='P6')
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             """
             The 4 queries should be:
                 get all pages
                 get all page permissions
                 get all titles
+                get the menu cache key
                 set the menu cache key
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
@@ -724,18 +735,19 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                         in_navigation=True, reverse_id='a')
         b =create_page('B', 'nav_playground.html', 'en', parent=a,
                        published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
+        create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(5):
                 """
                 The 4 queries should be:
                     get all pages
                     get all page permissions
                     get all titles
+                    get the menu cache key
                     set the menu cache key
                 """
                 # Actually seems to run:
