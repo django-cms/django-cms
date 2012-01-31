@@ -70,7 +70,10 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
-        qs = super(CMSChangeList, self).get_query_set(request).drafts()
+        if 'request' in ChangeList.get_query_set.func_code.co_varnames: # django 1.4
+            qs = super(CMSChangeList, self).get_query_set(request).drafts()
+        else:
+            qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
             site = self._current_site
             permissions = Page.permissions.get_change_id_list(request.user, site)
