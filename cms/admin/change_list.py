@@ -54,9 +54,9 @@ class CMSChangeList(ChangeList):
     real_queryset = False
     
     def __init__(self, request, *args, **kwargs):
-        super(CMSChangeList, self).__init__(request, *args, **kwargs)
         from cms.utils.plugins import current_site
         self._current_site = current_site(request)
+        super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
             self.query_set = self.get_query_set(request)
         except:
@@ -70,7 +70,7 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
-        qs = super(CMSChangeList, self).get_query_set().drafts()
+        qs = super(CMSChangeList, self).get_query_set(request).drafts()
         if request:
             site = self._current_site
             permissions = Page.permissions.get_change_id_list(request.user, site)
