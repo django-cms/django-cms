@@ -350,12 +350,15 @@ class AdminTestCase(AdminTestsBase):
         request.user = admin
         
         page_admin = site._registry[Page]
-                
-        cl = CMSChangeList(request, page_admin.model, page_admin.list_display,
+
+        cl_params = [request, page_admin.model, page_admin.list_display,
                             page_admin.list_display_links, page_admin.list_filter,
                             page_admin.date_hierarchy, page_admin.search_fields, 
-                            page_admin.list_select_related, page_admin.list_per_page, 
-                            page_admin.list_editable, page_admin)
+                            page_admin.list_select_related, page_admin.list_per_page]
+        if hasattr(page_admin, 'list_max_show_all'): # django 1.4
+            cl_params.append(page_admin.list_max_show_all)
+        cl_params.extend([page_admin.list_editable, page_admin])
+        cl = CMSChangeList(*tuple(cl_params))
         
         cl.set_items(request)
         
