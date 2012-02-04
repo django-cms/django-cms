@@ -7,6 +7,7 @@
 
 /*##################################################|*/
 /* #PLACEHOLDERS# */
+.cms_placeholder { display: inline-block; }
 .cms_placeholder-bar { height:36px; border:1px solid #ddd !important;
 	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
 
