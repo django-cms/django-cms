@@ -16,7 +16,6 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
-from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from django.conf import settings
 from django.contrib import admin
@@ -1074,7 +1073,7 @@ class PageAdmin(ModelAdmin):
         if request.method != "POST":
             raise Http404
         plugin_type = request.POST['plugin_type']
-        if not has_plugin_permission(request.user, plugin_type, "add"):
+        if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
             return HttpResponseForbidden(ugettext('You have no permission to add a plugin'))
         placeholder_id = request.POST.get('placeholder', None)
         parent_id = request.POST.get('parent_id', None)
@@ -1161,7 +1160,7 @@ class PageAdmin(ModelAdmin):
 
         # check permissions before copy the plugins:
         for plugin in plugins:
-            if not has_plugin_permission(request.user, plugin.plugin_type, "add"):
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
                 return HttpResponseForbidden(ugettext("You do not have permission to add plugins"))
 
         copy_plugins.copy_plugins_to(plugins, placeholder, language)
@@ -1216,7 +1215,7 @@ class PageAdmin(ModelAdmin):
             if not instance:
                 raise Http404("This plugin is not saved in a revision")
 
-        if not has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
+        if not permissions.has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
             return HttpResponseForbidden(ugettext("You have no permission to edit a plugin"))
 
         plugin_admin.cms_plugin_instance = cms_plugin
@@ -1285,7 +1284,7 @@ class PageAdmin(ModelAdmin):
         success = False
         if 'plugin_id' in request.POST:
             plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-            if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
                 return HttpResponseForbidden()
 
             page = plugins.get_page_from_plugin_or_404(plugin)
@@ -1306,7 +1305,7 @@ class PageAdmin(ModelAdmin):
         if 'ids' in request.POST:
             for plugin_id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=plugin_id)
-                if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
+                if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
                     return HttpResponseForbidden(ugettext("You have no permission to move a plugin"))
                 page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
                 if not page: # use placeholderadmin instead!
@@ -1338,7 +1337,7 @@ class PageAdmin(ModelAdmin):
         plugin_id = request.POST['plugin_id']
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
 
-        if not has_plugin_permission(request.user, plugin.plugin_type, "delete"):
+        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
             return HttpResponseForbidden(ugettext("You have no permission to remove a plugin"))
 
         placeholder = plugin.placeholder
