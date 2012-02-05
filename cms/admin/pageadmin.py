@@ -18,7 +18,6 @@ from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
 from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
-from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -998,7 +997,7 @@ class PageAdmin(ModelAdmin):
             "app_label": app_label,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
+        context_instance = RequestContext(request, current_app=self.admin_site.name)
         return render_to_response(self.delete_confirmation_template or [
             "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
             "admin/%s/delete_confirmation.html" % app_label,
