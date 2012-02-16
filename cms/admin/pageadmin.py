@@ -1304,15 +1304,15 @@ class PageAdmin(ModelAdmin):
             plugin.position = position
             plugin.save()
             success = True
-        if 'ids' in request.POST:
+        elif 'ids' in request.POST:
             for plugin_id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=plugin_id)
                 if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
                     return HttpResponseForbidden(ugettext("You have no permission to move a plugin"))
+
                 page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
-                if not page: # use placeholderadmin instead!
-                    raise Http404
-                if not page.has_change_permission(request):
+                
+                if page and not page.has_change_permission(request):
                     return HttpResponseForbidden(ugettext("You have no permission to change this page"))
 
                 if plugin.position != pos:
@@ -1346,7 +1346,7 @@ class PageAdmin(ModelAdmin):
         page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
 
         if page and not page.has_change_permission(request):
-            raise Http404
+            return HttpResponseForbidden(ugettext("You have no permission to change this page"))
 
         if page and settings.CMS_MODERATOR and page.is_under_moderation():
             # delete the draft version of the plugin
