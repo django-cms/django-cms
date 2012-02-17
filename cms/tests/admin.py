@@ -903,7 +903,7 @@ class PluginPermissionTests(AdminTestsBase):
         self._give_permission(normal_guy, Text, 'delete')
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        # But he can't edit the page associated with this plugin's placeholder
+        # But if he can't edit the page associated with this plugin's placeholder
         # he's not allowed to delete this plugin
         plugin = self._create_plugin() # Must create a new one since the original was removed
         data = dict(plugin_id=plugin.id)
@@ -938,7 +938,7 @@ class PluginPermissionTests(AdminTestsBase):
         response = client.post(url, data_swap)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         # But if the plugin is from a placeholder of a page he isn't
-        # allowed to change, he can't change the plugin.
+        # allowed to change, he can't move the plugin.
         GlobalPagePermission.objects.all().delete()
         response = client.post(url, data_swap)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
