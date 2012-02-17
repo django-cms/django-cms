@@ -1311,7 +1311,6 @@ class PageAdmin(ModelAdmin):
                     return HttpResponseForbidden(ugettext("You have no permission to move a plugin"))
 
                 page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
-                
                 if page and not page.has_change_permission(request):
                     return HttpResponseForbidden(ugettext("You have no permission to change this page"))
 
