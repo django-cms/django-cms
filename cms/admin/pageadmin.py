@@ -380,7 +380,7 @@ class PageAdmin(ModelAdmin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
 
-            placeholders = plugins.get_placeholders(selected_template)
+            placeholders = self.get_fieldset_placeholders(selected_template)
             for placeholder_name in placeholders:
                 plugin_list = []
                 show_copy = False
@@ -511,7 +511,7 @@ class PageAdmin(ModelAdmin):
 
             #activate(user_lang_set)
             extra_context = {
-                'placeholders': plugins.get_placeholders(selected_template),
+                'placeholders': self.get_fieldset_placeholders(selected_template),
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
@@ -1291,7 +1291,7 @@ class PageAdmin(ModelAdmin):
                 return HttpResponseForbidden(ugettext("You have no permission to change this page"))
 
             placeholder_slot = request.POST['placeholder']
-            placeholders = plugins.get_placeholders(page.get_template())
+            placeholders = self.get_fieldset_placeholders(page.get_template())
             if not placeholder_slot in placeholders:
                 return HttpResponse(str("error"))
             placeholder = page.placeholders.get(slot=placeholder_slot)
