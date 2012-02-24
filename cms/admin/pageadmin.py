@@ -641,16 +641,12 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
-            if hasattr(self, 'list_editable'):# django 1.1
-                if hasattr(self, 'list_max_show_all'):# django 1.4
-                    cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                        self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
-                else:
-                    cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                        self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
-            else:# django 1.0.2
+            if django.VERSION >= (1, 4):
                 cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+            else:
+                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -941,7 +937,6 @@ class PageAdmin(ModelAdmin):
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
         if django.VERSION[1] > 2: # pragma: no cover
-            # WARNING: Django 1.3 is not officially supported yet!
             using = router.db_for_read(self.model)
             kwargs = {
                 'admin_site': self.admin_site,
