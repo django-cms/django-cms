@@ -14,6 +14,8 @@ top of your template::
 ***********
 placeholder
 ***********
+.. versionchanged:: 2.1
+    The placeholder name became case sensitive.
 
 The ``placeholder`` templatetag defines a placeholder on a page. All
 placeholders in a template will be auto-detected and can be filled with
