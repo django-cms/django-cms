@@ -68,7 +68,7 @@ class CleanAdminListFilter(InclusionTag):
             if choice['query_string'] != query_string:
                 unique_choices.append(choice)
                 query_string = choice['query_string']
-        return {'title': spec.title(), 'choices' : unique_choices}
+        return {'title': str(spec.title), 'choices' : unique_choices}
 register.tag(CleanAdminListFilter)
 
 
