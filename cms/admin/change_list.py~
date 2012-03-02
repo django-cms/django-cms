@@ -74,7 +74,7 @@ class CMSChangeList(ChangeList):
         if 'request' in inspect.getargspec(super(CMSChangeList, self).get_query_set)[0]: # Django 1.4
             qs = super(CMSChangeList, self).get_query_set(request).drafts()
         else: # Django <= 1.3
-            qs = super(CMSChangeList, self).get_query_set().drafts()
+            qs = super(CMSChangeList, self).get_query_set(request).drafts()
         if request:
             site = self._current_site
             permissions = Page.permissions.get_change_id_list(request.user, site)
