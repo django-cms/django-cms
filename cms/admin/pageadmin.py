@@ -495,7 +495,7 @@ class PageAdmin(ModelAdmin):
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
 
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
@@ -534,7 +534,13 @@ class PageAdmin(ModelAdmin):
             }
             extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
-        response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
+        try:
+            # Django >= 1.4
+            response = super(PageAdmin, self).change_view(request, object_id, form_url=form_url,
+                                                          extra_context=extra_context)
+        except TypeError:
+            response = super(PageAdmin, self).change_view(request, object_id,
+                                                          extra_context=extra_context)
 
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
