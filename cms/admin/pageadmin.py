@@ -1042,7 +1042,7 @@ class PageAdmin(ModelAdmin):
         Switch the status of a page
         """
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             page.published = not page.published
@@ -1057,7 +1057,7 @@ class PageAdmin(ModelAdmin):
         """
         # why require post and still have page id in the URL???
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.in_navigation = not page.in_navigation
@@ -1376,7 +1376,7 @@ class PageAdmin(ModelAdmin):
         """
         from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, id=page_id)
         moderate = request.POST.get('moderate', None)
         if moderate is not None and page.has_moderate_permission(request):
