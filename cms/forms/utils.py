@@ -21,7 +21,7 @@ def update_site_and_page_choices(lang=None):
     else:
         title_queryset = Title.objects.filter(page__publisher_is_draft=True)
     title_queryset = title_queryset.select_related('page', 'page__site').order_by('page__tree_id', 'page__lft', 'page__rght')
-    pages = defaultdict(lambda: SortedDict())
+    pages = defaultdict(SortedDict)
     sites = {}
     for title in title_queryset:
         page = pages[title.page.site.pk].get(title.page.pk, {})
