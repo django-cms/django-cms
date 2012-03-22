@@ -1247,6 +1247,13 @@ class PageAdmin(ModelAdmin):
                 'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
                 'cancel': True,
             }
+            instance = cms_plugin.get_plugin_instance()[0]
+            if not instance:
+                # cancelled before any content was added to plugin
+                cms_plugin.delete()
+                context.update({
+                    "deleted":True,
+                })
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
         if not instance:
