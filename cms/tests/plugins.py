@@ -410,7 +410,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.count(), 6)
 
         new_plugin = Text.objects.get(pk=6)
-        self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
+        idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
+        expected = sorted([u'4', u'5'])
+        self.assertEquals(idlist, expected)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

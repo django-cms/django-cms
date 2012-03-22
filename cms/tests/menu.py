@@ -12,12 +12,13 @@ from cms.test_utils.util.context_managers import (SettingsOverride,
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
+from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
+
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
@@ -111,16 +112,26 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             """
-            The 4 queries should be:
+            The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
+                get the menu cache key
                 set the menu cache key
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
+            
+    def test_show_menu_cache_key_leak(self):
+        context = self.get_context()
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        self.assertEqual(CacheKey.objects.count(), 0)
+        tpl.render(context)
+        self.assertEqual(CacheKey.objects.count(), 1)
+        tpl.render(context)
+        self.assertEqual(CacheKey.objects.count(), 1)
         
     def test_only_active_tree(self):
         context = self.get_context()
@@ -665,12 +676,13 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         page = Page.objects.get(title_set__title='P6')
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             """
-            The 4 queries should be:
+            The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
+                get the menu cache key
                 set the menu cache key
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
@@ -690,7 +702,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         """
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
-        b =create_page('B', 'nav_playground.html', 'en', parent=a,
+        b = create_page('B', 'nav_playground.html', 'en', parent=a,
                        published=True, in_navigation=True)
         c = create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
@@ -723,18 +735,19 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                         in_navigation=True, reverse_id='a')
         b =create_page('B', 'nav_playground.html', 'en', parent=a,
                        published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
+        create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(5):
                 """
-                The 4 queries should be:
+                The queries should be:
                     get all pages
                     get all page permissions
                     get all titles
+                    get the menu cache key
                     set the menu cache key
                 """
                 # Actually seems to run:
@@ -762,6 +775,8 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
+        page.level = 0
+        page.tree_id = 1
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
@@ -771,8 +786,14 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
+        page.level = 0
+        page.tree_id = 1
         pages = [page]
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(1):
+            """
+                The queries are:
+                PagePermission count query
+            """    
             get_visible_pages(request, pages)
     
     def test_public_for_all(self):
@@ -834,7 +855,10 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
     
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = User()
+            user.username="test"
+            user.is_staff = True
+            user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
             page = Page()
@@ -849,7 +873,10 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = User()
+            user.username="test"
+            user.is_staff = True
+            user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
             page = Page()
@@ -857,13 +884,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page.level = 0
             page.tree_id = 1
             pages = [page]
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(2):
                 """
                 The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                Generic django permission lookup
-                content type lookup by permission lookup
+                PagePermission count query 
+                GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
     
@@ -890,13 +915,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page.level = 0
             page.tree_id = 1
             pages = [page]
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(2):
                 """
                 The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                Generic django permission lookup
-                content type lookup by permission lookup
+                View Permission Calculation Query
+                globalpagepermissino calculation
                 """
                 get_visible_pages(request, pages, site)
     
