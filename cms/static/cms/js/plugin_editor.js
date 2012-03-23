@@ -179,5 +179,9 @@ function loadPluginForm(target, id){
         $('#plugin_'+id+" span.text").html(html);
         $('#iframe_'+id).parent().html("<p>"+msg+"</p>");
     }
+
+    removed_cancelled_plugin = function(plugin_id) {
+        $('#plugin_'+plugin_id).remove();
+    }
  
 })(jQuery);
