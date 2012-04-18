@@ -90,7 +90,8 @@ jQuery(document).ready(function ($) {
 					// we get the id back
 					that.editPlugin.call(that, values.placeholder_id, response, editUrl);
 				},
-				'error': function () {
+				'error': function (xhr) {
+					alert(xhr.responseText);
 					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
 			});
@@ -184,7 +185,8 @@ jQuery(document).ready(function ($) {
 						// remove plugin from the dom
 						plugin.remove();
 					},
-					'error': function () {
+					'error': function (xhr) {
+						alert(xhr.responseText);
 						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 					}
 				});
@@ -231,7 +233,8 @@ jQuery(document).ready(function ($) {
 				'url': url,
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
-				'error': function () {
+				'error': function (xhr) {
+					alert(xhr.responseText);
 					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
 			});
@@ -311,7 +314,8 @@ jQuery(document).ready(function ($) {
 					'success': function () {
 						refreshPluginPosition(slot);
 					},
-					'error': function () {
+					'error': function (xhr) {
+						alert(xhr.responseText);
 						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 					}
 				});
@@ -600,3 +604,4 @@ jQuery(document).ready(function ($) {
 });
 
 })(jQuery);
+
