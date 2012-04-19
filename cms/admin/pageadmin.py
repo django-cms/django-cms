@@ -860,7 +860,7 @@ class PageAdmin(ModelAdmin):
         referer = request.META.get('HTTP_REFERER', reverse('admin:cms_page_changelist'))
         path = '../../'
         if 'admin' not in referer:
-            path = '%s?edit-off' % referer.split('?')[0]
+            path = referer.split('?')[0]
         return HttpResponseRedirect( path )
 
 
@@ -875,7 +875,7 @@ class PageAdmin(ModelAdmin):
         path = '../../'
         # TODO: use admin base here!
         if 'admin' not in referer:
-            path = '%s?edit-off' % referer.split('?')[0]
+            path = referer.split('?')[0]
         return HttpResponseRedirect( path )
 
 
