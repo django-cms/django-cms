@@ -9,9 +9,14 @@ class Link(CMSPlugin):
 
     name = models.CharField(_("name"), max_length=256)
     url = models.URLField(_("link"), verify_exists=False, blank=True, null=True)
+    additional_classes = models.CharField(_("additional classes"),
+        max_length=256, blank=True, null=True, 
+        help_text=_(
+            "Additional HTML classes to apply to the link. All links also have the plugin_link class. Use spaces to separate multiple values."))
+            
     page_link = models.ForeignKey(Page, verbose_name=_("page"), blank=True, null=True, help_text=_("A link to a page has priority over a text link."))
     mailto = models.EmailField(_("mailto"), blank=True, null=True, help_text=_("An email adress has priority over a text link."))
-
+    
     def __unicode__(self):
         return self.name
 
