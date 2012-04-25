@@ -1189,7 +1189,6 @@ class PageAdmin(ModelAdmin):
             from reversion.models import Version
             pre_edit = request.path.split("/edit-plugin/")[0]
             version_id = pre_edit.split("/")[-1]
-            Version.objects.get(pk=version_id)
             version = get_object_or_404(Version, pk=version_id)
             rev_objs = []
             for related_version in version.revision.version_set.all():

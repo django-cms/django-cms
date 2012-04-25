@@ -100,5 +100,5 @@ def cms_static_url(path):
     Helper that prefixes a URL with STATIC_URL and cms
     '''
     if not path:
-        ''
+        return ''
     return configured_storage.url(os.path.join('cms', path))
