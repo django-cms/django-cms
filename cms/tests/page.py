@@ -533,6 +533,8 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'i-want-another-url/')
 
+        # tests a bug found in 2.2 where saving an ancestor page
+        # wiped out the overwrite_url for child pages
         page2.save()
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'i-want-another-url/')
