@@ -191,13 +191,10 @@ class CMSChangeList(ChangeList):
                 page._has_moderator_state_chache = page.pk in pagemoderator_states_id_set
                 
             if page.root_node or self.is_filtered():
+                # page.last is used only in the template to ease output of embedded <ul> lists
                 page.last = True
                 if len(children):
-                    # TODO: WTF!?!
-                    # The last one is not the last... wait, what?
-                    # children should NOT be a queryset. If it is, check that
-                    # your django-mptt version is 0.5.1
-                    children[-1].last = False
+                    children[children.count() - 1].last = False
                 page.menu_level = 0
                 root_pages.append(page)
                 if page.parent_id:
