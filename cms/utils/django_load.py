@@ -18,8 +18,12 @@ def get_module(app, modname, verbose, failfast):
     """
     module_name = '%s.%s' % (app, modname)
     try:
-        module = import_module(module_name)
+        module = __import__(module_name)
     except ImportError, e:
+        failed_mod = e.message.split(' ')[-1]
+        if not module_name.endswith(failed_mod):
+            raise
+
         if failfast:
             raise e
         elif verbose:
