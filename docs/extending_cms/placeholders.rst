@@ -41,7 +41,7 @@ correctly::
 
     from django.contrib import admin
     from cms.admin.placeholderadmin import PlaceholderAdmin
-    from myapp import MyModel
+    from myapp.models import MyModel
 
     admin.site.register(MyModel, PlaceholderAdmin)
 
