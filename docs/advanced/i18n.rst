@@ -65,7 +65,7 @@ In the models of the current object add an optional language parameter to the
 
 
 In the view pass the :meth:`get_absolute_url` method to the
-``set_language_chooser`` function::
+``set_language_changer`` function::
 
     from menus.utils import set_language_changer
 
