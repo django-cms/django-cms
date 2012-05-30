@@ -37,8 +37,7 @@
 				a_class: "title"
 			},
 			cookies : {
-				prefix: "djangocms_nodes",
-				path: "/admin/cms/page"
+				prefix: "djangocms_nodes"
 			},
 			callback: {
 				beforemove  : function(what, where, position, tree) {
