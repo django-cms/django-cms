@@ -461,7 +461,11 @@ class PageAdmin(ModelAdmin):
     # remove permission inlines, if user isn't allowed to change them
     def get_formsets(self, request, obj=None):
         if obj:
-            for inline in self.inline_instances:
+            try:
+                inline_instances = self.inline_instances # Django <= 1.3
+            except AttributeError:
+                inline_instances = self.get_inline_instances(request) # Django 1.4
+            for inline in inline_instances:
                 if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin) and not isinstance(inline, ViewRestrictionInlineAdmin):
                     if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
                         continue
@@ -491,7 +495,7 @@ class PageAdmin(ModelAdmin):
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context)
 
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
@@ -530,7 +534,13 @@ class PageAdmin(ModelAdmin):
             }
             extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
-        response = super(PageAdmin, self).change_view(request, object_id, extra_context)
+        try:
+            # Django >= 1.4
+            response = super(PageAdmin, self).change_view(request, object_id, form_url=form_url,
+                                                          extra_context=extra_context)
+        except TypeError:
+            response = super(PageAdmin, self).change_view(request, object_id,
+                                                          extra_context=extra_context)
 
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
@@ -640,8 +650,12 @@ class PageAdmin(ModelAdmin):
             raise PermissionDenied
         try:
             if hasattr(self, 'list_editable'):# django 1.1
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
+                if hasattr(self, 'list_max_show_all'):# django 1.4
+                    cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                        self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+                else:
+                    cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                        self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
             else:# django 1.0.2
                 cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
                     self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
@@ -674,7 +688,6 @@ class PageAdmin(ModelAdmin):
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
-            'root_path': self.admin_site.root_path,
             'app_label': app_label,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
@@ -994,7 +1007,6 @@ class PageAdmin(ModelAdmin):
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
             "opts": titleopts,
-            "root_path": self.admin_site.root_path,
             "app_label": app_label,
         }
         context.update(extra_context or {})

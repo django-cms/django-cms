@@ -5,10 +5,10 @@ from cms.templatetags.cms_tags import Placeholder
 from cms.utils.placeholder import validate_placeholder_name
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
-from django.template import (NodeList, TextNode, VariableNode, 
+from django.template import (NodeList, TextNode, VariableNode,
     TemplateSyntaxError)
 from django.template.loader import get_template
-from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode, 
+from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode,
     BlockNode)
 import warnings
 
@@ -20,7 +20,7 @@ def _extend_blocks(extend_node, blocks):
     Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if hasattr(extend_node, 'parent_name_expr') and extend_node.parent_name_expr:
         return
     parent = extend_node.get_parent(None)
     # Search for new blocks
@@ -39,14 +39,14 @@ def _extend_blocks(extend_node, blocks):
     for node in parent.nodelist.get_nodes_by_type(ExtendsNode):
         _extend_blocks(node, blocks)
         break
-        
+
 def _find_topmost_template(extend_node):
     parent_template = extend_node.get_parent({})
     for node in parent_template.nodelist.get_nodes_by_type(ExtendsNode):
         # Their can only be one extend block in a template, otherwise django raises an exception
         return _find_topmost_template(node)
     # No ExtendsNode
-    return extend_node.get_parent({}) 
+    return extend_node.get_parent({})
 
 def _extend_nodelist(extend_node):
     """
@@ -54,7 +54,7 @@ def _extend_nodelist(extend_node):
     ExtendsNode
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if hasattr(extend_node, 'parent_name_expr') and extend_node.parent_name_expr:
         return []
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
