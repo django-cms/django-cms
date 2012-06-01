@@ -5,8 +5,7 @@ from cms.admin.dialog.forms import (ModeratorForm, PermissionForm,
     PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.forms import PageForm
-from cms.admin.pageadmin import (contribute_fieldsets, contribute_list_filter, 
-    PageAdmin)
+from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState
@@ -32,6 +31,7 @@ from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden,
     HttpResponse)
 from django.test.client import Client
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
@@ -688,9 +688,6 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'plugin_id': plugin.pk})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'ids': plugin.pk})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
-        with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': 'invalid-placeholder'})
             response = self.admin_class.move_plugin(request)
@@ -906,23 +903,47 @@ class PluginPermissionTests(AdminTestsBase):
         self._give_permission(normal_guy, Text, 'delete')
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-
+        # But if he can't edit the page associated with this plugin's placeholder
+        # he's not allowed to delete this plugin
+        plugin = self._create_plugin() # Must create a new one since the original was removed
+        data = dict(plugin_id=plugin.id)
+        GlobalPagePermission.objects.all().delete()
+        response = client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.content, ugettext('You have no permission to change this page'))
+        
     def test_plugin_move_requires_permissions(self):
         """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
         plugin = self._create_plugin()
+        second_plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         client = Client()
         client.login(username='test', password='test')
         url = reverse('admin:cms_page_move_plugin')
+        # Make sure he can't move it by passing the id
         data = dict(plugin_id=plugin.id,
                     placeholder=self._placeholder)
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # After he got the permissions, he can edit the plugin
+        # Nor by specifying the plugins to swap
+        data_swap = dict(ids=[plugin.id, second_plugin.id])
+        response = client.post(url, data_swap)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.content, ugettext('You have no permission to move a plugin'))
+        # After he got the permissions, he can move the plugin by id
         self._give_permission(normal_guy, Text, 'change')
         response = client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-
+        # And by ids to swap
+        response = client.post(url, data_swap)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        # But if the plugin is from a placeholder of a page he isn't
+        # allowed to change, he can't move the plugin.
+        GlobalPagePermission.objects.all().delete()
+        response = client.post(url, data_swap)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.content, ugettext('You have no permission to change this page'))
+        
     def test_plugins_copy_requires_permissions(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
         plugin = self._create_plugin()
