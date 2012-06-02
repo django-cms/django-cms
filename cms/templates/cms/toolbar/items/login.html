@@ -1,0 +1,14 @@
+{% load i18n %}
+<form action="?cms-toolbar-login=1" method="post" id="cms_toolbar-item_login" class="cms_toolbar-item{% if auth_error %} cms_toolbar_error{% endif %}">
+	<fieldset>
+		{% csrf_token %}
+		<label for="cms_toolbar-item_login-username">{% trans "Username" %}</label>
+		<div><input type="text" name="cms_username" id="cms_toolbar-item_login-username" /></div>
+		<label for="cms_toolbar-item_login-password">{% trans "Password" %}</label>
+		<div><input type="password" name="cms_password" id="cms_toolbar-item_login-password" /></div>
+		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
+			<span class="cms_toolbar-btn_right">{% trans "Login" %}</span>
+		</a>
+		<input type="submit" value="{% trans 'Login' %}" style="border:0;height:0;width:0" />
+	</fieldset>
+</form>

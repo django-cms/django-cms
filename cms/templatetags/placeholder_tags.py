@@ -20,7 +20,5 @@ class RenderPlaceholder(Tag):
             return ''
         if not placeholder:
             return ''
-        if hasattr(request, 'placeholder_media'):
-            request.placeholder_media += placeholder.get_media(request, context)
         return safe(placeholder.render(context, width))
 register.tag(RenderPlaceholder)

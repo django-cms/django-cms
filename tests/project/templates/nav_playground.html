@@ -1,0 +1,165 @@
+{% load cache cms_tags menu_tags sekizai_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ lang }}" xml:lang="{{ lang }}" >
+<head>
+<title>{% page_attribute page_title %}</title>
+<meta name="description" content="{% page_attribute meta_description %}"/>
+<meta name="keywords" content="{% page_attribute meta_keywords %}"/>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+{% render_block "css" %}
+<style>
+    .placeholder-editable {
+        border:1px #bbb solid;
+        background:#fff;
+        min-height:1em;
+        padding:5px;
+        cursor:text;
+        overflow:hidden;
+        height:1%;
+    }
+
+    .placeholder-editable input {
+        float:right;
+        padding:4px 10px;
+        margin-top:3px;
+    }
+
+    .placeholder-over, .edit {
+        border:1px #999 solid;
+        background:#5c705c;
+        color:#fff;
+        cursor: hand;
+    }
+
+    .edit {
+        padding:5px;
+    }
+
+    body {
+        font-family:sans-serif;
+        font-size:75%;
+        background:#b5b185;
+        color:#333;
+    }
+
+    #main {
+        width:600px;
+        padding:20px;
+        margin:0 auto;
+        border:1px #999 solid;
+        margin-bottom:40px;
+        height:1%;
+        background:#fffdca;
+    }
+
+    h1, h2 {
+        border-bottom:1px #ddd solid;
+        color:#a4b854;
+    }
+
+    a {
+        color:#ff7959
+    }
+	
+	ul.breadcrumb {
+		clear:left;
+		padding-bottom:30px;
+		margin-left:-40px;
+	}
+	ul.breadcrumb li{
+		float:left;
+		margin-left:5px;
+		list-style:none;
+		}
+	p.chooser a{
+		text-decoration: none;
+	}	
+	p.chooser a.current {
+		text-decoration: underline;
+	}
+</style>
+</head>
+<body>
+{% cms_toolbar %}
+<div id="main">
+<p style="float:right">
+    {% if user.is_authenticated %}
+        <a href="/admin/logout/">log out</a>
+    {% else %}
+        <a href="/admin/">log in</a>
+    {% endif %}
+</p>
+<p class="chooser">
+	See this page in: {% language_chooser %}
+</p>
+<h1>{% block title %}{% page_attribute title %}{% endblock %}</h1>
+
+<h3>site: {{ site.name }}</h3>
+
+<h2>Complete navigation</h2>
+
+<ul>
+	{% show_menu 0 100 100 100 %}
+</ul>
+
+<h2>Navigation with active tree</h2>
+<ul>
+	{% show_menu 0 100 0 100 %}
+</ul>
+
+<h2>Navigation with only 1 active extra level</h2>
+<ul>
+	{% show_menu 0 100 0 1 %}
+</ul>
+
+<h2>Level 0 navigation </h2>
+<ul>
+	{% show_menu 0 0 0 0 %}
+</ul>
+
+<h2>Level 1 navigation </h2>
+<ul>
+	{% show_menu 1 1 100 100 %}
+</ul>
+
+<h2>Level 1 navigation (only active tree)</h2>
+<ul>
+	{% show_menu 1 1 0 100 %}
+</ul>
+
+<h2>Level 0-1 navigation</h2>
+<ul>
+	{% show_menu 0 1 100 100 %}
+</ul>
+
+<h2>Display the sub menu (2 level deep) of the current page</h2>
+
+<ul>
+    {% show_sub_menu 2 %}
+</ul>
+
+
+<h2>Show the breadcrumb navigation of the current page</h2>
+<ul class="breadcrumb">
+	{% show_breadcrumb %}
+</ul>
+
+<h2>Content</h2>
+{% block content %}
+    <div>
+		<h3>Title placeholder {% page_attribute title %}</h3>
+		<div style="float:right;width:30%;">
+    		<h3>Right column placeholder</h3>
+    		{% placeholder right-column %}
+    	 </div>
+        <div style="float:left;width:65%;">
+        	<h3>Body placeholder</h3>
+         	{% placeholder "body" %}
+         </div>
+    </div>
+{% endblock %}
+
+</div>
+
+{% render_block "js" %}
+</body>
+</html>

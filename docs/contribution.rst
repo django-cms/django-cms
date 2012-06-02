@@ -1,8 +1,8 @@
 ##########################
-Contributing to Django-CMS
+Contributing to django CMS
 ##########################
 
-Like every open-source project, Django-CMS is always looking for motivated
+Like every open-source project, django CMS is always looking for motivated
 individuals to contribute to it's source code.
 However, to ensure the highest code quality and keep the repository nice and
 tidy, everybody has to follow a few rules (nothing major, I promise :) )
@@ -12,12 +12,12 @@ tidy, everybody has to follow a few rules (nothing major, I promise :) )
 Community
 *********
 
-People interested in developing for the django-cms should join the
+People interested in developing for the django CMS should join the
 `django-cms-developers`_ mailing list as well as heading over to #django-cms on
-freenode for help and to discuss the development.
+the `freenode`_ IRC network for help and to discuss the development.
 
-You may also be interested in following @djangocmsstatus on twitter to get the
-github commits as well as the hudson build reports. There is also a @djangocms
+You may also be interested in following `@djangocmsstatus`_ on twitter to get the
+GitHub commits as well as the hudson build reports. There is also a `@djangocms`_
 account for less technical announcements.
 
 
@@ -26,14 +26,14 @@ In a nutshell
 *************
 
 Here's what the contribution process looks like, in a bullet-points fashion, and
-only for the stuff we host on github:
+only for the stuff we host on GitHub:
 
-#. django-cms is hosted on `Github`_, at https://github.com/divio/django-cms
+#. django CMS is hosted on `GitHub`_, at https://github.com/divio/django-cms
 #. The best method to contribute back is to create an account there, then fork
    the project. You can use this fork as if it was your own project, and should
    push your changes to it.
-#. When you feel your code is good enough for inclusion, "send us a pull
-   request", by using the nice Github web interface.
+#. When you feel your code is good enough for inclusion, "send us a `pull
+   request`_", by using the nice GitHub web interface.
 
 
 
@@ -45,7 +45,7 @@ Contributing Code
 Getting the source code
 =======================
 
-If you're interested in developing a new feature for the cms, it is recommended
+If you're interested in developing a new feature for the CMS, it is recommended
 that you first discuss it on the `django-cms-developers`_  mailing list so as
 not to do any work that will not get merged in anyway.
 
@@ -58,10 +58,10 @@ not to do any work that will not get merged in anyway.
 - Usually, if unit tests are written, pass, and your change is relevant, then
   it'll be merged.
 
-Since we're hosted on github, django-cms uses git as a version control system.
+Since we're hosted on GitHub, django CMS uses `git`_ as a version control system.
 
-The `Github help`_ is very well written and will get you started on using git
-and github in a jiffy. It is an invaluable resource for newbies and old timers
+The `GitHub help`_ is very well written and will get you started on using git
+and GitHub in a jiffy. It is an invaluable resource for newbies and old timers
 alike.
 
 
@@ -82,7 +82,7 @@ Process
 
 This is how you fix a bug or add a feature:
 
-#. `fork`_ us on github.
+#. `fork`_ us on GitHub.
 #. Checkout your fork.
 #. Hack hack hack, test test test, commit commit commit, test again.
 #. Push to your fork.
@@ -135,7 +135,7 @@ correctness.
 
 Documentation should be:
 
-- We use `Sphinx`_/restructuredText. So obviously this is the format you should
+- We use `Sphinx`_/`restructuredText`_. So obviously this is the format you should
   use :) File extensions should be .rst.
 - Written in English. We can discuss how it would bring more people to the
   project to have a Klingon translation or anything, but that's a problem we
@@ -148,7 +148,7 @@ Documentation should be:
   A brief description of what it does is also welcome. 
 
 Pulling of documentation is pretty fast and painless. Usually somebody goes over
-your text and merges it, since there are no "breaks" and that github parses rst
+your text and merges it, since there are no "breaks" and that GitHub parses rst
 files automagically it's really convenient to work with.
 
 Also, contributing to the documentation will earn you great respect from the
@@ -173,7 +173,7 @@ Translations
 ************
 
 
-For translators we have a `transifex account
+For translators we have a `Transifex account
 <http://www.transifex.net/projects/p/django-cms/>`_ where you can translate
 the .po files and don't need to install git or mercurial to be able to
 contribute. All changes there will be automatically sent to the project.
@@ -182,5 +182,12 @@ contribute. All changes there will be automatically sent to the project.
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
-.. _Github : http://www.github.com
-.. _Github help : http://help.github.com
+.. _GitHub : http://www.github.com
+.. _GitHub help : http://help.github.com
+.. _freenode : http://freenode.net/
+.. _@djangocmsstatus : https://twitter.com/djangocmsstatus
+.. _@djangocms : https://twitter.com/djangocms
+.. _pull request : http://help.github.com/send-pull-requests/
+.. _git : http://git-scm.com/
+.. _restructuredText: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
+

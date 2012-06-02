@@ -1,15 +1,15 @@
-from tinymce.widgets import TinyMCE, get_language_config
+from cms.utils import cms_static_url
 from django.conf import settings
-from django.utils.translation import get_language
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
-from os.path import join
-from django.utils.encoding import smart_unicode
-import tinymce.settings
-from django.utils import simplejson
-from django.template.defaultfilters import escape
 from django.forms.widgets import flatatt
+from django.template.defaultfilters import escape
+from django.template.loader import render_to_string
+from django.utils import simplejson
+from django.utils.encoding import smart_unicode
+from django.utils.safestring import mark_safe
+from django.utils.translation import get_language
+from tinymce.widgets import TinyMCE, get_language_config
 import cms.plugins.text.settings
+import tinymce.settings
 
 class TinyMCEEditor(TinyMCE):
     
@@ -30,13 +30,17 @@ class TinyMCEEditor(TinyMCE):
         
     def _media(self):
         media = super(TinyMCEEditor, self)._media()
-        media.add_js([join(settings.CMS_MEDIA_URL, path) for path in (
-                      'js/tinymce.placeholdereditor.js',
-                      'js/lib/ui.core.js',
-                      'js/placeholder_editor_registry.js',
-                      )])
-        media.add_css({"all":[join(settings.CMS_MEDIA_URL, path) for path in ('css/jquery/cupertino/jquery-ui.css',
-                                                                     'css/tinymce_toolbar.css')]})
+        media.add_js([cms_static_url(path) for path in (
+          'js/tinymce.placeholdereditor.js',
+          'js/libs/jquery.ui.core.js',
+          'js/placeholder_editor_registry.js',
+        )])
+        media.add_css({
+            "all": [
+                cms_static_url(path) for path in ('css/jquery/cupertino/jquery-ui.css',
+                                                  'css/tinymce_toolbar.css')
+            ]
+        })
         
         return media
     
@@ -76,8 +80,8 @@ class TinyMCEEditor(TinyMCE):
                 'debug': False,
             }
             c_json = simplejson.dumps(compressor_config)
-            html.append(u'<script type="text/javascript">tinyMCE_GZ.init(%s);</script>' % (c_json))
-        html.append(u'<script type="text/javascript">%s;\ntinyMCE.init(%s);</script>' % (self.render_additions(name, value, attrs), json))
+            html.append(u'<script type="text/javascript">//<![CDATA[\ntinyMCE_GZ.init(%s);\n//]]></script>' % (c_json))
+        html.append(u'<script type="text/javascript">//<![CDATA[\n%s;\ntinyMCE.init(%s);\n//]]></script>' % (self.render_additions(name, value, attrs), json))
         return mark_safe(u'\n'.join(html))
     
     
