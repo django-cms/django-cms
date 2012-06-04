@@ -44,6 +44,9 @@ def plugin_tags_to_user_html(text, context, placeholder):
             obj = CMSPlugin.objects.get(pk=plugin_id)
             obj._render_meta.text_enabled = True
             context['admin_tag'] = m.group(0)
+            context['admin_tag_attributes'] = dict(
+            	re.compile(r'(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?').findall(m.group(0))
+            )
         except CMSPlugin.DoesNotExist:
             # Object must have been deleted.  It cannot be rendered to
             # end user so just remove it from the HTML altogether
