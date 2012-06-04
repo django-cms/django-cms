@@ -43,8 +43,8 @@ def plugin_tags_to_user_html(text, context, placeholder):
         try:
             obj = CMSPlugin.objects.get(pk=plugin_id)
             obj._render_meta.text_enabled = True
-            context['admin_tag'] = m.group(0)
-            context['admin_tag_attributes'] = dict(
+            context['placeholder_tag'] = m.group(0)
+            context['placeholder_attributes'] = dict(
             	re.compile(r'(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?').findall(m.group(0))
             )
         except CMSPlugin.DoesNotExist:
