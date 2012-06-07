@@ -1,8 +1,15 @@
+// TODO: This file is intended to be deprecated as soon as the jQuery version
+// in the admin is fixed
+// TODO: Indentation is broken in this file.
+
 (function($){
 $.fn.cmsPatchCSRF = function () {
 $.ajaxSetup({
 beforeSend: function(xhr, settings) {
-if (typeof(settings.csrfTokenSet) != undefined && settings.csrfTokenSet) {return true;} 
+if (typeof(settings.csrfTokenSet) !== undefined && settings.csrfTokenSet) {
+    // CSRF token has already been set elsewhere so we won't touch it.
+    return true;
+} 
 function getCookie(name) {
 var cookieValue = null;
 if (document.cookie && document.cookie != '') {
