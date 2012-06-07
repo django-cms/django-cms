@@ -17,7 +17,7 @@ class CacheKeyManager(models.Manager):
             ret = self.filter(site=site_id).filter(language=language)
         return ret
 
-    def get_or_create(self, kwargs):
+    def get_or_create(self, **kwargs):
         try:
             return super(CacheKeyManager, self).get_or_create(**kwargs)
         except CacheKey.MultipleObjectsReturned:
