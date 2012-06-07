@@ -1,25 +1,30 @@
-/**
- * @requires:	Classy, jQuery
- *
- * assign Class and CMS namespace */
- var CMS = CMS || {};
-     CMS.Class = CMS.Class || Class.$noConflict();
-     CMS.API = CMS.API || {};
+// insuring django namespace is available when using on admin
+var django = django || undefined;
+// assigning correct jquery instance to jQuery variable
+var jQuery = (django) ? django.jQuery : window.jQuery || undefined;
+// assign global namespaces
+var CMS = CMS || {};
+	CMS.jQuery = window.jQuery;
+	CMS.$ = CMS.jQuery.noConflict(true);
+	CMS.Class = CMS.Class || Class.$noConflict();
+	CMS.API = CMS.API || {};
+// reattach jQuery to window
+window.jQuery = CMS.jQuery;
 
-(function ($) {
 /*##################################################|*/
 /* #CMS.BASE# */
-jQuery(document).ready(function ($) {
-	/**
-	 * Security
-	 * @version: 1.0.0
-	 * @description: Adds security layer to CMS namespace
+CMS.$(document).ready(function ($) {
+	// assign correct jquery to $ namespace
+	$ = CMS.$ || $;
+
+	/*!
+	 * Adds security methods to api namespace
 	 * @public_methods:
 	 *	- CMS.API.Security.csrf();
-	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
+	 * @compatibility: IE >= 7, FF >= 3, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 	CMS.API.Security = {
-	
+
 		csrf: function () {
 			$.ajaxSetup({
 				beforeSend: function (xhr, settings) {
@@ -56,10 +61,8 @@ jQuery(document).ready(function ($) {
 	
 	};
 	
-	/**
-	 * Helpers
-	 * @version: 1.0.0
-	 * @description: Adds helper methods to be invoked
+	/*!
+	 * Adds helper methods to api namespace
 	 * @public_methods:
 	 *	- CMS.API.Helpers.reloadBrowser();
 	 *	- CMS.API.Helpers.getUrl(urlString);
@@ -128,5 +131,3 @@ jQuery(document).ready(function ($) {
 	};
 
 });
-
-})(jQuery);
