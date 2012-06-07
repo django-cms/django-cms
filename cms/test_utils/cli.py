@@ -17,11 +17,8 @@ def configure(**extra):
         DATABASE_SUPPORTS_TRANSACTIONS = True,
         DATABASES = {
             'default': {
-                'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                'NAME': 'cmstest',
-                'USER': 'cmstest',
-                'PASSWORD': 'cmstest',
-                'PORT': 5433,
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
             }
         },
         SITE_ID = 1,
@@ -183,10 +180,6 @@ def configure(**extra):
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
     from django.core.urlresolvers import set_urlconf
-    from django.utils.importlib import import_module
     from django.contrib import admin
     admin.autodiscover()
     set_urlconf(settings.ROOT_URLCONF)
-    module = import_module(__name__)
-    for key, value in defaults.items():
-        setattr(module, key, value)
