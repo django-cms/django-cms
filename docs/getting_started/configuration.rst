@@ -263,6 +263,19 @@ Example::
         'en': ['de'],
     }
 
+.. setting:: CMS_LANGUAGES_URL_IGNORE_PREFIXES
+
+CMS_LANGUAGES_URL_IGNORE_PREFIXES
+=================================
+
+Default: ``()``
+
+In complex Django CMS installations there could be URLs on the same site as
+Django CMS but which are processed by your HTTP server in some other manner and
+never passed to Django CMS. Multilingual middleware would process also links to
+such URLs, so you can use this setting to configure which URLs should be left
+as they are.
+
 .. setting:: CMS_SITE_LANGUAGES
 
 CMS_SITE_LANGUAGES
