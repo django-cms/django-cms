@@ -11,11 +11,9 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
     URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, 
     SettingsOverride)
-from cms.utils.page_resolver import get_page_from_request, get_page_from_path
+from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.exceptions import MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
