@@ -1,16 +1,11 @@
-(function ($) {
-/**
- * @requires:	Classy, jQuery, jQuery.cookie
- */
-
 /*##################################################|*/
 /* #CMS.TOOLBAR# */
-jQuery(document).ready(function ($) {
+CMS.$(document).ready(function ($) {
+	// assign correct jquery to $ namespace
+	$ = CMS.$ || $;
 
-	/**
+	/*!
 	 * Toolbar
-	 * @version: 1.0.0
-	 * @description: Implements and controls toolbar
 	 * @public_methods:
 	 *	- CMS.API.Toolbar.toggleToolbar();
 	 *	- CMS.API.Toolbar.registerItem(obj);
@@ -447,5 +442,3 @@ jQuery(document).ready(function ($) {
 
 	});
 });
-
-})(jQuery);

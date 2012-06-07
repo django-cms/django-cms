@@ -1,15 +1,11 @@
-(function ($) {
-/**
- * @requires:	Classy, jQuery, jQuery.ui.core, jQuery.ui.draggable, jQuery.ui.droppable
- */
-
 /*##################################################|*/
 /* #CMS.PLACEHOLDERS# */
-jQuery(document).ready(function ($) {
-	/**
+CMS.$(document).ready(function ($) {
+	// assign correct jquery to $ namespace
+	$ = CMS.$ || $;
+
+	/*!
 	 * Placeholders
-	 * @version: 1.0.0
-	 * @description: Handles placeholders when in editmode and adds "lightbox" to toolbar
 	 * @public_methods:
 	 *	- CMS.API.Placeholder.addPlugin(obj, url);
 	 *	- CMS.API.Placeholder.editPlugin(placeholder_id, plugin_id);
@@ -598,5 +594,3 @@ jQuery(document).ready(function ($) {
 	});
 
 });
-
-})(jQuery);
