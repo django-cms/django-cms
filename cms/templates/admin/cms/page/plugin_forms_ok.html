@@ -23,7 +23,7 @@ jQuery(document).ready(function ($) {
         	window.parent.removed_cancelled_plugin({{ plugin_id }});
         	{% endif %}
         parent.hide_iframe({{ plugin_id }}, {% javascript_string %}{{ type }}{% end_javascript_string %}, {% javascript_string %}{{ name }}{% end_javascript_string %}, {% javascript_string %}
-        	{% if cancel %}{% trans "Plugin editing has been cancelled." %}{% else %}{% trans "Plugin saved successfully." %}{% endif %}
+        	{% if cancel %}{% trans "Your changes to this plugin have not been saved." %}{% else %}{% trans "Plugin saved successfully." %}{% endif %}
         	{% end_javascript_string %});
         	
 		} else {
