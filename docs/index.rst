@@ -24,6 +24,7 @@ Getting Started
     getting_started/configuration
     getting_started/navigation
     getting_started/plugin_reference
+    faq/common_issues
     
 
 ********

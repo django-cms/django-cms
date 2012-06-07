@@ -103,6 +103,44 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
+        # edit body, but click cancel button
+        data = {
+            "body":"Hello World!!",
+            "_cancel":True,
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals("Hello World", txt.body)
+
+    def test_add_cancel_plugin(self):
+        """
+        Test that you can cancel a new plugin before editing and 
+        that the plugin is removed.
+        """
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now click cancel instead of editing
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body":"Hello World",
+            "_cancel":True,
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(0, Text.objects.count())
 
     def test_copy_plugins(self):
         """

@@ -1,4 +1,10 @@
 (function($) {
+    // Expose globally to allow widgets to use the same jQuery object
+    // in order to share the same `data` objects containing id and name.
+    // This fix the issue arising when another jQuery version is loaded between
+    // this script and the plugin_editor mechanism in the `PlaceholderPluginEditorWidget`
+    // see 'templates/admin/cms/page/widgets/plugin_editor.html'
+    cms_plugin_editor_jQuery = $;
     $(document).ready(function() {
         // Add Plugin Handler
     	$.fn.cmsPatchCSRF();
@@ -179,5 +185,9 @@ function loadPluginForm(target, id){
         $('#plugin_'+id+" span.text").html(html);
         $('#iframe_'+id).parent().html("<p>"+msg+"</p>");
     }
+
+    removed_cancelled_plugin = function(plugin_id) {
+        $('#plugin_'+plugin_id).remove();
+    }
  
-})(jQuery);
+})(jQuery); 
