@@ -21,12 +21,15 @@ def is_valid_page_slug(page, parent, lang, slug, site):
         qs = qs.filter(language=lang)
 
     if not settings.CMS_FLAT_URLS:
-        if parent:# and not parent.is_home():
+        if parent:
             if parent.is_home():
                 qs = qs.filter(Q(page__parent=parent) |
                                Q(page__parent__isnull=True))
             else:
                 qs = qs.filter(page__parent=parent)
+        else:
+            qs = qs.filter(page__parent__isnull=True)
+
     if page.pk:
         qs = qs.exclude(language=lang, page=page)
     if qs.count():

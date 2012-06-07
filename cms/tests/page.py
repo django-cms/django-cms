@@ -91,8 +91,8 @@ class PagesTestCase(CMSTestCase):
             page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
                                   published=True, parent=page1, slug="foo")
             # both sibling pages has same slug, so both pages has an invalid slug
-            self.assertTrue(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
-            self.assertTrue(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
+            self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+            self.assertFalse(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
 
     def test_slug_collisions_api_2(self):
         """ Checks for slug collisions on root (not home) page and a home page child - uses API to create pages
