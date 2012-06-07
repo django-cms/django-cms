@@ -7,7 +7,8 @@
 
 /*##################################################|*/
 /* #PLACEHOLDERS# */
-.cms_placeholder { display:-moz-inline-box; -moz-box-orient:vertical; display:inline-block; vertical-align:middle; *vertical-align:auto; }
+.cms_placeholder { display:-moz-inline-box; -moz-box-orient:vertical; display:inline-block;
+	vertical-align:middle; *vertical-align:auto; width:100%; }
 .cms_placeholder-bar { height:36px; border:1px solid #ddd !important;
 	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
 
