@@ -1042,7 +1042,7 @@ class PageAdmin(ModelAdmin):
         Switch the status of a page
         """
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             page.published = not page.published
@@ -1057,7 +1057,7 @@ class PageAdmin(ModelAdmin):
         """
         # why require post and still have page id in the URL???
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.in_navigation = not page.in_navigation
@@ -1189,7 +1189,6 @@ class PageAdmin(ModelAdmin):
             from reversion.models import Version
             pre_edit = request.path.split("/edit-plugin/")[0]
             version_id = pre_edit.split("/")[-1]
-            Version.objects.get(pk=version_id)
             version = get_object_or_404(Version, pk=version_id)
             rev_objs = []
             for related_version in version.revision.version_set.all():
@@ -1268,8 +1267,8 @@ class PageAdmin(ModelAdmin):
                 'name': unicode(saved_object),
                 "type": saved_object.get_plugin_name(),
                 'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(saved_object.get_instance_icon_src())),
-                'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
+                'icon': force_escape(saved_object.get_instance_icon_src()),
+                'alt': force_escape(saved_object.get_instance_icon_alt()),
             }
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
@@ -1377,7 +1376,7 @@ class PageAdmin(ModelAdmin):
         """
         from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, id=page_id)
         moderate = request.POST.get('moderate', None)
         if moderate is not None and page.has_moderate_permission(request):
