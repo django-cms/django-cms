@@ -7,6 +7,7 @@ cms/django
 *.svn
 .*
 *.xml
+/*env*/
 cms.sqlite
 cms/media/cms_page_media/
 cms/docs/build

@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from os.path import join
-from project.fileapp.models import FileModel
+from cms.test_utils.project.fileapp.models import FileModel
 from reversion.models import Revision, Version
 from reversion import revision as revision_manager
 import shutil
