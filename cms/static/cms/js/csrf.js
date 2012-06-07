@@ -2,6 +2,7 @@
 $.fn.cmsPatchCSRF = function () {
 $.ajaxSetup({
 beforeSend: function(xhr, settings) {
+if (typeof(settings.csrfTokenSet) != undefined && settings.csrfTokenSet) {return true;} 
 function getCookie(name) {
 var cookieValue = null;
 if (document.cookie && document.cookie != '') {
@@ -25,6 +26,7 @@ base_settings_url = base_settings_url[0];
 if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)) || base_doc_url == base_settings_url) {
 // Only send the token to relative URLs i.e. locally.
 xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+settings.csrfTokenSet = true;
 }
 }
 });
