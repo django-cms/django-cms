@@ -1,479 +1,506 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import create_page, publish_page, add_plugin
-from cms.conf.patch import post_patch_check
-from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models import Page, Placeholder
-from cms.models.pluginmodel import CMSPlugin, PluginModelBase
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
-from cms.plugins.file.models import File
-from cms.plugins.inherit.models import InheritPagePlaceholder
-from cms.plugins.link.forms import LinkForm
-from cms.plugins.link.models import Link
-from cms.plugins.text.models import Text
-from cms.plugins.text.utils import (plugin_tags_to_id_list, 
-    plugin_tags_to_admin_html)
-from cms.plugins.twitter.models import TwitterRecentEntries
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
-    URL_CMS_PLUGIN_REMOVE)
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.copy_plugins import copy_plugins_to
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command
-from django.forms.widgets import Media
-from django.test.testcases import TestCase
-from project.pluginapp.models import Article, Section
-from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
-import os
 
-
-from cms.admin.forms import PageForm
-from cms.api import create_page
-from cms.models import Page, Title
+from cms.api import create_page, add_plugin
+from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugins.text.models import Text
-from cms.sitemaps import CMSSitemap
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, 
-    SettingsOverride)
-from cms.utils.page_resolver import get_page_from_request
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-import datetime
-import os.path
 from cms.tests.plugins import PluginsTestBaseCase
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.placeholder import get_page_from_placeholder_if_exists
+from cms.plugins.link.cms_plugins import LinkPlugin
+from cms.plugins.text.cms_plugins import TextPlugin
+import cms
 
+URL_CMS_MOVE_PLUGIN = u'/admin/cms/page/%d/move-plugin/'    
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-   
-    def test_copy_placeholder_page(self):
-        #setup page 1
-        templates = []
-        
-        page_en = create_page("Three Placeholder", "col_three.html", "en",
-                           position="last-child", published=True, in_navigation=True)
-        ph_one = page_en.placeholders.get(slot="col_sidebar")
-        ph_two = page_en.placeholders.get(slot="col_left")
-        ph_three = page_en.placeholders.get(slot="col_right")
-        page_two = create_page("Three Placeholder - page 2", "col_three.html", "en",
-                           position="last-child", published=True, in_navigation=True)
-        #setup page 2 as copy target
-        page_two.save()
-        # add the text plugin
-        text_plugin_en = add_plugin(ph_one, "TextPlugin", "en", body="Hello World")
-        self.assertEquals(text_plugin_en.pk, CMSPlugin.objects.all()[0].pk)
-        
-        # add a *nested* link plugin
-        link_plugin_en = add_plugin(ph_one, "LinkPlugin", "en", target=text_plugin_en,
-                                 name="A Link", url="https://www.django-cms.org")
-        
-        # the call above to add a child makes a plugin reload required here.
-        text_plugin_en = self.reload(text_plugin_en)
-        
-        # check the relations
-        self.assertEquals(text_plugin_en.get_children().count(), 1)
-        self.assertEqual(link_plugin_en.parent.pk, text_plugin_en.pk)
-        page_en_text_plugin_id = text_plugin_en.pk
-        nested_plugin_id =link_plugin_en.pk
-        # just sanity check that so far everything went well
-        # pre
-        pre_add_plugin_count=CMSPlugin.objects.count()
-        self.assertEqual(pre_add_plugin_count, 2)
-        page_en.save()
-        # load the page and check if the texts are present
-         
-        ###
-        # add a second plugin
-        text_plugin_two = add_plugin(ph_two, "TextPlugin", "en", body="A second text plugin")
-        # reload the text plugin
-        text_plugin_en = self.reload(text_plugin_en)
-        # get link plugin from teh reloaded text 
-        self.assertEquals(text_plugin_en.get_children().count(), 1)
-        self.assertEqual(link_plugin_en.parent.pk, text_plugin_en.pk)
-        
-        link_plugin_en = text_plugin_en.get_children()[0]
-        page_en_text_plugin_id = text_plugin_en.pk
-        nested_plugin_id = link_plugin_en.pk
-             
-        
-        page_en.save()
-        post_add_plugin_count=CMSPlugin.objects.count()
-        self.assertEqual((post_add_plugin_count >pre_add_plugin_count) , True)
-        
-        all_page_count=Page.objects.all().count()
-        pre_copy_placeholder_count=Placeholder.objects.count()
-        ###
-        # 
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            self.copy_page(page_en, page_two)
-        post_copy_page_plugin_count=CMSPlugin.objects.count()
-        after_copy_page_count = Page.objects.all().count()
-        after_copy_placeholder_count=Placeholder.objects.count()
-        
-        self.assertEqual((after_copy_page_count > all_page_count), True)
-        self.assertEqual((post_copy_page_plugin_count > post_add_plugin_count), True)
-        self.assertEqual((after_copy_placeholder_count > pre_copy_placeholder_count), True)    
-        ###
-        # orginal placeholder
-        ###
-        page_en=self.reload(page_en)
-        page_en_ph_one=page_en.placeholders.get(slot="col_sidebar")
-        page_en_ph_two = page_two.placeholders.get(slot="col_left")
-        page_en_ph_three = page_two.placeholders.get(slot="col_right")
-        
-        ##
-        # copied page placeholders
-        ##
-        page_two=self.reload(page_two)
-        page_two_ph_one = page_two.placeholders.get(slot="col_sidebar")
-        page_two_ph_two = page_two.placeholders.get(slot="col_left")
-        page_two_ph_three = page_two.placeholders.get(slot="col_right")
-#        print "placeholder ids"
-#        print "copied page placeholder 1 id %s" % page_two_ph_one.pk
-#        print "org    page placeholder 1 id %s" % page_en_ph_one.pk
-#        print "copied page placeholder 2 id %s" % page_two_ph_two.pk
-#        print "org    page placeholder 2 id %s" % page_en_ph_two.pk
-#        print "copied page placeholder 3 id %s" % page_two_ph_three.pk
-#        print "org    page placeholder 3 id %s" % page_en_ph_three.pk
-        msg='placehoder ids copy:%s org:%s copied page %s are identical with orginal page - tree broken' % (page_two_ph_one.pk,
-                                                                                                      page_en_ph_one.pk,
-                                                                                                      page_two.pk)
-        self.assertNotEquals(page_two_ph_one.pk,page_en_ph_one.pk,msg)
-        msg='placehoder ids copy:%s org:%s copied page %s are identical with orginal page - tree broken' % (page_two_ph_two.pk,
-                                                                                                      page_en_ph_two.pk,
-                                                                                                      page_two.pk)
-        self.assertNotEquals(page_two_ph_two.pk,page_en_ph_two.pk,msg)
-        msg='placehoder ids copy:%s org:%s copied page %s are identical with orginal page - tree broken' % (page_two_ph_three.pk,
-                                                                                                      page_en_ph_three.pk,
-                                                                                                      page_two.pk)
-        self.assertNotEquals(page_two_ph_three.pk,page_en_ph_three.pk,msg)
-        
-        ###
-        # get teh text plugin from the copied page
-        ###
-        
-        
-        # copy the plugins to the german placeholder
-#        copy_plugins_to(ph_en.cmsplugin_set.all(), ph_de, 'de')
-#        
-#        self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 1)
-#        text_plugin_de = ph_de.cmsplugin_set.get(parent=None).get_plugin_instance()[0]
-#        self.assertEqual(text_plugin_de.get_children().count(), 1)
-#        link_plugin_de = text_plugin_de.get_children().get().get_plugin_instance()[0]
-        
-        
-        
-        
-#    def test_move_plugins_to_another_placeholder(self):
-#        """
-#        Test that copying plugins works as expected.
-#        """
-#        # create some objects
-#        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-#        #page_de = create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
-#        ph_en = page_en.placeholders.get(slot="body")
-#        #ph_de = page_de.placeholders.get(slot="body")
-#        
-#        # add the text plugin
-#        text_plugin_en = add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
-#        self.assertEquals(text_plugin_en.pk, CMSPlugin.objects.all()[0].pk)
-#        
-#        # add a *nested* link plugin
-#        link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
-#                                 name="A Link", url="https://www.django-cms.org")
-#        
-#        # the call above to add a child makes a plugin reload required here.
-#        text_plugin_en = self.reload(text_plugin_en)
-#        
-#        # check the relations
-#        self.assertEquals(text_plugin_en.get_children().count(), 1)
-#        self.assertEqual(link_plugin_en.parent.pk, text_plugin_en.pk)
-#        
-#        # just sanity check that so far everything went well
-#        self.assertEqual(CMSPlugin.objects.count(), 2)
-#        
-#        # copy the plugins to the german placeholder
-#        copy_plugins_to(ph_en.cmsplugin_set.all(), ph_de, 'de')
-#        
-#        self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 1)
-#        text_plugin_de = ph_de.cmsplugin_set.get(parent=None).get_plugin_instance()[0]
-#        self.assertEqual(text_plugin_de.get_children().count(), 1)
-#        link_plugin_de = text_plugin_de.get_children().get().get_plugin_instance()[0]
-#        
-#        
-#        # check we have twice as many plugins as before
-#        self.assertEqual(CMSPlugin.objects.count(), 4)
-#        
-#        # check language plugins
-#        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), 2)
-#        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), 2)
-#        
-#        
-#        text_plugin_en = self.reload(text_plugin_en)
-#        link_plugin_en = self.reload(link_plugin_en)
-#        
-#        # check the relations in english didn't change
-#        self.assertEquals(text_plugin_en.get_children().count(), 1)
-#        self.assertEqual(link_plugin_en.parent.pk, text_plugin_en.pk)
-#        
-#        self.assertEqual(link_plugin_de.name, link_plugin_en.name)
-#        self.assertEqual(link_plugin_de.url, link_plugin_en.url)
-#        
-#        self.assertEqual(text_plugin_de.body, text_plugin_en.body)
-#        # now move the plugin to another placeholder
-#
-# 
-#
-#
-#    def test_copy_textplugin(self):
-#        """
-#        Test that copying of textplugins replaces references to copied plugins
-#        """
-#        page = create_page("page", "nav_playground.html", "en")
-#        
-#        placeholder = page.placeholders.get(slot='body')
-#
-#        plugin_base = CMSPlugin(
-#            plugin_type='TextPlugin',
-#            placeholder=placeholder,
-#            position=1,
-#            language=self.FIRST_LANG)
-#        plugin_base.insert_at(None, position='last-child', save=False)
-#
-#        plugin = Text(body='')
-#        plugin_base.set_base_attr(plugin)
-#        plugin.save()
-#
-#        plugin_ref_1_base = CMSPlugin(
-#            plugin_type='TextPlugin',
-#            placeholder=placeholder,
-#            position=1,
-#            language=self.FIRST_LANG)
-#        plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
-#
-#        plugin_ref_1 = Text(body='')
-#        plugin_ref_1_base.set_base_attr(plugin_ref_1)
-#        plugin_ref_1.save()
-#
-#        plugin_ref_2_base = CMSPlugin(
-#            plugin_type='TextPlugin',
-#            placeholder=placeholder,
-#            position=2,
-#            language=self.FIRST_LANG)
-#        plugin_ref_2_base.insert_at(plugin_base, position='last-child', save=False)
-#
-#        plugin_ref_2 = Text(body='')
-#        plugin_ref_2_base.set_base_attr(plugin_ref_2)
-#
-#        plugin_ref_2.save()
-#
-#        plugin.body = plugin_tags_to_admin_html(' {{ plugin_object %s }} {{ plugin_object %s }} ' % (str(plugin_ref_1.pk), str(plugin_ref_2.pk)))
-#        plugin.save()
-#        self.assertEquals(plugin.pk, 1)
-#        page_data = self.get_new_page_data()
-#
-#        #create 2nd language page
-#        page_data.update({
-#            'language': self.SECOND_LANG,
-#            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
-#        })
-#        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-#        self.assertRedirects(response, URL_CMS_PAGE)
-#
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
-#        self.assertEquals(CMSPlugin.objects.count(), 3)
-#        self.assertEquals(Page.objects.all().count(), 1)
-#
-#        copy_data = {
-#            'placeholder': placeholder.pk,
-#            'language': self.SECOND_LANG,
-#            'copy_from': self.FIRST_LANG,
-#        }
-#        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
-#        self.assertEquals(response.status_code, 200)
-#        self.assertEqual(response.content.count('<li '), 3)
-#        # assert copy success
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
-#        self.assertEquals(CMSPlugin.objects.count(), 6)
-#
-#        new_plugin = Text.objects.get(pk=6)
-#        self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
-#
+    
+    def test_nested_plugin_on_page(self):
+        """
+        Validate a textplugin with a nested link plugin
+        mptt values are correctly showing a parent child relationship
+        of a nested plugin
+        """
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            # setup page 1
+            page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
+                               position=u"last-child", published=True, in_navigation=True)
+            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            
+            ###
+            # add a plugin
+            ###
+            pre_nesting_body = u"<p>the nested text plugin with a link inside</p>"
+            text_plugin = add_plugin(page_one_ph_two, u"TextPlugin", u"en", body=pre_nesting_body)
+            # prepare nestin plugin
+            page_one_ph_two = self.reload(page_one_ph_two)
+            text_plugin = self.reload(text_plugin)
+            link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin)
+            link_plugin.name = u"django-cms Link"
+            link_plugin.url = u"https://www.django-cms.org" 
+            
+            # as for some reason mptt does not 
+            # update the parent child relationship 
+            # in the add_plugin method when a target present
+            # but this is not the topic of the test
+            link_plugin.parent = text_plugin
+            link_plugin.save()
+            # reloading needs to be done after every save
+            link_plugin = self.reload(link_plugin)
+            text_plugin = self.reload(text_plugin)
+            
+            # mptt related insertion correct?
+            msg = u"parent plugin right is not updated, child not inserted correctly"
+            self.assertTrue(text_plugin.rght > link_plugin.rght, msg=msg)
+            msg = u"link has no parent"
+            self.assertFalse(link_plugin.parent == None, msg=msg)
+            msg = u"parent plugin left is not updated, child not inserted correctly"
+            self.assertTrue(text_plugin.lft < link_plugin.lft, msg=msg)
+            msg = u"child level is not bigger than parent level"
+            self.assertTrue(text_plugin.level < link_plugin.level , msg=msg)
+            
+            # add the link plugin to the body
+            # emulate the editor in admin that adds some txt for the nested plugin
+            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/images/plugins/link.png">"""
+            nesting_body = u"%s<p>%s</p>" % (text_plugin.body, (in_txt % (link_plugin.id)))
+            text_plugin.body = nesting_body
+            text_plugin.save()
+            
+            text_plugin = self.reload(text_plugin)
+            self.assertEquals(text_plugin.get_children().count(), 1)
+            post_add_plugin_count = CMSPlugin.objects.count()
+            self.assertEqual(post_add_plugin_count, 2)
+            
+    
+    
+    def test_copy_page_nested_plugin(self):
+        """
+        Test to verify that page copy with a nested plugin works
+        page one - 3 placeholder 
+                    col_sidebar: 
+                        1 text plugin
+                    col_left: 1 text plugin with nested link plugin
+                    col_right: no plugin
+        page two (copy target)
+        Verify copied page, placeholders, plugins and body text
+        """
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            templates = []
+            # setup page 1
+            page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
+                               position=u"last-child", published=True, in_navigation=True)
+            page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
+            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
+            # add the text plugin to placeholder one
+            text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body="Hello World")
+            self.assertEquals(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
+            self.assertEquals(text_plugin_en.get_children().count(), 0)
+            pre_add_plugin_count = CMSPlugin.objects.count()
+            self.assertEqual(pre_add_plugin_count, 1)
+            ###
+            # add a plugin to placeholder twho
+            ###
+            pre_nesting_body = u"<p>the nested text plugin with a link inside</p>"
+            text_plugin_two = add_plugin(page_one_ph_two, u"TextPlugin", u"en", body=pre_nesting_body)
+            text_plugin_two = self.reload(text_plugin_two)
+            # prepare nestin plugin
+            page_one_ph_two = self.reload(page_one_ph_two)
+            text_plugin_two = self.reload(text_plugin_two)
+            link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
+            link_plugin.name = u"django-cms Link"
+            link_plugin.url = u"https://www.django-cms.org" 
+            link_plugin.parent = text_plugin_two
+            link_plugin.save()
+            
+            link_plugin = self.reload(link_plugin)
+            text_plugin_two = self.reload(text_plugin_two)
+            in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/images/plugins/link.png">"""
+            nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
+            # emulate the editor in admin that adds some txt for the nested plugin
+            text_plugin_two.body = nesting_body
+            text_plugin_two.save()
+            text_plugin_two = self.reload(text_plugin_two)
+            # the link is attached as a child?
+            self.assertEquals(text_plugin_two.get_children().count(), 1)
+            post_add_plugin_count = CMSPlugin.objects.count()
+            self.assertEqual(post_add_plugin_count, 3)
+            page_one.save()
+            # get the plugins from the original page
+            page_one = self.reload(page_one)
+            page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
+            page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
+            page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
+            # verifiy the plugins got created
+            org_placeholder_one_plugins = page_one_ph_one.get_plugins()
+            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            org_placeholder_two_plugins = page_one_ph_two.get_plugins()
+            self.assertEquals(len(org_placeholder_two_plugins), 2)
+            org_placeholder_three_plugins = page_one_ph_three.get_plugins()
+            self.assertEquals(len(org_placeholder_three_plugins), 0)
+            self.assertEquals(page_one.placeholders.count(), 3)
+            placeholder_count = Placeholder.objects.count()
+            self.assertEquals(placeholder_count, 3)
+            self.assertEquals(CMSPlugin.objects.count(), 3)
+            page_one_plugins = CMSPlugin.objects.all()
+            ##
+            # setup page_copy_target page
+            ##
+            page_copy_target = create_page("Three Placeholder - page copy target", "col_three.html", "en",
+                               position="last-child", published=True, in_navigation=True)
+            all_page_count = Page.objects.all().count()
+            pre_copy_placeholder_count = Placeholder.objects.count()
+            self.assertEquals(pre_copy_placeholder_count, 6)
+            # copy the page
+            superuser = self.get_superuser()
+            with self.login_user_context(superuser):
+                page_two = self.copy_page(page_one, page_copy_target)
+            # validate the expected pages,placeholders,plugins,pluginbodies
+            after_copy_page_plugin_count = CMSPlugin.objects.count()
+            self.assertEquals(after_copy_page_plugin_count, 6)
+            # check the amount of copied stuff
+            after_copy_page_count = Page.objects.all().count()
+            after_copy_placeholder_count = Placeholder.objects.count()
+            self.assertTrue((after_copy_page_count > all_page_count), msg = u"no new page after copy")
+            self.assertTrue((after_copy_page_plugin_count > post_add_plugin_count), msg = u"plugin count is not grown")
+            self.assertTrue((after_copy_placeholder_count > pre_copy_placeholder_count), msg = u"placeholder count is not grown")    
+            self.assertTrue((after_copy_page_count == 3), msg = u"no new page after copy")
+            # orginal placeholder
+            page_one = self.reload(page_one)
+            page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
+            page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
+            page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
+            # check if there are multiple pages assigned to this placeholders
+            found_page = get_page_from_placeholder_if_exists(page_one_ph_one)
+            self.assertEqual(found_page, page_one)
+            found_page = get_page_from_placeholder_if_exists(page_one_ph_two)
+            self.assertEqual(found_page, page_one)
+            found_page = get_page_from_placeholder_if_exists(page_one_ph_three)
+            self.assertEqual(found_page, page_one)
+            
+            page_two = self.reload(page_two)
+            page_two_ph_one = page_two.placeholders.get(slot = u"col_sidebar")
+            page_two_ph_two = page_two.placeholders.get(slot = u"col_left")
+            page_two_ph_three = page_two.placeholders.get(slot = u"col_right")
+            # check if there are multiple pages assigned to this placeholders
+            found_page = get_page_from_placeholder_if_exists(page_two_ph_one)
+            self.assertEqual(found_page, page_two)
+            found_page = get_page_from_placeholder_if_exists(page_two_ph_two)
+            self.assertEqual(found_page, page_two)
+            found_page = get_page_from_placeholder_if_exists(page_two_ph_three)
+            self.assertEqual(found_page, page_two)
+            # check the stored placeholders org vs copy
+            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)
+            self.assertNotEquals(page_two_ph_one.pk, page_one_ph_one.pk, msg)
+            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk)
+            self.assertNotEquals(page_two_ph_two.pk, page_one_ph_two.pk, msg)
+            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk)
+            self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
+            # get the plugins from the original page
+            org_placeholder_one_plugins = page_one_ph_one.get_plugins()
+            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            org_placeholder_two_plugins = page_one_ph_two.get_plugins()
+            self.assertEquals(len(org_placeholder_two_plugins), 2)
+            org_placeholder_three_plugins = page_one_ph_three.get_plugins()
+            self.assertEquals(len(org_placeholder_three_plugins), 0)
+            # get the plugins from the copied page
+            copied_placeholder_one_plugins = page_two_ph_one.get_plugins()
+            self.assertEquals(len(copied_placeholder_one_plugins), 1)
+            copied_placeholder_two_plugins = page_two_ph_two.get_plugins()
+            self.assertEquals(len(copied_placeholder_two_plugins), 2)
+            copied_placeholder_three_plugins = page_two_ph_three.get_plugins()
+            self.assertEquals(len(copied_placeholder_three_plugins), 0)
+            # verify the plugins got copied
+            # placeholder 1
+            count_plugins_copied = len(copied_placeholder_one_plugins)
+            count_plugins_org = len(org_placeholder_one_plugins)
+            msg = u"plugin count %s %s for placeholder one not equal" % (count_plugins_copied, count_plugins_org)
+            self.assertEquals(count_plugins_copied, count_plugins_org, msg)        
+            # placeholder 2
+            count_plugins_copied = len(copied_placeholder_two_plugins)
+            count_plugins_org = len(org_placeholder_two_plugins)
+            msg = u"plugin count %s %s for placeholder two not equal" % (count_plugins_copied, count_plugins_org)
+            self.assertEquals(count_plugins_copied, count_plugins_org, msg)        
+            # placeholder 3
+            count_plugins_copied = len(copied_placeholder_three_plugins)
+            count_plugins_org = len(org_placeholder_three_plugins)
+            msg = u"plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
+            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            # verify the body of text plugin with nested link plugin
+            # org to copied  
+            org_nested_text_plugin = None
+            # do this iteration to find the real text plugin with the attached link
+            # the inheritance mechanism for the cmsplugins works through 
+            # (tuple)get_plugin_instance()
+            for x in org_placeholder_two_plugins:     
+                if x.plugin_type == u"TextPlugin":
+                    instance = x.get_plugin_instance()[0]
+                    if instance.body.startswith(pre_nesting_body):
+                        org_nested_text_plugin = instance
+                        break
+            copied_nested_text_plugin = None
+            for x in copied_placeholder_two_plugins:        
+                if x.plugin_type == u"TextPlugin":
+                    instance = x.get_plugin_instance()[0]
+                    if instance.body.startswith(pre_nesting_body):
+                        copied_nested_text_plugin = instance
+                        break
+            msg = u"orginal nested text plugin not found"
+            self.assertNotEquals(org_nested_text_plugin, None, msg=msg)
+            msg = u"copied nested text plugin not found"
+            self.assertNotEquals(copied_nested_text_plugin, None, msg=msg)
+            # get the children ids of the texplugin with a nested link
+            # to check if the body of the text is genrated correctly
+            org_link_child_plugin = org_nested_text_plugin.get_children()[0]
+            copied_link_child_plugin = copied_nested_text_plugin.get_children()[0]
+            # validate the textplugin body texts
+            msg = u"org plugin and copied plugin are the same"
+            self.assertTrue(org_link_child_plugin.id != copied_link_child_plugin.id, msg)
+            needle = u"plugin_obj_%s"
+            msg = u"child plugin id differs to parent in body plugin_obj_id"
+            # linked child is in body
+            self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
+            msg = u"copy: child plugin id differs to parent in body plugin_obj_id"
+            self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
+            # really nothing else
+            msg = u"child link plugin id differs to parent body plugin_obj_id"
+            self.assertTrue(org_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) == -1, msg)
+            msg = u"copy: child link plugin id differs to parent body plugin_obj_id"
+            self.assertTrue(copied_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) == -1, msg)
+            # now reverse lookup the placeholders from the plugins
+            org_placeholder = org_link_child_plugin.placeholder
+            copied_placeholder = copied_link_child_plugin.placeholder
+            msg = u"placeholder of the orginal plugin and copied plugin are the same"
+            ok = ((org_placeholder.id != copied_placeholder.id))
+            self.assertTrue(ok, msg)
 
-
-#class PluginManyToManyTestCase(PluginsTestBaseCase):
-#
-#    def setUp(self):
-#        self.super_user = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-#        self.super_user.set_password("test")
-#        self.super_user.save()
-#
-#        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
-#        self.slave.set_password("slave")
-#        self.slave.save()
-#        
-#        self._login_context = self.login_user_context(self.super_user)
-#        self._login_context.__enter__()
-#    
-#        # create 3 sections
-#        self.sections = []
-#        self.section_pks = []
-#        for i in range(3):
-#            section = Section.objects.create(name="section %s" %i)
-#            self.sections.append(section)
-#            self.section_pks.append(section.pk)
-#        self.section_count = len(self.sections)
-#        # create 10 articles by section
-#        for section in self.sections:
-#            for j in range(10):
-#                Article.objects.create(
-#                    title="article %s" % j,
-#                    section=section
-#                )
-#        self.FIRST_LANG = settings.LANGUAGES[0][0]
-#        self.SECOND_LANG = settings.LANGUAGES[1][0]
-#    
-#    def test_add_plugin_with_m2m(self):
-#        # add a new text plugin
-#        page_data = self.get_new_page_data()
-#        self.client.post(URL_CMS_PAGE_ADD, page_data)
-#        page = Page.objects.all()[0]
-#        placeholder = page.placeholders.get(slot="body")
-#        plugin_data = {
-#            'plugin_type': "ArticlePlugin",
-#            'language': self.FIRST_LANG,
-#            'placeholder': placeholder.pk,
-#        }
-#        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-#        self.assertEquals(response.status_code, 200)
-#        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
-#        # now edit the plugin
-#        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-#        response = self.client.get(edit_url)
-#        self.assertEquals(response.status_code, 200)
-#        data = {
-#            'title': "Articles Plugin 1",
-#            "sections": self.section_pks
-#        }
-#        response = self.client.post(edit_url, data)
-#        self.assertEqual(response.status_code, 200)
-#        self.assertEqual(ArticlePluginModel.objects.count(), 1)
-#        plugin = ArticlePluginModel.objects.all()[0]
-#        self.assertEquals(self.section_count, plugin.sections.count())
-#
-#    def test_add_plugin_with_m2m_and_publisher(self):
-#        page_data = self.get_new_page_data()
-#        self.client.post(URL_CMS_PAGE_ADD, page_data)
-#        page = Page.objects.all()[0]
-#        placeholder = page.placeholders.get(slot="body")
-#
-#        # add a plugin
-#        plugin_data = {
-#            'plugin_type': "ArticlePlugin",
-#            'language': self.FIRST_LANG,
-#            'placeholder': placeholder.pk,
-#
-#        }
-#        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-#        self.assertEquals(response.status_code, 200)
-#        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
-#
-#        # there should be only 1 plugin
-#        self.assertEquals(1, CMSPlugin.objects.all().count())
-#
-#        articles_plugin_pk = int(response.content)
-#        self.assertEquals(articles_plugin_pk, CMSPlugin.objects.all()[0].pk)
-#        # now edit the plugin
-#        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
-#
-#        data = {
-#            'title': "Articles Plugin 1",
-#            'sections': self.section_pks
-#        }
-#        response = self.client.post(edit_url, data)
-#        self.assertEquals(response.status_code, 200)
-#        self.assertEquals(1, ArticlePluginModel.objects.count())
-#        articles_plugin = ArticlePluginModel.objects.all()[0]
-#        self.assertEquals(u'Articles Plugin 1', articles_plugin.title)
-#        self.assertEquals(self.section_count, articles_plugin.sections.count())
-#
-#
-#        # check publish box
-#        page = publish_page(page, self.super_user)
-#
-#        # there should now be two plugins - 1 draft, 1 public
-#        self.assertEquals(2, ArticlePluginModel.objects.all().count())
-#
-#        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
-#        expected = [self.section_count for i in range(len(db_counts))]
-#        self.assertEqual(expected, db_counts)
-#
-#
-#    def test_copy_plugin_with_m2m(self):
-#        page = create_page("page", "nav_playground.html", "en")
-#        
-#        placeholder = page.placeholders.get(slot='body')
-#
-#        plugin = ArticlePluginModel(
-#            plugin_type='ArticlePlugin',
-#            placeholder=placeholder,
-#            position=1,
-#            language=self.FIRST_LANG)
-#        plugin.insert_at(None, position='last-child', save=True)
-#
-#        edit_url = URL_CMS_PLUGIN_EDIT + str(plugin.pk) + "/"
-#
-#        data = {
-#            'title': "Articles Plugin 1",
-#            "sections": self.section_pks
-#        }
-#        response = self.client.post(edit_url, data)
-#        self.assertEquals(response.status_code, 200)
-#        self.assertEqual(ArticlePluginModel.objects.count(), 1)
-#
-#        self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
-#
-#        page_data = self.get_new_page_data()
-#
-#        #create 2nd language page
-#        page_data.update({
-#            'language': self.SECOND_LANG,
-#            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
-#        })
-#        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-#        self.assertRedirects(response, URL_CMS_PAGE)
-#
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
-#        self.assertEquals(CMSPlugin.objects.count(), 1)
-#        self.assertEquals(Page.objects.all().count(), 1)
-#        copy_data = {
-#            'placeholder': placeholder.pk,
-#            'language': self.SECOND_LANG,
-#            'copy_from': self.FIRST_LANG,
-#        }
-#        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
-#        self.assertEquals(response.status_code, 200)
-#        self.assertEqual(response.content.count('<li '), 1)
-#        # assert copy success
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
-#        self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
-#        self.assertEquals(CMSPlugin.objects.count(), 2)
-#        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
-#        expected = [self.section_count for i in range(len(db_counts))]
-#        self.assertEqual(expected, db_counts)
-        
+     
+    def test_copy_page_nested_plugin_moved_parent_plugin(self):
+        """
+        Test to verify that page copy with a nested plugin works
+        when a plugin with child got moved to another placeholder
+        page one - 3 placeholder 
+                    col_sidebar: 
+                        1 text plugin
+                    col_left: 1 text plugin with nested link plugin
+                    col_right: no plugin
+        page two (copy target)
+        step2: move the col_left text plugin to col_right
+                    col_sidebar: 
+                        1 text plugin
+                    col_left: no plugin
+                    col_right: 1 text plugin with nested link plugin
+        verify the copied page structure
+        """
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            templates = []
+            # setup page 1
+            page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
+                               position=u"last-child", published=True, in_navigation=True)
+            page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
+            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
+            # add the text plugin to placeholder one
+            text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
+            self.assertEquals(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
+            self.assertEquals(text_plugin_en.get_children().count(), 0)
+            pre_add_plugin_count = CMSPlugin.objects.count()
+            self.assertEqual(pre_add_plugin_count, 1)
+            # add a plugin to placeholder twho
+            pre_nesting_body = u"<p>the nested text plugin with a link inside</p>"
+            text_plugin_two = add_plugin(page_one_ph_two, u"TextPlugin", u"en", body=pre_nesting_body)
+            text_plugin_two = self.reload(text_plugin_two)
+            # prepare nestin plugin
+            page_one_ph_two = self.reload(page_one_ph_two)
+            text_plugin_two = self.reload(text_plugin_two)
+            link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
+            link_plugin.name = u"django-cms Link"
+            link_plugin.url = u"https://www.django-cms.org" 
+            link_plugin.parent = text_plugin_two
+            link_plugin.save()
+            # reload after every save
+            link_plugin = self.reload(link_plugin)
+            text_plugin_two = self.reload(text_plugin_two)
+            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/images/plugins/link.png">"""
+            nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
+            # emulate the editor in admin that adds some txt for the nested plugin
+            text_plugin_two.body = nesting_body
+            text_plugin_two.save()
+            text_plugin_two = self.reload(text_plugin_two)
+            # the link is attached as a child?
+            self.assertEquals(text_plugin_two.get_children().count(), 1)
+            post_add_plugin_count = CMSPlugin.objects.count()
+            self.assertEqual(post_add_plugin_count, 3)
+            page_one.save()
+            # get the plugins from the original page
+            page_one = self.reload(page_one)
+            page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
+            page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
+            page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
+            # verifiy the plugins got created
+            org_placeholder_one_plugins = page_one_ph_one.get_plugins()
+            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            org_placeholder_two_plugins = page_one_ph_two.get_plugins()
+            self.assertEquals(len(org_placeholder_two_plugins), 2)
+            org_placeholder_three_plugins = page_one_ph_three.get_plugins()
+            self.assertEquals(len(org_placeholder_three_plugins), 0)
+            self.assertEquals(page_one.placeholders.count(), 3)
+            
+            placeholder_count = Placeholder.objects.count()
+            self.assertEquals(placeholder_count, 3)
+            self.assertEquals(CMSPlugin.objects.count(), 3)
+            page_one_plugins = CMSPlugin.objects.all()
+            # setup page_copy_target
+            page_copy_target = create_page("Three Placeholder - page copy target", "col_three.html", "en",
+                               position="last-child", published=True, in_navigation=True)
+            all_page_count = Page.objects.all().count()
+            pre_copy_placeholder_count = Placeholder.objects.count()
+            self.assertEquals(pre_copy_placeholder_count, 6)
+            superuser = self.get_superuser()
+            with self.login_user_context(superuser):
+                # now move the parent text plugin to another placeholder
+                post_data = {
+                             u'placeholder': u"col_right",
+                             u'placeholder_id': u"%s" % (page_one_ph_three.id),
+                             u'ids': u"%s" % (text_plugin_two.id),
+                             u'plugin_id': u"%s" % (text_plugin_two.id),
+                }
+                edit_url = URL_CMS_MOVE_PLUGIN % (page_one.id)
+                response = self.client.post(edit_url, post_data)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.content, u'ok')
+                # check if the plugin got moved
+                page_one = self.reload(page_one)
+                text_plugin_two = self.reload(text_plugin_two)
+                page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
+                page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
+                page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
+                
+                org_placeholder_one_plugins = page_one_ph_one.get_plugins()
+                self.assertEquals(len(org_placeholder_one_plugins), 1)
+                org_placeholder_two_plugins = page_one_ph_two.get_plugins()
+                # the plugin got moved and child got moved
+                self.assertEquals(len(org_placeholder_two_plugins), 0)
+                org_placeholder_three_plugins = page_one_ph_three.get_plugins()
+                self.assertEquals(len(org_placeholder_three_plugins), 2)
+                # copy the page
+                page_two = self.copy_page(page_one, page_copy_target)
+            # validate the expected pages,placeholders,plugins,pluginbodies
+            after_copy_page_plugin_count = CMSPlugin.objects.count()
+            self.assertEquals(after_copy_page_plugin_count, 6)
+            after_copy_page_count = Page.objects.all().count()
+            after_copy_placeholder_count = Placeholder.objects.count()
+            self.assertTrue((after_copy_page_count > all_page_count), msg = u"no new page after copy")
+            self.assertTrue((after_copy_page_plugin_count > post_add_plugin_count), msg = u"plugin count is not grown")
+            self.assertTrue((after_copy_placeholder_count > pre_copy_placeholder_count), msg = u"placeholder count is not grown")    
+            self.assertTrue((after_copy_page_count == 3), msg = u"no new page after copy")
+            # validate the structure
+            # orginal placeholder
+            page_one = self.reload(page_one)
+            page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
+            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
+            # check if there are multiple pages assigned to this placeholders
+            found_page = get_page_from_placeholder_if_exists(page_one_ph_one)
+            self.assertEqual(found_page, page_one)
+            found_page = get_page_from_placeholder_if_exists(page_one_ph_two)
+            self.assertEqual(found_page, page_one)
+            found_page = get_page_from_placeholder_if_exists(page_one_ph_three)
+            self.assertEqual(found_page, page_one)
+            page_two = self.reload(page_two)
+            page_two_ph_one = page_two.placeholders.get(slot = u"col_sidebar")
+            page_two_ph_two = page_two.placeholders.get(slot = u"col_left")
+            page_two_ph_three = page_two.placeholders.get(slot = u"col_right")
+            # check if there are multiple pages assigned to this placeholders
+            found_page = get_page_from_placeholder_if_exists(page_two_ph_one)
+            self.assertEqual(found_page, page_two)
+            found_page = get_page_from_placeholder_if_exists(page_two_ph_two)
+            self.assertEqual(found_page, page_two)
+            found_page = get_page_from_placeholder_if_exists(page_two_ph_three)
+            self.assertEqual(found_page, page_two)
+            # check the stored placeholders org vs copy
+            msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)
+            self.assertNotEquals(page_two_ph_one.pk, page_one_ph_one.pk, msg)
+            msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk)
+            self.assertNotEquals(page_two_ph_two.pk, page_one_ph_two.pk, msg)
+            msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk)
+            self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
+            # get the plugins from the original page
+            org_placeholder_one_plugins = page_one_ph_one.get_plugins()
+            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            org_placeholder_two_plugins = page_one_ph_two.get_plugins()
+            self.assertEquals(len(org_placeholder_two_plugins), 0)
+            org_placeholder_three_plugins = page_one_ph_three.get_plugins()
+            self.assertEquals(len(org_placeholder_three_plugins), 2)
+            # get the plugins from the copied page
+            copied_placeholder_one_plugins = page_two_ph_one.get_plugins()
+            self.assertEquals(len(copied_placeholder_one_plugins), 1)
+            copied_placeholder_two_plugins = page_two_ph_two.get_plugins()
+            self.assertEquals(len(copied_placeholder_two_plugins), 0)
+            copied_placeholder_three_plugins = page_two_ph_three.get_plugins()
+            self.assertEquals(len(copied_placeholder_three_plugins), 2)
+            # verify the plugins got copied
+            # placeholder 1
+            count_plugins_copied = len(copied_placeholder_one_plugins)
+            count_plugins_org = len(org_placeholder_one_plugins)
+            msg = u"plugin count %s %s for placeholder one not equal" % (count_plugins_copied, count_plugins_org)
+            self.assertEquals(count_plugins_copied, count_plugins_org, msg)        
+            # placeholder 2
+            count_plugins_copied = len(copied_placeholder_two_plugins)
+            count_plugins_org = len(org_placeholder_two_plugins)
+            msg = u"plugin count %s %s for placeholder two not equal" % (count_plugins_copied, count_plugins_org)
+            self.assertEquals(count_plugins_copied, count_plugins_org, msg)        
+            # placeholder 3
+            count_plugins_copied = len(copied_placeholder_three_plugins)
+            count_plugins_org = len(org_placeholder_three_plugins)
+            msg = u"plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
+            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            # verify the body of text plugin with nested link plugin
+            # org to copied  
+            org_nested_text_plugin = None
+            # do this iteration to find the real text plugin with the attached link
+            # the inheritance mechanism for the cmsplugins works through 
+            # (tuple)get_plugin_instance()
+            for x in org_placeholder_three_plugins:     
+                if x.plugin_type == u"TextPlugin":
+                    instance = x.get_plugin_instance()[0]
+                    if instance.body.startswith(pre_nesting_body):
+                        org_nested_text_plugin = instance
+                        break
+            copied_nested_text_plugin = None
+            for x in copied_placeholder_three_plugins:        
+                if x.plugin_type == u"TextPlugin":
+                    instance = x.get_plugin_instance()[0]
+                    if instance.body.startswith(pre_nesting_body):
+                        copied_nested_text_plugin = instance
+                        break
+            msg = u"orginal nested text plugin not found"
+            self.assertNotEquals(org_nested_text_plugin, None, msg=msg)
+            msg = u"copied nested text plugin not found"
+            self.assertNotEquals(copied_nested_text_plugin, None, msg=msg)
+            # get the children ids of the texplugin with a nested link
+            # to check if the body of the text is generated correctly
+            org_link_child_plugin = org_nested_text_plugin.get_children()[0]
+            copied_link_child_plugin = copied_nested_text_plugin.get_children()[0]
+            # validate the textplugin body texts
+            msg = u"org plugin and copied plugin are the same"
+            self.assertTrue(org_link_child_plugin.id != copied_link_child_plugin.id, msg)
+            needle = u"plugin_obj_%s"
+            msg = u"child plugin id differs to parent in body plugin_obj_id"
+            # linked child is in body
+            self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
+            msg = u"copy: child plugin id differs to parent in body plugin_obj_id"
+            self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
+            # really nothing else
+            msg = u"child link plugin id differs to parent body plugin_obj_id"
+            self.assertTrue(org_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) == -1, msg)
+            msg = u"copy: child link plugin id differs to parent body plugin_obj_id"
+            self.assertTrue(copied_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) == -1, msg)
+            # now reverse lookup the placeholders from the plugins
+            org_placeholder = org_link_child_plugin.placeholder
+            copied_placeholder = copied_link_child_plugin.placeholder
+            msg = u"placeholder of the orginal plugin and copied plugin are the same"
+            ok = ((org_placeholder.id != copied_placeholder.id))
+            self.assertTrue(ok, msg)       
