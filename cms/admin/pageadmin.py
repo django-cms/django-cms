@@ -1226,7 +1226,7 @@ class PageAdmin(ModelAdmin):
             pass
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
-            # view, which actually does'nt exists
+            # view, which actually doesn't exists
             request.POST['_continue'] = True
 
         if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
@@ -1235,7 +1235,7 @@ class PageAdmin(ModelAdmin):
             return render_to_response(plugin_admin.render_template, plugin_admin.render(context, instance, plugin_admin.placeholder))
 
         if request.POST.get("_cancel", False):
-            # cancel buton was clicked
+            # cancel button was clicked
             context = {
                 'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
                 'plugin': cms_plugin,
