@@ -16,16 +16,17 @@ def is_valid_page_slug(page, parent, lang, slug, site):
         Q(page=page.publisher_public) |
         Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
     )
-    
+
     if settings.i18n_installed:
         qs = qs.filter(language=lang)
-    
-    if not settings.CMS_FLAT_URLS:
-        if parent and not parent.is_home(): 
-            qs = qs.filter(page__parent=parent)
-        else:
-            qs = qs.filter(page__parent__isnull=True)
 
+    if not settings.CMS_FLAT_URLS:
+        if parent:# and not parent.is_home():
+            if parent.is_home():
+                qs = qs.filter(Q(page__parent=parent) |
+                               Q(page__parent__isnull=True))
+            else:
+                qs = qs.filter(page__parent=parent)
     if page.pk:
         qs = qs.exclude(language=lang, page=page)
     if qs.count():
@@ -36,9 +37,9 @@ def is_valid_page_slug(page, parent, lang, slug, site):
 def get_available_slug(title, new_slug=None):
     """Smart function generates slug for title if current title slug cannot be
     used. Appends APPEND_TO_SLUG to slug and checks it again.
-    
+
     (Used in page copy function)
-    
+
     Returns: slug
     """
     slug = new_slug or title.slug
