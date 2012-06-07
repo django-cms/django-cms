@@ -47,6 +47,8 @@ nice "It Worked" message from Django.
 .. |it-worked| image:: ../images/it-worked.png
 
 
+.. _configure-django-cms:
+
 Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
