@@ -187,7 +187,7 @@ The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
 how to configure that. The best way to understand this is to head 
 over to `Wymeditor examples page 
-<http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ 
+<http://files.wymeditor.org/wymeditor/examples/>`_
 After understand how Wymeditor works. 
 
 The :mod:`cms.plugins.text` plugin exposes several variables named

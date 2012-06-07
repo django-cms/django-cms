@@ -93,12 +93,15 @@ class FormsTestCase(CMSTestCase):
             site = Site.objects.create(domain='http://www.django-cms.org', name='Django CMS')
             page1 = create_page('Page 1', 'nav_playground.html', 'en', site=site)
             page2 = create_page('Page 2', 'nav_playground.html', 'de', site=site)
+            page3 = create_page('Page 3', 'nav_playground.html', 'en',
+                         site=site, parent=page1)
             # enfore the choices to be casted to a list
             site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
             self.assertEqual(page_choices, [
                 ('', '----'),
                 (site.name, [
                     (page1.pk, 'Page 1'),
+                    (page3.pk, '&nbsp;&nbsp;Page 3'),
                     (page2.pk, 'Page 2'),
                 ])
             ])

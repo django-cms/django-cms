@@ -92,7 +92,6 @@
 			    var url = pathHolder.text();
 			    // load just once
 			    pathHolder.remove();
-			    var target = $(parent).find('div.load');
 			    $(parent).find('div.loading').load(url);
 		    }
 		    return false;	

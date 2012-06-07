@@ -13,7 +13,7 @@ What's new in 2.2
 proper dependency and is no longer shipped with the django CMS. This solves the
 version conflict issues many people had when trying to use the django CMS
 together with other Django apps that require django-mptt. django CMS 2.2
-requires django-mptt 0.4.2 or higher.
+requires django-mptt 0.5.1.
 
 .. warning::
 
@@ -34,6 +34,8 @@ View permissions
 ================
 
 You can now give view permissions for django CMS pages to groups and users.
+
+.. _backwards-incompatible-changes:
 
 ******************************
 Backwards incompatible changes

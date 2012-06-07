@@ -47,6 +47,8 @@ nice "It Worked" message from Django.
 .. |it-worked| image:: ../images/it-worked.png
 
 
+.. _configure-django-cms:
+
 Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
@@ -160,7 +162,6 @@ Point your :setting:`django:STATIC_ROOT` to where the static files should live
 
     STATIC_ROOT = os.path.join(PROJECT_PATH, "static")
     STATIC_URL = "/static/"
-    ADMIN_MEDIA_PREFIX = "/static/admin/"
 
 For uploaded files, you will need to set up the :setting:`django:MEDIA_ROOT`
 setting::

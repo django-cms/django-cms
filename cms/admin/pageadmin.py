@@ -168,7 +168,7 @@ class PageAdmin(ModelAdmin):
                 'css/jquery.dialog.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+        js = ['%sjs/jquery.min.js' % settings.STATIC_URL] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/libs/jquery.query.js',
                 'js/libs/jquery.ui.core.js',
@@ -518,7 +518,7 @@ class PageAdmin(ModelAdmin):
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
-                'ADMIN_MEDIA_URL': settings.ADMIN_MEDIA_PREFIX,
+                'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
                 'moderation_level': moderation_level,
@@ -1042,7 +1042,7 @@ class PageAdmin(ModelAdmin):
         Switch the status of a page
         """
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             page.published = not page.published
@@ -1057,7 +1057,7 @@ class PageAdmin(ModelAdmin):
         """
         # why require post and still have page id in the URL???
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.in_navigation = not page.in_navigation
@@ -1226,7 +1226,7 @@ class PageAdmin(ModelAdmin):
             pass
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
-            # view, which actually does'nt exists
+            # view, which actually doesn't exists
             request.POST['_continue'] = True
 
         if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
@@ -1234,6 +1234,27 @@ class PageAdmin(ModelAdmin):
             context = RequestContext(request)
             return render_to_response(plugin_admin.render_template, plugin_admin.render(context, instance, plugin_admin.placeholder))
 
+        if request.POST.get("_cancel", False):
+            # cancel button was clicked
+            context = {
+                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+                'plugin': cms_plugin,
+                'is_popup': True,
+                'name': unicode(cms_plugin),
+                "type": cms_plugin.get_plugin_name(),
+                'plugin_id': plugin_id,
+                'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
+                'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
+                'cancel': True,
+            }
+            instance = cms_plugin.get_plugin_instance()[0]
+            if not instance:
+                # cancelled before any content was added to plugin
+                cms_plugin.delete()
+                context.update({
+                    "deleted":True,
+                })
+            return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
         if not instance:
             # instance doesn't exist, call add view
@@ -1267,8 +1288,8 @@ class PageAdmin(ModelAdmin):
                 'name': unicode(saved_object),
                 "type": saved_object.get_plugin_name(),
                 'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(saved_object.get_instance_icon_src())),
-                'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
+                'icon': force_escape(saved_object.get_instance_icon_src()),
+                'alt': force_escape(saved_object.get_instance_icon_alt()),
             }
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
@@ -1376,7 +1397,7 @@ class PageAdmin(ModelAdmin):
         """
         from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
         if request.method != 'POST':
-            return HttpResponseNotAllowed
+            return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, id=page_id)
         moderate = request.POST.get('moderate', None)
         if moderate is not None and page.has_moderate_permission(request):

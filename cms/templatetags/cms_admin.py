@@ -76,7 +76,7 @@ register.tag(CleanAdminListFilter)
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[value], value))
+    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.STATIC_URL, BOOLEAN_MAPPING[value], value))
 
 @register.filter
 def is_restricted(page, request):
