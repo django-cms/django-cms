@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 import urllib
 from utils.permissions import has_page_change_permission, has_any_page_change_permissions
+from django.conf import settings
 
 
 def _get_page_admin_url(context, toolbar, **kwargs):
@@ -115,21 +116,17 @@ class CMSToolbar(Toolbar):
                         GetButton(RIGHT, 'moderator', label, urlgetter)
                     )
 
-                has_global_current_page_change_permission = has_page_change_permission(self.request)
-                has_global_any_page_change_permission = has_any_page_change_permissions(self.request)
+                has_global_current_page_change_permission = False
+                if settings.CMS_PERMISSION:
+                    has_global_current_page_change_permission = has_page_change_permission(self.request)
                 has_current_page_change_permission = self.request.current_page.has_change_permission(self.request)
-                has_any_page_permission = self.request.current_page.has_change_permission(self.request) or \
-                                                 self.request.current_page.has_add_permission(self.request) or \
-                                                 self.request.current_page.has_delete_permission(self.request) or \
-                                                 self.request.current_page.has_move_page_permission(self.request)
 
                 # The 'templates' Menu
                 if has_global_current_page_change_permission or has_current_page_change_permission:
                     items.append(self.get_template_menu(context, self.can_change, self.is_staff))
                 
                 # The 'page' Menu
-                if has_global_any_page_change_permission or has_any_page_permission:
-                    items.append(self.get_page_menu(context, self.can_change, self.is_staff))
+                items.append(self.get_page_menu(context, self.can_change, self.is_staff))
             
             # The 'Admin' Menu
             items.append(self.get_admin_menu(context, self.can_change, self.is_staff))
