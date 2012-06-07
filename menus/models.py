@@ -23,7 +23,7 @@ class CacheKeyManager(models.Manager):
         except CacheKey.MultipleObjectsReturned:
             # Truncate the table, we don't want a funny cache object to cause
             # mayhem!
-            CacheKey.object.all().delete()
+            CacheKey.objects.all().delete()
             return super(CacheKeyManager, self).get_or_create(**kwargs)
 
 
