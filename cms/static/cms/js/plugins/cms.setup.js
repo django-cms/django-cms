@@ -9,7 +9,7 @@ var jQuery = (django) ? django.jQuery : window.jQuery || undefined;
 
 // assign global namespaces
 var CMS = {
-	'$': jQuery.noConflict(true),
+	'$': jQuery.noConflict(),
 	'Class': Class.$noConflict(),
 	'API': {}
 };
