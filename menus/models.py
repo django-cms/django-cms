@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+
 class CacheKeyManager(models.Manager):
     def get_keys(self, site_id=None, language=None):
         ret = self.none()
@@ -16,12 +17,22 @@ class CacheKeyManager(models.Manager):
             ret = self.filter(site=site_id).filter(language=language)
         return ret
 
+    def get_or_create(self, **kwargs):
+        try:
+            return super(CacheKeyManager, self).get_or_create(**kwargs)
+        except CacheKey.MultipleObjectsReturned:
+            # Truncate the table, we don't want a funny cache object to cause
+            # mayhem!
+            CacheKey.objects.all().delete()
+            return super(CacheKeyManager, self).get_or_create(**kwargs)
+
+
 class CacheKey(models.Model):
     '''
-    This is to store a "set" of cache keys in a fashion where it's accessible 
+    This is to store a "set" of cache keys in a fashion where it's accessible
     by multiple processes / machines.
     Multiple Django instances will then share the keys.
-    This allows for selective invalidation of the menu trees (per site, per 
+    This allows for selective invalidation of the menu trees (per site, per
     language), in the cache.
     '''
     language = models.CharField(max_length=255)
