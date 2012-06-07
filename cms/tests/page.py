@@ -533,6 +533,12 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'i-want-another-url/')
 
+        # tests a bug found in 2.2 where saving an ancestor page
+        # wiped out the overwrite_url for child pages
+        page2.save()
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
