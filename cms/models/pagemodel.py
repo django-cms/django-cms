@@ -286,6 +286,8 @@ class Page(MPTTModel):
                     ph.pk = None # make a new instance
                     ph.save()
                     page.placeholders.add(ph)
+                    # update the page copy
+                    page_copy = page
                 if plugins:
                     copy_plugins_to(plugins, ph)
                     
