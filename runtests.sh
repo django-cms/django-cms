@@ -11,7 +11,7 @@ index=0
 
 reuse_env=true
 disable_coverage=true
-django=12
+django=14
 
 python="python" # to ensure this script works if no python option is specified
 while [ "$index" -lt "$num_args" ]
