@@ -160,7 +160,6 @@ Point your :setting:`django:STATIC_ROOT` to where the static files should live
 
     STATIC_ROOT = os.path.join(PROJECT_PATH, "static")
     STATIC_URL = "/static/"
-    ADMIN_MEDIA_PREFIX = "/static/admin/"
 
 For uploaded files, you will need to set up the :setting:`django:MEDIA_ROOT`
 setting::
