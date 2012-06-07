@@ -34,6 +34,14 @@ do
             django="${args[$index]}"
             ;;
         
+        "-t"|"--time-tests")
+            export TIMETESTS=1
+            ;;
+        
+        "-x"|"--xml-reports")
+            export XML_REPORTS=1
+            ;;
+        
         "-p"|"--python")
             let "index = $index + 1"
             python="${args[$index]}"
