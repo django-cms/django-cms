@@ -472,7 +472,7 @@ jQuery(document).ready(function ($) {
 			// change data information
 			this.dim.data('dimmed', false);
 			// hide dim
-			this.dim.css('opcaity', 0.6).stop().fadeOut();
+			this.dim.css('opacity', 0.6).stop().fadeOut();
 			// remove dim event
 			this.dim.unbind('click');
 		}

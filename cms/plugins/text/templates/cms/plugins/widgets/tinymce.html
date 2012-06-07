@@ -41,7 +41,7 @@ tinymce.create('tinymce.plugins.CMSPluginEditor', {
 						texteditor = get_editor("{{ name }}");
 						
 						// First create db instance using AJAX post back
-						add_plugin(pluginvalue, parent_id, language)
+						add_plugin(pluginvalue, parent_id, language);
 		             }
 		        });
 				{% for p in installed_plugins %}
@@ -84,11 +84,11 @@ tinymce.create('tinymce.plugins.CMSPluginEditor', {
 tinymce.PluginManager.add('cmsplugins', tinymce.plugins.CMSPluginEditor);
 
 function init_plugin_editor(placeholder){
-	var toolbar = get_plugin_html()
-	var html = '<table class="mceToolbar mceToolbarRow3 Enabled"><tbody>'
-	html += '<td class="mceToolbarStart mceToolbarStartListBox mceFirst">'
-	html += '<span></span>'
-	html += '</td><td>' + toolbar + '</td></tbody></table>'
+	var toolbar = get_plugin_html();
+	var html = '<table class="mceToolbar mceToolbarRow3 Enabled"><tbody>';
+	html += '<td class="mceToolbarStart mceToolbarStartListBox mceFirst">';
+	html += '<span></span>';
+	html += '</td><td>' + toolbar + '</td></tbody></table>';
 	$("td.mceToolbar").append(html);
 	init_buttons(placeholder);
 }
@@ -113,7 +113,7 @@ function init_buttons(placeholder){
 			return;
 		}
 		// First create db instance using AJAX post back
-		add_plugin(pluginvalue, parent_id, language)
+		add_plugin(pluginvalue, parent_id, language);
 		
 	}).css("cursor", "pointer").css("margin", "5px");
 	

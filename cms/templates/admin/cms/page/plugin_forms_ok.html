@@ -4,7 +4,7 @@
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-	<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
 	{{ media }}
 {% endblock %}
 
@@ -18,7 +18,14 @@ jQuery(document).ready(function ($) {
 	if(window.parent != self) {
 		if (typeof window.parent.CMS === 'undefined'){
 			// backend admin
-        parent.hide_iframe({{ plugin.pk }}, {% javascript_string %}{{ type }}{% end_javascript_string %}, {% javascript_string %}{{ name }}{% end_javascript_string %}, {% javascript_string %}{% trans "Plugin saved successfully." %}{% end_javascript_string %});
+			{% if deleted %}
+			// delete plugin selector if cancelled before adding content
+        	window.parent.removed_cancelled_plugin({{ plugin_id }});
+        	{% endif %}
+        parent.hide_iframe({{ plugin_id }}, {% javascript_string %}{{ type }}{% end_javascript_string %}, {% javascript_string %}{{ name }}{% end_javascript_string %}, {% javascript_string %}
+        	{% if cancel %}{% trans "Your changes to this plugin have not been saved." %}{% else %}{% trans "Plugin saved successfully." %}{% endif %}
+        	{% end_javascript_string %});
+        	
 		} else {
 			// frontend edit
 			setTimeout(function () { window.parent.CMS.API.Helpers.reloadBrowser(); }, 1000);

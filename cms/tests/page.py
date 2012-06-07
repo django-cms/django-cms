@@ -409,6 +409,17 @@ class PagesTestCase(CMSTestCase):
         request = self.get_request('/does-not-exist/')
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
+
+    def test_get_page_without_final_slash(self):
+        root = create_page("root", "nav_playground.html", "en", slug="root", 
+                           published=True)
+        page = create_page("page", "nav_playground.html", "en", slug="page", 
+                           published=True, parent=root)
+        root.publish()
+        page.publish()
+        request = self.get_request('/page')
+        found_page = get_page_from_request(request)
+        self.assertFalse(found_page is None)
     
     def test_get_page_from_request_with_page_preview(self):
         page = create_page("page", "nav_playground.html", "en")
@@ -530,6 +541,12 @@ class PagesTestCase(CMSTestCase):
 
         self.assertEqual(page2.get_absolute_url(),
             self.get_pages_root()+'page-test-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
+        # tests a bug found in 2.2 where saving an ancestor page
+        # wiped out the overwrite_url for child pages
+        page2.save()
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'i-want-another-url/')
 

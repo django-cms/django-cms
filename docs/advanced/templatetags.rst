@@ -14,6 +14,8 @@ top of your template::
 ***********
 placeholder
 ***********
+.. versionchanged:: 2.1
+    The placeholder name became case sensitive.
 
 The ``placeholder`` templatetag defines a placeholder on a page. All
 placeholders in a template will be auto-detected and can be filled with
@@ -389,12 +391,13 @@ cms_toolbar
 ***********
 
 The ``cms_toolbar`` templatetag will add the needed css and javascript to the
-sekizai blocks in the base template. The templatetag should be placed somewhere
-within the body of the HTML (within ``<body>...</body>``).
+sekizai blocks in the base template. The templatetag has to be placed after the
+``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences within your HTML.
 
 Example::
 
     <body>
     {% cms_toolbar %}
+    {% placeholder "home" %}
     ...
 
