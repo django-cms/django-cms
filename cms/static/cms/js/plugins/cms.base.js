@@ -1,16 +1,3 @@
-// insuring django namespace is available when using on admin
-var django = django || undefined;
-// assigning correct jquery instance to jQuery variable
-var jQuery = (django) ? django.jQuery : window.jQuery || undefined;
-// assign global namespaces
-var CMS = CMS || {};
-	CMS.jQuery = window.jQuery;
-	CMS.$ = CMS.jQuery.noConflict(true);
-	CMS.Class = CMS.Class || Class.$noConflict();
-	CMS.API = CMS.API || {};
-// reattach jQuery to window
-window.jQuery = CMS.jQuery;
-
 /*##################################################|*/
 /* #CMS.BASE# */
 CMS.$(document).ready(function ($) {
