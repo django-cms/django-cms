@@ -168,7 +168,7 @@ class PageAdmin(ModelAdmin):
                 'css/jquery.dialog.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+        js = ['%sjs/jquery.min.js' % settings.STATIC_URL] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/libs/jquery.query.js',
                 'js/libs/jquery.ui.core.js',
@@ -518,7 +518,7 @@ class PageAdmin(ModelAdmin):
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
-                'ADMIN_MEDIA_URL': settings.ADMIN_MEDIA_PREFIX,
+                'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
                 'moderation_level': moderation_level,

@@ -81,7 +81,7 @@ class MiddlewareTestCase(CMSTestCase):
                 </ul>""" %(
                     settings.MEDIA_URL,
                     settings.STATIC_URL,
-                    settings.ADMIN_MEDIA_PREFIX,
+                    settings.STATIC_URL,
                     '/some-path/',
                 )
             
@@ -94,7 +94,7 @@ class MiddlewareTestCase(CMSTestCase):
             # These shall not
             self.assertTrue('href="%simages/some-media-file.jpg' %settings.MEDIA_URL in response.content)
             self.assertTrue('href="%simages/some-static-file.jpg' %settings.STATIC_URL in response.content)            
-            self.assertTrue('href="%simages/some-admin-file.jpg' %settings.ADMIN_MEDIA_PREFIX in response.content)
+            self.assertTrue('href="%simages/some-admin-file.jpg' %settings.STATIC_URL in response.content)
             
     
     def test_multilingual_middleware_handles_redirections(self):
