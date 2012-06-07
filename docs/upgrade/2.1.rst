@@ -24,7 +24,7 @@ with django CMS
 
 .. code-block:: bash
 
-    pip install --upgrade django-mptt==0.4.2
+    pip install --upgrade django-mptt==0.5.1
 
 Updates to ``settings.py``
 ==========================
