@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
-
+import django
 
 COPY_VAR = "copy"
 
@@ -70,7 +70,10 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
-        qs = super(CMSChangeList, self).get_query_set(request).drafts()
+        if django.VERSION[1] > 3:
+            qs = super(CMSChangeList, self).get_query_set(request).drafts()
+        else:
+            qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
             site = self._current_site
             permissions = Page.permissions.get_change_id_list(request.user, site)
