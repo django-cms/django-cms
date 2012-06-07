@@ -34,6 +34,14 @@ do
             django="${args[$index]}"
             ;;
         
+        "-t"|"--time-tests")
+            export TIMETESTS=1
+            ;;
+        
+        "-x"|"--xml-reports")
+            export XML_REPORTS=1
+            ;;
+        
         "-p"|"--python")
             let "index = $index + 1"
             python="${args[$index]}"
@@ -53,6 +61,8 @@ do
             echo "    -d, --django <version> - run tests against a django version, options: 12, 13 or trunk"
             echo "    -p, --python /path/to/python - python version to use to run the tests"
             echo "    -h, --help - display this help"
+            echo "    -t, --time-tests - run test timings (show 10 slowest tests)"
+            echo "    -x, --xml-reports - generate XML reports (for Jenkins)"
             exit 1
             ;;
 
