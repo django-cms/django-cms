@@ -123,7 +123,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
-            
+
     def test_show_menu_cache_key_leak(self):
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
@@ -132,7 +132,20 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(CacheKey.objects.count(), 1)
         tpl.render(context)
         self.assertEqual(CacheKey.objects.count(), 1)
-        
+
+    def test_menu_keys_duplicate_truncates(self):
+        """
+        When two objects with the same characteristics are present in the
+        database, get_or_create truncates the database table to "invalidate"
+        the cache, before retrying. This can happen after migrations, and since
+        it's only cache, we don't want any propagation of errors.
+        """
+        CacheKey.objects.create(language="fr", site=1, key="a")
+        CacheKey.objects.create(language="fr", site=1, key="a")
+        CacheKey.objects.get_or_create(language="fr", site=1, key="a")
+
+        self.assertEqual(CacheKey.objects.count(), 1)
+
     def test_only_active_tree(self):
         context = self.get_context()
         # test standard show_menu

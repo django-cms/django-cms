@@ -461,7 +461,9 @@ class PageAdmin(ModelAdmin):
     # remove permission inlines, if user isn't allowed to change them
     def get_formsets(self, request, obj=None):
         if obj:
-            for inline in self.inline_instances:
+            inlines = self.get_inline_instances(request) if hasattr(self, 'get_inline_instances') \
+                      else self.inline_instances
+            for inline in inlines:
                 if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin) and not isinstance(inline, ViewRestrictionInlineAdmin):
                     if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
                         continue
@@ -639,12 +641,12 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
-            if hasattr(self, 'list_editable'):# django 1.1
+            if django.VERSION >= (1, 4):
+                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+            else:
                 cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
                     self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
-            else:# django 1.0.2
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -667,14 +669,14 @@ class PageAdmin(ModelAdmin):
             languages = settings.CMS_SITE_LANGUAGES[site_id]
         else:
             languages = [x[0] for x in settings.CMS_LANGUAGES]
-        
+
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
-            'root_path': self.admin_site.root_path,
+            'root_path': reverse('admin:index'),
             'app_label': app_label,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
@@ -936,7 +938,6 @@ class PageAdmin(ModelAdmin):
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
         if django.VERSION[1] > 2: # pragma: no cover
-            # WARNING: Django 1.3 is not officially supported yet!
             using = router.db_for_read(self.model)
             kwargs = {
                 'admin_site': self.admin_site,
@@ -994,7 +995,7 @@ class PageAdmin(ModelAdmin):
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
             "opts": titleopts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
         }
         context.update(extra_context or {})

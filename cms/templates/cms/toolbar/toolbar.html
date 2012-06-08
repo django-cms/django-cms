@@ -1,7 +1,9 @@
 {% load i18n adminmedia sekizai_tags cms_js_tags %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript">var jQuery = (jQuery) ? jQuery.noConflict(true) : undefined;</script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.cookie.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.toolbar.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.placeholders.js"></script>{% endaddtoblock %}
@@ -9,9 +11,7 @@
 {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.placeholders.css?v1" media="all" />{% endaddtoblock %}
 {% addtoblock "js" %}
 <script type="text/javascript">
-//<![CDATA[
-jQuery(document).ready(function ($) {
-
+CMS.$(document).ready(function () {
 	// initialize toolbar, pass options, items and allow public access
 	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
 
@@ -25,10 +25,9 @@ jQuery(document).ready(function ($) {
 		}
 	});
 });
-//]]>
 </script>
 {% endaddtoblock %}
-
+{% addtoblock "js" %}<script type="text/javascript">window.jQuery = window.$ = jQuery;</script>{% endaddtoblock %}
 <div id="cms_toolbar" class="cms_reset" style="display:none;">
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
