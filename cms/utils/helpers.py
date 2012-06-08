@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from reversion.models import VERSION_CHANGE
 
 # modify reversions to match our needs if required...
 
@@ -38,23 +39,27 @@ def make_revision_with_plugins(obj, user=None, message=None):
     Only add to revision if it is a draft.
     """
     revision_manager = reversion.revision
+    revision_context = reversion.revision_context_manager
     
     cls = obj.__class__
     
-    if cls in revision_manager._registry:
+    if cls in revision_manager._registered_models:
         
         placeholder_relation = find_placeholder_relation(obj)
 
-        if revision_manager.is_active():      
+        if revision_context.is_active():      
             # add toplevel object to the revision
-            revision_manager.add(obj)
+            adapter = revision_manager.get_adapter(obj.__class__)
+            revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
             # add plugins and subclasses to the revision
             filters = {'placeholder__%s' % placeholder_relation: obj}
             for plugin in CMSPlugin.objects.filter(**filters):
                 plugin_instance, admin = plugin.get_plugin_instance()
                 if plugin_instance:
-                    revision_manager.add(plugin_instance)
-                revision_manager.add(plugin)
+                    padapter = revision_manager.get_adapter(plugin_instance.__class__)
+                    revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
+                bpadapter = revision_manager.get_adapter(plugin.__class__)
+                revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
                 
 def find_placeholder_relation(obj):
     return 'page'

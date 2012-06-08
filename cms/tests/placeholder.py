@@ -20,6 +20,7 @@ from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
+from django.contrib.messages.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
@@ -439,6 +440,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
         }
         request = self.get_post_request(data)
         request.user = self.reload(user)
+        request._messages = default_storage(request)
         return request
 
     def test_plugin_add_requires_permissions(self):
