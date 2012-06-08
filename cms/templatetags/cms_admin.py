@@ -186,4 +186,4 @@ def admin_static_url():
     """
     If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
     """
-    return getattr(settings, 'ADMIN_MEDIA_PREFIX') or ''.join([settings.STATIC_URL, 'admin/'])
+    return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
