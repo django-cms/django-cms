@@ -37,6 +37,7 @@ from django.template.defaultfilters import (title, escape, force_escape,
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
+from cms.templatetags.cms_admin import admin_static_url
 import django
 import inspect
 
@@ -168,7 +169,7 @@ class PageAdmin(ModelAdmin):
                 'css/jquery.dialog.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.STATIC_URL] + [cms_static_url(path) for path in [
+        js = ['%sjs/jquery.min.js' % admin_static_url()] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/libs/jquery.query.js',
                 'js/libs/jquery.ui.core.js',

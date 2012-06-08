@@ -1,6 +1,6 @@
-{% load i18n adminmedia sekizai_tags cms_js_tags %}
+{% load i18n adminmedia sekizai_tags cms_js_tags cms_admin %}
 {% addtoblock "js" %}<script type="text/javascript">var jQuery = (jQuery) ? jQuery.noConflict(true) : undefined;</script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.cookie.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>{% endaddtoblock %}
