@@ -674,7 +674,7 @@ class PageAdmin(ModelAdmin):
             'cl': cl,
             'opts':opts,
             'has_add_permission': self.has_add_permission(request),
-            'root_path': self.admin_site.root_path,
+            'root_path': reverse('admin:index'),
             'app_label': app_label,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
@@ -994,7 +994,7 @@ class PageAdmin(ModelAdmin):
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
             "opts": titleopts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
         }
         context.update(extra_context or {})
