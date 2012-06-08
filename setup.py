@@ -36,9 +36,12 @@ setup(
         'django-sekizai>=0.6.1',
     ],
     tests_require=[
-        'django-reversion==1.4',
+        'django-reversion==1.6',
         'Pillow==1.7.7',
-        'sphinx',
+        'Sphinx==1.1.3',
+        'Jinja2==2.6',
+        'Pygments==1.5',
+        
     ],
     packages=find_packages(exclude=["project","project.*"]),
     include_package_data=True,
