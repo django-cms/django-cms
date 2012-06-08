@@ -16,7 +16,7 @@
  */
 
 function TinyMCEPlaceholderBridge(wym) {
-    this.wym = wym;
+	this.wym = wym;
 }
 
 TinyMCEPlaceholderBridge.prototype.insertText = function(text) {
@@ -25,13 +25,11 @@ TinyMCEPlaceholderBridge.prototype.insertText = function(text) {
 };
 
 TinyMCEPlaceholderBridge.prototype.replaceContent = function(old, rep) {
-	var content = tinyMCE.activeEditor.getContent()
-	content = content.split(old).join(rep)
+	var content = tinyMCE.activeEditor.getContent();
+	content = content.split(old).join(rep);
 	tinyMCE.activeEditor.setContent(content)
 };
 
-
 TinyMCEPlaceholderBridge.prototype.selectedObject = function() {
-    return tinyMCE.activeEditor.selection.getContent();
+	return tinyMCE.activeEditor.selection.getContent();
 };
-
