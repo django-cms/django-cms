@@ -134,8 +134,7 @@ class MultilingualURLMiddleware(object):
                 response['Location'] = location
             if not has_lang_prefix(location) and location.startswith("/") and \
                     not location.startswith(settings.MEDIA_URL) and \
-                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)) and \
-                    not location.startswith(settings.STATIC_URL):
+                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)):
                 response['Location'] = "/%s%s" % (language, location)
         response.set_cookie("django_language", language)
         return response
