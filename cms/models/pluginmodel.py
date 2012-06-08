@@ -138,10 +138,9 @@ class CMSPlugin(MPTTModel):
     
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
-        if instance:
-            return instance.__unicode__()
-        else:
-            return _("<Empty>")
+        if instance is not None:
+            return unicode(instance)
+        return _("<Empty>")
     
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
