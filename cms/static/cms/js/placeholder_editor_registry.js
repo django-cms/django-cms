@@ -16,13 +16,12 @@
 
 var PlaceholderEditorRegistry = {};
 
-jQuery.extend(PlaceholderEditorRegistry,
-              {
-                  registerEditor : function(fieldname, editor) {
-                      PlaceholderEditorRegistry.STORE[fieldname] = editor;
-                  },
-                  retrieveEditor : function(fieldname) {
-                      return PlaceholderEditorRegistry.STORE[fieldname];
-                  },
-                  STORE : {}
-              });
+jQuery.extend(PlaceholderEditorRegistry, {
+	registerEditor : function(fieldname, editor) {
+		PlaceholderEditorRegistry.STORE[fieldname] = editor;
+	},
+	retrieveEditor : function(fieldname) {
+		return PlaceholderEditorRegistry.STORE[fieldname];
+	},
+	STORE : {}
+});
