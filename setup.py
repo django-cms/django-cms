@@ -38,6 +38,7 @@ setup(
     tests_require=[
         'django-reversion==1.4',
         'Pillow==1.7.7',
+        'sphinx',
     ],
     packages=find_packages(exclude=["project","project.*"]),
     include_package_data=True,
