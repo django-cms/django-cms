@@ -33,7 +33,7 @@ setup(
         'south>=0.7.2',
         'html5lib',
         'django-mptt==0.5.1',
-        'django-sekizai>=0.4.2',
+        'django-sekizai>=0.6.1',
     ],
     packages=find_packages(exclude=["project","project.*"]),
     include_package_data=True,
