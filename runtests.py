@@ -6,7 +6,9 @@ import sys
 
 
 def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
-         time_tests=False, verbosity=1, failfast=False):
+         time_tests=False, verbosity=1, failfast=False, test_labels=None):
+    if not test_labels:
+        test_labels = ['cms']
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
             configure(TEST_RUNNER=test_runner, JUNIT_OUTPUT_DIR=junit_output_dir,
@@ -17,7 +19,7 @@ def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir
             TestRunner = get_runner(settings)
         
             test_runner = TestRunner(verbosity=verbosity, interactive=False, failfast=failfast)
-            failures = test_runner.run_tests(['cms', 'menus'])
+            failures = test_runner.run_tests(test_labels)
     sys.exit(failures)
 
 
@@ -33,6 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('--verbosity', default=1)
     parser.add_argument('--time-tests', action='store_true', default=False,
             dest='time_tests')
+    parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
     if getattr(args, 'jenkins', False):
         test_runner = 'cms.test_utils.runners.JenkinsTestRunner'
@@ -40,6 +43,7 @@ if __name__ == '__main__':
         test_runner = 'cms.test_utils.runners.NormalTestRunner'
     junit_output_dir = getattr(args, 'jenkins_data_dir', '.')
     time_tests = getattr(args, 'time_tests', False)
+    test_labels = ['cms.%s' % label for label in args.test_labels]
     main(test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
-         verbosity=args.verbosity, failfast=args.failfast)
+         verbosity=args.verbosity, failfast=args.failfast, test_labels=test_labels)
     
