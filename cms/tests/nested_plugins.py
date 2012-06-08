@@ -67,7 +67,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             text_plugin.save()
             
             text_plugin = self.reload(text_plugin)
-            self.assertEquals(text_plugin.get_children().count(), 1)
+            # none of the descendants should have a placeholder other then my own one
+            self.assertEquals(text_plugin.get_descendants().exclude(placeholder=text_plugin.placeholder).count(), 0)
             post_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(post_add_plugin_count, 2)
             

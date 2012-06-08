@@ -1322,10 +1322,9 @@ class PageAdmin(ModelAdmin):
             # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
             position = CMSPlugin.objects.filter(placeholder=placeholder).count()
             plugin.position = position
-            # if the plugin has children update them too
-            for child in plugin.get_children():
+            # update the placeholder on all descendant plugins as well
+            for child in plugin.get_descendants():
                 child.placeholder = placeholder
-                #fixme: what about grand children? - does this case exist?
                 child.save()
             plugin.save()
             success = True
