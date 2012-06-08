@@ -995,7 +995,7 @@ class PageAdmin(ModelAdmin):
             "object": titleobj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
-            "opts": titleopts,
+            "opts": opts,
             "root_path": reverse('admin:index'),
             "app_label": app_label,
         }
