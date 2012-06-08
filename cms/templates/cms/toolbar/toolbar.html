@@ -1,8 +1,13 @@
 {% load i18n adminmedia sekizai_tags cms_js_tags cms_admin %}
-{% addtoblock "js" %}<script type="text/javascript">var jQuery = (jQuery) ? jQuery.noConflict(true) : undefined;</script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script type="text/javascript">
+	var _jQuery = window.jQuery || null;
+	var _$ = window.$;
+</script>
+{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.cookie.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.toolbar.js"></script>{% endaddtoblock %}
@@ -27,7 +32,12 @@ CMS.$(document).ready(function () {
 });
 </script>
 {% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript">window.jQuery = window.$ = jQuery;</script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script type="text/javascript">
+	window.jQuery = _jQuery || jQuery;
+	window.$ = _$ || jQuery;
+</script>
+{% endaddtoblock %}
 <div id="cms_toolbar" class="cms_reset" style="display:none;">
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
