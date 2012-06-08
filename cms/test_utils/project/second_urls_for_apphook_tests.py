@@ -12,5 +12,5 @@ urlpatterns = patterns('',
         {'document_root': settings.CMS_MEDIA_ROOT, 'show_indexes': True}),
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'^', include('project.second_cms_urls_for_apphook_tests')),
+    url(r'^', include('cms.test_utils.project.second_cms_urls_for_apphook_tests')),
 )

@@ -5,8 +5,7 @@ from cms.admin.dialog.forms import (ModeratorForm, PermissionForm,
     PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.forms import PageForm
-from cms.admin.pageadmin import (contribute_fieldsets, contribute_list_filter, 
-    PageAdmin)
+from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState

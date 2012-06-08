@@ -12,7 +12,7 @@ import sys
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "project.sampleapp.cms_app"
+APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
 class ApphooksTestCase(CMSTestCase):
@@ -53,7 +53,7 @@ class ApphooksTestCase(CMSTestCase):
         """
             
         apps = ['project.sampleapp']
-        with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='project.urls_for_apphook_tests'):
+        with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()
             app_names = [hook[0] for hook in hooks]
@@ -63,7 +63,7 @@ class ApphooksTestCase(CMSTestCase):
     
     def test_apphook_on_root(self):
         
-        with SettingsOverride(ROOT_URLCONF='project.urls_for_apphook_tests'):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             apphook_pool.clear()    
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
             page = create_page("apphooked-page", "nav_playground.html", "en",
@@ -86,7 +86,7 @@ class ApphooksTestCase(CMSTestCase):
     
     def test_get_page_for_apphook(self):
             
-        with SettingsOverride(ROOT_URLCONF='project.second_urls_for_apphook_tests'):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
     
             apphook_pool.clear()    
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
