@@ -100,12 +100,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             pre_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(pre_add_plugin_count, 1)
             ###
-            # add a plugin to placeholder twho
+            # add a plugin to placeholder two
             ###
             pre_nesting_body = u"<p>the nested text plugin with a link inside</p>"
             text_plugin_two = add_plugin(page_one_ph_two, u"TextPlugin", u"en", body=pre_nesting_body)
             text_plugin_two = self.reload(text_plugin_two)
-            # prepare nestin plugin
+            # prepare nesting plugin
             page_one_ph_two = self.reload(page_one_ph_two)
             text_plugin_two = self.reload(text_plugin_two)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
@@ -338,7 +338,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
             page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
-            # verifiy the plugins got created
+            # verify the plugins got created
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEquals(len(org_placeholder_one_plugins), 1)
             org_placeholder_two_plugins = page_one_ph_two.get_plugins()
