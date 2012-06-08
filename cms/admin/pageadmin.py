@@ -24,12 +24,12 @@ from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import transaction, models
 from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (title, escape, force_escape, 
@@ -44,6 +44,8 @@ import inspect
 
 
 # silly hack to test features/ fixme
+from cms.utils.page_resolver import is_valid_overwrite_url
+
 if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
     from django.db import router
 else:
@@ -1047,9 +1049,13 @@ class PageAdmin(ModelAdmin):
             return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
-            page.published = not page.published
-            page.save()
-            return admin_utils.render_admin_menu_item(request, page)
+            try:
+                if page.published or is_valid_overwrite_url(page.get_absolute_url(),page):
+                    page.published = not page.published
+                    page.save()
+                return admin_utils.render_admin_menu_item(request, page)
+            except ValidationError,e:
+                return HttpResponseServerError(unicode(e))
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 

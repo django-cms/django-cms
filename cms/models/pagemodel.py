@@ -132,6 +132,7 @@ class Page(MPTTModel):
         all the places which are changing page position. Used like an interface
         to mptt, but after move is done page_moved signal is fired.
         """
+        # TODO: Check for slug/overwrite_url clashes upon copying page (in the current page and all children pages)
         # make sure move_page does not break when using INHERIT template
         if (position in ('left', 'right')
             and not target.parent
@@ -159,6 +160,7 @@ class Page(MPTTModel):
         Note: public_copy was added in order to enable the creation of a copy for creating the public page during
         the publish operation as it sets the publisher_is_draft=False.
         """
+        # TODO: Check for slug/overwrite_url clashes upon copying page (in the current page and all children pages)
         from cms.utils.moderator import update_moderation_message
         
         page_copy = None
