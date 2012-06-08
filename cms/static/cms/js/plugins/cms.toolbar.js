@@ -30,7 +30,7 @@ CMS.$(document).ready(function ($) {
 			// save reference to this class
 			var that = this;
 			// check if only one element is given
-			if($(container).length > 2) { throw new Error('Toolbar Error: one element expected, multiple elements given.'); return false; }
+			if($(container).length > 2) { throw new Error('Toolbar Error: one element expected, multiple elements given.'); }
 			// merge passed argument options with internal options
 			this.options = $.extend(this.options, options);
 
