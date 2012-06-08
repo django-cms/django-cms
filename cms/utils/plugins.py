@@ -68,8 +68,10 @@ def _extend_nodelist(extend_node):
     placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
     return placeholders
 
-def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
+def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
     placeholders = []
+    if ignore_blocks is None:
+        ignore_blocks = []
 
     for node in nodelist:
         # check if this is a placeholder first
