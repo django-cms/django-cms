@@ -21,7 +21,8 @@ dist
 .project
 .pydevproject
 .settings
-*.egg-info
+/*.egg-info/
+/*.egg/
 develop-eggs
 downloads
 eggs

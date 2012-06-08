@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
-import os
-import sys
 
 
 def main():

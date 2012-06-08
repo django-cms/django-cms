@@ -5,7 +5,23 @@ import argparse
 import sys
 
 
-def main():
+def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
+         time_tests=False, verbosity=1, failfast=False):
+    with temp_dir() as STATIC_ROOT:
+        with temp_dir() as MEDIA_ROOT:
+            configure(TEST_RUNNER=test_runner, JUNIT_OUTPUT_DIR=junit_output_dir,
+                TIME_TESTS=time_tests, ROOT_URLCONF='cms.test_utils.project.urls',
+                STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT)
+            from django.conf import settings
+            from django.test.utils import get_runner
+            TestRunner = get_runner(settings)
+        
+            test_runner = TestRunner(verbosity=verbosity, interactive=False, failfast=failfast)
+            failures = test_runner.run_tests(['cms', 'menus'])
+    sys.exit(failures)
+
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--jenkins', action='store_true', default=False,
             dest='jenkins')
@@ -19,25 +35,11 @@ def main():
             dest='time_tests')
     args = parser.parse_args()
     if getattr(args, 'jenkins', False):
-        TEST_RUNNER = 'cms.test_utils.runners.JenkinsTestRunner'
+        test_runner = 'cms.test_utils.runners.JenkinsTestRunner'
     else:
-        TEST_RUNNER = 'cms.test_utils.runners.NormalTestRunner'
-    JUNIT_OUTPUT_DIR = getattr(args, 'jenkins_data_dir', '.')
-    TIME_TESTS = getattr(args, 'time_tests', False)
-    with temp_dir() as STATIC_ROOT:
-        with temp_dir() as MEDIA_ROOT:
-            configure(TEST_RUNNER=TEST_RUNNER, JUNIT_OUTPUT_DIR=JUNIT_OUTPUT_DIR,
-                TIME_TESTS=TIME_TESTS, ROOT_URLCONF='cms.test_utils.project.urls',
-                STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT)
-            from django.conf import settings
-            from django.test.utils import get_runner
-            TestRunner = get_runner(settings)
-        
-            test_runner = TestRunner(verbosity=args.verbosity, interactive=False, failfast=args.failfast)
-            failures = test_runner.run_tests(['cms', 'menus'])
-    if failures:
-        sys.exit(bool(failures))
-
-
-if __name__ == '__main__':
-    main()
+        test_runner = 'cms.test_utils.runners.NormalTestRunner'
+    junit_output_dir = getattr(args, 'jenkins_data_dir', '.')
+    time_tests = getattr(args, 'time_tests', False)
+    main(test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
+         verbosity=args.verbosity, failfast=args.failfast)
+    

@@ -35,7 +35,12 @@ setup(
         'django-mptt==0.5.1',
         'django-sekizai>=0.4.2',
     ],
+    tests_require=[
+        'django-reversion==1.4',
+        'Pillow==1.7.7',
+    ],
     packages=find_packages(exclude=["project","project.*"]),
     include_package_data=True,
-    zip_safe = False
+    zip_safe = False,
+    test_suite = 'runtests.main',
 )
