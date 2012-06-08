@@ -215,7 +215,10 @@ class Placeholder(Tag):
 
         page = request.current_page
         if not page or page == 'dummy':
-            return ''
+            if nodelist:
+                return nodelist.render(context)
+            else:
+                return ''
 
         content = get_placeholder_content(context, request, page, name, inherit)
         if not content and nodelist:

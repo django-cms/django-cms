@@ -63,3 +63,6 @@
 - Removed support for django-dbgettext
 - Google Maps Plugin now defaults to use HTTPS.
 - Google Maps Plugin now uses the version 3 of their API, no longer requiring an API Key.
+
+==== placeholder-inherited-template-fix ====
+- Fixed unexpected behaviour when using template inheritance for CMS and project views (see issue 1256).
