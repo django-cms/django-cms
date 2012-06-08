@@ -38,7 +38,7 @@ Recommended
 
 * `django-filer`_ with its `django CMS plugins`_, file and image management
   application to use instead of some core plugins
-* `django-reversion`_ 1.4, to support versions of your content
+* `django-reversion`_ 1.6, to support versions of your content
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
