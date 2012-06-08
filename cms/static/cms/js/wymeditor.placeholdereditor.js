@@ -15,44 +15,43 @@
  * the WYMEditor, simply enabling it when the editor is created.
  */
 
-function WymPlaceholderBridge(wym, opts) {
-    this.wym = wym;
+function WymPlaceholderBridge(wym) {
+	this.wym = wym;
 }
 
 WymPlaceholderBridge.prototype.insertText = function(text) {
-    /* Inserts the text given at the current insertion point
-     * in the text editor
-     */
-    this.wym.insert(text);
+	/* Inserts the text given at the current insertion point
+	 * in the text editor
+	 */
+	this.wym.insert(text);
 };
 
 WymPlaceholderBridge.prototype.replaceContent = function(old, rep) {
-    /* Replaces occurence of `old` with `new` in the editor. 
-     */
-	var html = this.wym.html()
+	/* Replaces occurence of `old` with `new` in the editor.
+	 */
+	var html = this.wym.html();
 	this.wym.html(html.replace(old, rep));
 };
 
 WymPlaceholderBridge.prototype.selectedObject = function() {
-    /* If an image/object is selected, returns the HTMLImageObject for that image,
-     * otherwise undefined/null.
-     */
+	/* If an image/object is selected, returns the HTMLImageObject for that image,
+	 * otherwise undefined/null.
+	 */
 
-    // We rely on a private attribute that is set in 'mousedown' event
-    // if the user clicks on an image. This could be fragile :-)
-    return this.wym._selected_image; // Returns null if no image selected.
+	// We rely on a private attribute that is set in 'mousedown' event
+	// if the user clicks on an image. This could be fragile :-)
+	return this.wym._selected_image; // Returns null if no image selected.
 };
-
 
 /* Create plugin for the WYMEditor -- this function is called
  * when the editor is set up.
  */
 WYMeditor.editor.prototype.placeholderbridge = function(options) {
-    /* options must include 'name', the name of the textarea
-     * that is being edited.
-     */
-    var wym = this;
-    var c = new WymPlaceholderBridge(wym, options);
-    PlaceholderEditorRegistry.registerEditor(options['name'], c);
+	/* options must include 'name', the name of the textarea
+	 * that is being edited.
+	 */
+	var wym = this;
+	var c = new WymPlaceholderBridge(wym, options);
+	PlaceholderEditorRegistry.registerEditor(options['name'], c);
 };
 

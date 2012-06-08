@@ -13,20 +13,21 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import Client
 from menus.menu_pool import menu_pool
+from urlparse import urljoin
 import sys
 import urllib
 import warnings
 
 
 
-URL_CMS_PAGE = "/admin/cms/page/"
-URL_CMS_PAGE_ADD = URL_CMS_PAGE + "add/"
-URL_CMS_PAGE_CHANGE = URL_CMS_PAGE + "%d/" 
-URL_CMS_PAGE_DELETE = URL_CMS_PAGE_CHANGE + "delete/" 
-URL_CMS_PLUGIN_ADD = URL_CMS_PAGE_CHANGE + "add-plugin/"
-URL_CMS_PLUGIN_EDIT = URL_CMS_PAGE_CHANGE + "edit-plugin/"
-URL_CMS_PLUGIN_REMOVE = URL_CMS_PAGE_CHANGE + "remove-plugin/"
-URL_CMS_TRANSLATION_DELETE = URL_CMS_PAGE_CHANGE + "delete-translation/"
+URL_CMS_PAGE = "/en/admin/cms/page/"
+URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
+URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
+URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
+URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE_CHANGE, "add-plugin/")
+URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
+URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE_CHANGE, "remove-plugin/")
+URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
 
 class _Warning(object):
     def __init__(self, message, category, filename, lineno):
