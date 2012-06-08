@@ -116,10 +116,8 @@ something this way) or IRC discussions.
 Running the tests
 -----------------
 
-To run the tests simply execute ``runtests.sh`` from your shell. To make sure
-you have the correct environment you should also provide the ``--rebuild-env``
-flag, but since that makes running the test suite slower, it's disabled by
-default. You can also see all flags using ``--help``.
+To run the tests simply execute ``runtests.py`` from your shell. You should do
+that in a virtualenv with the dependencies you want to test against.
 
 
 **************************

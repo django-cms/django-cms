@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% load placeholder_tags %}
-{% block content %}
-{% for example in examples %}
-    <div>{% render_placeholder example.placeholder %}</div>
-{% empty %}
-    <div>No examples found</div>
-{% endfor %}
-{% endblock content %}
