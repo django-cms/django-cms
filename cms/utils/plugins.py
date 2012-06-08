@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode, 
     BlockNode)
 import warnings
+from sekizai.helpers import is_variable_extend_node
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
@@ -20,7 +21,7 @@ def _extend_blocks(extend_node, blocks):
     Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if is_variable_extend_node(extend_node):
         return
     parent = extend_node.get_parent(None)
     # Search for new blocks
@@ -54,7 +55,7 @@ def _extend_nodelist(extend_node):
     ExtendsNode
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if is_variable_extend_node(extend_node):
         return []
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
