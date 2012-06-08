@@ -139,7 +139,7 @@ def is_valid_overwrite_url(url,instance):
         url_clashes = []
         if page_qs is not None:
             if isinstance(page_qs,Page):
-                pages = [page_qs]
+                page_qs = [page_qs]
             for page in page_qs:
                 if page and page.pk != instance.pk:
                     url_clashes.append("'%s'" % page)
