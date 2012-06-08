@@ -8,14 +8,12 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
-from cms.plugins.link.cms_plugins import LinkPlugin
-from cms.plugins.text.cms_plugins import TextPlugin
-import cms
+
 
 URL_CMS_MOVE_PLUGIN = u'/admin/cms/page/%d/move-plugin/'    
 
 
-class PluginsTestCase(PluginsTestBaseCase):
+class NestedPluginsTestCase(PluginsTestBaseCase):
     
     def test_nested_plugin_on_page(self):
         """
