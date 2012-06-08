@@ -116,8 +116,7 @@ something this way) or IRC discussions.
 Running the tests
 -----------------
 
-To run the tests simply execute ``runtests.py`` from your shell. You should do
-that in a virtualenv with the dependencies you want to test against.
+To run the tests simply execute ``python setup.py test`` from your shell.
 
 
 **************************
