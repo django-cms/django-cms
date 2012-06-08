@@ -6,6 +6,7 @@ from django.middleware.locale import LocaleMiddleware
 from django.utils import translation
 import re
 import urllib
+import urlparse
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
 
@@ -128,10 +129,12 @@ class MultilingualURLMiddleware(object):
 
         if (response.status_code == 301 or response.status_code == 302 ):
             location = response['Location']
+            if location.startswith('.'):
+                location = urlparse.urljoin(request.path, location)
+                response['Location'] = location
             if not has_lang_prefix(location) and location.startswith("/") and \
                     not location.startswith(settings.MEDIA_URL) and \
-                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)) and \
-                    not location.startswith(settings.STATIC_URL):
+                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)):
                 response['Location'] = "/%s%s" % (language, location)
         response.set_cookie("django_language", language)
         return response
