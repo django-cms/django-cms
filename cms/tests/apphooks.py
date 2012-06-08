@@ -52,7 +52,7 @@ class ApphooksTestCase(CMSTestCase):
         Test implicit apphook loading with INSTALLED_APPS + cms_app.py
         """
             
-        apps = ['project.sampleapp']
+        apps = ['cms.test_utils.project.sampleapp']
         with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()

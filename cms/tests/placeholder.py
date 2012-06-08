@@ -89,7 +89,7 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         
     def test_fieldsets(self):
-        from project.placeholderapp import admin as __ # load admin
+        from cms.test_utils.project.placeholderapp import admin as __ # load admin
         request = self.get_request('/')
         admins = [
             (Example1, 2),

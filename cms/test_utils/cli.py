@@ -113,6 +113,11 @@ def configure(**extra):
             'de':['fr', 'en'],
             'en':['fr', 'de'],
         },
+        CMS_SITE_LANGUAGES = {
+            1:['en','de','fr','pt-BR'],
+            2:['de','fr'],
+            3:['nl'],
+        },
         CMS_TEMPLATES = (
             ('col_two.html', gettext('two columns')),
             ('col_three.html', gettext('three columns')),

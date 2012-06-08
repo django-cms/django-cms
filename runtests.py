@@ -1,4 +1,5 @@
 from cms.test_utils.cli import configure
+from cms.test_utils.tmpdir import temp_dir
 import argparse
 import sys
 
@@ -23,14 +24,17 @@ def main():
         TEST_RUNNER = 'cms.test_utils.runners.NormalTestRunner'
     JUNIT_OUTPUT_DIR = getattr(args, 'jenkins_data_dir', '.')
     TIME_TESTS = getattr(args, 'time_tests', False)
-    configure(TEST_RUNNER=TEST_RUNNER, JUNIT_OUTPUT_DIR=JUNIT_OUTPUT_DIR,
-        TIME_TESTS=TIME_TESTS, ROOT_URLCONF='cms.test_utils.project.urls')
-    from django.conf import settings
-    from django.test.utils import get_runner
-    TestRunner = get_runner(settings)
-
-    test_runner = TestRunner(verbosity=args.verbosity, interactive=False, failfast=args.failfast)
-    failures = test_runner.run_tests(['cms', 'menus'])
+    with temp_dir() as STATIC_ROOT:
+        with temp_dir() as MEDIA_ROOT:
+            configure(TEST_RUNNER=TEST_RUNNER, JUNIT_OUTPUT_DIR=JUNIT_OUTPUT_DIR,
+                TIME_TESTS=TIME_TESTS, ROOT_URLCONF='cms.test_utils.project.urls',
+                STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT)
+            from django.conf import settings
+            from django.test.utils import get_runner
+            TestRunner = get_runner(settings)
+        
+            test_runner = TestRunner(verbosity=args.verbosity, interactive=False, failfast=args.failfast)
+            failures = test_runner.run_tests(['cms', 'menus'])
     if failures:
         sys.exit(bool(failures))
 
