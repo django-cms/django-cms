@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
 import argparse
@@ -17,7 +18,6 @@ def main():
     parser.add_argument('--time-tests', action='store_true', default=False,
             dest='time_tests')
     args = parser.parse_args()
-    args.urlconf = 'cms.test_utils.project.urls'
     if getattr(args, 'jenkins', False):
         TEST_RUNNER = 'cms.test_utils.runners.JenkinsTestRunner'
     else:

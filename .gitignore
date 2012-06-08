@@ -8,7 +8,7 @@ cms/django
 .*
 *.xml
 /*env*/
-cms.sqlite
+*.sqlite
 cms/media/cms_page_media/
 cms/docs/build
 example/run
