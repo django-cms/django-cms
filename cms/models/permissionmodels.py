@@ -6,7 +6,8 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
 
 from cms.models import Page, ACCESS_CHOICES, ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
+from cms.models.managers import (BasicPagePermissionManager, PagePermissionManager,
+    GlobalPagePermissionManager)
 from cms.utils.helpers import reversion_register
 
 class AbstractPagePermission(models.Model):
@@ -51,7 +52,7 @@ class GlobalPagePermission(AbstractPagePermission):
     can_recover_page = models.BooleanField(_("can recover pages"), default=True, help_text=_("can recover any deleted page"))
     sites = models.ManyToManyField(Site, null=True, blank=True, help_text=_('If none selected, user haves granted permissions to all sites.'), verbose_name=_('sites'))
     
-    objects = BasicPagePermissionManager()
+    objects = GlobalPagePermissionManager()
     
     class Meta:
         verbose_name = _('Page global permission')

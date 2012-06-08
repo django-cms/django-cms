@@ -55,8 +55,8 @@ def has_page_add_permission(request):
             page = Page.objects.get(pk=target)
         except Page.DoesNotExist:
             return False
-        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id])):
+        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(request.user, page.site_id).exists()
+        if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
             return True
         if position in ("first-child", "last-child"):
             return page.has_add_permission(request)
@@ -67,8 +67,8 @@ def has_page_add_permission(request):
     else:
         from cms.utils.plugins import current_site
         site = current_site(request)
-        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[site])):
+        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(request.user, site).exists()
+        if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
             return True
     return False
 
@@ -89,11 +89,13 @@ def has_page_change_permission(request):
     """
     from cms.utils.plugins import current_site
     opts = Page._meta
+
+    site = current_site(request)
+    global_change_perm = GlobalPagePermission.objects.user_has_change_permission(request.user, site).exists()
+
     if request.user.is_superuser or (
-        request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and (
-            GlobalPagePermission.objects.with_user(request.user).filter(
-                can_change=True, sites__in=[current_site(request)]
-            ).exists()) or has_any_page_change_permissions(request)):
+        request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        and global_change_perm or has_any_page_change_permissions(request)):
         return True
     return False
 
@@ -231,6 +233,7 @@ def has_global_change_permissions_permission(user):
 def has_generic_permission(page_id, user, attr, site):
     """
     Permission getter for single page with given id.
+    Internally, this calls a method on PagePermissionsPermissionManager
     """
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
     permission = func(user, site)
