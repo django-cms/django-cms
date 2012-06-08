@@ -5,7 +5,7 @@ from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE,
     PageUserGroup)
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
-from cms.utils.page_resolver import get_page_from_path
+from cms.utils.page_resolver import get_page_from_path, is_valid_overwrite_url
 from cms.utils.permissions import (get_current_user, get_subordinate_users, 
     get_subordinate_groups)
 from cms.utils.urlutils import any_path_re
@@ -116,6 +116,22 @@ class PageAddForm(forms.ModelForm):
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
+        if self.cleaned_data['published'] and page.title_set.count():
+            #Check for titles attached to the page makes sense only because
+            #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
+            #Looks like just a theoretical corner case
+            t = page.get_title_obj(lang)
+            if t:
+                oldslug = t.slug
+                t.slug = self.cleaned_data['slug']
+                t.save()
+                try:
+                    is_valid_overwrite_url(t.path,page)
+                except ValidationError,e:
+                    t.slug = oldslug
+                    t.save()
+                    del cleaned_data['published']
+                    self._errors['published'] = ErrorList(e.messages)
         return cleaned_data
     
     def clean_slug(self):
@@ -173,15 +189,9 @@ class PageForm(PageAddForm):
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']
-            if url:
-                if not any_path_re.match(url):
-                    raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
-                page = get_page_from_path(url.strip('/'))
-                if (page and
-                    page.pk not in [self.instance.pk,
-                                    self.instance.publisher_public_id]):
-                    raise forms.ValidationError(_('Page with redirect url %r already exist') % url)
-        return url
+            is_valid_overwrite_url(url,self.instance)
+            # TODO: Check what happens if 'overwrite_url' is NOT in self.fields
+            return url
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """
