@@ -3,6 +3,7 @@
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
 {{ media }}
 
