@@ -348,15 +348,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             if settings.DEBUG:
                 raise
             return {'content': ''}
-        baseqs = get_cmsplugin_queryset(request)
-        plugins = baseqs.filter(
-            placeholder=placeholder,
-            language=lang,
-            placeholder__slot__iexact=placeholder_name,
-            parent__isnull=True
-        ).order_by('position').select_related()
-        c = render_plugins(plugins, context, placeholder)
-        content = "".join(c)
+        content = render_placeholder(placeholder, context, placeholder_name)
 
     if cache_result:
         cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
