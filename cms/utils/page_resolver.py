@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
+from django.utils.encoding import force_unicode
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -131,7 +132,7 @@ def get_page_from_request(request, use_path=None):
     return page
 
 
-def is_valid_overwrite_url(url,instance):
+def is_valid_overwrite_url(url,instance,create_links=True):
     if url:
         if not any_path_re.match(url):
             raise ValidationError(_('Invalid URL, use /my/url format.'))
@@ -142,8 +143,16 @@ def is_valid_overwrite_url(url,instance):
                 page_qs = [page_qs]
             for page in page_qs:
                 if page and page.pk != instance.pk:
-                    url_clashes.append("'%s'" % page)
+                    if create_links:
+                        url_clashes.append('<a href="%(page_url)s%(pk)s">%(page_title)s</a>' %
+                                           {'page_url':reverse('admin:cms_page_changelist'),'pk':page.pk,
+                                            'page_title': force_unicode(page)
+                                            } )
+                    else:
+                        url_clashes.append("'%s'" % page)
             if url_clashes:
-                url_clashes.append("'%s'" % instance)
-                raise ValidationError(_('Pages %(pages)s has the same url \'%(url)s\'.') % {'pages':", ".join(url_clashes),'url':url})
+                raise ValidationError(ungettext_lazy('Page %(pages)s has the same url \'%(url)s\' as current page "%(instance)s".',
+                                                     'Pages %(pages)s have the same url \'%(url)s\' as current page "%(instance)s".',
+                                                    len(url_clashes)) %
+                                      {'pages':", ".join(url_clashes),'url':url,'instance':instance})
     return True

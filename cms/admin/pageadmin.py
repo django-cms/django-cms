@@ -1063,7 +1063,7 @@ class PageAdmin(ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             try:
-                if page.published or is_valid_overwrite_url(page.get_absolute_url(),page):
+                if page.published or is_valid_overwrite_url(page.get_absolute_url(),page,False):
                     page.published = not page.published
                     page.save()
                 return admin_utils.render_admin_menu_item(request, page)
