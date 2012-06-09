@@ -1069,6 +1069,8 @@ class PageAdmin(ModelAdmin):
                 return admin_utils.render_admin_menu_item(request, page)
             except ValidationError,e:
                 return HttpResponseServerError(json.dumps(e.messages))
+            except Exception,e:
+                return HttpResponseServerError(json.dumps(e.messages))
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
