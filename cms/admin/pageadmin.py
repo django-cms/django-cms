@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import json
+from multiprocessing.dummy import dict, list
+from locale import str
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
@@ -19,6 +22,8 @@ from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
 from copy import deepcopy
 from distutils.version import LooseVersion
+from coverage.backward import set
+from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -1063,7 +1068,7 @@ class PageAdmin(ModelAdmin):
                     page.save()
                 return admin_utils.render_admin_menu_item(request, page)
             except ValidationError,e:
-                return HttpResponseServerError(unicode(e))
+                return HttpResponseServerError(json.dumps(e.messages))
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
