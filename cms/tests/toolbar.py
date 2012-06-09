@@ -2,6 +2,7 @@ from __future__ import with_statement
 from cms.api import create_page
 from cms.cms_toolbar import CMSToolbar
 from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.request_factory import RequestFactory
 from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
     GetButton)
@@ -194,6 +195,18 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         logout = items[5]
         self.assertTrue(isinstance(logout, GetButton))
         self.assertEqual(logout.url, '?cms-toolbar-logout')
+
+    def test_toolbar_template_change_permission(self):
+        with SettingsOverride(CMS_PERMISSIONS=True):
+            page = create_page('test', 'nav_playground.html', 'en', published=True)
+            request = self.request_factory.get(page.get_absolute_url())
+            request.user = self.get_staff()
+            request.current_page = page
+            SessionMiddleware().process_request(request)
+            request.session = {}
+            toolbar = CMSToolbar(request)
+            items = toolbar.get_items({})
+            self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
         
     def test_toolbar_markup(self):
         superuser = self.get_superuser()
