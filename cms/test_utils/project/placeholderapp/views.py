@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from project.placeholderapp.models import Example1
+from cms.test_utils.project.placeholderapp.models import Example1
 
 
 def example_view(request):

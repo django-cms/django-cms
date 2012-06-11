@@ -4,7 +4,7 @@ from django.conf.urls.defaults import *
 Also used in cms.tests.ApphooksTestCase
 """
 
-urlpatterns = patterns('project.sampleapp.views',
+urlpatterns = patterns('cms.test_utils.project.sampleapp.views',
     url(r'^$', 'sample_view', {'message': 'sample root page',}, name='sample-root'),  
     url(r'^settings/$', 'sample_view', kwargs={'message': 'sample settings page'}, name='sample-settings'),
     url(r'^account/$', 'sample_view', {'message': 'sample account page'}, name='sample-account'),

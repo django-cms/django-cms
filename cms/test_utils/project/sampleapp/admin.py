@@ -1,6 +1,6 @@
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from django.contrib import admin
-from project.sampleapp.models import Picture, Category
+from cms.test_utils.project.sampleapp.models import Picture, Category
 
 class PictureInline(admin.StackedInline):
     model = Picture

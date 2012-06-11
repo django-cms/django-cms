@@ -10,7 +10,7 @@ from menus.base import NavigationNode
 
 
 class NonRootCase(CMSTestCase):
-    urls = 'project.nonroot_urls'
+    urls = 'cms.test_utils.project.nonroot_urls'
 
     def setUp(self):
         with SettingsOverride(CMS_MODERATOR = False):

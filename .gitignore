@@ -7,7 +7,8 @@ cms/django
 *.svn
 .*
 *.xml
-cms.sqlite
+/*env*/
+*.sqlite
 cms/media/cms_page_media/
 cms/docs/build
 example/run
@@ -20,7 +21,8 @@ dist
 .project
 .pydevproject
 .settings
-*.egg-info
+/*.egg-info/
+/*.egg/
 develop-eggs
 downloads
 eggs
