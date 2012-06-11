@@ -101,7 +101,7 @@ class CleanAdminListFilter(InclusionTag):
             if choice['query_string'] != query_string:
                 unique_choices.append(choice)
                 query_string = choice['query_string']
-        return {'title': spec.title(), 'choices' : unique_choices}
+        return {'title': spec.title, 'choices' : unique_choices}
 register.tag(CleanAdminListFilter)
 
 
@@ -109,7 +109,7 @@ register.tag(CleanAdminListFilter)
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[value], value))
+    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (admin_static_url(), BOOLEAN_MAPPING[value], value))
 
 @register.filter
 def is_restricted(page, request):
@@ -212,3 +212,11 @@ register.tag(PageSubmitRow)
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]
 in_filtered = register.filter('in_filtered', in_filtered)
+
+
+@register.simple_tag
+def admin_static_url():
+    """
+    If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
+    """
+    return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])

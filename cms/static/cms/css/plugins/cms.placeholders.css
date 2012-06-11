@@ -7,6 +7,10 @@
 
 /*##################################################|*/
 /* #PLACEHOLDERS# */
+.cms_placeholder { display:-moz-inline-box; -moz-box-orient:vertical; display:inline-block; float:left;
+	vertical-align:middle; *vertical-align:auto; width:100%;
+	clear:both; overflow:hidden; }
+
 .cms_placeholder-bar { height:36px; border:1px solid #ddd !important;
 	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
 

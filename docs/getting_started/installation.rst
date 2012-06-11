@@ -14,7 +14,7 @@ Requirements
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
-* `django-mptt`_ 0.4.2 or higher
+* `django-mptt`_ 0.5.1 (strict to due API compatibility issues)
 * `django-sekizai`_ 0.4.2 or higher
 * `html5lib`_ 0.90 or higher
 * An installed and working instance of one of the databases listed in the
@@ -38,7 +38,7 @@ Recommended
 
 * `django-filer`_ with its `django CMS plugins`_, file and image management
   application to use instead of some core plugins
-* `django-reversion`_ 1.4, to support versions of your content
+* `django-reversion`_ 1.6, to support versions of your content
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer

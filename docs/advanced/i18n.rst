@@ -65,7 +65,7 @@ In the models of the current object add an optional language parameter to the
 
 
 In the view pass the :meth:`get_absolute_url` method to the
-``set_language_chooser`` function::
+``set_language_changer`` function::
 
     from menus.utils import set_language_changer
 
@@ -78,6 +78,18 @@ This allows the language chooser to have another URL then the current one.
 If the current URL is not handled by the CMS and no ``set_language_changer``
 function is provided it will take the exact same URL as the current one and
 will only change the language prefix.
+
+For class-based generic views ``set_languager_changer`` can be used as follows::
+
+    from menus.utils import set_language_changer
+
+    class ProductDetailView(DetailView):
+        model = Product
+        
+        def get_context_data(self, **kwargs):
+            context = super(ProductDetailView, self).get_context_data(**kwargs)
+            set_language_changer(self.request, self.object.get_absolute_url)
+            return context
 
 For the language chooser to work the
 :class:`cms.middleware.multilingual.MultilingualURLMiddleware` must be enabled.

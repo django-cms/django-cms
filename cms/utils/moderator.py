@@ -241,7 +241,7 @@ def mail_approvement_request(page, user=None):
     if not recipient_list:
         return
 
-    from django.contrib import admin
+    from django.core.urlresolvers import reverse
     from django.contrib.sites.models import Site
     from cms.utils.urlutils import urljoin
     from cms.utils.mail import send_mail
@@ -249,10 +249,9 @@ def mail_approvement_request(page, user=None):
     site = Site.objects.get_current()
 
     subject = _('CMS - Page %s requires approvement.') % unicode(page)
-
     context = {
         'page': page,
-        'admin_url': "http://%s" % urljoin(site.domain, admin.site.root_path, 'cms/page', page.id),
+        'admin_url': "http://%s" % urljoin(site.domain, reverse('admin:index'), 'cms/page', page.id),
     }
 
     send_mail(subject, 'admin/cms/mail/approvement_required.txt', recipient_list, context, 'admin/cms/mail/approvement_required.html')

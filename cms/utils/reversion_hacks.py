@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 import reversion
-from reversion.revisions import RegistrationError, RegistrationInfo
+from reversion.revisions import RegistrationError, VersionAdapter
 
 def register_draft_only(model_class, fields, follow, format):
     """
@@ -29,6 +29,9 @@ def register_draft_only(model_class, fields, follow, format):
 
     # Register the generated registration information.
     follow = tuple(follow)
-    registration_info = RegistrationInfo(fields, follow, format)
-    revision_manager._registry[model_class] = registration_info
+    registration_info = VersionAdapter(model_class)
+    registration_info.fields = fields
+    registration_info.follow = follow
+    registration_info.format = format
+    revision_manager._registered_models[model_class] = registration_info
     # Do not connect to the post save signal of the model.

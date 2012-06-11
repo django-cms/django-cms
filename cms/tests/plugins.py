@@ -15,6 +15,9 @@ from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.test_utils.project.pluginapp.models import Article, Section
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
+    ArticlePluginModel)
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
     URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
@@ -27,8 +30,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
-from project.pluginapp.models import Article, Section
-from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
 
 
@@ -102,6 +103,44 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
+        # edit body, but click cancel button
+        data = {
+            "body":"Hello World!!",
+            "_cancel":True,
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals("Hello World", txt.body)
+
+    def test_add_cancel_plugin(self):
+        """
+        Test that you can cancel a new plugin before editing and 
+        that the plugin is removed.
+        """
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now click cancel instead of editing
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body":"Hello World",
+            "_cancel":True,
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(0, Text.objects.count())
 
     def test_copy_plugins(self):
         """
@@ -410,7 +449,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.count(), 6)
 
         new_plugin = Text.objects.get(pk=6)
-        self.assertEquals(plugin_tags_to_id_list(new_plugin.body), [u'4', u'5'])
+        idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
+        expected = sorted([u'4', u'5'])
+        self.assertEquals(idlist, expected)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

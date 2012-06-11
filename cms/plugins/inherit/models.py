@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
-from cms import settings
+from django.conf import settings
 
 class InheritPagePlaceholder(CMSPlugin):
     """

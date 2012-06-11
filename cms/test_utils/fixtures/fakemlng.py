@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import add_plugin
-from project.fakemlng.models import MainModel, Translations
+from cms.test_utils.project.fakemlng.models import MainModel, Translations
 
 class FakemlngFixtures(object):
     def create_fixtures(self):

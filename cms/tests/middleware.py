@@ -7,6 +7,7 @@ from cms.test_utils.util.mock import AttributeObject
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import django
+from cms.templatetags.cms_admin import admin_static_url
 
 class MiddlewareTestCase(CMSTestCase):
     def test_multilingual_middleware_get_lang_from_request(self):
@@ -81,7 +82,7 @@ class MiddlewareTestCase(CMSTestCase):
                 </ul>""" %(
                     settings.MEDIA_URL,
                     settings.STATIC_URL,
-                    settings.ADMIN_MEDIA_PREFIX,
+                    admin_static_url(),
                     '/some-path/',
                 )
             
@@ -94,7 +95,7 @@ class MiddlewareTestCase(CMSTestCase):
             # These shall not
             self.assertTrue('href="%simages/some-media-file.jpg' %settings.MEDIA_URL in response.content)
             self.assertTrue('href="%simages/some-static-file.jpg' %settings.STATIC_URL in response.content)            
-            self.assertTrue('href="%simages/some-admin-file.jpg' %settings.ADMIN_MEDIA_PREFIX in response.content)
+            self.assertTrue('href="%simages/some-admin-file.jpg' %admin_static_url() in response.content)
             
     
     def test_multilingual_middleware_handles_redirections(self):

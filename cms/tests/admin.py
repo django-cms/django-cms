@@ -5,8 +5,7 @@ from cms.admin.dialog.forms import (ModeratorForm, PermissionForm,
     PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.forms import PageForm
-from cms.admin.pageadmin import (contribute_fieldsets, contribute_list_filter, 
-    PageAdmin)
+from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState
@@ -351,12 +350,15 @@ class AdminTestCase(AdminTestsBase):
         request.user = admin
         
         page_admin = site._registry[Page]
-                
-        cl = CMSChangeList(request, page_admin.model, page_admin.list_display,
+
+        cl_params = [request, page_admin.model, page_admin.list_display,
                             page_admin.list_display_links, page_admin.list_filter,
                             page_admin.date_hierarchy, page_admin.search_fields, 
-                            page_admin.list_select_related, page_admin.list_per_page, 
-                            page_admin.list_editable, page_admin)
+                            page_admin.list_select_related, page_admin.list_per_page]
+        if hasattr(page_admin, 'list_max_show_all'): # django 1.4
+            cl_params.append(page_admin.list_max_show_all)
+        cl_params.extend([page_admin.list_editable, page_admin])
+        cl = CMSChangeList(*tuple(cl_params))
         
         cl.set_items(request)
         
@@ -1035,12 +1037,12 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
         Expected a username only 2 times in the content, but a relationship
         between usercount and pagesize
         """
-        with SettingsOverride(CMS_MODERATOR = False, CMS_PERMISSIONS = True):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
             admin = self.get_superuser()
             PAGE_NAME = 'TestPage'
             USER_NAME = 'test_size_user_0'
             site = Site.objects.get(pk = 1)
-            page = create_page(PAGE_NAME, "nav_playground.html", "en", site = site, created_by = admin)
+            page = create_page(PAGE_NAME, "nav_playground.html", "en", site=site, created_by=admin)
             page.save()
             self._page = page
             with self.login_user_context(admin):
@@ -1050,7 +1052,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 old_response_size = len(response.content)
                 old_user_count = User.objects.count()
                 # create additionals user and reload the page
-                obj = User.objects.create(username = USER_NAME, is_active = True)
+                User.objects.create(username=USER_NAME, is_active=True)
                 user_count = User.objects.count()
                 more_users_in_db = old_user_count < user_count 
                 # we have more users
