@@ -492,7 +492,7 @@ class PageAdmin(ModelAdmin):
         extra_context.update({
             'language': language,
         })
-        return super(PageAdmin, self).add_view(request, form_url, extra_context)
+        return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
     def change_view(self, request, object_id, extra_context=None):
         """
