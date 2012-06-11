@@ -3,8 +3,7 @@
     {% include 'admin/cms/page/menu_item.html' %}
     
     {% with page.children as children %}
-        {% if children %}<ul{% if page.last %} class="last"{% endif %}>{% for child in children.all %}
-            {# show_lazy_admin_menu child #}{% endfor %}
+        {% if children %}<ul{% if page.last %} class="last"{% endif %}>
         </ul>{% endif %}
     {% endwith %}
 </li>
