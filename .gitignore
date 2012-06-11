@@ -1,4 +1,5 @@
 *.pyc
+!.travis.yml
 *.swp
 *.lock
 *.pid
