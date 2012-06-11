@@ -2,7 +2,7 @@ from django.db import models
 
 from cms.models import CMSPlugin
 
-from project.pluginapp.models import Section
+from cms.test_utils.project.pluginapp.models import Section
 
 
 class ArticlePluginModel(CMSPlugin):

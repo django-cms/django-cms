@@ -15,6 +15,9 @@ from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, 
     plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
+from cms.test_utils.project.pluginapp.models import Article, Section
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
+    ArticlePluginModel)
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
     URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, 
     URL_CMS_PLUGIN_REMOVE)
@@ -27,8 +30,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
-from project.pluginapp.models import Article, Section
-from project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 import os
 
 

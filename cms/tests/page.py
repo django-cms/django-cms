@@ -304,7 +304,7 @@ class PagesTestCase(CMSTestCase):
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        path = os.path.join(settings.PROJECT_DIR, 'templates', 'add_placeholder.html')
+        path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
         f = open(path, 'r')
         old = f.read()
         f.close()
@@ -626,7 +626,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
 class NoAdminPageTests(CMSTestCase):
-    urls = 'project.noadmin_urls'
+    urls = 'cms.test_utils.project.noadmin_urls'
     
     def setUp(self):
         admin = 'django.contrib.admin'

@@ -7,10 +7,12 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
     url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
     url(r'^media/cms/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.CMS_MEDIA_ROOT, 'show_indexes': True}),
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'^', include('project.second_cms_urls_for_apphook_tests')),
+    (r'', include('django.contrib.staticfiles.urls')),
+    url(r'^', include('cms.urls')),
 )

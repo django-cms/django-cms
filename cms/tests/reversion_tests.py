@@ -3,17 +3,18 @@ from __future__ import with_statement
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD,
-    URL_CMS_PLUGIN_EDIT)
+from cms.test_utils.project.fileapp.models import FileModel
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT)
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from os.path import join
-from project.fileapp.models import FileModel
-from reversion.models import Revision, Version
-from reversion import revision as revision_manager
+from cms.test_utils.project.fileapp.models import FileModel
+from reversion import (revision as revision_manager, 
+    revision_context_manager as revision_context)
+from reversion.models import Revision, Version, VERSION_CHANGE
 import shutil
 
 class ReversionTestCase(CMSTestCase):
@@ -68,7 +69,7 @@ class ReversionTestCase(CMSTestCase):
         with self.login_user_context(User.objects.get(username="test")):
             self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEquals(Revision.objects.all().count(), 7)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -93,14 +94,14 @@ class ReversionTestCase(CMSTestCase):
 
             # test that CMSPlugin subclasses are reverted
             self.assertEquals(Text.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 6)
+            self.assertEquals(Revision.objects.all().count(), 9)
 
     def test_recover(self):
         """
         Test that you can recover a page
         """
         with self.login_user_context(User.objects.get(username="test")):
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEquals(Revision.objects.all().count(), 7)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
             version = Version.objects.get(content_type=ctype, revision=revision)
@@ -145,7 +146,8 @@ class ReversionFileFieldTests(CMSTestCase):
             file1.save()
             # manually add a revision because we use the explicit way
             # django-cms uses too.
-            revision_manager.add(file1)
+            adapter = revision_manager.get_adapter(FileModel)
+            revision_context.add_to_context(revision_manager, file1, adapter.get_version_data(file1, VERSION_CHANGE))
 
         # reload the instance from db
         file2 = FileModel.objects.all()[0]
