@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from reversion.models import VERSION_CHANGE
+
+# reversion's recommended, not required
+if 'cms' in settings.INSTALLED_APPS:
+    from reversion.models import VERSION_CHANGE
 
 # modify reversions to match our needs if required...
 
