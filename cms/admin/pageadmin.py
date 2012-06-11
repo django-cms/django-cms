@@ -13,6 +13,7 @@ from cms.models import (Page, Title, CMSPlugin, PagePermission,
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
+from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
@@ -37,7 +38,6 @@ from django.template.defaultfilters import (title, escape, force_escape,
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
-from cms.templatetags.cms_admin import admin_static_url
 import django
 import inspect
 
@@ -674,10 +674,9 @@ class PageAdmin(ModelAdmin):
 
         # parse the cookie that saves which page trees have
         # been opened already and extracts the page ID
-        open_menu_trees = []
-        if request.COOKIES.get("djangocms_nodes_open", False):
-            open_menu_trees = [int(c.split("page_")[1]) for c in \
-                    request.COOKIES["djangocms_nodes_open"].split("%2C")]
+        djangocms_nodes_open = request.COOKIES.get('djangocms_nodes_open', '')
+        raw_nodes = unquote(djangocms_nodes_open).split(',')
+        open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
 
         context = {
             'title': cl.title,
@@ -1080,6 +1079,9 @@ class PageAdmin(ModelAdmin):
         """
         Get html for descendants of given page
         Used for lazy loading pages in change_list.js
+        
+        Permission checks is done in admin_utils.get_admin_menu_item_context
+        which is called by admin_utils.render_admin_menu_item.
         """
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
