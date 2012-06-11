@@ -16,7 +16,7 @@ from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_page_from_placeholder_if_exists
 
-from mptt.models import MPTTModel, MPTTModelBase
+from cms.vendored.mptt.models import MPTTModel, MPTTModelBase
 
 
 class BoundRenderMeta(object):

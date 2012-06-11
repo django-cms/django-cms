@@ -72,7 +72,6 @@ def configure(**extra):
             'django.contrib.staticfiles',
             'cms',
             'menus',
-            'mptt',
             'cms.plugins.text',
             'cms.plugins.picture',
             'cms.plugins.file',

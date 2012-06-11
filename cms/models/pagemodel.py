@@ -18,7 +18,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
-from mptt.models import MPTTModel
+from cms.vendored.mptt.models import MPTTModel
 from os.path import join
 import copy
 
