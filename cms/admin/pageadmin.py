@@ -13,6 +13,7 @@ from cms.models import (Page, Title, CMSPlugin, PagePermission,
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
+from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
@@ -37,7 +38,6 @@ from django.template.defaultfilters import (title, escape, force_escape,
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
-from cms.templatetags.cms_admin import admin_static_url
 import django
 import inspect
 
@@ -205,6 +205,7 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
             pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
@@ -671,6 +672,12 @@ class PageAdmin(ModelAdmin):
         else:
             languages = [x[0] for x in settings.CMS_LANGUAGES]
 
+        # parse the cookie that saves which page trees have
+        # been opened already and extracts the page ID
+        djangocms_nodes_open = request.COOKIES.get('djangocms_nodes_open', '')
+        raw_nodes = unquote(djangocms_nodes_open).split(',')
+        open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
+
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -686,6 +693,7 @@ class PageAdmin(ModelAdmin):
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
+            'open_menu_trees': open_menu_trees,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)
@@ -1067,6 +1075,18 @@ class PageAdmin(ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 
+    def descendants(self, request, page_id):
+        """
+        Get html for descendants of given page
+        Used for lazy loading pages in change_list.js
+        
+        Permission checks is done in admin_utils.get_admin_menu_item_context
+        which is called by admin_utils.render_admin_menu_item.
+        """
+        page = get_object_or_404(Page, pk=page_id)
+        return admin_utils.render_admin_menu_item(request, page,
+                template="admin/cms/page/lazy_menu.html")
+                
     @create_on_success
     def add_plugin(self, request):
         '''
