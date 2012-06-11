@@ -179,6 +179,7 @@ Default: ``True``
 If set to ``False``, frontend editing is not available for models using
 :class:`cms.models.fields.PlaceholderField`.
 
+********************
 Editor configuration
 ********************
 
