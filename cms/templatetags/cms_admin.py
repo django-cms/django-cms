@@ -46,6 +46,39 @@ class ShowAdminMenu(InclusionTag):
         return context
 register.tag(ShowAdminMenu)
 
+class ShowLazyAdminMenu(InclusionTag):
+    name = 'show_lazy_admin_menu'
+    template = 'admin/cms/page/lazy_child_menu.html'
+    
+    options = Options(
+        Argument('page')
+    )
+    
+    def get_context(self, context, page):
+        request = context['request']
+
+        
+        if context.has_key("cl"):
+            filtered = context['cl'].is_filtered()
+        elif context.has_key('filtered'):
+            filtered = context['filtered']
+        
+        
+        
+        # following function is newly used for getting the context per item (line)
+        # if something more will be required, then get_admin_menu_item_context
+        # function have to be updated. 
+        # This is done because item can be reloaded after some action over ajax.
+        context.update(get_admin_menu_item_context(request, page, filtered))
+        
+        # this here is just context specific for menu rendering - items itself does
+        # not use any of following variables
+        #context.update({
+        #    'no_children': no_children,
+        #})
+        return context
+register.tag(ShowLazyAdminMenu)
+
 
 class CleanAdminListFilter(InclusionTag):
     """
