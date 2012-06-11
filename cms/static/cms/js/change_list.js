@@ -95,7 +95,6 @@
 	};
 	
 	$(document).ready(function() {
-		$.fn.cmsPatchCSRF();
 		selected_page = false;
 		action = false;
 
