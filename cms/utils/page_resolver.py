@@ -2,6 +2,7 @@
 from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
 
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.conf import settings
@@ -153,7 +154,7 @@ def is_valid_overwrite_url(url,instance,create_links=True):
                 if page and page.pk != instance.pk:
                     if create_links:
                         # Format return message with page url
-                        url_clashes.append('<a href="%(page_url)s%(pk)s">%(page_title)s</a>' %
+                        url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' %
                                            {'page_url':reverse('admin:cms_page_changelist'),'pk':page.pk,
                                             'page_title': force_unicode(page)
                                             } )
@@ -162,8 +163,8 @@ def is_valid_overwrite_url(url,instance,create_links=True):
                         url_clashes.append("'%s'" % page)
             if url_clashes:
                 # If clashing pages exist raise the exception
-                raise ValidationError(ungettext_lazy('Page %(pages)s has the same url \'%(url)s\' as current page "%(instance)s".',
+                raise ValidationError(mark_safe(ungettext_lazy('Page %(pages)s has the same url \'%(url)s\' as current page "%(instance)s".',
                                                      'Pages %(pages)s have the same url \'%(url)s\' as current page "%(instance)s".',
                                                     len(url_clashes)) %
-                                      {'pages':", ".join(url_clashes),'url':url,'instance':instance})
+                                      {'pages':", ".join(url_clashes),'url':url,'instance':instance}))
     return True
