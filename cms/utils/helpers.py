@@ -38,6 +38,7 @@ def make_revision_with_plugins(obj, user=None, message=None):
     # we can safely import reversion - calls here always check for 
     # reversion in installed_applications first
     import reversion
+    from reversion.models import VERSION_CHANGE
     """
     Only add to revision if it is a draft.
     """
