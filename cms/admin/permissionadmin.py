@@ -21,7 +21,7 @@ PAGE_ADMIN_INLINES = []
 class TabularInline(admin.TabularInline):
     pass
 
-if DJANGO_1_3:
+if DJANGO_1_3 and 'reversion' in settings.INSTALLED_APPS:
     """
     Backwards compatibility for Django < 1.4 and django-reversion 1.6
     """
