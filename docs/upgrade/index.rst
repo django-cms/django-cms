@@ -2,6 +2,16 @@
 Upgrading a django CMS installation
 ###################################
 
+
+***********
+2.3 Release
+***********
+
+.. toctree::
+    :maxdepth: 1
+
+    2.3
+
 ***********
 2.2 Release
 ***********
