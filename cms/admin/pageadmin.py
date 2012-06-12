@@ -18,6 +18,8 @@ from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
+from cms.utils.admin import HttpJsResponse
+from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from distutils.version import LooseVersion
 from django import template
@@ -1063,11 +1065,9 @@ class PageAdmin(ModelAdmin):
                 if page.published or is_valid_overwrite_url(page.get_absolute_url(),page,False):
                     page.published = not page.published
                     page.save()
-                return admin_utils.render_admin_menu_item(request, page)
+                return HttpJsResponse(admin_utils.render_admin_menu_item(request, page).content,200)
             except ValidationError,e:
-                return HttpResponseServerError(json.dumps(e.messages))
-            except Exception,e:
-                return HttpResponseServerError(json.dumps(e.messages))
+                return HttpJsResponse(e.messages,500)
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
