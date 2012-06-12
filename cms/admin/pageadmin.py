@@ -676,7 +676,10 @@ class PageAdmin(ModelAdmin):
         # been opened already and extracts the page ID
         djangocms_nodes_open = request.COOKIES.get('djangocms_nodes_open', '')
         raw_nodes = unquote(djangocms_nodes_open).split(',')
-        open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
+        try:
+            open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
+        except IndexError:
+            open_menu_trees = []
 
         context = {
             'title': cl.title,
