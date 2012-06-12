@@ -680,10 +680,10 @@ class PagesTestCase(CMSTestCase):
             self.assertTrue(is_valid_overwrite_url(foo.get_absolute_url('en'),foo))
 
             # Set url_overwrite for page foo
-            t = foo.get_title_obj(language='en')
-            t.has_url_overwrite = True
-            t.path = '/bar/'
-            t.save()
+            title = foo.get_title_obj(language='en')
+            title.has_url_overwrite = True
+            title.path = '/bar/'
+            title.save()
             try:
                 url = is_valid_overwrite_url(bar.get_absolute_url('en'),bar)
             except ValidationError:
