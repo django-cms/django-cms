@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 
-# reversion's recommended, not required
-if 'cms' in settings.INSTALLED_APPS:
-    from reversion.models import VERSION_CHANGE
-
 # modify reversions to match our needs if required...
 
 
@@ -16,9 +12,11 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
      
     """
     
+    # reversion's merely recommended, not required
     if not 'reversion' in settings.INSTALLED_APPS:
         return
     
+    from reversion.models import VERSION_CHANGE
     if fields and exclude_fields:
         raise ValueError("Just one of fields, exclude_fields arguments can be passed.")
     
@@ -37,6 +35,8 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
 
 def make_revision_with_plugins(obj, user=None, message=None):
     from cms.models.pluginmodel import CMSPlugin
+    # we can safely import reversion - calls here always check for 
+    # reversion in installed_applications first
     import reversion
     """
     Only add to revision if it is a draft.
