@@ -120,16 +120,16 @@ class PageAddForm(forms.ModelForm):
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
-            t = page.get_title_obj(lang)
-            if t:
-                oldslug = t.slug
-                t.slug = self.cleaned_data['slug']
-                t.save()
+            title = page.get_title_obj(lang)
+            if title:
+                oldslug = title.slug
+                title.slug = self.cleaned_data['slug']
+                title.save()
                 try:
-                    is_valid_overwrite_url(t.path,page)
+                    is_valid_overwrite_url(title.path,page)
                 except ValidationError,e:
-                    t.slug = oldslug
-                    t.save()
+                    title.slug = oldslug
+                    title.save()
                     del cleaned_data['published']
                     self._errors['published'] = ErrorList(e.messages)
         return cleaned_data
