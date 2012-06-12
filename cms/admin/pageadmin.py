@@ -19,6 +19,7 @@ from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
 from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
+from distutils.version import LooseVersion
 from django import template
 from django.conf import settings
 from django.contrib import admin
@@ -27,7 +28,7 @@ from django.contrib.admin.util import unquote, get_deleted_objects
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import transaction, models
+from django.db import router, transaction, models
 from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
@@ -39,15 +40,9 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 import django
-import inspect
 
 
-
-# silly hack to test features/ fixme
-if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
-    from django.db import router
-else:
-    router = False
+DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -56,6 +51,17 @@ if 'reversion' in settings.INSTALLED_APPS:
 else: # pragma: no cover
     from django.contrib.admin import ModelAdmin
     create_on_success = lambda x: x
+
+if DJANGO_1_3:
+    """
+    Backwards compatibility for Django < 1.4 and django-reversion 1.6
+    """
+    class ModelAdmin(ModelAdmin):
+        def get_inline_instances(self, request):
+            return self.inline_instances
+        
+        def get_prepopulated_fields(self, request):
+            return self.prepopulated_fields
 
 
 def contribute_fieldsets(cls):
@@ -643,12 +649,12 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
-            if django.VERSION >= (1, 4):
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
-            else:
+            if DJANGO_1_3:
                 cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
                     self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
+            else:
+                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -949,18 +955,12 @@ class PageAdmin(ModelAdmin):
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
-        if django.VERSION[1] > 2: # pragma: no cover
-            using = router.db_for_read(self.model)
-            kwargs = {
-                'admin_site': self.admin_site,
-                'user': request.user,
-                'using': using
-            }
-        else:
-            kwargs = {
-                'admin_site': self.admin_site,
-                'user': request.user,
-            }
+        using = router.db_for_read(self.model)
+        kwargs = {
+            'admin_site': self.admin_site,
+            'user': request.user,
+            'using': using
+        }
         deleted_objects, perms_needed =  get_deleted_objects(
             [titleobj],
             titleopts,
