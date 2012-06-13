@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.compat import ADMIN_STATIC_PREFIX
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser, Placeholder
 from cms.plugin_pool import plugin_pool
@@ -170,7 +171,7 @@ class UserSelectAdminWidget(Select):
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Add Another')))
+            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (ADMIN_STATIC_PREFIX, _('Add Another')))
         return mark_safe(u''.join(output))
     
     

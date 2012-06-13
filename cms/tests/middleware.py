@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.compat import ADMIN_STATIC_PREFIX
 from cms.middleware.multilingual import MultilingualURLMiddleware, HAS_LANG_PREFIX_RE
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -81,7 +82,7 @@ class MiddlewareTestCase(CMSTestCase):
                 </ul>""" %(
                     settings.MEDIA_URL,
                     settings.STATIC_URL,
-                    settings.ADMIN_MEDIA_PREFIX,
+                    ADMIN_STATIC_PREFIX,
                     '/some-path/',
                 )
             
@@ -94,7 +95,7 @@ class MiddlewareTestCase(CMSTestCase):
             # These shall not
             self.assertTrue('href="%simages/some-media-file.jpg' %settings.MEDIA_URL in response.content)
             self.assertTrue('href="%simages/some-static-file.jpg' %settings.STATIC_URL in response.content)            
-            self.assertTrue('href="%simages/some-admin-file.jpg' %settings.ADMIN_MEDIA_PREFIX in response.content)
+            self.assertTrue('href="%simages/some-admin-file.jpg' %ADMIN_STATIC_PREFIX in response.content)
             
     
     def test_multilingual_middleware_handles_redirections(self):

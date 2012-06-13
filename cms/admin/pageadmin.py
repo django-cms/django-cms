@@ -6,6 +6,7 @@ from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES,
     PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
+from cms.compat import ADMIN_STATIC_PREFIX
 from cms.exceptions import NoPermissionsException
 from cms.forms.widgets import PluginEditor
 from cms.models import (Page, Title, CMSPlugin, PagePermission, 
@@ -168,7 +169,7 @@ class PageAdmin(ModelAdmin):
                 'css/jquery.dialog.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+        js = ['%sjs/jquery.min.js' % ADMIN_STATIC_PREFIX] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/libs/jquery.query.js',
                 'js/libs/jquery.ui.core.js',
@@ -522,7 +523,7 @@ class PageAdmin(ModelAdmin):
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
-                'ADMIN_MEDIA_URL': settings.ADMIN_MEDIA_PREFIX,
+                'ADMIN_MEDIA_URL': ADMIN_STATIC_PREFIX,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
                 'has_moderate_permission': obj.has_moderate_permission(request),
                 'moderation_level': moderation_level,

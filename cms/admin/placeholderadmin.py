@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.compat import ADMIN_STATIC_PREFIX
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
@@ -16,7 +17,6 @@ from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
 
-
 class PlaceholderAdmin(ModelAdmin):
       
     class Media:
@@ -29,7 +29,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+        js = ['%sjs/jquery.min.js' % ADMIN_STATIC_PREFIX] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/csrf.js',
                 'js/libs/jquery.query.js',
