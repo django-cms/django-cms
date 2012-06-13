@@ -11,3 +11,6 @@ script:
     python runtests.py
 notifications:
     email: false
+    irc:
+        - "irc.freenode.org#django-cms"
+        - "irc.freenode.org#django-cms-sprint"
