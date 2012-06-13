@@ -16,9 +16,9 @@ register = template.Library()
 
 
 if LooseVersion(django.get_version()) < LooseVersion('1.4'):
-    CMS_ADMIN_ICON_BASE = "%s/admin/img/admin/" % settings.STATIC_URL
+    CMS_ADMIN_ICON_BASE = "%sadmin/img/admin/" % settings.STATIC_URL
 else:
-    CMS_ADMIN_ICON_BASE = "%s/admin/img/" % settings.STATIC_URL
+    CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 class ShowAdminMenu(InclusionTag):
     name = 'show_admin_menu'
