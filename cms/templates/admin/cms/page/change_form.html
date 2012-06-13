@@ -1,5 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_modify adminmedia cms_tags cms_admin %}
+{% with admin_static = STATIC_URL + 'admin/' %}
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
@@ -10,7 +11,7 @@
 {% if not add %}
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_form.js"></script>
 {% endif %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
+<script type="text/javascript" src="{{ ADMIN_STATIC }}js/urlify.js"></script>
 
 {% if add %}
 <script type="text/javascript">
@@ -288,3 +289,4 @@
 </div>
 </form></div>
 {% endblock %}
+{% endwith %}
