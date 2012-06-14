@@ -383,7 +383,7 @@ class AdminTestCase(AdminTestsBase):
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
         client = Client()
         client.login(username='admin', password='admin')
-        client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_3%2Cpage_225%2Cpage_182'
+        client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
         response = client.get(url)
         self.assertContains(response,"<title>List of pages</title>")
 
