@@ -73,8 +73,6 @@ Tracing the logic of the menu system
 
 Let's look at an example using the {% show_menu %} templatetag. 
 
-In the representation below, an blank line separates methods. An indentation reflects a similar Python/logical indentation.
-
 Each of the methods below passes a big list of nodes to the ones it calls, and returns them to the one that it was in turn called by.
                  
 Don't forget that show_menu recurses - so it will do all of the below for each level in the menu.
@@ -87,40 +85,20 @@ Don't forget that show_menu recurses - so it will do all of the below for each l
 				* unregistered Modifier classes, placing them in the self.modifiers list
             * menu_pool.MenuPool._build_nodes() 
                 * checks the cache to see if it should return cached nodes
-                * loops over the Menus in self.menus; for each:
-                    # note: by default the only generator is cms.menu.CMSMenu
+                * loops over the Menus in self.menus (note: by default the only generator is cms.menu.CMSMenu); for each:
 				    * call its get_nodes() # the menu generator
 				    * calls menu_pool._build_nodes_inner_for_one_menu(), add all nodes into a big list
             * menu_pool.MenuPool.apply_modifiers() 
                 * menu_pool.MenuPool._mark_selected() # loops over each node, comparing its URL with the request.path, and marks the best match as `selected`
-                * loops over the Modifiers in self.modifiers # the defaults are shown here
+                * loops over the Modifiers in self.modifiers calling modify(post_cut = False) # default Modifiers are:
                     * cms.menu.NavExtender
                     * cms.menu.SoftRootCutter 
-                    * menus.modifiers.Marker
-                    * menus.modifiers.AuthVisibility
-                    * menus.modifiers.Level]:
-            
-                    cms.menu.NavExtender.modify() [needs a description]
-                
-                    cms.menu.SoftRootCutter.modify() [needs a description]
-                
-                    menus.modifiers.Marker.modify():
-                        loops over all nodes
-                            once it has found the selected node, marks all its ancestors, siblings and children
-                
-                    menus.modifiers.AuthVisibility.modify() [removes nodes that require authorisation]
-                
-                    menus.modifiers.Level.modify():
-                        if post_cut = False, loops over all nodes; for each one that is a root node (level = 0) passes it to:
-
-                            menus.modifiers.Level.mark_levels(): 
-                                [recurses over a node's descendants marking their levels until it has reached them all]
-
-        [we are now back in menu_tags.ShowMenu.render() again]
-        if we have been provided a root_id, get rid of any nodes other than its descendants]
-    
-        menus.templatetags.cut_levels() [removes nodes from the menu according to the arguments provided by the templatetag]
-    
-        menu_pool.MenuPool.apply_modifiers(post_cut = True) [remember we did these earlier with post_cut = False]
-
-        returns the nodes to the context
+                    * menus.modifiers.Marker # loops over all nodes; finds selected, marks its ancestors, siblings and children
+                    * menus.modifiers.AuthVisibility # removes nodes that require authorisation
+                    * menus.modifiers.Level # loops over all nodes; for each one that is a root node (level = 0) passes it to:
+                        * menus.modifiers.Level.mark_levels() # recurses over a node's descendants marking their levels
+    * back in menu_tags.ShowMenu.get_context() again
+    * if we have been provided a root_id, get rid of any nodes other than its descendants
+    * menus.templatetags.cut_levels() # removes nodes from the menu according to the arguments provided by the templatetag
+    * menu_pool.MenuPool.apply_modifiers(post_cut = True) # I won't list them all again
+    * return the nodes to the context
