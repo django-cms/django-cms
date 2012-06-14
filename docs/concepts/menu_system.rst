@@ -88,7 +88,7 @@ Don't forget that show_menu recurses - so it will do all of the below for each l
             * menu_pool.MenuPool._build_nodes() 
                 * checks the cache to see if it should return cached nodes
                 * loops over the Menus in self.menus; for each:
-                # note: by default the only generator is cms.menu.CMSMenu
+                    # note: by default the only generator is cms.menu.CMSMenu
 				    * call its get_nodes() # the menu generator
 				    * calls menu_pool._build_nodes_inner_for_one_menu(), add all nodes into a big list
             * menu_pool.MenuPool.apply_modifiers() 
