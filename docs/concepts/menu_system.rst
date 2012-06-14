@@ -79,23 +79,15 @@ Each of the methods below passes a big list of nodes to the ones it calls, and r
                  
 Don't forget that show_menu recurses - so it will do all of the below for each level in the menu.
 
-    {% show_menu %}: # the templatetag in the template
-
-        menu_tags.ShowMenu.get_context():
-
-            menu_pool.MenuPool.get_nodes():
-
-                menu_pool.MenuPool.discover_menus():
-                    # this loops over every application, checking the menu.py file; it registers:
-     				* 	unregistered Menu classes, placing them in the self.menus dict
-    				*	unregistered Modifier classes, placing them in the self.modifiers list]
-
-                menu_pool.MenuPool._build_nodes():
-                    [this first checks the cache to see if it should return cached nodes]
-
-                    [then, it loops over the Menus in self.menus - by default the only one is:
-                    *   cms.menu.CMSMenu]:
-                
+    {% show_menu %} # the templatetag in the template
+        menu_tags.ShowMenu.get_context() 
+            menu_pool.MenuPool.get_nodes()
+                menu_pool.MenuPool.discover_menus() # checks every application's menu.py, and registers:
+     				unregistered Menu classes, placing them in the self.menus dict
+    				unregistered Modifier classes, placing them in the self.modifiers list
+                menu_pool.MenuPool._build_nodes() 
+                    * checks the cache to see if it should return cached nodes
+                    * loops over the Menus in self.menus - by default the only one is cms.menu.CMSMenu
     				cms.menu.CMSMenu.get_nodes() [the menu's own method for getting nodes]
 
     				menu_pool._build_nodes_inner_for_one_menu() [I don't really understand what this does]
