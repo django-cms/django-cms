@@ -71,34 +71,44 @@ How does all this work?
 Tracing the logic of the menu system
 ====================================
 
-Let's look at an example using the {% show_menu %} templatetag. 
+Let's look at an example using the {% show_menu %} templatetag. It will be different for other templatetags, and your applications might have their own menu classes. But this should help explain what's going on and what the menu system is doing.
 
-Each of the methods below passes a big list of nodes to the ones it calls, and returns them to the one that it was in turn called by.
+One thing to understand is that the system passes around a list of ``nodes``, doing various things to it. 
+
+Many of the methods below pass this list of nodes to the ones it calls, and return them to the ones that they were in turn called by.
                  
-Don't forget that show_menu recurses - so it will do all of the below for each level in the menu.
+Don't forget that show_menu recurses - so it will do *all* of the below for *each level* in the menu.
 
-* {% show_menu %} # the templatetag in the template
-    * menu_tags.ShowMenu.get_context() 
-        * menu_pool.MenuPool.get_nodes()
-            * menu_pool.MenuPool.discover_menus() # checks every application's menu.py, and registers:
- 				* unregistered Menu classes, placing them in the self.menus dict
-				* unregistered Modifier classes, placing them in the self.modifiers list
-            * menu_pool.MenuPool._build_nodes() 
+* ``{% show_menu %}`` - the templatetag in the template
+    * ``menu_tags.ShowMenu.get_context()`` 
+        * ``menu_pool.MenuPool.get_nodes()``
+            * ``menu_pool.MenuPool.discover_menus()`` checks every application's menu.py, and registers:
+ 				* Menu classes, placing them in the self.menus dict
+				* Modifier classes, placing them in the self.modifiers list
+            * ``menu_pool.MenuPool._build_nodes()`` 
                 * checks the cache to see if it should return cached nodes
                 * loops over the Menus in self.menus (note: by default the only generator is cms.menu.CMSMenu); for each:
-				    * call its get_nodes() # the menu generator
-				    * calls menu_pool._build_nodes_inner_for_one_menu(), add all nodes into a big list
-            * menu_pool.MenuPool.apply_modifiers() 
-                * menu_pool.MenuPool._mark_selected() # loops over each node, comparing its URL with the request.path, and marks the best match as `selected`
-                * loops over the Modifiers in self.modifiers calling modify(post_cut = False) # default Modifiers are:
-                    * cms.menu.NavExtender
-                    * cms.menu.SoftRootCutter 
-                    * menus.modifiers.Marker # loops over all nodes; finds selected, marks its ancestors, siblings and children
-                    * menus.modifiers.AuthVisibility # removes nodes that require authorisation
-                    * menus.modifiers.Level # loops over all nodes; for each one that is a root node (level = 0) passes it to:
-                        * menus.modifiers.Level.mark_levels() # recurses over a node's descendants marking their levels
-        * # we're back in menu_tags.ShowMenu.get_context() again
+				    * call its get_nodes() - the menu generator
+				    * ``menu_pool._build_nodes_inner_for_one_menu()``
+				    * adds all nodes into a big list
+            * ``menu_pool.MenuPool.apply_modifiers()`` 
+                * ``menu_pool.MenuPool._mark_selected()`` 
+                * loops over each node, comparing its URL with the request.path, and marks the best match as ``selected``
+                * loops over the Modifiers in self.modifiers calling ``modify(post_cut = False)``. The default Modifiers are:
+                    * ``cms.menu.NavExtender``
+                    * ``cms.menu.SoftRootCutter`` removes all nodes below the appropriate soft root 
+                    * ``menus.modifiers.Marker`` loops over all nodes; finds selected, marks its ancestors, siblings and children
+                    * ``menus.modifiers.AuthVisibility`` removes nodes that require authorisation to see
+                    * ``menus.modifiers.Level`` loops over all nodes; for each one that is a root node (level = 0) passes it to:
+                        * ``menus.modifiers.Level.mark_levels()`` recurses over a node's descendants marking their levels
+        * we're now back in ``menu_tags.ShowMenu.get_context()`` again
         * if we have been provided a root_id, get rid of any nodes other than its descendants
-        * menus.templatetags.cut_levels() # removes nodes from the menu according to the arguments provided by the templatetag
-        * menu_pool.MenuPool.apply_modifiers(post_cut = True) # I won't list them all again
+        * ``menus.templatetags.cut_levels()`` removes nodes from the menu according to the arguments provided by the templatetag
+        * ``menu_pool.MenuPool.apply_modifiers(post_cut = True)`` loops over all the Modifiers again
+            * ``cms.menu.NavExtender``
+            * ``cms.menu.SoftRootCutter`` 
+            * ``menus.modifiers.Marker`` 
+            * ``menus.modifiers.AuthVisibility`` 
+            * ``menus.modifiers.Level``
+                * ``menus.modifiers.Level.mark_levels()``
         * return the nodes to the context
