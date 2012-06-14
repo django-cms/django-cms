@@ -24,7 +24,8 @@ from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote, get_deleted_objects
+from django.contrib.admin.util import get_deleted_objects
+from urllib2 import unquote
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
