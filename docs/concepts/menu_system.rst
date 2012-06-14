@@ -97,8 +97,8 @@ Don't forget that show_menu recurses - so it will do all of the below for each l
                     * menus.modifiers.AuthVisibility # removes nodes that require authorisation
                     * menus.modifiers.Level # loops over all nodes; for each one that is a root node (level = 0) passes it to:
                         * menus.modifiers.Level.mark_levels() # recurses over a node's descendants marking their levels
-    * back in menu_tags.ShowMenu.get_context() again
-    * if we have been provided a root_id, get rid of any nodes other than its descendants
-    * menus.templatetags.cut_levels() # removes nodes from the menu according to the arguments provided by the templatetag
-    * menu_pool.MenuPool.apply_modifiers(post_cut = True) # I won't list them all again
-    * return the nodes to the context
+        * # we're back in menu_tags.ShowMenu.get_context() again
+        * if we have been provided a root_id, get rid of any nodes other than its descendants
+        * menus.templatetags.cut_levels() # removes nodes from the menu according to the arguments provided by the templatetag
+        * menu_pool.MenuPool.apply_modifiers(post_cut = True) # I won't list them all again
+        * return the nodes to the context
