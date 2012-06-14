@@ -370,6 +370,23 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(root_page.get_children()[1], second_level_page_bottom)
         self.assertEqual(root_page.get_children()[0].get_children()[0], third_level_page)
 
+    def test_changelist_tree(self):
+        admin = self._get_guys(True)
+        first_level_page = create_page('level1',  'nav_playground.html', 'en')
+        second_level_page_top = create_page('level21', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= first_level_page)
+        second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= self.reload(first_level_page))
+        third_level_page = create_page('level3', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= second_level_page_top)
+
+        url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
+        client = Client()
+        client.login(username='admin', password='admin')
+        client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_3%2Cpage_225%2Cpage_182'
+        response = client.get(url)
+        self.assertContains(response,"<title>List of pages</title>")
+
 
 
 class AdminFieldsetTests(TestCase):
