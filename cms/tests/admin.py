@@ -371,6 +371,11 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(root_page.get_children()[0].get_children()[0], third_level_page)
 
     def test_changelist_tree(self):
+        """ This test checks for proper jstree cookie unquoting.
+
+        It should be converted to a selenium test to actually test the jstree behaviour.
+        Cookie set below is just a forged example (from live session)
+        """
         admin = self._get_guys(True)
         first_level_page = create_page('level1',  'nav_playground.html', 'en')
         second_level_page_top = create_page('level21', "nav_playground.html", "en",
