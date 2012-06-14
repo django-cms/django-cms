@@ -57,6 +57,18 @@ Extending the CMS
     extending_cms/searchdocs
     extending_cms/fields
 
+ 
+********
+Concepts
+********
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    concepts/introduction
+    concepts/menu_system
+
 
 **************************
 Contributing to django CMS
