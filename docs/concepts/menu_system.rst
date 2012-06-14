@@ -87,25 +87,18 @@ Don't forget that show_menu recurses - so it will do all of the below for each l
 				* unregistered Modifier classes, placing them in the self.modifiers list
             * menu_pool.MenuPool._build_nodes() 
                 * checks the cache to see if it should return cached nodes
-                * loops over the Menus in self.menus - by default the only one is cms.menu.CMSMenu
-				* cms.menu.CMSMenu.get_nodes() [the menu's own method for getting nodes]
-
-				menu_pool._build_nodes_inner_for_one_menu() [I don't really understand what this does]
-
-				adds all nodes into a big list
-                    ]
-
-            menu_pool.MenuPool.apply_modifiers(): 
-
-                menu_pool.MenuPool._mark_selected():
-                    [loops over each node, comparing its URL with the request.path, and marks the best match as selected]
-
-                [loops over the Modifiers in self.modifiers - by default, these are:
-                *   cms.menu.NavExtender
-                *   cms.menu.SoftRootCutter 
-                *   menus.modifiers.Marker
-                *   menus.modifiers.AuthVisibility
-                *   menus.modifiers.Level]:
+                * loops over the Menus in self.menus; for each:
+                # note: by default the only generator is cms.menu.CMSMenu
+				    * call its get_nodes() # the menu generator
+				    * calls menu_pool._build_nodes_inner_for_one_menu(), add all nodes into a big list
+            * menu_pool.MenuPool.apply_modifiers() 
+                * menu_pool.MenuPool._mark_selected() # loops over each node, comparing its URL with the request.path, and marks the best match as `selected`
+                * loops over the Modifiers in self.modifiers # the defaults are shown here
+                    * cms.menu.NavExtender
+                    * cms.menu.SoftRootCutter 
+                    * menus.modifiers.Marker
+                    * menus.modifiers.AuthVisibility
+                    * menus.modifiers.Level]:
             
                     cms.menu.NavExtender.modify() [needs a description]
                 
