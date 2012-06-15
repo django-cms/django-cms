@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 from classytags.arguments import Argument
-from classytags.core import Options
+from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
+from distutils.version import LooseVersion
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
+import django
 
 register = template.Library()
 
+
+if LooseVersion(django.get_version()) < LooseVersion('1.4'):
+    CMS_ADMIN_ICON_BASE = "%sadmin/img/admin/" % settings.STATIC_URL
+else:
+    CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 class ShowAdminMenu(InclusionTag):
     name = 'show_admin_menu'
@@ -109,7 +116,7 @@ register.tag(CleanAdminListFilter)
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (admin_static_url(), BOOLEAN_MAPPING[value], value))
+    return mark_safe(u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING[value], value))
 
 @register.filter
 def is_restricted(page, request):
@@ -220,3 +227,12 @@ def admin_static_url():
     If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
     """
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
+
+
+class CMSAdminIconBase(Tag):
+    name = 'cms_admin_icon_base'
+
+    def render_tag(self, context):
+        return CMS_ADMIN_ICON_BASE
+
+register.tag(CMSAdminIconBase)

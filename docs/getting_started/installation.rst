@@ -10,7 +10,7 @@ Requirements
 ************
 
 * `Python`_ 2.5 (or a higher release of 2.x).
-* `Django`_ 1.2.5 (or a 1.3.x release).
+* `Django`_ 1.3.1 or 1.4.
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
