@@ -1,9 +1,9 @@
 from cms.models.fields import PlaceholderField
+from cms.vendored.mptt.models import MPTTModel
 from django.core.urlresolvers import reverse
 from django.db import models
-import mptt
 
-class Category(models.Model):
+class Category(MPTTModel):
     parent = models.ForeignKey('self', blank=True, null=True)
     name = models.CharField(max_length=20)
     description = PlaceholderField('category_description', 600)
@@ -17,10 +17,6 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = 'categories'
     
-try:
-    mptt.register(Category)
-except mptt.AlreadyRegistered:
-    pass
 
 class Picture(models.Model):
     image = models.ImageField(upload_to="pictures")

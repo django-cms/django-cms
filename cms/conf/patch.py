@@ -3,7 +3,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy  as _
 from sekizai.helpers import validate_template
-from warnings import warn
 
 def pre_patch():
     """Patch settings befere adding global cms defaults

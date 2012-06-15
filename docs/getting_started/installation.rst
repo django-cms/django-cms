@@ -14,13 +14,12 @@ Requirements
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
-* `django-mptt`_ 0.5.1 (strict to due API compatibility issues)
 * `django-sekizai`_ 0.4.2 or higher
 * `html5lib`_ 0.90 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
 
-.. note:: When installing the django CMS using pip, Django, django-mptt
+.. note:: When installing the django CMS using pip, Django,
           django-classy-tags, django-sekizai, south and html5lib will be
           installed automatically.
 
@@ -29,7 +28,6 @@ Requirements
 .. _PIL: http://www.pythonware.com/products/pil/
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
-.. _django-mptt: https://github.com/django-mptt/django-mptt
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: http://code.google.com/p/html5lib/
 
