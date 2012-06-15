@@ -96,7 +96,7 @@ Don't forget that show_menu recurses - so it will do *all* of the below for *eac
                 * checks the cache to see if it should return cached nodes
                 * loops over the Menus in self.menus (note: by default the only generator is :py:class:`cms.menu.CMSMenu`); for each:
 				    * call its :py:meth:`get_nodes()` - the menu generator
-				    * :py:function:`menus.menu_pool._build_nodes_inner_for_one_menu()`
+				    * :py:meth:`menus.menu_pool._build_nodes_inner_for_one_menu()`
 				    * adds all nodes into a big list
             * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()` 
                 * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
