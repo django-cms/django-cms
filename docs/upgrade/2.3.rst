@@ -83,4 +83,4 @@ New minimum requirements for dependencies
 Pending deprecations
 ********************
 
-The ``CMS_FLAT_URLS`` setting is deprecated adn will be removed in version 2.4.
+The ``CMS_FLAT_URLS`` setting is deprecated and will be removed in version 2.4.
