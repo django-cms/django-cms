@@ -64,7 +64,7 @@ def patch_response(content, pages_root, language):
     ))
 
     content = HREF_URL_FIX_RE.sub(ur'<a\1href=\2/%s%s\5\6\7>' % (language, pages_root), content)
-    content = FORM_URL_FIX_RE.sub(ur'<form\1action=\2%s%s/\5\6\7>' % (pages_root, language), content).encode("utf8")
+    content = FORM_URL_FIX_RE.sub(ur'<form\1action=\2/%s%s\5\6\7>' % (language, pages_root), content).encode("utf8")
     return content
 
 class MultilingualURLMiddleware(object):
