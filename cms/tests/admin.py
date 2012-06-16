@@ -416,6 +416,7 @@ class AdminTestCase(AdminTestsBase):
         response = pageadmin.changelist_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed("admin/cms/page/change_list.html")
+        self.assertEquals(response.context["open_menu_trees"], [1,2])
 
 
 class AdminFieldsetTests(TestCase):
