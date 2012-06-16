@@ -392,6 +392,30 @@ class AdminTestCase(AdminTestsBase):
         response = client.get(url)
         self.assertContains(response,"<title>List of pages</title>")
 
+    def test_changelist_unquote(self):
+        """ This test checks for proper jstree cookie unquoting.
+
+        It should be converted to a selenium test to actually test the jstree behaviour.
+        Cookie set below is just a forged example (from live session)
+        """
+        from cms.admin.pageadmin import PageAdmin
+        first_level_page = create_page('level1',  'nav_playground.html', 'en')
+        second_level_page_top = create_page('level21', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= first_level_page)
+        second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= self.reload(first_level_page))
+        third_level_page = create_page('level3', "nav_playground.html", "en",
+                            created_by=admin, published=True, parent= second_level_page_top)
+
+        url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
+        request = self.request_factory.get(url)
+        request.user = self.get_superuser()
+        request.session = {}
+        request.COOKIES = {'djangocms_nodes_open':'page_1%2Cpage_2'}
+        pageadmin = site._registry[Page]
+        response = pageadmin.changelist_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed("admin/cms/page/change_list.html")
 
 
 class AdminFieldsetTests(TestCase):
