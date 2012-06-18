@@ -78,6 +78,18 @@ New minimum requirements for dependencies
 * ``django-reversion`` must now be at version 1.6
 * ``django-sekizai`` must be at least at version 0.6.1
 
+Registering a list of plugins in the plugin pool
+================================================
+This feature was deprecated in version 2.2 and removed in 2.3. Code like this
+will not work anymore::
+
+    plugin_pool.register_plugin([FooPlugin, BarPlugin])
+
+Instead, use multiple calls to ``register_plugin``::
+
+    plugin_pool.register_plugin(FooPlugin)
+    plugin_pool.register_plugin(BarPlugin)
+
 
 ********************
 Pending deprecations
