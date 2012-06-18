@@ -279,7 +279,8 @@ class CMSMenu(Menu):
             pages.filter(parent__in=relevant_pages).distinct() | \
             relevant_pages.distinct() | \
             pages.filter(parent__in=current_page_queryset).distinct() | \
-            current_page_queryset
+            current_page_queryset | \
+            pages.filter(level=0).distinct()
         
         # do they need to be ordered here? I am not sure this is necessary 
         pages = pages.order_by("tree_id", "lft")
