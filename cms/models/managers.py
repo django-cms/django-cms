@@ -351,8 +351,8 @@ class PagePermissionManager(BasicPagePermissionManager):
         # NOTE:  '... or 0' is used for test cases, 
         #        if the page is not saved through mptt
         left_right = {
-              'page__%s__lte' % page._meta.left_attr: getattr(page, page._meta.left_attr) or 0,
-              'page__%s__gte' % page._meta.right_attr: getattr(page, page._meta.right_attr) or 0,
+              'page__%s__lte' % page._mptt_meta.left_attr: getattr(page, page._mptt_meta.left_attr) or 0,
+              'page__%s__gte' % page._mptt_meta.right_attr: getattr(page, page._mptt_meta.right_attr) or 0,
         }
         q_parents = Q(**left_right)
         q_desc = (Q(page__level__lt=page.level) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
