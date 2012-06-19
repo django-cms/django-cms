@@ -158,7 +158,7 @@ class CMSChangeList(ChangeList):
         for page in pages:
            
 
-            children = page.get_children()
+            children = list(page.get_children())
 
             # note: We are using change_list permission here, because we must
             # display also pages which user must not edit, but he haves a 
