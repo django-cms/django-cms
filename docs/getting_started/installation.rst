@@ -14,8 +14,8 @@ Requirements
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
-* `django-mptt`_ 0.5.1 (strict to due API compatibility issues)
-* `django-sekizai`_ 0.4.2 or higher
+* `django-mptt`_ 0.5.2 (strict due to API compatibility issues)
+* `django-sekizai`_ 0.6.1 or higher
 * `html5lib`_ 0.90 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
