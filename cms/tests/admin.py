@@ -5,8 +5,7 @@ from cms.admin.dialog.forms import (ModeratorForm, PermissionForm,
     PermissionAndModeratorForm)
 from cms.admin.dialog.views import _form_class_selector
 from cms.admin.forms import PageForm
-from cms.admin.pageadmin import (contribute_fieldsets, contribute_list_filter, 
-    PageAdmin)
+from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.moderatormodels import PageModeratorState
@@ -31,6 +30,7 @@ from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, 
     HttpResponse)
 from django.test.client import Client
+from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType
 from unittest import TestCase
@@ -350,12 +350,15 @@ class AdminTestCase(AdminTestsBase):
         request.user = admin
         
         page_admin = site._registry[Page]
-                
-        cl = CMSChangeList(request, page_admin.model, page_admin.list_display,
+
+        cl_params = [request, page_admin.model, page_admin.list_display,
                             page_admin.list_display_links, page_admin.list_filter,
                             page_admin.date_hierarchy, page_admin.search_fields, 
-                            page_admin.list_select_related, page_admin.list_per_page, 
-                            page_admin.list_editable, page_admin)
+                            page_admin.list_select_related, page_admin.list_per_page]
+        if hasattr(page_admin, 'list_max_show_all'): # django 1.4
+            cl_params.append(page_admin.list_max_show_all)
+        cl_params.extend([page_admin.list_editable, page_admin])
+        cl = CMSChangeList(*tuple(cl_params))
         
         cl.set_items(request)
         
@@ -941,7 +944,7 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
-class AdminFormsTests(TestCase):
+class AdminFormsTests(AdminTestsBase):
     def test_clean_overwrite_url(self):
         user = AnonymousUser()
         user.is_superuser = True
@@ -967,3 +970,101 @@ class AdminFormsTests(TestCase):
             Title.objects.set_or_create(request, instance, form, 'en')
             form = PageForm(data, instance=instance)
             self.assertTrue(form.is_valid(), form.errors.as_text())
+
+    def test_reverse_id_error_location(self):
+        ''' Test moving the reverse_id validation error to a field specific one '''
+
+        # this is the Reverse ID we'll re-use to break things.
+        dupe_id = 'p1'
+        site = Site.objects.get_current()
+        page1 = create_page('Page 1', 'nav_playground.html', 'en', reverse_id=dupe_id)
+        # Assemble a bunch of data to test the page form
+        page2_data = {
+            'title': 'Page 2',
+            'slug': 'page-2',
+            'language': 'en',
+            'site': site.pk,
+            'template': settings.CMS_TEMPLATES[0][0],
+            'reverse_id': dupe_id,
+        }
+        form = PageForm(data=page2_data, files=None)
+        self.assertTrue(not form.is_valid())
+        # reverse_id is the only item that is in __all__ as every other field
+        # has it's own clean method. Moving it to be a field error means
+        # __all__ is now not available.
+        self.assertTrue('__all__' not in form.errors)
+        # In moving it to it's own field, it should be in form.errors, and
+        # the values contained therein should match these.
+        self.assertTrue('reverse_id' in form.errors)
+        self.assertEqual(1, len(form.errors['reverse_id']))
+        self.assertEqual([u'A page with this reverse URL id exists already.'],
+            form.errors['reverse_id'])
+
+        admin = self._get_guys(admin_only=True)
+        # reset some of page2_data so we can use cms.api.create_page
+        page2_data['reverse_id'] = None
+        page2_data['site'] = site
+        page2 = create_page(**page2_data)
+        with self.login_user_context(admin):
+            # re-reset the page2_data for the admin form instance.
+            page2_data['reverse_id'] = dupe_id
+            page2_data['site'] = site.pk
+            # This is needed to avoid management form tampering errors.
+            page2_data['pagepermission_set-TOTAL_FORMS'] = 0
+            page2_data['pagepermission_set-INITIAL_FORMS'] = 0
+            page2_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+            page2_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+            page2_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+            page2_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+            # post to the admin change form for page 2, and test that the
+            # reverse_id form row has an errors class. Django's admin avoids
+            # collapsing these, so that the error is visible.
+            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page2.pk, page2_data)
+            self.assertTrue('<div class="form-row errors reverse_id">' in resp.content)
+
+
+class AdminPageEditContentSizeTests(AdminTestsBase):
+    """
+    System user count influences the size of the page edit page,
+    but the users are only 2 times present on the page
+    
+    The test relates to extra=0 
+    at PagePermissionInlineAdminForm and ViewRestrictionInlineAdmin
+    """
+    
+    def test_editpage_contentsize(self):
+        """
+        Expected a username only 2 times in the content, but a relationship
+        between usercount and pagesize
+        """
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
+            admin = self.get_superuser()
+            PAGE_NAME = 'TestPage'
+            USER_NAME = 'test_size_user_0'
+            site = Site.objects.get(pk = 1)
+            page = create_page(PAGE_NAME, "nav_playground.html", "en", site=site, created_by=admin)
+            page.save()
+            self._page = page
+            with self.login_user_context(admin):
+                url = base.URL_CMS_PAGE_CHANGE % self._page.pk
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                old_response_size = len(response.content)
+                old_user_count = User.objects.count()
+                # create additionals user and reload the page
+                User.objects.create(username=USER_NAME, is_active=True)
+                user_count = User.objects.count()
+                more_users_in_db = old_user_count < user_count 
+                # we have more users
+                self.assertTrue(more_users_in_db,"New users got NOT created")
+                response = self.client.get(url)
+                new_response_size = len(response.content)
+                page_size_grown = old_response_size < new_response_size
+                # expect that the pagesize gets influenced by the useramount of the system
+                self.assertTrue(page_size_grown,"Page size has not grown after user creation")
+                # usernames are only 2 times in content
+                text = smart_str(response.content, response._charset)
+                foundcount = text.count(USER_NAME)
+                # 2 forms contain usernames as options
+                self.assertEqual(foundcount, 2, "Username %s appeared %s times in response.content, expected 2 times" % (USER_NAME, foundcount))
+            

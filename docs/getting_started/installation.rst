@@ -10,12 +10,12 @@ Requirements
 ************
 
 * `Python`_ 2.5 (or a higher release of 2.x).
-* `Django`_ 1.2.5 (or a 1.3.x release).
+* `Django`_ 1.3.1 or 1.4.
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
-* `django-mptt`_ 0.4.2 or higher
-* `django-sekizai`_ 0.4.2 or higher
+* `django-mptt`_ 0.5.2 (strict due to API compatibility issues)
+* `django-sekizai`_ 0.6.1 or higher
 * `html5lib`_ 0.90 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
@@ -38,7 +38,7 @@ Recommended
 
 * `django-filer`_ with its `django CMS plugins`_, file and image management
   application to use instead of some core plugins
-* `django-reversion`_ 1.4, to support versions of your content
+* `django-reversion`_ 1.6, to support versions of your content
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer

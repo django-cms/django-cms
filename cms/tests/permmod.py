@@ -11,10 +11,11 @@ from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
+
 from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
-
+from django.db.models import Q
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
     """Permissions and moderator together
@@ -490,20 +491,51 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
     def test_superuser_can_view(self):
+        url = self.page_b.get_absolute_url(language='en')
         with self.login_user_context(self.user_super):
-            response = self.client.get("/en/pageb/")
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
     def test_staff_can_view(self):
-        with self.login_user_context(self.user_staff):
-            response = self.client.get("/en/pageb/")
-            self.assertEqual(response.status_code, 200)
-
+        url = self.page_b.get_absolute_url(language='en')
+        all_view_perms = PagePermission.objects.filter(can_view=True)
+        # verifiy that the user_staff has access to this page
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b:
+                if perm.user == self.user_staff:
+                    has_perm = True
+        self.assertEqual(has_perm, False)
+        login_ok = self.client.login(username=self.user_staff.username, password=self.user_staff.username)
+        self.assertTrue(login_ok)
+        # really logged in
+        self.assertTrue('_auth_user_id' in self.client.session)
+        login_user_id = self.client.session.get('_auth_user_id')
+        user = User.objects.get(username=self.user_staff.username)
+        self.assertEquals(login_user_id,user.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+    
     def test_user_normal_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
+        all_view_perms = PagePermission.objects.filter(can_view=True)
+        # verifiy that the normal_user has access to this page
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b:
+                if perm.user == self.user_normal:
+                    has_perm = True
+        self.assertEqual(has_perm, True)
         with self.login_user_context(self.user_normal):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+        
+        # verifiy that the user_non_global has not access to this page
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b:
+                if perm.user == self.user_non_global:
+                    has_perm = True
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
@@ -513,10 +545,10 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
     def test_user_globalpermission(self):
         # Global user
+        user_global = User(username="global", is_active=True)
+        user_global.set_password("global")
+        user_global.save()
         with self.login_user_context(self.user_super):
-            user_global = User(username="global", is_active=True)
-            user_global.set_password("global")
-            user_global.save()
             user_global = create_page_user(user_global, user_global)
             user_global.is_staff = False
             user_global.save() # Prevent is_staff permission
@@ -524,15 +556,36 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
                                       published=True)
             global_page = publish_page(global_page, user_global, approve=True)
             # it's allowed for the normal user to view the page
-            assign_user_to_page(global_page, user_global,
-                global_permission=True, can_view=True)
+            assign_user_to_page(global_page, user_global, 
+                                global_permission=True, can_view=True)
         
         url = global_page.get_absolute_url('en')
-
+        all_view_perms = PagePermission.objects.filter(can_view=True)
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b and perm.user == user_global:
+                has_perm = True
+        self.assertEqual(has_perm, False)
+        
+        global_page_perm_q = Q(user=user_global) & Q(can_view=True)
+        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        self.assertEqual(global_view_perms, True)
+        
+        # user_global
         with self.login_user_context(user_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+        # self.non_user_global
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b and perm.user == self.user_non_global:
+                has_perm = True
+        self.assertEqual(has_perm, False)
 
+        global_page_perm_q = Q(user=self.user_non_global) & Q(can_view=True)
+        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        self.assertEqual(global_view_perms, False)
+        
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)

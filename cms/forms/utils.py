@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db.models.signals import post_save, post_delete
 from django.utils import translation
+from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 
 
@@ -19,11 +20,13 @@ def update_site_and_page_choices(lang=None):
         title_queryset = Title.objects.filter(page__publisher_is_draft=False)
     else:
         title_queryset = Title.objects.filter(page__publisher_is_draft=True)
-    title_queryset = title_queryset.select_related('page', 'page__site')
-    pages = defaultdict(lambda: defaultdict(dict))
+    title_queryset = title_queryset.select_related('page', 'page__site').order_by('page__tree_id', 'page__lft', 'page__rght')
+    pages = defaultdict(SortedDict)
     sites = {}
     for title in title_queryset:
-        pages[title.page.site.pk][title.page.pk][title.language] = title
+        page = pages[title.page.site.pk].get(title.page.pk, {})
+        page[title.language] = title
+        pages[title.page.site.pk][title.page.pk] = page
         sites[title.page.site.pk] = title.page.site.name
     
     site_choices = []

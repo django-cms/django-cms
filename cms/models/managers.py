@@ -343,13 +343,23 @@ class PagePermissionManager(BasicPagePermissionManager):
         """
         from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN,\
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS 
+        # code taken from
+        # https://github.com/divio/django-cms/issues/1113#issuecomment-3376790
+        q_tree = Q(page__tree_id=page.tree_id)
+        q_page = Q(page=page)
         
-        q = Q(page__tree_id=page.tree_id) & (
-            Q(page=page) 
-            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
-        ) 
+        # NOTE:  '... or 0' is used for test cases, 
+        #        if the page is not saved through mptt
+        left_right = {
+              'page__%s__lte' % page._mptt_meta.left_attr: getattr(page, page._mptt_meta.left_attr) or 0,
+              'page__%s__gte' % page._mptt_meta.right_attr: getattr(page, page._mptt_meta.right_attr) or 0,
+        }
+        q_parents = Q(**left_right)
+        q_desc = (Q(page__level__lt=page.level) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
+        q_kids = (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
+        q = q_tree & q_parents & (q_page | q_desc | q_kids)
         return self.filter(q).order_by('page__level')
+        
 
 class PagePermissionsPermissionManager(models.Manager):
     """Page permissions permission manager.

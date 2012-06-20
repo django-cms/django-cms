@@ -101,8 +101,11 @@ def get_page_from_request(request, use_path=None):
     if use_path:
         path = use_path
     else:
-        # otherwise strip of the non-cms part of the URL 
-        path = request.path[len(pages_root):-1]
+        # otherwise strip off the non-cms part of the URL
+        path = request.path[len(pages_root):]
+        # and strip any final slash
+        if path.endswith("/"):
+            path = path[:-1]
     
     page = get_page_from_path(path, preview)
         

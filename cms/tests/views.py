@@ -6,16 +6,16 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.views import _handle_no_page, details
 from django.conf import settings
 from django.core.urlresolvers import clear_url_caches
-from django.http import Http404
+from django.http import Http404, HttpResponse
 import sys
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "project.sampleapp.cms_app"
+APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
 class ViewTests(SettingsOverrideTestCase):
-    urls = 'project.urls_for_apphook_tests'
+    urls = 'cms.test_utils.project.urls_for_apphook_tests'
     settings_overrides = {'CMS_MODERATOR': False}
     
     def setUp(self):
@@ -101,6 +101,22 @@ class ViewTests(SettingsOverrideTestCase):
         response = details(request, url.strip('/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_three)
+        
+    def test_redirect_to_self(self):
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect='/')
+        url = one.get_absolute_url()
+        request = self.get_request(url)
+        response = details(request, url.strip('/'))
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        
+    def test_redirect_to_self_with_host(self):
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect='http://testserver/')
+        url = one.get_absolute_url()
+        request = self.get_request(url)
+        response = details(request, url.strip('/'))
+        self.assertEqual(response.status_code, HttpResponse.status_code)
     
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,

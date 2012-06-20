@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 from classytags.arguments import Argument
-from classytags.core import Options
+from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
+from distutils.version import LooseVersion
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
+import django
 
 register = template.Library()
 
+
+if LooseVersion(django.get_version()) < LooseVersion('1.4'):
+    CMS_ADMIN_ICON_BASE = "%sadmin/img/admin/" % settings.STATIC_URL
+else:
+    CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 class ShowAdminMenu(InclusionTag):
     name = 'show_admin_menu'
@@ -46,6 +53,39 @@ class ShowAdminMenu(InclusionTag):
         return context
 register.tag(ShowAdminMenu)
 
+class ShowLazyAdminMenu(InclusionTag):
+    name = 'show_lazy_admin_menu'
+    template = 'admin/cms/page/lazy_child_menu.html'
+    
+    options = Options(
+        Argument('page')
+    )
+    
+    def get_context(self, context, page):
+        request = context['request']
+
+        
+        if context.has_key("cl"):
+            filtered = context['cl'].is_filtered()
+        elif context.has_key('filtered'):
+            filtered = context['filtered']
+        
+        
+        
+        # following function is newly used for getting the context per item (line)
+        # if something more will be required, then get_admin_menu_item_context
+        # function have to be updated. 
+        # This is done because item can be reloaded after some action over ajax.
+        context.update(get_admin_menu_item_context(request, page, filtered))
+        
+        # this here is just context specific for menu rendering - items itself does
+        # not use any of following variables
+        #context.update({
+        #    'no_children': no_children,
+        #})
+        return context
+register.tag(ShowLazyAdminMenu)
+
 
 class CleanAdminListFilter(InclusionTag):
     """
@@ -68,7 +108,7 @@ class CleanAdminListFilter(InclusionTag):
             if choice['query_string'] != query_string:
                 unique_choices.append(choice)
                 query_string = choice['query_string']
-        return {'title': spec.title(), 'choices' : unique_choices}
+        return {'title': spec.title, 'choices' : unique_choices}
 register.tag(CleanAdminListFilter)
 
 
@@ -76,7 +116,7 @@ register.tag(CleanAdminListFilter)
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[value], value))
+    return mark_safe(u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING[value], value))
 
 @register.filter
 def is_restricted(page, request):
@@ -179,3 +219,20 @@ register.tag(PageSubmitRow)
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]
 in_filtered = register.filter('in_filtered', in_filtered)
+
+
+@register.simple_tag
+def admin_static_url():
+    """
+    If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
+    """
+    return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
+
+
+class CMSAdminIconBase(Tag):
+    name = 'cms_admin_icon_base'
+
+    def render_tag(self, context):
+        return CMS_ADMIN_ICON_BASE
+
+register.tag(CMSAdminIconBase)

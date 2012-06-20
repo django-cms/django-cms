@@ -15,6 +15,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
+from cms.templatetags.cms_admin import admin_static_url
 
 
 class PlaceholderAdmin(ModelAdmin):
@@ -29,7 +30,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = ['%sjs/jquery.min.js' % settings.ADMIN_MEDIA_PREFIX] + [cms_static_url(path) for path in [
+        js = ['%sjs/jquery.min.js' % admin_static_url()] + [cms_static_url(path) for path in [
                 'js/plugins/admincompat.js',
                 'js/csrf.js',
                 'js/libs/jquery.query.js',

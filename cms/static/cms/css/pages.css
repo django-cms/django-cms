@@ -192,6 +192,21 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	float:left;
 	line-height:27px;
 	margin-right:10px;
+	font-size: 14px;
+}
+
+#sitemap li .move-target-container a:hover {
+	text-decoration: none;
+}
+
+#sitemap li .move-target{
+	display:inline-block;
+	padding: 2px 8px;
+	border-left: 1px solid grey;
+}
+
+#sitemap li .move-target:first-child{
+	border-left:none;
 }
 
 #sitemap li .col-softroot,

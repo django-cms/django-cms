@@ -10,7 +10,7 @@
 {% if not add %}
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_form.js"></script>
 {% endif %}
-<script type="text/javascript" src="{% admin_media_prefix %}js/urlify.js"></script>
+<script type="text/javascript" src="{% admin_static_url %}js/urlify.js"></script>
 
 {% if add %}
 <script type="text/javascript">
@@ -36,7 +36,7 @@
 	margin-bottom:-1px;
 	border-color:#ddd #aaa #ccc #ddd !important;
 	border:1px;
-	background:#fff url('{% admin_media_prefix %}img/admin/nav-bg.gif') repeat-x center bottom !important;
+	background:#fff url('{% admin_static_url %}img/admin/nav-bg.gif') repeat-x center bottom !important;
 }
 
 #lang_tab_content h2.header {
@@ -45,7 +45,7 @@
 	font-size:11px;
 	text-align:left;
 	font-weight:bold;
-	background:#7ca0c7 url('{% admin_media_prefix %}img/admin/default-bg.gif') repeat-x left top;
+	background:#7ca0c7 url('{% admin_static_url %}img/admin/default-bg.gif') repeat-x left top;
 	color:#fff;
 }
 
@@ -93,11 +93,11 @@
 	{% if moderation_delete_request %}<li><a href="remove-delete-state/" class="approvelink">{% trans "Remove delete request" %}</a></li>{% endif %}  	
 	{% if moderator_should_approve %}
 	<li><a href="approve/" class="approvelink">{% if moderation_delete_request %}{% trans "Approve delete" %}{% else %}{% trans "Approve" %} {% trans "draft" %}{% endif %}</a></li>
-	<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http{% if request.is_secure %}s{% endif %}://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview&draft=1" class="previewdraftlink">{% trans "Preview" %} {% trans "draft" %}</a></li>
+	<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http{% if request.is_secure %}s{% endif %}://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview&draft=1" class="previewdraftlink">{% trans "Preview" %} {% trans "draft" %}</a></li>
 	{% endif %}
 	
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http{% if request.is_secure %}s{% endif %}://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if has_absolute_url %}<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http{% if request.is_secure %}s{% endif %}://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}

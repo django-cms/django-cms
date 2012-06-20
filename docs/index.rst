@@ -24,6 +24,7 @@ Getting Started
     getting_started/configuration
     getting_started/navigation
     getting_started/plugin_reference
+    faq/common_issues
     
 
 ********
@@ -55,6 +56,19 @@ Extending the CMS
     extending_cms/placeholders
     extending_cms/searchdocs
     extending_cms/fields
+
+
+********
+Concepts
+********
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    concepts/introduction
+    concepts/menu_system
+    concepts/multiple_languages
 
 
 **************************

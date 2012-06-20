@@ -8,7 +8,6 @@
 		return this.after(o).remove().end(); 
 	};
 
-
 	var tree;
 	// global initTree function
 	initTree = function(){
@@ -36,9 +35,11 @@
 				theme_name: "default",
 				a_class: "title"
 			},
-			cookies : {},
+			cookies : {
+				prefix: "djangocms_nodes"
+			},
 			callback: {
-				beforemove  : function(what, where, position, tree) {
+				beforemove  : function(what, where, position) {
 					item_id = what.id.split("page_")[1];
 					target_id = where.id.split("page_")[1];
 					old_node = what;
@@ -58,11 +59,11 @@
 							old_position = "inside";
 						}
 					}
-					
+
 					addUndo(what, where, position);
 					return true; 
 				},
-				onmove: function(what, where, position, tree){
+				onmove: function(what, where, position){
 					item_id = what.id.split("page_")[1];
 					target_id = where.id.split("page_")[1];
 
@@ -75,32 +76,30 @@
 					}
 					moveTreeItem(what, item_id, target_id, position, false);
 				},
-				onchange: function(node, tree){
+				onchange: function(node){
 					url = $(node).find('a.title').attr("href");
 					window.location = url;
 				}
 			}
 		};
-		
-		
+
 		if (!$($("div.tree").get(0)).hasClass('root_allow_children')){
 			// disalow possibility for adding subnodes to main tree, user doesn't
 			// have permissions for this
 			options.rules.dragrules = ["node inside topnode", "topnode inside topnode", "node * node"];
 		}
-		
+
 		//dragrules : [ "folder * folder", "folder inside root", "tree-drop * folder" ],
-	        
+
 		tree.init($("div.tree"), options);
 	};
 	
 	$(document).ready(function() {
-		$.fn.cmsPatchCSRF();
-	    selected_page = false;
-	    action = false;
-		
+		selected_page = false;
+		action = false;
+
 		var _oldAjax = $.ajax;
-		
+
 		$.ajax = function(s){
 			// just override ajax function, so the loader message gets displayed 
 			// always
@@ -126,16 +125,15 @@
 			// TODO: add error state!
 			return _oldAjax(s);
 		};
-		
-		
+
 		function refresh(){
 			window.location = window.location.href;
 		}
-		
+
 		function refreshIfChildren(pageId){
 			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){};
 		}
-	
+
 		/**
 		 * Loads remote dialog to dialogs div.
 		 * 
@@ -152,53 +150,52 @@
 				if (callback) callback(response);
 			});
 		}
-		
+
 		// let's start event delegation
-		
-	    $('#changelist li').click(function(e) {
-	        // I want a link to check the class
-	        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
-	            target = e.target.parentNode;
-	        } else {
-	            target = e.target;
-	        }
-            var jtarget = $(target);
-	        if(jtarget.hasClass("move")) {
-	        	// prepare tree for move / cut paste
+		$('#changelist li').click(function(e) {
+			// I want a link to check the class
+			if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
+				target = e.target.parentNode;
+			} else {
+				target = e.target;
+			}
+			var jtarget = $(target);
+			if(jtarget.hasClass("move")) {
+				// prepare tree for move / cut paste
 				var id = e.target.id.split("move-link-")[1];
 				if(id==null){
 					id = e.target.parentNode.id.split("move-link-")[1];
 				}
-	            var page_id = id;
-	            selected_page = page_id;
-	            action = "move";
+				var page_id = id;
+				selected_page = page_id;
+				action = "move";
 				$('span.move-target-container, span.line, a.move-target').show();
-	            $('#page_'+page_id).addClass("selected");
+				$('#page_'+page_id).addClass("selected");
 				$('#page_'+page_id+' span.move-target-container').hide();
 				e.stopPropagation();
-	            return false;
-	        }
-	        
-	        if(jtarget.hasClass("copy")) {
-	        	// prepare tree for copy
+				return false;
+			}
+			
+			if(jtarget.hasClass("copy")) {
+				// prepare tree for copy
 				id = e.target.id.split("copy-link-")[1];
 				if(id==null){
 					id = e.target.parentNode.id.split("copy-link-")[1];
 				}
 				selected_page = id;
-	            action = mark_copy_node(id);
+				action = mark_copy_node(id);
 				e.stopPropagation();
-	            return false;
-	        }
-	        
-	        if(jtarget.hasClass("viewpage")) {
-	            var view_page_url = $('#' + target.id + '-select').val();
-	            if(view_page_url){
-	                window.open(view_page_url);
-	            }
-	        }
-	        
-	        if(jtarget.hasClass("addlink")) {
+				return false;
+			}
+			
+			if(jtarget.hasClass("viewpage")) {
+				var view_page_url = $('#' + target.id + '-select').val();
+				if(view_page_url){
+					window.open(view_page_url);
+				}
+			}
+			
+			if(jtarget.hasClass("addlink")) {
 				if (!/#$/g.test(jtarget.attr('href'))) {
 					// if there is url instead of # inside href, follow this url
 					// used if user haves add_page 
@@ -206,44 +203,44 @@
 				}
 				
 				$("tr").removeClass("target");
-	            $("#changelist table").removeClass("table-selected");
-	            page_id = target.id.split("add-link-")[1];
-	            selected_page = page_id;
-	            action = "add";
-	            $('tr').removeClass("selected");
-	            $('#page-row-'+page_id).addClass("selected");
-	            $('.move-target-container').hide();
-	            $('a.move-target, span.line, #move-target-'+page_id).show();
+				$("#changelist table").removeClass("table-selected");
+				page_id = target.id.split("add-link-")[1];
+				selected_page = page_id;
+				action = "add";
+				$('tr').removeClass("selected");
+				$('#page-row-'+page_id).addClass("selected");
+				$('.move-target-container').hide();
+				$('a.move-target, span.line, #move-target-'+page_id).show();
 				e.stopPropagation();
-	            return false;
-	        }
-	        
-	        // don't assume admin site is root-level
-	        // grab base url to construct full absolute URLs
-	        admin_base_url = document.URL.split("/cms/page/")[0] + "/";
-	        
+				return false;
+			}
+			
+			// don't assume admin site is root-level
+			// grab base url to construct full absolute URLs
+			admin_base_url = document.URL.split("/cms/page/")[0] + "/";
+			
 			// publish
 			if(jtarget.hasClass("publish-checkbox")) {
-	            pageId = jtarget.attr("name").split("status-")[1];
-	            // if I don't put data in the post, django doesn't get it
-	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", { 1:1 });
+				pageId = jtarget.attr("name").split("status-")[1];
+				// if I don't put data in the post, django doesn't get it
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", { 1:1 });
 				e.stopPropagation();
-	            return true;
-	        }
+				return true;
+			}
 			
 			// in navigation
 			if(jtarget.hasClass("navigation-checkbox")) {
-	            pageId = jtarget.attr("name").split("navigation-")[1];
-	            // if I don't put data in the post, django doesn't get it
+				pageId = jtarget.attr("name").split("navigation-")[1];
+				// if I don't put data in the post, django doesn't get it
 				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
 				e.stopPropagation();
-	            return true;
-	        }
+				return true;
+			}
 			
 			// moderation
 			if(jtarget.hasClass("moderator-checkbox")) {
-	            pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-	            parent = jtarget.parents('div.col-moderator');
+				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
+				parent = jtarget.parents('div.col-moderator');
 				
 				value = 0;
 				parent.find('input[type=checkbox]').each(function(i, el){
@@ -256,8 +253,8 @@
 				
 				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-moderation/", { moderate: value }, refreshIfChildren(pageId));
 				e.stopPropagation();
-	            return true;
-	        }
+				return true;
+			}
 			
 			// quick approve
 			if(jtarget.hasClass("approve")) {
@@ -265,39 +262,59 @@
 				// just reload the page for now in callback... 
 				// TODO: this must be changed sometimes to reloading just the portion
 				// of the tree = current node + descendants 
-	            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
 	            return false;
+	        }
+
+	        // lazy load descendants on tree open
+	        if(jtarget.hasClass("closed")) {
+	        	// only load them once
+	        	if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
+	        		// keeps this event from firing multiple times before
+	        		// the dom as changed. it still needs to propagate for 
+	        		// the other click event on this element to fire
+                    jtarget.addClass("loading");
+                    var pageId = $(jtarget).attr("id").split("page_")[1];
+
+                    $.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
+                        jtarget.children('ul').append(r);    
+                        // show move targets if needed
+                        if($('span.move-target-container:visible').length > 0) {
+                        	jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
+                        }
+                    });
+                }
 	        }
 			
-	        if(jtarget.hasClass("move-target")) {
-	            if(jtarget.hasClass("left")){
-	                position = "left";
-	            }
-	            if(jtarget.hasClass("right")){
-	                position = "right";
-	            }
-	            if(jtarget.hasClass("last-child")){
-	                position = "last-child";
-	            }
-	            target_id = target.parentNode.id.split("move-target-")[1];
-	            
+			if(jtarget.hasClass("move-target")) {
+				if(jtarget.hasClass("left")){
+					position = "left";
+				}
+				if(jtarget.hasClass("right")){
+					position = "right";
+				}
+				if(jtarget.hasClass("last-child")){
+					position = "last-child";
+				}
+				target_id = target.parentNode.id.split("move-target-")[1];
+				
 				if(action=="move") {
 					moveTreeItem(null, selected_page, target_id, position, tree);
-	                $('.move-target-container').hide();
-	            }else if(action=="copy") {
-	            	site = $('#site-select')[0].value;
+					$('.move-target-container').hide();
+				}else if(action=="copy") {
+					site = $('#site-select')[0].value;
 					copyTreeItem(selected_page, target_id, position, site);
-	                $('.move-target-container').hide();
-	            }else if(action=="add") {
-	                site = $('#site-select')[0].value;
-	                window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&amp;position="+position+"&amp;site="+site;
-	            }
+					$('.move-target-container').hide();
+				}else if(action=="add") {
+					site = $('#site-select')[0].value;
+					window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&amp;position="+position+"&amp;site="+site;
+				}
 				e.stopPropagation();
-	            return false;
-	        }
-	        return true;
-	    });
+				return false;
+			}
+			return true;
+		});
 		/* Colums width sync */
 		$.fn.syncWidth = function(max) {
 			$(this).each(function() {
@@ -348,7 +365,7 @@
 				'removeParam': "site__exact"
 			});
 
-			window.location = url;
+			window.location.href = url;
 		});
 		var copy_splits = window.location.href.split("copy=");
 		if(copy_splits.length > 1){
@@ -360,25 +377,25 @@
 		// moderation checkboxes over livequery
 		$('div.col-moderator input').livequery(function() {
 			$(this).checkBox({addLabel:false});
-		});	
+		});
 		
 		function copyTreeItem(item_id, target_id, position, site){
 			if (cmsSettings.cmsPermission || cmsSettings.cmsModerator) {
 				return loadDialog('./' + item_id + '/dialog/copy/', {
 					position:position,
-		            target:target_id,
-		            site:site,
+					target:target_id,
+					site:site,
 					callback: $.callbackRegister("_copyTreeItem", _copyTreeItem, item_id, target_id, position, site)
-				});	
+				});
 			}
 			return _copyTreeItem(item_id, target_id, position, site);
 		}
 		
 		function _copyTreeItem(item_id, target_id, position, site, options) {
 			var data = {
-			    position:position,
-			    target:target_id,
-			    site:site
+				position:position,
+				target:target_id,
+				site:site
 			};
 			data = $.extend(data, options);
 			
@@ -389,15 +406,15 @@
 				}else{
 					moveError($('#page_'+item_id + " div.col1:eq(0)"));  
 				}
-		    });
+			});
 		}
 		
 		function mark_copy_node(id){
 			$('a.move-target, span.move-target-container, span.line').show();
-		    $('#page_'+id).addClass("selected");
+			$('#page_'+id).addClass("selected");
 			$('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
-		    $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
-		    return "copy";
+			$('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
+			return "copy";
 		}
 	});
 	
@@ -462,13 +479,13 @@
 			{ position: position, target: target_id }, 
 			
 			// on success
-			function(response){
+			function(){
 				if (tree) {
 					var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
 					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
 				} else {
 					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
-				}			
+				}
 			},
 			
 			// on error
@@ -477,9 +494,9 @@
 			}
 		);
 	}
-	
+
 	var undos = [];
-		
+
 	function addUndo(node, target, position){
 		undos.push({node:node, target:target, position:position});
 	}

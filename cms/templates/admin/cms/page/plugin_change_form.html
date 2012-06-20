@@ -2,7 +2,8 @@
 {% load i18n admin_modify adminmedia cms_admin %}
 
 {% block extrahead %}{{ block.super }}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
 {{ media }}
 
@@ -42,9 +43,9 @@
 	});
 	$(document).ready(function(){
 		$("a.add-another,a.related-lookup").each(function(i, sign){
-			var href = $(sign).attr("href")
+			var href = $(sign).attr("href");
 			if (href.substr(0,2) == ".."){
-				href = "../../"+href
+				href = "../../"+href;
 				$(sign).attr("href", href); 
 			}
 		});
@@ -56,7 +57,7 @@
 
 {% endblock %}
  
-{% block extrastyle %}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_static_url %}css/forms.css" />{% endblock %}
  
 {% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
  
@@ -110,8 +111,8 @@
  
 </div>
 <span class="plugin-submit-row"{% if is_popup %} style="overflow: auto;"{% endif %}>
-	<input type="submit" name="_save" class="default" value="{% trans "Save" %}" {{ onclick_attrib }}/>
-	<input type="submit" style="margin-left: 8px;" value="{% trans "Cancel" %}" name="_cancel">
+	<input type="submit" style="float:none;" name="_save" class="default" value="{% trans "Save" %}" {{ onclick_attrib }}/>
+	<input type="submit" style="margin-left: 8px;" value="{% trans "Cancel" %}" name="_cancel" class="cancel-btn">
 </span>
 </form>
 

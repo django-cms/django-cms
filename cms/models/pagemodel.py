@@ -286,6 +286,8 @@ class Page(MPTTModel):
                     ph.pk = None # make a new instance
                     ph.save()
                     page.placeholders.add(ph)
+                    # update the page copy
+                    page_copy = page
                 if plugins:
                     copy_plugins_to(plugins, ph)
                     
@@ -680,17 +682,12 @@ class Page(MPTTModel):
     def has_view_permission(self, request):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
         from cms.utils.plugins import current_site
-        # staff is allowed to see everything
-        if request.user.is_staff and settings.CMS_PUBLIC_FOR in ('staff', 'all'):
-            return True
-        
+                        
         if not self.publisher_is_draft and self.publisher_public:
             return self.publisher_public.has_view_permission(request)
         # does any restriction exist?
-        # direct
         # inherited and direct
-        is_restricted = PagePermission.objects.for_page(self).filter(can_view=True).exists()
-        
+        is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
         if request.user.is_authenticated():
             site = current_site(request)
             global_perms_q = Q(can_view=True) & Q(
@@ -698,13 +695,26 @@ class Page(MPTTModel):
             )
             global_view_perms = GlobalPagePermission.objects.with_user(
                 request.user).filter(global_perms_q).exists()
+
             # a global permission was given to the request's user
             if global_view_perms:
                 return True
-            # authenticated user, no restriction and public for all
-            if (not is_restricted and not global_view_perms and 
-                settings.CMS_PUBLIC_FOR == 'all'):
-                return True
+                
+            elif not is_restricted:
+            	if ((settings.CMS_PUBLIC_FOR == 'all') or
+            	    (settings.CMS_PUBLIC_FOR == 'staff' and
+            		 request.user.is_staff)):
+            			return True
+
+            # a restricted page and an authenticated user
+            elif is_restricted:
+                opts = self._meta
+                codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
+                user_perm = request.user.has_perm(codename)
+                generic_perm = self.has_generic_permission(request, "view")  
+                return (user_perm or generic_perm)
+    
+
         else:
             #anonymous user
             if is_restricted or not settings.CMS_PUBLIC_FOR == 'all':
@@ -922,7 +932,7 @@ class Page(MPTTModel):
         Returns this model instance's next sibling in the tree, or
         ``None`` if it doesn't have a next sibling.
         """
-        opts = self._meta
+        opts = self._mptt_meta
         if self.is_root_node():
             filters.update({
                 '%s__isnull' % opts.parent_attr: True,
@@ -955,7 +965,7 @@ class Page(MPTTModel):
         Returns this model instance's previous sibling in the tree, or
         ``None`` if it doesn't have a previous sibling.
         """
-        opts = self._meta
+        opts = self._mptt_meta
         if self.is_root_node():
             filters.update({
                 '%s__isnull' % opts.parent_attr: True,

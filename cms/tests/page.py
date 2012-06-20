@@ -13,12 +13,12 @@ from cms.test_utils.util.context_managers import (LanguageOverride,
     SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
 import os.path
+from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):
     
@@ -79,7 +79,56 @@ class PagesTestCase(CMSTestCase):
                 self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
             # TODO: check for slug collisions after move
             # TODO: check for slug collisions with different settings         
-  
+
+    def test_slug_collisions_api_1(self):
+        """ Checks for slug collisions on sibling pages - uses API to create pages
+        """
+        with SettingsOverride(CMS_MODERATOR=False):
+            page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                                published=True)
+            page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                                  published=True, parent=page1, slug="foo")
+            page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
+                                  published=True, parent=page1, slug="foo")
+            # both sibling pages has same slug, so both pages has an invalid slug
+            self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+            self.assertFalse(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
+
+    def test_slug_collisions_api_2(self):
+        """ Checks for slug collisions on root (not home) page and a home page child - uses API to create pages
+        """
+        with SettingsOverride(CMS_MODERATOR=False):
+            page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                                published=True)
+            page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                                  published=True, parent=page1, slug="foo")
+            page2 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                                  published=True, slug="foo")
+            # Home page child has an invalid slug, while root page is ok. Root wins!
+            self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+            self.assertTrue(is_valid_page_slug(page2,page2.parent,"en",page2.get_slug("en"),page2.site))
+
+    def test_slug_collisions_api_3(self):
+        """ Checks for slug collisions on children of a non root page - uses API to create pages
+        """
+        with SettingsOverride(CMS_MODERATOR=False):
+            page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                                published=True)
+            page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                                  published=True, parent=page1, slug="foo")
+            page1_1_1 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
+                                  published=True, parent=page1_1, slug="bar")
+            page1_1_2 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
+                                  published=True, parent=page1_1, slug="bar")
+            page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
+                                  published=True, parent=page1, slug="bar")
+            # Direct children of home has different slug so it's ok.
+            self.assertTrue(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+            self.assertTrue(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
+            # children of page1_1 has the same slug -> you lose!
+            self.assertFalse(is_valid_page_slug(page1_1_1,page1_1_1.parent,"en",page1_1_1.get_slug("en"),page1_1_1.site))
+            self.assertFalse(is_valid_page_slug(page1_1_2,page1_1_2.parent,"en",page1_1_2.get_slug("en"),page1_1_2.site))
+
     def test_details_view(self):
         """
         Test the details view
@@ -255,7 +304,7 @@ class PagesTestCase(CMSTestCase):
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        path = os.path.join(settings.PROJECT_DIR, 'templates', 'add_placeholder.html')
+        path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
         f = open(path, 'r')
         old = f.read()
         f.close()
@@ -409,6 +458,17 @@ class PagesTestCase(CMSTestCase):
         request = self.get_request('/does-not-exist/')
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
+
+    def test_get_page_without_final_slash(self):
+        root = create_page("root", "nav_playground.html", "en", slug="root", 
+                           published=True)
+        page = create_page("page", "nav_playground.html", "en", slug="page", 
+                           published=True, parent=root)
+        root.publish()
+        page.publish()
+        request = self.get_request('/page')
+        found_page = get_page_from_request(request)
+        self.assertFalse(found_page is None)
     
     def test_get_page_from_request_with_page_preview(self):
         page = create_page("page", "nav_playground.html", "en")
@@ -505,7 +565,40 @@ class PagesTestCase(CMSTestCase):
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'test-page-4/test-page-3/')
-    
+
+    def test_page_overwrite_urls(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+            published=True)
+
+        page2 = create_page('test page 2', 'nav_playground.html', 'en',
+            published=True, parent=page1)
+
+        page3 = create_page('test page 3', 'nav_playground.html', 'en',
+            published=True, parent=page2, overwrite_url='i-want-another-url')
+
+        self.assertEqual(page2.get_absolute_url(),
+            self.get_pages_root()+'test-page-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
+        title2 = page2.title_set.get()
+        title2.slug = 'page-test-2'
+        title2.save()
+
+        page2 = Page.objects.get(pk=page2.pk)
+        page3 = Page.objects.get(pk=page3.pk)
+
+        self.assertEqual(page2.get_absolute_url(),
+            self.get_pages_root()+'page-test-2/')
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
+        # tests a bug found in 2.2 where saving an ancestor page
+        # wiped out the overwrite_url for child pages
+        page2.save()
+        self.assertEqual(page3.get_absolute_url(),
+            self.get_pages_root()+'i-want-another-url/')
+
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
@@ -533,7 +626,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
 class NoAdminPageTests(CMSTestCase):
-    urls = 'project.noadmin_urls'
+    urls = 'cms.test_utils.project.noadmin_urls'
     
     def setUp(self):
         admin = 'django.contrib.admin'

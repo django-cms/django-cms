@@ -49,12 +49,14 @@ def update_title(title):
     
     if title.page.is_home():
         title.path = ''
-    else:
+    elif not title.has_url_overwrite:
         title.path = u'%s' % slug
-    if parent_page_id:
-        parent_title = Title.objects.get_title(parent_page_id, language=title.language, language_fallback=True)
-        if parent_title:
-            title.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+
+        if parent_page_id:
+            parent_title = Title.objects.get_title(parent_page_id,
+                language=title.language, language_fallback=True)
+            if parent_title:
+                title.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
 
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
@@ -91,7 +93,8 @@ def post_save_title(instance, raw, created, **kwargs):
             page__lft__gt=instance.page.lft, 
             page__rght__lt=instance.page.rght, 
             page__tree_id__exact=instance.page.tree_id,
-            language=instance.language
+            language=instance.language,
+            has_url_overwrite=False,
         ).order_by('page__tree_id', 'page__parent', 'page__lft')
         
         for descendant_title in descendant_titles:

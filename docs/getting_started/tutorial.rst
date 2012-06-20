@@ -47,6 +47,8 @@ nice "It Worked" message from Django.
 .. |it-worked| image:: ../images/it-worked.png
 
 
+.. _configure-django-cms:
+
 Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
@@ -81,6 +83,11 @@ Also add any (or all) of the following plugins, depending on your needs:
 * ``'cms.plugins.text'``
 * ``'cms.plugins.video'``
 * ``'cms.plugins.twitter'``
+
+.. warning::
+
+    Adding the ``'cms.plugins.snippet'`` plugin is a potential security hazard.
+    For more information, refer to :ref:`snippets-plugin`.
 
 They are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
 There is even more plugins available on django CMS `extensions page`_.
@@ -155,7 +162,6 @@ Point your :setting:`django:STATIC_ROOT` to where the static files should live
 
     STATIC_ROOT = os.path.join(PROJECT_PATH, "static")
     STATIC_URL = "/static/"
-    ADMIN_MEDIA_PREFIX = "/static/admin/"
 
 For uploaded files, you will need to set up the :setting:`django:MEDIA_ROOT`
 setting::
@@ -272,6 +278,7 @@ Here is a simple example for a base template called ``base.html``:
         {% render_block "css" %}
     </head>
     <body>
+        {% cms_toolbar %}
         {% placeholder base_content %}
         {% block base_content%}{% endblock %}
         {% render_block "js" %}

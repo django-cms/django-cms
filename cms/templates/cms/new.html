@@ -48,7 +48,7 @@
 		<div class="box-right">
 			<h1>Welcome to the django CMS!<br />Here is what to do next:</h1>
 			<p>&nbsp;</p>
-			<h2>Log into the <a href="/admin/">admin</a> interface and start <a href="/admin/cms/page/add/">adding</a> some pages!</h2>
+			<h2>Log into the <a href="{% url admin:index %}">admin</a> interface and start <a href="{% url admin:cms_page_add %}">adding</a> some pages!</h2>
 			<p class="info">Make sure you publish them.</p>
 			<p>&nbsp;</p>
 			<p class="padding-top">

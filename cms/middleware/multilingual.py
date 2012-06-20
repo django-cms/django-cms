@@ -6,6 +6,7 @@ from django.middleware.locale import LocaleMiddleware
 from django.utils import translation
 import re
 import urllib
+import urlparse
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
 
@@ -38,7 +39,7 @@ def patch_response(content, pages_root, language):
     # If the regex matches, the extracted path we want is stored in the fourth group (\4).
     quoted_root = urllib.quote(pages_root)
     ignore_paths = ['%s%s/' % (quoted_root, l[0]) for l in settings.CMS_LANGUAGES]
-    ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
+    ignore_paths += [settings.MEDIA_URL, settings.STATIC_URL]
     if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
         
@@ -53,7 +54,7 @@ def patch_response(content, pages_root, language):
     # For understanding this regex, please read the documentation for HREF_URL_FIX_RE above.
     
     ignore_paths = ['%s%s/' % (pages_root, l[0]) for l in settings.CMS_LANGUAGES]
-    ignore_paths += [settings.MEDIA_URL, settings.ADMIN_MEDIA_PREFIX]
+    ignore_paths += [settings.MEDIA_URL, settings.STATIC_URL]
     if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
     FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
@@ -110,7 +111,7 @@ class MultilingualURLMiddleware(object):
         #       testing this and throwing an exception otherwise, would probably be a good idea
         
         if not path.startswith(settings.MEDIA_URL) and \
-                not path.startswith(settings.ADMIN_MEDIA_PREFIX) and \
+                not path.startswith(settings.STATIC_URL) and \
                 not (getattr(settings,'STATIC_URL', False) and path.startswith(settings.STATIC_URL)) and \
                 response.status_code == 200 and \
                 response._headers['content-type'][1].split(';')[0] == "text/html":
@@ -128,10 +129,12 @@ class MultilingualURLMiddleware(object):
 
         if (response.status_code == 301 or response.status_code == 302 ):
             location = response['Location']
+            if location.startswith('.'):
+                location = urlparse.urljoin(request.path, location)
+                response['Location'] = location
             if not has_lang_prefix(location) and location.startswith("/") and \
                     not location.startswith(settings.MEDIA_URL) and \
-                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)) and \
-                    not location.startswith(settings.ADMIN_MEDIA_PREFIX):
+                    not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)):
                 response['Location'] = "/%s%s" % (language, location)
         response.set_cookie("django_language", language)
         return response

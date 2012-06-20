@@ -35,6 +35,12 @@ Example::
     ``js`` and ``css`` sekizai namespaces, for more information, see 
     :ref:`sekizai-namespaces`.
 
+.. warning::
+
+    django CMS internally relies on a number of templates to function correctly;
+    these exist beneath ``cms`` within the templates directory. As such, it
+    is highly recommended you avoid using the same directory name for your own
+    project templates.
 
 *******************
 Basic Customization
@@ -70,13 +76,13 @@ Example::
 
     CMS_PLACEHOLDER_CONF = {
         'content': {
-            'plugins': ('TextPlugin', 'PicturePlugin'),
-            'text_only_plugins': ('LinkPlugin',)
+            'plugins': ['TextPlugin', 'PicturePlugin'],
+            'text_only_plugins': ['LinkPlugin']
             'extra_context': {"width":640},
             'name':gettext("Content"),
         },
         'right-column': {
-            "plugins": ('TeaserPlugin', 'LinkPlugin'),
+            "plugins": ['TeaserPlugin', 'LinkPlugin'],
             "extra_context": {"width":280},
             'name':gettext("Right Column"),
             'limits': {
@@ -86,11 +92,11 @@ Example::
             },
         },
         'base.html content': {
-            "plugins": {'TextPlugin', 'PicturePlugin', 'TeaserPlugin'}
+            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
         },
     }
 
-You can combine template names and placeholder names to granually define
+You can combine template names and placeholder names to granularly define
 plugins, as shown above with ''base.html content''.
 
 **plugins**
@@ -181,7 +187,7 @@ The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
 how to configure that. The best way to understand this is to head 
 over to `Wymeditor examples page 
-<http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ 
+<http://files.wymeditor.org/wymeditor/examples/>`_
 After understand how Wymeditor works. 
 
 The :mod:`cms.plugins.text` plugin exposes several variables named
@@ -388,6 +394,10 @@ flexible, handy, and is designed exactly for this purpose.
 
 CMS_FLAT_URLS
 =============
+
+.. deprecated:: 2.4
+
+    ``CMS_FLAT_URLS`` will be removed in 2.4.
 
 Default: ``False``
 

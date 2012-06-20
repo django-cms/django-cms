@@ -3,7 +3,7 @@ from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from classytags.parser import Parser
-from cms.models import Page
+from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_plugins, render_placeholder
 from cms.plugins.utils import get_plugins
 from cms.utils import get_language_from_request
@@ -89,19 +89,19 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
 class PageUrl(InclusionTag):
     template = 'cms/content.html'
     name = 'page_url'
-    
+
     options = Options(
         Argument('page_lookup'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
     )
-    
+
     def get_context(self, context, page_lookup, lang, site):
         site_id = get_site_id(site)
         request = context.get('request', False)
         if not request:
             return {'content': ''}
-    
+
         if request.current_page == "dummy":
             return {'content': ''}
         if lang is None:
@@ -155,8 +155,8 @@ class PlaceholderParser(Parser):
             if getattr(bit, 'value', bit.var.value) == 'or':
                 return super(PlaceholderParser, self).parse_blocks()
         return
-                
-    
+
+
 class PlaceholderOptions(Options):
     def get_parser_class(self):
         return PlaceholderParser
@@ -215,13 +215,16 @@ class Placeholder(Tag):
 
         page = request.current_page
         if not page or page == 'dummy':
+            if nodelist:
+                return nodelist.render(context)
+
             return ''
-        
+
         content = get_placeholder_content(context, request, page, name, inherit)
         if not content and nodelist:
             return nodelist.render(context)
         return content
-    
+
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 register.tag(Placeholder)
@@ -262,7 +265,7 @@ class PageAttribute(Tag):
         Argument('name', resolve=False),
         Argument('page_lookup', required=False, default=None)
     )
-    
+
     valid_attributes = [
         "title",
         "slug",
@@ -271,7 +274,7 @@ class PageAttribute(Tag):
         "page_title",
         "menu_title"
     ]
-    
+
     def render_tag(self, context, name, page_lookup):
         if not 'request' in context:
             return ''
@@ -290,12 +293,12 @@ register.tag(PageAttribute)
 class CleanAdminListFilter(InclusionTag):
     template = 'admin/filter.html'
     name = 'clean_admin_list_filter'
-    
+
     options = Options(
         Argument('cl'),
         Argument('spec'),
     )
-    
+
     def get_context(self, context, cl, spec):
         choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
         query_string = None
@@ -319,7 +322,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     and their interpretation for the page_lookup argument.
     """
     validate_placeholder_name(placeholder_name)
-    
+
     request = context.get('request', False)
     site_id = get_site_id(site)
 
@@ -331,7 +334,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     content = None
 
     if cache_result:
-        cache_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)+'_placeholder:'+placeholder_name
+        base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
+        cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         content = cache.get(cache_key)
 
     if not content:
@@ -340,7 +344,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             return {'content': ''}
         try:
             placeholder = page.placeholders.get(slot=placeholder_name)
-        except Placeholder.DoesNotExist:
+        except PlaceholderModel.DoesNotExist:
             if settings.DEBUG:
                 raise
             return {'content': ''}
@@ -364,17 +368,17 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
 class ShowPlaceholderById(InclusionTag):
     template = 'cms/content.html'
     name = 'show_placeholder_by_id'
-    
+
     options = Options(
         Argument('placeholder_name'),
         Argument('reverse_id'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
     )
-    
+
     def get_context(self, *args, **kwargs):
         return _show_placeholder_for_page(**self.get_kwargs(*args, **kwargs))
-    
+
     def get_kwargs(self, context, placeholder_name, reverse_id, lang, site):
         return {
             'context': context,
@@ -400,7 +404,7 @@ register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 class CMSToolbar(InclusionTag):
     template = 'cms/toolbar/toolbar.html'
     name = 'cms_toolbar'
-    
+
     def render(self, context):
         request = context.get('request', None)
         if not request:
@@ -411,7 +415,7 @@ class CMSToolbar(InclusionTag):
         if not toolbar.show_toolbar:
             return ''
         return super(CMSToolbar, self).render(context)
-    
+
     def get_context(self, context):
         context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context

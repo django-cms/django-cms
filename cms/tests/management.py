@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from StringIO import StringIO
-from cms.api import create_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.api import create_page, add_plugin
@@ -18,7 +17,7 @@ class ManagementTestCase(CMSTestCase):
 
     def test_list_apphooks(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "project.sampleapp"]
+        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
             self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)            
@@ -36,7 +35,7 @@ class ManagementTestCase(CMSTestCase):
 
     def test_uninstall_apphooks_with_apphook(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "project.sampleapp"]
+        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
             self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)
@@ -48,7 +47,7 @@ class ManagementTestCase(CMSTestCase):
 
     def test_list_plugins(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "project.sampleapp"]
+        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             placeholder = Placeholder.objects.create(slot="test")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
@@ -67,7 +66,7 @@ class ManagementTestCase(CMSTestCase):
 
     def test_uninstall_plugins_with_plugin(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "project.sampleapp"]
+        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             placeholder = Placeholder.objects.create(slot="test")
             add_plugin(placeholder, TextPlugin, "en", body="en body")

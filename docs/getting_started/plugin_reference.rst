@@ -105,7 +105,6 @@ setting in your project's ``settings.py`` file::
 
 .. :class:: cms.plugins.picture.cms_plugins.PicturePlugin
 
-
 *******
 Picture
 *******
@@ -121,28 +120,27 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
-If you want to resize the picture you can get a thumbnail library. We
-recommend `sorl.thumbnail <http://code.google.com/p/sorl-thumbnail/>`_.
+There are several solutions for Python and Django out there to automatically
+resize your pictures, you can find some on `Django Packages`_ and compare them
+there.
 
 In your project template directory create a folder called ``cms/plugins`` and
 create a file called ``picture.html`` in there. Here is an example
-``picture.html`` template:
+``picture.html`` template using `easy-thumbnails`_:
 
 .. code-block:: html+django
 
-    {% load i18n thumbnail %}
-    {% spaceless %}
+    {% load thumbnail %}
 
     {% if picture.url %}<a href="{{ picture.url }}">{% endif %}
     {% ifequal placeholder "content" %}
-        <img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
+        <img src="{% thumbnail picture.image 300x600 %}"{% if picture.alt %} alt="{{ picture.alt }}"{% endif %} />
     {% endifequal %}
     {% ifequal placeholder "teaser" %}
-        <img src="{% thumbnail picture.image.name 484x1500 upscale %}" {% if picture.alt %}alt="{{ picture.alt }}" {% endif %}/>
+        <img src="{% thumbnail picture.image 150x150 %}"{% if picture.alt %} alt="{{ picture.alt }}"{% endif %} />
     {% endifequal %}
     {% if picture.url %}</a>{% endif %}
 
-    {% endspaceless %}
 
 In this template the picture is scaled differently based on which placeholder
 it was placed in.
@@ -156,7 +154,7 @@ running.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with
-          `django CMS plugin`_ and its ``cmsplugin_filer_video`` component
+          `django CMS plugin`_ and its ``cmsplugin_filer_image`` component
           instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
@@ -165,6 +163,8 @@ running.
 .. :module:: cms.plugins.snippet
 
 .. :class:: cms.plugins.snippet.cms_plugins.SnippetPlugin
+
+.. _snippets-plugin:
 
 *******
 Snippet
@@ -185,6 +185,13 @@ setting in your project's ``settings.py`` file::
 .. note:: This plugin should mainly be used during development to quickly test
           HTML snippets.
 
+.. warning::
+
+    This plugin is a potential security hazard, since it allows admins to place
+    custom JavaScript on pages. This may allow administrators with the right to
+    add snippets to elevate their privileges to superusers. This plugin should
+    only be used during the initial development phase for rapid prototyping and
+    should be disabled on production sites.
 
 .. :module:: cms.plugins.teaser
 
@@ -355,3 +362,6 @@ For installation be sure you have the following in your project's
 
 .. warning:: The inherit plugin is currently the only core-plugin which can
              **not** be used in non-cms placeholders.
+
+.. _Django Packages: http://djangopackages.com/grids/g/thumbnails/
+.. _easy-thumbnails: https://github.com/SmileyChris/easy-thumbnails

@@ -52,8 +52,12 @@ class PluginModelBase(MPTTModelBase):
         # 'myapp_' bit from the db_table name.
         if [base for base in bases if isinstance(base, PluginModelBase)]:
             splitter = '%s_' % new_class._meta.app_label
-            splitted = new_class._meta.db_table.split(splitter, 1)
-            table_name = 'cmsplugin_%s' % splitted[1]
+            
+            if splitter in new_class._meta.db_table:
+                splitted = new_class._meta.db_table.split(splitter, 1)
+                table_name = 'cmsplugin_%s' % splitted[1]
+            else:
+                table_name = new_class._meta.db_table
             new_class._meta.db_table = table_name
         
         return new_class

@@ -2,7 +2,8 @@
 from __future__ import with_statement
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, clear_app_resolvers
+from cms.appresolver import (applications_page_check, clear_app_resolvers, 
+    get_app_patterns)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
@@ -12,7 +13,7 @@ import sys
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "project.sampleapp.cms_app"
+APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
 class ApphooksTestCase(CMSTestCase):
@@ -52,8 +53,8 @@ class ApphooksTestCase(CMSTestCase):
         Test implicit apphook loading with INSTALLED_APPS + cms_app.py
         """
             
-        apps = ['project.sampleapp']
-        with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='project.urls_for_apphook_tests'):
+        apps = ['cms.test_utils.project.sampleapp']
+        with SettingsOverride(INSTALLED_APPS=apps, ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()
             app_names = [hook[0] for hook in hooks]
@@ -63,7 +64,7 @@ class ApphooksTestCase(CMSTestCase):
     
     def test_apphook_on_root(self):
         
-        with SettingsOverride(ROOT_URLCONF='project.urls_for_apphook_tests'):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             apphook_pool.clear()    
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
             page = create_page("apphooked-page", "nav_playground.html", "en",
@@ -86,7 +87,7 @@ class ApphooksTestCase(CMSTestCase):
     
     def test_get_page_for_apphook(self):
             
-        with SettingsOverride(ROOT_URLCONF='project.second_urls_for_apphook_tests'):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
     
             apphook_pool.clear()    
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
@@ -135,3 +136,15 @@ class ApphooksTestCase(CMSTestCase):
             self.assertContains(response, de_title.title)
             
             apphook_pool.clear()
+
+    def test_apphook_breaking_under_home_with_new_path_caching(self):
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            home = create_page("home", "nav_playground.html", "en", published=True)
+            child = create_page("child", "nav_playground.html", "en", published=True, parent=home)
+            # not-home is what breaks stuff, because it contains the slug of the home page
+            not_home = create_page("not-home", "nav_playground.html", "en", published=True, parent=child)
+            create_page("subchild", "nav_playground.html", "en", published=True, parent=not_home, apphook='SampleApp')
+            urlpatterns = get_app_patterns()
+            resolver = urlpatterns[0]
+            url = resolver.reverse('sample-root')
+            self.assertEqual(url, 'child/not-home/subchild/')
