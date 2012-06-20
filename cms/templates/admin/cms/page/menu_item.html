@@ -13,10 +13,10 @@
 			{% if not CMS_PERMISSION or has_add_permission or has_add_page_permission %}
 				{# if permissions not enabled, user user haves global can_add page #}
 					{% if has_add_on_same_level_permission %}
-						<a href="#" class="move-target left" title="{% trans "insert above" %}">↑</a><span class="line first"> |</span>
-						<a href="#" class="move-target right" title="{% trans "insert below" %}">↓</a><span class="line second"> |</span>
+						<a href="#" class="move-target left" title="{% trans "insert above" %}">&nbsp;↑&nbsp;</a><span class="line first"> |</span>
+						<a href="#" class="move-target right" title="{% trans "insert below" %}">&nbsp;↓&nbsp;</a><span class="line second"> |</span>
 					{% endif %}
-				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">↘</a>
+				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">&nbsp;↘&nbsp;</a>
 			{% endif %}
 		</span>
 
