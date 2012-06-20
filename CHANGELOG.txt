@@ -80,3 +80,4 @@
 - Fixed internationalized strings in JS not being escaped
 - django-reversion dependency upgraded to 1.6
 - django-sekizai dependency upgraded to 0.6.1 or higher
+- django-mptt dependency upgraded to 0.5.1 or higher
