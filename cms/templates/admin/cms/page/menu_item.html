@@ -10,14 +10,14 @@
 	</div>
 	<div class="col2">
 		<span id="move-target-{{ page.id }}" class="move-target-container" >
-			{% if not CMS_PERMISSION or has_add_permission or has_add_page_permission %}
+			{% if not CMS_PERMISSION or has_add_permission or has_add_page_permission %}{% spaceless %}
 				{# if permissions not enabled, user user haves global can_add page #}
 					{% if has_add_on_same_level_permission %}
-						<a href="#" class="move-target left" title="{% trans "insert above" %}">&nbsp;↑&nbsp;</a><span class="line first"> |</span>
-						<a href="#" class="move-target right" title="{% trans "insert below" %}">&nbsp;↓&nbsp;</a><span class="line second"> |</span>
+						<a href="#" class="move-target left" title="{% trans "insert above" %}">↑</a>
+						<a href="#" class="move-target right" title="{% trans "insert below" %}">↓</a>
 					{% endif %}
-				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">&nbsp;↘&nbsp;</a>
-			{% endif %}
+				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">↘</a>
+			{% endspaceless %}{% endif %}
 		</span>
 
 		{% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}

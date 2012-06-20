@@ -194,6 +194,16 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	margin-right:10px;
 }
 
+#sitemap li .move-target{
+	display:inline-block;
+	padding: 2px 8px;
+	border-left: 1px solid grey;
+}
+
+#sitemap li .move-target:first-child{
+	border-left:none;
+}
+
 #sitemap li .col-softroot,
 #sitemap li .col-language,
 #sitemap li .col-actions,	
