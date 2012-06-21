@@ -2,7 +2,7 @@
     
     {% include 'admin/cms/page/menu_item.html' %}
     
-    {% has_children %}<ul{% if page.last %} class="last"{% endif %}>
+    {% if has_children %}<ul{% if page.last %} class="last"{% endif %}>
     </ul>{% endif %}
 </li>
 {%  endwith %}
