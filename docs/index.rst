@@ -68,6 +68,7 @@ Concepts
 
     concepts/introduction
     concepts/menu_system
+    concepts/multiple_languages
 
 
 **************************

@@ -395,6 +395,10 @@ flexible, handy, and is designed exactly for this purpose.
 CMS_FLAT_URLS
 =============
 
+.. deprecated:: 2.4
+
+    ``CMS_FLAT_URLS`` will be removed in 2.4.
+
 Default: ``False``
 
 If this is enabled the slugs are not nested in the urls.

@@ -77,3 +77,11 @@ New minimum requirements for dependencies
 
 * ``django-reversion`` must now be at version 1.6
 * ``django-sekizai`` must be at least at version 0.6.1
+* ``django-mptt`` version 0.5.1 or 0.5.2 is required
+
+
+********************
+Pending deprecations
+********************
+
+The ``CMS_FLAT_URLS`` setting is deprecated and will be removed in version 2.4.
