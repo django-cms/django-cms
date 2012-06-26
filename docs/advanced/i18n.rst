@@ -74,7 +74,7 @@ In the view pass the :meth:`get_absolute_url` method to the
         set_language_changer(request, item.get_absolute_url)
         # ...
 
-This allows the language chooser to have another URL then the current one.
+This allows the language chooser to have another URL than the current one.
 If the current URL is not handled by the CMS and no ``set_language_changer``
 function is provided it will take the exact same URL as the current one and
 will only change the language prefix.
@@ -131,7 +131,7 @@ If you put :setting:`CMS_HIDE_UNTRANSLATED` to ``False`` in your
 ``settings.py`` all pages will be displayed in all  languages even if they are
 not translated yet.
 
-If :setting:`CMS_HIDE_UNTRANSLATED`  is ``True`` is in your ``settings.py``
-and you are on a page that hasn't got a english translation yet and you view the
-german version then the language chooser will redirect to ``/``. The same goes
+If :setting:`CMS_HIDE_UNTRANSLATED`  is ``True`` in your ``settings.py``
+and you are on a page that doesn't yet have an English translatio and you view the
+Ferman version then the language chooser will redirect to ``/``. The same goes
 for urls that are not handled by the cms and display a language chooser.

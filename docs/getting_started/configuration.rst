@@ -5,7 +5,7 @@ Configuration
 #############
 
 The django CMS has a lot of settings you can use to customize your installation
-of the CMS to be exactly like you want it to be.
+so that it is exactly as you'd like it to be.
 
 *****************
 Required Settings
@@ -37,8 +37,8 @@ Example::
 
 .. warning::
 
-    django CMS internally relies on a number of templates to function correctly;
-    these exist beneath ``cms`` within the templates directory. As such, it
+    django CMS internally relies on a number of templates to function correctly.
+    These exist beneath ``cms`` within the templates directory. As such, it
     is highly recommended you avoid using the same directory name for your own
     project templates.
 
@@ -121,7 +121,7 @@ internationalized.
 **limits**
 
 Limit the number of plugins that can be placed inside this placeholder.
-Dictionary keys are plugin names; values are their respective limits. Special
+Dictionary keys are plugin names and the values are their respective limits. Special
 case: "global" - Limit the absolute number of plugins in this placeholder
 regardless of type (takes precedence over the type-specific limits).
 
@@ -133,7 +133,7 @@ CMS_PLUGIN_CONTEXT_PROCESSORS
 Default: ``[]``
 
 A list of plugin context processors. Plugin context processors are callables
-that modify all plugin's context before rendering. See
+that modify all plugins' context before rendering. See
 :doc:`../extending_cms/custom_plugins` for more information.
 
 .. setting:: CMS_PLUGIN_PROCESSORS
@@ -185,10 +185,10 @@ Editor configuration
 
 The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
-how to configure that. The best way to understand this is to head 
-over to `Wymeditor examples page 
+how to configure that. The best thing to do is to head 
+over to the `Wymeditor examples page 
 <http://files.wymeditor.org/wymeditor/examples/>`_
-After understand how Wymeditor works. 
+in order to understand how Wymeditor works. 
 
 The :mod:`cms.plugins.text` plugin exposes several variables named
 WYM_* that correspond to the wym configuration. The simplest 
@@ -271,8 +271,8 @@ CMS_SITE_LANGUAGES
 Default: ``{}``
 
 If you have more than one site and :setting:`CMS_LANGUAGES` differs between
-the sites, you may want to fill this out so if you switch between the sites
-in the admin you only get the languages available on this site.
+the sites, you may want to fill this out so that when you switch between sites
+in the admin you only get the languages available to that particular site.
 
 Example::
 
@@ -382,9 +382,9 @@ CMS_REDIRECTS
 
 Default: ``False``
 
-This adds a new "redirect" field to the "advanced settings" tab of the page
+This adds a new "redirect" field to the "advanced settings" tab of the page.
 
-You can set a url here, which a visitor will be redirected to when the page is
+You can set a url here to which visitors will be redirected when the page is
 accessed.
 
 Note: Don't use this too much. :mod:`django.contrib.redirects` is much more
@@ -446,7 +446,7 @@ page". But he will only see the users he created. The users he created can also
 only inherit the rights he has. So if he only has been granted the right to edit
 a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
-only a subset of the pages he's allowed access to, for example.
+only a subset of the pages to which he is allowed access.
 
 .. setting:: CMS_PUBLIC_FOR
 
@@ -455,7 +455,7 @@ CMS_PUBLIC_FOR
 
 Default: ``all``
 
-Decides if pages without any view restrictions are public by default, or staff
+Decides if pages without any view restrictions are public by default or staff
 only. Possible values are ``all`` and ``staff``.
 
 .. setting:: CMS_MODERATOR
@@ -465,11 +465,11 @@ CMS_MODERATOR
 
 Default: ``False``
 
-If set to true, gives you a new "moderation" column in the tree view.
+If set to ``True``, gives you a new "moderation" column in the tree view.
 
 You can select to moderate pages or whole trees. If a page is under moderation
 you will receive an email if somebody changes a page and you will be asked to
-approve the changes. Only after you approved the changes will they be updated
+approve the changes. Only after you approve the changes will they be updated
 on the "live" site. If you make changes to a page you moderate yourself, you
 will need to approve it anyway. This allows you to change a lot of pages for
 a new version of the site, for example, and go live with all the changes at the

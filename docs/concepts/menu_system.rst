@@ -15,9 +15,9 @@ What they operate on is a list of menu nodes, that gets passed around the menu s
 
 The main active parts of the menu system are menu *generators* and *modifiers*.
 
-Some of these parts are supplied with the menus application. Some come from from other applications (from the cms application in django CMS, for example, or some other application entirely).
+Some of these parts are supplied with the menus application. Some come from other applications (from the cms application in django CMS, for example, or some other application entirely).
 
-All these active parts need to be registered with the menu system.
+All these active parts need to be registered within the menu system.
 
 Then, when the time comes to build a menu, the system will ask all the registered menu generators and modifiers to get to work on it.
 
@@ -42,13 +42,13 @@ Modifiers
 
 A modifier examines the nodes that have been assembled, and modifies them according to its requirements (adding or removing them, or manipulating their attributes, as it sees fit).
 
-One important one in cms (:py:class:`cms.menu.SoftRootCutter`) removes the nodes that are no longer required when a soft root is encountered.
+An important one in cms (:py:class:`cms.menu.SoftRootCutter`) removes the nodes that are no longer required when a soft root is encountered.
 
 These classes are subclasses of :py:class:`menus.base.Modifier`. Examples are :py:class:`cms.menu.NavExtender` and :py:class:`cms.menu.SoftRootCutter`.
 
 In order to use a modifier, its :py:meth:`modify()` method must be called.
-            
-Note that each Modifer's :py:meth:`modify()` method can be called *twice*, before and after the menu has been trimmed.
+
+Note that each Modifier's :py:meth:`modify()` method can be called *twice*, before and after the menu has been trimmed.
 
 For example when using the {% show_menu %} templatetag, it's called: 
 
@@ -101,7 +101,7 @@ Don't forget that show_menu recurses - so it will do *all* of the below for *eac
             * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()` 
                 * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
                 * loops over each node, comparing its URL with the request.path, and marks the best match as ``selected``
-                * loops over the Modifiers in self.modifiers calling each one's :py:meth:`modify(post_cut = False)`. The default Modifiers are:
+                * loops over the Modifiers in self.modifiers calling each one's :py:meth:`modify(post_cut=False)`. The default Modifiers are:
                     * :py:class:`cms.menu.NavExtender`
                     * :py:class:`cms.menu.SoftRootCutter` removes all nodes below the appropriate soft root 
                     * :py:class:`menus.modifiers.Marker` loops over all nodes; finds selected, marks its ancestors, siblings and children
