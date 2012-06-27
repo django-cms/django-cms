@@ -392,7 +392,15 @@ class AdminTestCase(AdminTestsBase):
         response = client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context["open_menu_trees"], [1,2])
-
+        # tests descendants method for the lazy load ajax call
+        url = "%s%d/descendants/" % (url, first_level_page.pk)
+        response = client.get(url)
+        self.assertEquals(response.status_code, 200)
+        # should include both direct descendant pages
+        self.assertTrue('id="page_2"' in response.content)
+        self.assertTrue('id="page_3"' in response.content)
+        # but not any further down the tree
+        self.assertFalse('id="page_4"' in response.content)
 
 
 class AdminFieldsetTests(TestCase):
