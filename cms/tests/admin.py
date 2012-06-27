@@ -390,7 +390,8 @@ class AdminTestCase(AdminTestsBase):
         client.login(username='admin', password='admin')
         client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
         response = client.get(url)
-        self.assertContains(response,"<title>List of pages</title>")
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["open_menu_trees"], [1,2])
 
 
 
