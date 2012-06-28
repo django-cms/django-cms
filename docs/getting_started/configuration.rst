@@ -75,12 +75,13 @@ Example::
             'plugins': ['TextPlugin', 'PicturePlugin'],
             'text_only_plugins': ['LinkPlugin']
             'extra_context': {"width":640},
-            'name':gettext("Content"),
+            'name': gettext("Content"),
+            'language_fallback': True,
         },
         'right-column': {
             "plugins": ['TeaserPlugin', 'LinkPlugin'],
             "extra_context": {"width":280},
-            'name':gettext("Right Column"),
+            'name': gettext("Right Column"),
             'limits': {
                 'global': 2,
                 'TeaserPlugin': 1,
@@ -116,6 +117,11 @@ plugins, as shown above with ``base.html content``.
     limits. Special case: ``global`` - Limit the absolute number of plugins in
     this placeholder regardless of type (takes precedence over the
     type-specific limits).
+
+``language_fallback``
+    When ``True``, if the placeholder has no plugin for the current language
+    it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
+    Defaults to ``False`` to maintain pre-3.0 behavior.
 
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 

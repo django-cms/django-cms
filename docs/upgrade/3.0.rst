@@ -122,7 +122,15 @@ CMS_MENU_TITLE_OVERWRITE
 ========================
 
 New default is ``True``.
-          
+
+
+Plugin fallback languages
+=========================
+
+It's now possible to specify fallback languages for a placeholder if the placeholder
+is empty for the current language.
+This must be activated in :setting:`CMS_PLACEHOLDER_CONF` per placeholder.
+Default to ``False`` to maintain pre-3.0 behavior.
 
 language_chooser
 ================
