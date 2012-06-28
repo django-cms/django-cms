@@ -42,26 +42,26 @@ Follow an example
 It helps to understand how the system behaves by stepping through some actual
 examples.
 
-1. the situation:
-* your browser wants Italian content
-* the CMS is set up to provide content in English and Italian
-* :setting:`CMS_HIDE_UNTRANSLATED` is False
-* the page ``/some/page``
+#. the situation:
+    * your browser wants Italian content
+    * the CMS is set up to provide content in English and Italian
+    * :setting:`CMS_HIDE_UNTRANSLATED` is False
+    * the page ``/some/page``
 
-2. you visit ``/some/page``
-* the content is served in Italian
-* all link URLs (menus etc.) on that page will be prepended with /it
-* the page is served at ``/some/page`` (i.e. no redirection has taken place)
+#. you visit ``/some/page``
+    * the content is served in Italian
+    * all link URLs (menus etc.) on that page will be prepended with /it
+    * the page is served at ``/some/page`` (i.e. no redirection has taken place)
 
-3. now you select one of those links ``/it/some/other/page`` that is available in Italian
-* Italian content is served
-* the page is served at ``/it/some/other/page``
+#. now you select one of those links ``/it/some/other/page`` that is available in Italian
+    * Italian content is served
+    * the page is served at ``/it/some/other/page``
 
-4. now you select a link to a page **not** available in Italian
-* the link is still ``/it/some/other/page``
-* you'll get the English version, because Italian's not available
-* the path of the new page is ``/en/some/other/page`` (i.e. it has redirected)
-* some issues (see :ref:`the_bug` below)
+#. now you select a link to a page **not** available in Italian
+    * the link is still ``/it/some/other/page``
+    * you'll get the English version, because Italian's not available
+    * the path of the new page is ``/en/some/other/page`` (i.e. it has redirected)
+    * some issues (see :ref:`the_bug` below)
 
     * all links on ``/en/some/other/page`` are prepended with ``/en`` - even if they are available in Italian
     * if you now visit ``/some/page`` or any other page without using a language prefix, you'll get content in English - even though your browser wants Italian

@@ -9,7 +9,7 @@ You have 5 ways of integrating your app:
 
     Statically extend the menu entries
 
-2. Attac hMenus
+2. Attach Menus
 
     Attach your menu to a page.
 
