@@ -133,5 +133,5 @@ not translated yet.
 
 If :setting:`CMS_HIDE_UNTRANSLATED`  is ``True`` in your ``settings.py``
 and you are on a page that doesn't yet have an English translatio and you view the
-Ferman version then the language chooser will redirect to ``/``. The same goes
+German version then the language chooser will redirect to ``/``. The same goes
 for urls that are not handled by the cms and display a language chooser.
