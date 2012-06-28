@@ -137,6 +137,48 @@ class ApphooksTestCase(CMSTestCase):
             
             apphook_pool.clear()
 
+    def test_include_urlconf(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+
+            apphook_pool.clear()
+            superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+            page = create_page("home", "nav_playground.html", "en",
+                               created_by=superuser, published=True)
+            create_title('de', page.get_title(), page)
+            child_page = create_page("child_page", "nav_playground.html", "en",
+                         created_by=superuser, published=True, parent=page)
+            create_title('de', child_page.get_title(), child_page)
+            child_child_page = create_page("child_child_page", "nav_playground.html",
+                "en", created_by=superuser, published=True, parent=child_page, apphook='SampleApp')
+            create_title("de", child_child_page.get_title(), child_child_page, apphook='SampleApp')
+
+            child_child_page.publish()
+            path = reverse('extra_first')
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/home.html')
+            self.assertContains(response, "test urlconf")
+
+            path = reverse('extra_second')
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/home.html')
+            self.assertContains(response, "test included urlconf")
+
+            path = reverse('de:extra_first')
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/home.html')
+            self.assertContains(response, "test urlconf")
+
+            path = reverse('de:extra_second')
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/home.html')
+            self.assertContains(response, "test included urlconf")
+
+            apphook_pool.clear()
+
     def test_apphook_breaking_under_home_with_new_path_caching(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             home = create_page("home", "nav_playground.html", "en", published=True)

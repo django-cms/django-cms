@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+	<h2>Sample application page - on page {% page_attribute page_title %}</h2>
+	<h3>{{ message }}</h3>
+	{{ block.super }}
+	{% url extra_first %}
+	{% url extra_second %}
+{% endblock content %}
