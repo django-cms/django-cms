@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import add_plugin, create_page
+from cms.api import add_plugin, create_page, create_title
 from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
@@ -198,6 +198,47 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_scanning_nested_super(self):
         placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
         self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
+
+    def test_plugins_language_fallback(self):
+        """ Tests language_fallback placeholder configuration """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        title_de = create_title("de", "page_de", page_en)
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
+
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+            pop = push
+        context_en = NoPushPopContext()
+        context_en['request'] = self.get_request(language="en")
+        context_de = NoPushPopContext()
+        context_de['request'] = self.get_request(language="de")
+
+        # First test the default (non-fallback) behavior)
+        ## English page should have the text plugin
+        content_en = render_placeholder(placeholder_en, context_en)
+        self.assertRegexpMatches(content_en,"^en body$")
+
+        ## Deutsch page should have no text
+        content_de = render_placeholder(placeholder_en, context_de)
+        self.assertNotRegexpMatches(content_de,"^en body$")
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            ## Deutsch page should have no text
+            content_de = render_placeholder(placeholder_en, context_de)
+            self.assertRegexpMatches(content_de,"^en body$")
+
+            # Then we add a plugin to check for proper rendering
+            add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de,"^de body$")
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
