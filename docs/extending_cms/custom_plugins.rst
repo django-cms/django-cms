@@ -2,7 +2,7 @@
 Custom Plugins
 ##############
 
-CMS Plugins are reusable content publishers that can be inserted into django 
+CMS Plugins are reusable content publishers that can be inserted into Django 
 CMS pages (or indeed into any content that uses django CMS placeholders). They
 enable the publishing of information automatically, without further intervention.
 
