@@ -32,9 +32,9 @@ template to your project or edit the one provided with django-cms.
 ``extra_inactive``, and ``extra_active``.
 
 The first two parameters, ``start_level`` (default=0) and ``end_level``
-(default=100) specify from what level to which level should the navigation be
-rendered.
-If you have a home as a root node and don't want to display home you can render
+(default=100) specify from which level the navigation shoud be rendered
+and at which level it should stop.
+If you have home as a root node and don't want to display home you can render
 the navigation only after level 1.
 
 The third parameter, ``extra_inactive`` (default=0), specifies how many levels
@@ -102,7 +102,7 @@ show_sub_menu
 *************
 
 Display the sub menu of the current page (as a nested list).
-Takes one argument that specifies how many levels deep should the submenu be
+Takes one argument that specifies how many levels deep the submenu should be
 displayed. The template can be found at ``menu/sub_menu.html``::
 
     <ul>
@@ -157,7 +157,7 @@ The level of the node. Starts at 0.
 
 The level of the node from the root node of the menu. Starts at 0.
 If your menu starts at level 1 or you have a "soft root" (described
-in the next section) the first node still would have 0 as its `menu_level`.
+in the next section) the first node would still have 0 as its `menu_level`.
 ::
 
     {{ node.get_absolute_url }}

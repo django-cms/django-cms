@@ -6,9 +6,9 @@ Serving content in multiple languages
 Basic concepts
 **************
 
-django CMS has a sophisticated multilingual capability; it's able to serve
+django CMS has a sophisticated multilingual capability. It is able to serve
 content in multiple languages, with fallbacks into other languages where
-translations have not been provided, the facility for the user to set the
+translations have not been provided. It also has the facility for the user to set the
 preferred language and so on.
 
 How django CMS determines the user's preferred language
@@ -47,14 +47,17 @@ examples.
 * the CMS is set up to provide content in English and Italian
 * :setting:`CMS_HIDE_UNTRANSLATED` is False
 * the page ``/some/page``
-1. you visit ``/some/page``
+
+2. you visit ``/some/page``
 * the content is served in Italian
 * all link URLs (menus etc.) on that page will be prepended with /it
 * the page is served at ``/some/page`` (i.e. no redirection has taken place)
-1. now you select one of those links ``/it/some/other/page`` that is available in Italian
+
+3. now you select one of those links ``/it/some/other/page`` that is available in Italian
 * Italian content is served
 * the page is served at ``/it/some/other/page``
-1. now you select a link to a page **not** available in Italian
+
+4. now you select a link to a page **not** available in Italian
 * the link is still ``/it/some/other/page``
 * you'll get the English version, because Italian's not available
 * the path of the new page is ``/en/some/other/page`` (i.e. it has redirected)
@@ -96,9 +99,11 @@ Your language cookie should only ever get set or changed if:
 * your browser has asked for a language (but this can't override your choice above)
 
 If your cookie contains a particualar language (say, "it"):
+
 * the content should be served in Italian wherever available
 * links on a page should be to ``/it`` content where available, and fallback where not
 
 When visiting a page only available in English:
+
 * content will have to be in English
 * links should be to Italian content where possible

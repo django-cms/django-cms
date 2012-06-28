@@ -22,14 +22,14 @@ Lazy page tree loading in admin
 ===============================
 
 Thanks to the work by Andrew Schoen the page tree in the admin now loads lazily,
-improving the performance of that view for large sites significantly.
+significantly improving the performance of that view for large sites.
 
 
 Toolbar isolation
 =================
 
 The toolbar JavaScript dependencies should now be properly isolated and no
-longer pollutes the global JavaScript namespace. 
+longer pollute the global JavaScript namespace. 
 
 
 Plugin cancel button fixed
@@ -51,19 +51,19 @@ Check ``runtests.py -h`` for options.
 Moving text plugins to different placeholders no longer loses inline plugins
 ============================================================================
 
-A serious bug where moving a text plugin with inline plugins would lose all
-the inline plugins when moved to a different placeholder was fixed.
+A serious bug where a text plugin with inline plugins would lose all
+the inline plugins when moved to a different placeholder has been fixed.
 
 
 Minor improvements
 ==================
 
-* The ``or`` clause in the ``placeholder`` tag now correctly works on non-cms
+* The ``or`` clause in the ``placeholder`` tag now works correctly on non-cms
   pages.
 * The icon source URL for inline plugins for text plugins no longer gets double
   escaped.
 * ``PageSelectWidget`` correctly orders pages again.
-* Fixed the file plugin sometimes causing invalid HTML (unclosed ``span`` tag).
+* Fixed the file plugin which was sometimes causing invalid HTML (unclosed ``span`` tag).
 * Migration ordering for plugins improved.
 * Internationalized strings in JavaScript now get escaped.
 
