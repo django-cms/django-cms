@@ -3,7 +3,7 @@
 
 {% block fieldsets %}
 {% for fieldset in adminform %}
-	{% include "cms/plugins/text_plugin_fieldset.html" %}
+	{% include "admin/includes/fieldset.html" %}
 {% endfor %}
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>
