@@ -153,17 +153,18 @@ class ApphooksTestCase(CMSTestCase):
             create_title("de", child_child_page.get_title(), child_child_page, apphook='SampleApp')
 
             child_child_page.publish()
-            path = reverse('extra_first')
-            response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
-            self.assertTemplateUsed(response, 'sampleapp/extra.html')
-            self.assertContains(response, "test urlconf")
 
             path = reverse('extra_second')
             response = self.client.get(path)
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test included urlconf")
+            
+            path = reverse('extra_first')
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/extra.html')
+            self.assertContains(response, "test urlconf")
 
             path = reverse('de:extra_first')
             response = self.client.get(path)

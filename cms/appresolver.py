@@ -76,8 +76,9 @@ def recurse_patterns(path, pattern_list, page_id):
     newpatterns = []
     for pattern in pattern_list:
         app_pat = pattern.regex.pattern
-        if app_pat.startswith('^'):
-            app_pat = app_pat[1:]
+        # make sure we don't get patterns that start with more than one '^'!
+        app_pat = app_pat.lstrip('^')
+        path = path.lstrip('^')
         regex = r'^%s%s' % (path, app_pat)
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
