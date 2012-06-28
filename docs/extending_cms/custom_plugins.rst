@@ -2,20 +2,19 @@
 Custom Plugins
 ##############
 
-CMS Plugins are reusable content publishers, that can be inserted into django 
-CMS pages (or indeed into any content that uses django CMS placeholders) in 
-order to publish information automatically, without further intervention.
+CMS Plugins are reusable content publishers that can be inserted into django 
+CMS pages (or indeed into any content that uses django CMS placeholders). They
+enable the publishing of information automatically, without further intervention.
 
-This means that your published web content, whatever it is, can be kept 
-instantly up-to-date at all times. 
+This means that your published web content, whatever it is, is kept 
+up-to-date at all times.
 
 It's like magic, but quicker.
 
 Unless you're lucky enough to discover that your needs can be met by the 
 built-in plugins, or by the many available 3rd-party plugins, you'll have 
-to write your own custom CMS Plugin.
-
-Don't worry though, since writing a CMS Plugin is rather simple.
+to write your own custom CMS Plugin. Don't worry though -
+writing a CMS Plugin is rather simple.
 
 *************************************
 Why would you need to write a plugin?
@@ -25,7 +24,7 @@ A plugin is the most convenient way to integrate content from another Django
 app into a django CMS page.
 
 For example, suppose you're developing a site for a record company in django 
-CMS. You might like to have on your site's home page a "Latest releases" box.
+CMS. You might like to have a "Latest releases" box on your site's home page.
 
 Of course, you could every so often edit that page and update the information. 
 However, a sensible record company will manage its catalogue in Django too, 
@@ -51,13 +50,13 @@ A django CMS plugin is fundamentally composed of three things.
 * a plugin **publisher**, to do the automated work of deciding what to publish
 * a plugin **template**, to render the information into a web page
 
-These correspond to the familiar with the Model-View-Template scheme:
+These correspond to the familiar Model-View-Template scheme:
 
 * the plugin **model** to store its configuration
 * the plugin **view** that works out what needs to be displayed
 * the plugin **template** to render the information
 
-And so to build your plugin, you'll make it out of: 
+And so to build your plugin, you'll make it from: 
 
 * a subclass of :class:`cms.models.pluginmodel.CMSPlugin` to
   **store the configuration** for your plugin instances
@@ -78,15 +77,15 @@ An aside on models and configuration
 The plugin **model**, the subclass of :class:`cms.models.pluginmodel.CMSPlugin`,
 is actually optional.
 
-You could have a plugin that didn't need to be configured, because it only
-ever did one thing. 
+You could have a plugin that doesn't need to be configured, because it only
+ever does one thing. 
 
-For example, you could have a plugin that always and only publishes information 
+For example, you could have a plugin that only publishes information 
 about the top-selling record of the past seven days. Obviously, this wouldn't 
-be very flexible - you wouldn't be able to use the same plugin to for the 
+be very flexible - you wouldn't be able to use the same plugin for the 
 best-selling release of the last *month* instead.
 
-Usually, you find that it is useful to be able to configure your plugin, and it
+Usually, you find that it is useful to be able to configure your plugin, and this
 will require a model.
 
 
@@ -95,10 +94,10 @@ The simplest plugin
 *******************
 
 You may use ``python manage.py startapp`` to set up the basic layout for you
-plugin app, alternatively, just add a file called ``cms_plugins.py`` to an
+plugin app. Alternatively, just add a file called ``cms_plugins.py`` to an
 existing Django application.
 
-In there, you place your plugins, in our example the following code::
+In there, you place your plugins. For our example, include the following code::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
@@ -115,7 +114,7 @@ In there, you place your plugins, in our example the following code::
 
     plugin_pool.register_plugin(HelloPlugin)
 
-Now we're almost done, all that's left is adding the template. Add the
+Now we're almost done. All that's left is to add the template. Add the
 following into the root template directory in a file called
 ``hello_plugin.html``:
 
@@ -133,11 +132,11 @@ plugins.
 
 There are three required attributes on those classes:
 
-* ``model``: The model you wish to use to store information about this plugin,
-  if you do not require any special information, for example configuration, to
-  be stored for your plugins, you may just use
-  :class:`cms.models.pluginmodel.CMSPlugin`. We'll look at that model more
-  closely in a bit.
+* ``model``: The model you wish to use for storing information about this plugin.
+  If you do not require any special information, for example configuration, to
+  be stored for your plugins, you can simply use
+  :class:`cms.models.pluginmodel.CMSPlugin` (We'll look at that model more
+  closely in a bit).
 * ``name``: The name of your plugin as displayed in the admin. It is generally
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional.
@@ -147,7 +146,7 @@ In addition to those three attributes, you must also define a
 :meth:`render` method on your subclasses. It is specifically this `render` 
 method that is the **view** for your plugin.
 
-That `render` method takes three arguments:
+The `render` method takes three arguments:
 
 * ``context``: The context with which the page is rendered.
 * ``instance``: The instance of your plugin that is rendered.
@@ -162,22 +161,22 @@ plugin template.
 Storing configuration
 *********************
 
-In many cases, you want to store configuration for your plugin instances, for
-example if you have a plugin that shows the latest blog posts, you might want
+In many cases, you want to store configuration for your plugin instances. For
+example, if you have a plugin that shows the latest blog posts, you might want
 to be able to choose the amount of entries shown. Another example would be a
-gallery plugin, where you want to choose the pictures to show for the plugin.
+gallery plugin where you want to choose the pictures to show for the plugin.
 
 To do so, you create a Django model by subclassing
 :class:`cms.models.pluginmodel.CMSPlugin` in the ``models.py`` of an installed
 application.
 
-Let's improve our ``HelloPlugin`` from above by making it configurable what the
-fallback name for non-authenticated users should be.
+Let's improve our ``HelloPlugin`` from above by making its fallback name for
+non-authenticated users configurable.
 
-In our ``models.py`` we add following model::
+In our ``models.py`` we add the following::
 
     from cms.models.pluginmodel import CMSPlugin
-    
+
     from django.db import models
 
     class Hello(CMSPlugin):
@@ -250,9 +249,9 @@ responsible for copying those if necessary whenever the CMS copies the plugin.
 
 To do this you can implement a method called
 :meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` on your plugin
-model which gets the **old** instance of the plugin as argument.
+model which gets the **old** instance of the plugin as an argument.
 
-Lets assume this is your plugin::
+Let's assume this is your plugin::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
@@ -314,8 +313,8 @@ Sekizai style
 -------------
 
 To fully harness the power of django-sekizai, it is helpful to have a consistent
-style on how to use it. Here is a set of conventions that should, but don't
-necessarily need to, be followed:
+style on how to use it. Here is a set of conventions that should be followed
+(but don't necessarily need to be):
 
 * One bit per ``addtoblock``. Always include one external CSS or JS file per
   ``addtoblock`` or one snippet per ``addtoblock``. This is needed so
@@ -411,8 +410,8 @@ A plugin processor takes 4 arguments:
 Example
 -------
 
-Suppose you want to put wrap each plugin in the main placeholder in a colored
-box, but it would be too complicated to edit each individual plugin's template:
+Suppose you want to wrap each plugin in the main placeholder in a colored
+box but it would be too complicated to edit each individual plugin's template:
 
 In your ``settings.py``::
 

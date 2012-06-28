@@ -12,7 +12,7 @@ the following commands.
 
     pip install --upgrade django-cms==2.2 django==1.3.1
 
-If you are using django-reversion make sure to have atleast
+If you are using django-reversion make sure to have at least
 version 1.4 installed
 
 .. code-block:: bash

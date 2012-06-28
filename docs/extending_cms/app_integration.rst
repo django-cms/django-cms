@@ -7,9 +7,9 @@ You have 5 ways of integrating your app:
 
 1. Menus
 
-    Static extend the menu entries
+    Statically extend the menu entries
 
-2. AttachMenus
+2. Attac hMenus
 
     Attach your menu to a page.
 
@@ -29,7 +29,7 @@ You have 5 ways of integrating your app:
 Menus
 *****
 
-Create a menu.py in your application and write the following inside::
+Create a ``menu.py`` in your application and write the following inside::
 
     from menus.base import Menu, NavigationNode
     from menus.menu_pool import menu_pool
@@ -58,7 +58,7 @@ The get_nodes function should return a list of
 
 - title
 
-  What should the menu entry read?
+  What the menu entry should read as
 
 - url,
 
@@ -70,7 +70,7 @@ The get_nodes function should return a list of
 
 - parent_id=None
 
-  If this is a child of another node give here the id of the parent.
+  If this is a child of another node supply the the id of the parent here.
 
 - parent_namespace=None
 
@@ -87,7 +87,7 @@ The get_nodes function should return a list of
 
   Whether or not this menu item should be visible.
 
-Additionally, each :class:`NavigationNode` provides a number of methods, which are
+Additionally, each :class:`NavigationNode` provides a number of methods which are
 detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 ************
@@ -95,7 +95,7 @@ Attach Menus
 ************
 
 Classes that extend from :class:`menus.base.Menu` always get attached to the
-root. But if you want the menu be attached to a CMS Page you can do that as
+root. But if you want the menu to be attached to a CMS Page you can do that as
 well.
 
 Instead of extending from :class:`~menus.base.Menu` you need to extend from
@@ -157,7 +157,7 @@ App-Hooks
 With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
 
-To create an apphook create a ``cms_app.py`` in your application. And in there
+To create an apphook create a ``cms_app.py`` in your application. And in it
 write the following::
 
     from cms.app_base import CMSApp
@@ -188,7 +188,7 @@ under "Application". Save the page.
     there is a cms management command called uninstall apphooks
     that removes the specified apphook(s) from all pages by name.
     eg. ``manage.py cms uninstall apphooks MyApphook``.
-    To find all names for uninstallable apphooks there is a command for this aswell
+    To find all names for uninstallable apphooks there is a command for this as well
     ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
@@ -228,7 +228,7 @@ template:
 
     {% url app_main %}
 
-If you want to access the same url but in a different language use a langauge
+If you want to access the same url but in a different language use a language
 namespace:
 
 .. code-block:: html+django
@@ -293,7 +293,7 @@ We would now create a menu out of these categories::
                     category.get_absolute_url(),
                     category.pk,
                     category.parent_id
-                )                
+                )
                 nodes.append(node)
             return nodes
 
@@ -370,7 +370,7 @@ of :class:`~menus.base.NavigationNode` instances.
 
 - request
 
-  A Django request instance. Maybe you want to modify based on sessions, or
+  A Django request instance. You want to modify based on sessions, or
   user or permissions?
 
 - nodes
@@ -389,7 +389,7 @@ of :class:`~menus.base.NavigationNode` instances.
 - post_cut
 
   Every modifier is called two times. First on the whole tree. After that the
-  tree gets cut. To only show the nodes that are shown in the current menu.
+  tree gets cut to only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
   the case ``post_cut`` is ``True``.
 
