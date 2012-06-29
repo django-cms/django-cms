@@ -85,3 +85,5 @@ Pending deprecations
 ********************
 
 The ``CMS_FLAT_URLS`` setting is deprecated and will be removed in version 2.4.
+The moderation feature (``CMS_MODERATOR = True``) will be deprecated in 2.4 and
+replaced with a simpler way of handling unpublished changes. 
