@@ -33,7 +33,7 @@ Plugin and apphook management commands
 ``cms uninstall``
 =================
 
-The ``uninstall`` subcommand can be used to make an uninstallation of a CMS
+The ``uninstall`` subcommand can be used to make uninstalling a CMS
 Plugin or an apphook easier.
 
 It has two subcommands:
@@ -41,13 +41,13 @@ It has two subcommands:
 * ``cms uninstall plugins <plugin name> [<plugin name 2> [...]]`` uninstalls
   one or several plugins by **removing** them from all pages where they are
   used. Note that the plugin name should be the name of the class that is
-  registered to the django CMS. If you are unsure about the plugin name, use
+  registered in the django CMS. If you are unsure about the plugin name, use
   the :ref:`cms-list-command` to see a list of installed plugins.
 * ``cms uninstall apphooks <apphook name> [<apphook name 2> [...]]`` uninstalls
   one or several apphooks by **removing** them from all pages where they are
   used. Note that the apphook name should be the name of the class that is
-  registered to the django CMS. If you are unsure about the apphook name, use
-  the :ref:`cms-list-command` to see a list of installed apphook.
+  registered in the django CMS. If you are unsure about the apphook name, use
+  the :ref:`cms-list-command` to see a list of installed apphooks.
 
 .. warning::
 

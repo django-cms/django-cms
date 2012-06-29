@@ -1,19 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+# Daigo Sakamoto <superdaigo@gmail.com>, 2011.
+# Jonas Obrist <me@ojii.ch>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-08-14 09:47-0500\n"
-"PO-Revision-Date: 2011-03-22 15:24+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-12-16 16:30+0000\n"
+"Last-Translator: Jonas Obrist <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -125,9 +128,9 @@ msgid "Page Title"
 msgstr "ページタイトル"
 
 #: admin/forms.py:138
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
 
 #: admin/forms.py:139
 msgid "Application"
@@ -170,9 +173,9 @@ msgid "Invalid URL, use /my/url format."
 msgstr "無効なURLです。 /my/url のように入力してください。"
 
 #: admin/forms.py:181
-#, fuzzy, python-format
+#, python-format
 msgid "Page with redirect url %r already exist"
-msgstr "このスラグを使っているページが存在します。"
+msgstr ""
 
 #: admin/forms.py:191 admin/forms.py:192 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
@@ -190,9 +193,8 @@ msgid "Add page permission also requires edit page permission."
 msgstr "ページ追加権限は編集権限も必要です。"
 
 #: admin/forms.py:248
-#, fuzzy
 msgid "can_view"
-msgstr "見る"
+msgstr ""
 
 #: admin/forms.py:260
 msgid "Please select user or group first."
@@ -213,7 +215,7 @@ msgstr "変更"
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr "変更"
+msgstr "削除"
 
 #: admin/forms.py:270
 msgid "Recover (any) pages"
@@ -227,9 +229,7 @@ msgstr "ユーザに通知"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザ"
-"メールが必要です。"
+msgstr "パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザメールが必要です。"
 
 #: admin/forms.py:318
 msgid "New password"
@@ -278,9 +278,8 @@ msgid "SEO Settings"
 msgstr "SEO設定"
 
 #: admin/pageadmin.py:299
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:485
 msgid "higher"
@@ -297,8 +296,7 @@ msgstr "ページを承認しました。"
 #: admin/pageadmin.py:927
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-"プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
+msgstr "プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
 
 #: admin/pageadmin.py:933
 msgid "There only exists one translation for this page"
@@ -307,7 +305,7 @@ msgstr "このページは一つの翻訳しかありません。"
 #: admin/pageadmin.py:969
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "%(language)sのタイトルとプラグインは削除をしました。"
 
 #: admin/pageadmin.py:991
 msgid "Are you sure?"
@@ -322,9 +320,8 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "メニューステータスを変更する権限がありません。"
 
 #: admin/pageadmin.py:1079
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1126 admin/pageadmin.py:1158
 msgid "Language must be set to a supported language!"
@@ -344,9 +341,8 @@ msgid "Language must be different than the copied language!"
 msgstr ""
 
 #: admin/pageadmin.py:1166
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1173
 #, python-format
@@ -354,14 +350,12 @@ msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1186 admin/pageadmin.py:1294 admin/pageadmin.py:1316
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1221
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1256
 #, python-format
@@ -370,18 +364,16 @@ msgid ""
 msgstr ""
 
 #: admin/pageadmin.py:1311
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1329
 msgid "Plugins where moved"
-msgstr ""
+msgstr "プラグインは動かしました。"
 
 #: admin/pageadmin.py:1343
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1361 admin/placeholderadmin.py:292
 #, python-format
@@ -411,19 +403,16 @@ msgid "Page permissions management"
 msgstr "ページ権限管理"
 
 #: admin/placeholderadmin.py:150 admin/placeholderadmin.py:191
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/placeholderadmin.py:187
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/placeholderadmin.py:288
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -876,7 +865,7 @@ msgstr "幅"
 
 #: models/pluginmodel.py:140
 msgid "<Empty>"
-msgstr ""
+msgstr "<空>"
 
 #: models/titlemodels.py:12
 msgid "overwrite the title in the menu"
@@ -1132,7 +1121,7 @@ msgstr ""
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
-msgstr ""
+msgstr "プラグイン"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
@@ -1237,9 +1226,8 @@ msgid "we were checking out"
 msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
-#, fuzzy
 msgid "loading tweets..."
-msgstr "ちょっと待って下さい"
+msgstr ""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1262,13 +1250,10 @@ msgid "movie url"
 msgstr "ムービーのURL"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
-"VIMEOやYOUTUBEのURLを使って下さい。例えば：http://www.youtube.com/watch?"
-"v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1588,12 +1573,12 @@ msgstr "コピーして"
 
 #: templates/admin/cms/page/menu_item.html:34
 msgid "copy"
-msgstr "コピーして"
+msgstr "コピー"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
 msgid "Add Child"
-msgstr ""
+msgstr "子ページを追加"
 
 #: templates/admin/cms/page/menu_item.html:37
 #: templates/admin/cms/page/menu_item.html:41
@@ -1659,9 +1644,8 @@ msgid "Can move"
 msgstr ""
 
 #: templates/admin/cms/page/permissions.html:14
-#, fuzzy
 msgid "Can view"
-msgstr "見る"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
@@ -1777,9 +1761,8 @@ msgstr "ユーザ名"
 
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
-#, fuzzy
 msgid "Login"
-msgstr "ログイン"
+msgstr ""
 
 #: templates/cms/toolbar/items/status.html:2
 msgid "Status"
@@ -1814,8 +1797,7 @@ msgstr ""
 #: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1840,47 +1822,14 @@ msgstr "承認"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Page %s は承認が必要です。"
 
-#~ msgid "Move to %(name)s"
-#~ msgstr "%(name)s へ移動"
-
 #~ msgid "move"
-#~ msgstr "移動"
+#~ msgstr "move request"
 
-#~ msgid "history"
-#~ msgstr "履歴"
+#~ msgid "sidebar column"
+#~ msgstr "background color"
 
-#~ msgid "Lock"
-#~ msgstr "ロック"
+#~ msgid "fgcolor"
+#~ msgstr "foreground color"
 
-#~ msgid "Close"
-#~ msgstr "閉める"
-
-#~ msgid "Settings"
-#~ msgstr "設定"
-
-#~ msgid "Delete Plugin"
-#~ msgstr "プラグイン削除"
-
-#~ msgid "English"
-#~ msgstr "英語"
-
-#~ msgid "French"
-#~ msgstr "フランス語"
-
-#~ msgid "German"
-#~ msgstr "ドイツ語"
-
-#~ msgid "Dutch"
-#~ msgstr "オランダ語"
-
-#~ msgid "two columns"
-#~ msgstr "二つ列"
-
-#~ msgid "three columns"
-#~ msgstr "三つ列"
-
-#~ msgid "left column"
-#~ msgstr "左列"
-
-#~ msgid "right column"
-#~ msgstr "右列"
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Requested language has not been translated yet."

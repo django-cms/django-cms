@@ -18,6 +18,9 @@ def patch_settings():
     if getattr(settings, 'CMS_FLAT_URLS', False):
         warnings.warn("CMS_FLAT_URLS are deprecated and will be removed in django CMS 2.4!", DeprecationWarning)
     
+    if getattr(settings, 'CMS_MODERATOR', False):
+        warnings.warn("CMS_MODERATOR will be removed and replaced in django CMS 2.4!", DeprecationWarning)
+    
     from cms.conf import global_settings
     # patch settings
     

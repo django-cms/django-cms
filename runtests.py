@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import with_statement
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
 import argparse

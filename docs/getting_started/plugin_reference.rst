@@ -32,7 +32,7 @@ You might consider using `django-filer`_ with `django CMS plugin`_ and its
 
 .. warning::
 
-    The builtin file plugin does only work with local storages. If you need
+    The builtin file plugin only works with local storages. If you need
     more advanced solutions, please look at alternative file plugins for the
     django CMS, such as `django-filer`_.
 
@@ -97,7 +97,7 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
-.. note:: As of version 2.2, the link plugin no longer verifies the existance of
+.. note:: As of version 2.2, the link plugin no longer verifies the existence of
           link targets.
 
 
@@ -125,7 +125,7 @@ resize your pictures, you can find some on `Django Packages`_ and compare them
 there.
 
 In your project template directory create a folder called ``cms/plugins`` and
-create a file called ``picture.html`` in there. Here is an example
+in it create a file called ``picture.html``. Here is an example
 ``picture.html`` template using `easy-thumbnails`_:
 
 .. code-block:: html+django
@@ -170,7 +170,7 @@ running.
 Snippet
 *******
 
-Renders a HTML snippet from a HTML file in your templates directories or a
+Renders an HTML snippet from an HTML file in your templates directories or a
 snippet given via direct input.
 
 For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
@@ -274,7 +274,7 @@ Video
 *****
 
 Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
-<http://github.com/FlashJunior/OSFlashVideoPlayer>`_. If you upload a file use
+<http://github.com/FlashJunior/OSFlashVideoPlayer>`_. When uploading videos use either
 .flv files or h264 encoded video files.
 
 For installation be sure you have the following in your project's
@@ -326,7 +326,7 @@ running.
 Twitter
 *******
 
-Displays the last number of post of a twitter user.
+Display's a number of a twitter user's latest posts.
 
 For installation be sure you have the following in your project's
 :setting:`django:INSTALLED_APPS` setting::
@@ -348,8 +348,8 @@ For installation be sure you have the following in your project's
 Inherit
 *******
 
-Displays all plugins of another page or another language. Great if you need
-always the same plugins on a lot of pages.
+Displays all plugins of another page or another language. Great if you always
+need the same plugins on a lot of pages.
 
 For installation be sure you have the following in your project's
 :setting:`django:INSTALLED_APPS` setting::
@@ -360,8 +360,8 @@ For installation be sure you have the following in your project's
         # ...
     )
 
-.. warning:: The inherit plugin is currently the only core-plugin which can
-             **not** be used in non-cms placeholders.
+.. warning:: The inherit plugin is currently the only core-plugin which
+             **cannot** be used in non-cms placeholders.
 
 .. _Django Packages: http://djangopackages.com/grids/g/thumbnails/
 .. _easy-thumbnails: https://github.com/SmileyChris/easy-thumbnails

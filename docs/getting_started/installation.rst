@@ -2,7 +2,7 @@
 Installation
 ############
 
-This document assumes you are familiar with Python and Django, and should
+This document assumes you are familiar with Python and Django. It should
 outline the steps necessary for you to follow the :doc:`tutorial`.
 
 ************
@@ -51,7 +51,7 @@ On Ubuntu
 
     The instructions here install certain packages, such as PIL, Django, South
     and django CMS globally, which is not recommended. We recommend you use
-    `virtualenv`_ to use instead. If you chose to do so, install Django,
+    `virtualenv`_ instead. If you choose to do so, install Django,
     django CMS and South inside a virtualenv.
 
 If you're using Ubuntu (tested with 10.10), the following should get you
@@ -61,9 +61,9 @@ started:
 
     sudo aptitude install python2.6 python-setuptools python-imaging
     sudo easy_install pip
-    sudo pip install Django==1.3 django-cms south
+    sudo pip install Django==1.4 django-cms south
 
-Additionally, you need the python driver for your selected database:
+Additionally, you need the Python driver for your selected database:
 
 .. code-block:: bash
 
@@ -79,10 +79,6 @@ This will install PIL and your database's driver globally.
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
-.. note:: This will install Django version 1.3 for use with the CMS. While
-          later versions of Django (such as 1.4) are know to work for some
-          people, it is NOT recommended and will not be supported until further
-          notice (and tests)
 
 On Mac OSX
 ==========
@@ -101,12 +97,12 @@ Databases
 
 We recommend using `PostgreSQL`_ or `MySQL`_ with django CMS. Installing and
 maintaining database systems is outside the scope of this documentation, but is
-very well documented on the system's respective websites.
+very well documented on the systems' respective websites.
 
 To use django CMS efficiently, we recommend:
 
-* Create a separate set of credentials for django CMS.
-* Create a separate database for django CMS to use.
+* Creating a separate set of credentials for django CMS.
+* Creating a separate database for django CMS to use.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com

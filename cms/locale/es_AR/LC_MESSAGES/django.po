@@ -1,19 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+# Juan Carizza <sencillomail@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-14 09:48-0500\n"
-"PO-Revision-Date: 2011-03-22 15:24+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2011-08-14 09:47-0500\n"
+"PO-Revision-Date: 2011-12-17 04:47+0000\n"
+"Last-Translator: Juan Carizza <sencillomail@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: es_AR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -125,10 +127,9 @@ msgid "Page Title"
 msgstr "Título de la página"
 
 #: admin/forms.py:138
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Sobreescribe lo que se muestra en la barra de título del navegador o en los "
-"marcadores"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Sobreescribe lo que se muestra en la barra de título del navegador o en los marcadores"
 
 #: admin/forms.py:139
 msgid "Application"
@@ -160,9 +161,7 @@ msgstr "La descripción de la página se utiliza habitualmente en los buscadores
 
 #: admin/forms.py:154
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Una lista de palabras clave separadas por coma se utiliza habitualmente en "
-"los buscadores"
+msgstr "Una lista de palabras clave separadas por coma se utiliza habitualmente en los buscadores"
 
 #: admin/forms.py:170
 msgid "A page with this reverse URL id exists already."
@@ -173,9 +172,9 @@ msgid "Invalid URL, use /my/url format."
 msgstr "URL inválida, utiliza el formato /mi/url"
 
 #: admin/forms.py:181
-#, fuzzy, python-format
+#, python-format
 msgid "Page with redirect url %r already exist"
-msgstr "Una página con el mismo slug ya existe"
+msgstr ""
 
 #: admin/forms.py:191 admin/forms.py:192 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
@@ -186,10 +185,7 @@ msgstr "usuario"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"El permiso para añadir una página implica también el acceso a los hijos y "
-"descendientes, en caso contrario la página añadida no podría ser cambiada "
-"por su creador."
+msgstr "El permiso para añadir una página implica también el acceso a los hijos y descendientes, en caso contrario la página añadida no podría ser cambiada por su creador."
 
 #: admin/forms.py:221
 msgid "Add page permission also requires edit page permission."
@@ -232,9 +228,7 @@ msgstr "Avisiar al usuario"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Envia un aviso al usuario ante cambios del nombre de usuario o la clave. "
-"Requiere el e-mail del usuario."
+msgstr "Envia un aviso al usuario ante cambios del nombre de usuario o la clave. Requiere el e-mail del usuario."
 
 #: admin/forms.py:318
 msgid "New password"
@@ -251,15 +245,12 @@ msgstr "La notificación por e-mail requiere una dirección de correo válida"
 #: admin/forms.py:341
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"¡El permiso para añadir páginas necesita del permiso para modificar páginas!"
+msgstr "¡El permiso para añadir páginas necesita del permiso para modificar páginas!"
 
 #: admin/forms.py:343
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"¡El permiso para añadir nuevos usuarios necesita del permiso para modificar "
-"usuario!"
+msgstr "¡El permiso para añadir nuevos usuarios necesita del permiso para modificar usuario!"
 
 #: admin/forms.py:345
 msgid "To add permissions you also need to edit them!"
@@ -271,8 +262,7 @@ msgstr "Configuración básica."
 
 #: admin/pageadmin.py:100
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Nota: Esta página se recargará si cambias la selección. Guárdala primero."
+msgstr "Nota: Esta página se recargará si cambias la selección. Guárdala primero."
 
 #: admin/pageadmin.py:102 admin/pageadmin.py:154
 msgid "Hidden"
@@ -287,9 +277,8 @@ msgid "SEO Settings"
 msgstr "Configuración para SEO"
 
 #: admin/pageadmin.py:299
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:485
 msgid "higher"
@@ -327,13 +316,11 @@ msgstr "No tienes permisos para publicar esta página"
 
 #: admin/pageadmin.py:1066
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
-"No tienes permisos para cambiar el estado de navegación de esta página."
+msgstr "No tienes permisos para cambiar el estado de navegación de esta página."
 
 #: admin/pageadmin.py:1079
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:1126 admin/pageadmin.py:1158
 msgid "Language must be set to a supported language!"
@@ -353,9 +340,8 @@ msgid "Language must be different than the copied language!"
 msgstr "El idioma debe ser distinto de idioma copiado!"
 
 #: admin/pageadmin.py:1166
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:1173
 #, python-format
@@ -363,36 +349,30 @@ msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "Se copiaron los plugins %(language)s a %(placeholder)s"
 
 #: admin/pageadmin.py:1186 admin/pageadmin.py:1294 admin/pageadmin.py:1316
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:1221
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:1256
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Plugin %(plugin_name)s modificado en la posición %(position)s de "
-"%(placeholder)s"
+msgstr "Plugin %(plugin_name)s modificado en la posición %(position)s de %(placeholder)s"
 
 #: admin/pageadmin.py:1311
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:1329
 msgid "Plugins where moved"
 msgstr "Plugins movidos"
 
 #: admin/pageadmin.py:1343
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:1361 admin/placeholderadmin.py:292
 #, python-format
@@ -422,19 +402,16 @@ msgid "Page permissions management"
 msgstr ""
 
 #: admin/placeholderadmin.py:150 admin/placeholderadmin.py:191
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/placeholderadmin.py:187
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/placeholderadmin.py:288
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -442,15 +419,15 @@ msgstr ""
 
 #: admin/useradmin.py:26
 msgid "Groups"
-msgstr ""
+msgstr "Grupos"
 
 #: admin/useradmin.py:36 templates/cms/toolbar/items/login.html:7
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
 #: admin/dialog/forms.py:9
 msgid "Copy permissions"
-msgstr ""
+msgstr "Copiar permisos"
 
 #: admin/dialog/forms.py:16
 msgid "Copy moderation"
@@ -470,7 +447,7 @@ msgstr ""
 
 #: forms/widgets.py:173
 msgid "Add Another"
-msgstr ""
+msgstr "Seguir agregando"
 
 #: migrations/0001_initial.py:12 migrations/0001_initial.py:24
 #: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
@@ -479,7 +456,7 @@ msgstr ""
 #: models/pluginmodel.py:79 models/titlemodels.py:10
 #: plugins/inherit/models.py:11
 msgid "language"
-msgstr ""
+msgstr "lenguaje"
 
 #: migrations/0001_initial.py:13 migrations/0001_initial.py:26
 #: migrations/0001_initial.py:40 migrations/0001_initial.py:78
@@ -494,12 +471,12 @@ msgstr "página"
 #: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
 #: migrations/0004_textobjects.py:22 models/pluginmodel.py:78
 msgid "position"
-msgstr ""
+msgstr "posición"
 
 #: migrations/0001_initial.py:15 migrations/0001_initial.py:29
 #: models/pluginmodel.py:81 models/titlemodels.py:22
 msgid "creation date"
-msgstr ""
+msgstr "fecha de creación"
 
 #: migrations/0001_initial.py:16 migrations/0001_initial.py:77
 #: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:13
@@ -508,7 +485,7 @@ msgstr ""
 
 #: migrations/0001_initial.py:18 models/pluginmodel.py:80
 msgid "plugin_name"
-msgstr ""
+msgstr "nombre del plugin"
 
 #: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
 #: migrations/0011_title_overwrites.py:15 models/titlemodels.py:11
@@ -517,11 +494,11 @@ msgstr ""
 #: plugins/twitter/models.py:6 plugins/twitter/models.py:15
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
-msgstr ""
+msgstr "título"
 
 #: migrations/0001_initial.py:28
 msgid "path"
-msgstr ""
+msgstr "ruta"
 
 #: migrations/0001_initial.py:30 models/titlemodels.py:13
 msgid "slug"
@@ -529,7 +506,7 @@ msgstr ""
 
 #: migrations/0001_initial.py:36
 msgid "everybody"
-msgstr ""
+msgstr "todos"
 
 #: migrations/0001_initial.py:37 models/permissionmodels.py:20
 msgid "can edit"
@@ -537,7 +514,7 @@ msgstr ""
 
 #: migrations/0001_initial.py:38 models/permissionmodels.py:17
 msgid "group"
-msgstr ""
+msgstr "grupo"
 
 #: migrations/0001_initial.py:39 models/permissionmodels.py:24
 msgid "can publish"
@@ -1273,8 +1250,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1820,8 +1797,7 @@ msgstr ""
 #: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1845,3 +1821,15 @@ msgstr ""
 #, python-format
 msgid "CMS - Page %s requires approvement."
 msgstr ""
+
+#~ msgid "move"
+#~ msgstr "move request"
+
+#~ msgid "sidebar column"
+#~ msgstr "background color"
+
+#~ msgid "fgcolor"
+#~ msgstr "foreground color"
+
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Requested language has not been translated yet."
