@@ -2,10 +2,6 @@
 2.3 release notes
 #################
 
-.. warning::
-    
-    Django CMS 2.3 is still in development
-
 *****************
 What's new in 2.3
 *****************
