@@ -23,6 +23,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
     URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.views import details
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
@@ -112,6 +113,31 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
+
+
+    def test_plugin_order(self):
+        """
+        Test that plugin position is saved after creation
+        """
+        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+                              slug="page1",published=True, in_navigation=True)
+        ph_en = page_en.placeholders.get(slot="col_left")
+
+        # We check created objects and objects from the DB to be sure the position value
+        # has been saved correctly
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
+        db_plugin_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk)
+        db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
+
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            self.assertEqual(text_plugin_1.position,1)
+            self.assertEqual(db_plugin_1.position,1)
+            self.assertEqual(text_plugin_2.position,2)
+            self.assertEqual(db_plugin_2.position,2)
+            ## Finally we render the placeholder to test the actual content
+            rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url()),None)
+            self.assertEquals(rendered_placeholder,"I'm the firstI'm the second")
 
     def test_add_cancel_plugin(self):
         """
