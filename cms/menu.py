@@ -206,6 +206,7 @@ def page_to_node(page, home, cut):
     
     # Do we have a redirectURL?
     attr['redirect_url'] = page.get_redirect()  # save redirect URL if any
+    attr['publisher_public_id'] = page.publisher_public_id
     
     # Now finally, build the NavigationNode object and return it.
     ret_node = NavigationNode(
