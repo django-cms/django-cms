@@ -173,7 +173,7 @@ def configure(**extra):
         CMS_NAVIGATION_EXTENDERS = (
             ('cms.test_utils.project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
         ),
-        TEST_RUNNER = 'cms.test_utils.runners.NormalTestRUnner',
+        TEST_RUNNER = 'cms.test_utils.runners.NormalTestRunner',
         JUNIT_OUTPUT_DIR = '.',
         TIME_TESTS = False,
         ROOT_URLCONF = 'cms.test_utils.cli',
