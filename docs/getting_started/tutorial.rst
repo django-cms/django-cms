@@ -281,7 +281,7 @@ Here is a simple example for a base template called ``base.html``:
     <body>
         {% cms_toolbar %}
         {% placeholder base_content %}
-        {% block base_content%}{% endblock %}
+        {% block base_content %}{% endblock %}
         {% render_block "js" %}
     </body>
   </html>
