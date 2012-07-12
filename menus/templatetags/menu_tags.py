@@ -171,7 +171,7 @@ class ShowSubMenu(InclusionTag):
     """
     show the sub menu of the current nav-node.
     -levels: how many levels deep
-    -root_level: the level of navigation to start the menu at
+    -root_level: the level to start the menu after
     -temlplate: template used to render the navigation
     """
     name = 'show_sub_menu'
