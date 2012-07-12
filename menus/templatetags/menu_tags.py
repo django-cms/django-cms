@@ -171,6 +171,7 @@ class ShowSubMenu(InclusionTag):
     """
     show the sub menu of the current nav-node.
     -levels: how many levels deep
+    -root_level: the level of navigation to start the menu at
     -temlplate: template used to render the navigation
     """
     name = 'show_sub_menu'
@@ -178,10 +179,11 @@ class ShowSubMenu(InclusionTag):
     
     options = Options(
         IntegerArgument('levels', default=100, required=False),
+        IntegerArgument('root_level', default=None, required=False),
         Argument('template', default='menu/sub_menu.html', required=False),
     )
     
-    def get_context(self, context, levels, template):
+    def get_context(self, context, levels, root_level, template):
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
@@ -190,7 +192,15 @@ class ShowSubMenu(InclusionTag):
         nodes = menu_pool.get_nodes(request)
         children = []
         for node in nodes:
-            if node.selected:
+            if root_level is None:
+                if node.selected:
+                    # if no root_level specified, set it to the selected nodes level
+                    root_level = node.level
+            # is this the ancestor of current selected node at the root level?
+            is_root_ancestor = (node.ancestor and node.level == root_level)
+            # is a node selected on the root_level specified
+            root_selected = (node.selected and node.level == root_level)
+            if is_root_ancestor or root_selected:
                 cut_after(node, levels, [])
                 children = node.children
                 for child in children:
