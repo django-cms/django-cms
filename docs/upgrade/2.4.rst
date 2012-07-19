@@ -1,0 +1,37 @@
+#################
+2.4 release notes
+#################
+
+*****************
+What's new in 2.4
+*****************
+
+..
+    New feature
+    ===========
+
+..
+    Feature description
+
+Minor improvements
+==================
+
+.. * Some minor improvement.
+
+
+******************************
+Backwards incompatible changes
+******************************
+
+New minimum requirements for dependencies
+=========================================
+
+.. * ``package`` must now be at version X.Y
+
+
+********************
+Pending deprecations
+********************
+
+* ``simple_language_changer`` will be removed in version 2.5. A bugfix makes
+  this redundant as every non managed url will behave like this.

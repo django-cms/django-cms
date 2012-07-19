@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import warnings
+
 from cms.models.titlemodels import Title
 
 
@@ -66,7 +68,7 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
-class _SimpleLanguageChanger(object):
+class NonManagedLanguageChanger(object):
     def __init__(self, request):
         self.request = request
         self._app_path = None
@@ -94,8 +96,10 @@ class _SimpleLanguageChanger(object):
             return ''
 
 def simple_language_changer(func):
+    warnings.warn("simple_language_chooser is deprecated and will be removed in 2.5!", DeprecationWarning)
+
     def _wrapped(request, *args, **kwargs):
-        set_language_changer(request, _SimpleLanguageChanger(request))
+        set_language_changer(request, NonManagedLanguageChanger(request))
         return func(request, *args, **kwargs)
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__

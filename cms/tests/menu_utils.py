@@ -31,6 +31,22 @@ class MenuUtilsTests(CMSTestCase):
         output = tag.get_context(fake_context, 'ja')
         url = output['content']
         self.assertEqual(url, '/ja/')
+
+    def test_default_language_changer(self):
+        view = self.get_simple_view()
+        # check we maintain the view name
+        self.assertEqual(view.__name__, view.__name__)
+        request = self.get_request('/', 'en')
+        response = view(request)
+        self.assertEqual(response.content, '')
+        fake_context = {'request': request}
+        tag = DumbPageLanguageUrl()
+        output = tag.get_context(fake_context, 'en')
+        url = output['content']
+        self.assertEqual(url, '/en/')
+        output = tag.get_context(fake_context, 'ja')
+        url = output['content']
+        self.assertEqual(url, '/ja/')
         
     def test_language_changer_decorator(self):
         def lang_changer(lang):
@@ -58,4 +74,3 @@ class MenuUtilsTests(CMSTestCase):
         nodes = [root]
         selected = find_selected(nodes)
         self.assertEqual(selected, selectedchild)
-        
