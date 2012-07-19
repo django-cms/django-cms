@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
+from menus.utils import  NonManagedLanguageChanger
 import urllib
 
 register = template.Library()
@@ -357,21 +358,22 @@ class PageLanguageUrl(InclusionTag):
             request = context['request']
         except KeyError:
             return {'template': 'cms/content.html'}
+
         if hasattr(request, "_language_changer"):
-            try:
-                setattr(request._language_changer, 'request', request)
-            except AttributeError:
-                pass
             url = "/%s" % lang + request._language_changer(lang)
         else:
-            page = request.current_page
-            if page == "dummy":
-                return {'content': ''}
-            try:
-                url = page.get_absolute_url(language=lang, fallback=False)
-                url = "/" + lang + url
-            except:
-                # no localized path/slug. 
-                url = ''
-        return {'content':url}
+            page = getattr(request, 'current_page', None)
+            if page:
+                if page == "dummy":
+                    return {'content': ''}
+                try:
+                    url = page.get_absolute_url(language=lang, fallback=False)
+                    url = "/" + lang + url
+                except:
+                    # no localized path/slug.
+                    url = ''
+            else:
+                # this is a non cms managed url with no language_changer
+                url = "/%s" % lang + NonManagedLanguageChanger(request)(lang)
+        return {'content': url}
 register.tag(PageLanguageUrl)
