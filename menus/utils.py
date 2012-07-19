@@ -96,7 +96,9 @@ class NonManagedLanguageChanger(object):
             return ''
 
 def simple_language_changer(func):
-    warnings.warn("simple_language_chooser is deprecated and will be removed in 2.5!", DeprecationWarning)
+    warnings.warn("simple_language_changer is deprecated and will be removed in "
+        "2.5! This is the default behaviour now for non CMS managed views and is no longer needed.",
+        DeprecationWarning)
 
     def _wrapped(request, *args, **kwargs):
         set_language_changer(request, NonManagedLanguageChanger(request))
