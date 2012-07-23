@@ -133,8 +133,12 @@ def _get_placeholder(current_page, page, context, name):
     return placeholder_cache[page.pk].get(name, None)
 
 def get_placeholder_content(context, request, current_page, name, inherit):
+    edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
     pages = [current_page]
-    if inherit:
+    # don't display inherited plugins in edit mode, so that the user doesn't
+    # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
+    # there for possible enhancements
+    if inherit and not edit_mode:
         pages = chain([current_page], current_page.get_cached_ancestors(ascending=True))
     for page in pages:
         placeholder = _get_placeholder(current_page, page, context, name)
