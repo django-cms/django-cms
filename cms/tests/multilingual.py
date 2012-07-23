@@ -4,6 +4,7 @@ from cms.middleware.multilingual import patch_response
 from cms.test_utils.testcases import CMSTestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test.client import Client
 import urllib
 
 
@@ -71,3 +72,12 @@ class MultilingualTestCase(CMSTestCase):
             reverse('pages-root')
         except RuntimeError:
             self.fail('maximum recursion depth exceeded')
+
+    def test_no_unnecessary_language_cookie(self):
+        client = Client() # we need a fresh client to ensure no cookies are set
+        response = client.get('/en/')
+        self.assertIn('django_language', response.cookies)
+        self.assertIn('sessionid', response.cookies)
+        response = client.get('/')
+        self.assertNotIn('django_language', response.cookies)
+        self.assertNotIn('sessionid', response.cookies)
