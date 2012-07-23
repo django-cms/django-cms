@@ -124,7 +124,7 @@ def get_patterns_for_title(path, title):
     app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
     for pattern_list in get_app_urls(app.urls):
-        if not path.endswith('/'):
+        if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id
         patterns += recurse_patterns(path, pattern_list, page_id)
