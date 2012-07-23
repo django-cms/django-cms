@@ -105,7 +105,7 @@ class MultilingualURLMiddleware(object):
     def process_response(self, request, response):
         language = getattr(request, 'LANGUAGE_CODE', self.get_language_from_request(request))
         local_middleware = LocaleMiddleware()
-        response =local_middleware.process_response(request, response)
+        response = local_middleware.process_response(request, response)
         path = unicode(request.path)
 
         # note: pages_root is assumed to end in '/'.
@@ -137,5 +137,6 @@ class MultilingualURLMiddleware(object):
                     not location.startswith(settings.MEDIA_URL) and \
                     not (getattr(settings,'STATIC_URL', False) and location.startswith(settings.STATIC_URL)):
                 response['Location'] = "/%s%s" % (language, location)
-        response.set_cookie("django_language", language)
+        if request.COOKIES.get('django_language') != language:
+            response.set_cookie("django_language", language)
         return response
