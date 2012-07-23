@@ -84,6 +84,19 @@ class ApphooksTestCase(CMSTestCase):
             self.assertTemplateUsed(response, 'nav_playground.html')
 
             apphook_pool.clear()
+
+    def test_apphook_on_root_reverse(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            apphook_pool.clear()
+            superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+            page = create_page("apphooked-page", "nav_playground.html", "en",
+                created_by=superuser, published=True, apphook="SampleApp")
+            create_title("de", "aphooked-page-de", page, apphook="SampleApp")
+            self.assertTrue(page.publish())
+
+            self.assertFalse(reverse('sample-settings').startswith('//'))
+
+            apphook_pool.clear()
     
     def test_get_page_for_apphook(self):
             
