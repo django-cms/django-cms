@@ -1,12 +1,11 @@
 from django.utils.translation import ugettext as _
 
+from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from project.pluginapp.plugins.extra_context.models import ExtraContextPluginModel
-
 class ExtraContextPlugin(CMSPluginBase):
-    model = ExtraContextPluginModel
+    model = CMSPlugin
     name = _("Extra Context")
     render_template = "extra_context_plugin.html"
     admin_preview = False
