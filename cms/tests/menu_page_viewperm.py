@@ -548,14 +548,13 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
                     'page_4',
                     'page_5',
         ]
+        urls = self.get_url_dict(all_pages)
+        user = AnonymousUser()
         # anonymous doesn't see page_6
         self.assertGrantedVisibility(all_pages, granted)
-        url = "/en/page_2/page_3/page_4/"
-        self.assertPageFound(url)
-        url = "/en/page_5/"
-        self.assertPageFound(url)
-        url = "/en/page_5/page_6/"
-        self.assertPageNotFound(url)
+        self.assertViewAllowed(urls["/en/page_2/page_3/page_4/"], user)
+        self.assertViewAllowed(urls["/en/page_5/"], user)
+        self.assertViewNotAllowed(urls["/en/page_5/page_6/"], user)
         # group member
         granted = [ 'page_1',
                     'page_2',
@@ -564,10 +563,9 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
                     'page_5',
                     'page_6',
         ]
+
         self.assertGrantedVisibility(all_pages, granted, username='user_6')
-        client = Client()
-        login_ok = client.login(username='user_6', password='user_6')
-        self.assertTrue(login_ok)
+        user = User.objects.get(username='user_6')
         url = "/en/page_2/page_3/page_4/"
         self.assertViewAllowed(urls[url], user)
         url = "/en/page_5/page_6/"
