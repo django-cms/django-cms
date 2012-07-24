@@ -227,11 +227,11 @@ class ViewPermissionTests(SettingsOverrideTestCase):
 
     def assertViewAllowed(self, page, user):
         request = self.get_request(user)
-        self.assertEquals(page.has_view_permission(request), True)
+        self.assertTrue(page.has_view_permission(request))
 
     def assertViewNotAllowed(self, page, user):
         request = self.get_request(user)
-        self.assertEquals(page.has_view_permission(request), False)
+        self.assertFalse(page.has_view_permission(request))
 
     def assertNodeMemberships(self, visible_page_ids, restricted_pages, public_page_ids):
         """
