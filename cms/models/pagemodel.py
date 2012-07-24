@@ -832,7 +832,7 @@ class Page(MPTTModel):
         """
         # TODO: optimize SQL... 1 query per page 
         if settings.CMS_MODERATOR:
-            has_moderator_state = getattr(self, '_has_moderator_state_chache', None)
+            has_moderator_state = getattr(self, '_has_moderator_state_cache', None)
             if has_moderator_state == False:
                 return self.pagemoderatorstate_set.none()
             return self.pagemoderatorstate_set.all().order_by('created',)[:5]
@@ -886,7 +886,7 @@ class Page(MPTTModel):
         """Returns page moderation value for given user, moderation value is
         sum of moderations.
         """
-        moderation_value = getattr(self, '_moderation_value_cahce', None)
+        moderation_value = getattr(self, '_moderation_value_cache', None)
         if moderation_value is not None and self._moderation_value_cache_for_user_id == user.pk:
             return moderation_value
         try:
@@ -896,7 +896,7 @@ class Page(MPTTModel):
         
         moderation_value = page_moderator.get_decimal()
         
-        self._moderation_value_cahce = moderation_value
+        self._moderation_value_cache = moderation_value
         self._moderation_value_cache_for_user_id = user
             
         return moderation_value 
