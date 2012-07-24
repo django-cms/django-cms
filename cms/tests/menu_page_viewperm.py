@@ -276,7 +276,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         return type('Request', (object,), attrs)
 
     def get_url_dict(self, pages, language='en'):
-        return {'/%s%s' % (language, page.get_absolute_url(language=language)): page for page in pages}
+        return dict(('/%s%s' % (language, page.get_absolute_url(language=language)), page) for page in pages)
 
 
 class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
