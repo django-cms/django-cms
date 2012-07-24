@@ -37,7 +37,7 @@ def configure(**extra):
             'django.template.loaders.app_directories.Loader',
             'django.template.loaders.eggs.Loader',
         ),
-       TEMPLATE_CONTEXT_PROCESSORS = [
+        TEMPLATE_CONTEXT_PROCESSORS = [
             "django.contrib.auth.context_processors.auth",
             "django.core.context_processors.i18n",
             "django.core.context_processors.debug",
@@ -129,14 +129,14 @@ def configure(**extra):
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
-            },                    
-                                
+            },
+
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
                 'name': gettext("left column")
-            },                  
-                                
+            },
+
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
@@ -178,6 +178,9 @@ def configure(**extra):
         JUNIT_OUTPUT_DIR = '.',
         TIME_TESTS = False,
         ROOT_URLCONF = 'cms.test_utils.cli',
+        PASSWORD_HASHERS = (
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+        )
     )
     defaults.update(extra)
     settings.configure(**defaults)
