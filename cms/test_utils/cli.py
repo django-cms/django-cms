@@ -88,6 +88,7 @@ def configure(**extra):
             'cms.test_utils.project.placeholderapp',
             'cms.test_utils.project.pluginapp',
             'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
+            'project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
             'south',
