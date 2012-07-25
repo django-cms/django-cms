@@ -166,11 +166,9 @@ class CMSPlugin(MPTTModel):
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
         if instance and not (admin and not plugin.admin_preview):
-            if isinstance(placeholder, Placeholder):
-                placeholder_slot = placeholder.slot
-            else:
-                placeholder_slot = placeholder or instance.placeholder.slot
-            placeholder = instance.placeholder
+            if not isinstance(placeholder, Placeholder):
+                placeholder = instance.placeholder
+            placeholder_slot = placeholder.slot
             context = PluginContext(context, instance, placeholder)
             context = plugin.render(context, instance, placeholder_slot)
             if plugin.render_plugin:
