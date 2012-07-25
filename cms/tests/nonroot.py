@@ -49,12 +49,14 @@ class NonRootCase(CMSTestCase):
 
     def test_basic_cms_menu(self):
         with SettingsOverride(CMS_MODERATOR = False):
+            self.client.get('/')
             response = self.client.get(self.get_pages_root())
             self.assertEquals(response.status_code, 200)
             self.assertEquals(self.get_pages_root(), "/content/")
 
     def test_show_menu(self):
         with SettingsOverride(CMS_MODERATOR = False):
+            self.client.get('/')
             context = self.get_context()
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context) 
@@ -63,7 +65,8 @@ class NonRootCase(CMSTestCase):
             self.assertEqual(nodes[0].get_absolute_url(), "/content/")
 
     def test_show_breadcrumb(self):
-        with SettingsOverride(CMS_MODERATOR = False):    
+        with SettingsOverride(CMS_MODERATOR = False):
+            self.client.get('/')
             page2 = Page.objects.get(pk=self.page2.pk)
             context = self.get_context(path=self.page2.get_absolute_url())
             tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
