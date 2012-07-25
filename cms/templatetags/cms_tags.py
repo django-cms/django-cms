@@ -5,7 +5,7 @@ from classytags.helpers import InclusionTag
 from classytags.parser import Parser
 from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_plugins, render_placeholder
-from cms.plugins.utils import get_plugins
+from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
@@ -15,9 +15,10 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from itertools import chain
 import re
+
 
 register = template.Library()
 
@@ -122,11 +123,14 @@ register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
+    from cms.utils.plugins import get_placeholders
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
         return placeholder_cache[page.pk].get(name, None)
     placeholder_cache[page.pk] = {}
-    placeholders = page.placeholders.all()
+    slots = get_placeholders(page.template)
+    placeholders = list(page.placeholders.filter(slot__in=slots))
+    assign_plugins(context['request'], placeholders, get_language())
     for placeholder in placeholders:
         placeholder_cache[page.pk][placeholder.slot] = placeholder
     current_page._tmp_placeholders_cache = placeholder_cache

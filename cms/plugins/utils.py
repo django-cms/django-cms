@@ -1,3 +1,7 @@
+import operator
+from itertools import groupby
+
+from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.moderator import get_cmsplugin_queryset
 
@@ -10,6 +14,30 @@ def get_plugins(request, placeholder, lang=None):
             placeholder=placeholder, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related())
     return getattr(placeholder, '_%s_plugins_cache' % lang)
+
+def assign_plugins(request, placeholders, lang=None):
+    """
+	Fetch all plugins for the given ``placeholders`` and
+	cast them down to the concrete instances in one query
+	per type.
+	"""
+    placeholders = list(placeholders)
+    if not placeholders:
+        return
+    lang = lang or get_language_from_request(request)
+    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=lang, parent__isnull=True).order_by('placeholder', 'position')
+    plugin_types_map = {}
+    plugin_lookup = {}
+    for plugin in qs:
+        plugin_types_map.setdefault(plugin.plugin_type, []).append(plugin.pk)
+    for plugin_type, pks in plugin_types_map.iteritems():
+        cls = plugin_pool.get_plugin(plugin_type)
+        for instance in cls.model.objects.filter(pk__in=pks):
+            plugin_lookup[instance.pk] = instance
+    plugin_list = [plugin_lookup[p.pk] for p in qs]
+    groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
+    for placeholder in placeholders:
+        setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
 
 def get_plugins_for_page(request, page, lang=None):
     if not page:
