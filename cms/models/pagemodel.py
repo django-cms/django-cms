@@ -701,10 +701,10 @@ class Page(MPTTModel):
                 return True
                 
             elif not is_restricted:
-            	if ((settings.CMS_PUBLIC_FOR == 'all') or
-            	    (settings.CMS_PUBLIC_FOR == 'staff' and
-            		 request.user.is_staff)):
-            			return True
+                if ((settings.CMS_PUBLIC_FOR == 'all') or
+                    (settings.CMS_PUBLIC_FOR == 'staff' and
+                     request.user.is_staff)):
+                    return True
 
             # a restricted page and an authenticated user
             elif is_restricted:
