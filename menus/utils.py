@@ -68,7 +68,7 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
-class NonManagedLanguageChanger(object):
+class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
         self._app_path = None
@@ -101,7 +101,7 @@ def simple_language_changer(func):
         DeprecationWarning)
 
     def _wrapped(request, *args, **kwargs):
-        set_language_changer(request, NonManagedLanguageChanger(request))
+        set_language_changer(request, DefaultLanguageChanger(request))
         return func(request, *args, **kwargs)
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__
