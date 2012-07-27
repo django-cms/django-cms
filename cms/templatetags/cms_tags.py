@@ -129,6 +129,7 @@ def _get_placeholder(current_page, page, context, name):
     placeholders = page.placeholders.all()
     for placeholder in placeholders:
         placeholder_cache[page.pk][placeholder.slot] = placeholder
+        placeholder.page = page
     current_page._tmp_placeholders_cache = placeholder_cache
     return placeholder_cache[page.pk].get(name, None)
 
@@ -145,6 +146,9 @@ def get_placeholder_content(context, request, current_page, name, inherit):
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
+    # if we reach this point, we have an empty or non-existant placeholder
+    # call _get_placeholder again to get the placeholder properly rendered
+    # in frontend editing
     placeholder = _get_placeholder(current_page, current_page, context, name)
     return render_placeholder(placeholder, context, name)
 
