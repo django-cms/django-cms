@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from html5lib import sanitizer, serializer, treebuilders, treewalkers, sanitizer
+from html5lib import sanitizer, serializer, treebuilders, treewalkers
 import html5lib
 
 DEFAULT_PARSER = html5lib.HTMLParser(tokenizer=sanitizer.HTMLSanitizer,
