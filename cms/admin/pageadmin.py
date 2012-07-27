@@ -1202,8 +1202,8 @@ class PageAdmin(ModelAdmin):
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
-            cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder',), pk=plugin_id)
-            page =cms_plugin.placeholder.page if cms_plugin.placeholder else None
+            cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
+            page = cms_plugin.placeholder.page if cms_plugin.placeholder else None
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
             if page and not page.has_change_permission(request):
                 return HttpResponseForbidden(ugettext("You have no permission to change this page"))
@@ -1384,7 +1384,7 @@ class PageAdmin(ModelAdmin):
         if 'history' in request.path:
             raise Http404
         plugin_id = request.POST['plugin_id']
-        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder',), pk=plugin_id)
+        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
             return HttpResponseForbidden(ugettext("You have no permission to remove a plugin"))
