@@ -630,6 +630,28 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
+    def test_plugin_loading_queries(self):
+        with SettingsOverride(CMS_TEMPLATES = (('placeholder_tests/base.html', 'tpl'),)):
+            page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
+            placeholders = list(page.placeholders.all())
+            for i, placeholder in enumerate(placeholders):
+                for j in range(5):
+                    add_plugin(placeholder, TextPlugin, 'en', body='text-%d-%d' % (i, j))
+                    add_plugin(placeholder, LinkPlugin, 'en', name='link-%d-%d' % (i, j))
+            from django.db import connection
+            connection.queries = []
+
+            # trigger the apphook query so that it doesn't get in our way
+            reverse('pages-root')
+            with self.assertNumQueries(4):
+                context = self.get_context()
+                for i, placeholder in enumerate(placeholders):
+                    content = get_placeholder_content(context, context['request'], page, placeholder.slot, False)
+                    for j in range(5):
+                        self.assertIn('text-%d-%d' % (i, j), content)
+                        self.assertIn('link-%d-%d' % (i, j), content)
+
+
 class NoAdminPageTests(CMSTestCase):
     urls = 'cms.test_utils.project.noadmin_urls'
     
