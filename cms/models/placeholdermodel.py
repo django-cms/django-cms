@@ -125,6 +125,20 @@ class Placeholder(models.Model):
         """
         return [field.model for field in self._get_attached_fields()]
 
+    @property
+    def page(self):
+        if not hasattr(self, '_page'):
+            from cms.models.pagemodel import Page
+            try:
+                self._page = Page.objects.get(placeholders=self)
+            except (Page.DoesNotExist, Page.MultipleObjectsReturned,):
+                self._page = None
+        return self._page
+
+    @page.setter
+    def page(self, value):
+        self._page = value
+
     def get_plugins_list(self):
         return list(self.get_plugins())
     

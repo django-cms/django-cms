@@ -14,7 +14,6 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
 
 from mptt.models import MPTTModel, MPTTModelBase
 
@@ -195,7 +194,7 @@ class CMSPlugin(MPTTModel):
             "Don't use the page attribute on CMSPlugins! CMSPlugins are not "
             "guaranteed to have a page associated with them!",
             DontUsePageAttributeWarning)
-        return get_page_from_placeholder_if_exists(self.placeholder)
+        return self.placeholder.page if self.placeholder_id else None
     
     def get_instance_icon_src(self):
         """
@@ -293,7 +292,7 @@ class CMSPlugin(MPTTModel):
         """
         position = self.position
         slot = self.placeholder.slot
-        page = get_page_from_placeholder_if_exists(self.placeholder)
+        page = self.placeholder.page
         if page and getattr(page, 'publisher_public'):
             try:
                 placeholder = Placeholder.objects.get(page=page.publisher_public, slot=slot)
@@ -306,7 +305,7 @@ class CMSPlugin(MPTTModel):
         self.delete()
         
     def has_change_permission(self, request):
-        page = get_page_from_placeholder_if_exists(self.placeholder)
+        page = self.placeholder.page if self.placeholder else None
         if page:
             return page.has_change_permission(request)
         elif self.placeholder:

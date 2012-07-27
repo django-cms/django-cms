@@ -7,7 +7,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.placeholder import get_page_from_placeholder_if_exists
 
 
 URL_CMS_MOVE_PLUGIN = u'/admin/cms/page/%d/move-plugin/'    
@@ -172,11 +171,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
             page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
             # check if there are multiple pages assigned to this placeholders
-            found_page = get_page_from_placeholder_if_exists(page_one_ph_one)
+            found_page = page_one_ph_one.page if page_one_ph_one else None
             self.assertEqual(found_page, page_one)
-            found_page = get_page_from_placeholder_if_exists(page_one_ph_two)
+            found_page = page_one_ph_two.page if page_one_ph_two else None
             self.assertEqual(found_page, page_one)
-            found_page = get_page_from_placeholder_if_exists(page_one_ph_three)
+            found_page = page_one_ph_three.page if page_one_ph_three else None
             self.assertEqual(found_page, page_one)
             
             page_two = self.reload(page_two)
@@ -184,11 +183,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             page_two_ph_two = page_two.placeholders.get(slot = u"col_left")
             page_two_ph_three = page_two.placeholders.get(slot = u"col_right")
             # check if there are multiple pages assigned to this placeholders
-            found_page = get_page_from_placeholder_if_exists(page_two_ph_one)
+            found_page = page_two_ph_one.page if page_two_ph_one else None
             self.assertEqual(found_page, page_two)
-            found_page = get_page_from_placeholder_if_exists(page_two_ph_two)
+            found_page = page_two_ph_two.page if page_two_ph_two else None
             self.assertEqual(found_page, page_two)
-            found_page = get_page_from_placeholder_if_exists(page_two_ph_three)
+            found_page = page_two_ph_three.page if page_two_ph_three else None
             self.assertEqual(found_page, page_two)
             # check the stored placeholders org vs copy
             msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)
@@ -402,22 +401,22 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
             page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
             # check if there are multiple pages assigned to this placeholders
-            found_page = get_page_from_placeholder_if_exists(page_one_ph_one)
+            found_page = page_one_ph_one.page if page_one_ph_one else None
             self.assertEqual(found_page, page_one)
-            found_page = get_page_from_placeholder_if_exists(page_one_ph_two)
+            found_page = page_one_ph_two.page if page_one_ph_two else None
             self.assertEqual(found_page, page_one)
-            found_page = get_page_from_placeholder_if_exists(page_one_ph_three)
+            found_page = page_one_ph_three.page if page_one_ph_three else None
             self.assertEqual(found_page, page_one)
             page_two = self.reload(page_two)
             page_two_ph_one = page_two.placeholders.get(slot = u"col_sidebar")
             page_two_ph_two = page_two.placeholders.get(slot = u"col_left")
             page_two_ph_three = page_two.placeholders.get(slot = u"col_right")
             # check if there are multiple pages assigned to this placeholders
-            found_page = get_page_from_placeholder_if_exists(page_two_ph_one)
+            found_page = page_two_ph_one.page if page_two_ph_one else None
             self.assertEqual(found_page, page_two)
-            found_page = get_page_from_placeholder_if_exists(page_two_ph_two)
+            found_page = page_two_ph_two.page if page_two_ph_two else None
             self.assertEqual(found_page, page_two)
-            found_page = get_page_from_placeholder_if_exists(page_two_ph_three)
+            found_page = page_two_ph_three.page if page_two_ph_three else None
             self.assertEqual(found_page, page_two)
             # check the stored placeholders org vs copy
             msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)

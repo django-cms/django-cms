@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.admin.forms import PageForm
-from cms.api import create_page
+from cms.api import create_page, add_plugin
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugins.link.cms_plugins import LinkPlugin
+from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
+from cms.plugins.link.models import Link
 from cms.sitemaps import CMSSitemap
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, 
-    SettingsOverride)
+from cms.templatetags.cms_tags import get_placeholder_content
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
+                                      URL_CMS_PAGE_ADD)
+from cms.test_utils.util.context_managers import (LanguageOverride,
+                                                  SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -19,6 +23,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
 import os.path
 from cms.utils.page import is_valid_page_slug
+
 
 class PagesTestCase(CMSTestCase):
     
