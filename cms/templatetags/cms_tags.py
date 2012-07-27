@@ -142,10 +142,14 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             continue
         if not get_plugins(request, placeholder):
             continue
+        if placeholder:
+            placeholder.page = page
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
     placeholder = _get_placeholder(current_page, current_page, context, name)
+    if placeholder:
+        placeholder.page = current_page
     return render_placeholder(placeholder, context, name)
 
 

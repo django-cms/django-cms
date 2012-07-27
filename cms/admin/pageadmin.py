@@ -1104,7 +1104,7 @@ class PageAdmin(ModelAdmin):
         parent_id = request.POST.get('parent_id', None)
         if placeholder_id:
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-            page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+            page = placeholder.page
         else:
             placeholder = None
             page = None
@@ -1128,7 +1128,7 @@ class PageAdmin(ModelAdmin):
         elif parent_id:
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
-            page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+            page = placeholder.page if placeholder else None
             if not page: # Make sure we do have a page
                 raise Http404
             language = parent.language
@@ -1172,7 +1172,7 @@ class PageAdmin(ModelAdmin):
         copy_from = request.POST['copy_from']
         placeholder_id = request.POST['placeholder']
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+        page = placeholder.page
         language = request.POST['language'] or get_language_from_request(request)
 
         if not page.has_change_permission(request):
@@ -1202,8 +1202,8 @@ class PageAdmin(ModelAdmin):
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
-            cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-            page = placeholder_utils.get_page_from_placeholder_if_exists(cms_plugin.placeholder)
+            cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder',), pk=plugin_id)
+            page =cms_plugin.placeholder.page if cms_plugin.placeholder else None
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
             if page and not page.has_change_permission(request):
                 return HttpResponseForbidden(ugettext("You have no permission to change this page"))
@@ -1353,10 +1353,10 @@ class PageAdmin(ModelAdmin):
             success = True
         if 'ids' in request.POST:
             for plugin_id in request.POST['ids'].split("_"):
-                plugin = CMSPlugin.objects.get(pk=plugin_id)
+                plugin = CMSPlugin.objects.select_related('placeholder').get(pk=plugin_id)
                 if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
                     return HttpResponseForbidden(ugettext("You have no permission to move a plugin"))
-                page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
+                page = plugin.placeholder.page if plugin.placeholder else None
                 if not page: # use placeholderadmin instead!
                     raise Http404
                 if not page.has_change_permission(request):
@@ -1384,13 +1384,13 @@ class PageAdmin(ModelAdmin):
         if 'history' in request.path:
             raise Http404
         plugin_id = request.POST['plugin_id']
-        plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder',), pk=plugin_id)
 
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
             return HttpResponseForbidden(ugettext("You have no permission to remove a plugin"))
 
         placeholder = plugin.placeholder
-        page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+        page = placeholder.page if placeholder else None
 
         if page and not page.has_change_permission(request):
             raise Http404
