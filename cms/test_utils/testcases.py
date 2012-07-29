@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext, 
-    SettingsOverride, _AssertNumQueriesContext)
+    SettingsOverride)
 from cms.test_utils.util.request_factory import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import connections
-from django.db.utils import DEFAULT_DB_ALIAS
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import Client
@@ -67,40 +65,9 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         warnings.filters[:] = origFilters
         warnings.showwarning = origShow
     return result
-    
-    
-if hasattr(testcases.TestCase, 'assertNumQueries'):
-    TestCase = testcases.TestCase
-else:
-    class TestCase(testcases.TestCase):
-        def assertNumQueries(self, num, func=None, *args, **kwargs):
-            if hasattr(testcases.TestCase, 'assertNumQueries'):
-                return super(TestCase, self).assertNumQueries(num, func, *args, **kwargs)
-            return self._assertNumQueries(num, func, *args, **kwargs)
-    
-        def _assertNumQueries(self, num, func=None, *args, **kwargs):
-            """
-            Backport from Django 1.3 for Django 1.2
-            """
-            using = kwargs.pop("using", DEFAULT_DB_ALIAS)
-            connection = connections[using]
-    
-            context = _AssertNumQueriesContext(self, num, connection)
-            if func is None:
-                return context
-    
-            # Basically emulate the `with` statement here.
-    
-            context.__enter__()
-            try:
-                func(*args, **kwargs)
-            except:
-                context.__exit__(*sys.exc_info())
-                raise
-            else:
-                context.__exit__(*sys.exc_info())
+
                 
-class CMSTestCase(TestCase):
+class CMSTestCase(testcases.TestCase):
     counter = 1
     
     def _fixture_setup(self):
