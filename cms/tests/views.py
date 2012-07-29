@@ -106,7 +106,7 @@ class ViewTests(SettingsOverrideTestCase):
         one = create_page("one", "nav_playground.html", "en", published=True,
                           redirect='/')
         url = one.get_absolute_url()
-        request = self.get_request(url)
+        request = self.get_request(url, page=one)
         response = details(request, url.strip('/'))
         self.assertEqual(response.status_code, HttpResponse.status_code)
         
@@ -114,14 +114,14 @@ class ViewTests(SettingsOverrideTestCase):
         one = create_page("one", "nav_playground.html", "en", published=True,
                           redirect='http://testserver/')
         url = one.get_absolute_url()
-        request = self.get_request(url)
+        request = self.get_request(url, page=one)
         response = details(request, url.strip('/'))
         self.assertEqual(response.status_code, HttpResponse.status_code)
     
     def test_login_required(self):
-        create_page("page", "nav_playground.html", "en", published=True,
+        one = create_page("page", "nav_playground.html", "en", published=True,
                          login_required=True)
-        request = self.get_request('/')
+        request = self.get_request('/', page=one)
         response = details(request, '')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '%s?next=/en/' % settings.LOGIN_URL)

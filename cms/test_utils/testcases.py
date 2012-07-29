@@ -227,17 +227,17 @@ class CMSTestCase(TestCase):
     def get_pages_root(self):
         return urllib.unquote(reverse("pages-root"))
         
-    def get_context(self, path=None):
+    def get_context(self, path=None, page=None):
         if not path:
             path = self.get_pages_root()
         context = {}
-        request = self.get_request(path)
+        request = self.get_request(path, page=page)
         
         context['request'] = request
         
         return Context(context)   
         
-    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
         factory = RequestFactory()
         
         if not path:
@@ -254,6 +254,7 @@ class CMSTestCase(TestCase):
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
+        request.current_page = page
         return request
     
     def check_published_page_attributes(self, page):

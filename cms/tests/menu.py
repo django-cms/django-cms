@@ -263,8 +263,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
         
     def test_language_chooser(self):
-        # test simple language chooser with default args 
-        context = self.get_context(path=self.get_page(3).get_absolute_url())
+        # test simple language chooser with default args
+        page = self.get_page(3)
+        context = self.get_context(path=page.get_absolute_url(), page=page)
         tpl = Template("{% load menu_tags %}{% language_chooser %}")
         tpl.render(context) 
         self.assertEqual(len(context['languages']), len(settings.CMS_SITE_LANGUAGES[settings.SITE_ID]))
@@ -279,8 +280,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(*lang)
                     
     def test_page_language_url(self):
-        path = self.get_page(3).get_absolute_url()
-        context = self.get_context(path=path)
+        page = self.get_page(3)
+        path = page.get_absolute_url()
+        context = self.get_context(path=path, page=page)
         tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
         url = tpl.render(context)
         self.assertEqual(url, "/%s%s" % (settings.LANGUAGES[0][0], path))
