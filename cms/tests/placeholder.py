@@ -181,8 +181,26 @@ class PlaceholderTestCase(CMSTestCase):
             pl_url = "%sedit-plugin/%s/" % (
                 reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
                 test_plugin.pk)
-            response = self.client.post(pl_url, {
-            })
+            response = self.client.post(pl_url, {})
+            self.assertContains(response,"/static/plugins/empty-image-file.png")
+
+    def test_nested_plugin_escapejs_page(self):
+        """
+        Sibling test of the above, on a page.
+        #1366 does not apply to placeholder defined in a page
+        """
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            page = create_page('page', 'col_two.html', 'en')
+            ph1 = page.placeholders.get(slot='col_left')
+            ###
+            # add the test plugin
+            ###
+            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+            test_plugin.save()
+            pl_url = "%sedit-plugin/%s/" % (
+                reverse('admin:cms_page_change', args=(page.pk,)),
+                test_plugin.pk)
+            response = self.client.post(pl_url, {})
             self.assertContains(response,"/static/plugins/empty-image-file.png")
 
     def test_placeholder_scanning_fail(self):
