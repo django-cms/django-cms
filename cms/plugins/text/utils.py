@@ -1,6 +1,9 @@
-from cms.models import CMSPlugin
-from django.template.defaultfilters import force_escape
 import re
+
+from django.template.defaultfilters import force_escape
+
+from cms.models import CMSPlugin
+from cms.plugins.utils import downcast_plugins
 
 OBJ_TAG_RE = re.compile(u"\{\{ plugin_object (\d+) \}\}")
 OBJ_ADMIN_RE_PATTERN = ur'<img [^>]*\bid="plugin_obj_(\d+)"[^>]*/?>'
@@ -38,12 +41,15 @@ def plugin_tags_to_user_html(text, context, placeholder):
 
     context is the template context to use, placeholder is the placeholder name
     """
+    plugin_ids = map(int, set(OBJ_ADMIN_RE.findall(text)))
+    plugin_list = downcast_plugins(CMSPlugin.objects.filter(pk__in=plugin_ids), select_placeholder=True)
+    plugin_map = dict((plugin.pk, plugin) for plugin in plugin_list)
     def _render_tag(m):
         plugin_id = int(m.groups()[0])
         try:
-            obj = CMSPlugin.objects.get(pk=plugin_id)
+            obj = plugin_map[plugin_id]
             obj._render_meta.text_enabled = True
-        except CMSPlugin.DoesNotExist:
+        except KeyError:
             # Object must have been deleted.  It cannot be rendered to
             # end user so just remove it from the HTML altogether
             return u''

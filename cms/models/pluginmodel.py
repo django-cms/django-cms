@@ -146,9 +146,8 @@ class CMSPlugin(MPTTModel):
         return plugin_pool.get_plugin(self.plugin_type)
         
     def get_plugin_instance(self, admin=None):
-        from cms.plugin_pool import plugin_pool
-        plugin_class = plugin_pool.get_plugin(self.plugin_type)
-        plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
+        plugin_class = self.get_plugin_class()
+        plugin = plugin_class(plugin_class.model, admin) # needed so we have the same signature as the original ModelAdmin
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
