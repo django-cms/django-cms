@@ -11,9 +11,7 @@ def get_plugins(request, placeholder, lang=None):
         return []
     lang = lang or get_language_from_request(request)
     if not hasattr(placeholder, '_%s_plugins_cache' % lang):
-        setattr(placeholder, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
-            placeholder=placeholder, language=lang, parent__isnull=True
-        ).order_by('placeholder', 'position').select_related())
+        assign_plugins(request, [placeholder], lang)
     return getattr(placeholder, '_%s_plugins_cache' % lang)
 
 def assign_plugins(request, placeholders, lang=None):
@@ -45,7 +43,7 @@ def assign_plugins(request, placeholders, lang=None):
         for instance in plugin_qs:
             plugin_lookup[instance.pk] = instance
     # make the equivalent list of qs, but with downcasted instances
-    plugin_list = [plugin_lookup[p.pk] for p in qs]
+    plugin_list = [plugin_lookup[p.pk] for p in qs if p.pk in plugin_lookup]
 
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))

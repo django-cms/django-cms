@@ -453,6 +453,23 @@ class PluginsTestCase(PluginsTestBaseCase):
         expected = sorted([u'4', u'5'])
         self.assertEquals(idlist, expected)
 
+    def test_empty_plugin_is_ignored(self):
+        page = create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+
+        plugin = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG)
+        plugin.insert_at(None, position='last-child', save=True)
+
+        # this should not raise any errors, but just ignore the empty plugin
+        out = placeholder.render(self.get_context(), width=300)
+        self.assertFalse(len(out))
+        self.assertFalse(len(placeholder._en_plugins_cache))
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):
@@ -647,7 +664,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
-        
+
 class PluginsMetaOptionsTests(TestCase):
     ''' TestCase set for ensuring that bugs like #992 are caught '''
 
