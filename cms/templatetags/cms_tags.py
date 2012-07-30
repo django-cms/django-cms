@@ -128,7 +128,7 @@ def _get_placeholder(current_page, page, context, name):
     if page.pk in placeholder_cache:
         return placeholder_cache[page.pk].get(name, None)
     placeholder_cache[page.pk] = {}
-    slots = get_placeholders(page.template)
+    slots = get_placeholders(page.get_template())
     placeholders = page.placeholders.filter(slot__in=slots)
     assign_plugins(context['request'], placeholders, get_language())
     for placeholder in placeholders:
