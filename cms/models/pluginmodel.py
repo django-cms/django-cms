@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import itertools
 import os
 import warnings
 from datetime import datetime, date
@@ -60,8 +61,35 @@ class PluginModelBase(MPTTModelBase):
             new_class._meta.db_table = table_name
         
         return new_class
-         
-    
+
+
+class CMSPluginManager(models.Manager):
+    def bulk_get(self, ids, with_instances=True, select_placeholder=True):
+        """
+        Retrieve a set of CMSPlugin objects, with their plugin model instances,
+        efficiently, and a return as dictionary of {pk:CMSPlugin object}.
+        """
+        from cms.plugin_pool import plugin_pool
+        objs = list(self.get_query_set().filter(id__in=ids))
+        retval = dict([(o.id, o) for o in objs])
+        if with_instances:
+            # group according to plugin_type, and retrieve the child objects in
+            # batches.
+            for plugin_type, parents in itertools.groupby(objs, lambda o: o.plugin_type):
+                parents = list(parents)
+                plugin_class = plugin_pool.get_plugin(parents[0].plugin_type)
+                q = plugin_class.model.objects.filter(id__in=[o.id for o in parents])
+                if select_placeholder:
+                    q = q.select_related('placeholder')
+                children = list(q)
+                # Now match them up
+                children_parent_dict = dict([(o.cmsplugin_ptr_id, o) for o in children])
+                for parent in parents:
+                    child = children_parent_dict[parent.id]
+                    parent._instance = child
+        return retval
+
+
 class CMSPlugin(MPTTModel):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
@@ -87,7 +115,9 @@ class CMSPlugin(MPTTModel):
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
-        
+
+    objects = CMSPluginManager()
+
     class Meta:
         app_label = 'cms'
         
@@ -149,6 +179,10 @@ class CMSPlugin(MPTTModel):
         from cms.plugin_pool import plugin_pool
         plugin_class = plugin_pool.get_plugin(self.plugin_type)
         plugin = plugin_class(plugin_class.model, admin)# needed so we have the same signature as the original ModelAdmin
+
+        if hasattr(self, '_instance'):
+            return self._instance, plugin
+
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
