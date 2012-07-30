@@ -306,7 +306,9 @@ class Page(MPTTModel):
                 some existing page and this new page will require moderation; 
                 this is because of how this adding works - first save, then move
         """
-        
+        # delete template cache
+        if hasattr(self, '_template_cache'):
+            delattr(self, '_template_cache')
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
         if self.publisher_is_draft:
@@ -654,6 +656,8 @@ class Page(MPTTModel):
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
+        if hasattr(self, '_template_cache'):
+            return self._template_cache
         template = None
         if self.template:
             if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
@@ -666,6 +670,7 @@ class Page(MPTTModel):
                     pass
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
+        self._template_cache = template
         return template
     
     def get_template_name(self):
