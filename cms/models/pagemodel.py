@@ -659,10 +659,11 @@ class Page(MPTTModel):
             if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
                 template = self.template
             else:
-                for p in self.get_ancestors(ascending=True):
-                    template = p.get_template()
-                    if template:
-                        break
+                try:
+                    template = self.get_ancestors(ascending=True).exclude(
+                        template=settings.CMS_TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
+                except IndexError:
+                    pass
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
         return template
