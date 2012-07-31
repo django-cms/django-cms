@@ -371,7 +371,13 @@ class PageLanguageUrl(InclusionTag):
                 url = page.get_absolute_url(language=lang, fallback=False)
                 url = "/" + lang + url
             except:
-                # no localized path/slug. 
-                url = ''
+                # no localized path/slug
+                if settings.CMS_HIDE_UNTRANSLATED:
+                    # redirect to root url if CMS_HIDE_UNTRANSLATED
+                    url = '/' + lang + '/'
+                else:
+                    # If untranslated pages are shown, this will not redirect
+                    # at all.
+                    url = ''
         return {'content':url}
 register.tag(PageLanguageUrl)

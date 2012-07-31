@@ -1,19 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+# aaffdd11 <chenyuan328@gmail.com>, 2011.
+#   <glacier_05@yahoo.com.cn>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-08-14 09:47-0500\n"
-"PO-Revision-Date: 2011-03-22 15:24+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"PO-Revision-Date: 2011-12-13 08:05+0000\n"
+"Last-Translator: ofive <glacier_05@yahoo.com.cn>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -25,7 +28,7 @@ msgstr "编辑模式"
 
 #: cms_toolbar.py:77
 msgid "django CMS"
-msgstr ""
+msgstr "django 新闻发布系统"
 
 #: cms_toolbar.py:108 templates/admin/cms/page/menu_item.html:73
 msgid "Publish"
@@ -78,7 +81,7 @@ msgstr "查看履历"
 
 #: cms_toolbar.py:205
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: plugin_base.py:65
 msgid "Advanced options"
@@ -125,7 +128,8 @@ msgid "Page Title"
 msgstr "页面标题"
 
 #: admin/forms.py:138
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "覆盖显示在浏览器顶部标题栏或书签中的信息"
 
 #: admin/forms.py:139
@@ -169,9 +173,9 @@ msgid "Invalid URL, use /my/url format."
 msgstr "无效的URL, 正确格式：/my/url"
 
 #: admin/forms.py:181
-#, fuzzy, python-format
+#, python-format
 msgid "Page with redirect url %r already exist"
-msgstr "其他页面已经使用了该缩略名"
+msgstr "重定向页面url %r已经存在"
 
 #: admin/forms.py:191 admin/forms.py:192 migrations/0001_initial.py:41
 #: models/permissionmodels.py:16
@@ -189,9 +193,8 @@ msgid "Add page permission also requires edit page permission."
 msgstr "添加页面的权限同时需要有编辑页面的权限"
 
 #: admin/forms.py:248
-#, fuzzy
 msgid "can_view"
-msgstr "查看"
+msgstr "can_view"
 
 #: admin/forms.py:260
 msgid "Please select user or group first."
@@ -275,9 +278,8 @@ msgid "SEO Settings"
 msgstr "SEO设置"
 
 #: admin/pageadmin.py:299
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "您没有权限修改本页面"
+msgstr "没有修改模版权限"
 
 #: admin/pageadmin.py:485
 msgid "higher"
@@ -318,9 +320,8 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "你没有权限修改这个页面的浏览模式"
 
 #: admin/pageadmin.py:1079
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "您没有权限修改本页面"
+msgstr "没有添加插件权限"
 
 #: admin/pageadmin.py:1126 admin/pageadmin.py:1158
 msgid "Language must be set to a supported language!"
@@ -340,9 +341,8 @@ msgid "Language must be different than the copied language!"
 msgstr "该语言必须和被复制的语言不同！"
 
 #: admin/pageadmin.py:1166
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "您没有权限修改本页面"
+msgstr "没有添加插件权限"
 
 #: admin/pageadmin.py:1173
 #, python-format
@@ -350,14 +350,12 @@ msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "复制%(language)s 插件到 %(placeholder)s"
 
 #: admin/pageadmin.py:1186 admin/pageadmin.py:1294 admin/pageadmin.py:1316
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "您没有权限修改本页面"
+msgstr "没有修改页面权限"
 
 #: admin/pageadmin.py:1221
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "您没有权限修改本页面"
+msgstr "没有编辑插件权限"
 
 #: admin/pageadmin.py:1256
 #, python-format
@@ -366,18 +364,16 @@ msgid ""
 msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被修改"
 
 #: admin/pageadmin.py:1311
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "您没有权限修改本页面"
+msgstr "没有移动插件权限"
 
 #: admin/pageadmin.py:1329
 msgid "Plugins where moved"
 msgstr "已移动的插件"
 
 #: admin/pageadmin.py:1343
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "您没有权限修改本页面"
+msgstr "没有移除插件权限"
 
 #: admin/pageadmin.py:1361 admin/placeholderadmin.py:292
 #, python-format
@@ -388,11 +384,11 @@ msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被�
 
 #: admin/permissionadmin.py:72
 msgid "View restriction"
-msgstr ""
+msgstr "视图限制"
 
 #: admin/permissionadmin.py:73
 msgid "View restrictions"
-msgstr ""
+msgstr "视图限制"
 
 #: admin/permissionadmin.py:133 models/permissionmodels.py:75
 msgid "Page permissions"
@@ -407,19 +403,16 @@ msgid "Page permissions management"
 msgstr "页面权限管理"
 
 #: admin/placeholderadmin.py:150 admin/placeholderadmin.py:191
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "您没有权限修改本页面"
+msgstr "没有在这里添加内容的权限"
 
 #: admin/placeholderadmin.py:187
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "您没有权限修改本页面"
+msgstr "没有添加插件权限"
 
 #: admin/placeholderadmin.py:288
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "您没有权限修改本页面"
+msgstr "没有删除插件权限"
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -811,11 +804,11 @@ msgstr "可以核对"
 
 #: models/permissionmodels.py:28
 msgid "view restricted"
-msgstr ""
+msgstr "视图受限"
 
 #: models/permissionmodels.py:28
 msgid "frontend view restriction"
-msgstr ""
+msgstr "前端视图限制"
 
 #: models/permissionmodels.py:51
 msgid "can recover pages"
@@ -897,7 +890,7 @@ msgstr "文件"
 
 #: plugins/file/templates/cms/plugins/file.html:6
 msgid "file missing!"
-msgstr ""
+msgstr "文件丢失"
 
 #: plugins/flash/cms_plugins.py:9
 msgid "Flash"
@@ -914,15 +907,13 @@ msgstr "高"
 
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
-#, fuzzy
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"flash插件缺失. 请在 <a href=\"http://adobe.com/flashplayer\">这里</a>下载"
+msgstr "flash插件丢失，请下载最新版的Adobe Flash Player"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
 msgid "Get Adobe Flash Player"
-msgstr ""
+msgstr "获取Get Adobe Flash Player"
 
 #: plugins/googlemap/cms_plugins.py:10
 msgid "Google Map"
@@ -1041,7 +1032,7 @@ msgstr "图片"
 
 #: plugins/picture/models.py:14
 msgid "center"
-msgstr ""
+msgstr "中心"
 
 #: plugins/picture/models.py:15
 msgid "left"
@@ -1212,35 +1203,31 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"例子：\"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from "
-"the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains"
-"\" and \"zombies\""
+msgstr "例子：\"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:12
 msgid "we said,"
-msgstr ""
+msgstr "我们说，"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:13
 msgid "we"
-msgstr ""
+msgstr "我们"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we were"
-msgstr ""
+msgstr "我们是"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
 msgid "we replied to"
-msgstr ""
+msgstr "我们回复给"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
 msgid "we were checking out"
-msgstr ""
+msgstr "我们正在检查"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
-#, fuzzy
 msgid "loading tweets..."
-msgstr "加载中..."
+msgstr "加载推文中...."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1263,12 +1250,10 @@ msgid "movie url"
 msgstr "电影url"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"vimeo或youtube视频的url。例如： http://www.youtube.com/watch?v=YFa59lK-kpo"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "vimeo或者youtube视频url连接，例如：http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1529,7 +1514,7 @@ msgstr "结束"
 
 #: templates/admin/cms/page/change_list_tree.html:17
 msgid "restricted"
-msgstr ""
+msgstr "受限的"
 
 #: templates/admin/cms/page/change_list_tree.html:19
 msgid "last changes"
@@ -1659,9 +1644,8 @@ msgid "Can move"
 msgstr "允许移动"
 
 #: templates/admin/cms/page/permissions.html:14
-#, fuzzy
 msgid "Can view"
-msgstr "允许移动"
+msgstr "Can view"
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
@@ -1683,7 +1667,7 @@ msgstr "页面不继承任何权限。"
 #: templates/admin/cms/page/plugin_change_form.html:114
 #: templates/cms/toolbar/toolbar.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
@@ -1753,7 +1737,7 @@ msgstr "可用的插件"
 
 #: templates/cms/toolbar/toolbar.html:22
 msgid "The selected element can not be moved to the desired location."
-msgstr ""
+msgstr "所选元素不能移动到目标位置"
 
 #: templates/cms/toolbar/toolbar.html:23
 msgid "Are you sure you want to delete this plugin?"
@@ -1769,7 +1753,7 @@ msgstr "下"
 
 #: templates/cms/toolbar/toolbar.html:61
 msgid "Move to placeholder"
-msgstr ""
+msgstr "移动到placeholder"
 
 #: templates/cms/toolbar/items/login.html:5
 msgid "Username"
@@ -1777,9 +1761,8 @@ msgstr "用户名"
 
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
-#, fuzzy
 msgid "Login"
-msgstr "登录"
+msgstr "登陆"
 
 #: templates/cms/toolbar/items/status.html:2
 msgid "Status"
@@ -1787,12 +1770,12 @@ msgstr "状态"
 
 #: templates/cms/toolbar/items/switcher.html:4
 msgid "Switch on/off"
-msgstr ""
+msgstr "开关"
 
 #: templatetags/cms_admin.py:86
 #, python-format
 msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
-msgstr ""
+msgstr "<span title=\"限制: %(title)s\">%(icon)s</span>"
 
 #: templatetags/cms_admin.py:99
 msgid "Unbind page moderation"
@@ -1814,12 +1797,9 @@ msgstr "该页面在 %(domain)s 中未找到"
 #: templatetags/cms_tags.py:79
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s"
-"%(path)s"
+msgstr "模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s%(path)s"
 
 #: utils/mail.py:38
 msgid "CMS - your user account was created."
@@ -1842,98 +1822,14 @@ msgstr "批准"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - 页面[%s]请求批准。"
 
-#~ msgid "Missing flash plugin."
-#~ msgstr "没有找到Flash插件"
-
-#~ msgid "Login url: %(login_url)s"
-#~ msgstr "登录链接 %(login_url)s"
-
-#~ msgid "Move to %(name)s"
-#~ msgstr "移动到%(name)s"
-
 #~ msgid "move"
-#~ msgstr "移动"
-
-#~ msgid "add child"
-#~ msgstr "添加子页面"
-
-#~ msgid "add sibling"
-#~ msgstr "添加同级页面"
-
-#~ msgid "history"
-#~ msgstr "历史"
-
-#~ msgid "Lock"
-#~ msgstr "锁定"
-
-#~ msgid "Close"
-#~ msgstr "关闭"
-
-#~ msgid "Settings"
-#~ msgstr "设置"
-
-#~ msgid "Delete Plugin"
-#~ msgstr "删除插件"
-
-#~ msgid "English"
-#~ msgstr "英语"
-
-#~ msgid "French"
-#~ msgstr "法语"
-
-#~ msgid "German"
-#~ msgstr "德语"
-
-#~ msgid "Brazil"
-#~ msgstr "巴西语"
-
-#~ msgid "Dutch"
-#~ msgstr "荷兰语"
-
-#~ msgid "two columns"
-#~ msgstr "两列"
-
-#~ msgid "three columns"
-#~ msgstr "三列"
-
-#~ msgid "navigation examples"
-#~ msgstr "导航案例"
+#~ msgstr "move request"
 
 #~ msgid "sidebar column"
-#~ msgstr "边栏列"
-
-#~ msgid "left column"
-#~ msgstr "左列"
-
-#~ msgid "right column"
-#~ msgstr "右列"
-
-#~ msgid "Articles"
-#~ msgstr "文章"
-
-#~ msgid "Sample App"
-#~ msgstr "示例应用程序"
-
-#~ msgid "sample root page"
-#~ msgstr "示例根页面"
-
-#~ msgid "sample settings page"
-#~ msgstr "示例设置页"
-
-#~ msgid "sample account page"
-#~ msgstr "示例账户页"
-
-#~ msgid "sample my profile page"
-#~ msgstr "示例个人简介页"
-
-#~ msgid "Static Menu"
-#~ msgstr "静态菜单"
-
-#~ msgid "Static Menu2"
-#~ msgstr "静态菜单2"
+#~ msgstr "background color"
 
 #~ msgid "fgcolor"
-#~ msgstr "前景色"
+#~ msgstr "foreground color"
 
 #~ msgid "Wanted language has not been translated yet."
-#~ msgstr "您所要的语言还未被翻译"
+#~ msgstr "Requested language has not been translated yet."

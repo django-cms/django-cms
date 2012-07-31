@@ -11,7 +11,7 @@ on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers. Also the functions defined in this
 module do sanity checks on arguments.
     
-.. warning:: None of the functions in this modules do any security or permission
+.. warning:: None of the functions in this module does any security or permission
              checks. They verify their input values to be sane wherever
              possible, however permission checks should be implemented manually
              before calling any of these functions.
@@ -56,7 +56,7 @@ Functions and constants
     :param string redirect: URL redirect (only applicable if :setting:`CMS_REDIRECTS` is ``True``)
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
-    :param created_by: User that creates this page
+    :param created_by: User that is creating this page
     :type created_by: string of :class:`django.contrib.auth.models.User` instance
     :param parent: Parent page of this page
     :type parent: :class:`cms.models.pagemodel.Page` instance
@@ -65,7 +65,7 @@ Functions and constants
     :param boolean in_navigation: Whether this page should be in the navigation or not
     :param boolean soft_root: Whether this page is a softroot or not
     :param string reverse_id: Reverse ID of this page (for template tags)
-    :param string navigation_extenders: Menu to attach to this page, must be a valid menu
+    :param string navigation_extenders: Menu to attach to this page. Must be a valid menu
     :param boolean published: Whether this page should be published or not
     :param site: Site to put this page on
     :type site: :class:`django.contrib.sites.models.Site` instance
@@ -201,7 +201,7 @@ cms.plugin_base
         
     .. attribute:: module
 
-        Will be group the plugin in the plugin editor. If module is ``None``,
+        Will group the plugin in the plugin editor. If module is ``None``,
         plugin is grouped "Generic" group.
     
     .. attribute:: name

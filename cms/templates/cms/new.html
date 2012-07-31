@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load url from future %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en" xml:lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -48,7 +48,7 @@
 		<div class="box-right">
 			<h1>Welcome to the django CMS!<br />Here is what to do next:</h1>
 			<p>&nbsp;</p>
-			<h2>Log into the <a href="{% url admin:index %}">admin</a> interface and start <a href="{% url admin:cms_page_add %}">adding</a> some pages!</h2>
+			<h2>Log into the <a href="{% url 'admin:index' %}">admin</a> interface and start <a href="{% url 'admin:cms_page_add' %}">adding</a> some pages!</h2>
 			<p class="info">Make sure you publish them.</p>
 			<p>&nbsp;</p>
 			<p class="padding-top">

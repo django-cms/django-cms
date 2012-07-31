@@ -76,8 +76,9 @@ def recurse_patterns(path, pattern_list, page_id):
     newpatterns = []
     for pattern in pattern_list:
         app_pat = pattern.regex.pattern
-        if app_pat.startswith('^'):
-            app_pat = app_pat[1:]
+        # make sure we don't get patterns that start with more than one '^'!
+        app_pat = app_pat.lstrip('^')
+        path = path.lstrip('^')
         regex = r'^%s%s' % (path, app_pat)
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
@@ -123,7 +124,7 @@ def get_patterns_for_title(path, title):
     app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
     for pattern_list in get_app_urls(app.urls):
-        if not path.endswith('/'):
+        if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id
         patterns += recurse_patterns(path, pattern_list, page_id)

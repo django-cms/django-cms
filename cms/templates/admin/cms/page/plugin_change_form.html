@@ -1,10 +1,10 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_modify adminmedia cms_admin %}
-
+{% load url from future %}
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
-<script type="text/javascript" src="{% url admin:jsi18n %}"></script>
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
 {{ media }}
 
 <script type="text/javascript">

@@ -1,19 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+#   <kristian@oellegaard.com>, 2011.
+# KristianOellegaard <kristian@oellegaard.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-14 09:45-0500\n"
-"PO-Revision-Date: 2011-04-05 07:23+0000\n"
-"Last-Translator: KristianOellegaard <kristian@oellegaard.com>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2011-08-14 09:44-0500\n"
+"PO-Revision-Date: 2011-12-16 17:04+0000\n"
+"Last-Translator: Kristian Øllegaard <kristian@oellegaard.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: static/cms/js/change_form.js:31
@@ -26,7 +29,7 @@ msgstr "Er du sikker på du vil ændre %(field_name)s uden at gemme siden først
 msgid ""
 "Not all plugins are saved. Are you sure you want to save the page?\n"
 "All unsaved plugin content will tried to save."
-msgstr ""
+msgstr "Ikke alle plugins er gemte. Er du sikker på du vil gemme siden?\nAlle ikke-gemte plugins vil blive forsøgt gemt."
 
 #: static/cms/js/change_form.js:127
 msgid "Are you sure you want to change tabs without saving the page first?"
