@@ -1,5 +1,5 @@
 // some very small jquery extensions
-(function($) {
+(function namespacing($) {
 	// very simple yellow fade plugin..
 	$.fn.yft = function(){ this.effect("highlight", {}, 1000); };
 	
@@ -276,13 +276,26 @@
 	        		// the other click event on this element to fire
                     jtarget.addClass("loading");
                     var pageId = $(jtarget).attr("id").split("page_")[1];
+                    // the following is added because IE is stupid
+                    // ref: http://stackoverflow.com/questions/4557532/jquery-ajax-requests-failing-in-ie8-with-message-error-this-method-cannot-be-c
+                    $.ajaxSetup({
+			            xhr: function() {
+			                    //return new window.XMLHttpRequest();
+			                    try{
+			                        if(window.ActiveXObject)
+			                            return new window.ActiveXObject("Microsoft.XMLHTTP");
+			                    } catch(e) { }
+
+			                    return new window.XMLHttpRequest();
+			                }
+			        });
 
                     $.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
                         jtarget.children('ul').append(r);    
                         // show move targets if needed
                         if($('span.move-target-container:visible').length > 0) {
                         	jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
-                        }
+                        };
                     });
                 }
 	        }
@@ -500,4 +513,4 @@
 	function addUndo(node, target, position){
 		undos.push({node:node, target:target, position:position});
 	}
-})(jQuery);
+})(window.CMS.$);

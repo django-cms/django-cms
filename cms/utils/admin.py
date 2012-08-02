@@ -96,4 +96,5 @@ def render_admin_menu_item(request, page, template=None):
     
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered))
-    return render_to_response(template, context)
+    # add mimetype to help out IE
+    return render_to_response(template, context, mimetype="text/html; charset=utf-8")
