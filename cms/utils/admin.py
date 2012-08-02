@@ -6,9 +6,9 @@ from django.template.context import RequestContext
 
 from django.contrib.sites.models import Site
 
-from cms.models.pagemodel import Page
-from cms.models.permissionmodels import GlobalPagePermission
+from cms.models import Page
 from cms.utils import permissions, moderator, get_language_from_request
+from cms.utils.permissions import has_global_page_permission
 
 NOT_FOUND_RESPONSE = "NotFound"
 
@@ -42,12 +42,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     has_add_on_same_level_permission = False
     opts = Page._meta
     if settings.CMS_PERMISSION:
-        if not hasattr(request, '_cms_global_perms'):
-            request._cms_global_perms = {}
-        try:
-            perms = request._cms_global_perms[page.site_id]
-        except KeyError:
-            perms = request._cms_global_perms.setdefault(page.site_id, GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id]).exists())
+        perms = has_global_page_permission(request, page.site_id, can_add=True)
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
         
