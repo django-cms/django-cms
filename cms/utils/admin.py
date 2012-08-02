@@ -12,19 +12,14 @@ from cms.utils import permissions, moderator, get_language_from_request
 
 NOT_FOUND_RESPONSE = "NotFound"
 
-class HttpJsResponse(HttpResponse):
-    """ Extended HttpResponse type for django-javascript communication.
-
-    It wraps text messages returned to javascript functions with a status code for message handling in JS.
-    Response content is automatically serialized to json.
+def jsonify_request(response):
+    """ Turn any response in a 200 response to let jQuery code handle it nicely.
+        Response contains a json object with the following attributes:
+         * status: original response status code
+         * content: original response content
     """
-    # this is the status code used by javascript to detect error semantic. Based on HTTP error statuses
-    js_dj_status = 200
-
-    def __init__(self, content, js_dj_status):
-        content = json.dumps({'status':js_dj_status,'body':content})
-        super(HttpJsResponse,self).__init__(content,content_type="application/json")
-
+    return HttpResponse(json.dumps({'status':response.status_code,'content':response.content}),
+                                content_type="application/json")
 
 def get_admin_menu_item_context(request, page, filtered=False):
     """
