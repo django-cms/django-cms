@@ -45,7 +45,7 @@
 {% block content %}
 <script type="text/javascript">
 //<![CDATA[	
-(function($) {
+(function namespacing($) {
 	$(document).ready(function() {
 		{% if not cl.is_filtered %}
 			initTree();
@@ -71,7 +71,7 @@
 		cmsModerator: {{ CMS_MODERATOR|js }},
 		debug: {{ DEBUG|js }}
 	};
-})(jQuery);
+})(window.CMS.$);
 //]]>
 </script>
 
