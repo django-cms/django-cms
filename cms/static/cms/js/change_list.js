@@ -227,10 +227,9 @@
                         jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/",
                         { 1:1 },
                         // on success
-                        function(encoded_response,textStatus){
-                            decoded = $.parseJSON(encoded_response)
-                            response = decoded['body'];
-                            status = decoded['status'];
+                        function(decoded,textStatus){
+                            response = decoded.content;
+                            status = decoded.status;
                             if(status==200) {
                                 if (/page_\d+/.test($(jtarget).attr('id'))) {
                                     // one level higher
