@@ -264,41 +264,41 @@
 				// of the tree = current node + descendants 
 				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
-	            return false;
-	        }
+				return false;
+			}
 
-	        // lazy load descendants on tree open
-	        if(jtarget.hasClass("closed")) {
-	        	// only load them once
-	        	if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
-	        		// keeps this event from firing multiple times before
-	        		// the dom as changed. it still needs to propagate for 
-	        		// the other click event on this element to fire
-                    jtarget.addClass("loading");
-                    var pageId = $(jtarget).attr("id").split("page_")[1];
-                    // the following is added because IE is stupid
-                    // ref: http://stackoverflow.com/questions/4557532/jquery-ajax-requests-failing-in-ie8-with-message-error-this-method-cannot-be-c
-                    $.ajaxSetup({
-			            xhr: function() {
-			                    //return new window.XMLHttpRequest();
-			                    try{
-			                        if(window.ActiveXObject)
-			                            return new window.ActiveXObject("Microsoft.XMLHTTP");
-			                    } catch(e) { }
+			// lazy load descendants on tree open
+			if(jtarget.hasClass("closed")) {
+				// only load them once
+				if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
+					// keeps this event from firing multiple times before
+					// the dom as changed. it still needs to propagate for 
+					// the other click event on this element to fire
+					jtarget.addClass("loading");
+					var pageId = $(jtarget).attr("id").split("page_")[1];
+					// the following is added because IE is stupid
+					// ref: http://stackoverflow.com/questions/4557532/jquery-ajax-requests-failing-in-ie8-with-message-error-this-method-cannot-be-c
+					$.ajaxSetup({
+						xhr: function() {
+								//return new window.XMLHttpRequest();
+								try{
+									if(window.ActiveXObject)
+										return new window.ActiveXObject("Microsoft.XMLHTTP");
+								} catch(e) { }
 
-			                    return new window.XMLHttpRequest();
-			                }
-			        });
+								return new window.XMLHttpRequest();
+							}
+					});
 
-                    $.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
-                        jtarget.children('ul').append(r);    
-                        // show move targets if needed
-                        if($('span.move-target-container:visible').length > 0) {
-                        	jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
-                        };
-                    });
-                }
-	        }
+					$.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
+						jtarget.children('ul').append(r);    
+						// show move targets if needed
+						if($('span.move-target-container:visible').length > 0) {
+							jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
+						};
+					});
+				}
+			}
 			
 			if(jtarget.hasClass("move-target")) {
 				if(jtarget.hasClass("left")){
@@ -334,8 +334,8 @@
 				var val= $(this).width();
 				if(val > max){max = val;}
 			});
-	 		$(this).each(function() {
-	  			$(this).css("width",max + 'px');
+			$(this).each(function() {
+				$(this).css("width",max + 'px');
 			});
 			return this;
 		};
