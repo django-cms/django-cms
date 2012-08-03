@@ -5,6 +5,20 @@
 		// assign correct jquery to $ namespace
 		$ = CMS.$ || $;
 
+		// the following is added because IE is stupid
+		// $.ajax requests in IE8 fail without this hack
+		// ref: http://stackoverflow.com/questions/4557532/jquery-ajax-requests-failing-in-ie8-with-message-error-this-method-cannot-be-c
+		$.ajaxSetup({
+			xhr: function() {
+					try{
+						if(window.ActiveXObject)
+							return new window.ActiveXObject("Microsoft.XMLHTTP");
+					} catch(e) { }
+
+					return new window.XMLHttpRequest();
+				}
+		});
+
 		/*!
 		 * Adds security methods to api namespace
 		 * @public_methods:
