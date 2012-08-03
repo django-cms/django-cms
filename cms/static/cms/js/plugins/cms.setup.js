@@ -5,7 +5,7 @@
     django = window.django || undefined;
 
     // assigning correct jquery instance to jQuery variable
-    jQuery = (django) ? django.jQuery : window.jQuery || undefined;
+    var jQuery = (django) ? django.jQuery : window.jQuery || undefined;
 
     // assign global namespaces
     window.CMS = {
