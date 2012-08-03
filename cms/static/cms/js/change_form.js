@@ -63,7 +63,7 @@
 		// saveform event handler
 		$('#page_form').submit(function(){
 			if($('iframe').length){
-				var question = gettext("Not all plugins are saved. Are you sure you want to save the page?\nYou may lose your changes. To prevent that, press 'Cancel' and save every unsaved plugin(s) first.");
+				var question = gettext("Not all plugins are saved. Are you sure you want to save the page?\nYou may lose your changes. To prevent that, press 'Cancel' and save every unsaved plugin first.");
 				var answer = confirm(question, true);
 				if (answer){
 					$('iframe').contents().find('#content-main>form').each(function(){
