@@ -1112,6 +1112,13 @@ class PageAdmin(ModelAdmin):
         # page add-plugin
         if page:
             language = request.POST['language'] or get_language_from_request(request)
+            # Remove empty plugins (created by adding it and then pressing
+            # cancel button in admin popup.
+            # It is needed to avoid enforcing limits with this pahantom
+            # plugins stealing free slots.
+            for pl in CMSPlugin.objects.filter(language=language, placeholder=placeholder):
+                if pl.get_plugin_instance()[0] is None:
+                    pl.delete()
             position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
             limits = placeholder_utils.get_placeholder_conf("limits", placeholder.slot, page.get_template())
             if limits:
