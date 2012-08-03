@@ -276,20 +276,7 @@
 					// the other click event on this element to fire
 					jtarget.addClass("loading");
 					var pageId = $(jtarget).attr("id").split("page_")[1];
-					// the following is added because IE is stupid
-					// ref: http://stackoverflow.com/questions/4557532/jquery-ajax-requests-failing-in-ie8-with-message-error-this-method-cannot-be-c
-					$.ajaxSetup({
-						xhr: function() {
-								//return new window.XMLHttpRequest();
-								try{
-									if(window.ActiveXObject)
-										return new window.ActiveXObject("Microsoft.XMLHTTP");
-								} catch(e) { }
-
-								return new window.XMLHttpRequest();
-							}
-					});
-
+					
 					$.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
 						jtarget.children('ul').append(r);    
 						// show move targets if needed
