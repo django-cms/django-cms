@@ -25,7 +25,7 @@
 			}
 	    });
 	});
-})(jQuery);
+})(window.CMS.$);
 //]]>
 </script>
 {% endif %}
@@ -169,6 +169,7 @@
 	{% endif %}
 
 	{% if moderation_delete_request %}<script type="text/javascript">
+	(function namespacing($) {
 		$(function(){
 			// disable all fields
 			function lockControls(){
@@ -179,6 +180,7 @@
 			lockControls();
 			setTimeout(lockControls,200);
 		});
+	})(window.CMS.$);
 	</script>{% endif %}
 
 	{% if CMS_MODERATOR and moderation_required %}
@@ -261,7 +263,7 @@
 					}
 				});
 			});
-		})(jQuery);
+		})(window.CMS.$);
 		//]]>
 		</script>
 	{% endif %}
