@@ -45,7 +45,9 @@ class NonRootCase(CMSTestCase):
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]
         self.level2_pages = [self.page3]
-        
+
+    def test_get_page_root(self):
+        self.assertEqual(self.get_pages_root(), '/content/')
 
     def test_basic_cms_menu(self):
         with SettingsOverride(CMS_MODERATOR = False):
