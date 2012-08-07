@@ -5,13 +5,12 @@
 {% for fieldset in adminform %}
 	{% include "cms/plugins/text_plugin_fieldset.html" %}
 {% endfor %}
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
 <script type="text/javascript">
-jQuery(document).ready(function ($) {
-	// initialize security patch
-	CMS.API.Security.csrf();
-});
+(function namespacing(jQuery) {
+    jQuery(document).ready(function ($) {
+        // initialize security patch
+        window.CMS.API.Security.csrf();
+    });
+})(window.CMS.$)
 </script>
 {% endblock %}
