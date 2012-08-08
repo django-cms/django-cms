@@ -74,27 +74,6 @@ class CMSTestCase(testcases.TestCase):
         self.create_fixtures()
         self.client = Client()
 
-    def _urlconf_setup(self):
-        """
-        bug in django does not set the urlconf. reverse withouth any request via testclient will not use the custome
-        urlconf.
-        """
-        if hasattr(self, 'urls'):
-            self._old_root_urlconf = settings.ROOT_URLCONF
-            settings.ROOT_URLCONF = self.urls
-            set_urlconf(self.urls)
-            clear_url_caches()
-
-    def _urlconf_teardown(self):
-        """
-        bug in django does not set the urlconf. reverse withouth any request via testclient will not use the custome
-        urlconf.
-        """
-        if hasattr(self, '_old_root_urlconf'):
-            settings.ROOT_URLCONF = self._old_root_urlconf
-            set_urlconf(self._old_root_urlconf)
-            clear_url_caches()
-
     def create_fixtures(self):
         pass
 
