@@ -6,7 +6,7 @@ from cms.test_utils.util.request_factory import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, set_urlconf, clear_url_caches
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import Client
@@ -73,6 +73,27 @@ class CMSTestCase(testcases.TestCase):
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         self.client = Client()
+
+    def _urlconf_setup(self):
+        """
+        bug in django does not set the urlconf. reverse withouth any request via testclient will not use the custome
+        urlconf.
+        """
+        if hasattr(self, 'urls'):
+            self._old_root_urlconf = settings.ROOT_URLCONF
+            settings.ROOT_URLCONF = self.urls
+            set_urlconf(self.urls)
+            clear_url_caches()
+
+    def _urlconf_teardown(self):
+        """
+        bug in django does not set the urlconf. reverse withouth any request via testclient will not use the custome
+        urlconf.
+        """
+        if hasattr(self, '_old_root_urlconf'):
+            settings.ROOT_URLCONF = self._old_root_urlconf
+            set_urlconf(self._old_root_urlconf)
+            clear_url_caches()
 
     def create_fixtures(self):
         pass

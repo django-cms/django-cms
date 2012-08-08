@@ -19,9 +19,6 @@ class NonRootCase(CMSTestCase):
             u.save()
             with self.login_user_context(u):
                 self.create_some_pages()
-        
-    # def tearDown(self):
-    #     menu_pool.menus = self.old_menu
 
     def create_some_pages(self):
         """
