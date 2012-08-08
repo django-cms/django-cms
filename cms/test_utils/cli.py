@@ -188,7 +188,5 @@ def configure(**extra):
     patch_settings()
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
-    from django.core.urlresolvers import set_urlconf
     from django.contrib import admin
     admin.autodiscover()
-    set_urlconf(settings.ROOT_URLCONF)
