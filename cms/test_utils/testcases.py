@@ -6,7 +6,7 @@ from cms.test_utils.util.request_factory import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse, set_urlconf, clear_url_caches
+from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import Client
