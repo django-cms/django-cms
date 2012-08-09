@@ -45,7 +45,7 @@ def get_page_from_path(path, preview=False):
     pages = pages.filter(site=site)
     
     # Check if there are any pages
-    if not pages.all_root():
+    if not pages.all_root().exists():
         return None
     
     # get the home page (needed to get the page)

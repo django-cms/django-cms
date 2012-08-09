@@ -130,3 +130,5 @@ class FormsTestCase(CMSTestCase):
                  'can_change_pagepermission', 'can_delete_pagepermission']
         for name in names:
             self.assertTrue(puf.initial.get(name, False))
+
+

@@ -28,11 +28,12 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     return default
 
 def get_page_from_placeholder_if_exists(placeholder):
-    from cms.models.pagemodel import Page
-    try:
-        return Page.objects.get(placeholders=placeholder)
-    except (Page.DoesNotExist, MultipleObjectsReturned,):
-        return None
+    import warnings
+    warnings.warn(
+        "The get_page_from_placeholder_if_exists function is deprecated. Use placeholder.page instead",
+        DeprecationWarning
+    )
+    return placeholder.page if placeholder else None
 
 def validate_placeholder_name(name):
     try:

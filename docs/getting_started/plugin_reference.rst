@@ -150,7 +150,8 @@ You should take care that the directory defined by the configuration setting
 :setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
-
+.. note:: In order to improve clarity, some Picture fields have been omitted in
+          the example template code.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with

@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.admin.forms import PageForm
-from cms.api import create_page
+from cms.api import create_page, add_plugin
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugins.link.cms_plugins import LinkPlugin
+from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, 
-    SettingsOverride)
+from cms.templatetags.cms_tags import get_placeholder_content
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
+                                      URL_CMS_PAGE_ADD)
+from cms.test_utils.util.context_managers import (LanguageOverride,
+                                                  SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -19,6 +22,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
 import os.path
 from cms.utils.page import is_valid_page_slug
+
 
 class PagesTestCase(CMSTestCase):
     
@@ -163,7 +167,34 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'changed title')
-    
+
+    def test_moderator_edit_page_redirect(self):
+        """
+        Test that a page can be edited multiple times with moderator
+        """
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            with SettingsOverride(CMS_MODERATOR=True):
+                page_data = self.get_new_page_data()
+                response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+                self.assertEquals(response.status_code, 302)
+                page =  Page.objects.get(title_set__slug=page_data['slug'])
+                response = self.client.get('/en/admin/cms/page/%s/' %page.id)
+                self.assertEqual(response.status_code, 200)
+                page_data['overwrite_url'] = '/hello/'
+                page_data['has_url_overwrite'] = True
+                response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertEqual(page.get_absolute_url(), '/hello/')
+                title = Title.objects.all()[0]
+                page.publish()
+                page_data['title'] = 'new title'
+                response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
+                page =  Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertEqual(page.get_title(), 'new title')
+
+
     def test_meta_description_and_keywords_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin
@@ -624,6 +655,28 @@ class PagesTestCase(CMSTestCase):
         home.publish()
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+
+    def test_plugin_loading_queries(self):
+        with SettingsOverride(CMS_TEMPLATES = (('placeholder_tests/base.html', 'tpl'),)):
+            page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
+            placeholders = list(page.placeholders.all())
+            for i, placeholder in enumerate(placeholders):
+                for j in range(5):
+                    add_plugin(placeholder, TextPlugin, 'en', body='text-%d-%d' % (i, j))
+                    add_plugin(placeholder, LinkPlugin, 'en', name='link-%d-%d' % (i, j))
+            from django.db import connection
+            connection.queries = []
+
+            # trigger the apphook query so that it doesn't get in our way
+            reverse('pages-root')
+            with self.assertNumQueries(4):
+                context = self.get_context()
+                for i, placeholder in enumerate(placeholders):
+                    content = get_placeholder_content(context, context['request'], page, placeholder.slot, False)
+                    for j in range(5):
+                        self.assertIn('text-%d-%d' % (i, j), content)
+                        self.assertIn('link-%d-%d' % (i, j), content)
+
 
 class NoAdminPageTests(CMSTestCase):
     urls = 'cms.test_utils.project.noadmin_urls'

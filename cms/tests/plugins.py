@@ -23,6 +23,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
     URL_CMS_PLUGIN_REMOVE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.views import details
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
@@ -112,6 +113,31 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
+
+
+    def test_plugin_order(self):
+        """
+        Test that plugin position is saved after creation
+        """
+        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+                              slug="page1",published=True, in_navigation=True)
+        ph_en = page_en.placeholders.get(slot="col_left")
+
+        # We check created objects and objects from the DB to be sure the position value
+        # has been saved correctly
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
+        db_plugin_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk)
+        db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
+
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            self.assertEqual(text_plugin_1.position,1)
+            self.assertEqual(db_plugin_1.position,1)
+            self.assertEqual(text_plugin_2.position,2)
+            self.assertEqual(db_plugin_2.position,2)
+            ## Finally we render the placeholder to test the actual content
+            rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url()),None)
+            self.assertEquals(rendered_placeholder,"I'm the firstI'm the second")
 
     def test_add_cancel_plugin(self):
         """
@@ -453,6 +479,23 @@ class PluginsTestCase(PluginsTestBaseCase):
         expected = sorted([u'4', u'5'])
         self.assertEquals(idlist, expected)
 
+    def test_empty_plugin_is_ignored(self):
+        page = create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+
+        plugin = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG)
+        plugin.insert_at(None, position='last-child', save=True)
+
+        # this should not raise any errors, but just ignore the empty plugin
+        out = placeholder.render(self.get_context(), width=300)
+        self.assertFalse(len(out))
+        self.assertFalse(len(placeholder._en_plugins_cache))
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):
@@ -647,7 +690,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
-        
+
 class PluginsMetaOptionsTests(TestCase):
     ''' TestCase set for ensuring that bugs like #992 are caught '''
 

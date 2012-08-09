@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load cms_tags %}
+{% load url from future %}
 
 {% block content %}
 	<h2>Sample application home page - on page {% page_attribute page_title %}</h2>
@@ -7,13 +8,13 @@
 	{{ block.super }}
 	<ul>
 		<li>
-			<a href="{% url sample-root %}">Sample app root reverse test</a>
+			<a href="{% url 'sample-root' %}">Sample app root reverse test</a>
 		</li>
 		<li>
-			<a href="{% url de:sample-account %}">Sample app account reverse test german</a>
+			<a href="{% url 'de:sample-account' %}">Sample app account reverse test german</a>
 		</li>
 		<li>
-			<a href="{% url en:sample-account %}">Sample app account reverse test english</a>
+			<a href="{% url 'en:sample-account' %}">Sample app account reverse test english</a>
 		</li>
 	</ul>
 	<h4>Sample image  - appmedia works?</h4>

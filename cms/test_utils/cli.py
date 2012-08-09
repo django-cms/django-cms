@@ -37,7 +37,7 @@ def configure(**extra):
             'django.template.loaders.app_directories.Loader',
             'django.template.loaders.eggs.Loader',
         ),
-       TEMPLATE_CONTEXT_PROCESSORS = [
+        TEMPLATE_CONTEXT_PROCESSORS = [
             "django.contrib.auth.context_processors.auth",
             "django.core.context_processors.i18n",
             "django.core.context_processors.debug",
@@ -88,6 +88,7 @@ def configure(**extra):
             'cms.test_utils.project.placeholderapp',
             'cms.test_utils.project.pluginapp',
             'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
+            'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
             'south',
@@ -128,14 +129,14 @@ def configure(**extra):
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
-            },                    
-                                
+            },
+
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
                 'name': gettext("left column")
-            },                  
-                                
+            },
+
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
@@ -173,10 +174,13 @@ def configure(**extra):
         CMS_NAVIGATION_EXTENDERS = (
             ('cms.test_utils.project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
         ),
-        TEST_RUNNER = 'cms.test_utils.runners.NormalTestRUnner',
+        TEST_RUNNER = 'cms.test_utils.runners.NormalTestRunner',
         JUNIT_OUTPUT_DIR = '.',
         TIME_TESTS = False,
         ROOT_URLCONF = 'cms.test_utils.cli',
+        PASSWORD_HASHERS = (
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+        )
     )
     defaults.update(extra)
     settings.configure(**defaults)
@@ -184,7 +188,5 @@ def configure(**extra):
     patch_settings()
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
-    from django.core.urlresolvers import set_urlconf
     from django.contrib import admin
     admin.autodiscover()
-    set_urlconf(settings.ROOT_URLCONF)
