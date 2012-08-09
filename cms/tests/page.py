@@ -8,7 +8,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.link.cms_plugins import LinkPlugin
 from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
-from cms.plugins.link.models import Link
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
@@ -168,7 +167,34 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'changed title')
-    
+
+    def test_moderator_edit_page_redirect(self):
+        """
+        Test that a page can be edited multiple times with moderator
+        """
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            with SettingsOverride(CMS_MODERATOR=True):
+                page_data = self.get_new_page_data()
+                response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+                self.assertEquals(response.status_code, 302)
+                page =  Page.objects.get(title_set__slug=page_data['slug'])
+                response = self.client.get('/en/admin/cms/page/%s/' %page.id)
+                self.assertEqual(response.status_code, 200)
+                page_data['overwrite_url'] = '/hello/'
+                page_data['has_url_overwrite'] = True
+                response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertEqual(page.get_absolute_url(), '/hello/')
+                title = Title.objects.all()[0]
+                page.publish()
+                page_data['title'] = 'new title'
+                response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
+                page =  Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertEqual(page.get_title(), 'new title')
+
+
     def test_meta_description_and_keywords_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin
