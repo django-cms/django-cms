@@ -146,22 +146,13 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
     def test_toolbar_staff(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.request_factory.get(page.get_absolute_url())
-        request.user = self.get_staff()
+        request.user = self.get_superuser()
         request.current_page = page
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_items({})
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6)
-
-        # check the logo is there
-        logo = items[0]
-        self.assertTrue(isinstance(logo, Anchor))
-
-        # check the edit-mode switcher is there and the switcher is turned off
-        edit = items[1]
-        self.assertTrue(isinstance(edit, Switcher))
-        self.assertFalse(toolbar.edit_mode)
 
         # check templates
         templates = items[2]
@@ -171,8 +162,24 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         for item, template in zip(templates.raw_items, settings.CMS_TEMPLATES):
             self.assertEqual(item.url, '%s?template=%s' % (base, template[0]))
 
+        # normal staff without templates
+        request.user = self.get_staff()
+        toolbar = CMSToolbar(request)
+
+        items = toolbar.get_items({})
+        # Logo + edit-mode + page-menu + admin-menu + logout
+        self.assertEqual(len(items), 5)
+        # check the logo is there
+        logo = items[0]
+        self.assertTrue(isinstance(logo, Anchor))
+
+        # check the edit-mode switcher is there and the switcher is turned off
+        edit = items[1]
+        self.assertTrue(isinstance(edit, Switcher))
+        self.assertFalse(toolbar.edit_mode)
+
         # check page menu
-        pagemenu = items[3]
+        pagemenu = items[2]
         self.assertTrue(isinstance(pagemenu, List))
         self.assertEqual(len(pagemenu.raw_items), 4)
 
@@ -186,13 +193,13 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
             reverse('admin:cms_page_delete', args=(page.pk,)))
 
         # check the admin-menu
-        admin = items[4]
+        admin = items[3]
         self.assertTrue(isinstance(admin, List))
         self.assertEqual(len(admin.raw_items), 1) # only the link to main admin
         self.assertTrue(isinstance(admin.raw_items[0], ListItem))
 
         # check the logout button
-        logout = items[5]
+        logout = items[4]
         self.assertTrue(isinstance(logout, GetButton))
         self.assertEqual(logout.url, '?cms-toolbar-logout')
 
@@ -271,8 +278,8 @@ class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
 
         items = toolbar.get_items({})
 
-        # Logo + edit-mode + moderate + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 7)
+        # Logo + edit-mode + moderate + page-menu + admin-menu + logout
+        self.assertEqual(len(items), 6)
 
         moderate = items[2]
         self.assertTrue(isinstance(moderate, GetButton))
@@ -294,6 +301,6 @@ class ToolbarNoModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
         self.assertTrue(toolbar.edit_mode)
 
         items = toolbar.get_items({})
-        # Logo + edit-mode + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
+        # Logo + edit-mode + page-menu + admin-menu + logout
+        self.assertEqual(len(items), 5)
 
