@@ -3,13 +3,13 @@ from cms.api import create_page
 from cms.cms_toolbar import CMSToolbar
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.util.request_factory import RequestFactory
 from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
     GetButton)
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 
 class ToolbarUserMixin(object):
     def get_anon(self):
@@ -164,6 +164,7 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
 
         # normal staff without templates
         request.user = self.get_staff()
+        request.session = {}
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_items({})
@@ -272,6 +273,7 @@ class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
         request = self.request_factory.get(page.get_absolute_url() + '?edit')
         request.user = self.get_staff()
         request.current_page = page
+        request.session = {}
         toolbar = CMSToolbar(request)
 
         self.assertTrue(toolbar.edit_mode)
@@ -295,6 +297,7 @@ class ToolbarNoModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.request_factory.get(page.get_absolute_url() + '?edit')
         request.user = self.get_staff()
+        request.session = {}
         request.current_page = page
         toolbar = CMSToolbar(request)
 
