@@ -4,7 +4,7 @@ Template Tags
 
 .. highlightlang:: html+django
 
-To use any of the following templatetags you need to load them first at the
+To use any of the following templatetags you first need to load them at the
 top of your template::
 
     {% load cms_tags menu_tags %}
@@ -29,7 +29,7 @@ Example::
 If you want additional content to be displayed in case the placeholder is
 empty, use the ``or`` argument and an additional ``{% endplaceholder %}``
 closing tag. Everything between ``{% placeholder "..." or %}`` and ``{%
-endplaceholder %}`` is rendered instead if the placeholder has no plugins or
+endplaceholder %}`` is rendered in the event that the placeholder has no plugins or
 the plugins do not generate any output.
 
 Example::
@@ -48,7 +48,7 @@ same name on parent pages, simply pass the ``inherit`` argument::
 
     {% placeholder "content" inherit %}
 
-This will walk the page tree up till the root page and will show the first
+This will walk up the page tree up until the root page and will show the first
 placeholder it can find with content.
 
 It's also possible to combine this with the ``or`` argument to show an
@@ -111,7 +111,7 @@ that ``reverse_id`` with the appropriate templatetags::
 
 If you are referring to a page `relative` to the current page, you'll probably
 have to use a numeric page ID or a page object. For instance, if you want the
-content of the parent page display on the current page, you can use::
+content of the parent page to display on the current page, you can use::
 
     {% show_placeholder "content" request.current_page.parent_id %}
 
@@ -208,9 +208,9 @@ four optional parameters: ``start_level``, ``end_level``, ``extra_inactive``,
 and ``extra_active``.
 
 The first two parameters, ``start_level`` (default=0) and ``end_level``
-(default=100) specify from what level to which level should the navigation be
-rendered. If you have a home as a root node and don't want to display home you
-can render the navigation only after level 1.
+(default=100) specify from which level the navigation shoud be rendered
+and at which level it should stop. If you have home as a root node and don't
+want to display home you can render the navigation only after level 1.
 
 The third parameter, ``extra_inactive`` (default=0), specifies how many levels
 of navigation should be displayed if a node is not a direct ancestor or
@@ -278,7 +278,7 @@ show_sub_menu
 *************
 
 Displays the sub menu of the current page (as a nested list).
-Takes one argument that specifies how many levels deep should the submenu be
+Takes one argument that specifies how many levels deep the submenu should be
 displayed. The template can be found at ``cms/sub_menu.html``::
 
     <ul>
@@ -345,7 +345,7 @@ Returns the url of the current page in an other language::
     {% page_language_url en %}
 
 If the current url has no cms-page and is handled by a navigation extender and
-the url changes based on the language: You will need to set a language_changer
+the url changes based on the language, you will need to set a language_changer
 function with the set_language_changer function in cms.utils.
 
 For more information, see :doc:`i18n`.
@@ -370,8 +370,8 @@ or with custom template::
     
 The language_chooser has three different modes in which it will display the
 languages you can choose from: "raw" (default), "native", "current" and "short".
-It can be passed as last argument to the ``language_chooser tag`` as a string.
-In "raw" mode, the language will be displayed like it's verbose name in the
+It can be passed as the last argument to the ``language_chooser tag`` as a string.
+In "raw" mode, the language will be displayed like its verbose name in the
 settings. In "native" mode the languages are displayed in their actual language
 (eg. German will be displayed "Deutsch", Japanese as "日本語" etc). In "current"
 mode the languages are translated into the current language the user is seeing
@@ -379,7 +379,7 @@ the site in (eg. if the site is displayed in German, Japanese will be displayed
 as "Japanisch"). "Short" mode takes the language code (eg. "en") to display.
 
 If the current url has no cms-page and is handled by a navigation extender and
-the url changes based on the language: You will need to set a language_changer
+the url changes based on the language, you will need to set a language_changer
 function with the set_language_changer function in menus.utils.
 
 For more information, see :doc:`i18n`.
@@ -390,7 +390,7 @@ For more information, see :doc:`i18n`.
 cms_toolbar
 ***********
 
-The ``cms_toolbar`` templatetag will add the needed css and javascript to the
+The ``cms_toolbar`` templatetag will add the required css and javascript to the
 sekizai blocks in the base template. The templatetag has to be placed after the
 ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences within your HTML.
 

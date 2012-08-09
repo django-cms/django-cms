@@ -1,0 +1,8 @@
+{% load cms_admin i18n adminmedia %}{% with page.get_descendant_count as has_children %}<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf{% endif %}{% if forloop.last %} last{% endif %}{% if has_move_page_permission %} moveable{% endif %}{% if has_children %} closed{% endif %}"{% if metadata %} mdata="{{ metadata }}{% endif %}" rel="{% ifequal page.level 0 %}topnode{% else %}node{% endifequal %}">
+    
+    {% include 'admin/cms/page/menu_item.html' %}
+    
+    {% if has_children %}<ul{% if page.last %} class="last"{% endif %}>
+    </ul>{% endif %}
+</li>
+{%  endwith %}

@@ -58,6 +58,19 @@ Extending the CMS
     extending_cms/fields
 
 
+********
+Concepts
+********
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    concepts/introduction
+    concepts/menu_system
+    concepts/multiple_languages
+
+
 **************************
 Contributing to django CMS
 **************************

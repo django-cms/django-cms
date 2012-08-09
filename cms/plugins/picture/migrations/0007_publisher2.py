@@ -4,6 +4,11 @@ from django.db import models
 from cms.plugins.picture.models import *
 
 class Migration:
+    needed_by = (
+        # Migration after cms.publisher2, keep migrations in sync with real db
+        # Fixes migration error in MySQL
+        ("cms", "0022_login_required_added.py"),
+    )
     
     def forwards(self, orm):
         

@@ -10,23 +10,24 @@ from cms.plugins.link.cms_plugins import LinkPlugin
 from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
-from cms.test_utils.testcases import CMSTestCase, TestCase
+from cms.test_utils.project.fakemlng.models import Translations
+from cms.test_utils.project.placeholderapp.models import (Example1, Example2, 
+    Example3, Example4, Example5)
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions, 
-    get_placeholder_conf)
+from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
+from django.contrib.messages.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
-from project.fakemlng.models import Translations
-from project.placeholderapp.models import (Example1, Example2, Example3, 
-    Example4, Example5)
+from django.test import TestCase
 
 
 class PlaceholderTestCase(CMSTestCase):
@@ -90,7 +91,7 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         
     def test_fieldsets(self):
-        from project.placeholderapp import admin as __ # load admin
+        from cms.test_utils.project.placeholderapp import admin as __ # load admin
         request = self.get_request('/')
         admins = [
             (Example1, 2),
@@ -439,6 +440,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
         }
         request = self.get_post_request(data)
         request.user = self.reload(user)
+        request._messages = default_storage(request)
         return request
 
     def test_plugin_add_requires_permissions(self):

@@ -13,20 +13,21 @@ from cms.models import (Page, Title, CMSPlugin, PagePermission,
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
+from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
-from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
-from django import template
+from distutils.version import LooseVersion
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import unquote, get_deleted_objects
+from django.contrib.admin.util import get_deleted_objects
+from urllib2 import unquote
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import transaction, models
+from django.db import router, transaction, models
 from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
@@ -37,17 +38,10 @@ from django.template.defaultfilters import (title, escape, force_escape,
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
-from cms.templatetags.cms_admin import admin_static_url
 import django
-import inspect
 
 
-
-# silly hack to test features/ fixme
-if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
-    from django.db import router
-else:
-    router = False
+DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -56,6 +50,17 @@ if 'reversion' in settings.INSTALLED_APPS:
 else: # pragma: no cover
     from django.contrib.admin import ModelAdmin
     create_on_success = lambda x: x
+
+if DJANGO_1_3:
+    """
+    Backwards compatibility for Django < 1.4 and django-reversion 1.6
+    """
+    class ModelAdmin(ModelAdmin):
+        def get_inline_instances(self, request):
+            return self.inline_instances
+        
+        def get_prepopulated_fields(self, request):
+            return self.prepopulated_fields
 
 
 def contribute_fieldsets(cls):
@@ -205,6 +210,7 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
             pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
@@ -304,14 +310,13 @@ class PageAdmin(ModelAdmin):
         Add fieldsets of placeholders to the list of already existing
         fieldsets.
         """
-        placeholders_template = get_template_from_request(request, obj)
-
         if obj: # edit
             given_fieldsets = deepcopy(self.fieldsets)
             if not obj.has_publish_permission(request):
                 l = list(given_fieldsets[0][1]['fields'][2])
                 l.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(l)
+            placeholders_template = get_template_from_request(request, obj)
             for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
                 name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
                 name = _(name)
@@ -384,7 +389,7 @@ class PageAdmin(ModelAdmin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
 
-            placeholders = plugins.get_placeholders(selected_template)
+            placeholders = self.get_fieldset_placeholders(selected_template)
             for placeholder_name in placeholders:
                 plugin_list = []
                 show_copy = False
@@ -517,7 +522,7 @@ class PageAdmin(ModelAdmin):
 
             #activate(user_lang_set)
             extra_context = {
-                'placeholders': plugins.get_placeholders(selected_template),
+                'placeholders': self.get_fieldset_placeholders(selected_template),
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'CMS_MODERATOR': settings.CMS_MODERATOR,
@@ -642,12 +647,12 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
-            if django.VERSION >= (1, 4):
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
-            else:
+            if DJANGO_1_3:
                 cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
                     self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
+            else:
+                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -671,6 +676,15 @@ class PageAdmin(ModelAdmin):
         else:
             languages = [x[0] for x in settings.CMS_LANGUAGES]
 
+        # parse the cookie that saves which page trees have
+        # been opened already and extracts the page ID
+        djangocms_nodes_open = request.COOKIES.get('djangocms_nodes_open', '')
+        raw_nodes = unquote(djangocms_nodes_open).split(',')
+        try:
+            open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
+        except IndexError:
+            open_menu_trees = []
+
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -686,6 +700,7 @@ class PageAdmin(ModelAdmin):
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
+            'open_menu_trees': open_menu_trees,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)
@@ -938,18 +953,12 @@ class PageAdmin(ModelAdmin):
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
         
-        if django.VERSION[1] > 2: # pragma: no cover
-            using = router.db_for_read(self.model)
-            kwargs = {
-                'admin_site': self.admin_site,
-                'user': request.user,
-                'using': using
-            }
-        else:
-            kwargs = {
-                'admin_site': self.admin_site,
-                'user': request.user,
-            }
+        using = router.db_for_read(self.model)
+        kwargs = {
+            'admin_site': self.admin_site,
+            'user': request.user,
+            'using': using
+        }
         deleted_objects, perms_needed =  get_deleted_objects(
             [titleobj],
             titleopts,
@@ -1000,7 +1009,7 @@ class PageAdmin(ModelAdmin):
             "app_label": app_label,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
+        context_instance = RequestContext(request, current_app=self.admin_site.name)
         return render_to_response(self.delete_confirmation_template or [
             "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
             "admin/%s/delete_confirmation.html" % app_label,
@@ -1067,6 +1076,18 @@ class PageAdmin(ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 
+    def descendants(self, request, page_id):
+        """
+        Get html for descendants of given page
+        Used for lazy loading pages in change_list.js
+        
+        Permission checks is done in admin_utils.get_admin_menu_item_context
+        which is called by admin_utils.render_admin_menu_item.
+        """
+        page = get_object_or_404(Page, pk=page_id)
+        return admin_utils.render_admin_menu_item(request, page,
+                template="admin/cms/page/lazy_menu.html")
+                
     @create_on_success
     def add_plugin(self, request):
         '''
@@ -1077,13 +1098,13 @@ class PageAdmin(ModelAdmin):
         if request.method != "POST":
             raise Http404
         plugin_type = request.POST['plugin_type']
-        if not has_plugin_permission(request.user, plugin_type, "add"):
+        if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
             return HttpResponseForbidden(ugettext('You have no permission to add a plugin'))
         placeholder_id = request.POST.get('placeholder', None)
         parent_id = request.POST.get('parent_id', None)
         if placeholder_id:
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-            page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+            page = placeholder.page
         else:
             placeholder = None
             page = None
@@ -1107,7 +1128,7 @@ class PageAdmin(ModelAdmin):
         elif parent_id:
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
-            page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+            page = placeholder.page if placeholder else None
             if not page: # Make sure we do have a page
                 raise Http404
             language = parent.language
@@ -1151,7 +1172,7 @@ class PageAdmin(ModelAdmin):
         copy_from = request.POST['copy_from']
         placeholder_id = request.POST['placeholder']
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+        page = placeholder.page
         language = request.POST['language'] or get_language_from_request(request)
 
         if not page.has_change_permission(request):
@@ -1164,7 +1185,7 @@ class PageAdmin(ModelAdmin):
 
         # check permissions before copy the plugins:
         for plugin in plugins:
-            if not has_plugin_permission(request.user, plugin.plugin_type, "add"):
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
                 return HttpResponseForbidden(ugettext("You do not have permission to add plugins"))
 
         copy_plugins.copy_plugins_to(plugins, placeholder, language)
@@ -1181,8 +1202,8 @@ class PageAdmin(ModelAdmin):
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
-            cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
-            page = placeholder_utils.get_page_from_placeholder_if_exists(cms_plugin.placeholder)
+            cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
+            page = cms_plugin.placeholder.page if cms_plugin.placeholder else None
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
             if page and not page.has_change_permission(request):
                 return HttpResponseForbidden(ugettext("You have no permission to change this page"))
@@ -1218,7 +1239,7 @@ class PageAdmin(ModelAdmin):
             if not instance:
                 raise Http404("This plugin is not saved in a revision")
 
-        if not has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
+        if not permissions.has_plugin_permission(request.user, cms_plugin.plugin_type, "change"):
             return HttpResponseForbidden(ugettext("You have no permission to edit a plugin"))
 
         plugin_admin.cms_plugin_instance = cms_plugin
@@ -1308,7 +1329,7 @@ class PageAdmin(ModelAdmin):
         success = False
         if 'plugin_id' in request.POST:
             plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-            if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
                 return HttpResponseForbidden()
 
             page = plugins.get_page_from_plugin_or_404(plugin)
@@ -1316,7 +1337,7 @@ class PageAdmin(ModelAdmin):
                 return HttpResponseForbidden(ugettext("You have no permission to change this page"))
 
             placeholder_slot = request.POST['placeholder']
-            placeholders = plugins.get_placeholders(page.get_template())
+            placeholders = self.get_fieldset_placeholders(page.get_template())
             if not placeholder_slot in placeholders:
                 return HttpResponse(str("error"))
             placeholder = page.placeholders.get(slot=placeholder_slot)
@@ -1332,10 +1353,10 @@ class PageAdmin(ModelAdmin):
             success = True
         if 'ids' in request.POST:
             for plugin_id in request.POST['ids'].split("_"):
-                plugin = CMSPlugin.objects.get(pk=plugin_id)
-                if not has_plugin_permission(request.user, plugin.plugin_type, "change"):
+                plugin = CMSPlugin.objects.select_related('placeholder').get(pk=plugin_id)
+                if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
                     return HttpResponseForbidden(ugettext("You have no permission to move a plugin"))
-                page = placeholder_utils.get_page_from_placeholder_if_exists(plugin.placeholder)
+                page = plugin.placeholder.page if plugin.placeholder else None
                 if not page: # use placeholderadmin instead!
                     raise Http404
                 if not page.has_change_permission(request):
@@ -1363,13 +1384,13 @@ class PageAdmin(ModelAdmin):
         if 'history' in request.path:
             raise Http404
         plugin_id = request.POST['plugin_id']
-        plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
-        if not has_plugin_permission(request.user, plugin.plugin_type, "delete"):
+        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
             return HttpResponseForbidden(ugettext("You have no permission to remove a plugin"))
 
         placeholder = plugin.placeholder
-        page = placeholder_utils.get_page_from_placeholder_if_exists(placeholder)
+        page = placeholder.page if placeholder else None
 
         if page and not page.has_change_permission(request):
             raise Http404

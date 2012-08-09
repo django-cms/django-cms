@@ -11,11 +11,11 @@ import sys
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "project.sampleapp.cms_app"
+APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
 class ViewTests(SettingsOverrideTestCase):
-    urls = 'project.urls_for_apphook_tests'
+    urls = 'cms.test_utils.project.urls_for_apphook_tests'
     settings_overrides = {'CMS_MODERATOR': False}
     
     def setUp(self):

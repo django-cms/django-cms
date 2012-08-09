@@ -28,14 +28,23 @@ setup(
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Django>=1.2.5',
+        'Django>=1.3.1,<1.5',
         'django-classy-tags>=0.3.4.1',
         'south>=0.7.2',
         'html5lib',
-        'django-mptt==0.5.1',
+        'django-mptt>=0.5.1,<0.6',
         'django-sekizai>=0.6.1',
+    ],
+    tests_require=[
+        'django-reversion==1.6',
+        'Pillow==1.7.7',
+        'Sphinx==1.1.3',
+        'Jinja2==2.6',
+        'Pygments==1.5',
+        
     ],
     packages=find_packages(exclude=["project","project.*"]),
     include_package_data=True,
-    zip_safe = False
+    zip_safe = False,
+    test_suite = 'runtests.main',
 )

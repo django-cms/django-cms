@@ -1,0 +1,1836 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+#   <legendri@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: django-cms\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2011-08-14 09:47-0500\n"
+"PO-Revision-Date: 2012-03-27 21:10+0000\n"
+"Last-Translator: legendri <legendri@gmail.com>\n"
+"Language-Team: divio.ch <developers@divio.ch>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2\n"
+"X-Poedit-Country: SWITZERLAND\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: cms_toolbar.py:68
+msgid "Edit mode"
+msgstr "Uređivanje"
+
+#: cms_toolbar.py:77
+msgid "django CMS"
+msgstr "django CMS"
+
+#: cms_toolbar.py:108 templates/admin/cms/page/menu_item.html:73
+msgid "Publish"
+msgstr "Objavi"
+
+#: cms_toolbar.py:112
+msgid "Request Approval"
+msgstr "Potrebno odobrenje"
+
+#: cms_toolbar.py:127 cms_toolbar.py:136
+msgid "Logout"
+msgstr "Odjavi se"
+
+#: cms_toolbar.py:152
+msgid "Template"
+msgstr "Predložak"
+
+#: cms_toolbar.py:160
+msgid "Move/add Pages"
+msgstr "Premjesti/dodaj stranicu"
+
+#: cms_toolbar.py:165
+msgid "Add child page"
+msgstr "Dodaj podređenu stranicu"
+
+#: cms_toolbar.py:171
+msgid "Add sibling page"
+msgstr "Dodaj stranicu istog nivoa"
+
+#: cms_toolbar.py:177
+msgid "Delete Page"
+msgstr "Izbriši stranicu"
+
+#: cms_toolbar.py:180 models/moderatormodels.py:45
+#: templates/admin/cms/page/permissions.html:5
+msgid "Page"
+msgstr "stranica"
+
+#: cms_toolbar.py:189
+msgid "Site Administration"
+msgstr "Upravljanje web stranicom"
+
+#: cms_toolbar.py:195
+msgid "Page Settings"
+msgstr "Podešavanja stranice"
+
+#: cms_toolbar.py:201
+msgid "View History"
+msgstr "Prikaži povijest"
+
+#: cms_toolbar.py:205
+msgid "Admin"
+msgstr "Administrator"
+
+#: plugin_base.py:65
+msgid "Advanced options"
+msgstr "Napredna svojstva"
+
+#: admin/forms.py:59
+msgid "Title"
+msgstr "Naslov"
+
+#: admin/forms.py:60
+msgid "The default title"
+msgstr "Uobičajeni naslov"
+
+#: admin/forms.py:61
+msgid "Slug"
+msgstr "Slug"
+
+#: admin/forms.py:62
+msgid "The part of the title that is used in the URL"
+msgstr "Dio naslova koji je korišten u URL-u"
+
+#: admin/forms.py:63
+msgid "Language"
+msgstr "Jezik"
+
+#: admin/forms.py:64
+msgid "The current language of the content fields."
+msgstr "Trenutni jezik polja sa sadržajem."
+
+#: admin/forms.py:117
+msgid "Another page with this slug already exists"
+msgstr "Stranica sa tim slugom već postoji"
+
+#: admin/forms.py:135
+msgid "Menu Title"
+msgstr "Naslov izbornika"
+
+#: admin/forms.py:136
+msgid "Overwrite what is displayed in the menu"
+msgstr "Pregazi ono što je prikazano u meniju."
+
+#: admin/forms.py:137
+msgid "Page Title"
+msgstr "Naslov stranice"
+
+#: admin/forms.py:138
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Pregazit će ono što je prikazano u vrhu preglednika i u oznakama."
+
+#: admin/forms.py:139
+msgid "Application"
+msgstr "Aplkacija"
+
+#: admin/forms.py:141
+msgid "Hook application to this page."
+msgstr "Zakači aplikaciju za ovu stranicu."
+
+#: admin/forms.py:142
+msgid "Overwrite URL"
+msgstr "Pregazi URL"
+
+#: admin/forms.py:143
+msgid "Keep this field empty if standard path should be used."
+msgstr "Ostavite ovo polje prazno ako treba koristiti standardnu putanju."
+
+#: admin/forms.py:149
+msgid "Redirect"
+msgstr "Redirekcija"
+
+#: admin/forms.py:150
+msgid "Redirects to this URL."
+msgstr "Izvedi redirekciju na ovaj URL."
+
+#: admin/forms.py:152
+msgid "A description of the page sometimes used by search engines."
+msgstr "Opis stranice koji koriste neki pretraživači."
+
+#: admin/forms.py:154
+msgid "A list of comma seperated keywords sometimes used by search engines."
+msgstr "Popis ključnih riječi, razadvojenih zarezima, koji koriste neki pretraživači."
+
+#: admin/forms.py:170
+msgid "A page with this reverse URL id exists already."
+msgstr "Stranica sa zadatim inverznim URL-om već postoji."
+
+#: admin/forms.py:178
+msgid "Invalid URL, use /my/url format."
+msgstr "Nepravilan URL, koristite format: /my/url."
+
+#: admin/forms.py:181
+#, python-format
+msgid "Page with redirect url %r already exist"
+msgstr "Stranica sa URL-om za redirekciju %r već postoji"
+
+#: admin/forms.py:191 admin/forms.py:192 migrations/0001_initial.py:41
+#: models/permissionmodels.py:16
+msgid "user"
+msgstr "korisnik"
+
+#: admin/forms.py:216
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr "Privilegije za dodavanje stranice također zahtjeva pravo pristupa djeci ili potomcima. U suprotnom, stranica se neće moći mijenjati od strane njenog tvorca."
+
+#: admin/forms.py:221
+msgid "Add page permission also requires edit page permission."
+msgstr "Privilegije za dodavanje stranice zahtjevaju i privilegije za izmijenu stranice."
+
+#: admin/forms.py:248
+msgid "can_view"
+msgstr "can_view"
+
+#: admin/forms.py:260
+msgid "Please select user or group first."
+msgstr "Molimo prvo izaberite korisnika ili grupu."
+
+#: admin/forms.py:267 admin/forms.py:274 admin/forms.py:278
+#: templates/admin/cms/page/change_form.html:67
+#: templates/admin/cms/page/plugin_change_form.html:70
+#: templates/cms/toolbar/placeholder.html:25
+msgid "Add"
+msgstr "Dodaj"
+
+#: admin/forms.py:268 admin/forms.py:275 admin/forms.py:279
+msgid "Change"
+msgstr "Izmijeni"
+
+#: admin/forms.py:269 admin/forms.py:276 admin/forms.py:280
+#: templates/admin/page_submit_line.html:5
+#: templates/admin/cms/page/menu_item.html:44
+msgid "Delete"
+msgstr "Izbriši"
+
+#: admin/forms.py:270
+msgid "Recover (any) pages"
+msgstr "Povrati (bilo koju) stranicu"
+
+#: admin/forms.py:297
+msgid "Notify user"
+msgstr "Obavjesti korisnika"
+
+#: admin/forms.py:298
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
+msgstr "Šalji e-mail obavijesti korisnicima pri promijeni korisničkog imena ili lozinke. Zahtjeva e-mail adresu korisnika."
+
+#: admin/forms.py:318
+msgid "New password"
+msgstr "Nova lozinka"
+
+#: admin/forms.py:320
+msgid "New password confirmation"
+msgstr "Potvrda nove lozinke"
+
+#: admin/forms.py:339
+msgid "Email notification requires valid email address."
+msgstr "Obavijesti putem e-maila zahtjevaju važeću e-mail adresu."
+
+#: admin/forms.py:341
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
+msgstr "Pravo na kreiranje nove stranice zahtjeva pravo za izmjenu stranice!"
+
+#: admin/forms.py:343
+msgid ""
+"The permission to add new users requires the permission to change users!"
+msgstr "Pravo na dodavanje novog korisnika zahtjeva pravo za izmjenu kornisika!"
+
+#: admin/forms.py:345
+msgid "To add permissions you also need to edit them!"
+msgstr "Za dodavanje dozvole morate je i izmjeniti!"
+
+#: admin/pageadmin.py:97
+msgid "Basic Settings"
+msgstr "Osnovna podešavanja"
+
+#: admin/pageadmin.py:100
+msgid "Note: This page reloads if you change the selection. Save it first."
+msgstr "Napomena: Ova stranica će se ponovo učitati ako izmjenite odabir. Prvo spremite stranicu."
+
+#: admin/pageadmin.py:102 admin/pageadmin.py:154
+msgid "Hidden"
+msgstr "Skriveno"
+
+#: admin/pageadmin.py:106
+msgid "Advanced Settings"
+msgstr "Napredna podešavanja"
+
+#: admin/pageadmin.py:113
+msgid "SEO Settings"
+msgstr "SEO podešavanja"
+
+#: admin/pageadmin.py:299
+msgid "You have no permission to change the template"
+msgstr "Nemate ovlasti da mjenjate predložak"
+
+#: admin/pageadmin.py:485
+msgid "higher"
+msgstr "više"
+
+#: admin/pageadmin.py:655
+msgid "Database error"
+msgstr "Greška baze podataka"
+
+#: admin/pageadmin.py:855
+msgid "Page was successfully approved."
+msgstr "Stranica je uspješno odobrena."
+
+#: admin/pageadmin.py:927
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "objekt %(name)s sa primarnim ključem %(key)r ne postoji."
+
+#: admin/pageadmin.py:933
+msgid "There only exists one translation for this page"
+msgstr "Postoji samo jedan prijevod ove stranice"
+
+#: admin/pageadmin.py:969
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "Naslov i plagin na jeziku %(language)s je obrisan"
+
+#: admin/pageadmin.py:991
+msgid "Are you sure?"
+msgstr "Da li ste sigurni?"
+
+#: admin/pageadmin.py:1052
+msgid "You do not have permission to publish this page"
+msgstr "Nemate ovlasti da izbrišete ovu stranicu"
+
+#: admin/pageadmin.py:1066
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Nemate ovlasti da izmjenite status ove stranice \"u navigaciji\""
+
+#: admin/pageadmin.py:1079
+msgid "You have no permission to add a plugin"
+msgstr "Nemate ovlasti da dodate plugin"
+
+#: admin/pageadmin.py:1126 admin/pageadmin.py:1158
+msgid "Language must be set to a supported language!"
+msgstr "Jezik mora biti postavljen na jedan od podržanih!"
+
+#: admin/pageadmin.py:1138
+#, python-format
+msgid "%(plugin_name)s plugin added to %(placeholder)s"
+msgstr "%(plugin_name)s plugin dodan u %(placeholder)s"
+
+#: admin/pageadmin.py:1156
+msgid "You do not have permission to change this page"
+msgstr "Nemate ovlasti da izmjenite ovu stranicu"
+
+#: admin/pageadmin.py:1160
+msgid "Language must be different than the copied language!"
+msgstr "Jezik mora biti različit od kopiranog jezika!"
+
+#: admin/pageadmin.py:1166
+msgid "You do not have permission to add plugins"
+msgstr "Nemate ovlasti da dodajete pluginove"
+
+#: admin/pageadmin.py:1173
+#, python-format
+msgid "Copied %(language)s plugins to %(placeholder)s"
+msgstr "Kopirano %(language)s plugina u %(placeholder)s"
+
+#: admin/pageadmin.py:1186 admin/pageadmin.py:1294 admin/pageadmin.py:1316
+msgid "You have no permission to change this page"
+msgstr "Nemate ovlasti da mjenjate ovu stranicu"
+
+#: admin/pageadmin.py:1221
+msgid "You have no permission to edit a plugin"
+msgstr "Nemate ovlasti da mjenjate plugin"
+
+#: admin/pageadmin.py:1256
+#, python-format
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr "%(plugin_name)s plugin, izmjenjen na poziciji %(position)s u %(placeholder)s"
+
+#: admin/pageadmin.py:1311
+msgid "You have no permission to move a plugin"
+msgstr "Nemate ovlasti da premještate plugin"
+
+#: admin/pageadmin.py:1329
+msgid "Plugins where moved"
+msgstr "Plugin je premješten"
+
+#: admin/pageadmin.py:1343
+msgid "You have no permission to remove a plugin"
+msgstr "Nemate ovlasti da uklonite plugin"
+
+#: admin/pageadmin.py:1361 admin/placeholderadmin.py:292
+#, python-format
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
+msgstr "%(plugin_name)s plugin na poziciji %(position)s u %(placeholder)s je uklonjen."
+
+#: admin/permissionadmin.py:72
+msgid "View restriction"
+msgstr "Prikaži ograničenja"
+
+#: admin/permissionadmin.py:73
+msgid "View restrictions"
+msgstr "Prikaži ograničenja"
+
+#: admin/permissionadmin.py:133 models/permissionmodels.py:75
+msgid "Page permissions"
+msgstr "Ovlasti stranice"
+
+#: admin/permissionadmin.py:134
+msgid "User & Group permissions"
+msgstr "Ovlasti korisnika i grupe"
+
+#: admin/permissionadmin.py:135
+msgid "Page permissions management"
+msgstr "Upravljanje ovlastima stranice"
+
+#: admin/placeholderadmin.py:150 admin/placeholderadmin.py:191
+msgid "You don't have permission to add content here."
+msgstr "Nemate ovlasti da ovdje dodajete sadržaj."
+
+#: admin/placeholderadmin.py:187
+msgid "You don't have permission to add plugins"
+msgstr "Nemate ovlasti da dodajete pluginove"
+
+#: admin/placeholderadmin.py:288
+msgid "You don't have permission to delete a plugin"
+msgstr "Nemate ovlasti da izbrišete plugin"
+
+#: admin/useradmin.py:25
+msgid "User details"
+msgstr "Detalji korisnika"
+
+#: admin/useradmin.py:26
+msgid "Groups"
+msgstr "Grupe"
+
+#: admin/useradmin.py:36 templates/cms/toolbar/items/login.html:7
+msgid "Password"
+msgstr "Lozinka"
+
+#: admin/dialog/forms.py:9
+msgid "Copy permissions"
+msgstr "Iskopiraj ovlasti"
+
+#: admin/dialog/forms.py:16
+msgid "Copy moderation"
+msgstr "Dosljednost kopiranja"
+
+#: conf/patch.py:28
+msgid "Inherit the template of the nearest ancestor"
+msgstr "Nasljedi predložak najbližeg pretka"
+
+#: forms/fields.py:19
+msgid "Select a valid site"
+msgstr "Izaberite ispravnu web stranicu"
+
+#: forms/fields.py:20
+msgid "Select a valid page"
+msgstr "Izaberite ispravnu stranicu"
+
+#: forms/widgets.py:173
+msgid "Add Another"
+msgstr "Dodaj još"
+
+#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
+#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
+#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
+#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
+#: models/pluginmodel.py:79 models/titlemodels.py:10
+#: plugins/inherit/models.py:11
+msgid "language"
+msgstr "jezik"
+
+#: migrations/0001_initial.py:13 migrations/0001_initial.py:26
+#: migrations/0001_initial.py:40 migrations/0001_initial.py:78
+#: migrations/0003_remove_placeholder.py:21 models/pagemodel.py:104
+#: models/permissionmodels.py:69 models/titlemodels.py:21
+#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
+#: plugins/picture/models.py:22 plugins/teaser/models.py:13
+msgid "page"
+msgstr "stranica"
+
+#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
+#: migrations/0004_textobjects.py:22 models/pluginmodel.py:78
+msgid "position"
+msgstr "pozicija"
+
+#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
+#: models/pluginmodel.py:81 models/titlemodels.py:22
+msgid "creation date"
+msgstr "datum kreiranja"
+
+#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
+#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:13
+msgid "slot"
+msgstr "prorez"
+
+#: migrations/0001_initial.py:18 models/pluginmodel.py:80
+msgid "plugin_name"
+msgstr "naziv plugina"
+
+#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
+#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:11
+#: models/titlemodels.py:12 models/titlemodels.py:20 plugins/file/models.py:25
+#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:9
+#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
+#: templates/admin/cms/page/change_list_tree.html:6
+msgid "title"
+msgstr "Naslov"
+
+#: migrations/0001_initial.py:28
+msgid "path"
+msgstr "putanja"
+
+#: migrations/0001_initial.py:30 models/titlemodels.py:13
+msgid "slug"
+msgstr "slug"
+
+#: migrations/0001_initial.py:36
+msgid "everybody"
+msgstr "svi"
+
+#: migrations/0001_initial.py:37 models/permissionmodels.py:20
+msgid "can edit"
+msgstr "može mijenjati"
+
+#: migrations/0001_initial.py:38 models/permissionmodels.py:17
+msgid "group"
+msgstr "grupa"
+
+#: migrations/0001_initial.py:39 models/permissionmodels.py:24
+msgid "can publish"
+msgstr "može objavljivati"
+
+#: migrations/0001_initial.py:42
+msgid "type"
+msgstr "tip"
+
+#: migrations/0001_initial.py:44
+msgid "can change soft-root"
+msgstr "može mijenjati soft-root"
+
+#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
+#: migrations/0006_apphook.py:62
+msgid "status"
+msgstr "status"
+
+#: migrations/0001_initial.py:53
+msgid "navigation extenders"
+msgstr "proširenja navigacije"
+
+#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
+#: migrations/0006_apphook.py:46 models/titlemodels.py:15
+msgid "has url overwrite"
+msgstr "izabrano prepisivanje url-a"
+
+#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
+msgid "url overwrite"
+msgstr "prepisivanje url-a"
+
+#: migrations/0001_initial.py:57
+msgid "author"
+msgstr "autor"
+
+#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
+msgid "reverse url id"
+msgstr "id inverznog url-a"
+
+#: migrations/0001_initial.py:59 models/pagemodel.py:84
+msgid "login required"
+msgstr "potrebno prijavljivanje"
+
+#: migrations/0001_initial.py:60 models/pagemodel.py:69
+msgid "soft root"
+msgstr "soft root"
+
+#: migrations/0001_initial.py:63 models/pagemodel.py:67
+msgid "publication end date"
+msgstr "datum okončanja objave"
+
+#: migrations/0001_initial.py:64 models/pagemodel.py:74
+#: plugins/snippet/models.py:14
+msgid "template"
+msgstr "predložak"
+
+#: migrations/0001_initial.py:66 models/pagemodel.py:66
+msgid "publication date"
+msgstr "datum objavljivanja"
+
+#: migrations/0001_initial.py:67 models/pagemodel.py:68
+#: templates/admin/cms/page/change_list_tree.html:9
+msgid "in navigation"
+msgstr "u navigaciji"
+
+#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
+#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:16
+msgid "application"
+msgstr "aplikacija"
+
+#: migrations/0006_apphook.py:65 models/pagemodel.py:70
+msgid "id"
+msgstr "id"
+
+#: migrations/0008_redirects.py:11 models/titlemodels.py:17
+msgid "redirect"
+msgstr "preusmjeravanje"
+
+#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:19
+msgid "keywords"
+msgstr "ključne riječi"
+
+#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:18
+#: plugins/teaser/models.py:20
+msgid "description"
+msgstr "opis"
+
+#: models/moderatormodels.py:25
+msgid "Current page"
+msgstr "trenutna stranica"
+
+#: models/moderatormodels.py:26
+msgid "Page children (immediate)"
+msgstr "potomci stranice (neposredni)"
+
+#: models/moderatormodels.py:27
+msgid "Page and children (immediate)"
+msgstr "stranica i potomci (neposredni)"
+
+#: models/moderatormodels.py:28
+msgid "Page descendants"
+msgstr "potomci stranice"
+
+#: models/moderatormodels.py:29
+msgid "Page and descendants"
+msgstr "stranica i potomci"
+
+#: models/moderatormodels.py:46
+#: templates/admin/cms/page/moderation_messages.html:6
+#: templates/admin/cms/page/permissions.html:6
+msgid "User"
+msgstr "korisnik"
+
+#: models/moderatormodels.py:50 templatetags/cms_admin.py:99
+msgid "Moderate page"
+msgstr "uredi stranicu"
+
+#: models/moderatormodels.py:51 templatetags/cms_admin.py:100
+msgid "Moderate children"
+msgstr "Uredi neposredne potomke stranice"
+
+#: models/moderatormodels.py:52 templatetags/cms_admin.py:101
+msgid "Moderate descendants"
+msgstr "uredi potomke"
+
+#: models/moderatormodels.py:55 models/moderatormodels.py:56
+msgid "PageModerator"
+msgstr "PageModerator"
+
+#: models/moderatormodels.py:99
+msgid "created"
+msgstr "stvoreno"
+
+#: models/moderatormodels.py:100 models/pagemodel.py:44
+msgid "changed"
+msgstr "promijenjen"
+
+#: models/moderatormodels.py:101
+msgid "delete req."
+msgstr " zahtjev za brisanje"
+
+#: models/moderatormodels.py:102
+msgid "move req."
+msgstr " zahtjev za premještanje"
+
+#: models/moderatormodels.py:103
+msgid "publish req."
+msgstr "zahtjev za objavljivanje "
+
+#: models/moderatormodels.py:104
+msgid "unpublish req."
+msgstr "zahtjev za obustavljanje objave"
+
+#: models/moderatormodels.py:105 models/pagemodel.py:47
+msgid "approved"
+msgstr "odobreno"
+
+#: models/moderatormodels.py:117
+msgid "Page moderator state"
+msgstr "Status moderatora stranice"
+
+#: models/moderatormodels.py:118
+msgid "Page moderator states"
+msgstr "Statusi moderatora stranice"
+
+#: models/pagemodel.py:45
+msgid "req. app."
+msgstr "potrebna dozvola"
+
+#: models/pagemodel.py:46 templates/admin/cms/page/menu_item.html:44
+#: templates/cms/toolbar/toolbar.html:57 utils/moderator.py:90
+msgid "delete"
+msgstr "izbriši"
+
+#: models/pagemodel.py:48
+msgid "app. par."
+msgstr "app. par."
+
+#: models/pagemodel.py:52
+msgid "for logged in users only"
+msgstr "samo za prijavljene korisnike"
+
+#: models/pagemodel.py:53
+msgid "for anonymous users only"
+msgstr "samo za anonimne korisnike"
+
+#: models/pagemodel.py:61
+msgid "created by"
+msgstr "stvorio"
+
+#: models/pagemodel.py:62 templates/admin/cms/page/change_list_tree.html:20
+msgid "changed by"
+msgstr "promijenio"
+
+#: models/pagemodel.py:66
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
+msgstr "Kako bi se stranica objavila, status joj mora biti \"Objavljeno\""
+
+#: models/pagemodel.py:67
+msgid "When to expire the page. Leave empty to never expire."
+msgstr "Kada ističe objava stranice. Ostavite prazno ako nikad ne ističe."
+
+#: models/pagemodel.py:69
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "svi preci  neće biti prikazani u navigaciji"
+
+#: models/pagemodel.py:70
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
+msgstr "Jedinstveni identifikator koji se koristi sa page_url oznakom za povezivanje sa ovom stranicom"
+
+#: models/pagemodel.py:71
+msgid "attached menu"
+msgstr "povezan izbornik"
+
+#: models/pagemodel.py:72
+msgid "is published"
+msgstr "objavljen je"
+
+#: models/pagemodel.py:74
+msgid "The template used to render the content."
+msgstr " predložak korišten za prikaz sadržaja"
+
+#: models/pagemodel.py:75
+msgid "The site the page is accessible at."
+msgstr "The site the page is accessible at."
+
+#: models/pagemodel.py:75
+msgid "site"
+msgstr "stranica"
+
+#: models/pagemodel.py:77
+msgid "moderator state"
+msgstr "stanje uređivanja"
+
+#: models/pagemodel.py:85
+msgid "menu visibility"
+msgstr "vidljivost izbornika"
+
+#: models/pagemodel.py:85
+msgid "limit when this page is visible in the menu"
+msgstr "ograniči kada je ova stranica vidljiva u izborniku"
+
+#: models/pagemodel.py:105
+msgid "pages"
+msgstr "stranice"
+
+#: models/pagemodel.py:267
+msgid "Page was copied."
+msgstr "stranica je kopirana"
+
+#: models/pagemodel.py:698
+msgid "default"
+msgstr "uobičajenoa"
+
+#: models/permissionmodels.py:21
+msgid "can add"
+msgstr "može dodati"
+
+#: models/permissionmodels.py:22
+msgid "can delete"
+msgstr "može brisati"
+
+#: models/permissionmodels.py:23
+msgid "can change advanced settings"
+msgstr "može mijenjati napredna podešavanja"
+
+#: models/permissionmodels.py:25
+msgid "can change permissions"
+msgstr "može mijenjati ovlasti"
+
+#: models/permissionmodels.py:25
+msgid "on page level"
+msgstr "na nivou stranice"
+
+#: models/permissionmodels.py:26
+msgid "can move"
+msgstr "može premještati"
+
+#: models/permissionmodels.py:27
+msgid "can moderate"
+msgstr "može uređivati"
+
+#: models/permissionmodels.py:28
+msgid "view restricted"
+msgstr "pregled nije dozvoljen"
+
+#: models/permissionmodels.py:28
+msgid "frontend view restriction"
+msgstr "zabrana prikaza na frontendu"
+
+#: models/permissionmodels.py:51
+msgid "can recover pages"
+msgstr "može povratiti stranicu"
+
+#: models/permissionmodels.py:51
+msgid "can recover any deleted page"
+msgstr "može povratiti bilo koju obrisanu stranicu"
+
+#: models/permissionmodels.py:52
+msgid "If none selected, user haves granted permissions to all sites."
+msgstr "Ako ništa nije selektirano, korisnik je ima ovlasti za sve stranice."
+
+#: models/permissionmodels.py:52
+msgid "sites"
+msgstr "stranice"
+
+#: models/permissionmodels.py:57
+msgid "Page global permission"
+msgstr "Globalne ovlasti za stranicu"
+
+#: models/permissionmodels.py:58
+msgid "Pages global permissions"
+msgstr "Globalne ovlasti za stranice"
+
+#: models/permissionmodels.py:68 templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "Postavi ovlasti za"
+
+#: models/permissionmodels.py:74
+msgid "Page permission"
+msgstr "Ovlasti stranice"
+
+#: models/permissionmodels.py:89
+msgid "User (page)"
+msgstr "Korisnik (stranica)"
+
+#: models/permissionmodels.py:90
+msgid "Users (page)"
+msgstr "Korisnici (stranica)"
+
+#: models/permissionmodels.py:100
+msgid "User group (page)"
+msgstr "Grupa korisnika (stranica)"
+
+#: models/permissionmodels.py:101
+msgid "User groups (page)"
+msgstr "Grupe korisnika (stranica)"
+
+#: models/placeholdermodel.py:14 plugins/flash/models.py:9
+#: plugins/flash/migrations/0001_initial.py:16 plugins/video/models.py:13
+msgid "width"
+msgstr "širina"
+
+#: models/pluginmodel.py:140
+msgid "<Empty>"
+msgstr "<Prazno>"
+
+#: models/titlemodels.py:12
+msgid "overwrite the title in the menu"
+msgstr "pregazi naslov u meniju"
+
+#: models/titlemodels.py:14
+msgid "Path"
+msgstr "Putanja"
+
+#: models/titlemodels.py:20
+msgid "overwrite the title (html title tag)"
+msgstr "pregazi naslov (html tag title)"
+
+#: plugins/file/cms_plugins.py:9
+msgid "File"
+msgstr "Datoteka"
+
+#: plugins/file/models.py:24 plugins/file/migrations/0001_initial.py:17
+#: plugins/flash/models.py:8 plugins/flash/migrations/0001_initial.py:18
+msgid "file"
+msgstr "datoteka"
+
+#: plugins/file/templates/cms/plugins/file.html:6
+msgid "file missing!"
+msgstr "datoteka ne postoji"
+
+#: plugins/flash/cms_plugins.py:9
+msgid "Flash"
+msgstr "Flash"
+
+#: plugins/flash/models.py:8
+msgid "use swf file"
+msgstr "koristite swf datoteku"
+
+#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:19
+#: plugins/video/models.py:14
+msgid "height"
+msgstr "visina"
+
+#: plugins/flash/templates/cms/plugins/flash.html:40
+#: plugins/video/templates/cms/plugins/video.html:60
+msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
+msgstr "Nemate instaliran flash plugin. Molimo prezumite najnoviji Adobe Flash Player."
+
+#: plugins/flash/templates/cms/plugins/flash.html:42
+#: plugins/video/templates/cms/plugins/video.html:62
+msgid "Get Adobe Flash Player"
+msgstr "Preuzmi Adobe Flash Player"
+
+#: plugins/googlemap/cms_plugins.py:10
+msgid "Google Map"
+msgstr "Google karta"
+
+#: plugins/googlemap/models.py:9
+msgid "map title"
+msgstr "naziv karte"
+
+#: plugins/googlemap/models.py:11
+msgid "address"
+msgstr "adresa"
+
+#: plugins/googlemap/models.py:12
+msgid "zip code"
+msgstr "poštanski broj"
+
+#: plugins/googlemap/models.py:13
+msgid "city"
+msgstr "grad"
+
+#: plugins/googlemap/models.py:15
+msgid "additional content"
+msgstr "dodatni sadržaj"
+
+#: plugins/googlemap/models.py:16
+msgid "zoom level"
+msgstr "stupanj uvećanja"
+
+#: plugins/googlemap/models.py:18
+msgid "latitude"
+msgstr "širina"
+
+#: plugins/googlemap/models.py:19
+msgid "Use latitude & longitude to fine tune the map possiton."
+msgstr "Koristi širinu i dužinu za fino podešavanje položaja na karti"
+
+#: plugins/googlemap/models.py:20
+msgid "longitude"
+msgstr "dužina"
+
+#: plugins/googlemap/models.py:22
+msgid "route planer title"
+msgstr "naslov planera rute"
+
+#: plugins/googlemap/models.py:22
+msgid "Calculate your fastest way to here"
+msgstr "Izračunaj najbrži pot do ovdje"
+
+#: plugins/googlemap/models.py:23
+msgid "route planer"
+msgstr "planer rute"
+
+#: plugins/googlemap/models.py:30
+msgid "Map"
+msgstr "Karta"
+
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:76
+msgid "Your address: "
+msgstr "Vaša adresa:"
+
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:78
+msgid "Calculate route"
+msgstr "Izračunaj rutu"
+
+#: plugins/inherit/cms_plugins.py:17
+msgid "Inherit Plugins from Page"
+msgstr "Preuzmi pluginove od stranice"
+
+#: plugins/inherit/forms.py:23
+msgid "Language or Page must be filled out"
+msgstr "Jezik ili stranica se moraju popuniti"
+
+#: plugins/inherit/models.py:10
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
+msgstr "Izaberite stranicu čije pluginove treba uključiti u placeholder, ako je prazno, biti će izabrana trenutna stranica"
+
+#: plugins/inherit/models.py:11
+msgid "Optional: the language of the plugins you want"
+msgstr "Opcionalno: jezik plugina koji želite"
+
+#: plugins/link/cms_plugins.py:12
+msgid "Link"
+msgstr "Link"
+
+#: plugins/link/models.py:10 plugins/link/migrations/0001_initial.py:18
+#: plugins/link/migrations/0004_larger_link_names.py:11
+#: plugins/link/migrations/0004_larger_link_names.py:17
+#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
+msgid "name"
+msgstr "ime"
+
+#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:16
+#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
+#: plugins/teaser/models.py:19
+msgid "link"
+msgstr "link"
+
+#: plugins/link/models.py:12
+msgid "A link to a page has priority over a text link."
+msgstr "Link na stranicu ima prioritet u odnosu na tekstualni link."
+
+#: plugins/link/models.py:13
+msgid "mailto"
+msgstr "email adresa"
+
+#: plugins/link/models.py:13
+msgid "An email adress has priority over a text link."
+msgstr "Email adresa ima prioritet u odnosu na tekstualni link."
+
+#: plugins/picture/cms_plugins.py:9
+msgid "Picture"
+msgstr "Slika"
+
+#: plugins/picture/models.py:14
+msgid "center"
+msgstr "centar"
+
+#: plugins/picture/models.py:15
+msgid "left"
+msgstr "lijevo"
+
+#: plugins/picture/models.py:16
+msgid "right"
+msgstr "desno"
+
+#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
+#: plugins/teaser/models.py:10 plugins/video/models.py:11
+msgid "image"
+msgstr "slika"
+
+#: plugins/picture/models.py:21 plugins/picture/models.py:22
+msgid "if present image will be clickable"
+msgstr "ako je izabrano, na sliku će se moći kliknuti"
+
+#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
+msgid "alternate text"
+msgstr "alternativni tekst"
+
+#: plugins/picture/models.py:23
+msgid "textual description of the image"
+msgstr "tekstualni opis slike"
+
+#: plugins/picture/models.py:24
+msgid "long description"
+msgstr "dugačak opis"
+
+#: plugins/picture/models.py:24
+msgid "additional description of the image"
+msgstr "dodatni opis slike"
+
+#: plugins/picture/models.py:25
+msgid "side"
+msgstr "strana"
+
+#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
+#: plugins/snippet/models.py:32
+msgid "Snippet"
+msgstr "Isječak"
+
+#: plugins/snippet/cms_plugins.py:30
+#, python-format
+msgid "Template %(template)s does not exist."
+msgstr "Predložak %(template)s ne postoji."
+
+#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
+msgid "HTML"
+msgstr "HTML"
+
+#: plugins/snippet/models.py:15
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr "Unesite ime predloška (na primjer \"snippets/plugin_xy.html\") koji se treba prikazivati."
+
+#: plugins/snippet/models.py:25
+msgid "Snippets"
+msgstr "Isječci"
+
+#: plugins/teaser/cms_plugins.py:8
+msgid "Teaser"
+msgstr "Teaser"
+
+#: plugins/teaser/models.py:14
+msgid "If present image will be clickable"
+msgstr "Ako je izabrano, na sliku će se moći kliknuti"
+
+#: plugins/teaser/models.py:19
+msgid "If present image will be clickable."
+msgstr "Ako je izabrano, na sliku će se moći kliknuti."
+
+#: plugins/teaser/templates/cms/plugins/teaser.html:11
+#: templates/cms/toolbar/toolbar.html:59
+msgid "more"
+msgstr "više"
+
+#: plugins/text/cms_plugins.py:15
+msgid "Text"
+msgstr "tekst"
+
+#: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
+msgid "body"
+msgstr "tijelo"
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
+msgid "Plugins"
+msgstr "Plugini"
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:67
+msgid "Please select a plugin type."
+msgstr "Molimo izaberite tip plugina."
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:110
+msgid "Edit selected plugin"
+msgstr "Uredi odabrani plugin."
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:85
+msgid "Text editor does not support editing objects."
+msgstr "Urednik teksta ne podržava uređivanje objekata."
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:90
+msgid "No object selected."
+msgstr "Objekt nije izabran."
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:73
+msgid "Text editor does not support inserting objects."
+msgstr "Urednik teksta ne podržava umetanje objekata."
+
+#: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:94
+msgid "Not a plugin object"
+msgstr "Objekt nije plugin."
+
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:106
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
+msgid "Available Plugins"
+msgstr "Dostupni plugini."
+
+#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:109
+msgid "Insert plugin"
+msgstr "Umetni plugin."
+
+#: plugins/twitter/cms_plugins.py:10
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:27
+msgid "Twitter"
+msgstr "Twitter"
+
+#: plugins/twitter/cms_plugins.py:23
+msgid "Twitter Search"
+msgstr "Pretraga Twitter-a"
+
+#: plugins/twitter/models.py:7
+msgid "twitter user"
+msgstr "Kosrisnik Twittera"
+
+#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
+msgid "count"
+msgstr "račun"
+
+#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
+msgid "Number of entries to display"
+msgstr "Broj unosa koji se prikazuju."
+
+#: plugins/twitter/models.py:9
+msgid "link hint"
+msgstr "link hint"
+
+#: plugins/twitter/models.py:9
+msgid "If given, the hint is displayed as link to your Twitter profile."
+msgstr "Ako je upisano, nagovještaj se prikazuje kao link na Vaš Twitter profil."
+
+#: plugins/twitter/models.py:16
+msgid "query"
+msgstr "upit"
+
+#: plugins/twitter/models.py:16
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
+msgstr "Primjer: \"mozgovi AND zombiji AND from:kišobran AND to:nemesis\": tweetovi od korisnika \"kišobran\" do korisnika \"nemesis\" koji sadrže riječi \"mozgovi\" i \"zombiji\""
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:12
+msgid "we said,"
+msgstr "rekli smo,"
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:13
+msgid "we"
+msgstr "mi"
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
+msgid "we were"
+msgstr "mi smo bili"
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
+msgid "we replied to"
+msgstr "odgovorili smo"
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
+msgid "we were checking out"
+msgstr "gledali smo"
+
+#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
+msgid "loading tweets..."
+msgstr "učitavanje tweetova..."
+
+#: plugins/video/cms_plugins.py:10
+msgid "Video"
+msgstr "Video"
+
+#: plugins/video/cms_plugins.py:42
+msgid "Color Settings"
+msgstr "Postavke boja"
+
+#: plugins/video/models.py:9
+msgid "movie file"
+msgstr "video datoteka"
+
+#: plugins/video/models.py:9
+msgid "use .flv file or h264 encoded video file"
+msgstr "koristi .flv ili h264 kodirane video datoteke"
+
+#: plugins/video/models.py:10
+msgid "movie url"
+msgstr "URL do videa"
+
+#: plugins/video/models.py:10
+msgid ""
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "vimeo ili youtube URL. Na primer: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+
+#: plugins/video/models.py:11
+msgid "preview image file"
+msgstr "brzi prikaz slike"
+
+#: plugins/video/models.py:16
+msgid "auto play"
+msgstr "automatsko pokretanje"
+
+#: plugins/video/models.py:17
+msgid "auto hide"
+msgstr "automatsko skrivanje"
+
+#: plugins/video/models.py:18
+msgid "fullscreen"
+msgstr "preko cijelog zaslona"
+
+#: plugins/video/models.py:19
+msgid "loop"
+msgstr "ciklus"
+
+#: plugins/video/models.py:22
+msgid "background color"
+msgstr "pozadinska boja"
+
+#: plugins/video/models.py:22 plugins/video/models.py:23
+#: plugins/video/models.py:24 plugins/video/models.py:25
+#: plugins/video/models.py:26 plugins/video/models.py:27
+#: plugins/video/models.py:28 plugins/video/models.py:29
+msgid "Hexadecimal, eg ff00cc"
+msgstr "Heksadecimalno, na primjer ff00cc"
+
+#: plugins/video/models.py:23
+msgid "text color"
+msgstr "boja teksta"
+
+#: plugins/video/models.py:24
+msgid "seekbar color"
+msgstr "pozadinska boja"
+
+#: plugins/video/models.py:25
+msgid "seekbar bg color"
+msgstr "pozadinska boja"
+
+#: plugins/video/models.py:26
+msgid "loadingbar color"
+msgstr "boja indikatora učitavanja"
+
+#: plugins/video/models.py:27
+msgid "button out color"
+msgstr "boja gumba kad su isključeni"
+
+#: plugins/video/models.py:28
+msgid "button over color"
+msgstr "boja gumba kada se pređe pokazivačem preko"
+
+#: plugins/video/models.py:29
+msgid "button highlight color"
+msgstr "boja istaknutog gumba"
+
+#: templates/admin/page_submit_line.html:3
+#: templates/admin/cms/page/change_form.html:274
+#: templates/admin/cms/page/plugin_change_form.html:113
+msgid "Save"
+msgstr "Spremi"
+
+#: templates/admin/page_submit_line.html:7
+#, python-format
+msgid "Delete %(language)s translation"
+msgstr "Izbriši prijevod na %(language)s"
+
+#: templates/admin/page_submit_line.html:11
+msgid "Save as new"
+msgstr "Spremi kao novi"
+
+#: templates/admin/page_submit_line.html:12
+msgid "Save and add another"
+msgstr "Spremi i dodaj još"
+
+#: templates/admin/page_submit_line.html:13
+#: templates/admin/cms/page/change_form.html:275
+msgid "Save and continue editing"
+msgstr "Spremi i nastavi uređivanje"
+
+#: templates/admin/cms/mail/approvement_required.html:5
+#, python-format
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgstr "Stranica <a href=\"%(admin_url)s\">%(page)s</a> može zahtijevati Vaše odobrenje."
+
+#: templates/admin/cms/mail/approvement_required.html:8
+msgid "Last changes"
+msgstr "Posljednje izmjene"
+
+#: templates/admin/cms/mail/base.html:55
+#, python-format
+msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
+msgstr "<a href=\"%(login_url)s\">Ovdje</a> se prijavite u administraciju.ovde"
+
+#: templates/admin/cms/mail/page_user_change.html:7
+msgid "Username:"
+msgstr "Korisničko ime:"
+
+#: templates/admin/cms/mail/page_user_change.html:11
+msgid "Password:"
+msgstr "Lozinka:"
+
+#: templates/admin/cms/page/change_form.html:3
+#: templates/admin/cms/page/plugin_forms_history.html:3
+#: templates/admin/cms/page/plugin_forms_ok.html:4
+msgid "Change a page"
+msgstr "Promijeni stranicu"
+
+#: templates/admin/cms/page/change_form.html:64
+#: templates/admin/cms/page/change_list.html:8
+#: templates/admin/cms/page/plugin_change_form.html:67
+#: templates/admin/cms/page/recover_form.html:14
+#: templates/admin/cms/page/revision_form.html:6
+msgid "Home"
+msgstr "može dodati"
+
+#: templates/admin/cms/page/change_form.html:73
+msgid "Approve page deletion"
+msgstr "Odobri brisanje stranice"
+
+#: templates/admin/cms/page/change_form.html:79
+#, python-format
+msgid "(requires approvement at %(moderation_level)s level)"
+msgstr "(zahtjeva odobrenje na nivou %(moderation_level)s)"
+
+#: templates/admin/cms/page/change_form.html:80
+msgid "(you can perform actions on this page directly)"
+msgstr "(možete direktno izvesti akcije nad ovom stranicom)"
+
+#: templates/admin/cms/page/change_form.html:93
+msgid "Remove delete request"
+msgstr "Ukloni zahtjev za brisanjem"
+
+#: templates/admin/cms/page/change_form.html:95
+msgid "Approve delete"
+msgstr "Odobri brisanje"
+
+#: templates/admin/cms/page/change_form.html:95
+msgid "Approve"
+msgstr "Odobri"
+
+#: templates/admin/cms/page/change_form.html:95
+#: templates/admin/cms/page/change_form.html:96
+#: templates/admin/cms/page/change_list_tree.html:12
+msgid "draft"
+msgstr "skica"
+
+#: templates/admin/cms/page/change_form.html:96
+msgid "Preview"
+msgstr "Pregled"
+
+#: templates/admin/cms/page/change_form.html:99
+#: templates/admin/cms/page/revision_form.html:10
+msgid "History"
+msgstr "Povijest"
+
+#: templates/admin/cms/page/change_form.html:100
+msgid "View on site"
+msgstr "Prikaži na web stranici"
+
+#: templates/admin/cms/page/change_form.html:130
+#: templates/admin/cms/page/plugin_change_form.html:84
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Molimo ispravite navedenu grešku."
+msgstr[1] "Molimo ispravite navedene greške."
+msgstr[2] "Molimo ispravite navedene greške."
+
+#: templates/admin/cms/page/change_form.html:150
+msgid "All permissions"
+msgstr "Sve ovlasti"
+
+#: templates/admin/cms/page/change_form.html:151
+#: templates/admin/cms/page/change_form.html:163
+#: templates/admin/cms/page/loading.html:2
+msgid "Loading..."
+msgstr "Učitavanje..."
+
+#: templates/admin/cms/page/change_form.html:162
+msgid "Page states"
+msgstr "Statusi stranice"
+
+#: templates/admin/cms/page/change_form.html:185
+#, python-format
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
+msgstr "Stranica se mora uređivati na nivou %(moderation_level)s, pošaljite poruku moderatoru."
+
+#: templates/admin/cms/page/change_form.html:187
+msgid "Request approvemet"
+msgstr "Zatraži odobrenje"
+
+#: templates/admin/cms/page/change_list.html:3
+msgid "List of pages"
+msgstr "Popis stranica"
+
+#: templates/admin/cms/page/change_list.html:58
+msgid "Successfully moved"
+msgstr "Uspješno premješteno"
+
+#: templates/admin/cms/page/change_list.html:63
+msgid "An error occured. Please reload the page"
+msgstr "Došlo je do greške. Molimo osvježite stranicu"
+
+#: templates/admin/cms/page/change_list.html:84
+#, python-format
+msgid "Recover deleted %(name)s"
+msgstr "Povrati obrisano (%(name)s)"
+
+#: templates/admin/cms/page/change_list.html:87
+#, python-format
+msgid "Add %(name)s"
+msgstr "Dodaj %(name)s"
+
+#: templates/admin/cms/page/change_list.html:99
+msgid "Pages on:"
+msgstr "Stranica na:"
+
+#: templates/admin/cms/page/change_list.html:116
+msgid "Filter:"
+msgstr "Filter:"
+
+#: templates/admin/cms/page/change_list.html:116
+msgid "on"
+msgstr "ukjlučeno"
+
+#: templates/admin/cms/page/change_list.html:116
+msgid "off"
+msgstr "isključeno"
+
+#: templates/admin/cms/page/change_list.html:118
+msgid "Filter"
+msgstr "Filter"
+
+#: templates/admin/cms/page/change_list_tree.html:8
+msgid "actions"
+msgstr "akcije"
+
+#: templates/admin/cms/page/change_list_tree.html:10
+msgid "moderate"
+msgstr "uredi"
+
+#: templates/admin/cms/page/change_list_tree.html:13
+msgid "published"
+msgstr "objavljeno"
+
+#: templates/admin/cms/page/change_list_tree.html:15
+msgid "start"
+msgstr "početak"
+
+#: templates/admin/cms/page/change_list_tree.html:16
+msgid "end"
+msgstr "kraj"
+
+#: templates/admin/cms/page/change_list_tree.html:17
+msgid "restricted"
+msgstr "ograničeno"
+
+#: templates/admin/cms/page/change_list_tree.html:19
+msgid "last changes"
+msgstr "posljednje izmjene"
+
+#: templates/admin/cms/page/menu_item.html:5
+msgid "select this page"
+msgstr "izaberi ovu stranicu"
+
+#: templates/admin/cms/page/menu_item.html:5
+#: templates/admin/cms/page/menu_item.html:6
+msgid "edit this page"
+msgstr "izmjeni ovu stranicu"
+
+#: templates/admin/cms/page/menu_item.html:6
+#: templates/cms/toolbar/toolbar.html:54
+msgid "edit"
+msgstr "uredi"
+
+#: templates/admin/cms/page/menu_item.html:16
+msgid "insert above"
+msgstr "ubaci iznad"
+
+#: templates/admin/cms/page/menu_item.html:17
+msgid "insert below"
+msgstr "ubaci ispod"
+
+#: templates/admin/cms/page/menu_item.html:19
+msgid "insert inside"
+msgstr "ubaci unutra"
+
+#: templates/admin/cms/page/menu_item.html:23
+msgid "softroot"
+msgstr "softroot"
+
+#: templates/admin/cms/page/menu_item.html:23
+msgid "home"
+msgstr "početna"
+
+#: templates/admin/cms/page/menu_item.html:26
+#, python-format
+msgid "Edit this page in %(language)s "
+msgstr "Izmeni stranicu na jeziku %(language)s"
+
+#: templates/admin/cms/page/menu_item.html:33
+msgid "Cut"
+msgstr "Izreži"
+
+#: templates/admin/cms/page/menu_item.html:33
+msgid "cut"
+msgstr "izreži"
+
+#: templates/admin/cms/page/menu_item.html:34
+msgid "Copy"
+msgstr "Kopiraj"
+
+#: templates/admin/cms/page/menu_item.html:34
+msgid "copy"
+msgstr "kopiraj"
+
+#: templates/admin/cms/page/menu_item.html:37
+#: templates/admin/cms/page/menu_item.html:41
+msgid "Add Child"
+msgstr "Dodaj podređenu"
+
+#: templates/admin/cms/page/menu_item.html:37
+#: templates/admin/cms/page/menu_item.html:41
+msgid "add"
+msgstr "dodaj"
+
+#: templates/admin/cms/page/menu_item.html:65
+msgid "Approve directly"
+msgstr "Odobri direktno"
+
+#: templates/admin/cms/page/menu_item.html:67
+#: templates/admin/cms/page/menu_item.html:79
+#: templates/admin/cms/page/menu_item.html:81
+msgid "view"
+msgstr "pogledaj"
+
+#: templates/admin/cms/page/menu_item.html:72
+msgid "Unpublish"
+msgstr "Ukloni objavu"
+
+#: templates/admin/cms/page/menu_item.html:79
+msgid "View on page"
+msgstr "Prikaži na stranici"
+
+#: templates/admin/cms/page/moderation_messages.html:4
+msgid "Action"
+msgstr "Akcija"
+
+#: templates/admin/cms/page/moderation_messages.html:5
+msgid "Created"
+msgstr "Kreirano"
+
+#: templates/admin/cms/page/moderation_messages.html:7
+msgid "Message"
+msgstr "Poruka"
+
+#: templates/admin/cms/page/permissions.html:7
+msgid "Group"
+msgstr "Grupa"
+
+#: templates/admin/cms/page/permissions.html:8
+msgid "Can edit"
+msgstr "Može mijenjati"
+
+#: templates/admin/cms/page/permissions.html:9
+msgid "Can add"
+msgstr "Može dodavati"
+
+#: templates/admin/cms/page/permissions.html:10
+msgid "Can delete"
+msgstr "Može brisati"
+
+#: templates/admin/cms/page/permissions.html:11
+msgid "Can publish"
+msgstr "Može objavljivati"
+
+#: templates/admin/cms/page/permissions.html:12
+msgid "Can change permissions"
+msgstr "Može mijenjati ovlasti"
+
+#: templates/admin/cms/page/permissions.html:13
+msgid "Can move"
+msgstr "Može premjestiti"
+
+#: templates/admin/cms/page/permissions.html:14
+msgid "Can view"
+msgstr "Može gledati"
+
+#: templates/admin/cms/page/permissions.html:21
+#: templates/admin/cms/page/permissions.html:22
+msgid "(global)"
+msgstr "(globalni)"
+
+#: templates/admin/cms/page/permissions.html:26
+msgid "(current)"
+msgstr "(tekući)"
+
+#: templates/admin/cms/page/permissions.html:43
+msgid "All"
+msgstr "Sve"
+
+#: templates/admin/cms/page/permissions.html:51
+msgid "Page doesn't inherit any permissions."
+msgstr "Stranica ne nasljeđuje niti jedno pravo pristupa"
+
+#: templates/admin/cms/page/plugin_change_form.html:114
+#: templates/cms/toolbar/toolbar.html:24
+msgid "Cancel"
+msgstr "Odustani"
+
+#: templates/admin/cms/page/plugin_forms_history.html:9
+msgid "An old revision of a plugin can not be saved!"
+msgstr "Stara revizija plugina se ne može sačuvati!"
+
+#: templates/admin/cms/page/plugin_forms_ok.html:21
+msgid "Plugin saved successfully."
+msgstr "Plugin je uspješno spremljen."
+
+#: templates/admin/cms/page/recover_form.html:17
+#, python-format
+msgid "Recover deleted %(verbose_name)s"
+msgstr "Povrati izbrisani %(verbose_name)s"
+
+#: templates/admin/cms/page/recover_form.html:24
+msgid "Press the save button below to recover this version of the object."
+msgstr "Kliknite na gumb Spremi kako biste povratili ovu verziju objekta."
+
+#: templates/admin/cms/page/revision_form.html:11
+#, python-format
+msgid "Revert %(verbose_name)s"
+msgstr "Povrati %(verbose_name)s"
+
+#: templates/admin/cms/page/revision_form.html:24
+msgid "Press the save button below to revert to this version of the object."
+msgstr "Pritisnite gumb Spremi kako biste povratili ovu verziju objekta."
+
+#: templates/admin/cms/page/dialog/copy.html:4
+msgid "Copy options"
+msgstr "Opcija kopiranja"
+
+#: templates/admin/cms/page/dialog/copy.html:6
+msgid "Choose copy options"
+msgstr "Izaberite opcije kopiranja"
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
+msgid "Generic"
+msgstr "Generičko"
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
+msgid "Add Plugin"
+msgstr "Dodaj plugin"
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:18
+msgid "From Language"
+msgstr "Na jeziku"
+
+#: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
+msgid "Copy Plugins"
+msgstr "Kopiraj plugin"
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:12
+msgid "You must save the page first to add plugins."
+msgstr "Prvo morate sačuvati stranicu kako biste dodali pluginove."
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:15
+msgid "No Plugin selected. Selected one on the left side"
+msgstr "Niste izabrali plugin. Izaberite jedan sa lijeve strane."
+
+#: templates/admin/cms/page/widgets/plugin_editor.html:17
+msgid "No Plugins present. Add a plugin to this placeholder-slot."
+msgstr "Nema dostupnih pluginova. Dodajte plugin na ovaj placeholder-slot."
+
+#: templates/cms/toolbar/placeholder.html:32
+msgid "Available plugins"
+msgstr "Dostupni pluginovi"
+
+#: templates/cms/toolbar/toolbar.html:22
+msgid "The selected element can not be moved to the desired location."
+msgstr "Izabrani element se ne može pomaknuti na željeno mjesto."
+
+#: templates/cms/toolbar/toolbar.html:23
+msgid "Are you sure you want to delete this plugin?"
+msgstr "Da li ste sigurni da želite izbrisati ovaj plugin?"
+
+#: templates/cms/toolbar/toolbar.html:55
+msgid "up"
+msgstr "gore"
+
+#: templates/cms/toolbar/toolbar.html:56
+msgid "down"
+msgstr "dolje"
+
+#: templates/cms/toolbar/toolbar.html:61
+msgid "Move to placeholder"
+msgstr "Premjesti u placeholder"
+
+#: templates/cms/toolbar/items/login.html:5
+msgid "Username"
+msgstr "Korisničko ime"
+
+#: templates/cms/toolbar/items/login.html:10
+#: templates/cms/toolbar/items/login.html:12
+msgid "Login"
+msgstr "Prijavi se"
+
+#: templates/cms/toolbar/items/status.html:2
+msgid "Status"
+msgstr "Status"
+
+#: templates/cms/toolbar/items/switcher.html:4
+msgid "Switch on/off"
+msgstr "Uključi/Isključi"
+
+#: templatetags/cms_admin.py:86
+#, python-format
+msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
+msgstr "<span title=\"Ograničenja: %(title)s\">%(icon)s</span>"
+
+#: templatetags/cms_admin.py:99
+msgid "Unbind page moderation"
+msgstr "Ukini uređivanje stranica"
+
+#: templatetags/cms_admin.py:100
+msgid "Unbind children moderation"
+msgstr "Ukini uređivanje podređenih stranica"
+
+#: templatetags/cms_admin.py:101
+msgid "Unbind descendants moderation"
+msgstr "Ukini uređivanje potomaka"
+
+#: templatetags/cms_tags.py:78
+#, python-format
+msgid "Page not found on %(domain)s"
+msgstr "Stranica nije pronađena na %(domain)s"
+
+#: templatetags/cms_tags.py:79
+#, python-format
+msgid ""
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"`. The URL of the request was: http://%(host)s%(path)s"
+msgstr "Template tag ne može pronaći stranicu sa parametrima `%(page_lookup)s `. URL je bio: http://%(host)s%(path)s"
+
+#: utils/mail.py:38
+msgid "CMS - your user account was created."
+msgstr "CMS - Vaš korisnički račun je kreiran."
+
+#: utils/mail.py:40
+msgid "CMS - your user account was changed."
+msgstr "CMS - Vaš korisnički račun je promjenjen."
+
+#: utils/moderator.py:83
+msgid "parent first"
+msgstr "prvi roditelj"
+
+#: utils/moderator.py:90
+msgid "approve"
+msgstr "odobri"
+
+#: utils/moderator.py:251
+#, python-format
+msgid "CMS - Page %s requires approvement."
+msgstr "CMS - Stranica %s zahtjeva odobrenje."
+
+#~ msgid "move"
+#~ msgstr "move request"
+
+#~ msgid "sidebar column"
+#~ msgstr "background color"
+
+#~ msgid "fgcolor"
+#~ msgstr "foreground color"
+
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Requested language has not been translated yet."

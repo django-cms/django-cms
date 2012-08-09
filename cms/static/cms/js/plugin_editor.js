@@ -7,7 +7,6 @@
 	cms_plugin_editor_jQuery = $;
 	$(document).ready(function() {
 		// Add Plugin Handler
-		$.fn.cmsPatchCSRF();
 		$('span.add-plugin').click(function(){
 		 var select = $(this).parent().children("select[name=plugins]");
 			var pluginvalue = select.attr('value');
@@ -69,7 +68,7 @@
 					url: "copy-plugins/", dataType: "html", type: "POST",
 					data: { page_id: page_id, placeholder: placeholder, copy_from: copy_from_language, language: to_language },
 					success: function(data) {
-						ul_list.append(data);
+						ul_list.empty().append(data);
 						setclickfunctions();
 					},
 					error: function(xhr) {

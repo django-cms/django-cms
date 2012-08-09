@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.admin.forms import PageForm
-from cms.api import create_page
+from cms.api import create_page, add_plugin
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugins.link.cms_plugins import LinkPlugin
+from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
+from cms.plugins.link.models import Link
 from cms.sitemaps import CMSSitemap
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, 
-    SettingsOverride)
+from cms.templatetags.cms_tags import get_placeholder_content
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
+                                      URL_CMS_PAGE_ADD)
+from cms.test_utils.util.context_managers import (LanguageOverride,
+                                                  SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -19,6 +23,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
 import os.path
 from cms.utils.page import is_valid_page_slug
+
 
 class PagesTestCase(CMSTestCase):
     
@@ -304,7 +309,7 @@ class PagesTestCase(CMSTestCase):
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        path = os.path.join(settings.PROJECT_DIR, 'templates', 'add_placeholder.html')
+        path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
         f = open(path, 'r')
         old = f.read()
         f.close()
@@ -625,8 +630,30 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
+    def test_plugin_loading_queries(self):
+        with SettingsOverride(CMS_TEMPLATES = (('placeholder_tests/base.html', 'tpl'),)):
+            page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
+            placeholders = list(page.placeholders.all())
+            for i, placeholder in enumerate(placeholders):
+                for j in range(5):
+                    add_plugin(placeholder, TextPlugin, 'en', body='text-%d-%d' % (i, j))
+                    add_plugin(placeholder, LinkPlugin, 'en', name='link-%d-%d' % (i, j))
+            from django.db import connection
+            connection.queries = []
+
+            # trigger the apphook query so that it doesn't get in our way
+            reverse('pages-root')
+            with self.assertNumQueries(4):
+                context = self.get_context()
+                for i, placeholder in enumerate(placeholders):
+                    content = get_placeholder_content(context, context['request'], page, placeholder.slot, False)
+                    for j in range(5):
+                        self.assertIn('text-%d-%d' % (i, j), content)
+                        self.assertIn('link-%d-%d' % (i, j), content)
+
+
 class NoAdminPageTests(CMSTestCase):
-    urls = 'project.noadmin_urls'
+    urls = 'cms.test_utils.project.noadmin_urls'
     
     def setUp(self):
         admin = 'django.contrib.admin'

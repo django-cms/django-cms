@@ -8,29 +8,28 @@ from django.db import models
 from django.utils.text import capfirst
 
 
-
 class PlaceholderField(models.ForeignKey):
     def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
         validate_placeholder_name(slotname)
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()
-        kwargs.update({'null':True}) # always allow Null
+        kwargs.update({'null': True})  # always allow Null
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
-    
+
     def formfield(self, **kwargs):
         """
         Returns a django.forms.Field instance for this database Field.
         """
         return self.formfield_for_admin(None, lambda qs: qs, **kwargs)
-    
+
     def formfield_for_admin(self, request, filter_func, **kwargs):
         defaults = {'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         widget = PlaceholderPluginEditorWidget(request, filter_func)
         widget.choices = []
         return PlaceholderFormField(required=False, widget=widget, **defaults)
-    
+
     def _get_new_placeholder(self):
         return Placeholder.objects.create(slot=self.slotname,
             default_width=self.default_width)
@@ -48,7 +47,7 @@ class PlaceholderField(models.ForeignKey):
             if not isinstance(data, Placeholder):
                 data = self._get_new_placeholder()
         super(PlaceholderField, self).save_form_data(instance, data)
-    
+
     def south_field_triple(self):
         "Returns a suitable description of this field for South."
         # We'll just introspect ourselves, since we inherit.
@@ -57,7 +56,7 @@ class PlaceholderField(models.ForeignKey):
         args, kwargs = introspector(self)
         # That's our definition!
         return (field_class, args, kwargs)
-    
+
     def contribute_to_class(self, cls, name):
         super(PlaceholderField, self).contribute_to_class(cls, name)
         if not hasattr(cls._meta, 'placeholder_field_names'):
@@ -68,10 +67,11 @@ class PlaceholderField(models.ForeignKey):
         cls._meta.placeholder_fields[self] = name
         self.model = cls
 
-        
+
 class PageField(models.ForeignKey):
     default_form_class = PageSelectFormField
     default_model_class = Page
+
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Page model as parameter...
         # a PageField can only be a ForeignKey to a Page

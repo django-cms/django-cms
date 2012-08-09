@@ -3,7 +3,7 @@ Contributing to django CMS
 ##########################
 
 Like every open-source project, django CMS is always looking for motivated
-individuals to contribute to it's source code.
+individuals to contribute to its source code.
 However, to ensure the highest code quality and keep the repository nice and
 tidy, everybody has to follow a few rules (nothing major, I promise :) )
 
@@ -116,10 +116,7 @@ something this way) or IRC discussions.
 Running the tests
 -----------------
 
-To run the tests simply execute ``runtests.sh`` from your shell. To make sure
-you have the correct environment you should also provide the ``--rebuild-env``
-flag, but since that makes running the test suite slower, it's disabled by
-default. You can also see all flags using ``--help``.
+To run the tests simply execute ``python setup.py test`` from your shell.
 
 
 **************************
@@ -129,7 +126,7 @@ Contributing Documentation
 Perhaps considered "boring" by hard-core coders, documentation is sometimes even
 more important than code! This is what brings fresh blood to a project, and
 serves as a reference for old timers. On top of this, documentation is the one
-area where less technical people can help most - you just need to write a
+area where less technical people can help most - you just need to write
 semi-decent English. People need to understand you. We don't care about style or
 correctness.
 
@@ -137,9 +134,9 @@ Documentation should be:
 
 - We use `Sphinx`_/`restructuredText`_. So obviously this is the format you should
   use :) File extensions should be .rst.
-- Written in English. We can discuss how it would bring more people to the
-  project to have a Klingon translation or anything, but that's a problem we
-  will ask ourselves when we already have a good documentation in English.
+- Written in English. We could discuss how it would bring more people to the
+  project by having a Klingon or some other translation, but that's a problem we
+  will confront once we already have good documentation in English.
 - Accessible. You should assume the reader to be moderately familiar with
   Python and Django, but not anything else. Link to documentation of libraries
   you use, for example, even if they are "obvious" to you (South is the first
@@ -158,7 +155,7 @@ double cookie points. Seriously. You rock.
 Section style
 =============
 
-We use Python documentation conventions fo section marking:
+We use Python documentation conventions for section marking:
 
 * ``#`` with overline, for parts
 * ``*`` with overline, for chapters

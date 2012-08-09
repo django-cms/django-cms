@@ -158,7 +158,7 @@ class CMSChangeList(ChangeList):
         for page in pages:
            
 
-            children = page.get_children()
+            children = list(page.get_children())
 
             # note: We are using change_list permission here, because we must
             # display also pages which user must not edit, but he haves a 
@@ -187,11 +187,11 @@ class CMSChangeList(ChangeList):
                     moderation_value = page_moderator[page.pk]
                 except:
                     pass
-                page._moderation_value_cahce = moderation_value
+                page._moderation_value_cache = moderation_value
                 page._moderation_value_cache_for_user_id = request.user.pk
                 
                 #moderation states
-                page._has_moderator_state_chache = page.pk in pagemoderator_states_id_set
+                page._has_moderator_state_cache = page.pk in pagemoderator_states_id_set
                 
             if page.root_node or self.is_filtered():
                 page.last = True

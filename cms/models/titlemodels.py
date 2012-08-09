@@ -6,6 +6,7 @@ from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
 
+
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
@@ -20,21 +21,21 @@ class Title(models.Model):
     page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
-    
+
     objects = TitleManager()
-    
+
     class Meta:
         unique_together = (('language', 'page'),)
         app_label = 'cms'
-    
+
     def __unicode__(self):
-        return "%s (%s)" % (self.title, self.slug) 
+        return "%s (%s)" % (self.title, self.slug)
 
     def save(self, *args, **kwargs):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
-        
+
         slug = u'%s' % self.slug
         if not self.has_url_overwrite:
             self.path = u'%s' % slug
@@ -51,8 +52,8 @@ class Title(models.Model):
         if self.has_url_overwrite:
             return self.path
         return None
-        
-        
+
+
 class EmptyTitle(object):
     """Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
@@ -67,10 +68,10 @@ class EmptyTitle(object):
     application_urls = ""
     menu_title = ""
     page_title = ""
-    
+
     @property
     def overwrite_url(self):
         return None
-    
-    
+
+
 reversion_register(Title)
