@@ -19,7 +19,6 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE,
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
-from cms.test_utils.util.request_factory import RequestFactory
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -29,7 +28,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, 
     HttpResponse)
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType

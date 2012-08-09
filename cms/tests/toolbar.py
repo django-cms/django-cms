@@ -2,13 +2,13 @@ from __future__ import with_statement
 from cms.api import create_page
 from cms.cms_toolbar import CMSToolbar
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.request_factory import RequestFactory
 from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
     GetButton)
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 
 class ToolbarUserMixin(object):
     def get_anon(self):
