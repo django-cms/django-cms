@@ -62,9 +62,9 @@ class AppRegexURLResolver(RegexURLResolver):
                     sub_match = pattern.resolve(new_path)
                 except Resolver404, e:
                     if 'tried' in e.args[0]:
-                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
+                        tried.extend([[pattern] + t for t in e.args[0]['tried']])
                     elif 'path' in e.args[0]:
-                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['path']])
+                        tried.extend([[pattern] + t for t in e.args[0]['path']])
                 else:
                     if sub_match:
                         return pattern.page_id
