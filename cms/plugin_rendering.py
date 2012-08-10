@@ -49,7 +49,7 @@ def render_plugin(context, instance, placeholder, template, processors=None,
     if not processors:
         processors = []
     if isinstance(template, basestring):
-        content = render_to_string(template, context)
+        content = render_to_string(template, context_instance=context)
     elif isinstance(template, Template):
         content = template.render(context)
     else:
