@@ -266,12 +266,22 @@ class RenderingTestCase(SettingsOverrideTestCase):
         """
         t = u'{% load cms_tags %}'+ \
             u'|{% page_attribute title %}'+ \
+            u'{% page_attribute title as title %}'+ \
+            u'|{{ title }}'+ \
             u'|{% page_attribute title '+str(self.test_page2.pk)+' %}'+ \
+            u'{% page_attribute title '+str(self.test_page2.pk)+' as title %}'+ \
+            u'|{{ title }}'+ \
             u'|{% page_attribute title test_dict %}'+ \
+            u'{% page_attribute title test_dict as title %}'+ \
+            u'|{{ title }}'+ \
             u'|{% page_attribute slug "'+str(self.test_page2.reverse_id)+'" %}'+ \
-            u'|{% page_attribute slug test_page %}'
+            u'{% page_attribute slug "'+str(self.test_page2.reverse_id)+'" as slug %}'+ \
+            u'|{{ slug }}'+ \
+            u'|{% page_attribute slug test_page %}'+ \
+            u'{% page_attribute slug test_page as slug %}'+ \
+            u'|{{ slug }}'
         r = self.render(t, self.test_page, {'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}})
-        self.assertEqual(r, u'|'+self.test_data['title']+(u'|'+self.test_data2['title'])*2+(u'|'+self.test_data2['slug'])*2)
+        self.assertEqual(r, (u'|'+self.test_data['title'])*2+(u'|'+self.test_data2['title'])*4+(u'|'+self.test_data2['slug'])*4)
 
     def test_inherit_placeholder(self):
         t = u'{% load cms_tags %}'+ \
