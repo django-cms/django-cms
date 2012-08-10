@@ -39,10 +39,14 @@ def plugin_tags_to_user_html(text, context, placeholder):
     context is the template context to use, placeholder is the placeholder name
     """
     def _render_tag(m):
-        plugin_id = int(m.groups()[0])
+        plugin_id = int(m.group(1))
         try:
             obj = CMSPlugin.objects.get(pk=plugin_id)
             obj._render_meta.text_enabled = True
+            context['placeholder_tag'] = m.group(0)
+            context['placeholder_attributes'] = dict(
+            	re.compile(r'(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?').findall(m.group(0))
+            )
         except CMSPlugin.DoesNotExist:
             # Object must have been deleted.  It cannot be rendered to
             # end user so just remove it from the HTML altogether
