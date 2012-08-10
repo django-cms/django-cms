@@ -769,8 +769,39 @@ class LinkPluginTestCase(PluginsTestBaseCase):
     def test_does_not_verify_existance_of_url(self):
         form = LinkForm(
             {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
-        self.assertEquals(form.is_valid(), True)
+        self.assertTrue(form.is_valid())
 
+    def test_opens_in_same_window_by_default(self):
+        """Could not figure out how to render this plugin
+
+        Checking only for the values in the model"""
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test'})
+        link = form.save()
+        self.assertEquals(link.target, '')
+
+    def test_open_in_blank_window(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : '_blank'})
+        link = form.save()
+        self.assertEquals(link.target, '_blank')
+
+    def test_open_in_parent_window(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : '_parent'})
+        link = form.save()
+        self.assertEquals(link.target, '_parent')
+
+    def test_open_in_top_window(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : '_top'})
+        link = form.save()
+        self.assertEquals(link.target, '_top')
+
+    def test_open_in_nothing_else(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : 'artificial'})
+        self.assertFalse(form.is_valid())
 
 class NoDatabasePluginTests(TestCase):
     def test_render_meta_is_unique(self):
