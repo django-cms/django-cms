@@ -185,9 +185,21 @@ def get_app_patterns():
         if not settings.APPEND_SLASH:
             path += '/'
         if use_namespaces:
-            if title.language not in hooked_applications:
-                hooked_applications[title.language] = []
-            hooked_applications[title.language] += get_patterns_for_title(path, title)
+            lang_ns = title.language
+            app_patterns = get_patterns_for_title(path, title)
+
+            app = apphook_pool.get_apphook(title.application_urls)
+
+            if app.app_name:
+                inst_ns = title.page.reverse_id if title.page.reverse_id else app.app_name
+                app_ns = app.app_name, inst_ns
+            else:
+                app_ns = None, None
+
+            if lang_ns not in hooked_applications:
+                hooked_applications[lang_ns] = []
+
+            hooked_applications[lang_ns].append((app_ns, app_patterns))
         else:
             hooked_applications += get_patterns_for_title(path, title)
         included.append(mixid)
@@ -195,7 +207,17 @@ def get_app_patterns():
     app_patterns = []
     if use_namespaces:
         for ns, currentpatterns in hooked_applications.items():
-            extra_patterns = patterns('', *currentpatterns)
+            no_ns_patterns = []
+            for (app_ns, inst_ns), ps in currentpatterns:
+                if app_ns is None:
+                    no_ns_patterns += ps
+                else:
+                    app_resolver = AppRegexURLResolver(r'', 'app_resolver',
+                        app_name=app_ns, namespace=inst_ns)
+                    app_resolver.url_patterns = patterns('', *ps)
+                    no_ns_patterns.append(app_resolver)
+
+            extra_patterns = patterns('', *no_ns_patterns)
             resolver = AppRegexURLResolver(r'', 'app_resolver', namespace=ns)
             resolver.url_patterns = extra_patterns
             app_patterns.append(resolver)
