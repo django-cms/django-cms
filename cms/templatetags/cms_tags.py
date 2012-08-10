@@ -277,7 +277,7 @@ class PageAttribute(AsTag):
     for the page_lookup argument.
     
     varname -- context variable name. Output will be added to template context as this variable. 
-    This argument is rquired to follow the 'as' keyword.
+    This argument is required to follow the 'as' keyword.
     """
     name = 'page_attribute'
     options = Options(
