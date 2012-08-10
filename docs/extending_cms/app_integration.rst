@@ -7,9 +7,9 @@ You have 5 ways of integrating your app:
 
 1. Menus
 
-    Static extend the menu entries
+    Statically extend the menu entries
 
-2. AttachMenus
+2. Attach Menus
 
     Attach your menu to a page.
 
@@ -29,7 +29,7 @@ You have 5 ways of integrating your app:
 Menus
 *****
 
-Create a menu.py in your application and write the following inside::
+Create a ``menu.py`` in your application and write the following inside::
 
     from menus.base import Menu, NavigationNode
     from menus.menu_pool import menu_pool
@@ -58,7 +58,7 @@ The get_nodes function should return a list of
 
 - title
 
-  What should the menu entry read?
+  What the menu entry should read as
 
 - url,
 
@@ -70,7 +70,7 @@ The get_nodes function should return a list of
 
 - parent_id=None
 
-  If this is a child of an other node give here the id of the parent.
+  If this is a child of another node supply the the id of the parent here.
 
 - parent_namespace=None
 
@@ -78,18 +78,24 @@ The get_nodes function should return a list of
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-  - attr=None
+- attr=None
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
+- visible=True
+
+  Whether or not this menu item should be visible.
+
+Additionally, each :class:`NavigationNode` provides a number of methods which are
+detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 ************
 Attach Menus
 ************
 
 Classes that extend from :class:`menus.base.Menu` always get attached to the
-root. But if you want the menu be attached to a CMS Page you can do that as
+root. But if you want the menu to be attached to a CMS Page you can do that as
 well.
 
 Instead of extending from :class:`~menus.base.Menu` you need to extend from
@@ -151,7 +157,7 @@ App-Hooks
 With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
 
-To create an apphook create a ``cms_app.py`` in your application. And in there
+To create an apphook create a ``cms_app.py`` in your application. And in it
 write the following::
 
     from cms.app_base import CMSApp
@@ -181,9 +187,9 @@ under "Application". Save the page.
     If at some point you want to remove this apphook after deleting the cms_app.py
     there is a cms management command called uninstall apphooks
     that removes the specified apphook(s) from all pages by name.
-    eg. ``manage.py cmsmanage uninstall apphooks MyApphook``.
-    To find all names for uninstallable apphooks there is a command for this aswell
-    ``manage.py cmsmanage list apphooks``.
+    eg. ``manage.py cms uninstall apphooks MyApphook``.
+    To find all names for uninstallable apphooks there is a command for this as well
+    ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::
@@ -199,9 +205,12 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the url ``/hello/world/sublevel/``.
 
 
-.. note:: All views that are attached like this must return a
-          :class:`~django.template.RequestContext` instance instead of the
-          default :class:`~django.template.Context` instance.
+.. note::
+
+    All views that are attached like this must return a
+    :class:`~django.template.RequestContext` instance instead of the
+    default :class:`~django.template.Context` instance.
+
 
 Language Namespaces
 -------------------
@@ -219,7 +228,7 @@ template:
 
     {% url app_main %}
 
-If you want to access the same url but in a different language use a langauge
+If you want to access the same url but in a different language use a language
 namespace:
 
 .. code-block:: html+django
@@ -279,7 +288,13 @@ We would now create a menu out of these categories::
         def get_nodes(self, request):
             nodes = []
             for category in Category.objects.all().order_by("tree_id", "lft"):
-                nodes.append(NavigationNode(category.name, category.pk, category.parent_id))
+                node = NavigationNode(
+                    category.name,
+                    category.get_absolute_url(),
+                    category.pk,
+                    category.parent_id
+                )
+                nodes.append(node)
             return nodes
 
     menu_pool.register_menu(CategoryMenu)
@@ -300,9 +315,34 @@ You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 Navigation Modifiers
 ********************
 
-Navigation Modifiers can add or change properties of navigation nodes,
-they even can rearrange whole menus. You normally want to create them in your
-apps ``menu.py``.
+Navigation Modifiers give your application access to navigation menus.
+
+A modifier can change the properties of existing nodes or rearrange entire
+menus.
+
+
+An example use-case
+-------------------
+
+A simple example: you have a news application that publishes pages
+independently of django CMS. However, you would like to integrate the
+application into the menu structure of your site, so that at appropriate 
+places a *News* node appears in the navigation menu.
+
+In such a case, a Navigation Modifier is the solution.
+
+
+How it works
+------------
+
+Normally, you'd want to place modifiers in your application's 
+``menu.py``.
+
+To make your modifier available, it then needs to be registered with 
+``menus.menu_pool.menu_pool``.
+
+Now, when a page is loaded and the menu generated, your modifier will
+be able to inspect and modify its nodes.
 
 A simple modifier looks something like this::
 
@@ -330,7 +370,7 @@ of :class:`~menus.base.NavigationNode` instances.
 
 - request
 
-  A Django request instance. Maybe you want to modify based on sessions, or
+  A Django request instance. You want to modify based on sessions, or
   user or permissions?
 
 - nodes
@@ -349,7 +389,7 @@ of :class:`~menus.base.NavigationNode` instances.
 - post_cut
 
   Every modifier is called two times. First on the whole tree. After that the
-  tree gets cut. To only show the nodes that are shown in the current menu.
+  tree gets cut to only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
   the case ``post_cut`` is ``True``.
 

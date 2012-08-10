@@ -62,6 +62,6 @@ class LinkPlugin(CMSPluginBase):
         return FakeForm(Form, site)
         
     def icon_src(self, instance):
-        return settings.CMS_MEDIA_URL + u"images/plugins/link.png"
+        return settings.STATIC_URL + u"cms/images/plugins/link.png"
     
 plugin_pool.register_plugin(LinkPlugin)

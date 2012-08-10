@@ -8,13 +8,6 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_spaces_between_tags
 
 
-def _media(suffix):
-    """
-    Helper that prefixes a URL with MEDIA_URL
-    """
-    return u'%s%s' % (settings.MEDIA_URL, suffix)
-
-
 class Switcher(BaseItem):
     """
     A 'switcher' button, state is defined using GET (and optionally a session
@@ -49,9 +42,9 @@ class Switcher(BaseItem):
         return state
         
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, toolbar, **kwargs):
         return {
-            'state': self.get_state(request)
+            'state': self.get_state(toolbar.request)
         }
 
 
@@ -108,8 +101,8 @@ class TemplateHTML(BaseItem):
         super(TemplateHTML, self).__init__(alignment, css_class_suffix)
         self.template =  template
         
-    def get_extra_data(self, context, request, **kwargs):
-        new_context = RequestContext(request)
+    def get_extra_data(self, context, toolbar, **kwargs):
+        new_context = RequestContext(toolbar.request)
         rendered = render_to_string(self.template, new_context)
         stripped = strip_spaces_between_tags(rendered.strip())
         return {
@@ -131,14 +124,11 @@ class GetButton(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, url, icon=None):
         """
         title: name of the button
-        icon: icon of the button, relative to MEDIA_URL
+        icon: icon of the button, relative to STATIC_URL
         url: target of the GET request
         """
         super(GetButton, self).__init__(alignment, css_class_suffix)
-        if icon:
-            self.icon = _media(icon)
-        else:
-            self.icon = icon
+        self.icon = icon
         self.title = title
         if callable(url):
             self.serialize_url = url
@@ -160,7 +150,7 @@ class PostButton(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, icon, action, *args, **kwargs):
         """
         title: name of the button
-        icon: icon of the button, relative to MEDIA_URL
+        icon: icon of the button, relative to STATIC_URL
         action: target of the request
         *args, **kwargs: data to POST
         
@@ -168,14 +158,14 @@ class PostButton(BaseItem):
         """
         super(PostButton, self).__init__(alignment, css_class_suffix)
         self.title = title
-        self.icon = _media(icon)
+        self.icon = icon
         self.action = action
         self.args = args
         self.kwargs = kwargs
         
-    def get_extra_data(self, context, request, **kwargs):
+    def get_extra_data(self, context, toolbar, **kwargs):
         double = self.kwargs.copy()
-        double['csrfmiddlewaretoken'] = get_token(request)
+        double['csrfmiddlewaretoken'] = get_token(toolbar.request)
         hidden = render_to_string('cms/toolbar/items/_post_button_hidden.html',
                                   Context({'single': self.args,
                                            'double': double}))
@@ -189,23 +179,25 @@ class ListItem(Serializable):
     A item in a dropdown list (List).
     """
     base_attributes = [
-        ('css_class', 'class'),
+        ('css_class', 'cls'),
         ('title', 'title'),
         ('url', 'url'),
         ('icon', 'icon'),
+        ('method', 'method'),
     ]
     extra_attributes = []
     
-    def __init__(self, css_class_suffix, title, url, icon=None):
+    def __init__(self, css_class_suffix, title, url, method='GET', icon=None):
         """
         title: name of the list
         url: target of the item
-        icon: icon of the item, relative to MEDIA_URL
+        icon: icon of the item, relative to STATIC_URL
         """
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
         self.title = title
-        self.icon = _media(icon)
+        self.method = method
+        self.icon = icon
         if callable(url):
             self.serialize_url = url
         else:
@@ -225,12 +217,12 @@ class List(BaseItem):
     def __init__(self, alignment, css_class_suffix, title, icon, items):
         """
         title: name of the item
-        icon: icon of the item, relative to MEDIA_URL
+        icon: icon of the item, relative to STATIC_URL
         items: an iterable of ListItem instances.
         """
         super(List, self).__init__(alignment, css_class_suffix)
         self.title = title
-        self.icon = _media(icon)
+        self.icon = icon
         self.validate_items(items)
         self.raw_items = items
         
@@ -242,8 +234,8 @@ class List(BaseItem):
                     'List instances'
                 )
     
-    def get_extra_data(self, context, request, **kwargs):
-        items = [item.serialize(context, request, **kwargs)
+    def get_extra_data(self, context, **kwargs):
+        items = [item.serialize(context, **kwargs)
                  for item in self.raw_items]
         return {
             'items': items

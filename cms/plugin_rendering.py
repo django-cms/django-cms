@@ -4,8 +4,7 @@ from cms.plugin_processors import (plugin_meta_context_processor,
     mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
 from cms.utils.django_load import iterload_objects
-from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
-    get_placeholder_conf)
+from cms.utils.placeholder import get_placeholder_conf
 from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import title
@@ -92,7 +91,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context.push()
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
-    page = get_page_from_placeholder_if_exists(placeholder)
+    page = placeholder.page if placeholder else None
     if page:
         template = page.template
     else:
@@ -113,13 +112,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     # Prepend frontedit toolbar output if applicable
     edit = False
-    if (
-        ("edit" in request.GET
-         or request.session.get("cms_edit", False)
-        )
-        and 'cms.middleware.toolbar.ToolbarMiddleware' in settings.MIDDLEWARE_CLASSES
-        and request.user.is_staff and request.user.is_authenticated()
-        and (not page or page.has_change_permission(request))):
+    toolbar = getattr(request, 'toolbar', None)
+    
+    if (getattr(toolbar, 'edit_mode', False) and
+        (not page or page.has_change_permission(request))):
             edit = True
     if edit:
         from cms.middleware.toolbar import toolbar_plugin_processor
@@ -137,7 +133,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
     request = context['request']
-    page = get_page_from_placeholder_if_exists(placeholder)
+    page = placeholder.page if placeholder else None
     if not page:
         page = getattr(request, 'current_page', None)
     if page:
@@ -145,6 +141,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         if name_fallback and not placeholder:
             placeholder = Placeholder.objects.create(slot=name_fallback)
             page.placeholders.add(placeholder)
+            placeholder.page = page
     else:
         template = None
     if placeholder:
@@ -152,13 +149,14 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         slot = None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
-    name = get_placeholder_conf(slot, template, "name", title(slot))
+    name = get_placeholder_conf("name", slot, template, title(slot))
     name = _(name)
-    toolbar = render_to_string("cms/toolbar/placeholder.html", {
-        'installed_plugins': installed_plugins,
-        'language': get_language_from_request(request),
-        'placeholder_label': name,
-        'placeholder': placeholder,
-        'page': page,
-    })
+    context.push()
+    context['installed_plugins'] = installed_plugins
+    context['language'] = get_language_from_request(request)
+    context['placeholder_label'] = name
+    context['placeholder'] = placeholder
+    context['page'] = page
+    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
+    context.pop()
     return "".join([toolbar, content])

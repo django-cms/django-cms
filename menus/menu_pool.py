@@ -84,7 +84,7 @@ class MenuPool(object):
             cache_keys = CacheKey.objects.get_keys()
         else:
             cache_keys = CacheKey.objects.get_keys(site_id, language)        
-        to_be_deleted = [obj.key for obj in cache_keys]
+        to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
         cache.delete_many(to_be_deleted)
         cache_keys.delete()
     
@@ -140,7 +140,7 @@ class MenuPool(object):
         # the database. It's still cheaper than recomputing every time!
         # This way we can selectively invalidate per-site and per-language, 
         # since the cache shared but the keys aren't 
-        CacheKey.objects.create(key=key, language=lang, site=site_id)
+        CacheKey.objects.get_or_create(key=key, language=lang, site=site_id)
         return final_nodes
 
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):

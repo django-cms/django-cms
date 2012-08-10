@@ -11,6 +11,7 @@ import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db.models import Max
 from django.template.defaultfilters import slugify
 from menus.menu_pool import menu_pool
 
@@ -142,11 +143,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
     # validate publication date
     if publication_date:
-        assert isinstance(publication_date, datetime.datetime)
+        assert isinstance(publication_date, datetime.date)
     
     # validate publication end date
     if publication_end_date:
-        assert isinstance(publication_date, datetime.datetime)
+        assert isinstance(publication_end_date, datetime.date)
         
     # validate softroot
     assert settings.CMS_SOFTROOT or not soft_root
@@ -266,10 +267,14 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     # validate and normalize plugin type
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
         
+
+    max_pos = CMSPlugin.objects.filter(language=language,
+        placeholder=placeholder).aggregate(Max('position'))['position__max'] or 0
+
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
         placeholder=placeholder, 
-        position=1, 
+        position=max_pos + 1,
         language=language
     )
     plugin_base.insert_at(target, position=position, save=False)

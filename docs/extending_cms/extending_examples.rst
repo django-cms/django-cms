@@ -2,13 +2,13 @@
 Extending the CMS: Examples
 ###########################
 
-From this part onwards, this tutorial assumes you have done the
-`Django Tutorial`_ and we will show you how to integrate that poll app into the
-django CMS. If a poll app is mentioned here, we mean the one you get when
-finishing the `Django Tutorial`_. 
+From this point onwards, this tutorial assumes you have done the
+`Django Tutorial`_ and will show you how to integrate the tutorial's poll app into the
+django CMS. Hereafter, if a poll app is mentioned, we are referring to the one you get
+after completing the `Django Tutorial`_. 
 Also, make sure the poll app is in your :setting:`django:INSTALLED_APPS`.
 
-We assume your main ``urls.py`` looks somewhat like this::
+We assume your main ``urls.py`` looks something like this::
 
     from django.conf.urls.defaults import *
 
@@ -30,10 +30,10 @@ A Plugin is a small bit of content you can place on your pages.
 The Model
 =========
 
-For our polling app we would like to have a small poll plugin, that shows one
+For our polling app we would like to have a small poll plugin which shows a
 poll and let's the user vote.
 
-In your poll application's ``models.py`` add the following model::
+In your poll application's ``models.py`` add the following::
 
     from cms.models import CMSPlugin
     
@@ -44,9 +44,11 @@ In your poll application's ``models.py`` add the following model::
           return self.poll.question
 
 
-.. note:: django CMS plugins must inherit from :class:`cms.models.CMSPlugin`
-          (or a subclass thereof) and not
-          :class:`models.Model <django.db.models.Model>`.
+.. note::
+
+    django CMS plugins must inherit from :class:`cms.models.CMSPlugin`
+    (or a subclass thereof) and not
+    :class:`models.Model <django.db.models.Model>`.
 
 Run ``manage.py syncdb`` to create the database tables for this model or see
 :doc:`../getting_started/using_south` to see how to do it using `South`_
@@ -56,8 +58,8 @@ The Plugin Class
 ================
 
 Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is
-in, so following the `Django Tutorial`_, your polls app folder should look like
-this now::
+in. After having followed the `Django Tutorial`_ and adding this file your polls
+app folder should look like this::
 
     polls/
         __init__.py
@@ -67,7 +69,7 @@ this now::
         views.py 
 
 
-The plugin class is responsible to provide the django CMS with the necessary
+The plugin class is responsible for providing the django CMS with the necessary
 information to render your Plugin.
 
 For our poll plugin, write following plugin class::
@@ -88,9 +90,11 @@ For our poll plugin, write following plugin class::
     
     plugin_pool.register_plugin(PollPlugin) # register the plugin
 
-.. note:: All plugin classes must inherit from
-          :class:`cms.plugin_base.CMSPluginBase` and must register themselves
-          with the :data:`cms.plugin_pool.plugin_pool`.
+.. note::
+
+    All plugin classes must inherit from 
+    :class:`cms.plugin_base.CMSPluginBase` and must register themselves
+    with the :data:`cms.plugin_pool.plugin_pool`.
 
 
 The Template
@@ -98,17 +102,17 @@ The Template
 
 You probably noticed the
 :attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>`
-attribute on that plugin class, for our plugin to work, that template must
+attribute in the above plugin class. In order for our plugin to work, that template must
 exist and is responsible for rendering the plugin.
 
 
-The template could look like this:
+The template should look something like this:
 
 .. code-block:: html+django
 
     <h1>{{ instance.poll.question }}</h1>
     
-    <form action="{% url polls.views.vote poll.id %}" method="post">
+    <form action="{% url polls.views.vote instance.poll.id %}" method="post">
     {% csrf_token %}
     {% for choice in instance.poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
@@ -118,21 +122,23 @@ The template could look like this:
     </form>
 
 
-.. note:: We don't show the errors here, because when submitting the form you're
-          taken off this page to the actual voting page.
+.. note::
+
+    We don't show the errors here, because when submitting the form you're
+    taken off this page to the actual voting page.
 
 **********************
 My First App (apphook)
 **********************
 
-Right now, external apps are statically hooked into the main ``urls.py``, that
-is not the preferred way in the django CMS. Ideally you attach your apps to CMS
+Right now, external apps are statically hooked into the main ``urls.py``. This
+is not the preferred approach in the django CMS. Ideally you attach your apps to CMS
 pages.
 
 For that purpose you write a :class:`CMSApp <cms.app_base.CMSApp>`. That is
 just a small class telling the CMS how to include that app.
 
-CMS Apps live in a file called ``cms_app.py``, so go ahead and create that to
+CMS Apps live in a file called ``cms_app.py``, so go ahead and create it to
 make your polls app look like this::
 
     polls/
@@ -176,8 +182,8 @@ Settings' tab and choose 'Polls App' for your 'Application'.
 
 .. |apphooks| image:: ../images/cmsapphook.png
 
-Now for those changes to take effect, unfortunately you will have to restart
-your server. So do that and now if you navigate to that CMS Page, you will see
+Unfortunately, for these changes to take effect, you will have to restart
+your server. So do that and afterwards if you navigate to that CMS Page, you will see
 your polls application.
 
 *************
@@ -185,10 +191,10 @@ My First Menu
 *************
 
 Now you might have noticed that the menu tree stops at the CMS Page you created
-in the last step, so let's create a menu that shows a node for each poll you
+in the last step. So let's create a menu that shows a node for each poll you
 have active.
 
-For this we need a file called ``menu.py``, create it and check your polls app
+For this we need a file called ``menu.py``. Create it and ensure your polls app
 looks like this::
 
     polls/
@@ -220,8 +226,8 @@ In your ``menu.py`` write::
             nodes = []
             for poll in Poll.objects.all():
                 # the menu tree consists of NavigationNode instances
-                # Each NavigationNode takes a label as first argument, a URL as
-                # second argument and a (for this tree) unique id as third
+                # Each NavigationNode takes a label as its first argument, a URL as
+                # its second argument and a (for this tree) unique id as its third
                 # argument.
                 node = NavigationNode(
                     poll.question,
@@ -233,7 +239,7 @@ In your ``menu.py`` write::
     menu_pool.register_menu(PollsMenu) # register the menu.
 
 
-Now this menu alone doesn't do a whole lot yet, we have to attach it to the
+At this point this menu alone doesn't do a whole lot. We have to attach it to the
 Apphook first.
 
 So open your ``cms_apps.py`` and write::
@@ -246,7 +252,7 @@ So open your ``cms_apps.py`` and write::
     class PollsApp(CMSApp):
         name = _("Poll App")
         urls = ["polls.urls"]
-        menu = [PollsMenu] # attach a CMSAttachMenu to this apphook.
+        menus = [PollsMenu] # attach a CMSAttachMenu to this apphook.
         
     apphook_pool.register(PollsApp)
 

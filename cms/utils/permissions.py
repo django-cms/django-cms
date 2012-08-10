@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+from cms.exceptions import NoPermissionsException
+from cms.models import Page, PagePermission, GlobalPagePermission
+from cms.plugin_pool import plugin_pool
 from django.conf import settings
+from django.contrib.auth.models import User, Group
+from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from django.contrib.auth.models import User, Group
-from django.contrib.sites.models import Site
 
-from cms.models import Page, PagePermission, GlobalPagePermission
-from cms.exceptions import NoPermissionsException
 
 try:
     from threading import local
@@ -97,11 +98,11 @@ def has_page_change_permission(request):
     return False
 
 def get_any_page_view_permissions(request, page):
-    from cms.utils.plugins import current_site
-    return PagePermission.objects.filter(
-            page__pk=page.pk,
-            page__site=current_site(request),
-            can_view=True)
+    """
+    Used by the admin template tag is_restricted
+    """
+    return PagePermission.objects.for_page(page=page).filter(can_view=True)
+
 
 
 def get_user_permission_level(user):
@@ -267,3 +268,16 @@ def get_user_sites_queryset(user):
     q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
         (Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True)))
     return qs.filter(q).distinct()
+
+
+def has_plugin_permission(user, plugin_type, permission_type):
+    """
+    Checks that a user has permissions for the plugin-type given to performe 
+    the action defined in permission_type
+    permission_type should be 'add', 'change' or 'delete'.
+    """
+    plugin_class = plugin_pool.get_plugin(plugin_type)
+    plugin_model = plugin_class.model
+    plugin_opts = plugin_model._meta
+    return user.has_perm('%s.%s_%s' % (plugin_opts.app_label, permission_type,
+                                      plugin_opts.object_name.lower()))

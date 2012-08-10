@@ -1,6 +1,6 @@
-##################################
-2.2 release notes (IN DEVELOPMENT)
-##################################
+#################
+2.2 release notes
+#################
 
 *****************
 What's new in 2.2
@@ -10,12 +10,32 @@ What's new in 2.2
 =======================================
 
 `django-mptt`_ is now used as a
-proper dependency and is now longer shipped with the django CMS. This solves the
-version conflict issues many people had when trying to use the django CMS
+proper dependency and is no longer shipped with the django CMS. This solves the
+version conflict issues many people were experiencing when trying to use the django CMS
 together with other Django apps that require django-mptt. django CMS 2.2
-requires django-mptt 0.4.2 or higher.
+requires django-mptt 0.5.1.
+
+.. warning::
+
+    Please remove the old ``mptt`` package from your Python site-packages
+    directory before upgrading. The ``setup.py`` file will install the
+    `django-mptt`_ package as an external dependency!
 
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
+
+
+Django 1.3 support
+==================
+
+The django CMS 2.2 supports both Django 1.2.5 and Django 1.3.
+
+
+View permissions
+================
+
+You can now give view permissions for django CMS pages to groups and users.
+
+.. _backwards-incompatible-changes:
 
 ******************************
 Backwards incompatible changes
@@ -35,22 +55,48 @@ are affected:
 * :attr:`cms.plugins_base.CMSPluginBase.pluginmedia`
 * :meth:`cms.plugins_base.CMSPluginBase.get_plugin_media`
 
-Accessing :attr:`cms.plugins_base.CMSPluginBase.pluginmedia` or
-:meth:`cms.plugins_base.CMSPluginBase.get_plugin_media` will raise a
-:exc:`cms.exceptions.Deprecated` exception.
+Accessing those attributes or methods will raise a
+:exc:`cms.exceptions.Deprecated` error.
 
 The :class:`cms.middleware.media.PlaceholderMediaMiddleware` middleware was also
-removed in this process and is therefore no longer required, however you now
-require to have the ``'sekizai.context_processors.sekizai'`` context processor
+removed in this process and is therefore no longer required. However you are now
+required to have the ``'sekizai.context_processors.sekizai'`` context processor
 in your :setting:`django:TEMPLATE_CONTEXT_PROCESSORS` setting.
 
-All templates in :setting:`CMS_TEMPLATES` must contain at least the ``js`` and ``css``
-sekizai namespaces.
+All templates in :setting:`CMS_TEMPLATES` must at least contain the ``js`` and
+``css`` sekizai namespaces.
 
 Please refer to the documentation on :ref:`custom-plugins-handling-media` in
 custom CMS plugins and the
 `django-sekizai documentation <http://django-sekizai.readthedocs.org/>`_ for
-more information.    
+more information.
+
+
+Toolbar must be enabled explicitly in templates
+===============================================
+
+The toolbar no longer hacks itself into responses in the middleware, but rather
+has to be enabled explicitly using the ``{% cms_toolbar %}`` template tag from
+the ``cms_tags`` template tag library in your templates. The template tag
+should be placed somewhere within the body of the HTML (within ``<body>...</body>``).
+
+This solves issues people were having with the toolbar showing up in places it
+shouldn't have.
+
+
+Static files moved to /static/
+==============================
+
+The static files (css/javascript/images) were moved from ``/media/`` to 
+``/static/`` to work with the new ``django.contrib.staticfiles`` app in Django
+1.3. This means you will have to make sure you serve static files as well as
+media files on your server.
+
+.. warning::
+
+    If you use Django 1.2.x you will not have a ``django.contrib.staticfiles``
+    app. Instead you need the `django-staticfiles`_ backport.
+
 
 **************************
 Features deprecated in 2.2
@@ -61,3 +107,6 @@ Features deprecated in 2.2
 
 The django-dbgettext support has been fully dropped in 2.2 in favor of the
 built-in mechanisms to achieve multilinguality.
+
+
+.. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/

@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode, 
     BlockNode)
 import warnings
+from sekizai.helpers import is_variable_extend_node
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
@@ -20,7 +21,7 @@ def _extend_blocks(extend_node, blocks):
     Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if is_variable_extend_node(extend_node):
         return
     parent = extend_node.get_parent(None)
     # Search for new blocks
@@ -29,13 +30,24 @@ def _extend_blocks(extend_node, blocks):
             blocks[node.name] = node
         else:
             # set this node as the super node (for {{ block.super }})
-            blocks[node.name].super = node
+            block = blocks[node.name]
+            seen_supers = []
+            while hasattr(block.super, 'nodelist') and block.super not in seen_supers:
+                seen_supers.append(block.super)
+                block = block.super
+            block.super = node
     # search for further ExtendsNodes
-    for node in parent.nodelist:
-        if not isinstance(node, TextNode):
-            if isinstance(node, ExtendsNode):
-                _extend_blocks(node, blocks)
-            break
+    for node in parent.nodelist.get_nodes_by_type(ExtendsNode):
+        _extend_blocks(node, blocks)
+        break
+        
+def _find_topmost_template(extend_node):
+    parent_template = extend_node.get_parent({})
+    for node in parent_template.nodelist.get_nodes_by_type(ExtendsNode):
+        # Their can only be one extend block in a template, otherwise django raises an exception
+        return _find_topmost_template(node)
+    # No ExtendsNode
+    return extend_node.get_parent({}) 
 
 def _extend_nodelist(extend_node):
     """
@@ -43,7 +55,7 @@ def _extend_nodelist(extend_node):
     ExtendsNode
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if is_variable_extend_node(extend_node):
         return []
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
@@ -52,14 +64,15 @@ def _extend_nodelist(extend_node):
     for block in blocks.values():
         placeholders += _scan_placeholders(block.nodelist, block, blocks.keys())
 
-    parent_template = extend_node.get_parent({})
-    # if this is the topmost template, check for placeholders outside of blocks
-    if not parent_template.nodelist.get_nodes_by_type(ExtendsNode):
-        placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
+    # Scan topmost template for placeholder outside of blocks
+    parent_template = _find_topmost_template(extend_node)
+    placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
     return placeholders
 
-def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
+def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
     placeholders = []
+    if ignore_blocks is None:
+        ignore_blocks = []
 
     for node in nodelist:
         # check if this is a placeholder first

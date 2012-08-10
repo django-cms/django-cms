@@ -2,7 +2,7 @@
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser, Placeholder
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, cms_static_url
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.forms.widgets import Select, MultiWidget, Widget
@@ -11,8 +11,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from os.path import join
 import copy
+from cms.templatetags.cms_admin import admin_static_url
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
@@ -130,13 +130,13 @@ class PluginEditor(Widget):
             self.attrs = {}
         
     class Media:
-        js = [join(settings.CMS_MEDIA_URL, path) for path in (
-            'js/lib/ui.core.js',
-            'js/lib/ui.sortable.js',
+        js = [cms_static_url(path) for path in (
+            'js/libs/jquery.ui.core.js',
+            'js/libs/jquery.ui.sortable.js',
             'js/plugin_editor.js',
         )]
         css = {
-            'all': [join(settings.CMS_MEDIA_URL, path) for path in (
+            'all': [cms_static_url(path) for path in (
                 'css/plugin_editor.css',
             )]
         }
@@ -171,7 +171,7 @@ class UserSelectAdminWidget(Select):
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Add Another')))
+            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (admin_static_url(), _('Add Another')))
         return mark_safe(u''.join(output))
     
     
@@ -207,7 +207,7 @@ class PlaceholderPluginEditorWidget(PluginEditor):
                 )
             context = {
                 'plugin_list': plugin_list,
-                'installed_plugins': plugin_pool.get_all_plugins(ph.slot),
+                'installed_plugins': plugin_pool.get_all_plugins(ph.slot, include_page_only=False),
                 'copy_languages': copy_languages, 
                 'language': language,
                 'show_copy': bool(copy_languages) and ph.actions.can_copy,

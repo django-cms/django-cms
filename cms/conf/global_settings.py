@@ -12,8 +12,9 @@ from django.conf import settings
 SITE_ID = 1
 
 # Which templates should be used for extracting the placeholders?
+# Empty by default, as we don't impose any rigid requirements on users.
 # example: CMS_TEMPLATES = (('base.html', 'default template'),)
-CMS_TEMPLATES = None
+CMS_TEMPLATES = ()
 
 # Should pages be allowed to inherit their parent templates?
 CMS_TEMPLATE_INHERITANCE = True

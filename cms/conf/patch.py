@@ -33,7 +33,11 @@ def post_patch_check():
     """Post patch check, just make sure there isn't any misconfiguration. All
     the code for checking settings should go here.
     """
-    if settings.CMS_TEMPLATES is None:
+
+    # Ensure templates are set, and more than just the inheritance setting.
+    cms_templates_length = len(settings.CMS_TEMPLATES)
+    if (cms_templates_length < 1 or
+        (cms_templates_length == 1 and settings.CMS_TEMPLATES[0][0] == settings.CMS_TEMPLATE_INHERITANCE_MAGIC)):
         raise ImproperlyConfigured('Please make sure you specified a CMS_TEMPLATES setting.')
     
     # check if is user middleware installed
@@ -51,7 +55,8 @@ def post_patch_check():
             continue
         if not validate_template(template[0], ['js', 'css']):
             raise ImproperlyConfigured(
-                "All templates defined in CMS_TEMPLATES must have at least the "
-                "'js' and 'css' sekizai namespaces. The template %r does not. "
+                "The 'js' and 'css' sekizai namespaces must be present in each template, "
+                "- or a template it inherits from - defined in CMS_TEMPLATES. "
+                "I can't find the namespaces in %r."
                 % template[0]
             )

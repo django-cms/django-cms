@@ -1,0 +1,6 @@
+{% load cms_admin i18n adminmedia %}
+    {% with page.children.all as children %}
+        {% for child in children %}
+            {% show_lazy_admin_menu child %}
+        {% endfor %}
+    {% endwith %}

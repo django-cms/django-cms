@@ -43,6 +43,21 @@ def update_title_paths(instance, **kwargs):
 page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
 
 
+def update_title(title):
+    parent_page_id = title.page.parent_id
+    slug = u'%s' % title.slug
+    
+    if title.page.is_home():
+        title.path = ''
+    elif not title.has_url_overwrite:
+        title.path = u'%s' % slug
+
+        if parent_page_id:
+            parent_title = Title.objects.get_title(parent_page_id,
+                language=title.language, language_fallback=True)
+            if parent_title:
+                title.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
@@ -64,14 +79,7 @@ def pre_save_title(instance, raw, **kwargs):
     if instance.has_url_overwrite and instance.path:
         instance.path = instance.path.strip(" /")
     else:
-        parent_page = instance.page.parent
-        slug = u'%s' % instance.slug
-        
-        instance.path = u'%s' % slug
-        if parent_page:
-            parent_title = Title.objects.get_title(parent_page, language=instance.language, language_fallback=True)
-            if parent_title:
-                instance.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
+        update_title(instance)
         
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
@@ -85,7 +93,8 @@ def post_save_title(instance, raw, created, **kwargs):
             page__lft__gt=instance.page.lft, 
             page__rght__lt=instance.page.rght, 
             page__tree_id__exact=instance.page.tree_id,
-            language=instance.language
+            language=instance.language,
+            has_url_overwrite=False,
         ).order_by('page__tree_id', 'page__parent', 'page__lft')
         
         for descendant_title in descendant_titles:
@@ -188,7 +197,7 @@ def pre_save_page(instance, raw, **kwargs):
         pass
 
 
-def post_save_page(instance, raw, created, **kwargs):   
+def post_save_page_moderator(instance, raw, created, **kwargs):   
     """Helper post save signal, cleans old_page attribute.
     """
     old_page = instance.old_page
@@ -198,7 +207,12 @@ def post_save_page(instance, raw, created, **kwargs):
         # tell moderator something was happen with this page
         from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
-
+        
+def post_save_page(instance, **kwargs):
+    for page in instance.get_descendants():
+        for title in page.title_set.all():
+            update_title(title)
+            title.save()
 
 def update_placeholders(instance, **kwargs):
     instance.rescan_placeholders()
@@ -209,7 +223,8 @@ def invalidate_menu_cache(instance, **kwargs):
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
     signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
-    signals.post_save.connect(post_save_page, sender=Page, dispatch_uid="cms.page.postsave")
+    signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
+signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)

@@ -26,7 +26,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         if not issubclass(new_plugin.model, CMSPlugin):
             raise SubClassNeededError(
                 "The 'model' attribute on CMSPluginBase subclasses must be "
-                "either 'None' or a subclass of CMSPlugin. %r on %r is not."
+                "either CMSPlugin or a subclass of CMSPlugin. %r on %r is not."
                 % (new_plugin.model, new_plugin)
             )
         # validate the template:
@@ -90,6 +90,7 @@ class CMSPluginBase(admin.ModelAdmin):
     render_plugin = True 
     model = CMSPlugin
     text_enabled = False
+    page_only = False
     
     opts = {}
     module = None #track in which module/application belongs

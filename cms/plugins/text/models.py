@@ -1,11 +1,11 @@
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
+from cms.plugins.text.utils import (plugin_admin_html_to_tags, 
+    plugin_tags_to_admin_html, plugin_tags_to_id_list, replace_plugin_tags)
+from cms.utils.html import clean_html
+from django.db import models
 from django.utils.html import strip_tags
 from django.utils.text import truncate_words
-from cms.plugins.text.utils import plugin_admin_html_to_tags,\
-    plugin_tags_to_admin_html, plugin_tags_to_id_list,\
-    replace_plugin_tags
+from django.utils.translation import ugettext_lazy as _
 
 _old_tree_cache = {}
 
@@ -33,6 +33,9 @@ class AbstractText(CMSPlugin):
     
     def __unicode__(self):
         return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")
+    
+    def clean(self):
+        self.body = clean_html(self.body, full=False)
     
     def clean_plugins(self):
         ids = plugin_tags_to_id_list(self.body)

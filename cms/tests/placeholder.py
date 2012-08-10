@@ -1,26 +1,33 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import add_plugin
+from cms.api import add_plugin, create_page
+from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.placeholdermodel import Placeholder
+from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
+from cms.plugins.link.cms_plugins import LinkPlugin
+from cms.plugins.text.cms_plugins import TextPlugin
+from cms.plugins.text.models import Text
+from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
+from cms.test_utils.project.fakemlng.models import Translations
+from cms.test_utils.project.placeholderapp.models import (Example1, Example2, 
+    Example3, Example4, Example5)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
-from cms.api import add_plugin
-from cms.plugins.text.cms_plugins import TextPlugin
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
+from django.contrib.messages.storage import default_storage
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
-from project.fakemlng.models import Translations
-from project.placeholderapp.models import (Example1, Example2, Example3, Example4, 
-    Example5)
+from django.test import TestCase
 
 
 class PlaceholderTestCase(CMSTestCase):
@@ -66,6 +73,10 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_scanning_extend_outside_block(self):
         placeholders = get_placeholders('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+
+    def test_placeholder_scanning_extend_outside_block_nested(self):
+        placeholders = get_placeholders('placeholder_tests/outside_nested.html')
+        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
     
     def test_fieldsets_requests(self):
         response = self.client.get(reverse('admin:placeholderapp_example1_add'))
@@ -80,6 +91,7 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         
     def test_fieldsets(self):
+        from cms.test_utils.project.placeholderapp import admin as __ # load admin
         request = self.get_request('/')
         admins = [
             (Example1, 2),
@@ -107,6 +119,44 @@ class PlaceholderTestCase(CMSTestCase):
                         self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
                         phfields.remove(field)
             self.assertEqual(phfields, [])
+            
+    def test_page_only_plugins(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        response = self.client.get(reverse('admin:placeholderapp_example1_change', args=(ex.pk,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
+        
+    def test_inter_placeholder_plugin_move(self):
+        ex = Example5(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph1 = ex.placeholder_1
+        ph2 = ex.placeholder_2
+        ph1_pl1 = add_plugin(ph1, TextPlugin, 'en', body='ph1 plugin1').cmsplugin_ptr
+        ph1_pl2 = add_plugin(ph1, TextPlugin, 'en', body='ph1 plugin2').cmsplugin_ptr
+        ph1_pl3 = add_plugin(ph1, TextPlugin, 'en', body='ph1 plugin3').cmsplugin_ptr
+        ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
+        ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
+        ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
+        response = self.client.post(reverse('admin:placeholderapp_example5_move_plugin'), {
+            'placeholder': ph2.slot,
+            'placeholder_id': str(ph2.pk),
+            'plugin_id': str(ph1_pl2.pk),
+            'ids': "_".join([str(p.pk) for p in [ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3]])
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
+        self.assertEqual([ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3], list(ph2.cmsplugin_set.order_by('position')))
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
@@ -146,9 +196,12 @@ class PlaceholderTestCase(CMSTestCase):
             self.assertTrue('width' in context)
             self.assertEqual(context['width'], 10)
 
+    def test_placeholder_scanning_nested_super(self):
+        placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
+        self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
 
-class PlaceholderActionTests(CMSTestCase):
-    fixtures = ['fakemlng.json']
+
+class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     
     def test_placeholder_no_action(self):
         actions = PlaceholderNoAction()
@@ -210,8 +263,9 @@ class PlaceholderActionTests(CMSTestCase):
         
     def test_mlng_placeholder_actions_no_placeholder(self):
         actions = MLNGPlaceholderActions()
-        nl = Translations.objects.get(language_code='nl')
+        Translations.objects.filter(language_code='nl').update(placeholder=None)
         de = Translations.objects.get(language_code='de')
+        nl = Translations.objects.get(language_code='nl')
         self.assertEqual(nl.placeholder, None)
         self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
         
@@ -308,13 +362,7 @@ class PlaceholderAdminTest(CMSTestCase):
         return admin.site._registry[Example1]
     
     def get_post_request(self, data):
-        request = self.get_request()
-        request.POST._mutable = True
-        request.POST.update(data)
-        request.POST._mutable = False
-        request.method = 'POST'
-        request.environ['METHOD'] = 'POST'
-        return request
+        return self.get_request(post_data=data)
     
     def test_global_limit(self):
         placeholder = self.get_placeholder()
@@ -353,3 +401,133 @@ class PlaceholderAdminTest(CMSTestCase):
                 response = admin.add_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")
+
+
+class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
+
+    def _testuser(self):
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = False)
+        u.set_password("test")
+        u.save()
+        return u
+
+    def _create_example(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        self._placeholder = ex.placeholder
+
+    def _create_plugin(self):
+        self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
+
+    def _give_permission(self, user, model, permission_type, save=True):
+        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        user.user_permissions.add(Permission.objects.get(codename=codename))
+
+    def _delete_permission(self, user, model, permission_type, save=True):
+        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        user.user_permissions.remove(Permission.objects.get(codename=codename))
+
+    def _post_request(self, user):
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': self._placeholder.pk,
+            'language': 'en',
+        }
+        request = self.get_post_request(data)
+        request.user = self.reload(user)
+        request._messages = default_storage(request)
+        return request
+
+    def test_plugin_add_requires_permissions(self):
+        """User wants to add a plugin to the example app placeholder but has no permissions"""
+        self._create_example()
+        normal_guy = self._testuser()
+        admin = self.get_admin()
+        request = self._post_request(normal_guy)
+        response = admin.add_plugin(request)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # The user gets the permission only for the plugin
+        self._give_permission(normal_guy, Text, 'add')
+        request = self._post_request(normal_guy)
+        response = admin.add_plugin(request)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # the user gets the permission only for the app
+        self._delete_permission(normal_guy, Text, 'add')
+        self._give_permission(normal_guy, Example1, 'add')
+        request = self._post_request(normal_guy)
+        response = admin.add_plugin(request)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # user gets permissions for the plugin and the app
+        self._give_permission(normal_guy, Text, 'add')
+        request = self._post_request(normal_guy)
+        response = admin.add_plugin(request)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+
+    def test_plugin_edit_requires_permissions(self):
+        """User wants to edit a plugin to the example app placeholder but has no permissions"""
+        self._create_example()
+        self._create_plugin()
+        normal_guy = self._testuser()
+        admin = self.get_admin()
+        request = self._post_request(normal_guy)
+        response = admin.edit_plugin(request, self._plugin.id)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # The user gets the permission only for the plugin
+        self._give_permission(normal_guy, Text, 'change')
+        request = self._post_request(normal_guy)
+        response = admin.edit_plugin(request, self._plugin.id)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # the user gets the permission only for the app
+        self._delete_permission(normal_guy, Text, 'change')
+        self._give_permission(normal_guy, Example1, 'change')
+        request = self._post_request(normal_guy)
+        response = admin.edit_plugin(request, self._plugin.id)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # user gets permissions for the plugin and the app
+        self._give_permission(normal_guy, Text, 'change')
+        request = self._post_request(normal_guy)
+        response = admin.edit_plugin(request, self._plugin.id)
+        # It looks like it breaks here because of a missing csrf token in the request
+        # I have no idea how to fix this
+        self.assertEqual(response.status_code, HttpResponse.status_code, response)
+
+
+class PlaceholderConfTests(TestCase):
+    def test_get_all_plugins_single_page(self):
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_two': {
+                'plugins': ['TextPlugin', 'LinkPlugin'],
+            },
+            'col_two.html col_left': {
+                'plugins': ['LinkPlugin'],
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            plugins = plugin_pool.get_all_plugins(placeholder, page)
+            self.assertEqual(len(plugins), 1, plugins)
+            self.assertEqual(plugins[0], LinkPlugin)
+
+    def test_get_all_plugins_inherit(self):
+        parent = create_page('parent', 'col_two.html', 'en')
+        page = create_page('page', CMS_TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_two': {
+                'plugins': ['TextPlugin', 'LinkPlugin'],
+            },
+            'col_two.html col_left': {
+                'plugins': ['LinkPlugin'],
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            plugins = plugin_pool.get_all_plugins(placeholder, page)
+            self.assertEqual(len(plugins), 1, plugins)
+            self.assertEqual(plugins[0], LinkPlugin)

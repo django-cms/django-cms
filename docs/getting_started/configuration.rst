@@ -4,8 +4,8 @@
 Configuration
 #############
 
-The Django-CMS has a lot of settings you can use to customize your installation
-of the CMS to be exactly like you want it to be.
+The django CMS has a lot of settings you can use to customize your installation
+so that it is exactly as you'd like it to be.
 
 *****************
 Required Settings
@@ -16,7 +16,7 @@ Required Settings
 CMS_TEMPLATES
 =============
 
-Default: ``None`` (Not a valid setting!)
+Default: ``()`` (Not a valid setting!)
 
 A list of templates you can select for a page.
 
@@ -29,10 +29,18 @@ Example::
         ('extra.html', gettext('Some extra fancy template')),
     )
 
-.. note:: All templates defined in :setting:`CMS_TEMPLATES` must contain at least the
-          ``js`` and ``css`` sekizai namespaces, for more information, see 
-          :ref:`sekizai-namespaces`.
+.. note::
 
+    All templates defined in :setting:`CMS_TEMPLATES` must contain at least the
+    ``js`` and ``css`` sekizai namespaces, for more information, see 
+    :ref:`sekizai-namespaces`.
+
+.. warning::
+
+    django CMS internally relies on a number of templates to function correctly.
+    These exist beneath ``cms`` within the templates directory. As such, it
+    is highly recommended you avoid using the same directory name for your own
+    project templates.
 
 *******************
 Basic Customization
@@ -68,13 +76,13 @@ Example::
 
     CMS_PLACEHOLDER_CONF = {
         'content': {
-            'plugins': ('TextPlugin', 'PicturePlugin'),
-            'text_only_plugins': ('LinkPlugin',)
+            'plugins': ['TextPlugin', 'PicturePlugin'],
+            'text_only_plugins': ['LinkPlugin']
             'extra_context': {"width":640},
             'name':gettext("Content"),
         },
         'right-column': {
-            "plugins": ('TeaserPlugin', 'LinkPlugin'),
+            "plugins": ['TeaserPlugin', 'LinkPlugin'],
             "extra_context": {"width":280},
             'name':gettext("Right Column"),
             'limits': {
@@ -84,11 +92,11 @@ Example::
             },
         },
         'base.html content': {
-            "plugins": {'TextPlugin', 'PicturePlugin', 'TeaserPlugin'}
+            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
         },
     }
 
-You can combine template names and placeholder names to granually define
+You can combine template names and placeholder names to granularly define
 plugins, as shown above with ''base.html content''.
 
 **plugins**
@@ -113,7 +121,7 @@ internationalized.
 **limits**
 
 Limit the number of plugins that can be placed inside this placeholder.
-Dictionary keys are plugin names; values are their respective limits. Special
+Dictionary keys are plugin names and the values are their respective limits. Special
 case: "global" - Limit the absolute number of plugins in this placeholder
 regardless of type (takes precedence over the type-specific limits).
 
@@ -125,7 +133,7 @@ CMS_PLUGIN_CONTEXT_PROCESSORS
 Default: ``[]``
 
 A list of plugin context processors. Plugin context processors are callables
-that modify all plugin's context before rendering. See
+that modify all plugins' context before rendering. See
 :doc:`../extending_cms/custom_plugins` for more information.
 
 .. setting:: CMS_PLUGIN_PROCESSORS
@@ -177,10 +185,10 @@ Editor configuration
 
 The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
-how to configure that. The best way to understand this is to head 
-over to `Wymeditor examples page 
-<http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ 
-After understand how Wymeditor works. 
+how to configure that. The best thing to do is to head 
+over to the `Wymeditor examples page 
+<http://files.wymeditor.org/wymeditor/examples/>`_
+in order to understand how Wymeditor works. 
 
 The :mod:`cms.plugins.text` plugin exposes several variables named
 WYM_* that correspond to the wym configuration. The simplest 
@@ -207,7 +215,7 @@ CMS_HIDE_UNTRANSLATED
 
 Default: ``True``
 
-By default django-cms hides menu items that are not yet translated into the
+By default django CMS hides menu items that are not yet translated into the
 current language. With this setting set to False they will show up anyway.
 
 .. setting:: CMS_LANGUAGES
@@ -217,7 +225,7 @@ CMS_LANGUAGES
 
 Default: Value of :setting:`django:LANGUAGES`
 
-Defines the languages available in the CMS.
+Defines the languages available in django CMS.
 
 Example::
 
@@ -263,8 +271,8 @@ CMS_SITE_LANGUAGES
 Default: ``{}``
 
 If you have more than one site and :setting:`CMS_LANGUAGES` differs between
-the sites, you may want to fill this out so if you switch between the sites
-in the admin you only get the languages available on this site.
+the sites, you may want to fill this out so that when you switch between sites
+in the admin you only get the languages available to that particular site.
 
 Example::
 
@@ -281,41 +289,13 @@ CMS_FRONTEND_LANGUAGES
 
 Default: Value of :setting:`CMS_LANGUAGES`
 
-A list of languages Django CMS uses in the frontend. For example, if
+A list of languages django CMS uses in the frontend. For example, if
 you decide you want to add a new language to your page but don't want to
 show it to the world yet.
 
 Example::
 
     CMS_FRONTEND_LANGUAGES = ("de", "en", "pt-BR")
-
-.. setting:: CMS_DBGETTEXT
-
-CMS_DBGETTEXT
-=============
-
-Default: ``False`` (unless ``dbgettext`` is in :setting:`django:INSTALLED_APPS`)
-
-Enable gettext-based translation of CMS content rather than use the standard
-administration interface. Requires `django-dbgettext
-<http://http://bitbucket.org/drmeers/django-dbgettext>`_.
-
-.. warning:: This feature is deprecated and will be removed in 2.2.
-
-.. setting:: CMS_DBGETTEXT_SLUGS
-
-CMS_DBGETTEXT_SLUGS
-===================
-
-Default: ``False``
-
-Enable gettext-based translation of page paths/slugs. Experimental at this
-stage, as resulting translations cannot be guaranteed to be unique.
-
-For general dbgettext settings, see the `dbgettext documentation
-<http://bitbucket.org/drmeers/django-dbgettext/src/tip/docs>`_.
-
-.. warning:: This feature is deprecated and will be removed in 2.2.
 
 
 **************
@@ -356,12 +336,12 @@ CMS_PAGE_MEDIA_PATH
 
 Default: ``'cms_page_media/'``
 
-By default, Django CMS creates a folder called ``cms_page_media`` in your
+By default, django CMS creates a folder called ``cms_page_media`` in your
 static files folder where all uploaded media files are stored. The media files
 are stored in subfolders numbered with the id of the page.
 
 You should take care that the directory to which it points is writable by the
-user under which django will be running.
+user under which Django will be running.
 
 
 ****
@@ -402,9 +382,9 @@ CMS_REDIRECTS
 
 Default: ``False``
 
-This adds a new "redirect" field to the "advanced settings" tab of the page
+This adds a new "redirect" field to the "advanced settings" tab of the page.
 
-You can set a url here, which a visitor will be redirected to when the page is
+You can set a url here to which visitors will be redirected when the page is
 accessed.
 
 Note: Don't use this too much. :mod:`django.contrib.redirects` is much more
@@ -414,6 +394,10 @@ flexible, handy, and is designed exactly for this purpose.
 
 CMS_FLAT_URLS
 =============
+
+.. deprecated:: 2.4
+
+    ``CMS_FLAT_URLS`` will be removed in 2.4.
 
 Default: ``False``
 
@@ -462,7 +446,17 @@ page". But he will only see the users he created. The users he created can also
 only inherit the rights he has. So if he only has been granted the right to edit
 a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
-only a subset of the pages he's allowed access to, for example.
+only a subset of the pages to which he is allowed access.
+
+.. setting:: CMS_PUBLIC_FOR
+
+CMS_PUBLIC_FOR
+==============
+
+Default: ``all``
+
+Decides if pages without any view restrictions are public by default or staff
+only. Possible values are ``all`` and ``staff``.
 
 .. setting:: CMS_MODERATOR
 
@@ -471,15 +465,19 @@ CMS_MODERATOR
 
 Default: ``False``
 
-If set to true, gives you a new "moderation" column in the tree view.
+If set to ``True``, gives you a new "moderation" column in the tree view.
 
 You can select to moderate pages or whole trees. If a page is under moderation
 you will receive an email if somebody changes a page and you will be asked to
-approve the changes. Only after you approved the changes will they be updated
+approve the changes. Only after you approve the changes will they be updated
 on the "live" site. If you make changes to a page you moderate yourself, you
 will need to approve it anyway. This allows you to change a lot of pages for
 a new version of the site, for example, and go live with all the changes at the
 same time.
+
+.. note:: When switching this value to ``True`` on an existing site, you have
+          to run the ``cms moderator on`` command to make the required database
+          changes.
 
 .. setting:: CMS_SHOW_START_DATE
 .. setting:: CMS_SHOW_END_DATE
@@ -531,8 +529,9 @@ Default: ``60``
 Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
 template tags.
 
-.. note:: This settings was previously called
-          :setting:`CMS_CONTENT_CACHE_DURATION`
+.. note::
+
+    This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
 
 ``'menus'``
 -----------
@@ -541,7 +540,9 @@ Default: ``3600``
 
 Cache expiration (in seconds) for the menu tree.
 
-.. note:: This settings was previously called :setting:`MENU_CACHE_DURATION`
+.. note::
+
+    This settings was previously called :setting:`MENU_CACHE_DURATION`
 
 ``'permissions'``
 -----------------
@@ -555,7 +556,7 @@ Cache expiration (in seconds) for view and other permissions.
 CMS_CACHE_PREFIX
 ================
 
-Default: ``None``
+Default: ``cms-``
 
 
 The CMS will prepend the value associated with this key to every cache access (set and get).
@@ -567,5 +568,6 @@ Example::
     CMS_CACHE_PREFIX = 'mysite-live'
 
 .. note::
+
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`

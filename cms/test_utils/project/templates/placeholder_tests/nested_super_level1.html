@@ -1,0 +1,7 @@
+{% extends "placeholder_tests/nested_super_level2.html" %}
+{% load cms_tags %}
+
+{% block one %}
+{% placeholder "level1" %}
+{{ block.super }}
+{% endblock %}

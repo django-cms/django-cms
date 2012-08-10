@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from classytags.arguments import IntegerArgument, Argument
+from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from django import template
@@ -10,6 +10,9 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
 import urllib
+
+register = template.Library()
+
 
 class NOT_PROVIDED: pass
 
@@ -73,7 +76,13 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             if node in final:
                 final.remove(node)
     return final
-register = template.Library()
+
+def flatten(nodes):
+    flat = []
+    for node in nodes:
+        flat.append(node)
+        flat.extend(flatten(node.children))
+    return flat
 
 
 class ShowMenu(InclusionTag):
@@ -95,9 +104,9 @@ class ShowMenu(InclusionTag):
         IntegerArgument('to_level', default=100, required=False),
         IntegerArgument('extra_inactive', default=0, required=False),
         IntegerArgument('extra_active', default=1000, required=False),
-        Argument('template', default='menu/menu.html', required=False),
-        Argument('namespace', default=None, required=False),
-        Argument('root_id', default=None, required=False),
+        StringArgument('template', default='menu/menu.html', required=False),
+        StringArgument('namespace', default=None, required=False),
+        StringArgument('root_id', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
     
@@ -118,14 +127,14 @@ class ShowMenu(InclusionTag):
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
-                    new_nodes = node.children
-                    for n in new_nodes:
+                    nodes = node.children
+                    for n in nodes:
                         n.parent = None
                     from_level += node.level + 1
                     to_level += node.level + 1
+                    nodes = flatten(nodes)
                 else:
-                    new_nodes = []
-                nodes = new_nodes
+                    nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
     
@@ -362,7 +371,13 @@ class PageLanguageUrl(InclusionTag):
                 url = page.get_absolute_url(language=lang, fallback=False)
                 url = "/" + lang + url
             except:
-                # no localized path/slug. 
-                url = ''
+                # no localized path/slug
+                if settings.CMS_HIDE_UNTRANSLATED:
+                    # redirect to root url if CMS_HIDE_UNTRANSLATED
+                    url = '/' + lang + '/'
+                else:
+                    # If untranslated pages are shown, this will not redirect
+                    # at all.
+                    url = ''
         return {'content':url}
 register.tag(PageLanguageUrl)

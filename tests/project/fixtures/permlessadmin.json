@@ -1,1 +1,0 @@
-[{"pk": 3, "model": "auth.user", "fields": {"username": "permless", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": true, "last_login": "2011-03-09 15:21:41", "groups": [], "user_permissions": [], "password": "sha1$1b402$0a5e2880d27c51000c7a4cc09464d986006948b3", "email": "permless@django-cms.org", "date_joined": "2011-03-09 15:21:41"}}]

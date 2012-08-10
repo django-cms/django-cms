@@ -8,11 +8,41 @@ from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
-from mptt.templatetags import mptt_tags
-
-
+import django
 
 COPY_VAR = "copy"
+
+
+def cache_tree_children(queryset):
+    """
+    For all items in the queryset, set the '_cached_children' attribute to a
+    list. This attribute is in turn used by the 'get_children' method on the
+    item, which would otherwise (if '_cached_children' is not set) cause a 
+    database query.
+    
+    The queryset MUST BE ORDERED BY 'lft', 'tree_id'! Otherwise this function
+    will raise a ValueError.
+    """
+    parents_dict = {}
+    lastleft = -1 # integrity check
+    lasttree = -1 # integrity check
+    for obj in queryset:
+        parents_dict[obj.pk] = obj
+        if obj.tree_id == lasttree and obj.lft < lastleft: # integrity check
+                raise ValueError('Objects passed in the wrong order, must be ordered by the mptt left attribute and tree id')
+        lastleft = obj.lft # integrity check
+        lasttree = obj.tree_id # integrity check
+        # set the '_cached_children' attribute
+        obj._cached_children = []
+        # get the parent of this object (if available) via parent_id
+        parent = parents_dict.get(obj.parent_id, None)
+        if parent:
+            # if there is a parent, append the current object to the _cached_children
+            # list of the parent. Since the objects are ordered by lft, tree_id
+            # the _cached_children attribute will always have been set by this
+            # function already.
+            parent._cached_children.append(obj)
+
 
 class CMSChangeList(ChangeList):
     '''
@@ -24,9 +54,9 @@ class CMSChangeList(ChangeList):
     real_queryset = False
     
     def __init__(self, request, *args, **kwargs):
-        super(CMSChangeList, self).__init__(request, *args, **kwargs)
         from cms.utils.plugins import current_site
         self._current_site = current_site(request)
+        super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
             self.query_set = self.get_query_set(request)
         except:
@@ -40,7 +70,10 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
-        qs = super(CMSChangeList, self).get_query_set().drafts()
+        if django.VERSION[1] > 3:
+            qs = super(CMSChangeList, self).get_query_set(request).drafts()
+        else:
+            qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
             site = self._current_site
             permissions = Page.permissions.get_change_id_list(request.user, site)
@@ -50,7 +83,6 @@ class CMSChangeList(ChangeList):
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
             qs = qs.filter(site=self._current_site)
-        qs = qs.order_by('tree_id', 'parent', 'lft')
         return qs
     
     def is_filtered(self):
@@ -75,7 +107,8 @@ class CMSChangeList(ChangeList):
         site = self._current_site
         # Get all the pages, ordered by tree ID (it's convenient to build the 
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id', 'parent', 'lft').select_related()
+        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
+        
         
         # Get lists of page IDs for which the current user has 
         # "permission to..." on the current site. 
@@ -117,14 +150,15 @@ class CMSChangeList(ChangeList):
         except NoHomeFound:
             home_pk = 0
             
-        # Make the pages a tree (using MPTT awesomeness).
-        # This is normally a tag filter, but it's really nice in our case too:
-        # It caches children for every page in the list we pass it, so no
-        # further queries are needed.
-        mptt_tags.cache_tree_children(pages)
+        # Unfortunately we cannot use the MPTT builtin code for pre-caching
+        # the children here, because MPTT expects the tree to be 'complete'
+        # and otherwise complaints about 'invalid item order'
+        cache_tree_children(pages)
         
         for page in pages:
-            children = page.get_children()
+           
+
+            children = list(page.get_children())
 
             # note: We are using change_list permission here, because we must
             # display also pages which user must not edit, but he haves a 
@@ -153,17 +187,19 @@ class CMSChangeList(ChangeList):
                     moderation_value = page_moderator[page.pk]
                 except:
                     pass
-                page._moderation_value_cahce = moderation_value
+                page._moderation_value_cache = moderation_value
                 page._moderation_value_cache_for_user_id = request.user.pk
                 
                 #moderation states
-                page._has_moderator_state_chache = page.pk in pagemoderator_states_id_set
+                page._has_moderator_state_cache = page.pk in pagemoderator_states_id_set
                 
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
                     # TODO: WTF!?!
                     # The last one is not the last... wait, what?
+                    # children should NOT be a queryset. If it is, check that
+                    # your django-mptt version is 0.5.1
                     children[-1].last = False
                 page.menu_level = 0
                 root_pages.append(page)
@@ -173,10 +209,19 @@ class CMSChangeList(ChangeList):
                     page.ancestors_ascending = []
                 page.home_pk_cache = home_pk
             
-            # childrens is the reverse accessor for the parent foreign key.
-            # We want to set it so the JSTree can display it nicely in admin.
-            # "childrens" is the fully cached version of children.
-            page.childrens = children
+            # Because 'children' is the reverse-FK accessor for the 'parent'
+            # FK from Page->Page, we have to use wrong English here and set
+            # an attribute called 'childrens'. We are aware that this is WRONG
+            # but what should we do?
+            
+            # If the queryset is filtered, do NOT set the 'childrens' attribute
+            # since *ALL* pages will be in the 'root_pages' list and therefore
+            # be displayed. (If the queryset is filtered, the result is not a
+            # tree but rather a flat list).
+            if self.is_filtered():
+                page.childrens = []
+            else:
+                page.childrens = children
         
         # TODO: OPTIMIZE!!
         titles = Title.objects.filter(page__in=ids)

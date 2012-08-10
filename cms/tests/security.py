@@ -1,11 +1,11 @@
 from __future__ import with_statement
 from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugins.text.models import Text
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 
     URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE)
 from django.conf import settings
 from django.core.urlresolvers import reverse
-
 
 
 class SecurityTests(CMSTestCase):
@@ -39,8 +39,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
         
     def test_edit(self):
@@ -66,8 +66,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
     
@@ -93,8 +93,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
@@ -120,8 +120,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
     
     def test_edit_ph(self):
@@ -148,8 +148,8 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
     
@@ -171,6 +171,20 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
         response = self.client.post(url, plugin_data)
-        # the user is logged in and the security check fails, so it should 404.
-        self.assertEqual(response.status_code, 404)
+        # the user is logged in and the security check fails, so it should 403.
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)
+        
+    def test_text_plugin_xss(self):
+        page, placeholder, superuser, staff = self.get_data()
+        with self.login_user_context(superuser):
+            plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
+            # ACTUAL TEST STARTS HERE.
+            data = {
+                "body": "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
+            }
+            edit_url = '%s%s/' % (URL_CMS_PLUGIN_EDIT, plugin.pk)
+            response = self.client.post(edit_url, data)
+            self.assertEquals(response.status_code, 200)
+            txt = Text.objects.all()[0]
+            self.assertEquals(txt.body, '<div>divcontent</div><a>acontent</a>')

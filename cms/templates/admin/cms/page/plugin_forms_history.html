@@ -1,9 +1,9 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia cms_tags %}
+{% load i18n admin_modify adminmedia cms_tags cms_admin %}
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
-<script type="text/javascript" src="{{ CMS_MEDIA_URL }}js/lib/jquery.js"></script>
+<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
 {% endblock %}
 
 {% block content_title %}{% trans "An old revision of a plugin can not be saved!" %}{% endblock %}

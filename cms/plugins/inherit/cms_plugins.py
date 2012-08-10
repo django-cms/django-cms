@@ -18,6 +18,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
     render_template = "cms/plugins/inherit_plugins.html"
     form = InheritForm
     admin_preview = False
+    page_only = True
     
     def render(self, context, instance, placeholder):
         template_vars = {

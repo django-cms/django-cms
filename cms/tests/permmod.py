@@ -5,12 +5,17 @@ from cms.api import (create_page, publish_page, approve_page, add_plugin,
 from cms.models import Page, CMSPlugin
 from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
     ACCESS_PAGE_AND_DESCENDANTS)
+from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
-    SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD)
+    SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
-from django.contrib.auth.models import User
 
+from django.contrib.auth.models import User, Permission, AnonymousUser, Group
+from django.contrib.sites.models import Site
+from django.core.management import call_command
+from django.db.models import Q
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
     """Permissions and moderator together
@@ -72,6 +77,10 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             master = User(username="master", email="master@django-cms.org", is_staff=True, is_active=True)
             master.set_password('master')
             master.save()
+            master.user_permissions.add(Permission.objects.get(codename='add_text'))
+            master.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            master.user_permissions.add(Permission.objects.get(codename='change_text'))
+            
             self.user_master = create_page_user(self.user_super, master, grant_all=True)
             # create non global, non staff user
             self.user_non_global = User(username="nonglobal", is_active=True)
@@ -94,6 +103,10 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             slave = User(username='slave', email='slave@django-cms.org', is_staff=True)
             slave.set_password('slave')
             slave.save()
+            slave.user_permissions.add(Permission.objects.get(codename='add_text'))
+            slave.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            slave.user_permissions.add(Permission.objects.get(codename='change_text'))
+            
             self.user_slave = create_page_user(self.user_super, slave,  can_add_page=True,
                                         can_change_page=True, can_delete_page=True)
             
@@ -478,20 +491,51 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
     def test_superuser_can_view(self):
+        url = self.page_b.get_absolute_url(language='en')
         with self.login_user_context(self.user_super):
-            response = self.client.get("/en/pageb/")
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
     def test_staff_can_view(self):
-        with self.login_user_context(self.user_staff):
-            response = self.client.get("/en/pageb/")
-            self.assertEqual(response.status_code, 200)
-
+        url = self.page_b.get_absolute_url(language='en')
+        all_view_perms = PagePermission.objects.filter(can_view=True)
+        # verifiy that the user_staff has access to this page
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b:
+                if perm.user == self.user_staff:
+                    has_perm = True
+        self.assertEqual(has_perm, False)
+        login_ok = self.client.login(username=self.user_staff.username, password=self.user_staff.username)
+        self.assertTrue(login_ok)
+        # really logged in
+        self.assertTrue('_auth_user_id' in self.client.session)
+        login_user_id = self.client.session.get('_auth_user_id')
+        user = User.objects.get(username=self.user_staff.username)
+        self.assertEquals(login_user_id,user.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+    
     def test_user_normal_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
+        all_view_perms = PagePermission.objects.filter(can_view=True)
+        # verifiy that the normal_user has access to this page
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b:
+                if perm.user == self.user_normal:
+                    has_perm = True
+        self.assertEqual(has_perm, True)
         with self.login_user_context(self.user_normal):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+        
+        # verifiy that the user_non_global has not access to this page
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b:
+                if perm.user == self.user_non_global:
+                    has_perm = True
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
@@ -501,10 +545,10 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
     def test_user_globalpermission(self):
         # Global user
+        user_global = User(username="global", is_active=True)
+        user_global.set_password("global")
+        user_global.save()
         with self.login_user_context(self.user_super):
-            user_global = User(username="global", is_active=True)
-            user_global.set_password("global")
-            user_global.save()
             user_global = create_page_user(user_global, user_global)
             user_global.is_staff = False
             user_global.save() # Prevent is_staff permission
@@ -512,15 +556,36 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
                                       published=True)
             global_page = publish_page(global_page, user_global, approve=True)
             # it's allowed for the normal user to view the page
-            assign_user_to_page(global_page, user_global,
-                global_permission=True, can_view=True)
+            assign_user_to_page(global_page, user_global, 
+                                global_permission=True, can_view=True)
         
         url = global_page.get_absolute_url('en')
-
+        all_view_perms = PagePermission.objects.filter(can_view=True)
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b and perm.user == user_global:
+                has_perm = True
+        self.assertEqual(has_perm, False)
+        
+        global_page_perm_q = Q(user=user_global) & Q(can_view=True)
+        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        self.assertEqual(global_view_perms, True)
+        
+        # user_global
         with self.login_user_context(user_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+        # self.non_user_global
+        has_perm = False
+        for perm in all_view_perms:
+            if perm.page == self.page_b and perm.user == self.user_non_global:
+                has_perm = True
+        self.assertEqual(has_perm, False)
 
+        global_page_perm_q = Q(user=self.user_non_global) & Q(can_view=True)
+        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        self.assertEqual(global_view_perms, False)
+        
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
@@ -779,3 +844,194 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             self.ph.publisher_public.get_absolute_url(),
             u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
         )
+
+
+class ModeratorSwitchCommandTest(CMSTestCase):
+    def test_switch_moderator_on(self):
+        with SettingsOverride(CMS_MODERATOR=False):
+            page1 = create_page('page', 'nav_playground.html', 'en', published=True)
+        with SettingsOverride(CMS_MODERATOR=True):
+            call_command('cms', 'moderator', 'on')
+            page2 = get_page_from_path(page1.get_absolute_url().strip('/'))
+        self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
+        
+    def test_switch_moderator_off(self):
+        with SettingsOverride(CMS_MODERATOR=True):
+            page1 = create_page('page', 'nav_playground.html', 'en', published=True)
+        with SettingsOverride(CMS_MODERATOR=False):
+            page2 = get_page_from_path(page1.get_absolute_url().strip('/'))
+        self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
+
+
+class ViewPermissionTests(SettingsOverrideTestCase):
+    settings_overrides = {
+        'CMS_MODERATOR': False,
+        'CMS_PERMISSION': True,
+        'CMS_PUBLIC_FOR': 'all',
+    }
+
+    
+    def get_request(self, user=None):
+        attrs = {
+            'user': user or AnonymousUser(),
+            'REQUEST': {},
+            'session': {},
+        }
+        return type('Request', (object,), attrs)
+    
+    def test_public_for_all_staff(self):
+        request = self.get_request()
+        request.user.is_staff = True
+        page = Page()
+        page.pk = 1
+        self.assertTrue(page.has_view_permission(request))
+
+    def test_public_for_all_staff_assert_num_queries(self):
+        request = self.get_request()
+        request.user.is_staff = True
+        page = Page()
+        page.pk = 1
+        with self.assertNumQueries(0):
+            page.has_view_permission(request)
+
+    def test_public_for_all(self):
+        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        request = self.get_request(user)
+        page = Page()
+        page.pk = 1
+        page.level = 0
+        page.tree_id = 1
+        self.assertTrue(page.has_view_permission(request))
+
+    def test_public_for_all_num_queries(self):
+        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        request = self.get_request(user)
+        site = Site()
+        site.pk = 1
+        page = Page()
+        page.pk = 1
+        page.level = 0
+        page.tree_id = 1
+        with self.assertNumQueries(3):
+            """
+            The queries are:
+            The current Site
+            PagePermission query for affected pages
+            GlobalpagePermission query for user
+            """
+            page.has_view_permission(request)
+    
+    def test_unauthed(self):
+        request = self.get_request()
+        page = Page()
+        page.pk = 1
+        page.level = 0
+        page.tree_id = 1
+        self.assertTrue(page.has_view_permission(request))
+        
+    def test_unauthed_num_queries(self):
+        request = self.get_request()
+        site = Site()
+        site.pk = 1
+        page = Page()
+        page.pk = 1
+        page.level = 0
+        page.tree_id = 1
+        with self.assertNumQueries(1):
+            """
+            The query is:
+            PagePermission query for affected pages
+            """
+            page.has_view_permission(request)
+    
+    def test_authed_basic_perm(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user.user_permissions.add(Permission.objects.get(codename='view_page'))
+            request = self.get_request(user)
+            page = Page()
+            page.pk = 1
+            page.level = 0
+            page.tree_id = 1
+            self.assertTrue(page.has_view_permission(request))
+    
+    def test_authed_basic_perm_num_queries(self):
+        site = Site()
+        site.pk = 1
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user.user_permissions.add(Permission.objects.get(codename='view_page'))
+            request = self.get_request(user)
+            page = Page()
+            page.pk = 1
+            page.level = 0
+            page.tree_id = 1
+            with self.assertNumQueries(5):
+                """
+                The queries are:
+                The site
+                PagePermission query for affected pages
+                GlobalpagePermission query for user
+                Generic django permission lookup
+                content type lookup by permission lookup
+                """
+                page.has_view_permission(request)
+    
+    def test_authed_no_access(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            request = self.get_request(user)
+            page = Page()
+            page.pk = 1
+            page.level = 0
+            page.tree_id = 1
+            self.assertFalse(page.has_view_permission(request))
+    
+    def test_unauthed_no_access(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            request = self.get_request()
+            page = Page()
+            page.pk = 1
+            page.level = 0
+            page.tree_id = 1
+            self.assertFalse(page.has_view_permission(request))
+        
+    def test_unauthed_no_access_num_queries(self):
+        site = Site()
+        site.pk = 1
+        request = self.get_request()
+        page = Page()
+        page.pk = 1
+        page.level = 0
+        page.tree_id = 1
+        with self.assertNumQueries(1):
+            page.has_view_permission(request)
+    
+    def test_page_permissions(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            request = self.get_request(user)
+            page = create_page('A', 'nav_playground.html', 'en')
+            PagePermission.objects.create(can_view=True, user=user, page=page)
+            self.assertTrue(page.has_view_permission(request))
+    
+    def test_page_permissions_view_groups(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            group = Group.objects.create(name='testgroup')
+            group.user_set.add(user)
+            request = self.get_request(user)
+            page = create_page('A', 'nav_playground.html', 'en')
+            PagePermission.objects.create(can_view=True, group=group, page=page)
+            self.assertTrue(page.has_view_permission(request))
+            
+    def test_global_permission(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            GlobalPagePermission.objects.create(can_view=True, user=user)
+            request = self.get_request(user)
+            page = Page()
+            page.pk = 1
+            page.level = 0
+            page.tree_id = 1
+            self.assertTrue(page.has_view_permission(request))

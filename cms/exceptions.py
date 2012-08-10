@@ -5,8 +5,10 @@ class PluginAlreadyRegistered(Exception):
 class PluginNotRegistered(Exception):
     pass
 
-class AppAllreadyRegistered(Exception):
+class AppAlreadyRegistered(Exception):
     pass
+
+AppAllreadyRegistered = AppAlreadyRegistered # backwards compatibility, will be dropped in 2.3
 
 class NotImplemented(Exception):
     pass

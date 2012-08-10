@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import operator
-
+from cms.utils.helpers import reversion_register
+from cms.utils.placeholder import PlaceholderNoAction
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.utils.translation import ugettext_lazy as _
+import operator
 
-from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import PlaceholderNoAction
 
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
@@ -17,7 +17,28 @@ class Placeholder(models.Model):
 
     def __unicode__(self):
         return self.slot
-        
+
+    def get_add_url(self):
+        return self._get_url('add_plugin')
+
+    def get_move_url(self):
+        return self._get_url('move_plugin')
+
+    def get_remove_url(self):
+        return self._get_url('remove_plugin')
+
+    def get_changelist_url(self):
+        return self._get_url('changelist')
+
+    def _get_url(self, key):
+        model = self._get_attached_model()
+        if not model:
+            return reverse('admin:cms_page_%s' % key)
+        else:
+            app_label = model._meta.app_label
+            model_name = model.__name__.lower()
+            return reverse('admin:%s_%s_%s' % (app_label, model_name, key))
+
     def _get_permission(self, request, key):
         """
         Generic method to check the permissions for a request for a given key,
@@ -62,7 +83,7 @@ class Placeholder(models.Model):
         if media_classes:
             return reduce(operator.add, media_classes)
         return Media()
-    
+
     def _get_attached_fields(self):
         """
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
@@ -74,7 +95,7 @@ class Placeholder(models.Model):
             field = getattr(self, rel.get_accessor_name())
             if field.count():
                 yield rel.field
-    
+
     def _get_attached_field(self):
         from cms.models import CMSPlugin
         if not hasattr(self, '_attached_field_cache'):
@@ -86,32 +107,45 @@ class Placeholder(models.Model):
                 if field.count():
                     self._attached_field_cache = rel.field
         return self._attached_field_cache
-    
+
     def _get_attached_field_name(self):
         field = self._get_attached_field()
         if field:
             return field.name
         return None
-    
+
     def _get_attached_model(self):
         field = self._get_attached_field()
         if field:
             return field.model
         return None
-    
+
     def _get_attached_models(self):
         """
         Returns a list of models of attached to this placeholder.
         """
         return [field.model for field in self._get_attached_fields()]
-        
+
+    @property
+    def page(self):
+        if not hasattr(self, '_page'):
+            from cms.models.pagemodel import Page
+            try:
+                self._page = Page.objects.get(placeholders=self)
+            except (Page.DoesNotExist, Page.MultipleObjectsReturned,):
+                self._page = None
+        return self._page
+
+    @page.setter
+    def page(self, value):
+        self._page = value
 
     def get_plugins_list(self):
         return list(self.get_plugins())
-    
+
     def get_plugins(self):
         return self.cmsplugin_set.all().order_by('tree_id', '-rght')
-    
+
     @property
     def actions(self):
         if not hasattr(self, '_actions_cache'):
@@ -119,4 +153,4 @@ class Placeholder(models.Model):
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
 
-reversion_register(Placeholder) # follow=["cmsplugin_set"] not following plugins since they are a spechial case
+reversion_register(Placeholder)  # follow=["cmsplugin_set"] not following plugins since they are a spechial case

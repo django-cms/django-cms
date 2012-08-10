@@ -1,15 +1,15 @@
-from tinymce.widgets import TinyMCE, get_language_config
+from cms.utils import cms_static_url
 from django.conf import settings
-from django.utils.translation import get_language
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
-from os.path import join
-from django.utils.encoding import smart_unicode
-import tinymce.settings
-from django.utils import simplejson
-from django.template.defaultfilters import escape
 from django.forms.widgets import flatatt
+from django.template.defaultfilters import escape
+from django.template.loader import render_to_string
+from django.utils import simplejson
+from django.utils.encoding import smart_unicode
+from django.utils.safestring import mark_safe
+from django.utils.translation import get_language
+from tinymce.widgets import TinyMCE, get_language_config
 import cms.plugins.text.settings
+import tinymce.settings
 
 class TinyMCEEditor(TinyMCE):
     
@@ -30,13 +30,17 @@ class TinyMCEEditor(TinyMCE):
         
     def _media(self):
         media = super(TinyMCEEditor, self)._media()
-        media.add_js([join(settings.CMS_MEDIA_URL, path) for path in (
-                      'js/tinymce.placeholdereditor.js',
-                      'js/lib/ui.core.js',
-                      'js/placeholder_editor_registry.js',
-                      )])
-        media.add_css({"all":[join(settings.CMS_MEDIA_URL, path) for path in ('css/jquery/cupertino/jquery-ui.css',
-                                                                     'css/tinymce_toolbar.css')]})
+        media.add_js([cms_static_url(path) for path in (
+          'js/tinymce.placeholdereditor.js',
+          'js/libs/jquery.ui.core.js',
+          'js/placeholder_editor_registry.js',
+        )])
+        media.add_css({
+            "all": [
+                cms_static_url(path) for path in ('css/jquery/cupertino/jquery-ui.css',
+                                                  'css/tinymce_toolbar.css')
+            ]
+        })
         
         return media
     

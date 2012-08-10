@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.db.models import Q
 import re
 
 APPEND_TO_SLUG = "-copy"
@@ -9,14 +10,23 @@ def is_valid_page_slug(page, parent, lang, slug, site):
     """Validates given slug depending on settings.
     """
     from cms.models import Title
-    qs = Title.objects.filter(page__site=site, slug=slug).exclude(page=page).exclude(page=page.publisher_public)
-    
+    # Exclude the page with the publisher_state == page.PUBLISHER_STATE_DELETE
+    qs = Title.objects.filter(page__site=site, slug=slug).exclude(
+        Q(page=page) |
+        Q(page=page.publisher_public) |
+        Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
+    )
+
     if settings.i18n_installed:
         qs = qs.filter(language=lang)
-    
+
     if not settings.CMS_FLAT_URLS:
-        if parent and not parent.is_home(): 
-            qs = qs.filter(page__parent=parent)
+        if parent:
+            if parent.is_home():
+                qs = qs.filter(Q(page__parent=parent) |
+                               Q(page__parent__isnull=True))
+            else:
+                qs = qs.filter(page__parent=parent)
         else:
             qs = qs.filter(page__parent__isnull=True)
 
@@ -30,9 +40,9 @@ def is_valid_page_slug(page, parent, lang, slug, site):
 def get_available_slug(title, new_slug=None):
     """Smart function generates slug for title if current title slug cannot be
     used. Appends APPEND_TO_SLUG to slug and checks it again.
-    
+
     (Used in page copy function)
-    
+
     Returns: slug
     """
     slug = new_slug or title.slug

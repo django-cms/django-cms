@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
-from cms.exceptions import NoHomeFound
 from cms.utils.moderator import get_page_queryset
 
 from django.conf import settings
@@ -9,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, \
     RegexURLPattern
+from django.db.models import Q
 from django.utils.importlib import import_module
 
 APP_RESOLVERS = []
@@ -32,7 +32,10 @@ def applications_page_check(request, current_page=None, path=None):
         try:
             page_id = resolver.resolve_page_id(path)
             # yes, it is application page
-            page = get_page_queryset(request).get(id=page_id)
+            if settings.CMS_MODERATOR:
+                page = get_page_queryset(request).get(Q(id=page_id) | Q(publisher_draft=page_id))
+            else:
+                page = get_page_queryset(request).get(id=page_id)
             # If current page was matched, then we have some override for content
             # from cms, but keep current page. Otherwise return page to which was application assigned.
             return page
@@ -76,8 +79,9 @@ def recurse_patterns(path, pattern_list, page_id):
     newpatterns = []
     for pattern in pattern_list:
         app_pat = pattern.regex.pattern
-        if app_pat.startswith('^'):
-            app_pat = app_pat[1:]
+        # make sure we don't get patterns that start with more than one '^'!
+        app_pat = app_pat.lstrip('^')
+        path = path.lstrip('^')
         regex = r'^%s%s' % (path, app_pat)
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
@@ -123,7 +127,7 @@ def get_patterns_for_title(path, title):
     app = apphook_pool.get_apphook(title.application_urls)
     patterns = []
     for pattern_list in get_app_urls(app.urls):
-        if not path.endswith('/'):
+        if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id
         patterns += recurse_patterns(path, pattern_list, page_id)
@@ -147,7 +151,6 @@ def get_app_patterns():
     the title path and then included into the cms url patterns.
     """
     from cms.models import Title
-    from cms.models.pagemodel import Page
     try:
         current_site = Site.objects.get_current()
     except Site.DoesNotExist:
@@ -159,14 +162,7 @@ def get_app_patterns():
     # use draft(). This can be done, because url patterns are used just 
     # in frontend
     is_draft = not settings.CMS_MODERATOR
-    try:
-        home = Page.objects.get_home()
-        home_titles = home.title_set.all()
-    except NoHomeFound:
-        home_titles = []
-    home_slugs = {}
-    for title in home_titles:
-        home_slugs[title.language] = title.slug
+
     title_qs = Title.objects.filter(page__publisher_is_draft=is_draft, page__site=current_site)
     
     if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
@@ -178,24 +174,11 @@ def get_app_patterns():
     
     # Loop over all titles with an application hooked to them
     for title in title_qs.exclude(application_urls=None).exclude(application_urls='').select_related():
-        if settings.CMS_FLAT_URLS:
-            if title.language in home_slugs:
-                path = title.slug.split(home_slugs[title.language] + "/", 1)[-1]
-            else:
-                path = title.slug
-            if use_namespaces:
-                mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
-            else:
-                mixid = "%s:%s" % (path + "/", title.application_urls)
+        path = title.path
+        if use_namespaces:
+            mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
         else:
-            if title.language in home_slugs:
-                path = title.path.split(home_slugs[title.language] + "/", 1)[-1]
-            else:
-                path = title.path
-            if use_namespaces:
-                mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
-            else:
-                mixid = "%s:%s" % (path + "/", title.application_urls)
+            mixid = "%s:%s" % (path + "/", title.application_urls)
         if mixid in included:
             # don't add the same thing twice
             continue  

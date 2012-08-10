@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+from cms.apphook_pool import apphook_pool
+from cms.forms.widgets import UserSelectAdminWidget
+from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, 
+    PageUserGroup)
+from cms.utils.mail import mail_page_user_change
+from cms.utils.page import is_valid_page_slug
+from cms.utils.page_resolver import get_page_from_path
+from cms.utils.permissions import (get_current_user, get_subordinate_users, 
+    get_subordinate_groups)
+from cms.utils.urlutils import any_path_re
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
@@ -11,18 +21,9 @@ from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _, get_language
-
-from cms.apphook_pool import apphook_pool
-from cms.forms.widgets import UserSelectAdminWidget
-from cms.models import (Page, PagePermission, PageUser,
-    ACCESS_PAGE, PageUserGroup)
-from cms.utils.mail import mail_page_user_change
-from cms.utils.page import is_valid_page_slug
-from cms.utils.permissions import (get_current_user, get_subordinate_users,
-    get_subordinate_groups)
-from cms.utils.urlutils import any_path_re
-
 from menus.menu_pool import menu_pool
+
+
 
 
 def get_permission_acessor(obj):
@@ -158,7 +159,7 @@ class PageForm(PageAddForm):
             self.fields['navigation_extenders'].widget = forms.Select({}, [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
-    
+            
     def clean(self):
         cleaned_data = super(PageForm, self).clean()
         if 'reverse_id' in self.fields:
@@ -166,7 +167,7 @@ class PageForm(PageAddForm):
             site_id = cleaned_data['site']
             if id:
                 if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
-                    raise forms.ValidationError(_('A page with this reverse URL id exists already.'))
+                    self._errors['reverse_id'] = self.error_class([_('A page with this reverse URL id exists already.')])
         return cleaned_data
 
     def clean_overwrite_url(self):
@@ -175,6 +176,11 @@ class PageForm(PageAddForm):
             if url:
                 if not any_path_re.match(url):
                     raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
+                page = get_page_from_path(url.strip('/'))
+                if (page and
+                    page.pk not in [self.instance.pk,
+                                    self.instance.publisher_public_id]):
+                    raise forms.ValidationError(_('Page with redirect url %r already exist') % url)
         return url
 
 class PagePermissionInlineAdminForm(forms.ModelForm):

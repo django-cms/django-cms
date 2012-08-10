@@ -41,14 +41,14 @@ def get_admin_menu_item_context(request, page, filtered=False):
     moderator_state = moderator.page_moderator_state(request, page)
     has_add_on_same_level_permission = False
     opts = Page._meta
-    if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id])):
-            has_add_on_same_level_permission = True
+    if settings.CMS_PERMISSION:
+        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
+                GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id])):
+                has_add_on_same_level_permission = True
         
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add", page.site)
     #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
-
     context = {
         'page': page,
         'site': site,
@@ -71,11 +71,14 @@ def get_admin_menu_item_context(request, page, filtered=False):
     return context
 
 
-def render_admin_menu_item(request, page):
+def render_admin_menu_item(request, page, template=None):
     """
     Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
     """
+    if not template:
+        template = "admin/cms/page/menu_item.html"
+
     if not page.pk:
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
         
@@ -93,4 +96,4 @@ def render_admin_menu_item(request, page):
     
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered))
-    return render_to_response('admin/cms/page/menu_item.html', context)
+    return render_to_response(template, context)

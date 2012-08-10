@@ -1,0 +1,490 @@
+/* specific CSS for the django page admin application */
+
+/* default icon */
+#sitemap li a.icon,
+#sitemap li span.icon,
+#sitemap li .col-moderator span.ui-checkbox {
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	background: url(../images/icons.png) 0px 0px no-repeat;
+	margin-top: 5px;
+}
+
+
+.change-list tr{
+    padding-left:1.5em;
+}
+
+.change-list .table-selected tr {
+    background:#ffffd0;
+}
+
+.change-list tr.selected {
+    background:#ffb;
+}
+
+.change-list table tr.target {
+    background:#fff;
+}
+
+td.actions a{
+	vertical-align:middle;
+}
+
+.placeholder-row textarea, .placeholder-row input {
+    float:left;
+}
+
+.placeholder-row .revisions {
+    float:left;
+    margin-left:2em;
+}
+
+.placeholder-row .revisions ul {
+    padding:0;
+    margin-left:0;
+}
+
+.revisions-list .selected {
+    font-weight:bold;
+}
+
+#status-row ul li {
+    list-style-type:none;
+}
+
+#site-selector {
+	float:left; 
+	margin-top:2px; 
+	margin-left:5px; 
+	margin-right:10px;
+}
+
+#traduction-helper-content {
+    margin-top:1em;
+    background:#ffc;
+    padding:1em;
+    display:none;
+    overflow:hidden;
+}
+
+a.collapse span{
+    font-family: monospace;
+}
+
+a.collapse span.collapsed{
+    display: none;
+}
+
+a.collapsed span{
+    display: none;
+}
+
+a.collapsed span.collapsed{
+    display: inline;
+}
+
+.clear {
+    clear: both;
+}
+
+.float-left {
+    float: left;
+    width: 60%;
+}
+
+.ac_results {
+    padding: 0px;
+    border: 1px solid #ccc;
+    background-color: white;
+    overflow: hidden;
+    z-index: 99999;
+}
+
+.ac_results ul {
+    width: 100%;
+    list-style-position: outside;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ac_results li {
+    margin: 0px;
+    padding: 2px 4px;
+    cursor: default;
+    display: block;
+    /*
+    if width will be 100% horizontal scrollbar will apear
+    when scroll mode will be used
+    */
+    /*width: 100%;*/
+    font: menu;
+    font-size: 11px;
+    /*
+    it is very important, if line-height not setted or setted
+    in relative units scroll will be broken in firefox
+    */
+    line-height: 14px;
+    overflow: hidden;
+}
+
+.ac_loading {
+    background: white url('../indicator.gif') right center no-repeat;
+}
+
+.ac_odd {
+    background-color: #eee;
+}
+
+.ac_over {
+    background-color: #999;
+    color: white;
+}
+
+
+
+/* Sitemap */
+div#sitemap {
+	margin:0px;
+	padding:0px 0px 5px 0px;
+}
+
+div#sitemap a{text-decoration:none; border:none; outline:none;}
+div#sitemap a:hover{text-decoration:underline;}
+div#sitemap li, div#sitemap ul{list-style-type: none;}
+#sitemap li, #sitemap ul{ display:block; }
+
+#sitemap li .cont{ display:block; background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px; }
+#sitemap .cont:hover { background-position: 0px -100px !important; }
+
+#sitemap li .col1 .title, #sitemap li .col1 .success{
+	display:block;
+	float:left;
+	line-height:27px;
+	height:28px;
+	padding-left:20px;	
+}
+
+#sitemap li .col1 .title{
+	background: none;
+}
+
+#sitemap li.moveable .col1 .title{
+	background-repeat:no-repeat;
+	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
+}
+
+#sitemap li .col1 .success{
+	padding-left:10px;
+	color:#666;
+}
+
+#sitemap li .col1 a.changelink{
+	margin-left:10px;
+	line-height:27px;
+	display:none;
+}
+
+#sitemap li .move-target-container{
+	display:none;
+	float:left;
+	line-height:27px;
+	margin-right:10px;
+	font-size: 14px;
+}
+
+#sitemap li .move-target-container a:hover {
+	text-decoration: none;
+}
+
+#sitemap li .move-target{
+	display:inline-block;
+	padding: 2px 8px;
+	border-left: 1px solid grey;
+}
+
+#sitemap li .move-target:first-child{
+	border-left:none;
+}
+
+#sitemap li .col-softroot,
+#sitemap li .col-language,
+#sitemap li .col-actions,	
+#sitemap li .col-published,
+#sitemap li .col-navigation,
+#sitemap li .col-moderator,
+#sitemap li .col-lastchange,
+#sitemap li .col-draft,
+#sitemap li .col-view-perms,
+#sitemap li .col-creator{
+	border-left:1px solid #DEDEDC;
+	text-align:center;
+	height:28px;
+	width:auto;
+	line-height:28px;
+	float:left;
+	display:block;
+	background-color:#fff;
+	padding-left:3px;
+	padding-right:3px;
+	white-space:nowrap;
+	filter: alpha(opacity=70);
+	-moz-opacity: 0.70;
+	opacity: 0.70;
+}
+
+#sitemap li .col-softroot,
+#sitemap li .col-language{
+	background:none;
+	border:none;
+	width:auto;
+	text-align:right;
+	padding-right:5px;
+}
+
+#sitemap li .col-language a{text-transform:uppercase;}
+#sitemap li .col-language a:hover{text-decoration:underline;}
+
+#sitemap li .col-actions a{ vertical-align:middle}
+#sitemap li .col-published a, #sitemap li .col-published input, #sitemap li .col-published label{ vertical-align:middle;}
+#sitemap li .col-draft a, #sitemap li .col-draft span{vertical-align:middle; margin-top:0;}
+#sitemap li  .col-navigation img{vertical-align:middle;}
+
+
+/*
+#sitemap li .col-actions { width: 80px; }
+#sitemap li .col-published {width:100px;}
+#sitemap li .col-navigation { width: 65px; }
+#sitemap li .col-softroot { width: 20px; }
+#sitemap li .col-moderator  { width:80px; }
+#sitemap li .col-creator{width: 70px;}
+#sitemap li .col-draft{width:119px; text-align: right;}
+#sitemap li .col-lastchange { width:96px; text-align: left;}
+*/
+#sitemap li .col-view-perms { width: 55px; text-align: center;}
+
+#sitemap li .col-draft {text-align: right;}
+#sitemap li .col-lastchange, 
+#sitemap li .col-published {text-align: left;}
+
+
+#sitemap li a.move {
+	width:18px;
+	height:18px;
+	display:inline-block;
+	background:url(../images/icons.png) -20px -20px no-repeat; 
+}
+#sitemap li a.move span{display:none;}
+
+#sitemap li a.copy {
+	width:15px;
+	height:15px;
+	margin-left:4px;
+	display:inline-block;
+	background:url(../images/copy.gif) 0px 0px no-repeat; 
+}
+
+#sitemap li a.copy span{display:none;}
+
+#sitemap li a.selector-add {
+	margin-left:4px;
+	background-position: -20px 0px;
+}
+
+#sitemap li .col-draft a.approve {
+	margin-left:4px;
+	background-position: -60px -80px;
+	margin-top:-4px;
+}
+
+#sitemap li a.selector-add span{display:none;}
+
+#sitemap li a.addlink, #sitemap li a.deletelink{
+	width:10px;
+	height:10px;
+	display:inline-block;
+	background-position:0 0px;
+	margin:0;
+	padding:0;	
+	margin-left:4px;
+}
+#sitemap li a.addlink span, #sitemap li a.deletelink span{display:none;}
+
+div#sitemap ul.header, div#sitemap ul.header li{
+	background:none;	
+	border:none;
+	list-style:none;
+	margin:0px;
+	padding:0px;
+}
+div#sitemap ul.header li{
+	background:#E1E1E1 url(../images/nav-bg.gif) repeat-x scroll left top;
+	border-bottom:1px solid #DDDDDD;
+	color:#666666;
+	font-size:11px;
+	padding:2px 0px 2px 5px;
+	font-weight:bold;
+	height:auto;
+}
+* html div#sitemap ul.header li{height:16px;}
+
+
+#sitemap ul.header li .cont{
+	background:none;
+	height:15px;
+	background:none;
+	border:none;
+}
+#sitemap ul.header li .col-language,
+#sitemap ul.header li .col-actions,	
+#sitemap ul.header li .col-published,
+#sitemap ul.header li .col-navigation,
+#sitemap ul.header li .col-softroot,
+#sitemap ul.header li .col-moderator,
+#sitemap ul.header li .col-lastchange,
+#sitemap ul.header li .col-draft,
+#sitemap ul.header li .col-view-perms,
+#sitemap ul.header li .col-creator{
+	height:auto;
+	border:none;
+	background:none;
+	line-height:14px;
+	text-align: center;
+}
+#sitemap ul.header li .cont:hover{}
+
+#sitemap .cont:hover a,
+#sitemap .cont:hover .col-language,
+#sitemap .cont:hover .col-language a{color:#fff;}
+
+#sitemap .cont:hover .col1 .title{ background-position:0px -40px;}
+#sitemap .cont:hover .col1 a.changelink{display:inline;}
+
+#sitemap li#dragged{
+	min-width:500px;
+}
+#sitemap li#dragged .cont{
+	border-top: 1px solid #DEDEDC;
+	border-right: 1px solid #DEDEDC;
+}
+#sitemap li#dragged .col2{
+	display:none;
+}
+#sitemap li#dragged .col1 .title{padding-right:10px;}
+
+.activ-filter #sitemap li, .activ-filter #sitemap ul{
+	background-image:none;
+}
+.activ-filter #sitemap .tree ul{margin-left:0px;}
+.activ-filter #sitemap .tree li{padding-left:0px;}
+.activ-filter #sitemap .tree li .cont{border-left:none;}
+.activ-filter #sitemap .tree li .col1 .title{background-image:none; padding-left:8px;}
+
+* html #sitemap ul.header{margin:0;height:21px;overflow:hidden;}
+* html #sitemap ul.header li{}
+
+#changelist{
+	width:auto;
+}
+/* changelist filter */
+#toolbar{height:23px;}
+#changelist-filter-button{
+	background:url(../images/changelist-filter-button-bg.jpg) no-repeat 0 0;
+	border-left:1px solid #DDDDDD;
+	margin:0;
+	position:absolute;
+	right:0;
+	top:0;
+	width:150px;
+	z-index:1000;
+	height:25px;
+	height:auto;
+	display:block;
+	line-height:30px;
+	padding-left:10px;	
+}
+* html #changelist-filter-button{margin-right:-1px;}
+* html #changelist #toolbar{height:23px;overflow:hidden;}
+
+#changelist-filter-button:hover{background-position:0px -50px;}
+.activ-filter #changelist-filter-button{background-position:0px -100px; color:#fff;}
+.activ-filter #changelist-filter-button:hover{background-position:0px -100px;}
+
+#changelist-filter{top:30px;}
+#changelist-filter h2{	display:none;}
+* html #changelist-filter{margin-right:-1px;}
+
+.change-list .filtered {background:#fff none repeat-y scroll right top !important;}
+
+.change-list #changelist .module{border:none;}
+
+/* special checkboxes */
+#sitemap li input.hidden {
+	position: absolute;
+	left: -999em;
+}
+
+/* moderator checkboxes */
+#sitemap li .col-moderator span.ui-checkbox-state-checked.page, 
+#sitemap li .col-moderator span.ui-checkbox-state-checked-hover.page {
+	background-position: 0px -20px;
+}
+
+
+#sitemap li .col-moderator span.ui-checkbox.children {
+	background-position: 0px -40px;
+}
+#sitemap li .col-moderator span.ui-checkbox-state-checked.children, 
+#sitemap li .col-moderator span.ui-checkbox-state-checked-hover.children {
+	background-position: 0px -60px;
+}
+
+#sitemap li .col-moderator span.ui-checkbox.descendants {
+	background-position: 0px -80px;
+}
+#sitemap li .col-moderator span.ui-checkbox-state-checked.descendants, 
+#sitemap li .col-moderator span.ui-checkbox-state-checked-hover.descendants {
+	background-position: 0px -100px;
+}
+
+
+/* moderation - last state */
+#sitemap li .col-lastchange .state-icon {
+	margin-right: -2px;
+}
+
+#sitemap li .col-lastchange .state-icon.add { background-position: -40px 0px; }
+#sitemap li .col-lastchange .state-icon.cha { background-position: -40px -20px; }
+#sitemap li .col-lastchange .state-icon.pub { background-position: -60px -20px; }
+#sitemap li .col-lastchange .state-icon.unp { background-position: -60px -40px; }
+#sitemap li .col-lastchange .state-icon.mov { background-position: -60px 0px; }
+#sitemap li .col-lastchange .state-icon.del { background-position: -40px -40px; }
+#sitemap li .col-lastchange .state-icon.app { background-position: -600px -60px; } 
+
+/* moderation - changed */
+#sitemap li .cont.moderatorstate0 { background-position: 0px -500px; } 
+
+/* moderation - requires approvement */
+#sitemap li .cont.moderatorstate1 { background-position: 0px -300px; } 
+#sitemap li .cont.moderatorstate1 .col-draft span.state { color: #ff6600; }
+
+/* moderation - requires deletion approvement */
+#sitemap li .cont.moderatorstate200 { background-position: 0px -600px; } 
+#sitemap li .cont.moderatorstate200 .col-draft span.state { color: #cc0000; }
+
+/* moderation - approved */
+#sitemap li .cont.moderatorstate10 {} 
+
+/* moderation - you should approve */
+#sitemap li .cont.moderatorstate11 { background-position: 0px -400px; } 
+#sitemap li .cont.moderatorstate11 .col-draft span.state { color: #44ad41; }
+ 
+
+/* softroot icon */
+#sitemap li .col-softroot span.icon { background-position: -80px 0px; }
+
+
+/* loading message */
+#loader-message { position: fixed; top: 0px; right: 0px; padding: 4px 8px; background-color: #f1f8ff; display: none;}
