@@ -4,7 +4,32 @@
   <script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true"></script>
 {% endaddtoblock %}
 
-{% addtoblock "js" %}
+{% addtoblock "css" %}
+  <style type="text/css">
+    .google-map-container { width:100%; height:400px; }
+  </style>
+{% endaddtoblock %}
+
+<div class="plugin_googlemap">
+  {% if object.get_title %}<h2>{{ object.get_title }}</h2>{% endif %}
+
+  <div id="google-map-{{ object.pk }}" class="google-map-container"></div>
+
+  {% if object.route_planer %}
+    <form action="http://maps.google.com/" method="get" class="frm google-map-routeplaner">
+      <fieldset>
+        <h3 class="nospace">{{ object.route_planer_title }}:</h3>
+        <p>
+          <label for="saddr-{{ object.pk }}">{% trans "Your address: " %}</label>
+          <input type="text" id="saddr-{{ object.pk }}" name="saddr" class="input_text" />
+          <span class="btn"><input type="submit" value="{% trans 'Calculate route' %}" /></span>
+          <input type="hidden" name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" />
+        </p>
+      </fieldset>
+    </form>
+  {% endif %}
+</div>
+
 <script type="text/javascript">
   (function () {
     // save settings form plugin
@@ -55,30 +80,3 @@
     }
   })();
 </script>
-{% endaddtoblock %}
-
-{% addtoblock "css" %}
-  <style type="text/css">
-    .google-map-container { width:100%; height:400px; }
-  </style>
-{% endaddtoblock %}
-
-<div class="plugin_googlemap">
-  {% if object.get_title %}<h2>{{ object.get_title }}</h2>{% endif %}
-
-  <div id="google-map-{{ object.pk }}" class="google-map-container"></div>
-
-  {% if object.route_planer %}
-    <form action="http://maps.google.com/" method="get" class="frm google-map-routeplaner">
-      <fieldset>
-        <h3 class="nospace">{{ object.route_planer_title }}:</h3>
-        <p>
-          <label for="saddr-{{ object.pk }}">{% trans "Your address: " %}</label>
-          <input type="text" id="saddr-{{ object.pk }}" name="saddr" class="input_text" />
-          <span class="btn"><input type="submit" value="{% trans 'Calculate route' %}" /></span>
-          <input type="hidden" name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" />
-        </p>
-      </fieldset>
-    </form>
-  {% endif %}
-</div>
