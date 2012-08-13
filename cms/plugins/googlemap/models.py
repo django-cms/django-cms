@@ -30,9 +30,8 @@ class GoogleMap(CMSPlugin):
                                default=_('Calculate your fastest way to here'))
     route_planer = models.BooleanField(_("route planer"), default=False)
 
-    width = models.PositiveSmallIntegerField(_('width'), blank=True, null=True)
-    height = models.PositiveSmallIntegerField(_('height'),
-                                              blank=True, null=True)
+    width = models.PositiveIntegerField(_('width'), blank=True, null=True)
+    height = models.PositiveIntegerField(_('height'), blank=True, null=True)
 
     def __unicode__(self):
         return u"%s (%s, %s %s)" % (self.get_title(), self.address,

@@ -8,24 +8,20 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'GoogleMap.width'
-        db.add_column('cmsplugin_googlemap', 'width',
-                      self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=None),
-                      keep_default=False)
 
-        # Adding field 'GoogleMap.height'
-        db.add_column('cmsplugin_googlemap', 'height',
-                      self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=None),
-                      keep_default=False)
+        # Changing field 'GoogleMap.width'
+        db.alter_column('cmsplugin_googlemap', 'width', self.gf('django.db.models.fields.PositiveIntegerField')(null=True))
 
+        # Changing field 'GoogleMap.height'
+        db.alter_column('cmsplugin_googlemap', 'height', self.gf('django.db.models.fields.PositiveIntegerField')(null=True))
 
     def backwards(self, orm):
-        # Deleting field 'GoogleMap.width'
-        db.delete_column('cmsplugin_googlemap', 'width')
 
-        # Deleting field 'GoogleMap.height'
-        db.delete_column('cmsplugin_googlemap', 'height')
+        # Changing field 'GoogleMap.width'
+        db.alter_column('cmsplugin_googlemap', 'width', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=None))
 
+        # Changing field 'GoogleMap.height'
+        db.alter_column('cmsplugin_googlemap', 'height', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=None))
 
     models = {
         'cms.cmsplugin': {
@@ -54,13 +50,13 @@ class Migration(SchemaMigration):
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'content': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'height': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
+            'height': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'lat': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
             'lng': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
             'route_planer': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'route_planer_title': ('django.db.models.fields.CharField', [], {'default': "u'Calculate your fastest way to here'", 'max_length': '150', 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'width': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
+            'width': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'zipcode': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'zoom': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         }
