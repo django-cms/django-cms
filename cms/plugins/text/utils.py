@@ -14,11 +14,12 @@ def plugin_tags_to_admin_html(text):
     Convert plugin object 'tags' into the form used to represent
     them in the admin text editor.
     """
+    plugin_map = _plugin_dict(text)
     def _tag_to_admin(m):
         plugin_id = int(m.groups()[0])
         try:
-            obj = CMSPlugin.objects.get(pk=plugin_id)
-        except CMSPlugin.DoesNotExist:
+            obj = plugin_map[plugin_id]
+        except KeyError:
             # Object must have been deleted.  It cannot be rendered to
             # end user, or edited, so just remove it from the HTML
             # altogether
@@ -32,8 +33,8 @@ def plugin_tags_to_admin_html(text):
 
 
 def plugin_tags_to_id_list(text):
-    ls = OBJ_ADMIN_RE.findall(text)    
-    return ls
+    ids = OBJ_ADMIN_RE.findall(text)
+    return [int(id) for id in ids if id.isdigit()]
 
 def plugin_tags_to_user_html(text, context, placeholder):
     """
@@ -41,9 +42,7 @@ def plugin_tags_to_user_html(text, context, placeholder):
 
     context is the template context to use, placeholder is the placeholder name
     """
-    plugin_ids = map(int, set(OBJ_ADMIN_RE.findall(text)))
-    plugin_list = downcast_plugins(CMSPlugin.objects.filter(pk__in=plugin_ids), select_placeholder=True)
-    plugin_map = dict((plugin.pk, plugin) for plugin in plugin_list)
+    plugin_map = _plugin_dict(text)
     def _render_tag(m):
         plugin_id = int(m.groups()[0])
         try:
@@ -81,3 +80,9 @@ def replace_plugin_tags(text, id_dict):
                     icon_alt=force_escape(obj.get_instance_icon_alt()),
                     )
     return OBJ_ADMIN_RE.sub(_replace_tag, text)
+
+
+def _plugin_dict(text):
+    plugin_ids = plugin_tags_to_id_list(text)
+    plugin_list = downcast_plugins(CMSPlugin.objects.filter(pk__in=plugin_ids), select_placeholder=True)
+    return dict((plugin.pk, plugin) for plugin in plugin_list)
