@@ -6,7 +6,10 @@
 
 {% addtoblock "css" %}
   <style type="text/css">
-    .google-map-container { width:100%; height:400px; }
+    .google-map-container{% if object.width or object.height %}#google-map-{{ object.pk }}{% endif %} {
+      width: {% if object.width %}{{ object.width }}px{% else %}100%{% endif%};
+      height: {{ object.height|default:'400' }}px;
+    }
   </style>
 {% endaddtoblock %}
 

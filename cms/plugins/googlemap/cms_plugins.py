@@ -10,6 +10,16 @@ class GoogleMapPlugin(CMSPluginBase):
     model = GoogleMap
     name = _("Google Map")
     render_template = "cms/plugins/googlemap.html"
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'address', ('zipcode', 'city',),
+                       'content', 'zoom', ('lat', 'lng'),),
+        }),
+        (_('Advanced'), {
+            'fields': (('route_planer', 'route_planer_title'),
+                       ('width', 'height',),),
+        }),
+    )
 
     def render(self, context, instance, placeholder):
         context.update({
