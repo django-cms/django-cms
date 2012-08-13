@@ -409,10 +409,22 @@ class PagesTestCase(CMSTestCase):
         """
         parent = create_page("parent", "nav_playground.html", "en")
         child = create_page("child", "nav_playground.html", "en", parent=parent)
+        grand_child = create_page("child", "nav_playground.html", "en", parent=child)
         child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        grand_child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         child.save()
-        self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
-        self.assertEqual(parent.get_template_name(), child.get_template_name())
+        grand_child.save()
+
+        # kill template cache
+        delattr(grand_child, '_template_cache')
+        with self.assertNumQueries(1):
+            self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+            self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
+
+        # test template cache
+        with self.assertNumQueries(0):
+            grand_child.get_template()
+
         parent.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         parent.save()
         self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
