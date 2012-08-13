@@ -1193,7 +1193,8 @@ class PageAdmin(ModelAdmin):
         if page and "reversion" in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
             reversion.revision.user = request.user
-            reversion.revision.comment = _(u"Copied %(language)s plugins to %(placeholder)s") % {'language':dict(settings.LANGUAGES)[language], 'placeholder':placeholder}
+            reversion.revision.comment = _(u"Copied %(language)s plugins to %(placeholder)s") % {'language': ugettext(dict(settings.LANGUAGES)[language]),
+                                                                                                 'placeholder': placeholder}
 
         plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
         return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list':plugin_list}, RequestContext(request))

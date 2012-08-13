@@ -168,6 +168,62 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(0, Text.objects.count())
 
+    def test_add_text_plugin_empty_tag(self):
+        """
+        Test that you can add a text plugin
+        """
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+            }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body":'<div class="someclass"></div><p>foo</p>'
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals('<div class="someclass"></div><p>foo</p>', txt.body)
+
+    def test_add_text_plugin_html_sanitizer(self):
+        """
+        Test that you can add a text plugin
+        """
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type':"TextPlugin",
+            'language':settings.LANGUAGES[0][0],
+            'placeholder':page.placeholders.get(slot="body").pk,
+            }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body":'<script>var bar="hacked"</script>'
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals('&lt;script&gt;var bar="hacked"&lt;/script&gt;', txt.body)
+
     def test_copy_plugins(self):
         """
         Test that copying plugins works as expected.
@@ -401,6 +457,39 @@ class PluginsTestCase(PluginsTestBaseCase):
             response = self.client.get(page.get_absolute_url())
             self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
 
+    def test_render_textplugin(self):
+        # Setup
+        page = create_page("render test", "nav_playground.html", "en")
+        ph = page.placeholders.get(slot="body")
+        text_plugin = add_plugin(ph, "TextPlugin", "en", body="Hello World")
+        link_plugins = []
+        for i in range(0, 10):
+            link_plugins.append(add_plugin(ph, "LinkPlugin", "en",
+                target=text_plugin,
+                name="A Link %d" % i,
+                url="http://django-cms.org"))
+            text_plugin.text.body += '<img src="/static/cms/images/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
+                link_plugins[-1].name,
+                link_plugins[-1].pk,
+                link_plugins[-1].name,
+            )
+        text_plugin.save()
+        txt = text_plugin.text
+        ph = Placeholder.objects.get(pk=ph.pk)
+        with self.assertNumQueries(2):
+            # 1 query for the CMSPlugin objects,
+            # 1 query for each type of child object (1 in this case, all are Link plugins)
+            txt.body = plugin_tags_to_admin_html(
+                '\n'.join(["{{ plugin_object %d }}" % l.cmsplugin_ptr_id
+                           for l in link_plugins]))
+        txt.save()
+        text_plugin = self.reload(text_plugin)
+
+        with self.assertNumQueries(2):
+            rendered = text_plugin.render_plugin(placeholder=ph)
+        for i in range(0, 10):
+            self.assertTrue('A Link %d' % i in rendered)
+
     def test_copy_textplugin(self):
         """
         Test that copying of textplugins replaces references to copied plugins
@@ -476,7 +565,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         new_plugin = Text.objects.get(pk=6)
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
-        expected = sorted([u'4', u'5'])
+        expected = sorted([4, 5])
         self.assertEquals(idlist, expected)
 
     def test_empty_plugin_is_ignored(self):
@@ -769,8 +858,39 @@ class LinkPluginTestCase(PluginsTestBaseCase):
     def test_does_not_verify_existance_of_url(self):
         form = LinkForm(
             {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
-        self.assertEquals(form.is_valid(), True)
+        self.assertTrue(form.is_valid())
 
+    def test_opens_in_same_window_by_default(self):
+        """Could not figure out how to render this plugin
+
+        Checking only for the values in the model"""
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test'})
+        link = form.save()
+        self.assertEquals(link.target, '')
+
+    def test_open_in_blank_window(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : '_blank'})
+        link = form.save()
+        self.assertEquals(link.target, '_blank')
+
+    def test_open_in_parent_window(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : '_parent'})
+        link = form.save()
+        self.assertEquals(link.target, '_parent')
+
+    def test_open_in_top_window(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : '_top'})
+        link = form.save()
+        self.assertEquals(link.target, '_top')
+
+    def test_open_in_nothing_else(self):
+        form = LinkForm({'name': 'Linkname',
+            'url': 'http://www.nonexistant.test', 'target' : 'artificial'})
+        self.assertFalse(form.is_valid())
 
 class NoDatabasePluginTests(TestCase):
     def test_render_meta_is_unique(self):

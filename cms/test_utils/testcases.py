@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext,
+from cms.test_utils.util.context_managers import (UserLoginContext, 
     SettingsOverride)
-from cms.test_utils.util.request_factory import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.test import testcases
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from menus.menu_pool import menu_pool
 from urlparse import urljoin
 import sys
