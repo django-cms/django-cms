@@ -5,56 +5,56 @@
 {% endaddtoblock %}
 
 {% addtoblock "js" %}
-<script type="text/javascript">
-  (function () {
-    // save settings form plugin
-    var container = 'google-map-{{ object.pk }}';
-    var latlng = new google.maps.LatLng(46.94708, 7.445975); // default to switzerland
+  <script type="text/javascript">
+    (function () {
+      // save settings form plugin
+      var container = 'google-map-{{ object.pk }}';
+      var latlng = new google.maps.LatLng(46.94708, 7.445975); // default to switzerland
 
-    var title = "{{ object.get_title }}";
-    var address = "{{ object.address }}, {{ object.zipcode }} {{ object.city }}";
+      var title = "{{ object.get_title }}";
+      var address = "{{ object.address }}, {{ object.zipcode }} {{ object.city }}";
 
-    var options = {
-      zoom: {{ object.get_zoom_level }},
-      mapTypeId: google.maps.MapTypeId.ROADMAP /* ROADMAP, SATELLITE, HYBRID or TERRAIN */
-    };
+      var options = {
+        zoom: {{ object.get_zoom_level }},
+        mapTypeId: google.maps.MapTypeId.ROADMAP /* ROADMAP, SATELLITE, HYBRID or TERRAIN */
+      };
 
-    {% if object.get_lat_lng %}
-      // load latlng from given lat lng settings
-      latlng = new google.maps.LatLng({{ object.get_lat_lng|join:", " }});
-      initGoogleMaps(latlng);
-    {% else %}
-      // load latlng from given address
-      var geocoder = new google.maps.Geocoder();
-        geocoder.geocode({'address': address}, function (results, status) {
-          // check if address can be found if not show default (var latlng)
-          if(status == google.maps.GeocoderStatus.OK) latlng = results[0].geometry.location;
-          initGoogleMaps(latlng);
+      {% if object.get_lat_lng %}
+        // load latlng from given lat lng settings
+        latlng = new google.maps.LatLng({{ object.get_lat_lng|join:", " }});
+        initGoogleMaps(latlng);
+      {% else %}
+        // load latlng from given address
+        var geocoder = new google.maps.Geocoder();
+          geocoder.geocode({'address': address}, function (results, status) {
+            // check if address can be found if not show default (var latlng)
+            if(status == google.maps.GeocoderStatus.OK) latlng = results[0].geometry.location;
+            initGoogleMaps(latlng);
+          });
+      {% endif %}
+
+      // initialize google maps
+      function initGoogleMaps(latlng) {
+        // overwrite options
+        options.center = latlng;
+        // initialize google map
+        var map = new google.maps.Map(document.getElementById(container), options);
+        // create marker
+        var marker = new google.maps.Marker({
+          'position': options.center,
+          'map': map,
+          'title': title
         });
-    {% endif %}
-
-    // initialize google maps
-    function initGoogleMaps(latlng) {
-      // overwrite options
-      options.center = latlng;
-      // initialize google map
-      var map = new google.maps.Map(document.getElementById(container), options);
-      // create marker
-      var marker = new google.maps.Marker({
-        'position': options.center,
-        'map': map,
-        'title': title
-      });
-      // prepare info window
-      var infowindow = new google.maps.InfoWindow({
-        content: "<strong>" + title + "<\/strong> \
-                  <br />" + address {% if map.content %} + "<br /><br /><em>{{ object.content }}<\/em>"{% endif %}
-      });
-      // show info window
-      infowindow.open(map, marker);
-    }
-  })();
-</script>
+        // prepare info window
+        var infowindow = new google.maps.InfoWindow({
+          content: "<strong>" + title + "<\/strong> \
+                    <br />" + address {% if map.content %} + "<br /><br /><em>{{ object.content }}<\/em>"{% endif %}
+        });
+        // show info window
+        infowindow.open(map, marker);
+      }
+    })();
+  </script>
 {% endaddtoblock %}
 
 {% addtoblock "css" %}
