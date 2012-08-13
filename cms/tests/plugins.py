@@ -401,6 +401,39 @@ class PluginsTestCase(PluginsTestBaseCase):
             response = self.client.get(page.get_absolute_url())
             self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
 
+    def test_render_textplugin(self):
+        # Setup
+        page = create_page("render test", "nav_playground.html", "en")
+        ph = page.placeholders.get(slot="body")
+        text_plugin = add_plugin(ph, "TextPlugin", "en", body="Hello World")
+        link_plugins = []
+        for i in range(0, 10):
+            link_plugins.append(add_plugin(ph, "LinkPlugin", "en",
+                target=text_plugin,
+                name="A Link %d" % i,
+                url="http://django-cms.org"))
+            text_plugin.text.body += '<img src="/static/cms/images/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
+                link_plugins[-1].name,
+                link_plugins[-1].pk,
+                link_plugins[-1].name,
+            )
+        text_plugin.save()
+        txt = text_plugin.text
+        ph = Placeholder.objects.get(pk=ph.pk)
+        with self.assertNumQueries(2):
+            # 1 query for the CMSPlugin objects,
+            # 1 query for each type of child object (1 in this case, all are Link plugins)
+            txt.body = plugin_tags_to_admin_html(
+                '\n'.join(["{{ plugin_object %d }}" % l.cmsplugin_ptr_id
+                           for l in link_plugins]))
+        txt.save()
+        text_plugin = self.reload(text_plugin)
+
+        with self.assertNumQueries(2):
+            rendered = text_plugin.render_plugin(placeholder=ph)
+        for i in range(0, 10):
+            self.assertTrue('A Link %d' % i in rendered)
+
     def test_copy_textplugin(self):
         """
         Test that copying of textplugins replaces references to copied plugins
@@ -476,7 +509,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         new_plugin = Text.objects.get(pk=6)
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
-        expected = sorted([u'4', u'5'])
+        expected = sorted([4, 5])
         self.assertEquals(idlist, expected)
 
     def test_empty_plugin_is_ignored(self):

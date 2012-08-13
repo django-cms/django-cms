@@ -27,28 +27,36 @@ def assign_plugins(request, placeholders, lang=None):
 
     # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=lang, parent__isnull=True).order_by('placeholder', 'position')
-    plugin_types_map = defaultdict(list)
-    plugin_lookup = {}
-
-    # make a map of plugin types, needed later for downcasting
-    for plugin in qs:
-        plugin_types_map[plugin.plugin_type].append(plugin.pk)
-    for plugin_type, pks in plugin_types_map.iteritems():
-        cls = plugin_pool.get_plugin(plugin_type)
-        # get all the plugins of type cls.model
-        plugin_qs = cls.model.objects.filter(pk__in=pks)
-
-        # put them in a map so we can replace the base CMSPlugins with their
-        # downcasted versions
-        for instance in plugin_qs:
-            plugin_lookup[instance.pk] = instance
-    # make the equivalent list of qs, but with downcasted instances
-    plugin_list = [plugin_lookup[p.pk] for p in qs if p.pk in plugin_lookup]
+    plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
     for placeholder in placeholders:
         setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
+
+
+def downcast_plugins(queryset, select_placeholder=False):
+    plugin_types_map = defaultdict(list)
+    plugin_lookup = {}
+
+    # make a map of plugin types, needed later for downcasting
+    for plugin in queryset:
+        plugin_types_map[plugin.plugin_type].append(plugin.pk)
+    for plugin_type, pks in plugin_types_map.iteritems():
+        cls = plugin_pool.get_plugin(plugin_type)
+        # get all the plugins of type cls.model
+        plugin_qs = cls.model.objects.filter(pk__in=pks)
+        if select_placeholder:
+            plugin_qs = plugin_qs.select_related('placeholder')
+
+        # put them in a map so we can replace the base CMSPlugins with their
+        # downcasted versions
+        for instance in plugin_qs:
+            plugin_lookup[instance.pk] = instance
+        # make the equivalent list of qs, but with downcasted instances
+    plugin_list = [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
+    return plugin_list
+
 
 def get_plugins_for_page(request, page, lang=None):
     if not page:
