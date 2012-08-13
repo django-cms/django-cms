@@ -172,6 +172,7 @@ class ShowSubMenu(InclusionTag):
     show the sub menu of the current nav-node.
     -levels: how many levels deep
     -root_level: the level to start the menu after
+    -nephews: the level of descendants of siblings (nephews) to show
     -temlplate: template used to render the navigation
     """
     name = 'show_sub_menu'
@@ -180,10 +181,11 @@ class ShowSubMenu(InclusionTag):
     options = Options(
         IntegerArgument('levels', default=100, required=False),
         IntegerArgument('root_level', default=None, required=False),
+        IntegerArgument('nephews', default=100, required=False),
         Argument('template', default='menu/sub_menu.html', required=False),
     )
     
-    def get_context(self, context, levels, root_level, template):
+    def get_context(self, context, levels, root_level, nephews, template):
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
@@ -205,6 +207,8 @@ class ShowSubMenu(InclusionTag):
                 children = node.children
                 for child in children:
                     child.parent = None
+                    if child.sibling:
+                        cut_after(child, nephews, [])
                 children = menu_pool.apply_modifiers(children, request, post_cut=True)
         context.update({
             'children':children,
