@@ -7,7 +7,7 @@
 
 /*##################################################|*/
 /* #PLACEHOLDERS# */
-.cms_placeholder-bar { display:-moz-inline-box; -moz-box-orient:vertical; display:inline-block !important; float:left;
+.cms_placeholder { display:-moz-inline-box; -moz-box-orient:vertical; display:inline-block !important; float:left;
 	vertical-align:middle; *vertical-align:auto; width:100%;
 	clear:both; overflow:hidden; }
 
