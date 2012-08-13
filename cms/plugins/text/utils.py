@@ -14,7 +14,7 @@ def plugin_tags_to_admin_html(text):
     Convert plugin object 'tags' into the form used to represent
     them in the admin text editor.
     """
-    plugin_map = _plugin_dict(text)
+    plugin_map = _plugin_dict(text, regex=OBJ_TAG_RE)
     def _tag_to_admin(m):
         plugin_id = int(m.groups()[0])
         try:
@@ -32,8 +32,8 @@ def plugin_tags_to_admin_html(text):
     return OBJ_TAG_RE.sub(_tag_to_admin, text)
 
 
-def plugin_tags_to_id_list(text):
-    ids = OBJ_ADMIN_RE.findall(text)
+def plugin_tags_to_id_list(text, regex=OBJ_ADMIN_RE):
+    ids = regex.findall(text)
     return [int(id) for id in ids if id.isdigit()]
 
 def plugin_tags_to_user_html(text, context, placeholder):
@@ -82,7 +82,7 @@ def replace_plugin_tags(text, id_dict):
     return OBJ_ADMIN_RE.sub(_replace_tag, text)
 
 
-def _plugin_dict(text):
-    plugin_ids = plugin_tags_to_id_list(text)
+def _plugin_dict(text, regex=OBJ_ADMIN_RE):
+    plugin_ids = plugin_tags_to_id_list(text, regex)
     plugin_list = downcast_plugins(CMSPlugin.objects.filter(pk__in=plugin_ids), select_placeholder=True)
     return dict((plugin.pk, plugin) for plugin in plugin_list)
