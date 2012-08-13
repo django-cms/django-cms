@@ -8,7 +8,7 @@ var editPluginPopupCallbacks = {};
 {% include "cms/plugins/widgets/widget_lib.js" %}
 
 (function namespacing(CMS) {
-	CMS(document).ready(function () {
+	CMS.$(document).ready(function () {
 		// scroll to top
 		scrollTo(0, 0);
 		
@@ -42,7 +42,7 @@ var editPluginPopupCallbacks = {};
 				//construct the insertLinkButton html
 				html = get_plugin_html()
 				//add the button to the tools box
-				jQuery(wym._box)
+				$(wym._box)
 				.find(wym._options.toolsSelector + wym._options.toolsListSelector)
 				.append(html);
 				// Enable the placeholderbridge plugin, to allow
@@ -113,7 +113,7 @@ var editPluginPopupCallbacks = {};
 			+ '</li>';
 	return html;
 	}
-})(window.CMS.$);
+})(window.CMS);
 
 //]]>
 </script>
