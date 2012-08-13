@@ -41,7 +41,7 @@ class AbstractText(CMSPlugin):
         ids = plugin_tags_to_id_list(self.body)
         plugins = CMSPlugin.objects.filter(parent=self)
         for plugin in plugins:
-            if not str(plugin.pk) in ids:
+            if not plugin.pk in ids:
                 plugin.delete() #delete plugins that are not referenced in the text anymore
 
     def post_copy(self, old_instance, ziplist):
