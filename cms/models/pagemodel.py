@@ -300,6 +300,10 @@ class Page(MPTTModel):
                 this is because of how this adding works - first save, then move
         """
 
+        # delete template cache
+        if hasattr(self, '_template_cache'):
+            delattr(self, '_template_cache')
+
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
         if self.publisher_is_draft:
@@ -646,17 +650,21 @@ class Page(MPTTModel):
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
+        if hasattr(self, '_template_cache'):
+            return self._template_cache
         template = None
         if self.template:
             if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
                 template = self.template
             else:
-                for p in self.get_ancestors(ascending=True):
-                    template = p.get_template()
-                    if template:
-                        break
+                try:
+                    template = self.get_ancestors(ascending=True).exclude(
+                        template=settings.CMS_TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
+                except IndexError:
+                    pass
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
+        self._template_cache = template
         return template
 
     def get_template_name(self):
