@@ -47,8 +47,9 @@
         });
         // prepare info window
         var infowindow = new google.maps.InfoWindow({
-          content: "<strong>" + title + "<\/strong> \
-                    <br />" + address {% if map.content %} + "<br /><br /><em>{{ object.content }}<\/em>"{% endif %}
+          content: "<strong>" + title + "</strong> \
+                    <br />" + address {% if object.content %} + "<br /> \
+                    <br /><em>{{ object.content }}</em>"{% endif %}
         });
         // show info window
         infowindow.open(map, marker);
