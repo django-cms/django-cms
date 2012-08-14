@@ -1,9 +1,12 @@
+# coding: utf-8
+
 import re
 from django.forms.models import ModelForm
 from .models import GoogleMap
 from django.utils.translation import ugettext_lazy as _
 
-CSS_LENGTH_RE = re.compile(r'^\d+(?:px|%)$')
+CSS_WIDTH_RE = re.compile(r'^\d+(?:px|%)$')
+CSS_HEIGHT_RE = re.compile(r'^\d+px$')
 
 
 class GoogleMapForm(ModelForm):
@@ -15,10 +18,10 @@ class GoogleMapForm(ModelForm):
         width = cleaned_data.get('width', '')
         height = cleaned_data.get('height', '')
         if width or height:
-            error = self.error_class([_('Must be a positive integer '
-                                        'followed by px or %.')])
-            if width and not CSS_LENGTH_RE.match(width):
-                self._errors['width'] = error
-            if height and not CSS_LENGTH_RE.match(height):
-                self._errors['height'] = error
+            if width and not CSS_WIDTH_RE.match(width):
+                self._errors['width'] = self.error_class([
+                    _(u'Must be a positive integer followed by “px” or “%”.')])
+            if height and not CSS_HEIGHT_RE.match(height):
+                self._errors['height'] = self.error_class([
+                           _(u'Must be a positive integer followed by “px”.')])
         return cleaned_data
