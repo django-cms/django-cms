@@ -1,15 +1,15 @@
-from django.conf import settings
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
-from cms.plugins.googlemap.models import GoogleMap
-from django.forms.widgets import Media
+from .models import GoogleMap
+from .forms import GoogleMapForm
 
 
 class GoogleMapPlugin(CMSPluginBase):
     model = GoogleMap
     name = _("Google Map")
     render_template = "cms/plugins/googlemap.html"
+    form = GoogleMapForm
     fieldsets = (
         (None, {
             'fields': ('title', 'address', ('zipcode', 'city',),
@@ -23,8 +23,8 @@ class GoogleMapPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         context.update({
-            'object':instance, 
-            'placeholder':placeholder, 
+            'object': instance,
+            'placeholder': placeholder,
         })
         return context
 

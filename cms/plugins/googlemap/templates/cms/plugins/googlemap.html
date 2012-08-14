@@ -57,19 +57,11 @@
   </script>
 {% endaddtoblock %}
 
-{% addtoblock "css" %}
-  <style type="text/css">
-    .google-map-container{% if object.width or object.height %}#google-map-{{ object.pk }}{% endif %} {
-      width: {% if object.width %}{{ object.width }}px{% else %}100%{% endif%};
-      height: {{ object.height|default:'400' }}px;
-    }
-  </style>
-{% endaddtoblock %}
-
 <div class="plugin_googlemap">
   {% if object.get_title %}<h2>{{ object.get_title }}</h2>{% endif %}
 
-  <div id="google-map-{{ object.pk }}" class="google-map-container"></div>
+  <div id="google-map-{{ object.pk }}" class="google-map-container"
+       style="width: {{ object.width }}; height: {{ object.height }};"></div>
 
   {% if object.route_planer %}
     <form action="http://maps.google.com/" method="get" class="frm google-map-routeplaner">
