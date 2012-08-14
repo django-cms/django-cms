@@ -9,6 +9,7 @@ class GoogleMapPlugin(CMSPluginBase):
     model = GoogleMap
     name = _("Google Map")
     render_template = "cms/plugins/googlemap.html"
+    admin_preview = False
     form = GoogleMapForm
     fieldsets = (
         (None, {
