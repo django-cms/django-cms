@@ -16,6 +16,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
+from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
@@ -45,8 +46,6 @@ import inspect
 
 
 # silly hack to test features/ fixme
-from cms.utils.page_resolver import is_valid_overwrite_url
-
 if inspect.getargspec(get_deleted_objects)[0][-1] == 'using':
     from django.db import router
 else:
@@ -755,20 +754,20 @@ class PageAdmin(ModelAdmin):
             page = self.model.objects.get(pk=page_id)
             target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
-            return HttpResponseBadRequest("error")
+            return jsonify_request(HttpResponseBadRequest("error"))
 
         # does he haves permissions to do this...?
         if not page.has_move_page_permission(request) or \
             not target.has_add_permission(request):
-                return HttpResponseForbidden("Denied")
+            return jsonify_request(HttpResponseForbidden(_("Error! You don't have permissions to move this page. Please reload the page")))
 
         # move page
         page.move_page(target, position)
         
         if "reversion" in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
-            
-        return admin_utils.render_admin_menu_item(request, page)
+
+        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(Page, id=page_id)
@@ -823,12 +822,15 @@ class PageAdmin(ModelAdmin):
                 return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                kwargs = {
-                    'copy_permissions': request.REQUEST.get('copy_permissions', False),
-                    'copy_moderation': request.REQUEST.get('copy_moderation', False),
-                }
-                page.copy_page(target, site, position, **kwargs)
-                return HttpResponse("ok")
+                try:
+                    kwargs = {
+                        'copy_permissions': request.REQUEST.get('copy_permissions', False),
+                        'copy_moderation': request.REQUEST.get('copy_moderation', False),
+                    }
+                    page.copy_page(target, site, position, **kwargs)
+                    return jsonify_request(HttpResponse("ok"))
+                except ValidationError,e:
+                    return jsonify_request(HttpResponseBadRequest(e.messages))
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
@@ -1051,7 +1053,7 @@ class PageAdmin(ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
             try:
-                if page.published or is_valid_overwrite_url(page.get_absolute_url(),page,False):
+                if page.published or is_valid_url(page.get_absolute_url(),page,False):
                     page.published = not page.published
                     page.save()
                 return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))

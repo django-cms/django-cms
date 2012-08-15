@@ -60,8 +60,13 @@
 		node.append(msg);
 	    msg.fadeOut(3000);
 	}
-	moveError = function(node){
-		var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
+	moveError = function(node,message){
+        if(message && message!="error") {
+            var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
+        }
+        else {
+            var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
+        }
 		node.append(msg);
 	}
 	// some settings used by javascript functions

@@ -11,7 +11,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
     URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, 
     SettingsOverride)
-from cms.utils.page_resolver import get_page_from_request, is_valid_overwrite_url
+from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -607,9 +607,9 @@ class PagesTestCase(CMSTestCase):
             home = create_page('home', 'nav_playground.html', 'en', published=True)
             bar = create_page('bar', 'nav_playground.html', 'en', published=False)
             foo = create_page('foo', 'nav_playground.html', 'en', published=True)
-            # Tests to assure is_valid_overwrite_url is ok on plain pages
-            self.assertTrue(is_valid_overwrite_url(bar.get_absolute_url('en'),bar))
-            self.assertTrue(is_valid_overwrite_url(foo.get_absolute_url('en'),foo))
+            # Tests to assure is_valid_url is ok on plain pages
+            self.assertTrue(is_valid_url(bar.get_absolute_url('en'),bar))
+            self.assertTrue(is_valid_url(foo.get_absolute_url('en'),foo))
 
             # Set url_overwrite for page foo
             title = foo.get_title_obj(language='en')
@@ -617,7 +617,7 @@ class PagesTestCase(CMSTestCase):
             title.path = '/bar/'
             title.save()
             try:
-                url = is_valid_overwrite_url(bar.get_absolute_url('en'),bar)
+                url = is_valid_url(bar.get_absolute_url('en'),bar)
             except ValidationError:
                 url = False
             if url:

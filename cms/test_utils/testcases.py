@@ -200,12 +200,13 @@ class CMSTestCase(TestCase):
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
-        
+
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, "ok")
+        # Altered to reflect the new django-js jsonified response messages
+        self.assertEquals(response.content, '{"status": 200, "content": "ok"}')
         
-        title = page.title_set.all()[0] 
+        title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
         
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
