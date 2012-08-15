@@ -133,7 +133,7 @@ def get_page_from_request(request, use_path=None):
     return page
 
 
-def is_valid_overwrite_url(url,instance,create_links=True):
+def is_valid_url(url,instance,create_links=True):
     """ Checks for conflicting urls
     """
     if url:

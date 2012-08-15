@@ -5,7 +5,7 @@ from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE,
     PageUserGroup)
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
-from cms.utils.page_resolver import get_page_from_path, is_valid_overwrite_url
+from cms.utils.page_resolver import get_page_from_path, is_valid_url
 from cms.utils.permissions import (get_current_user, get_subordinate_users, 
     get_subordinate_groups)
 from cms.utils.urlutils import any_path_re
@@ -126,7 +126,7 @@ class PageAddForm(forms.ModelForm):
                 title.slug = self.cleaned_data['slug']
                 title.save()
                 try:
-                    is_valid_overwrite_url(title.path,page)
+                    is_valid_url(title.path,page)
                 except ValidationError,e:
                     title.slug = oldslug
                     title.save()
@@ -189,7 +189,7 @@ class PageForm(PageAddForm):
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']
-            is_valid_overwrite_url(url,self.instance)
+            is_valid_url(url,self.instance)
             # TODO: Check what happens if 'overwrite_url' is NOT in self.fields
             return url
 

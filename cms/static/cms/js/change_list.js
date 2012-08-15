@@ -223,37 +223,37 @@
 			if(jtarget.hasClass("publish-checkbox")) {
 				pageId = jtarget.attr("name").split("status-")[1];
 				// if I don't put data in the post, django doesn't get it
-                reloadItem(
-                        jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/",
-                        { 1:1 },
-                        // on success
-                        function(decoded,textStatus){
-                            response = decoded.content;
-                            status = decoded.status;
-                            if(status==200) {
-                                if (/page_\d+/.test($(jtarget).attr('id'))) {
-                                    // one level higher
-                                    target = $(jtarget).find('div.cont:first');
-                                } else {
-                                    target = $(jtarget).parents('div.cont:first');
-                                }
+				reloadItem(
+						jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/",
+						{ 1:1 },
+						// on success
+						function(decoded,textStatus){
+							response = decoded.content;
+							status = decoded.status;
+							if(status==200) {
+								if (/page_\d+/.test($(jtarget).attr('id'))) {
+									// one level higher
+									target = $(jtarget).find('div.cont:first');
+								} else {
+									target = $(jtarget).parents('div.cont:first');
+								}
 
-                                var parent = target.parent();
-                                if (response == "NotFound") {
-                                    return parent.remove();
-                                }
-                                target.replace(response);
-                                parent.find('div.cont:first').yft();
+								var parent = target.parent();
+								if (response == "NotFound") {
+									return parent.remove();
+								}
+								target.replace(response);
+								parent.find('div.cont:first').yft();
 
-                                return true;
-                            }
-                            else {
-                                $(jtarget).attr("checked",false)
-                                alert(response);
-                                return false;
-                            }
-                        }
-                );
+								return false;
+							}
+							else {
+								$(jtarget).attr("checked",false)
+								alert(response);
+								return false;
+							}
+						}
+				);
 				e.stopPropagation();
 				return true;
 			}
@@ -429,12 +429,15 @@
 			};
 			data = $.extend(data, options);
 			
-			$.post("./" + item_id + "/copy-page/", data, function(html) {
-				if(html=="ok"){
+			$.post("./" + item_id + "/copy-page/", data, function(decoded) {
+				response = decoded.content;
+				status = decoded.status;
+				if(status==200) {
 					// reload tree
 					window.location = window.location.href;
 				}else{
-					moveError($('#page_'+item_id + " div.col1:eq(0)"));  
+					alert(response);
+					moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
 				}
 			});
 		}
@@ -468,24 +471,24 @@
 		}
 		
 		function onSuccess(response, textStatus) {
-            status = true;
+			status = true;
 			if (callback) status = callback(response, textStatus);
 
-            if(status==true) {
-                if (/page_\d+/.test($(el).attr('id'))) {
-                    // one level higher
-                    target = $(el).find('div.cont:first');
-                } else {
-                    target = $(el).parents('div.cont:first');
-                }
+			if(status==true) {
+				if (/page_\d+/.test($(el).attr('id'))) {
+					// one level higher
+					target = $(el).find('div.cont:first');
+				} else {
+					target = $(el).parents('div.cont:first');
+				}
 
-                var parent = target.parent();
-                if (response == "NotFound") {
-                    return parent.remove();
-                }
-                target.replace(response);
-                parent.find('div.cont:first').yft();
-            }
+				var parent = target.parent();
+				if (response == "NotFound") {
+					return parent.remove();
+				}
+				target.replace(response);
+				parent.find('div.cont:first').yft();
+			}
 
 			return true;
 		}
@@ -509,23 +512,25 @@
 		reloadItem(
 			jtarget, "./" + item_id + "/move-page/", 
 			
-			{ position: position, target: target_id }, 
-			
+			{ position: position, target: target_id },
+
 			// on success
-			function(){
-				if (tree) {
-					var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
-					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
-				} else {
-					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
+			function(decoded,textStatus){
+				response = decoded.content;
+				status = decoded.status;
+				if(status==200) {
+					if (tree) {
+						var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
+						tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
+					} else {
+						moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
+					}
+					return false;
 				}
-                return true;
-			},
-			
-			// on error
-			function(){
-				moveError($('#page_'+item_id + " div.col1:eq(0)"));
-                return false;
+				else {
+					moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
+					return false;
+				}
 			}
 		);
 	}
