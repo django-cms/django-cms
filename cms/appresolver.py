@@ -174,7 +174,10 @@ def get_app_patterns():
     
     # Loop over all titles with an application hooked to them
     for title in title_qs.exclude(application_urls=None).exclude(application_urls='').select_related():
-        path = title.path
+        if settings.CMS_FLAT_URLS:
+            path = title.slug
+        else:
+            path = title.path
         if use_namespaces:
             mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
         else:
