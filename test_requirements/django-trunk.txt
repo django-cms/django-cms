@@ -1,0 +1,2 @@
+-r requirements_base.txt
+https://github.com/django/django/tarball/master/django-cms.tar.gz'
