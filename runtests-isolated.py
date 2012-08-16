@@ -4,42 +4,38 @@ import pkgutil
 import pyclbr
 import subprocess
 import argparse
-from unittest.loader import findTestCases
-from cms.test_utils.cli import configure
-from cms.test_utils.tmpdir import temp_dir
 import sys
 import os.path
-import unittest
-from django.utils.unittest.loader import defaultTestLoader
+#from iterools import ifilter
 
-def main(argv,test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
-         time_tests=False, failfast=False):
+def main(argv, failfast=False, test_labels=None):
     testlist = []
-    with temp_dir() as STATIC_ROOT:
-        with temp_dir() as MEDIA_ROOT:
-            configure(TEST_RUNNER=test_runner, JUNIT_OUTPUT_DIR=junit_output_dir,
-                      TIME_TESTS=time_tests, ROOT_URLCONF='cms.test_utils.project.urls',
-                      STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT)
-            from django.conf import settings
-            tests = defaultTestLoader.discover('cms/tests',pattern="__init__.py")
-            for suite in tests:
-                for test in suite:
-                    for t in test:
-                        testlist.append(t.__class__.__name__+"."+t._testMethodName)
-            for cls in testlist:
-                print cls
-                args = ['python', 'runtests.py'] + argv + [cls]
+    for module in [name for _, name, _ in pkgutil.iter_modules([os.path.join("cms","tests")])]:
+        clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+        for clsname,cls in clsmembers.items():
+            testlist.append(cls)
+
+    for cls in testlist:
+        for method, line in cls.methods.items():
+            if not method.startswith('test_'):
+                continue
+            test = '%s.%s' % (cls.name, method)
+            if not test_labels or filter(lambda x: test.find(x)>-1, test_labels):
+                print "Running ",test,
+                args = ['python', 'runtests.py'] + argv + [test]
                 p = subprocess.Popen(args, stdout = subprocess.PIPE, stderr= subprocess.PIPE)
                 output, error = p.communicate()
                 if p.returncode > 0:
-                    print error,p.returncode
+                    print error
                     if failfast:
                         sys.exit(p.returncode)
+                else:
+                    print
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--failfast', action='store_true', default=False,
                         dest='failfast')
+    parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
-    main(sys.argv[1:],failfast=args.failfast)
-
+    main(sys.argv[2:],failfast=args.failfast,test_labels=args.test_labels)
