@@ -171,7 +171,7 @@ class ShowSubMenu(InclusionTag):
     """
     show the sub menu of the current nav-node.
     -levels: how many levels deep
-    -root_level: the level to start the menu after
+    -root_level: the level to start the menu at
     -nephews: the level of descendants of siblings (nephews) to show
     -temlplate: template used to render the navigation
     """
@@ -193,6 +193,9 @@ class ShowSubMenu(InclusionTag):
             return {'template': 'menu/empty.html'}
         nodes = menu_pool.get_nodes(request)
         children = []
+        # adjust root_level so we cut before the specified level, not after
+        if root_level > 0:
+            root_level = root_level - 1
         for node in nodes:
             if root_level is None:
                 if node.selected:

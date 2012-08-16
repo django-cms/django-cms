@@ -86,7 +86,7 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
 
     def test_show_submenu_nephews(self):
         context = self.get_context(path=self.get_page(2).get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 1 %}")
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 1 %}")
         tpl.render(context)
         nodes = context["children"]
         # P2 is the selected node
@@ -95,7 +95,7 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[1].children), 1)
         self.assertFalse(nodes[1].children[0].children)
 
-        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
         tpl.render(context)
         nodes = context["children"]
         # should now include both P10 and P11
@@ -282,7 +282,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[0].children), 0)
 
         context = self.get_context(path=self.get_page(3).get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
         tpl.render(context)
         nodes = context["children"]
         # P3 is the selected node
