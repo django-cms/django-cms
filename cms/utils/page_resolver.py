@@ -40,13 +40,13 @@ def get_page_queryset_from_path(path, preview=False):
             except Page.DoesNotExist:
                 page = None
         return page
-    
+
     if not settings.CMS_MODERATOR or preview:
         # We do not use moderator
         pages = Page.objects.drafts()
     else:
         pages = Page.objects.public()
-    
+
     if not preview:
         pages = pages.published()
 
@@ -151,7 +151,9 @@ def is_valid_url(url,instance,create_links=True):
                 page_qs = [page_qs]
             for page in page_qs:
                 # Every page in the queryset except the current one is a conflicting page
-                if page and page.pk != instance.pk:
+                # When CMS_MODERATOR is active we have to exclude both copies of the page
+                if page and ((not settings.CMS_MODERATOR and page.pk != instance.pk) or
+                             (settings.CMS_MODERATOR and page.publisher_public.pk != instance.pk)):
                     if create_links:
                         # Format return message with page url
                         url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' %
