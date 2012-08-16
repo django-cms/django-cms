@@ -118,6 +118,7 @@ class MultilingualURLMiddleware(object):
                 not path.startswith(settings.STATIC_URL) and
                 not (getattr(settings, 'STATIC_URL', False) and path.startswith(settings.STATIC_URL)) and
                 response.status_code == 200 and
+                response.has_header('Content-Type') and
                 response._headers['content-type'][1].split(';')[0] == "text/html"):
             pages_root = urllib.unquote(reverse("pages-root"))
             try:
