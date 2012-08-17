@@ -297,7 +297,9 @@ Displays the sub menu of the current page (as a nested list).
 The first argument, ``levels`` (default=100), specifies how many levels deep the submenu should be
 displayed
 
-The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.  For example, if root_level is 0 the menu will start after that level regardless of what level the current page is on.
+The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.  For example, if root_level is 0 the menu will start at that level regardless of what level the current page is on.
+
+The third argumemnt, ``nephews`` (default=100), specifices how many levels of nephews (children of siblings) are show.
 
 The template can be found at ``cms/sub_menu.html``::
 

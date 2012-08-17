@@ -294,6 +294,16 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[0].children), 1)
         # but not P1 as it's at the root_level
         self.assertEqual(nodes[0].parent, None)
+
+        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P1 should be in the nav
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_page(1).get_absolute_url())
+        # P2 is selected
+        self.assertTrue(nodes[0].children[0].selected)
+
         
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())

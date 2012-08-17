@@ -194,8 +194,11 @@ class ShowSubMenu(InclusionTag):
         nodes = menu_pool.get_nodes(request)
         children = []
         # adjust root_level so we cut before the specified level, not after
+        include_root = False
         if root_level > 0:
             root_level = root_level - 1
+        elif root_level == 0:
+            include_root = True
         for node in nodes:
             if root_level is None:
                 if node.selected:
@@ -212,7 +215,12 @@ class ShowSubMenu(InclusionTag):
                     child.parent = None
                     if child.sibling:
                         cut_after(child, nephews, [])
-                children = menu_pool.apply_modifiers(children, request, post_cut=True)
+                # if root_level was 0 we need to give the menu the entire tree
+                # not just the children
+                if include_root:
+                    children = menu_pool.apply_modifiers([node], request, post_cut=True)
+                else:
+                    children = menu_pool.apply_modifiers(children, request, post_cut=True)
         context.update({
             'children':children,
             'template':template,
