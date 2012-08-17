@@ -167,7 +167,7 @@ def preview_link(page, language):
         try:
             # attempt to retrieve the localized path/slug and return
             root = reverse('pages-root')
-            return root + language + "/" + page.get_absolute_url(language, fallback=False)[len(root):]
+            return "/" + language + root + page.get_absolute_url(language, fallback=False)[len(root):]
         except:
             # no localized path/slug. therefore nothing to preview. stay on the same page.
             # perhaps the user should be somehow notified for this.
