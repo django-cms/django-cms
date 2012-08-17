@@ -124,9 +124,14 @@ class Page(MPTTModel):
         return urlutils.urljoin(reverse('pages-root'), path)
 
     def move_page(self, target, position='first-child'):
-        """Called from admin interface when page is moved. Should be used on
+        """
+        Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
         to mptt, but after move is done page_moved signal is fired.
+
+        Note for issue #1166: url conflicts are handled by updated
+        check_title_slugs, overwrite_url on the moved page don't need any check
+        as it remains the same regardless of the page position in the tree
         """
         # make sure move_page does not break when using INHERIT template
         if (position in ('left', 'right')
@@ -154,6 +159,9 @@ class Page(MPTTModel):
 
         Note: public_copy was added in order to enable the creation of a copy for creating the public page during
         the publish operation as it sets the publisher_is_draft=False.
+
+        Note for issue #1166: when copying pages there is no need to check for conflicting
+        URLs as pages as copied unplublished.
         """
         from cms.utils.moderator import update_moderation_message
 
@@ -268,6 +276,8 @@ class Page(MPTTModel):
 
                 # create slug-copy for standard copy
                 if not public_copy:
+                    title.save() # We need to save the title in order to
+                                 # retrieve it in get_available_slug
                     title.slug = page_utils.get_available_slug(title)
                 title.save()
 

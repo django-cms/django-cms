@@ -17,20 +17,24 @@ from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
+from cms.utils.page_resolver import is_valid_url
+from cms.utils.admin import jsonify_request
+from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from distutils.version import LooseVersion
+from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from urllib2 import unquote
 from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction, models
 from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (title, escape, force_escape, 
@@ -42,6 +46,7 @@ import django
 
 
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
+
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -766,20 +771,20 @@ class PageAdmin(ModelAdmin):
             page = self.model.objects.get(pk=page_id)
             target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
-            return HttpResponseBadRequest("error")
+            return jsonify_request(HttpResponseBadRequest("error"))
 
         # does he haves permissions to do this...?
         if not page.has_move_page_permission(request) or \
             not target.has_add_permission(request):
-                return HttpResponseForbidden("Denied")
+            return jsonify_request(HttpResponseForbidden(_("Error! You don't have permissions to move this page. Please reload the page")))
 
         # move page
         page.move_page(target, position)
         
         if "reversion" in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
-            
-        return admin_utils.render_admin_menu_item(request, page)
+
+        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(Page, id=page_id)
@@ -834,12 +839,15 @@ class PageAdmin(ModelAdmin):
                 return HttpResponse("error")
                 #context.update({'error': _('Page could not been moved.')})
             else:
-                kwargs = {
-                    'copy_permissions': request.REQUEST.get('copy_permissions', False),
-                    'copy_moderation': request.REQUEST.get('copy_moderation', False),
-                }
-                page.copy_page(target, site, position, **kwargs)
-                return HttpResponse("ok")
+                try:
+                    kwargs = {
+                        'copy_permissions': request.REQUEST.get('copy_permissions', False),
+                        'copy_moderation': request.REQUEST.get('copy_moderation', False),
+                    }
+                    page.copy_page(target, site, position, **kwargs)
+                    return jsonify_request(HttpResponse("ok"))
+                except ValidationError,e:
+                    return jsonify_request(HttpResponseBadRequest(e.messages))
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
@@ -1055,9 +1063,13 @@ class PageAdmin(ModelAdmin):
             return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
         if page.has_publish_permission(request):
-            page.published = not page.published
-            page.save()
-            return admin_utils.render_admin_menu_item(request, page)
+            try:
+                if page.published or is_valid_url(page.get_absolute_url(),page,False):
+                    page.published = not page.published
+                    page.save()
+                return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
+            except ValidationError,e:
+                return jsonify_request(HttpResponseBadRequest(e.messages))
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 

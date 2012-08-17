@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
+from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
 
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db.models.query_utils import Q
 import urllib
 import re
+from cms.utils.urlutils import any_path_re
 
 ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
 
-def get_page_from_path(path, preview=False):
+def get_page_queryset_from_path(path, preview=False):
+    """ Returns a queryset of pages corresponding to the path given
+    In may returns None or a single page is no page is present or root path is given
+    """
     if 'django.contrib.admin' in settings.INSTALLED_APPS:
         admin_base = reverse('admin:index').lstrip('/')
     else:
@@ -32,18 +40,18 @@ def get_page_from_path(path, preview=False):
             except Page.DoesNotExist:
                 page = None
         return page
-    
+
     if not settings.CMS_MODERATOR or preview:
         # We do not use moderator
         pages = Page.objects.drafts()
     else:
         pages = Page.objects.public()
-    
+
     if not preview:
         pages = pages.published()
 
     pages = pages.filter(site=site)
-    
+
     # Check if there are any pages
     if not pages.all_root().exists():
         return None
@@ -65,13 +73,25 @@ def get_page_from_path(path, preview=False):
         query = Q(title_set__slug=path)
     else:
         query = Q(title_set__path=path)
-    try:
-        page = pages.filter(query).distinct().get()
-    except Page.DoesNotExist:
+    return pages.filter(query).distinct()
+
+
+def get_page_from_path(path, preview=False):
+    """ Resolves a url path to a single page object.
+    Raises exceptions is page does not exist or multiple pages are found
+    """
+    page_qs = get_page_queryset_from_path(path,preview)
+    if page_qs is not None:
+        if isinstance(page_qs,Page):
+            return page_qs
+        try:
+            page = page_qs.get()
+        except Page.DoesNotExist:
+            return None
+        return page
+    else:
         return None
-        
-    return page
-    
+
 
 def get_page_from_request(request, use_path=None):
     """
@@ -111,3 +131,42 @@ def get_page_from_request(request, use_path=None):
         
     request._current_page_cache = page
     return page
+
+
+def is_valid_url(url,instance,create_links=True):
+    """ Checks for conflicting urls
+    """
+    if url:
+        # Url sanity check via regexp
+        if not any_path_re.match(url):
+            raise ValidationError(_('Invalid URL, use /my/url format.'))
+        # Retrieve complete queryset of pages with corresponding URL
+        # This uses the same resolving function as ``get_page_from_path``
+        page_qs = get_page_queryset_from_path(url.strip('/'))
+        url_clashes = []
+        # If queryset has pages checks for conflicting urls
+        if page_qs is not None:
+            # If single page is returned create a list for interface compat
+            if isinstance(page_qs,Page):
+                page_qs = [page_qs]
+            for page in page_qs:
+                # Every page in the queryset except the current one is a conflicting page
+                # When CMS_MODERATOR is active we have to exclude both copies of the page
+                if page and ((not settings.CMS_MODERATOR and page.pk != instance.pk) or
+                             (settings.CMS_MODERATOR and page.publisher_public.pk != instance.pk)):
+                    if create_links:
+                        # Format return message with page url
+                        url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' %
+                                           {'page_url':reverse('admin:cms_page_changelist'),'pk':page.pk,
+                                            'page_title': force_unicode(page)
+                                            } )
+                    else:
+                        # Just return the page name
+                        url_clashes.append("'%s'" % page)
+            if url_clashes:
+                # If clashing pages exist raise the exception
+                raise ValidationError(mark_safe(ungettext_lazy('Page %(pages)s has the same url \'%(url)s\' as current page "%(instance)s".',
+                                                     'Pages %(pages)s have the same url \'%(url)s\' as current page "%(instance)s".',
+                                                    len(url_clashes)) %
+                                      {'pages':", ".join(url_clashes),'url':url,'instance':instance}))
+    return True
