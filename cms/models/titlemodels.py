@@ -32,6 +32,11 @@ class Title(models.Model):
         return "%s (%s)" % (self.title, self.slug)
 
     def save(self, *args, **kwargs):
+        # Update the path attribute before saving
+        self.update_path()
+        super(Title, self).save(*args, **kwargs)
+
+    def update_path(self):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
@@ -43,7 +48,6 @@ class Title(models.Model):
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
-        super(Title, self).save(*args, **kwargs)
 
     @property
     def overwrite_url(self):
