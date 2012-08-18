@@ -11,10 +11,14 @@ class Migration(DataMigration):
         depends_on = (
             ("googlemap", "0010_auto__chg_field_googlemap_content"),
         )
-        for plugin in orm.GoogleMap.objects.filter(zoom=None):
+        for plugin in orm.GoogleMap.objects.filter(models.Q(zoom=None) | models.Q(zoom__lt=0)):
             plugin.zoom = 13
             plugin.save()
-            print plugin
+            print 'Applying 13 as zoom value for plugin %s. See 2.3.1 Release notes for further info' % plugin.pk
+        for plugin in orm.GoogleMap.objects.filter(zoom__gt=21):
+            plugin.zoom = 21
+            plugin.save()
+            print 'Applying 21 as zoom value for plugin %s. See 2.3.1 Release notes for further info' % plugin.pk
 
 
     def backwards(self, orm):
