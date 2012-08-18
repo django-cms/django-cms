@@ -18,7 +18,8 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='400px', max_length=6),
                       keep_default=False)
 
-
+        db.execute('UPDATE cmsplugin_googlemap SET zoom=13 WHERE zoom is NULL')
+        print "Adding default value to null zoom fields"
         # Changing field 'GoogleMap.zoom'
         db.alter_column('cmsplugin_googlemap', 'zoom', self.gf('django.db.models.fields.PositiveSmallIntegerField')())
 
