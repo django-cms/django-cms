@@ -133,7 +133,7 @@ class MultilingualURLMiddleware(object):
             response.content = patch_response(
                 decoded_response,
                 pages_root,
-                request.LANGUAGE_CODE
+                language
             )
 
         if response.status_code == 301 or response.status_code == 302:
