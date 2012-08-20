@@ -18,6 +18,12 @@
 			if (!language) {
 				language = $('input[name=language]').attr("value");
 			}
+            
+			// Tries to get language from django-hvad current language tab
+			if (!language) {
+				language = $('span.current').attr("title");
+			}
+
 			// The new placeholder branch allows adding non-language plugins!
 			if (!language) {
 				//alert("Unable to determine the correct language for this plugin! Please report the bug!");
@@ -55,6 +61,11 @@
 
 			if (!to_language) {
 				to_language = $('input[name=language]').attr("value");
+			}
+
+			// Tries to get language from django-hvad current language tab
+			if (!to_language) {
+				to_language = $('span.current').attr("title");
 			}
 
 			if (!to_language) {
