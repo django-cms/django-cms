@@ -9,11 +9,13 @@ from django.utils.text import capfirst
 
 
 class PlaceholderField(models.ForeignKey):
-    def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
+    def __init__(self, slotname, default_width=None, language_aware=False, 
+            actions=PlaceholderNoAction, **kwargs):
         validate_placeholder_name(slotname)
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()
+        self.language_aware = language_aware
         kwargs.update({'null': True})  # always allow Null
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
 
@@ -26,7 +28,8 @@ class PlaceholderField(models.ForeignKey):
     def formfield_for_admin(self, request, filter_func, **kwargs):
         defaults = {'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
-        widget = PlaceholderPluginEditorWidget(request, filter_func)
+        widget = PlaceholderPluginEditorWidget(request, filter_func,
+                language_aware=self.language_aware)
         widget.choices = []
         return PlaceholderFormField(required=False, widget=widget, **defaults)
 

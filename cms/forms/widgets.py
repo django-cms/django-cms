@@ -177,9 +177,10 @@ class UserSelectAdminWidget(Select):
     
 class PlaceholderPluginEditorWidget(PluginEditor):
     attrs = {}
-    def __init__(self, request, filter_func):
+    def __init__(self, request, filter_func, language_aware=False):
         self.request = request
         self.filter_func = filter_func
+        self.language_aware = language_aware
             
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -198,6 +199,8 @@ class PlaceholderPluginEditorWidget(PluginEditor):
             plugin_list = ph.cmsplugin_set.filter(parent=None).order_by('position')
             plugin_list = self.filter_func(self.request, plugin_list)
             language = get_language_from_request(self.request)
+            if self.language_aware:
+                plugin_list = plugin_list.filter(language=language)
             copy_languages = []
             if ph.actions.can_copy:
                 copy_languages = ph.actions.get_copy_languages(
