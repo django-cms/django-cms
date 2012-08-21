@@ -52,13 +52,13 @@ def configure(**extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES = [
+            'django.middleware.common.CommonMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
-            'cms.middleware.multilingual.MultilingualURLMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.common.CommonMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
