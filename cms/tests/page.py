@@ -15,8 +15,14 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
+    URL_CMS_PAGE_ADD)
+from cms.test_utils.util.context_managers import (LanguageOverride, 
+    SettingsOverride)
+from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 import datetime
@@ -360,6 +366,26 @@ class PagesTestCase(CMSTestCase):
                     published=True, in_navigation=True)
         self.assertEqual(CMSSitemap().items().count(),0)
 
+    def test_sitemap_includes_last_modification_date(self):
+        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=one_day_ago)
+        page.creation_date = one_day_ago
+        page.save()
+        sitemap = CMSSitemap()
+        self.assertEqual(sitemap.items().count(), 1)
+        actual_last_modification_time = sitemap.lastmod(sitemap.items()[0])
+        self.assertTrue(actual_last_modification_time > one_day_ago)
+
+    def test_sitemap_uses_publication_date_when_later_than_modification(self):
+        now = datetime.datetime.now()
+        one_day_ago = now - datetime.timedelta(days=1)
+        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        page.creation_date = one_day_ago
+        page.changed_date = one_day_ago
+        sitemap = CMSSitemap()
+        actual_last_modification_time = sitemap.lastmod(page)
+        self.assertEqual(actual_last_modification_time, now)
+
     def test_edit_page_other_site_and_language(self):
         """
         Test that a page can edited via the admin when your current site is
@@ -409,10 +435,22 @@ class PagesTestCase(CMSTestCase):
         """
         parent = create_page("parent", "nav_playground.html", "en")
         child = create_page("child", "nav_playground.html", "en", parent=parent)
+        grand_child = create_page("child", "nav_playground.html", "en", parent=child)
         child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        grand_child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         child.save()
-        self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
-        self.assertEqual(parent.get_template_name(), child.get_template_name())
+        grand_child.save()
+
+        # kill template cache
+        delattr(grand_child, '_template_cache')
+        with self.assertNumQueries(1):
+            self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+            self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
+
+        # test template cache
+        with self.assertNumQueries(0):
+            grand_child.get_template()
+
         parent.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
         parent.save()
         self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
@@ -629,6 +667,31 @@ class PagesTestCase(CMSTestCase):
         page2.save()
         self.assertEqual(page3.get_absolute_url(),
             self.get_pages_root()+'i-want-another-url/')
+
+    def test_slug_url_overwrite_clash(self):
+        """ Tests if a URL-Override clashes with a normal page url
+        """
+        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+            home = create_page('home', 'nav_playground.html', 'en', published=True)
+            bar = create_page('bar', 'nav_playground.html', 'en', published=False)
+            foo = create_page('foo', 'nav_playground.html', 'en', published=True)
+            # Tests to assure is_valid_url is ok on plain pages
+            self.assertTrue(is_valid_url(bar.get_absolute_url('en'),bar))
+            self.assertTrue(is_valid_url(foo.get_absolute_url('en'),foo))
+
+            # Set url_overwrite for page foo
+            title = foo.get_title_obj(language='en')
+            title.has_url_overwrite = True
+            title.path = '/bar/'
+            title.save()
+            try:
+                url = is_valid_url(bar.get_absolute_url('en'),bar)
+            except ValidationError:
+                url = False
+            if url:
+                bar.published = True
+                bar.save()
+            self.assertFalse(bar.published)
 
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):

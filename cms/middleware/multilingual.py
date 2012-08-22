@@ -10,7 +10,7 @@ import urlparse
 
 SUPPORTED = dict(settings.CMS_LANGUAGES)
 
-HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join([re.escape(l[0]) for l in settings.CMS_LANGUAGES]))
+HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join([re.escape(lang[0]) for lang in settings.CMS_LANGUAGES]))
 
 
 def has_lang_prefix(path):
@@ -40,9 +40,11 @@ def patch_response(content, pages_root, language):
     # Notice that (?=...) and (?!=...) do not consume input or produce a group in the match object.
     # If the regex matches, the extracted path we want is stored in the fourth group (\4).
     quoted_root = urllib.quote(pages_root)
-    ignore_paths = ['%s%s/' % (quoted_root, l[0]) for l in settings.CMS_LANGUAGES]
-    ignore_paths += [settings.MEDIA_URL, settings.STATIC_URL]
-    if getattr(settings, 'STATIC_URL', False):
+    ignore_paths = ['%s%s/' % (quoted_root, lang[0]) for lang in settings.CMS_LANGUAGES]
+    ignore_paths += [settings.MEDIA_URL]
+    if getattr(settings, 'ADMIN_MEDIA_PREFIX', False):
+        ignore_paths += [settings.ADMIN_MEDIA_PREFIX]
+    if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
 
     HREF_URL_FIX_RE = re.compile(ur'<a([^>]+)href=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
@@ -55,9 +57,11 @@ def patch_response(content, pages_root, language):
     #
     # For understanding this regex, please read the documentation for HREF_URL_FIX_RE above.
 
-    ignore_paths = ['%s%s/' % (pages_root, l[0]) for l in settings.CMS_LANGUAGES]
-    ignore_paths += [settings.MEDIA_URL, settings.STATIC_URL]
-    if getattr(settings, 'STATIC_URL', False):
+    ignore_paths = ['%s%s/' % (pages_root, lang[0]) for lang in settings.CMS_LANGUAGES]
+    ignore_paths += [settings.MEDIA_URL]
+    if getattr(settings, 'ADMIN_MEDIA_PREFIX', False):
+        ignore_paths += [settings.ADMIN_MEDIA_PREFIX]
+    if getattr(settings,'STATIC_URL', False):
         ignore_paths += [settings.STATIC_URL]
     FORM_URL_FIX_RE = re.compile(ur'<form([^>]+)action=("|\')(?=%s)(?!(%s))(%s(.*?))("|\')(.*?)>' % (
         pages_root,
@@ -66,7 +70,7 @@ def patch_response(content, pages_root, language):
     ))
 
     content = HREF_URL_FIX_RE.sub(ur'<a\1href=\2/%s%s\5\6\7>' % (language, pages_root), content)
-    content = FORM_URL_FIX_RE.sub(ur'<form\1action=\2%s%s/\5\6\7>' % (pages_root, language), content).encode("utf8")
+    content = FORM_URL_FIX_RE.sub(ur'<form\1action=\2/%s%s\5\6\7>' % (language, pages_root), content).encode("utf8")
     return content
 
 
@@ -118,6 +122,7 @@ class MultilingualURLMiddleware(object):
                 not path.startswith(settings.STATIC_URL) and
                 not (getattr(settings, 'STATIC_URL', False) and path.startswith(settings.STATIC_URL)) and
                 response.status_code == 200 and
+                response.has_header('Content-Type') and
                 response._headers['content-type'][1].split(';')[0] == "text/html"):
             pages_root = urllib.unquote(reverse("pages-root"))
             try:

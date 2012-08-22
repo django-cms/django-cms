@@ -82,7 +82,7 @@ class CMSPlugin(MPTTModel):
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
-
+    changed_date = models.DateTimeField(auto_now=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
@@ -146,10 +146,9 @@ class CMSPlugin(MPTTModel):
         return plugin_pool.get_plugin(self.plugin_type)
 
     def get_plugin_instance(self, admin=None):
-        from cms.plugin_pool import plugin_pool
-        plugin_class = plugin_pool.get_plugin(self.plugin_type)
-        plugin = plugin_class(plugin_class.model, admin)  # needed so we have the same signature as the original ModelAdmin
-        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
+        plugin_class = self.get_plugin_class()
+        plugin = plugin_class(plugin_class.model, admin) # needed so we have the same signature as the original ModelAdmin
+        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 instance = getattr(self, plugin.model.__name__.lower())

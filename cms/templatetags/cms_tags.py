@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
-from classytags.helpers import InclusionTag
+from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_plugins, render_placeholder
@@ -242,14 +242,16 @@ class Placeholder(Tag):
 register.tag(Placeholder)
 
 
-class PageAttribute(Tag):
+class PageAttribute(AsTag):
     """
     This template node is used to output attribute from a page such
     as its title or slug.
 
     Synopsis
          {% page_attribute "field-name" %}
+         {% page_attribute "field-name" as varname %}
          {% page_attribute "field-name" page_lookup %}
+         {% page_attribute "field-name" page_lookup as varname %}
 
     Example
          {# Output current page's page_title attribute: #}
@@ -258,6 +260,8 @@ class PageAttribute(Tag):
          {% page_attribute "page_title" "the_page" %}
          {# Output slug attribute of the page with pk 10: #}
          {% page_attribute "slug" 10 %}
+         {# Assign page_title attribute to a variable: #}
+         {% page_attribute "page_title" as title %}
 
     Keyword arguments:
     field-name -- the name of the field to output. Use one of:
@@ -271,11 +275,16 @@ class PageAttribute(Tag):
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
+    
+    varname -- context variable name. Output will be added to template context as this variable. 
+    This argument is required to follow the 'as' keyword.
     """
     name = 'page_attribute'
     options = Options(
         Argument('name', resolve=False),
-        Argument('page_lookup', required=False, default=None)
+        Argument('page_lookup', required=False, default=None),
+        'as',
+        Argument('varname', required=False, resolve=False)
     )
 
     valid_attributes = [
@@ -287,7 +296,7 @@ class PageAttribute(Tag):
         "menu_title"
     ]
 
-    def render_tag(self, context, name, page_lookup):
+    def get_value(self, context, name, page_lookup):
         if not 'request' in context:
             return ''
         name = name.lower()
@@ -361,7 +370,6 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
                 raise
             return {'content': ''}
         content = render_placeholder(placeholder, context, placeholder_name)
-
     if cache_result:
         cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
 

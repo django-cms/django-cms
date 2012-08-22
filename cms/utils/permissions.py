@@ -56,7 +56,7 @@ def has_page_add_permission(request):
         except Page.DoesNotExist:
             return False
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[page.site_id])):
+            has_global_page_permission(request, page.site_id, can_add=True)):
             return True
         if position in ("first-child", "last-child"):
             return page.has_add_permission(request)
@@ -68,7 +68,7 @@ def has_page_add_permission(request):
         from cms.utils.plugins import current_site
         site = current_site(request)
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and
-            GlobalPagePermission.objects.with_user(request.user).filter(can_add=True, sites__in=[site])):
+            has_global_page_permission(request, site, can_add=True)):
             return True
     return False
 
@@ -91,18 +91,36 @@ def has_page_change_permission(request):
     opts = Page._meta
     if request.user.is_superuser or (
         request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and (
-            GlobalPagePermission.objects.with_user(request.user).filter(
-                can_change=True, sites__in=[current_site(request)]
-            ).exists()) or has_any_page_change_permissions(request)):
+            has_global_page_permission(request, current_site(request), can_change=True))
+            or has_any_page_change_permissions(request)):
         return True
     return False
+
+
+def has_global_page_permission(request, site, **filters):
+    """
+    A helper function to check for global page permissions for the current user
+    and site. Caches the result on a request basis, so multiple calls to this
+    funtion inside of one request/response cycle only generate one query.
+
+    :param request: the Request object
+    :param site: the Site object or ID
+    :param filters: queryset filters, e.g. ``can_add = True``
+    :return: ``True`` or ``False``
+    """
+    if not hasattr(request, '_cms_global_perms'):
+        request._cms_global_perms = {}
+    key = (site.pk if hasattr(site, 'pk') else int(site),) + tuple((k, v) for k, v in filters.iteritems())
+    if key not in request._cms_global_perms:
+        request._cms_global_perms[key] = GlobalPagePermission.objects.with_user(request.user).filter(sites__in=[site], **filters).exists()
+    return request._cms_global_perms[key]
+
 
 def get_any_page_view_permissions(request, page):
     """
     Used by the admin template tag is_restricted
     """
     return PagePermission.objects.for_page(page=page).filter(can_view=True)
-
 
 
 def get_user_permission_level(user):
@@ -224,7 +242,7 @@ def has_global_change_permissions_permission(user):
     opts = GlobalPagePermission._meta
     if user.is_superuser or (
         user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
-            GlobalPagePermission.objects.with_user(user).filter(can_change=True)):
+            GlobalPagePermission.objects.with_user(user).filter(can_change=True).exists()):
         return True
     return False
 
@@ -255,19 +273,18 @@ def get_user_sites_queryset(user):
         Q(can_add=True) | Q(can_change=True)
     ).values_list('id', flat=True)
     
-    q = Q()
+    query = Q()
     if global_ids:
-        q = Q(globalpagepermission__id__in=global_ids)
+        query = Q(globalpagepermission__id__in=global_ids)
         # haves some global permissions assigned
-        if not qs.filter(q).exists():
+        if not qs.filter(query).exists():
             # haves global permissions, but none of sites is specified,
             # so he haves access to all sites
             return qs
-    
-    # add some pages if he haves permission to add / change them
-    q |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
+    # add some pages if he has permission to add / change them
+    query |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
         (Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True)))
-    return qs.filter(q).distinct()
+    return qs.filter(query).distinct()
 
 
 def has_plugin_permission(user, plugin_type, permission_type):

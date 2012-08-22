@@ -10,7 +10,12 @@ install:
 script:
     python runtests.py
 notifications:
-    email: false
+    email:
+        recipients:
+          - digi@treepy.com
+        on_success: never
+        on_failure: always
     irc:
         - "irc.freenode.org#django-cms"
         - "irc.freenode.org#django-cms-sprint"
+

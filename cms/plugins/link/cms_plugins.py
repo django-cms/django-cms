@@ -25,6 +25,7 @@ class LinkPlugin(CMSPluginBase):
         context.update({
             'name': instance.name,
             'link': link, 
+            'target':instance.target,
             'placeholder': placeholder,
             'object': instance
         })

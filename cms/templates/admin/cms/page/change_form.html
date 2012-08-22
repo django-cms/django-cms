@@ -16,7 +16,7 @@
 {% if add %}
 <script type="text/javascript">
 //<![CDATA[	
-(function($) {
+
 	$(document).ready(function (){
 		$("#id_title").keyup(function () {
 			var e = $("#id_slug")[0];
@@ -25,7 +25,7 @@
 			}
 	    });
 	});
-})(jQuery);
+
 //]]>
 </script>
 {% endif %}
@@ -37,7 +37,7 @@
 	margin-bottom:-1px;
 	border-color:#ddd #aaa #ccc #ddd !important;
 	border:1px;
-	background:#fff url('{% admin_static_url %}img/admin/nav-bg.gif') repeat-x center bottom !important;
+	background:#fff url('{% cms_admin_icon_base %}nav-bg.gif') repeat-x center bottom !important;
 }
 
 #lang_tab_content h2.header {
@@ -46,7 +46,7 @@
 	font-size:11px;
 	text-align:left;
 	font-weight:bold;
-	background:#7ca0c7 url('{% admin_static_url %}img/admin/default-bg.gif') repeat-x left top;
+	background:#7ca0c7 url('{% cms_admin_icon_base %}default-bg.gif') repeat-x left top;
 	color:#fff;
 }
 
@@ -169,6 +169,7 @@
 	{% endif %}
 
 	{% if moderation_delete_request %}<script type="text/javascript">
+	(function namespacing($) {
 		$(function(){
 			// disable all fields
 			function lockControls(){
@@ -179,6 +180,7 @@
 			lockControls();
 			setTimeout(lockControls,200);
 		});
+	})(window.CMS.$);
 	</script>{% endif %}
 
 	{% if CMS_MODERATOR and moderation_required %}
@@ -261,7 +263,7 @@
 					}
 				});
 			});
-		})(jQuery);
+		})(window.CMS.$);
 		//]]>
 		</script>
 	{% endif %}

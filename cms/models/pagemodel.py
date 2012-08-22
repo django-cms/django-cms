@@ -124,9 +124,14 @@ class Page(MPTTModel):
         return urlutils.urljoin(reverse('pages-root'), path)
 
     def move_page(self, target, position='first-child'):
-        """Called from admin interface when page is moved. Should be used on
+        """
+        Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
         to mptt, but after move is done page_moved signal is fired.
+
+        Note for issue #1166: url conflicts are handled by updated
+        check_title_slugs, overwrite_url on the moved page don't need any check
+        as it remains the same regardless of the page position in the tree
         """
         # make sure move_page does not break when using INHERIT template
         if (position in ('left', 'right')
@@ -154,6 +159,9 @@ class Page(MPTTModel):
 
         Note: public_copy was added in order to enable the creation of a copy for creating the public page during
         the publish operation as it sets the publisher_is_draft=False.
+
+        Note for issue #1166: when copying pages there is no need to check for conflicting
+        URLs as pages as copied unplublished.
         """
         from cms.utils.moderator import update_moderation_message
 
@@ -268,6 +276,8 @@ class Page(MPTTModel):
 
                 # create slug-copy for standard copy
                 if not public_copy:
+                    title.save() # We need to save the title in order to
+                                 # retrieve it in get_available_slug
                     title.slug = page_utils.get_available_slug(title)
                 title.save()
 
@@ -299,6 +309,10 @@ class Page(MPTTModel):
                 some existing page and this new page will require moderation;
                 this is because of how this adding works - first save, then move
         """
+
+        # delete template cache
+        if hasattr(self, '_template_cache'):
+            delattr(self, '_template_cache')
 
         # Published pages should always have a publication date
         publish_directly, under_moderation = False, False
@@ -646,17 +660,21 @@ class Page(MPTTModel):
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
+        if hasattr(self, '_template_cache'):
+            return self._template_cache
         template = None
         if self.template:
             if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
                 template = self.template
             else:
-                for p in self.get_ancestors(ascending=True):
-                    template = p.get_template()
-                    if template:
-                        break
+                try:
+                    template = self.get_ancestors(ascending=True).exclude(
+                        template=settings.CMS_TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
+                except IndexError:
+                    pass
         if not template:
             template = settings.CMS_TEMPLATES[0][0]
+        self._template_cache = template
         return template
 
     def get_template_name(self):
@@ -836,12 +854,11 @@ class Page(MPTTModel):
         from cms.models.moderatormodels import PageModerator
         if not settings.CMS_MODERATOR or not self.tree_id:
             return PageModerator.objects.get_empty_query_set()
-
-        q = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
+        query = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
             Q(page__tree_id=self.tree_id, page__level=self.level - 1, moderate_children=True) | \
             Q(page__pk=self.pk, moderate_page=True)
 
-        return PageModerator.objects.distinct().filter(q).order_by('page__level')
+        return PageModerator.objects.distinct().filter(query).order_by('page__level')
 
     def is_under_moderation(self):
         return bool(self.get_moderator_queryset().count())
