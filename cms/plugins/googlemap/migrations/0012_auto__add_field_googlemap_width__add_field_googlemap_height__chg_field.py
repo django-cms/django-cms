@@ -1,29 +1,36 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        depends_on = (
-            ("googlemap", "0010_auto__chg_field_googlemap_content"),
-        )
-        for plugin in orm.GoogleMap.objects.filter(models.Q(zoom=None) | models.Q(zoom__lt=0)):
-            plugin.zoom = 13
-            plugin.save()
-            print 'Applying 13 as zoom value for plugin %s. See 2.3.1 Release notes for further info' % plugin.pk
-        for plugin in orm.GoogleMap.objects.filter(zoom__gt=21):
-            plugin.zoom = 21
-            plugin.save()
-            print 'Applying 21 as zoom value for plugin %s. See 2.3.1 Release notes for further info' % plugin.pk
+        # Adding field 'GoogleMap.width'
+        db.add_column('cmsplugin_googlemap', 'width',
+                      self.gf('django.db.models.fields.CharField')(default='100%', max_length=6),
+                      keep_default=False)
 
+        # Adding field 'GoogleMap.height'
+        db.add_column('cmsplugin_googlemap', 'height',
+                      self.gf('django.db.models.fields.CharField')(default='400px', max_length=6),
+                      keep_default=False)
+
+        # Changing field 'GoogleMap.zoom'
+        db.alter_column('cmsplugin_googlemap', 'zoom', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=13))
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        #raise RuntimeError("Cannot reverse this migration.")
+        # Deleting field 'GoogleMap.width'
+        db.delete_column('cmsplugin_googlemap', 'width')
+
+        # Deleting field 'GoogleMap.height'
+        db.delete_column('cmsplugin_googlemap', 'height')
+
+
+        # Changing field 'GoogleMap.zoom'
+        db.alter_column('cmsplugin_googlemap', 'zoom', self.gf('django.db.models.fields.IntegerField')(null=True))
 
     models = {
         'cms.cmsplugin': {
@@ -52,13 +59,15 @@ class Migration(DataMigration):
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'content': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'height': ('django.db.models.fields.CharField', [], {'default': "'400px'", 'max_length': '6'}),
             'lat': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
             'lng': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
             'route_planer': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'route_planer_title': ('django.db.models.fields.CharField', [], {'default': "u'Calculate your fastest way to here'", 'max_length': '150', 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'width': ('django.db.models.fields.CharField', [], {'default': "'100%'", 'max_length': '6'}),
             'zipcode': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'zoom': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'zoom': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '13'})
         }
     }
 
