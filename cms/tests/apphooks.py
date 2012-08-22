@@ -209,8 +209,10 @@ class ApphooksTestCase(CMSTestCase):
             en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
 
             path = reverse('en:namespaced_app_ns:sample-settings')
-            path_instance = reverse('en:instance_ns:sample-settings')
-            self.assertEquals(path, path_instance)
+            path_instance1 = reverse('en:instance_ns:sample-settings')
+            path_instance2 = reverse('en:namespaced_app_ns:sample-settings', current_app='instance_ns')
+            self.assertEquals(path, path_instance1)
+            self.assertEquals(path, path_instance2)
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
@@ -236,6 +238,7 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/app.html')
             self.assertContains(response, 'namespaced_app_ns')
+            self.assertContains(response, path)
 
             apphook_pool.clear()
 
@@ -255,6 +258,7 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/app.html')
             self.assertContains(response, 'instance_ns')
+            self.assertContains(response, path)
 
             apphook_pool.clear()
 
