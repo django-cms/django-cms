@@ -55,7 +55,7 @@ class ApphooksTestCase(CMSTestCase):
 
         for module in url_modules:
             if module in sys.modules:
-                reload(sys.modules[module]) # or del ...
+                del sys.modules[module]
 
     def create_base_structure(self, apphook, title_langs, reverse_id=None):
         apphook_pool.clear()
