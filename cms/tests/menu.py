@@ -5,7 +5,7 @@ from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
-    SoftrootFixture)
+    SoftrootFixture, ExtendedMenusFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     LanguageOverride)
@@ -49,6 +49,58 @@ class BaseMenuTest(SettingsOverrideTestCase):
     def tearDown(self):
         menu_pool.menus = self.old_menu
         super(BaseMenuTest, self).tearDown()
+
+
+class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
+    """
+    Tree from fixture:
+        
+        + P1
+        | + P2
+        |   + P3
+        | + P9
+        |   + P10
+        |      + P11
+        + P4
+        | + P5
+        + P6 (not in menu)
+          + P7
+          + P8
+    """
+    def get_page(self, num):
+        return Page.objects.get(title_set__title='P%s' % num)
+    
+    def get_level(self, num):
+        return Page.objects.filter(level=num)
+    
+    def get_all_pages(self):
+        return Page.objects.all()
+    
+    def test_menu_failfast_on_invalid_usage(self):
+        context = self.get_context()
+        context['child'] = self.get_page(1)
+        # test standard show_menu
+        with SettingsOverride(DEBUG=True, TEMPLATE_DEBUG=True):
+            tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
+            self.assertRaises(TemplateSyntaxError, tpl.render, context)
+
+    def test_show_submenu_nephews(self):
+        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P2 is the selected node
+        self.assertTrue(nodes[0].selected) 
+        # Should include P10 but not P11 
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertFalse(nodes[1].children[0].children)
+
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # should now include both P10 and P11
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertEqual(len(nodes[1].children[0].children), 1)
 
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
@@ -228,6 +280,30 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(len(nodes[0].children), 0)
+
+        context = self.get_context(path=self.get_page(3).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P3 is the selected node
+        self.assertFalse(nodes[0].selected)
+        self.assertTrue(nodes[0].children[0].selected)
+        # top level node should be P2
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
+        # should include P3 as well
+        self.assertEqual(len(nodes[0].children), 1)
+        # but not P1 as it's at the root_level
+        self.assertEqual(nodes[0].parent, None)
+
+        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P1 should be in the nav
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_page(1).get_absolute_url())
+        # P2 is selected
+        self.assertTrue(nodes[0].children[0].selected)
+
         
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())

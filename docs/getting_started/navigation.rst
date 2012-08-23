@@ -101,12 +101,25 @@ You can give it the same optional parameters as :ttag:`show_menu`::
 show_sub_menu
 *************
 
-Display the sub menu of the current page (as a nested list).
-Takes one argument that specifies how many levels deep the submenu should be
-displayed. The template can be found at ``menu/sub_menu.html``::
+Displays the sub menu of the current page (as a nested list).
+
+The first argument, ``levels`` (default=100), specifies how many levels deep the submenu should be
+displayed
+
+The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.  For example, if root_level is 0 the menu will start at that level regardless of what level the current page is on.
+
+The third argumemnt, ``nephews`` (default=100), specifices how many levels of nephews (children of siblings) are show.
+
+The template can be found at ``cms/sub_menu.html``::
 
     <ul>
         {% show_sub_menu 1 %}
+    </ul>
+
+Rooted at level 0::
+
+    <ul>
+        {% show_sub_menu 1 0 %}
     </ul>
 
 Or with a custom template::
