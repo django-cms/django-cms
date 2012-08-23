@@ -165,7 +165,7 @@ in the next section) the first node would still have 0 as its `menu_level`.
 The absolute URL of the node, without any protocol, domain or port.
 ::
 
-    {{ node.get_title }}
+    {{ node.title }}
 
 The title in the current language of the node.
 ::
