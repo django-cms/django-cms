@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.utils.functional import empty
 import os
 
 gettext = lambda s: s
 
-
 urlpatterns = []
-
 
 def configure(**extra):
     from django.conf import settings
@@ -183,6 +182,7 @@ def configure(**extra):
         )
     )
     defaults.update(extra)
+    settings._wrapped = empty
     settings.configure(**defaults)
     from cms.conf import patch_settings
     patch_settings()
