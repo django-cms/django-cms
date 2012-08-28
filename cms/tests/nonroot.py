@@ -7,6 +7,8 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.template import Template
 from menus.base import NavigationNode
+from django.http import HttpResponse
+from cms.templatetags.cms_admin import preview_link
 
 
 class NonRootCase(CMSTestCase):
@@ -72,3 +74,27 @@ class NonRootCase(CMSTestCase):
             self.assertEqual(nodes[0].get_absolute_url(), "/content/")
             self.assertEqual(isinstance(nodes[0], NavigationNode), True)
             self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
+
+    def test_form_multilingual(self):
+        """
+        Tests for correct form URL mangling
+        """
+        language = 'en'
+        pages_root = self.get_pages_root()
+        middle = #middleware handling
+        request = self.get_request(pages_root,language=language)
+
+        html = '<form action="%sfoo/bar/"> </form>' % pages_root
+        response = middle.process_response(request,HttpResponse(html))
+        self.assertContains(response,'/%s%sfoo/bar/' % (language,pages_root))
+        self.assertContains(response,'/en/content/foo/bar/')
+
+    def test_form_multilingual_admin(self):
+        """
+        Tests for correct form URL mangling in preview_link templatetag
+        """
+        language = 'en'
+        pages_root = self.get_pages_root()
+        link = preview_link(self.page2,language=language)
+        self.assertEqual(link,'/%s%s%s/' % (language,pages_root,self.page2.get_slug()))
+        self.assertEqual(link,'/en/content/page2/')
