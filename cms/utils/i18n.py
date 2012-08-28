@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.utils import translation
 
 def get_default_language(language_code=None):
     """Returns default language depending on settings.LANGUAGE_CODE merged with
@@ -40,7 +41,14 @@ def get_fallback_languages(language):
     if language in l_list:
         l_list.remove(language)
     return l_list
-    
-    
-    
-    
+
+
+
+class force_lang:
+    def __init__(self, new_lang):
+        self.new_lang = new_lang
+        self.old_lang = translation.get_language()
+    def __enter__(self):
+        translation.activate(self.new_lang)
+    def __exit__(self, type, value, tb):
+        translation.activate(self.old_lang)

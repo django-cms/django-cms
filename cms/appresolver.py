@@ -47,7 +47,7 @@ def applications_page_check(request, current_page=None, path=None):
 class AppRegexURLResolver(RegexURLResolver):
     page_id = None
     url_patterns = None
-    
+
     def resolve_page_id(self, path):
         """Resolves requested path similar way how resolve does, but instead
         of return callback,.. returns page_id to which was application 

@@ -51,13 +51,13 @@ def configure(**extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES = [
-            'django.middleware.common.CommonMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
+            'django.middleware.common.CommonMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
@@ -99,14 +99,14 @@ def configure(**extra):
             ('en', gettext('English')),
             ('fr', gettext('French')),
             ('de', gettext('German')),
-            ('pt-BR', gettext("Brazil")),
+            ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
         ),
         CMS_LANGUAGES = (
             ('en', gettext('English')),
             ('fr', gettext('French')),
             ('de', gettext('German')),
-            ('pt-BR', gettext("Brazil")),
+            ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
         ),
         CMS_LANGUAGE_CONF = {
@@ -114,7 +114,7 @@ def configure(**extra):
             'en':['fr', 'de'],
         },
         CMS_SITE_LANGUAGES = {
-            1:['en','de','fr','pt-BR'],
+            1:['en','de','fr','pt-br'],
             2:['de','fr'],
             3:['nl'],
         },
