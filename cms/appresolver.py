@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
+from cms.utils.i18n import force_lang
 from cms.utils.moderator import get_page_queryset
 
 from django.conf import settings
@@ -49,6 +50,7 @@ class AppRegexURLResolver(RegexURLResolver):
     url_patterns = None
 
     def resolve_page_id(self, path):
+        print "resolve page id"+path
         """Resolves requested path similar way how resolve does, but instead
         of return callback,.. returns page_id to which was application 
         assigned.
@@ -164,44 +166,38 @@ def get_app_patterns():
     is_draft = not settings.CMS_MODERATOR
 
     title_qs = Title.objects.filter(page__publisher_is_draft=is_draft, page__site=current_site)
-    
-    if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
-        use_namespaces = True
-        hooked_applications = {}
-    else:
-        use_namespaces = False
-        hooked_applications = []
-    
+
+    hooked_applications = {}
+
     # Loop over all titles with an application hooked to them
     for title in title_qs.exclude(application_urls=None).exclude(application_urls='').select_related():
         path = title.path
-        if use_namespaces:
-            mixid = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
-        else:
-            mixid = "%s:%s" % (path + "/", title.application_urls)
-        if mixid in included:
+        mix_id = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
+        if mix_id in included:
             # don't add the same thing twice
             continue  
         if not settings.APPEND_SLASH:
             path += '/'
-        if use_namespaces:
-            if title.language not in hooked_applications:
-                hooked_applications[title.language] = []
-            hooked_applications[title.language] += get_patterns_for_title(path, title)
-        else:
-            hooked_applications += get_patterns_for_title(path, title)
-        included.append(mixid)
+        if title.page_id not in hooked_applications:
+            hooked_applications[title.page_id] = {}
+        with force_lang(title.language):
+            hooked_applications[title.page_id][title.language] = get_patterns_for_title(path, title)
+        included.append(mix_id)
     # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
-    if use_namespaces:
-        for ns, currentpatterns in hooked_applications.items():
-            extra_patterns = patterns('', *currentpatterns)
-            resolver = AppRegexURLResolver(r'', 'app_resolver', namespace=ns)
-            resolver.url_patterns = extra_patterns
-            app_patterns.append(resolver)
-            APP_RESOLVERS.append(resolver)
-    else:
-        extra_patterns = patterns('', *hooked_applications)
+    for page_id in hooked_applications.keys():
+        merged_patterns = None
+        for lang in hooked_applications[page_id].keys():
+            current_patterns = hooked_applications[page_id][lang]
+            if not merged_patterns:
+                merged_patterns = current_patterns
+                continue
+            else:
+                for x in range(len(current_patterns)):
+                    orig = merged_patterns[x]
+
+                print current_patterns
+        extra_patterns = patterns('', *current_patterns)
         resolver = AppRegexURLResolver(r'', 'app_resolver')
         resolver.url_patterns = extra_patterns
         app_patterns.append(resolver)

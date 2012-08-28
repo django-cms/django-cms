@@ -65,7 +65,9 @@ def details(request, slug):
         # page = applications_page_check(request, page, slug)
         # Check for apphooks! This time for real!
         app_urls = page.get_application_urls(current_language, False)
+        print app_urls
         if app_urls:
+            print "app urls found"
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
@@ -76,7 +78,8 @@ def details(request, slug):
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass
-
+    else:
+        print "no apphooks"
     # Check if the page has a redirect url defined for this language. 
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
