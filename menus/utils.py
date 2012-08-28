@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from cms.utils.i18n import force_lang
+import warnings
+
 from cms.models.titlemodels import Title
 
 
@@ -66,7 +69,7 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
-class _SimpleLanguageChanger(object):
+class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
         self._app_path = None
@@ -85,17 +88,23 @@ class _SimpleLanguageChanger(object):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
     
     def get_page_path(self, lang):
-        if getattr(self.request, 'current_page', None):
-            try:
-                return self.request.current_page.get_absolute_url(language=lang, fallback=False)
-            except Title.DoesNotExist:
-                return self.request.current_page.get_absolute_url(language=lang, fallback=True)
+        page = getattr(self.request, 'current_page', None)
+        if page:
+            with force_lang(lang):
+                try:
+                    return page.get_absolute_url(language=lang, fallback=False)
+                except Title.DoesNotExist:
+                    return page.get_absolute_url(language=lang, fallback=True)
         else:
             return ''
 
 def simple_language_changer(func):
+    warnings.warn("simple_language_changer is deprecated and will be removed in "
+        "2.5! This is the default behaviour now for non CMS managed views and is no longer needed.",
+        DeprecationWarning)
+
     def _wrapped(request, *args, **kwargs):
-        set_language_changer(request, _SimpleLanguageChanger(request))
+        set_language_changer(request, DefaultLanguageChanger(request))
         return func(request, *args, **kwargs)
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__

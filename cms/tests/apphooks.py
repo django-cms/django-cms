@@ -6,6 +6,7 @@ from cms.appresolver import (applications_page_check, clear_app_resolvers,
     get_app_patterns)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.tests.menu_utils import DumbPageLanguageUrl
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches, reverse
 import sys
@@ -204,3 +205,65 @@ class ApphooksTestCase(CMSTestCase):
             resolver = urlpatterns[0]
             url = resolver.reverse('sample-root')
             self.assertEqual(url, 'child/not-home/subchild/')
+
+
+class ApphooksPageLanguageUrlTestCase(CMSTestCase):
+
+    def setUp(self):
+        clear_app_resolvers()
+        clear_url_caches()
+
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+
+    def tearDown(self):
+        clear_app_resolvers()
+        clear_url_caches()
+
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+
+    def test_page_language_url_for_apphook(self):
+
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+
+            apphook_pool.clear()
+            superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+            page = create_page("home", "nav_playground.html", "en",
+                               created_by=superuser, published=True)
+            create_title('de', page.get_title(), page)
+            child_page = create_page("child_page", "nav_playground.html", "en",
+                         created_by=superuser, published=True, parent=page)
+            create_title('de', child_page.get_title(), child_page)
+            child_child_page = create_page("child_child_page", "nav_playground.html",
+                "en", created_by=superuser, published=True, parent=child_page, apphook='SampleApp')
+            create_title("de", '%s_de' % child_child_page.get_title(), child_child_page, apphook='SampleApp')
+
+            child_page.publish()
+            child_child_page.publish()
+            # publisher_public is set to draft on publish, issue with onetoone reverse
+            child_child_page = self.reload(child_child_page)
+
+            path = reverse('en:extra_first')
+
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'en'
+            request.current_page = child_child_page
+
+            fake_context = {'request': request}
+            tag = DumbPageLanguageUrl()
+
+            output = tag.get_context(fake_context, 'en')
+            url = output['content']
+            self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
+
+            output = tag.get_context(fake_context, 'ja')
+            url = output['content']
+            self.assertEqual(url, '/ja/child_page/child_child_page/extra_1/')
+
+            output = tag.get_context(fake_context, 'de')
+            url = output['content']
+            # look the extra "_de"
+            self.assertEqual(url, '/de/child_page/child_child_page_de/extra_1/')
+
+            apphook_pool.clear()

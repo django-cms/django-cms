@@ -99,6 +99,10 @@ For the language chooser to work the
 simple_language_changer
 =======================
 
+.. deprecated:: 2.3.1
+
+    ``simple_language_changer`` will be removed in 2.5.
+
 If the URLs of your views don't actually change besides the language prefix,
 you can use the :func:`menus.utils.simple_language_changer` view decorator,
 instead of manually using :func:`~menus.utils.set_language_changer`::
@@ -133,6 +137,7 @@ If you put :setting:`CMS_HIDE_UNTRANSLATED` to ``False`` in your
 not translated yet.
 
 If :setting:`CMS_HIDE_UNTRANSLATED`  is ``True`` in your ``settings.py``
-and you are on a page that doesn't yet have an English translation and you view the
-German version then the language chooser will redirect to ``/``. The same goes
-for URLs that are not handled by the CMS and display a language chooser.
+and you are on a page that doesn't yet have an English translation and you view
+the German version then the language chooser will redirect to ``/``. The same
+goes for urls that are not handled by the cms and display a language chooser.
+

@@ -12,6 +12,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse, resolve
 from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
+from menus.utils import DefaultLanguageChanger
 import urllib
 from django.core.urlresolvers import reverse
 from django.utils.translation import activate
@@ -363,48 +364,11 @@ class PageLanguageUrl(InclusionTag):
         except KeyError:
             print 'no reuqest'
             return {'template': 'cms/content.html'}
-
         if hasattr(request, "_language_changer"):
-            print 'language changer found'
-            print request._language_changer
-            try:
-                setattr(request._language_changer, 'request', request)
-            except AttributeError:
-                pass
             url = request._language_changer(lang)
         else:
-            page = request.current_page
-            if page:
-                print 'page found'
-                print page
-                if page == "dummy":
-                    return {'content': ''}
-                try:
-                    with force_lang(lang):
-                        url = page.get_absolute_url(language=lang, fallback=False)
-                except Title.DoesNotExist:
-                    # no localized path/slug
-                    if settings.CMS_HIDE_UNTRANSLATED:
-                        # redirect to root url if CMS_HIDE_UNTRANSLATED
-                        url = '/' + lang + '/'
-                    else:
-                        # If untranslated pages are shown, use the fallback
-                        try:
-                            with force_lang(lang):
-                                url = page.get_absolute_url(language=lang, fallback=True)
-                        except Title.DoesNotExist:
-                            # not even  a fallback found. Return empty:
-                            return ''
-            else:
-                print 'no page found'
-                path = request.get_full_path()
-                res = resolve(path)
-                with force_lang:
-                    view = res.func
-                    if res.url_name:
-                        view = res.url_name
-                        if res.namespace:
-                            view = "%s:%s" % (res.namespace, view)
-                    url = reverse(view, args=res.args, kwargs=res.kwargs)
-        return {'content':url}
+            # use the default language changer
+            url = DefaultLanguageChanger(request)(lang)
+        return {'content': url}
+
 register.tag(PageLanguageUrl)
