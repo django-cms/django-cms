@@ -283,7 +283,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         context = self.get_context(path=path)
         tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
         url = tpl.render(context)
-        self.assertEqual(url, "/%s%s" % (settings.LANGUAGES[0][0], path))
+        self.assertEqual(url, "%s" % path)
             
     def test_show_menu_below_id(self):
         page2 = Page.objects.get(pk=self.get_page(2).pk)

@@ -3,22 +3,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy  as _
 from sekizai.helpers import validate_template
-from warnings import warn
 
-def pre_patch():
-    """Patch settings befere adding global cms defaults
-    """
-    
-    # append some usefull properties to settings
-    append_properties = {
-        'i18n_installed': 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
-    }
-    
-    for attr, value in append_properties.items():
-        if not hasattr(settings, attr):
-            setattr(settings._wrapped, attr, value)
-    
-    
+
 def post_patch():
     """Patch settings after global are adde
     """

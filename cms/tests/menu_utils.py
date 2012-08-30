@@ -36,7 +36,7 @@ class MenuUtilsTests(CMSTestCase):
         view = self.get_simple_view()
         # check we maintain the view name
         self.assertEqual(view.__name__, view.__name__)
-        request = self.get_request('/', 'en')
+        request = self.get_request('/en/', 'en')
         response = view(request)
         self.assertEqual(response.content, '')
         fake_context = {'request': request}
@@ -50,7 +50,7 @@ class MenuUtilsTests(CMSTestCase):
         
     def test_language_changer_decorator(self):
         def lang_changer(lang):
-            return "/dummy/"
+            return "/%s/dummy/" % lang
         decorated_view = language_changer_decorator(lang_changer)(self.get_simple_view())
         request = self.get_request('/some/path/', 'en')
         response = decorated_view(request)

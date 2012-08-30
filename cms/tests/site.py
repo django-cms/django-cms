@@ -35,7 +35,7 @@ class SiteTestCase(CMSTestCase):
         with SettingsOverride(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "en", site=self.site2)
     
-            response = self.client.get("/admin/cms/page/?site__exact=%s" % self.site3.pk)
+            response = self.client.get("/en/admin/cms/page/?site__exact=%s" % self.site3.pk)
             self.assertEqual(response.status_code, 200)
             create_page("page_3b", "nav_playground.html", "en", site=self.site3)
             

@@ -253,7 +253,7 @@ class CMSTestCase(testcases.TestCase):
                 4 - moderate descendants
                 + combinations
         """
-        response = self.client.post("/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
+        response = self.client.post("/en/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
         self.assertEquals(response.status_code, 200)
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):

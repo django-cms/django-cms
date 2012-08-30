@@ -11,6 +11,7 @@ from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, \
     RegexURLPattern
 from django.db.models import Q
 from django.utils.importlib import import_module
+from django.utils.translation import get_language
 
 APP_RESOLVERS = []
 
@@ -29,6 +30,9 @@ def applications_page_check(request, current_page=None, path=None):
         # This removes the non-CMS part of the URL.
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
+    for lang, lang_name in settings.CMS_LANGUAGES:
+        if path.startswith(lang+"/"):
+            path = path[len(lang+"/"):]
     for resolver in APP_RESOLVERS:
         try:
             page_id = resolver.resolve_page_id(path)
@@ -47,10 +51,17 @@ def applications_page_check(request, current_page=None, path=None):
 
 class AppRegexURLResolver(RegexURLResolver):
     page_id = None
-    url_patterns = None
+    url_patterns_dict = {}
+
+    @property
+    def url_patterns(self):
+        language = get_language()
+        if language in self.url_patterns_dict.keys():
+            return self.url_patterns_dict[language]
+        else:
+            return []
 
     def resolve_page_id(self, path):
-        print "resolve page id"+path
         """Resolves requested path similar way how resolve does, but instead
         of return callback,.. returns page_id to which was application
         assigned.
@@ -186,54 +197,26 @@ def get_app_patterns():
             path += '/'
         if title.page_id not in hooked_applications:
             hooked_applications[title.page_id] = {}
+        app = apphook_pool.get_apphook(title.application_urls)
+        if app.app_name:
+            inst_ns = title.page.reverse_id if title.page.reverse_id else app.app_name
+            app_ns = app.app_name, inst_ns
+        else:
+            app_ns = None, None
         with force_lang(title.language):
-            hooked_applications[title.page_id][title.language] = get_patterns_for_title(path, title)
-
-            lang_ns = title.language
-            app_patterns = get_patterns_for_title(path, title)
-
-            app = apphook_pool.get_apphook(title.application_urls)
-
-            if app.app_name:
-                inst_ns = title.page.reverse_id if title.page.reverse_id else app.app_name
-                app_ns = app.app_name, inst_ns
-            else:
-                app_ns = None, None
-
-            if lang_ns not in hooked_applications:
-                hooked_applications[lang_ns] = []
-
-            hooked_applications[lang_ns].append((app_ns, app_patterns))
-
+            hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title))
         included.append(mix_id)
     # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
     for page_id in hooked_applications.keys():
-        merged_patterns = None
+        resolver = None
         for lang in hooked_applications[page_id].keys():
-            current_patterns = hooked_applications[page_id][lang]
-            if not merged_patterns:
-                merged_patterns = current_patterns
-                continue
-            else:
-                for x in range(len(current_patterns)):
-                    orig = merged_patterns[x]
-
-                    no_ns_patterns = []
-                    for (app_ns, inst_ns), ps in currentpatterns:
-                        if app_ns is None:
-                            no_ns_patterns += ps
-                        else:
-                            app_resolver = AppRegexURLResolver(r'', 'app_resolver',
-                                app_name=app_ns, namespace=inst_ns)
-                            app_resolver.url_patterns = patterns('', *ps)
-                            no_ns_patterns.append(app_resolver)
-
-
-                print current_patterns
-        extra_patterns = patterns('', *current_patterns)
-        resolver = AppRegexURLResolver(r'', 'app_resolver')
-        resolver.url_patterns = extra_patterns
+            (app_ns, inst_ns), current_patterns = hooked_applications[page_id][lang]
+            if not resolver:
+                resolver = AppRegexURLResolver(r'', 'app_resolver', app_name=app_ns, namespace=inst_ns)
+                resolver.page_id = page_id
+            extra_patterns = patterns('', *current_patterns)
+            resolver.url_patterns_dict[lang] = extra_patterns
         app_patterns.append(resolver)
         APP_RESOLVERS.append(resolver)
     return app_patterns

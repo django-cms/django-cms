@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from patch import pre_patch, post_patch, post_patch_check
+from patch import post_patch, post_patch_check
 import warnings
 
 
@@ -23,9 +23,7 @@ def patch_settings():
     
     from cms.conf import global_settings
     # patch settings
-    
-    pre_patch()
-    
+
     # merge with global cms settings
     for attr in dir(global_settings):
         if attr == attr.upper() and not hasattr(settings, attr):

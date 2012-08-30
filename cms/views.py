@@ -32,8 +32,6 @@ def details(request, slug):
         return _handle_no_page(request, slug)
     
     current_language = get_language_from_request(request)
-    print "-------"+current_language
-    print page
     # Check that the current page is available in the desired (current) language
     available_languages = page.get_languages()
     
@@ -41,7 +39,6 @@ def details(request, slug):
     # Since the "old" details view had an exception for the root page, it is
     # ported here. So no resolution if the slug is ''.
     if current_language not in available_languages:
-        print "lang not found"
         if settings.CMS_LANGUAGE_FALLBACK:
             # If we didn't find the required page in the requested (current) 
             # language, let's try to find a suitable fallback in the list of 
@@ -65,9 +62,7 @@ def details(request, slug):
         # page = applications_page_check(request, page, slug)
         # Check for apphooks! This time for real!
         app_urls = page.get_application_urls(current_language, False)
-        print app_urls
         if app_urls:
-            print "app urls found"
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
@@ -79,13 +74,10 @@ def details(request, slug):
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass
-    else:
-        print "no apphooks"
-    # Check if the page has a redirect url defined for this language. 
+    # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        print "redirect found"
-        if (settings.i18n_installed and redirect_url[0] == "/"
+        if (settings.USE_I18N and redirect_url[0] == "/"
             and not redirect_url.startswith('/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))

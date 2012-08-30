@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.utils.i18n import force_lang
+from django.conf import settings
 import warnings
 
 from cms.models.titlemodels import Title
@@ -94,9 +95,12 @@ class DefaultLanguageChanger(object):
                 try:
                     return page.get_absolute_url(language=lang, fallback=False)
                 except Title.DoesNotExist:
-                    return page.get_absolute_url(language=lang, fallback=True)
+                    if settings.CMS_HIDE_UNTRANSLATED:
+                        return '/%s/' % lang
+                    else:
+                        return page.get_absolute_url(language=lang, fallback=True)
         else:
-            return ''
+            return '/%s/' % lang
 
 def simple_language_changer(func):
     warnings.warn("simple_language_changer is deprecated and will be removed in "

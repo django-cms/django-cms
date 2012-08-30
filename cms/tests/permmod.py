@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import urllib
 from cms.api import (create_page, publish_page, approve_page, add_plugin, 
     create_page_user, assign_user_to_page)
 from cms.models import Page, CMSPlugin
@@ -15,6 +16,7 @@ from cms.utils.permissions import has_generic_permission
 from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
@@ -848,18 +850,22 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
 class ModeratorSwitchCommandTest(CMSTestCase):
     def test_switch_moderator_on(self):
+        pages_root = urllib.unquote(reverse("pages-root"))
         with SettingsOverride(CMS_MODERATOR=False):
             page1 = create_page('page', 'nav_playground.html', 'en', published=True)
         with SettingsOverride(CMS_MODERATOR=True):
             call_command('cms', 'moderator', 'on')
-            page2 = get_page_from_path(page1.get_absolute_url().strip('/'))
+            path = page1.get_absolute_url()[len(pages_root):].strip('/')
+            page2 = get_page_from_path(path)
         self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
         
     def test_switch_moderator_off(self):
+        pages_root = urllib.unquote(reverse("pages-root"))
         with SettingsOverride(CMS_MODERATOR=True):
             page1 = create_page('page', 'nav_playground.html', 'en', published=True)
         with SettingsOverride(CMS_MODERATOR=False):
-            page2 = get_page_from_path(page1.get_absolute_url().strip('/'))
+            path = page1.get_absolute_url()[len(pages_root):].strip('/')
+            page2 = get_page_from_path(path)
         self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
 
 

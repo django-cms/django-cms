@@ -7,6 +7,7 @@ from cms.appresolver import (applications_page_check, clear_app_resolvers,
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
+from cms.utils.i18n import force_lang
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches, reverse
 import sys
@@ -157,8 +158,8 @@ class ApphooksTestCase(CMSTestCase):
 
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
-
-            path = reverse('en:sample-settings')
+            with force_lang("en"):
+                path = reverse('sample-settings')
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
@@ -171,13 +172,13 @@ class ApphooksTestCase(CMSTestCase):
 
             self.assertTemplateUsed(response, 'sampleapp/home.html')
             self.assertContains(response, en_title.title)
-
-            path = reverse('de:sample-settings')
+            with force_lang("de"):
+                path = reverse('sample-settings')
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
 
-            attached_to_page = applications_page_check(request, path=path[4:]) # strip leading slash and language prefix
+            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash and language prefix
             self.assertEquals(attached_to_page.pk, de_title.page.pk)
 
             response = self.client.get(path)
@@ -192,9 +193,9 @@ class ApphooksTestCase(CMSTestCase):
             en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
 
             self.reload_urls()
-
-            path = reverse('en:namespaced_app_ns:sample-root')
-            path_instance = reverse('en:instance_ns:sample-root')
+            with force_lang("en"):
+                path = reverse('namespaced_app_ns:sample-root')
+                path_instance = reverse('instance_ns:sample-root')
             self.assertEquals(path, path_instance)
 
             request = self.get_request(path)
@@ -208,26 +209,24 @@ class ApphooksTestCase(CMSTestCase):
     def test_get_child_page_for_apphook_with_instance_namespace(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
-
-            path = reverse('en:namespaced_app_ns:sample-settings')
-            path_instance1 = reverse('en:instance_ns:sample-settings')
-            path_instance2 = reverse('en:namespaced_app_ns:sample-settings', current_app='instance_ns')
+            with force_lang("en"):
+                path = reverse('namespaced_app_ns:sample-settings')
+                path_instance1 = reverse('instance_ns:sample-settings')
+                path_instance2 = reverse('namespaced_app_ns:sample-settings', current_app='instance_ns')
             self.assertEquals(path, path_instance1)
             self.assertEquals(path, path_instance2)
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
-
             attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
-            self.assertEquals(attached_to_page.pk, en_title.page.pk)
-
+            self.assertEquals(attached_to_page.pk, en_title.page_id)
             apphook_pool.clear()
 
     def test_get_sub_page_for_apphook_with_implicit_current_app(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title = self.create_base_structure(NS_APP_NAME, 'en')
-
-            path = reverse('en:namespaced_app_ns:current-app')
+            with force_lang("en"):
+                path = reverse('namespaced_app_ns:current-app')
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
@@ -246,8 +245,8 @@ class ApphooksTestCase(CMSTestCase):
     def test_get_sub_page_for_apphook_with_explicit_current_app(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
-
-            path = reverse('en:namespaced_app_ns:current-app')
+            with force_lang("en"):
+                path = reverse('namespaced_app_ns:current-app')
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
@@ -278,14 +277,14 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test urlconf")
-
-            path = reverse('de:extra_first')
+            with force_lang("de"):
+                path = reverse('extra_first')
             response = self.client.get(path)
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test urlconf")
-
-            path = reverse('de:extra_second')
+            with force_lang("de"):
+                path = reverse('extra_second')
             response = self.client.get(path)
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
@@ -345,8 +344,8 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
             child_child_page.publish()
             # publisher_public is set to draft on publish, issue with onetoone reverse
             child_child_page = self.reload(child_child_page)
-
-            path = reverse('en:extra_first')
+            with force_lang("en"):
+                path = reverse('extra_first')
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'

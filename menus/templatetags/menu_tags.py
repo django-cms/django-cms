@@ -362,7 +362,6 @@ class PageLanguageUrl(InclusionTag):
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
         except KeyError:
-            print 'no reuqest'
             return {'template': 'cms/content.html'}
         if hasattr(request, "_language_changer"):
             url = request._language_changer(lang)

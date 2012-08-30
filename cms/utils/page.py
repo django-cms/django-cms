@@ -18,7 +18,7 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
         Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
     )
 
-    if settings.i18n_installed:
+    if settings.USE_I18N:
         qs = qs.filter(language=lang)
 
     if not settings.CMS_FLAT_URLS:
