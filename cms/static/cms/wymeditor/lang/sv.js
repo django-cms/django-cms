@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['sv'] = {
+WYMeditor.STRINGS.sv = {
     Strong:           'Viktigt',
     Emphasis:         'Betoning',
     Superscript:      'Upphöjt',
@@ -26,6 +26,7 @@ WYMeditor.STRINGS['sv'] = {
     Table_Header:     'Tabellrubrik',
     URL:              'URL',
     Title:            'Titel',
+    Relationship:     'Relation',
     Alternative_Text: 'Alternativ text',
     Caption:          'Överskrift',
     Summary:          'Summary',

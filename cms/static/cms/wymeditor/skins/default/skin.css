@@ -26,7 +26,7 @@
         .wym_skin_default .wym_area_right         { display: block; }
 
 
-/*TYPO*/
+/*TYPO*/    
         .wym_skin_default                { font-size: 62.5%; font-family: Verdana, Arial, sans-serif; }
         .wym_skin_default h2             { font-size: 110%; /* = 11px */}
         .wym_skin_default h3             { font-size: 100%; /* = 10px */}
@@ -119,7 +119,7 @@
 /*DIALOGS*/
         .wym_dialog div.row         { margin-bottom: 5px;}
         .wym_dialog div.row input   { margin-right: 5px;}
-        .wym_dialog div.row label   { float: left; width: 150px; display: block; text-align: right; margin-right: 10px; }
+        .wym_dialog div.row label   { float: left; width: 120px; display: block; text-align: right; margin-right: 10px; }
         .wym_dialog div.row-indent  { padding-left: 160px; }
         /*autoclearing*/        
         .wym_dialog div.row:after            { content: "."; display: block; height: 0; clear: both; visibility: hidden; }

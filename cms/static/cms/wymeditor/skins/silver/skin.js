@@ -4,18 +4,18 @@ jQuery.fn.selectify = function() {
     return this.each(function() {
         jQuery(this).hover(
             function() {
-                jQuery("h2", this).css("background-position", "0px -18px"); 
+                jQuery("h2", this).css("background-position", "0px -18px");
                 jQuery("ul", this).fadeIn("fast");
             },
 		    function() {
-		        jQuery("h2", this).css("background-position", ""); 
+		        jQuery("h2", this).css("background-position", "");
 		        jQuery("ul", this).fadeOut("fast");
 		    }
         );
     });
 };
 
-WYMeditor.SKINS['silver'] = {
+WYMeditor.SKINS.silver = {
 
     init: function(wym) {
 

@@ -1,5 +1,5 @@
 //Translation To Persian: Ghassem Tofighi (http://ght.ir)
-WYMeditor.STRINGS['fa'] = {
+WYMeditor.STRINGS.fa = {
     Strong:           'پررنگ',//Strong
     Emphasis:         'ایتالیک',//Emphasis
     Superscript:      'بالانويس‌ ',//Superscript

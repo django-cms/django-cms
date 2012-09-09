@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['cs'] = {
+WYMeditor.STRINGS.cs = {
     Strong:           'Tučné',
     Emphasis:         'Kurzíva',
     Superscript:      'Horní index',

@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['pl'] = {
+WYMeditor.STRINGS.pl = {
     Strong:           'Nacisk',
     Emphasis:         'Emfaza',
     Superscript:      'Indeks górny',
