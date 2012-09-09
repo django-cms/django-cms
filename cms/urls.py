@@ -4,10 +4,8 @@ from cms.views import details
 from django.conf import settings
 from django.conf.urls.defaults import url, patterns
 
-if settings.APPEND_SLASH:
-    reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)/$', details, name='pages-details-by-slug')
-else:
-    reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)$', details, name='pages-details-by-slug')
+reg_re = r'(?u)^(?P<slug>[-.//\w]+)%s$' % (settings.APPEND_SLASH and '/' or '')
+reg = url(reg_re, details, name='pages-details-by-slug')
 
 urlpatterns = [
     # Public pages
