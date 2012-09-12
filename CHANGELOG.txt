@@ -85,3 +85,29 @@
 ==== 2.3.1 ====
 
 - pinned version of django-mptt to 0.5.1 or 0.5.2
+
+==== 2.3.2 ====
+
+- CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
+- Wymeditor updated to 1.0.4a
+- icon_url escape fixed
+- Ukranian translation added
+- Fixed wrong language prefix handling for form actions and admin preview
+- Admin icons in django 1.4 fixed
+- Added requirements.txt for pip and testing in test_requirements
+- Google map plugin with height and width properties
+- Docs fixes
+- Code cleanup
+- Switched html5lib to HTML serializer
+- Removed handling of iterables in plugin_pool.register_plugin
+- Performance and reduced queries
+- Link has target support
+- Made the PageAttribute templatetag an 'asTag'
+- JQuery namespace fixes in admin
+
+
+
+
+
+
+
