@@ -81,6 +81,3 @@ class MultilingualTestCase(CMSTestCase):
         response = client.get('/')
         self.assertNotIn('django_language', response.cookies)
         self.assertNotIn('sessionid', response.cookies)
-
-    def test_frontend_languages(self):
-        pass
