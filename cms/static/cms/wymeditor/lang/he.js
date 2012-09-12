@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['he'] = {
+WYMeditor.STRINGS.he = {
     Strong:           'חזק',
     Emphasis:         'מובלט',
     Superscript:      'כתב עילי',

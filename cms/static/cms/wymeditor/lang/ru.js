@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['ru'] = {
+WYMeditor.STRINGS.ru = {
     Strong:           'Жирный',
     Emphasis:         'Наклонный',
     Superscript:      'Надстрочный',

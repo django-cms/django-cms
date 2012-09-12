@@ -1,10 +1,10 @@
-WYMeditor.SKINS['compact'] = {
+WYMeditor.SKINS.compact = {
 
     init: function(wym) {
-    
+
         //move the containers panel to the top area
-        jQuery(wym._options.containersSelector + ', '
-          + wym._options.classesSelector, wym._box)
+        jQuery(wym._options.containersSelector + ', ' +
+            wym._options.classesSelector, wym._box)
           .appendTo( jQuery("div.wym_area_top", wym._box) )
           .addClass("wym_dropdown")
           .css({"margin-right": "10px", "width": "120px", "float": "left"});
@@ -24,7 +24,9 @@ WYMeditor.SKINS['compact'] = {
         var postInit = wym._options.postInit;
         wym._options.postInit = function(wym) {
 
-            if(postInit) postInit.call(wym, wym);
+            if (postInit) {
+                postInit.call(wym, wym);
+            }
             var rule = {
                 name: 'body',
                 css: 'background-color: #f0f0f0;'
