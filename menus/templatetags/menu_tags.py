@@ -170,8 +170,8 @@ register.tag(ShowMenuBelowId)
 class ShowSubMenu(InclusionTag):
     """
     show the sub menu of the current nav-node.
-    -levels: how many levels deep
-    -temlplate: template used to render the navigation
+    - levels: how many levels deep
+    - template: template used to render the navigation
     """
     name = 'show_sub_menu'
     template = 'menu/dummy.html'
