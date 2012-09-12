@@ -2,18 +2,26 @@
 from django.conf import settings
 from django.core.cache import cache
 
-permission_cache_keys = [] 
-all_keys = []
+from django.contrib.auth.models import User
+
+PERMISSION_KEYS = [
+    'can_change', 'can_add', 'can_delete',
+    'can_change_advanced_settings', 'can_publish',
+    'can_change_permissions', 'can_move_page',
+    'can_moderate', 'can_view']
+
 
 def get_cache_key(user, key):
     return "%s:permission:%s:%s" % (
         settings.CMS_CACHE_PREFIX, user.username, key)
+
 
 def get_permission_cache(user, key):
     """
     Helper for reading values from cache
     """
     return cache.get(get_cache_key(user, key))
+
 
 def set_permission_cache(user, key, value):
     """
@@ -22,20 +30,20 @@ def set_permission_cache(user, key, value):
     """
     # store this key, so we can clean it when required
     cache_key = get_cache_key(user, key)
-    
-    if not cache_key in all_keys:
-        all_keys.append(cache_key)
-    if not key in permission_cache_keys:
-        permission_cache_keys.append(key)
     cache.set(cache_key, value, settings.CMS_CACHE_DURATIONS['permissions'])
+
 
 def clear_user_permission_cache(user):
     """
     Cleans permission cache for given user.
     """
-    for key in permission_cache_keys:
-        cache.delete(get_cache_key(user, key)) 
+    for key in PERMISSION_KEYS:
+        cache.delete(get_cache_key(user, key))
+
 
 def clear_permission_cache():
-    for key in all_keys:
-        cache.delete(key)
+    users = User.objects.filter(is_active=True)
+    for user in users:
+        for key in PERMISSION_KEYS:
+            cache_key = get_cache_key(user, key)
+            cache.delete(cache_key)
