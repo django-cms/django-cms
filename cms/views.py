@@ -92,13 +92,16 @@ def details(request, slug):
             return HttpResponseRedirect(redirect_url)
     
     # permission checks
-    if page.login_required and not request.user.is_authenticated():
-        if settings.i18n_installed:
-            path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
-        else:
-            path = urlquote(request.get_full_path())
-        tup = settings.LOGIN_URL , "next", path
-        return HttpResponseRedirect('%s?%s=%s' % tup)
+    # check whether authenticated first; that we don't waste time doing anything else
+    if not request.user.is_authenticated():
+        # check this page and all its ancestors for login_required
+        if page.login_required or [ancestor for ancestor in page.get_ancestors() if ancestor.login_required]:
+            if settings.i18n_installed:
+                path = urlquote("/%s%s" % (request.LANGUAGE_CODE, request.get_full_path()))
+            else:
+                path = urlquote(request.get_full_path())
+            tup = settings.LOGIN_URL , "next", path
+            return HttpResponseRedirect('%s?%s=%s' % tup)
     
     template_name = get_template_from_request(request, page, no_current_page=True)
     # fill the context 
