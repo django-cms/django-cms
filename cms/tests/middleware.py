@@ -14,22 +14,24 @@ class MiddlewareTestCase(CMSTestCase):
         
         middle = MultilingualURLMiddleware()
         
-        KLINGON = 'x-klingon'
+        FRENCH = 'fr'
         ELVISH = 'x-elvish'
         
-        with SettingsOverride(CMS_LANGUAGES=((KLINGON, 'Klingon'),)):
+        with SettingsOverride(CMS_LANGUAGES=((FRENCH, 'French'),("it", "Italian")), CMS_FRONTEND_LANGUAGES=(FRENCH,)):
             request = AttributeObject(
                 session={},
-                path_info='/en/whatever',
-                path='/en/whatever'
+                path_info='/it/whatever',
+                path='/it/whatever',
+                COOKIES={},
+                META={},
             )
             result = middle.get_language_from_request(request)
-            self.assertEqual(result, 'en')
+            self.assertEqual(result, 'en')#falls back to default
             
             
             request = AttributeObject(
                 session={
-                    'django_language': KLINGON,
+                    'django_language': FRENCH,
                 },
                 path_info='whatever',
                 path='whatever',
@@ -37,19 +39,19 @@ class MiddlewareTestCase(CMSTestCase):
                 META={},
             )
             result = middle.get_language_from_request(request)
-            self.assertEqual(result, KLINGON) # the session's language. Nerd.
+            self.assertEqual(result, FRENCH) # the session's language.
             
             
             request = AttributeObject(
                 path_info='whatever',
                 path='whatever',
                 COOKIES={
-                    'django_language': KLINGON,
+                    'django_language': FRENCH,
                 },
                 META={},
             )
             result = middle.get_language_from_request(request)
-            self.assertEqual(result, KLINGON) # the cookies language.
+            self.assertEqual(result, FRENCH) # the cookies language.
             
             # Now the following should revert to the default language (en)
             request.COOKIES['django_language'] = ELVISH
@@ -60,18 +62,18 @@ class MiddlewareTestCase(CMSTestCase):
     def test_multilingual_middleware_ignores_static_url(self):
 
         middle = MultilingualURLMiddleware()
-        KLINGON = 'x-klingon'
+        FRENCH = 'x-FRENCH'
         
-        with SettingsOverride(CMS_LANGUAGES=((KLINGON, 'Klingon'),)):
+        with SettingsOverride(CMS_LANGUAGES=((FRENCH, 'FRENCH'),)):
             request = AttributeObject(
                 session={},
                 path_info='whatever',
                 path='whatever',
                 COOKIES={
-                    'django_language': KLINGON,
+                    'django_language': FRENCH,
                 },
                 META = {},
-                LANGUAGE_CODE = KLINGON
+                LANGUAGE_CODE = FRENCH
             )
             html = """<ul>
                 <li><a href="/some-page/">some page</a></li>
@@ -89,8 +91,8 @@ class MiddlewareTestCase(CMSTestCase):
             response = middle.process_response(request,HttpResponse(html))
             
             # These paths shall be prefixed
-            self.assertTrue('href="/%s/some-page/' %KLINGON in response.content)
-            self.assertTrue('href="/%s%simages/some-other-file.jpg' %(KLINGON, '/some-path/') in response.content)
+            self.assertTrue('href="/%s/some-page/' %FRENCH in response.content)
+            self.assertTrue('href="/%s%simages/some-other-file.jpg' %(FRENCH, '/some-path/') in response.content)
 
             # These shall not
             self.assertTrue('href="%simages/some-media-file.jpg' %settings.MEDIA_URL in response.content)

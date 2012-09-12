@@ -110,6 +110,11 @@ def configure(**extra):
             ('pt-BR', gettext("Brazil")),
             ('nl', gettext("Dutch")),
         ),
+        CMS_FRONTEND_LANGUAGES = (
+            'fr',
+            'de',
+            'nl',
+        ),
         CMS_LANGUAGE_CONF = {
             'de':['fr', 'en'],
             'en':['fr', 'de'],

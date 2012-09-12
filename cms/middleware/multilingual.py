@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.i18n import get_default_language
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -7,8 +8,6 @@ from django.utils import translation
 import re
 import urllib
 import urlparse
-
-SUPPORTED = dict(settings.CMS_LANGUAGES)
 
 HAS_LANG_PREFIX_RE = re.compile(r"^/(%s)/.*" % "|".join([re.escape(lang[0]) for lang in settings.CMS_LANGUAGES]))
 
@@ -76,32 +75,30 @@ def patch_response(content, pages_root, language):
 
 class MultilingualURLMiddleware(object):
     def get_language_from_request(self, request):
-        changed = False
         prefix = has_lang_prefix(request.path_info)
+        lang = None
         if prefix:
             request.path = "/" + "/".join(request.path.split("/")[2:])
             request.path_info = "/" + "/".join(request.path_info.split("/")[2:])
             t = prefix
-            if t in SUPPORTED:
+            if t in settings.CMS_FRONTEND_LANGUAGES:
                 lang = t
-                if (hasattr(request, "session") and
-                    request.session.get("django_language", None) != lang):
-                    request.session["django_language"] = lang
-                changed = True
-        else:
-            lang = translation.get_language_from_request(request)
-        if not changed:
-            if hasattr(request, "session"):
-                lang = request.session.get("django_language", None)
-                if lang in SUPPORTED and lang is not None:
-                    return lang
-            elif "django_language" in request.COOKIES.keys():
-                lang = request.COOKIES.get("django_language", None)
-                if lang in SUPPORTED and lang is not None:
-                    return lang
-            if not lang:
+        if not lang:
+            languages = []
+            for frontend_lang in settings.CMS_FRONTEND_LANGUAGES:
+                languages.append((frontend_lang,frontend_lang))
+            with SettingsOverride(LANGUAGES=languages):
                 lang = translation.get_language_from_request(request)
-        lang = get_default_language(lang)
+        if not lang:
+            lang = get_default_language()
+        old_lang = None
+        if hasattr(request, "session") and request.session.get("django_language", None):
+            old_lang = request.session["django_language"]
+        if not old_lang and hasattr(request, "COOKIES") and request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, None):
+            old_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+        if old_lang != lang:
+            if hasattr(request, 'session'):
+                request.session['django_language'] = lang
         return lang
 
     def process_request(self, request):
@@ -114,7 +111,8 @@ class MultilingualURLMiddleware(object):
         local_middleware = LocaleMiddleware()
         response = local_middleware.process_response(request, response)
         path = unicode(request.path)
-
+        if not hasattr(request, 'session') and request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) != language:
+            response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language)
         # note: pages_root is assumed to end in '/'.
         #       testing this and throwing an exception otherwise, would probably be a good idea
 
