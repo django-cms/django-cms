@@ -194,7 +194,7 @@ Example::
     {% page_attribute "page_title" request.current_page.parent_id %}
     {% page_attribute "slug" request.current_page.get_root %}
 
-.. versionadded:: 2.3.1
+.. versionadded:: 2.3.2
     This template tag supports the ``as`` argument. With this you can assign the result
     of the template tag to a new variable that you can use elsewhere in the template.
 
