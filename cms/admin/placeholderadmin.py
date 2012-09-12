@@ -225,7 +225,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'name': unicode(saved_object), 
                 "type": saved_object.get_plugin_name(),
                 'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(saved_object.get_instance_icon_src())),
+                'icon': force_escape(saved_object.get_instance_icon_src()),
                 'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
             }
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
