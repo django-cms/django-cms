@@ -58,7 +58,19 @@ Now to render the placeholder in a template you use the
 The :ttag:`render_placeholder` tag takes a
 :class:`~cms.models.fields.PlaceholderField` instance as its first argument and
 optionally accepts a width parameter as its second argument for context sensitive
-plugins.
+plugins. The view in which you render your placeholder field must return the
+:attr:`request <django.http.HttpRequest>` object in the context. This is
+typically achieved in Django applications by using :class:`RequestContext`::
+
+    from django.shortcuts import get_object_or_404, render_to_response
+    from django.template.context import RequestContext
+    from myapp.models import MyModel
+
+    def my_model_detail(request, id):
+        object = get_object_or_404(MyModel, id=id)
+        return render_to_response('my_model_detail.html', {
+            'object': object,
+        }, context_instance=RequestContext(request))
 
 
 *******************************
