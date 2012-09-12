@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['nb'] = {
+WYMeditor.STRINGS.nb = {
     Strong:           'Fet',
     Emphasis:         'Uthevet',
     Superscript:      'Opphøyet',

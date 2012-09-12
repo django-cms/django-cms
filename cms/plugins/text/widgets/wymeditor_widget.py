@@ -38,7 +38,7 @@ class WYMEditor(Textarea):
         return super(WYMEditor, self).render(name, value, attrs)
 
     def render_additions(self, name, value, attrs=None):
-        language = get_language()
+        language = get_language().split('-')[0]
         context = {
             'name': name,
             'language': language,
