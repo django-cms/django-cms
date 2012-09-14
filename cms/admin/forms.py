@@ -2,7 +2,7 @@
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, 
-    PageUserGroup, GlobalPagePermission)
+    PageUserGroup)
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import get_page_from_path
