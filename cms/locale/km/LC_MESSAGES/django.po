@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-24 11:47+0200\n"
+"POT-Creation-Date: 2012-09-12 15:34+0200\n"
 "PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -115,117 +115,108 @@ msgstr "ភាសា​បច្ចុប្បន្ន​នៃ ផ្នែ�
 msgid "Another page with this slug already exists"
 msgstr ""
 
-#: admin/forms.py:135
+#: admin/forms.py:151
 msgid "Menu Title"
 msgstr "ចំណង​ជើង​ម៉ឺនុយ"
 
-#: admin/forms.py:136
+#: admin/forms.py:152
 msgid "Overwrite what is displayed in the menu"
 msgstr "ជំនួស​ពី​លើ ឯកសារ​ដែល​បាន​បង្ហាញ​នៅ​ក្នុង​ម៉ឺនុយ"
 
-#: admin/forms.py:137
+#: admin/forms.py:153
 msgid "Page Title"
 msgstr "ចំណង​ជើង​ទំព័រ"
 
-#: admin/forms.py:138
+#: admin/forms.py:154
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "ជំនួស​ពី​លើ អ្វី​ដែល​បាន​បង្ហាញ​នៅ​ផ្នែក​កំពូល​នៃ​កម្មវិធី​រុក​រក​របស់​អ្នក ឬ នៅ​ក្នុង​សៀវភៅ​កត់​ចំណាំ"
 
-#: admin/forms.py:139
+#: admin/forms.py:155
 msgid "Application"
 msgstr "កម្មវិធី"
 
-#: admin/forms.py:141
+#: admin/forms.py:157
 msgid "Hook application to this page."
 msgstr "ភ្ជាប់​កម្មវិធី​ទៅ​កាន់​ទំព័រ​នេះ។"
 
-#: admin/forms.py:142
+#: admin/forms.py:158
 msgid "Overwrite URL"
 msgstr "ជំនួស​ពី​លើ URL"
 
-#: admin/forms.py:143
+#: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
 msgstr ""
 
-#: admin/forms.py:149
+#: admin/forms.py:165
 msgid "Redirect"
 msgstr "ប្ដូរ​ទិស​ដៅ"
 
-#: admin/forms.py:150
+#: admin/forms.py:166
 msgid "Redirects to this URL."
 msgstr "ប្ដូរ​ទិស​ដៅ​ទៅ​កាន់ URL មួយ​នេះ។"
 
-#: admin/forms.py:152
+#: admin/forms.py:168
 msgid "A description of the page sometimes used by search engines."
 msgstr ""
 
-#: admin/forms.py:154
+#: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
 
-#: admin/forms.py:170
+#: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
 msgstr ""
 
-#: admin/forms.py:178
-msgid "Invalid URL, use /my/url format."
-msgstr "URL មិន​ត្រឹម​ត្រូវ, ប្រើ​ទ្រង់​ទ្រាយ /my/url ។"
-
-#: admin/forms.py:183
-#, python-format
-msgid "Page with redirect url %r already exist"
-msgstr ""
-
-#: admin/forms.py:193 admin/forms.py:194 migrations/0001_initial.py:41
+#: admin/forms.py:203 admin/forms.py:204 migrations/0001_initial.py:41
 #: models/permissionmodels.py:17
 msgid "user"
 msgstr "អ្ន​ក​ប្រើ"
 
-#: admin/forms.py:218
+#: admin/forms.py:228
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
 
-#: admin/forms.py:223
+#: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
 msgstr ""
 
-#: admin/forms.py:250
+#: admin/forms.py:260
 #, fuzzy
 msgid "can_view"
 msgstr "មើល"
 
-#: admin/forms.py:262
+#: admin/forms.py:272
 msgid "Please select user or group first."
 msgstr "សូម​រើស​អ្នក​ប្រើ ឬ ក្រុម ជា​មុន​សិន។"
 
-#: admin/forms.py:269 admin/forms.py:276 admin/forms.py:280
+#: admin/forms.py:279 admin/forms.py:286 admin/forms.py:290
 #: templates/admin/cms/page/change_form.html:68
 #: templates/admin/cms/page/plugin_change_form.html:76
 #: templates/cms/toolbar/placeholder.html:26
 msgid "Add"
 msgstr "បន្ថែម"
 
-#: admin/forms.py:270 admin/forms.py:277 admin/forms.py:281
+#: admin/forms.py:280 admin/forms.py:287 admin/forms.py:291
 msgid "Change"
 msgstr "ផ្លាស់​ប្ដូរ"
 
-#: admin/forms.py:271 admin/forms.py:278 admin/forms.py:282
+#: admin/forms.py:281 admin/forms.py:288 admin/forms.py:292
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
 msgstr "លុប"
 
-#: admin/forms.py:272
+#: admin/forms.py:282
 msgid "Recover (any) pages"
 msgstr "ស្ដារទំព័រ (និមួយៗ) ឡើង​វិញ"
 
-#: admin/forms.py:299
+#: admin/forms.py:309
 msgid "Notify user"
 msgstr "ឲ្យ​ដំណឹង​ទៅ​កាន់​អ្នក​ប្រើ"
 
-#: admin/forms.py:300
+#: admin/forms.py:310
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
@@ -233,158 +224,164 @@ msgstr ""
 "ផ្ញើ​ការ​ជូន​ដំណឹង​តាម​អ៊ីមែល​ទៅ​កាន់​អ្នក​ប្រើ អំពី​ការ​ប្ដូរ​ឈ្មោះ​ប្រើ​ប្រាស់ ឬ ពាក្យ​សម្ងាត់។ គឺស្នើ​អោយ​មាន​អាសយ​"
 "ដ្ឋាន​មែល​របស់​អ្នក​ប្រើ។"
 
-#: admin/forms.py:320
+#: admin/forms.py:330
 msgid "New password"
 msgstr "ពាក្យ​សម្ងាត់​ថ្មី"
 
-#: admin/forms.py:322
+#: admin/forms.py:332
 msgid "New password confirmation"
 msgstr "ការ​អះអាង​ពាក្យ​សម្ងាត់​ថ្មី"
 
-#: admin/forms.py:341
+#: admin/forms.py:351
 msgid "Email notification requires valid email address."
 msgstr "ការ​ជូន​ដំណឹង​តាម​អ៊ីមែល គឺ​ត្រូវ​ការ​មាន​អាសយដ្ឋាន​មែល​ដែល​ត្រឹម​ត្រូវ។"
 
-#: admin/forms.py:343
+#: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
-#: admin/forms.py:345
+#: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
 
-#: admin/forms.py:347
+#: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
 msgstr ""
 
-#: admin/pageadmin.py:103
+#: admin/pageadmin.py:108
 msgid "Basic Settings"
 msgstr "ការ​កំណត់​ដំបូង"
 
-#: admin/pageadmin.py:106
+#: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 
-#: admin/pageadmin.py:108 admin/pageadmin.py:160
+#: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
 msgstr "ដែល​លាក់"
 
-#: admin/pageadmin.py:112
+#: admin/pageadmin.py:117
 msgid "Advanced Settings"
 msgstr "ការ​កំណត់​កម្រិត​ខ្ពស់"
 
-#: admin/pageadmin.py:119
+#: admin/pageadmin.py:124
 msgid "SEO Settings"
 msgstr "ការ​កំណត់ SEO"
 
-#: admin/pageadmin.py:306
+#: admin/pageadmin.py:311
 #, fuzzy
 msgid "You have no permission to change the template"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:493
+#: admin/pageadmin.py:498
 msgid "higher"
 msgstr "ខ្ពស់​ជាង​គេ"
 
-#: admin/pageadmin.py:663
+#: admin/pageadmin.py:668
 msgid "Database error"
 msgstr "បណ្ដុំ​ទិន្នន័យ មាន​បញ្ហា"
 
-#: admin/pageadmin.py:872
+#: admin/pageadmin.py:779
+#, fuzzy
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
+
+#: admin/pageadmin.py:880
 msgid "Page was successfully approved."
 msgstr "ទំព័រ ត្រូវ​បាន​យល់​ព្រម​ហើយ។"
 
-#: admin/pageadmin.py:944
+#: admin/pageadmin.py:952
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: admin/pageadmin.py:950
+#: admin/pageadmin.py:958
 msgid "There only exists one translation for this page"
 msgstr ""
 
-#: admin/pageadmin.py:979
+#: admin/pageadmin.py:987
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
 
-#: admin/pageadmin.py:1001
+#: admin/pageadmin.py:1009
 msgid "Are you sure?"
 msgstr "តើ​អ្នក​ប្រាកដ​ហើយឬ?"
 
-#: admin/pageadmin.py:1062
+#: admin/pageadmin.py:1074
 msgid "You do not have permission to publish this page"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​ផ្សាយ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1076
+#: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/pageadmin.py:1101
+#: admin/pageadmin.py:1113
 #, fuzzy
 msgid "You have no permission to add a plugin"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1148 admin/pageadmin.py:1180
+#: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
 msgstr "ភាសា ត្រូវ​តែ​បាន​កំណត់​ទៅ​ជា​ភាសា​ដែល​បាន​គាំទ្រ!"
 
-#: admin/pageadmin.py:1160
+#: admin/pageadmin.py:1172
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "កម្មវិធី​បន្ថែម​ឈ្មោះ %(plugin_name)s បាន​បន្ថែម​ទៅ​ក្នុង %(placeholder)s ហើយ"
 
-#: admin/pageadmin.py:1178
+#: admin/pageadmin.py:1190
 msgid "You do not have permission to change this page"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1182
+#: admin/pageadmin.py:1194
 msgid "Language must be different than the copied language!"
 msgstr ""
 
-#: admin/pageadmin.py:1188
+#: admin/pageadmin.py:1200
 #, fuzzy
 msgid "You do not have permission to add plugins"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1195
+#: admin/pageadmin.py:1207
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1209 admin/pageadmin.py:1337 admin/pageadmin.py:1363
+#: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
 #, fuzzy
 msgid "You have no permission to change this page"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1243
+#: admin/pageadmin.py:1255
 #, fuzzy
 msgid "You have no permission to edit a plugin"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1299
+#: admin/pageadmin.py:1311
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1358
+#: admin/pageadmin.py:1370
 #, fuzzy
 msgid "You have no permission to move a plugin"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1376
+#: admin/pageadmin.py:1388
 msgid "Plugins where moved"
 msgstr ""
 
-#: admin/pageadmin.py:1390
+#: admin/pageadmin.py:1402
 #, fuzzy
 msgid "You have no permission to remove a plugin"
 msgstr "អ្នក​ពុំ​មាន​សិទ្ធិ​ក្នុង​ការ​កែ​ប្រែ​ទំព័រ​នេះ​ទេ"
 
-#: admin/pageadmin.py:1408 admin/placeholderadmin.py:293
+#: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -778,11 +775,11 @@ msgstr ""
 msgid "pages"
 msgstr "ទំព័រ"
 
-#: models/pagemodel.py:260
+#: models/pagemodel.py:268
 msgid "Page was copied."
 msgstr "ទំព័រ​ត្រូវ​បាន​ចម្លង។"
 
-#: models/pagemodel.py:680
+#: models/pagemodel.py:690
 msgid "default"
 msgstr "លំនាំ​ដើម"
 
@@ -1527,37 +1524,37 @@ msgstr "បញ្ជី​ទំព័រ"
 msgid "Successfully moved"
 msgstr "បាន​ផ្លាស់​ទី​ដោយ​ជោគ​ជ័យ"
 
-#: templates/admin/cms/page/change_list.html:64
+#: templates/admin/cms/page/change_list.html:68
 msgid "An error occured. Please reload the page"
 msgstr "មាន​បញ្ហា​បាន​កើត​ឡើង។ សូម​ផ្ទុក​ទំព័រ​ឡើង​វិញ"
 
-#: templates/admin/cms/page/change_list.html:85
+#: templates/admin/cms/page/change_list.html:90
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "ស្ដារ %(name)s ដែល​បាន​លុប"
 
-#: templates/admin/cms/page/change_list.html:88
+#: templates/admin/cms/page/change_list.html:93
 #, python-format
 msgid "Add %(name)s"
 msgstr "បន្ថែម %(name)s"
 
-#: templates/admin/cms/page/change_list.html:100
+#: templates/admin/cms/page/change_list.html:105
 msgid "Pages on:"
 msgstr "ទំព័រ​នៅ​លើ៖"
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:122
 msgid "Filter:"
 msgstr "តម្រង៖"
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:122
 msgid "on"
 msgstr "បើក"
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:122
 msgid "off"
 msgstr "បិទ"
 
-#: templates/admin/cms/page/change_list.html:119
+#: templates/admin/cms/page/change_list.html:124
 msgid "Filter"
 msgstr "តម្រង"
 
@@ -1877,50 +1874,55 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:99 test_utils/cli.py:106
+#: test_utils/cli.py:100 test_utils/cli.py:107
 #, fuzzy
 msgid "English"
 msgstr "លែង​ផ្សាយ"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:102 test_utils/cli.py:109
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Brazil"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:122
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:123
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:124
+#: test_utils/cli.py:130
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:136
 msgid "sidebar column"
 msgstr ""
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:142
 msgid "left column"
 msgstr ""
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:148
 msgid "right column"
 msgstr ""
+
+#: test_utils/project/placeholderapp/cms_plugins.py:7
+#, fuzzy
+msgid "Test Plugin"
+msgstr "លុប​កម្មវិធី​បន្ថែម"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1960,11 +1962,6 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
-#: test_utils/project/sampleapp/urls.py:11
-#, fuzzy
-msgid "^account/$"
-msgstr "ចំនួន"
-
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - គណនី​ប្រើ​ប្រាស់​របស់​អ្នក ត្រូវ​បាន​បង្កើត​ហើយ។"
@@ -1985,6 +1982,18 @@ msgstr "យល់​ព្រម"
 #, python-format
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - ទំព័រ %s ស្នើ​អោយ​មាន​ការ​យល់​ព្រម។"
+
+#: utils/page_resolver.py:142
+msgid "Invalid URL, use /my/url format."
+msgstr "URL មិន​ត្រឹម​ត្រូវ, ប្រើ​ទ្រង់​ទ្រាយ /my/url ។"
+
+#: utils/page_resolver.py:168
+#, python-format
+msgid ""
+"Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
+msgid_plural ""
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+msgstr[0] ""
 
 #~ msgid "Missing flash plugin."
 #~ msgstr "ខ្វះ​កម្មវិធី​បន្ថែម ហ្វ្លាស់។"
@@ -2009,9 +2018,6 @@ msgstr "CMS - ទំព័រ %s ស្នើ​អោយ​មាន​កា�
 
 #~ msgid "Settings"
 #~ msgstr "ការ​កំណត់"
-
-#~ msgid "Delete Plugin"
-#~ msgstr "លុប​កម្មវិធី​បន្ថែម"
 
 #~ msgid "Wanted language has not been translated yet."
 #~ msgstr "ភាសា​ដែល​ត្រូវ​ការ​មិន​ទាន់​ត្រូវ​បាន​បក​ប្រែ​ទេ។"

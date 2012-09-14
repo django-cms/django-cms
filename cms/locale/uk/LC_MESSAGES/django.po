@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-18 09:53+0300\n"
+"POT-Creation-Date: 2012-09-12 15:35+0200\n"
 "PO-Revision-Date: 2012-08-18 15:16+0300\n"
 "Last-Translator: Roman Kozlovskyi <krzroman@gmail.com>\n"
 "Language-Team: Ukrainian Team <LL@li.org>\n"
@@ -15,7 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "X-Poedit-Language: Ukrainian\n"
 "X-Poedit-Country: UKRAINE\n"
 
@@ -27,8 +28,7 @@ msgstr "Режим редагування"
 msgid "django CMS"
 msgstr ""
 
-#: cms_toolbar.py:110
-#: templates/admin/cms/page/menu_item.html:69
+#: cms_toolbar.py:110 templates/admin/cms/page/menu_item.html:69
 msgid "Publish"
 msgstr "Опублікувати"
 
@@ -36,8 +36,7 @@ msgstr "Опублікувати"
 msgid "Request Approval"
 msgstr ""
 
-#: cms_toolbar.py:135
-#: cms_toolbar.py:144
+#: cms_toolbar.py:135 cms_toolbar.py:144
 msgid "Logout"
 msgstr "Вийти"
 
@@ -61,8 +60,7 @@ msgstr ""
 msgid "Delete Page"
 msgstr ""
 
-#: cms_toolbar.py:188
-#: models/moderatormodels.py:45
+#: cms_toolbar.py:188 models/moderatormodels.py:45
 #: templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Сторінка"
@@ -167,15 +165,15 @@ msgstr ""
 msgid "A page with this reverse URL id exists already."
 msgstr ""
 
-#: admin/forms.py:203
-#: admin/forms.py:204
-#: migrations/0001_initial.py:41
+#: admin/forms.py:203 admin/forms.py:204 migrations/0001_initial.py:41
 #: models/permissionmodels.py:17
 msgid "user"
 msgstr "користувач"
 
 #: admin/forms.py:228
-msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
 msgstr ""
 
 #: admin/forms.py:233
@@ -190,24 +188,18 @@ msgstr "Може переглянути"
 msgid "Please select user or group first."
 msgstr ""
 
-#: admin/forms.py:279
-#: admin/forms.py:286
-#: admin/forms.py:290
+#: admin/forms.py:279 admin/forms.py:286 admin/forms.py:290
 #: templates/admin/cms/page/change_form.html:68
 #: templates/admin/cms/page/plugin_change_form.html:76
 #: templates/cms/toolbar/placeholder.html:26
 msgid "Add"
 msgstr "Додати"
 
-#: admin/forms.py:280
-#: admin/forms.py:287
-#: admin/forms.py:291
+#: admin/forms.py:280 admin/forms.py:287 admin/forms.py:291
 msgid "Change"
 msgstr "Змінити"
 
-#: admin/forms.py:281
-#: admin/forms.py:288
-#: admin/forms.py:292
+#: admin/forms.py:281 admin/forms.py:288 admin/forms.py:292
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
@@ -222,7 +214,9 @@ msgid "Notify user"
 msgstr ""
 
 #: admin/forms.py:310
-msgid "Send email notification to user about username or password change. Requires user email."
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
 msgstr ""
 
 #: admin/forms.py:330
@@ -238,11 +232,13 @@ msgid "Email notification requires valid email address."
 msgstr ""
 
 #: admin/forms.py:353
-msgid "The permission to add new pages requires the permission to change pages!"
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
 msgstr ""
 
 #: admin/forms.py:355
-msgid "The permission to add new users requires the permission to change users!"
+msgid ""
+"The permission to add new users requires the permission to change users!"
 msgstr ""
 
 #: admin/forms.py:357
@@ -257,8 +253,7 @@ msgstr ""
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 
-#: admin/pageadmin.py:113
-#: admin/pageadmin.py:165
+#: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
 msgstr "Прихований"
 
@@ -283,7 +278,8 @@ msgid "Database error"
 msgstr "Помилка бази даних"
 
 #: admin/pageadmin.py:779
-msgid "Error! You don't have permissions to move this page. Please reload the page"
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
 #: admin/pageadmin.py:880
@@ -320,8 +316,7 @@ msgstr ""
 msgid "You have no permission to add a plugin"
 msgstr ""
 
-#: admin/pageadmin.py:1160
-#: admin/pageadmin.py:1192
+#: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
 msgstr ""
 
@@ -347,9 +342,7 @@ msgstr ""
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1221
-#: admin/pageadmin.py:1349
-#: admin/pageadmin.py:1375
+#: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
 msgid "You have no permission to change this page"
 msgstr ""
 
@@ -359,7 +352,8 @@ msgstr ""
 
 #: admin/pageadmin.py:1311
 #, python-format
-msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
 #: admin/pageadmin.py:1370
@@ -374,10 +368,11 @@ msgstr ""
 msgid "You have no permission to remove a plugin"
 msgstr ""
 
-#: admin/pageadmin.py:1420
-#: admin/placeholderadmin.py:293
+#: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
-msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
 msgstr ""
 
 #: admin/permissionadmin.py:94
@@ -388,8 +383,7 @@ msgstr ""
 msgid "View restrictions"
 msgstr ""
 
-#: admin/permissionadmin.py:155
-#: models/permissionmodels.py:76
+#: admin/permissionadmin.py:155 models/permissionmodels.py:76
 msgid "Page permissions"
 msgstr ""
 
@@ -401,8 +395,7 @@ msgstr ""
 msgid "Page permissions management"
 msgstr ""
 
-#: admin/placeholderadmin.py:151
-#: admin/placeholderadmin.py:192
+#: admin/placeholderadmin.py:151 admin/placeholderadmin.py:192
 msgid "You don't have permission to add content here."
 msgstr ""
 
@@ -422,8 +415,7 @@ msgstr "Властивості користувача"
 msgid "Groups"
 msgstr "Групи"
 
-#: admin/useradmin.py:36
-#: templates/cms/toolbar/items/login.html:7
+#: admin/useradmin.py:36 templates/cms/toolbar/items/login.html:7
 msgid "Password"
 msgstr "Пароль"
 
@@ -451,74 +443,49 @@ msgstr ""
 msgid "Add Another"
 msgstr "Додати Інше"
 
-#: migrations/0001_initial.py:12
-#: migrations/0001_initial.py:24
-#: migrations/0001_initial.py:75
-#: migrations/0003_remove_placeholder.py:18
-#: migrations/0010_5char_language.py:12
-#: migrations/0010_5char_language.py:15
-#: migrations/0010_5char_language.py:22
-#: migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:82
-#: models/titlemodels.py:11
+#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
+#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
+#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
+#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
+#: models/pluginmodel.py:82 models/titlemodels.py:11
 #: plugins/inherit/models.py:11
 msgid "language"
 msgstr "мова"
 
-#: migrations/0001_initial.py:13
-#: migrations/0001_initial.py:26
-#: migrations/0001_initial.py:40
-#: migrations/0001_initial.py:78
-#: migrations/0003_remove_placeholder.py:21
-#: models/pagemodel.py:99
-#: models/permissionmodels.py:70
-#: models/titlemodels.py:22
-#: plugins/inherit/forms.py:9
-#: plugins/link/forms.py:9
-#: plugins/link/models.py:12
-#: plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22
-#: plugins/teaser/models.py:13
+#: migrations/0001_initial.py:13 migrations/0001_initial.py:26
+#: migrations/0001_initial.py:40 migrations/0001_initial.py:78
+#: migrations/0003_remove_placeholder.py:21 models/pagemodel.py:99
+#: models/permissionmodels.py:70 models/titlemodels.py:22
+#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
+#: plugins/picture/models.py:22 plugins/teaser/models.py:13
 msgid "page"
 msgstr "сторінка"
 
-#: migrations/0001_initial.py:14
-#: migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22
-#: models/pluginmodel.py:81
+#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
+#: migrations/0004_textobjects.py:22 models/pluginmodel.py:81
 msgid "position"
 msgstr "позиція"
 
-#: migrations/0001_initial.py:15
-#: migrations/0001_initial.py:29
-#: models/pluginmodel.py:84
-#: models/titlemodels.py:23
+#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
+#: models/pluginmodel.py:84 models/titlemodels.py:23
 msgid "creation date"
 msgstr "дата створення"
 
-#: migrations/0001_initial.py:16
-#: migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20
-#: models/placeholdermodel.py:12
+#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
+#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:12
 msgid "slot"
 msgstr ""
 
-#: migrations/0001_initial.py:18
-#: models/pluginmodel.py:83
+#: migrations/0001_initial.py:18 models/pluginmodel.py:83
 msgid "plugin_name"
 msgstr ""
 
-#: migrations/0001_initial.py:25
-#: migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15
-#: models/titlemodels.py:12
-#: models/titlemodels.py:13
-#: models/titlemodels.py:21
-#: plugins/file/models.py:25
-#: plugins/file/migrations/0001_initial.py:18
-#: plugins/teaser/models.py:9
-#: plugins/twitter/models.py:6
-#: plugins/twitter/models.py:15
+#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
+#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
+#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:25
+#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:9
+#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
 #: templates/admin/cms/page/change_list_tree.html:6
 msgid "title"
 msgstr "заголовок"
@@ -527,8 +494,7 @@ msgstr "заголовок"
 msgid "path"
 msgstr "шлях"
 
-#: migrations/0001_initial.py:30
-#: models/titlemodels.py:14
+#: migrations/0001_initial.py:30 models/titlemodels.py:14
 msgid "slug"
 msgstr ""
 
@@ -536,18 +502,15 @@ msgstr ""
 msgid "everybody"
 msgstr ""
 
-#: migrations/0001_initial.py:37
-#: models/permissionmodels.py:21
+#: migrations/0001_initial.py:37 models/permissionmodels.py:21
 msgid "can edit"
 msgstr "може редагувати"
 
-#: migrations/0001_initial.py:38
-#: models/permissionmodels.py:18
+#: migrations/0001_initial.py:38 models/permissionmodels.py:18
 msgid "group"
 msgstr "група"
 
-#: migrations/0001_initial.py:39
-#: models/permissionmodels.py:25
+#: migrations/0001_initial.py:39 models/permissionmodels.py:25
 msgid "can publish"
 msgstr ""
 
@@ -559,8 +522,7 @@ msgstr "тип"
 msgid "can change soft-root"
 msgstr ""
 
-#: migrations/0001_initial.py:50
-#: migrations/0006_apphook.py:34
+#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
 msgstr "статус"
@@ -569,15 +531,12 @@ msgstr "статус"
 msgid "navigation extenders"
 msgstr ""
 
-#: migrations/0001_initial.py:54
-#: migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46
-#: models/titlemodels.py:16
+#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
+#: migrations/0006_apphook.py:46 models/titlemodels.py:16
 msgid "has url overwrite"
 msgstr ""
 
-#: migrations/0001_initial.py:55
-#: migrations/0006_apphook.py:49
+#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
 msgid "url overwrite"
 msgstr ""
 
@@ -585,67 +544,54 @@ msgstr ""
 msgid "author"
 msgstr "автор"
 
-#: migrations/0001_initial.py:58
-#: migrations/0006_apphook.py:37
+#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
 msgstr ""
 
-#: migrations/0001_initial.py:59
-#: models/pagemodel.py:79
+#: migrations/0001_initial.py:59 models/pagemodel.py:79
 msgid "login required"
 msgstr ""
 
-#: migrations/0001_initial.py:60
-#: models/pagemodel.py:64
+#: migrations/0001_initial.py:60 models/pagemodel.py:64
 msgid "soft root"
 msgstr ""
 
-#: migrations/0001_initial.py:63
-#: models/pagemodel.py:62
+#: migrations/0001_initial.py:63 models/pagemodel.py:62
 msgid "publication end date"
 msgstr ""
 
-#: migrations/0001_initial.py:64
-#: models/pagemodel.py:69
+#: migrations/0001_initial.py:64 models/pagemodel.py:69
 #: plugins/snippet/models.py:14
 msgid "template"
 msgstr "шаблон"
 
-#: migrations/0001_initial.py:66
-#: models/pagemodel.py:61
+#: migrations/0001_initial.py:66 models/pagemodel.py:61
 msgid "publication date"
 msgstr "дата публікації"
 
-#: migrations/0001_initial.py:67
-#: models/pagemodel.py:63
+#: migrations/0001_initial.py:67 models/pagemodel.py:63
 #: templates/admin/cms/page/change_list_tree.html:9
 msgid "in navigation"
 msgstr ""
 
-#: migrations/0006_apphook.py:15
-#: migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17
-#: models/titlemodels.py:17
+#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
+#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
 msgid "application"
 msgstr ""
 
-#: migrations/0006_apphook.py:65
-#: models/pagemodel.py:65
+#: migrations/0006_apphook.py:65 models/pagemodel.py:65
 msgid "id"
 msgstr "Ідентифікатор"
 
-#: migrations/0008_redirects.py:11
-#: models/titlemodels.py:18
+#: migrations/0008_redirects.py:11 models/titlemodels.py:18
 msgid "redirect"
 msgstr "перенаправлення"
 
-#: migrations/0009_added_meta_fields.py:12
-#: models/titlemodels.py:20
+#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
 msgid "keywords"
 msgstr "ключові слова"
 
-#: migrations/0009_added_meta_fields.py:15
-#: models/titlemodels.py:19
+#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
 #: plugins/teaser/models.py:20
 msgid "description"
 msgstr "опис"
@@ -676,23 +622,19 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: models/moderatormodels.py:50
-#: templatetags/cms_admin.py:147
+#: models/moderatormodels.py:50 templatetags/cms_admin.py:147
 msgid "Moderate page"
 msgstr ""
 
-#: models/moderatormodels.py:51
-#: templatetags/cms_admin.py:148
+#: models/moderatormodels.py:51 templatetags/cms_admin.py:148
 msgid "Moderate children"
 msgstr ""
 
-#: models/moderatormodels.py:52
-#: templatetags/cms_admin.py:149
+#: models/moderatormodels.py:52 templatetags/cms_admin.py:149
 msgid "Moderate descendants"
 msgstr ""
 
-#: models/moderatormodels.py:55
-#: models/moderatormodels.py:56
+#: models/moderatormodels.py:55 models/moderatormodels.py:56
 msgid "PageModerator"
 msgstr ""
 
@@ -700,8 +642,7 @@ msgstr ""
 msgid "created"
 msgstr "створено"
 
-#: models/moderatormodels.py:100
-#: models/pagemodel.py:39
+#: models/moderatormodels.py:100 models/pagemodel.py:39
 msgid "changed"
 msgstr "змінено"
 
@@ -721,8 +662,7 @@ msgstr ""
 msgid "unpublish req."
 msgstr ""
 
-#: models/moderatormodels.py:105
-#: models/pagemodel.py:42
+#: models/moderatormodels.py:105 models/pagemodel.py:42
 msgid "approved"
 msgstr ""
 
@@ -738,10 +678,8 @@ msgstr ""
 msgid "req. app."
 msgstr ""
 
-#: models/pagemodel.py:41
-#: templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:66
-#: utils/moderator.py:90
+#: models/pagemodel.py:41 templates/admin/cms/page/menu_item.html:44
+#: templates/cms/toolbar/toolbar.html:66 utils/moderator.py:90
 msgid "delete"
 msgstr "видалити"
 
@@ -761,13 +699,14 @@ msgstr ""
 msgid "created by"
 msgstr ""
 
-#: models/pagemodel.py:57
-#: templates/admin/cms/page/change_list_tree.html:20
+#: models/pagemodel.py:57 templates/admin/cms/page/change_list_tree.html:20
 msgid "changed by"
 msgstr ""
 
 #: models/pagemodel.py:61
-msgid "When the page should go live. Status must be \"Published\" for page to go live."
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 msgstr ""
 
 #: models/pagemodel.py:62
@@ -779,7 +718,9 @@ msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 #: models/pagemodel.py:65
-msgid "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgid ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 msgstr ""
 
 #: models/pagemodel.py:66
@@ -886,8 +827,7 @@ msgstr ""
 msgid "Pages global permissions"
 msgstr ""
 
-#: models/permissionmodels.py:69
-#: templates/admin/cms/page/permissions.html:15
+#: models/permissionmodels.py:69 templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr ""
 
@@ -911,10 +851,8 @@ msgstr ""
 msgid "User groups (page)"
 msgstr ""
 
-#: models/placeholdermodel.py:13
-#: plugins/flash/models.py:9
-#: plugins/flash/migrations/0001_initial.py:16
-#: plugins/googlemap/models.py:36
+#: models/placeholdermodel.py:13 plugins/flash/models.py:9
+#: plugins/flash/migrations/0001_initial.py:16 plugins/googlemap/models.py:36
 #: plugins/video/models.py:13
 msgid "width"
 msgstr ""
@@ -939,10 +877,8 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: plugins/file/models.py:24
-#: plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:8
-#: plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:24 plugins/file/migrations/0001_initial.py:17
+#: plugins/flash/models.py:8 plugins/flash/migrations/0001_initial.py:18
 msgid "file"
 msgstr ""
 
@@ -958,10 +894,8 @@ msgstr ""
 msgid "use swf file"
 msgstr ""
 
-#: plugins/flash/models.py:10
-#: plugins/flash/migrations/0001_initial.py:19
-#: plugins/googlemap/models.py:38
-#: plugins/video/models.py:14
+#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:19
+#: plugins/googlemap/models.py:38 plugins/video/models.py:14
 msgid "height"
 msgstr ""
 
@@ -1072,7 +1006,9 @@ msgid "Language or Page must be filled out"
 msgstr ""
 
 #: plugins/inherit/models.py:10
-msgid "Choose a page to include its plugins into this placeholder, empty will choose current page"
+msgid ""
+"Choose a page to include its plugins into this placeholder, empty will "
+"choose current page"
 msgstr ""
 
 #: plugins/inherit/models.py:11
@@ -1083,19 +1019,15 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
-#: plugins/link/models.py:10
-#: plugins/link/migrations/0001_initial.py:18
+#: plugins/link/models.py:10 plugins/link/migrations/0001_initial.py:18
 #: plugins/link/migrations/0004_larger_link_names.py:11
 #: plugins/link/migrations/0004_larger_link_names.py:17
-#: plugins/snippet/models.py:12
-#: plugins/snippet/migrations/0001_initial.py:17
+#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
 msgid "name"
 msgstr ""
 
-#: plugins/link/models.py:11
-#: plugins/link/migrations/0001_initial.py:16
-#: plugins/picture/models.py:21
-#: plugins/picture/migrations/0001_initial.py:16
+#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:16
+#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
 #: plugins/teaser/models.py:19
 msgid "link"
 msgstr "посилання"
@@ -1148,20 +1080,16 @@ msgstr ""
 msgid "right"
 msgstr ""
 
-#: plugins/picture/models.py:20
-#: plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:10
-#: plugins/video/models.py:11
+#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
+#: plugins/teaser/models.py:10 plugins/video/models.py:11
 msgid "image"
 msgstr "зображення"
 
-#: plugins/picture/models.py:21
-#: plugins/picture/models.py:22
+#: plugins/picture/models.py:21 plugins/picture/models.py:22
 msgid "if present image will be clickable"
 msgstr ""
 
-#: plugins/picture/models.py:23
-#: plugins/picture/migrations/0001_initial.py:19
+#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
 msgid "alternate text"
 msgstr "Структурований текст"
 
@@ -1181,8 +1109,7 @@ msgstr ""
 msgid "side"
 msgstr ""
 
-#: plugins/snippet/cms_plugins.py:12
-#: plugins/snippet/models.py:24
+#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
 msgstr ""
@@ -1192,13 +1119,13 @@ msgstr ""
 msgid "Template %(template)s does not exist."
 msgstr ""
 
-#: plugins/snippet/models.py:13
-#: plugins/snippet/migrations/0001_initial.py:18
+#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
 msgid "HTML"
 msgstr ""
 
 #: plugins/snippet/models.py:15
-msgid "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgid ""
+"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 msgstr ""
 
 #: plugins/snippet/models.py:25
@@ -1226,8 +1153,7 @@ msgstr "більше"
 msgid "Text"
 msgstr "Текст"
 
-#: plugins/text/models.py:14
-#: plugins/text/migrations/0001_initial.py:16
+#: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
 msgid "body"
 msgstr ""
 
@@ -1290,13 +1216,11 @@ msgstr ""
 msgid "twitter user"
 msgstr ""
 
-#: plugins/twitter/models.py:8
-#: plugins/twitter/models.py:17
+#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "count"
 msgstr ""
 
-#: plugins/twitter/models.py:8
-#: plugins/twitter/models.py:17
+#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "Number of entries to display"
 msgstr ""
 
@@ -1313,7 +1237,10 @@ msgid "query"
 msgstr ""
 
 #: plugins/twitter/models.py:16
-msgid "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgid ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
@@ -1361,7 +1288,9 @@ msgid "movie url"
 msgstr ""
 
 #: plugins/video/models.py:10
-msgid "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgid ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1388,14 +1317,10 @@ msgstr ""
 msgid "background color"
 msgstr ""
 
-#: plugins/video/models.py:22
-#: plugins/video/models.py:23
-#: plugins/video/models.py:24
-#: plugins/video/models.py:25
-#: plugins/video/models.py:26
-#: plugins/video/models.py:27
-#: plugins/video/models.py:28
-#: plugins/video/models.py:29
+#: plugins/video/models.py:22 plugins/video/models.py:23
+#: plugins/video/models.py:24 plugins/video/models.py:25
+#: plugins/video/models.py:26 plugins/video/models.py:27
+#: plugins/video/models.py:28 plugins/video/models.py:29
 msgid "Hexadecimal, eg ff00cc"
 msgstr ""
 
@@ -1454,7 +1379,8 @@ msgstr ""
 #: templates/admin/cms/mail/approvement_required.html:5
 #: templates/admin/cms/mail/approvement_required.txt:5
 #, python-format
-msgid "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+msgid ""
+"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
 msgstr ""
 
 #: templates/admin/cms/mail/approvement_required.html:8
@@ -1563,7 +1489,9 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:188
 #, python-format
-msgid "This page must be moderated at level %(moderation_level)s, post a message for moderator."
+msgid ""
+"This page must be moderated at level %(moderation_level)s, post a message "
+"for moderator."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:190
@@ -1896,8 +1824,7 @@ msgstr ""
 msgid "Switch on/off"
 msgstr ""
 
-#: templatetags/cms_admin.py:127
-#: templatetags/cms_admin.py:134
+#: templatetags/cms_admin.py:127 templatetags/cms_admin.py:134
 #, python-format
 msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
 msgstr ""
@@ -1922,58 +1849,59 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:100
-#: test_utils/cli.py:107
+#: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:101
-#: test_utils/cli.py:108
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102
-#: test_utils/cli.py:109
+#: test_utils/cli.py:102 test_utils/cli.py:109
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103
-#: test_utils/cli.py:110
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Brazil"
 msgstr ""
 
-#: test_utils/cli.py:104
-#: test_utils/cli.py:111
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:123
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:124
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:125
+#: test_utils/cli.py:130
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:131
+#: test_utils/cli.py:136
 msgid "sidebar column"
 msgstr ""
 
-#: test_utils/cli.py:137
+#: test_utils/cli.py:142
 msgid "left column"
 msgstr ""
 
-#: test_utils/cli.py:143
+#: test_utils/cli.py:148
 msgid "right column"
 msgstr ""
+
+#: test_utils/project/placeholderapp/cms_plugins.py:7
+#, fuzzy
+msgid "Test Plugin"
+msgstr "Плагіни"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -2038,8 +1966,9 @@ msgstr ""
 
 #: utils/page_resolver.py:168
 #, python-format
-msgid "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
-msgid_plural "Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+msgid ""
+"Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
+msgid_plural ""
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
-

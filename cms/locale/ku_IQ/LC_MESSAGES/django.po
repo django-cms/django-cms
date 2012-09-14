@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-24 11:47+0200\n"
+"POT-Creation-Date: 2012-09-12 15:34+0200\n"
 "PO-Revision-Date: 2012-03-29 08:35+0000\n"
 "Last-Translator: muhammad <muhammad.khalid@asiacell.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -114,75 +114,66 @@ msgstr "زمانی ئێستای پێکهاتەی بەشەکان"
 msgid "Another page with this slug already exists"
 msgstr "پەڕەیەکی تر هەیە بە هەمان بەستەر"
 
-#: admin/forms.py:135
+#: admin/forms.py:151
 msgid "Menu Title"
 msgstr "ناونیشانی پێڕست"
 
-#: admin/forms.py:136
+#: admin/forms.py:152
 msgid "Overwrite what is displayed in the menu"
 msgstr "ئەو نووسینانەی پیشان ئەدرێن لە پێڕست"
 
-#: admin/forms.py:137
+#: admin/forms.py:153
 msgid "Page Title"
 msgstr "ناونیشانی پەڕە"
 
-#: admin/forms.py:138
+#: admin/forms.py:154
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "ئەو نووسینانەی پیشان ئەدرێن لە بەشی سەرەوەی پەڕە یا لە نیشانەکاندا"
 
-#: admin/forms.py:139
+#: admin/forms.py:155
 msgid "Application"
 msgstr "بەرنامە"
 
-#: admin/forms.py:141
+#: admin/forms.py:157
 msgid "Hook application to this page."
 msgstr "بەستەری بەرنامە بۆ ئەم پەڕەیە"
 
-#: admin/forms.py:142
+#: admin/forms.py:158
 msgid "Overwrite URL"
 msgstr "ئەدرەسی نووسین"
 
-#: admin/forms.py:143
+#: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
 msgstr "ئەم خانەیە بە بەتاڵی جێبهێڵە گەر پێویستە ڕێرەوی ئاسایی بەکاربێت "
 
-#: admin/forms.py:149
+#: admin/forms.py:165
 msgid "Redirect"
 msgstr " ئارەستەکردن"
 
-#: admin/forms.py:150
+#: admin/forms.py:166
 msgid "Redirects to this URL."
 msgstr "ئارەستەکردن بۆ ئەم ئەدرەسە"
 
-#: admin/forms.py:152
+#: admin/forms.py:168
 msgid "A description of the page sometimes used by search engines."
 msgstr "پێناسەی پەڕە - هەندێک جار لە لایەن بزوێنەری گەڕانەوە بەکاردێت"
 
-#: admin/forms.py:154
+#: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr ""
 "خشتەی ئەو کۆمایەنەی کا کلیلە ووشەکان لەیەکتر جیا دەکاتەوە - هەندێک جار لە "
 "لایەن بزوێنەری گەڕانەوە بەکاردێت - "
 
-#: admin/forms.py:170
+#: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
 msgstr "پەڕەیەک بە هەمان ناسەرەوەی ئەدرەس بوونی هەیە"
 
-#: admin/forms.py:178
-msgid "Invalid URL, use /my/url format."
-msgstr "ئەدرەسێکی نەشیاو  "
-
-#: admin/forms.py:183
-#, python-format
-msgid "Page with redirect url %r already exist"
-msgstr " بوونی نیەurl %r پەرە لەگەڵ ئاڕاستەکەری "
-
-#: admin/forms.py:193 admin/forms.py:194 migrations/0001_initial.py:41
+#: admin/forms.py:203 admin/forms.py:204 migrations/0001_initial.py:41
 #: models/permissionmodels.py:17
 msgid "user"
 msgstr "بەکارهێنەر"
 
-#: admin/forms.py:218
+#: admin/forms.py:228
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
@@ -190,46 +181,46 @@ msgstr ""
 "زیادکردنی مۆڵەت بۆ پەڕە پێویستی بە گەشتن بە لقەکان هەیە بە پێچەوانەوە پەڕەی "
 "زیادکراو ناگۆڕدرێت لە لایەن دروستەکەرەکەیەوە"
 
-#: admin/forms.py:223
+#: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
 msgstr "زیادکردنی مۆڵەت بۆ پەڕە پێویستی بە مۆڵەتی دەستکاریکردنی پەڕە هەیە"
 
-#: admin/forms.py:250
+#: admin/forms.py:260
 msgid "can_view"
 msgstr "توانای پشاندان"
 
-#: admin/forms.py:262
+#: admin/forms.py:272
 msgid "Please select user or group first."
 msgstr "تکایە بەکارهێەر یان کۆمەڵەیەک دەستنیشان بکە "
 
-#: admin/forms.py:269 admin/forms.py:276 admin/forms.py:280
+#: admin/forms.py:279 admin/forms.py:286 admin/forms.py:290
 #: templates/admin/cms/page/change_form.html:68
 #: templates/admin/cms/page/plugin_change_form.html:76
 #: templates/cms/toolbar/placeholder.html:26
 msgid "Add"
 msgstr "زیادکردن"
 
-#: admin/forms.py:270 admin/forms.py:277 admin/forms.py:281
+#: admin/forms.py:280 admin/forms.py:287 admin/forms.py:291
 msgid "Change"
 msgstr "گۆڕین"
 
-#: admin/forms.py:271 admin/forms.py:278 admin/forms.py:282
+#: admin/forms.py:281 admin/forms.py:288 admin/forms.py:292
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
 msgstr "سڕینەوە"
 
-#: admin/forms.py:272
+#: admin/forms.py:282
 msgid "Recover (any) pages"
 msgstr ""
 "گەراندەوەی پەڕەکان - بەدەست خستنەوەی پەڕەکان\n"
 " "
 
-#: admin/forms.py:299
+#: admin/forms.py:309
 msgid "Notify user"
 msgstr "ئاگادار کردنەوەی بەکارهێنەر"
 
-#: admin/forms.py:300
+#: admin/forms.py:310
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
@@ -237,138 +228,144 @@ msgstr ""
 "پەیامی ئاگادارکردنەوە بنێرە بۆ بەکارهێنەر دەربارەی گۆڕینی ناوی بەکارهێنەر "
 "یان تێپەڕە ووشەکەی - پێویستی بە ئەدرەسی بەکارهێنەر هەیە"
 
-#: admin/forms.py:320
+#: admin/forms.py:330
 msgid "New password"
 msgstr "تێپەڕە ووشەی نوێ"
 
-#: admin/forms.py:322
+#: admin/forms.py:332
 msgid "New password confirmation"
 msgstr "دڵنیاکردنەوەی تێپەڕە ووشە"
 
-#: admin/forms.py:341
+#: admin/forms.py:351
 msgid "Email notification requires valid email address."
 msgstr "ئاگادارکردنەوە لە ڕێگەی پەیام پێویستی با ئەدرەسەکی شیاو هەیە"
 
-#: admin/forms.py:343
+#: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr ""
 "مۆڵەتی زیادکردنی پەڕەی نوێ پێویستی بە مۆڵەتی دەستکاریکردنی پەڕەکان هەیە"
 
-#: admin/forms.py:345
+#: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
 "مۆڵەی زیادکردنی بەکارهینەری نوێ پێویستی بە مۆڵەتی دەستکاریکردنی "
 "بەکارهێنەرەکان هەیە"
 
-#: admin/forms.py:347
+#: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
 msgstr "بۆ زیادکردنی مۆڵەت پیویستیت بە مۆڵەتی دەستکاریکردنی مؤڵەتەکان هەیە "
 
-#: admin/pageadmin.py:103
+#: admin/pageadmin.py:108
 msgid "Basic Settings"
 msgstr "ڕێکخستنە بنچینەیەکان"
 
-#: admin/pageadmin.py:106
+#: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr ""
 "تێبینی: ئەم پەڕەیە باردەکرێتەوە ئەگەر گۆڕانکاری بکەیت لە دەستنیشانکراوەکان. "
 "سەرەتا پاشەکەوتی بکە  "
 
-#: admin/pageadmin.py:108 admin/pageadmin.py:160
+#: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
 msgstr "شاردراوەکان"
 
-#: admin/pageadmin.py:112
+#: admin/pageadmin.py:117
 msgid "Advanced Settings"
 msgstr "ڕێکخستنە پێشکەوتووەکان"
 
-#: admin/pageadmin.py:119
+#: admin/pageadmin.py:124
 msgid "SEO Settings"
 msgstr "SEO ڕێکخستنیەکانی"
 
-#: admin/pageadmin.py:306
+#: admin/pageadmin.py:311
 msgid "You have no permission to change the template"
 msgstr "تۆ مۆڵەت پێدراو نیت بۆ گۆڕانکاری کردن لە قاڵب"
 
-#: admin/pageadmin.py:493
+#: admin/pageadmin.py:498
 msgid "higher"
 msgstr "بەرزترین"
 
-#: admin/pageadmin.py:663
+#: admin/pageadmin.py:668
 msgid "Database error"
 msgstr "هەڵە لە بنکەی زانیاری"
 
-#: admin/pageadmin.py:872
+#: admin/pageadmin.py:779
+#, fuzzy
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "تۆ مۆڵەت پێدراو نیت بۆ گۆڕانکاری کردن لەم پەڕەیە"
+
+#: admin/pageadmin.py:880
 msgid "Page was successfully approved."
 msgstr "پەڕە بە سەرکەوتووی پەسەند کرا "
 
-#: admin/pageadmin.py:944
+#: admin/pageadmin.py:952
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s object with primary key %(key)r does not exist."
 
-#: admin/pageadmin.py:950
+#: admin/pageadmin.py:958
 msgid "There only exists one translation for this page"
 msgstr "تاکە وەرگێڕان بۆ ئەم پەڕەیە"
 
-#: admin/pageadmin.py:979
+#: admin/pageadmin.py:987
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "سڕدرانەوە %(language)s  ناونیسان و پێوەکراوەکانی زمان"
 
-#: admin/pageadmin.py:1001
+#: admin/pageadmin.py:1009
 msgid "Are you sure?"
 msgstr "دڵنیایت؟"
 
-#: admin/pageadmin.py:1062
+#: admin/pageadmin.py:1074
 msgid "You do not have permission to publish this page"
 msgstr "تۆ مؤڵەت نەدراویت بۆ بڵاوکردنەوەی ئەم پەڕەیە"
 
-#: admin/pageadmin.py:1076
+#: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "تۆ مۆڵەت پێدراو نیت بۆ گۆڕانکاری کردن لەم پەڕەیەدا لە وێبگەڕدا"
 
-#: admin/pageadmin.py:1101
+#: admin/pageadmin.py:1113
 msgid "You have no permission to add a plugin"
 msgstr "مۆڵەت پێدراو نیت بۆ زیادکردنی پێوەکراو"
 
-#: admin/pageadmin.py:1148 admin/pageadmin.py:1180
+#: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
 msgstr "زمان پیویستە بگۆڕدرەت بۆ زمانەکی پشتیگری کراو"
 
-#: admin/pageadmin.py:1160
+#: admin/pageadmin.py:1172
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(placeholder)sپێوەکراوەکان زیادکراوە بۆ%(plugin_name)s "
 
-#: admin/pageadmin.py:1178
+#: admin/pageadmin.py:1190
 msgid "You do not have permission to change this page"
 msgstr "تۆ مۆڵەت پێدراو نیت بۆ گۆڕانکاری کردن لەم پەڕەیە"
 
-#: admin/pageadmin.py:1182
+#: admin/pageadmin.py:1194
 msgid "Language must be different than the copied language!"
 msgstr "زمانەکە پێویستە جیاواز بێت لە زمانە لەبەرگیراوەکە"
 
-#: admin/pageadmin.py:1188
+#: admin/pageadmin.py:1200
 msgid "You do not have permission to add plugins"
 msgstr "مۆڵەت نەدراویت بۆ زیادکردنی پێوەکراو"
 
-#: admin/pageadmin.py:1195
+#: admin/pageadmin.py:1207
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr " %(placeholder)s پێوەکراوەکان بۆ%(language)sلەبەرگیرایەوە"
 
-#: admin/pageadmin.py:1209 admin/pageadmin.py:1337 admin/pageadmin.py:1363
+#: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
 msgid "You have no permission to change this page"
 msgstr "مۆڵەت پێدراو نیت بۆ گۆڕانکاری کردن لە پەڕە"
 
-#: admin/pageadmin.py:1243
+#: admin/pageadmin.py:1255
 msgid "You have no permission to edit a plugin"
 msgstr "مۆڵەت پێدراو نیت بۆ دەستکاری کردنی پێوەکراو"
 
-#: admin/pageadmin.py:1299
+#: admin/pageadmin.py:1311
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
@@ -376,19 +373,19 @@ msgstr ""
 "%(position)s لە  %(placeholder)sپێوەکراوەکان دەستکاریکراوە لە شوێنی"
 "%(plugin_name)s "
 
-#: admin/pageadmin.py:1358
+#: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
 msgstr "مۆڵەت پێدراو نیت بۆ گواستنەوەی پێوەکراو"
 
-#: admin/pageadmin.py:1376
+#: admin/pageadmin.py:1388
 msgid "Plugins where moved"
 msgstr "ئەو پێوەکراوانەی گوازراونەتەوەوە"
 
-#: admin/pageadmin.py:1390
+#: admin/pageadmin.py:1402
 msgid "You have no permission to remove a plugin"
 msgstr "مۆڵەت پێدراو نیت بۆ سڕینەوەی پێوەکراو"
 
-#: admin/pageadmin.py:1408 admin/placeholderadmin.py:293
+#: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -782,11 +779,11 @@ msgstr "سنووردارکردن لە کاتێکا ئەم پەرەیە دەرک�
 msgid "pages"
 msgstr "پەڕەکان"
 
-#: models/pagemodel.py:260
+#: models/pagemodel.py:268
 msgid "Page was copied."
 msgstr "لەبەرگرتنەوەی پەرەکە سەرکەوتو بوو"
 
-#: models/pagemodel.py:680
+#: models/pagemodel.py:690
 msgid "default"
 msgstr "بنەڕەت"
 
@@ -1548,37 +1545,37 @@ msgstr "لیستی پەرەکان"
 msgid "Successfully moved"
 msgstr "بە سەرکەوتووی  گواسترایەوە"
 
-#: templates/admin/cms/page/change_list.html:64
+#: templates/admin/cms/page/change_list.html:68
 msgid "An error occured. Please reload the page"
 msgstr "هەڵەیەک ڕوویدا. تکایە پەرەکە باربکەرەوە "
 
-#: templates/admin/cms/page/change_list.html:85
+#: templates/admin/cms/page/change_list.html:90
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "%(name)s بەدەست خستنەوەی سڕدراوەکان "
 
-#: templates/admin/cms/page/change_list.html:88
+#: templates/admin/cms/page/change_list.html:93
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s زیادکردن "
 
-#: templates/admin/cms/page/change_list.html:100
+#: templates/admin/cms/page/change_list.html:105
 msgid "Pages on:"
 msgstr "پەرەکان لە: "
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:122
 msgid "Filter:"
 msgstr "پاڵاوتەکردن:"
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:122
 msgid "on"
 msgstr "لە"
 
-#: templates/admin/cms/page/change_list.html:117
+#: templates/admin/cms/page/change_list.html:122
 msgid "off"
 msgstr "off"
 
-#: templates/admin/cms/page/change_list.html:119
+#: templates/admin/cms/page/change_list.html:124
 msgid "Filter"
 msgstr "پاڵاوتەکردن"
 
@@ -1902,53 +1899,58 @@ msgstr ""
 "%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:99 test_utils/cli.py:106
+#: test_utils/cli.py:100 test_utils/cli.py:107
 #, fuzzy
 msgid "English"
 msgstr "بڵاو نەکردنەوە"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:102 test_utils/cli.py:109
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Brazil"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:122
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:123
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:124
+#: test_utils/cli.py:130
 #, fuzzy
 msgid "navigation examples"
 msgstr "درێژکەرەوەی وێبگەڕ"
 
-#: test_utils/cli.py:130
-msgid "sidebar column"
-msgstr "background color"
-
 #: test_utils/cli.py:136
-#, fuzzy
-msgid "left column"
+msgid "sidebar column"
 msgstr "background color"
 
 #: test_utils/cli.py:142
 #, fuzzy
+msgid "left column"
+msgstr "background color"
+
+#: test_utils/cli.py:148
+#, fuzzy
 msgid "right column"
 msgstr "background color"
+
+#: test_utils/project/placeholderapp/cms_plugins.py:7
+#, fuzzy
+msgid "Test Plugin"
+msgstr "پێوەکراو زیاد بکە"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1988,11 +1990,6 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
-#: test_utils/project/sampleapp/urls.py:11
-#, fuzzy
-msgid "^account/$"
-msgstr "ژمارە"
-
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "هەژماری بەکارهێنەرەکەت دروستکرا "
@@ -2013,6 +2010,22 @@ msgstr "پەسەندکردن"
 #, python-format
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Page %s داواکاری پەسەندکردن"
+
+#: utils/page_resolver.py:142
+msgid "Invalid URL, use /my/url format."
+msgstr "ئەدرەسێکی نەشیاو  "
+
+#: utils/page_resolver.py:168
+#, python-format
+msgid ""
+"Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
+msgid_plural ""
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+msgstr[0] ""
+msgstr[1] ""
+
+#~ msgid "Page with redirect url %r already exist"
+#~ msgstr " بوونی نیەurl %r پەرە لەگەڵ ئاڕاستەکەری "
 
 #~ msgid "move"
 #~ msgstr "move request"

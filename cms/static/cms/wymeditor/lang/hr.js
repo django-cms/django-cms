@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['hr'] = {
+WYMeditor.STRINGS.hr = {
     Strong:           'Podebljano',
     Emphasis:         'Naglašeno',
     Superscript:      'Iznad',

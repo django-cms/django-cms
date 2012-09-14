@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['pt'] = {
+WYMeditor.STRINGS.pt = {
     Strong:           'Negrito',
     Emphasis:         'Itálico',
     Superscript:      'Sobrescrito',
