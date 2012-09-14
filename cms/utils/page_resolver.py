@@ -137,16 +137,20 @@ def get_page_from_request(request, use_path=None):
     return page
 
 
-def is_valid_url(url,instance,create_links=True):
+def is_valid_url(url,instance,create_links=True, site=None):
     """ Checks for conflicting urls
     """
     if url:
         # Url sanity check via regexp
         if not any_path_re.match(url):
             raise ValidationError(_('Invalid URL, use /my/url format.'))
+        # We only check page FK to site object to allow is_valid_url check on
+        # incomplete Page instances
+        if not site and (instance.site_id):
+            site = instance.site
         # Retrieve complete queryset of pages with corresponding URL
         # This uses the same resolving function as ``get_page_from_path``
-        page_qs = get_page_queryset_from_path(url.strip('/'))
+        page_qs = get_page_queryset_from_path(url.strip('/'), site=site)
         url_clashes = []
         # If queryset has pages checks for conflicting urls
         if page_qs is not None:
