@@ -95,7 +95,7 @@
 - Fixed wrong language prefix handling for form actions and admin preview
 - Admin icons in django 1.4 fixed
 - Added requirements.txt for pip and testing in test_requirements
-- Google map plugin with height and width properties
+- Google map plugin with height and width properties. Migrations will set default values on not-null fields.
 - Docs fixes
 - Code cleanup
 - Switched html5lib to HTML serializer

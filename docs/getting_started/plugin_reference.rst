@@ -68,6 +68,20 @@ GoogleMap
 
 Displays a map of an address on your page.
 
+Both address and coordinates are supported to center the map; zoom level and
+route planner can be set when adding/editing plugin in the admin.
+
+.. versionadded:: 2.3.2
+    width/height parameter has been added, so it's no longer required to set
+    plugin container size in CSS or template.
+
+.. versionchanged:: 2.3.2
+    Zoom level is set via a select field which ensure only legal values are used.
+
+.. note:: Due to the above change, `level` field is now marked as `NOT NULL`,
+    and a datamigration has been introduced to modify existing googlemap plugin
+    instance to set the default value if `level` if is `NULL`.
+
 For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
@@ -132,14 +146,15 @@ in it create a file called ``picture.html``. Here is an example
 
     {% load thumbnail %}
 
-    {% if picture.url %}<a href="{{ picture.url }}">{% endif %}
-    {% ifequal placeholder "content" %}
+    {% if link %}<a href="{{ link }}">{% endif %}
+    {% if placeholder == "content" %}
         <img src="{% thumbnail picture.image 300x600 %}"{% if picture.alt %} alt="{{ picture.alt }}"{% endif %} />
-    {% endifequal %}
-    {% ifequal placeholder "teaser" %}
-        <img src="{% thumbnail picture.image 150x150 %}"{% if picture.alt %} alt="{{ picture.alt }}"{% endif %} />
-    {% endifequal %}
-    {% if picture.url %}</a>{% endif %}
+    {% else %}
+        {% if placeholder == "teaser" %}
+            <img src="{% thumbnail picture.image 150x150 %}"{% if picture.alt %} alt="{{ picture.alt }}"{% endif %} />
+        {% endif %}
+    {% endif %}
+    {% if link %}</a>{% endif %}
 
 
 In this template the picture is scaled differently based on which placeholder
