@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 15:33+0200\n"
+"POT-Creation-Date: 2012-09-14 16:10+0200\n"
 "PO-Revision-Date: 2012-03-27 21:10+0000\n"
 "Last-Translator: legendri <legendri@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -444,7 +444,7 @@ msgstr "Iskopiraj ovlasti"
 msgid "Copy moderation"
 msgstr "Dosljednost kopiranja"
 
-#: conf/patch.py:28
+#: conf/patch.py:14
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Nasljedi predložak najbližeg pretka"
 
@@ -778,11 +778,11 @@ msgstr "ograniči kada je ova stranica vidljiva u izborniku"
 msgid "pages"
 msgstr "stranice"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:267
 msgid "Page was copied."
 msgstr "stranica je kopirana"
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:689
 msgid "default"
 msgstr "uobičajenoa"
 
@@ -1895,50 +1895,50 @@ msgstr ""
 "Template tag ne može pronaći stranicu sa parametrima `%(page_lookup)s `. URL "
 "je bio: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:99 test_utils/cli.py:106
 #, fuzzy
 msgid "English"
 msgstr "Ukloni objavu"
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
+#: test_utils/cli.py:102 test_utils/cli.py:109
+msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:127
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:128
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:129
 #, fuzzy
 msgid "navigation examples"
 msgstr "proširenja navigacije"
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:135
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:141
 #, fuzzy
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:147
 #, fuzzy
 msgid "right column"
 msgstr "background color"
@@ -1958,6 +1958,10 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Namespaced App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1986,6 +1990,11 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
+#: test_utils/project/sampleapp/urls.py:11
+#, fuzzy
+msgid "^account/$"
+msgstr "račun"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - Vaš korisnički račun je kreiran."
@@ -2007,11 +2016,11 @@ msgstr "odobri"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Stranica %s zahtjeva odobrenje."
 
-#: utils/page_resolver.py:142
+#: utils/page_resolver.py:148
 msgid "Invalid URL, use /my/url format."
 msgstr "Nepravilan URL, koristite format: /my/url."
 
-#: utils/page_resolver.py:168
+#: utils/page_resolver.py:177
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."

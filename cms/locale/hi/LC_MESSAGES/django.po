@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 15:33+0200\n"
+"POT-Creation-Date: 2012-09-14 16:10+0200\n"
 "PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: ojii <me@ojii.ch>\n"
 "Language-Team: Hindi (http://www.transifex.net/projects/p/django-cms/team/"
@@ -446,7 +446,7 @@ msgstr "Copy permissions"
 msgid "Copy moderation"
 msgstr "कॉपी मॉडरेशन"
 
-#: conf/patch.py:28
+#: conf/patch.py:14
 msgid "Inherit the template of the nearest ancestor"
 msgstr "विरासत में निकटतम पूर्वज का खाका"
 
@@ -780,11 +780,11 @@ msgstr ""
 msgid "pages"
 msgstr "पन्ने"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:267
 msgid "Page was copied."
 msgstr "पृष्ठ नकल की थी."
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:689
 msgid "default"
 msgstr "default"
 
@@ -1893,50 +1893,50 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:99 test_utils/cli.py:106
 #, fuzzy
 msgid "English"
 msgstr "अप्रकाशित"
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
+#: test_utils/cli.py:102 test_utils/cli.py:109
+msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:127
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:128
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:129
 #, fuzzy
 msgid "navigation examples"
 msgstr "नेविगेशन extenders"
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:135
 #, fuzzy
 msgid "sidebar column"
 msgstr "seekbar color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:141
 msgid "left column"
 msgstr ""
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:147
 msgid "right column"
 msgstr ""
 
@@ -1955,6 +1955,10 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Namespaced App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1983,6 +1987,11 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
+#: test_utils/project/sampleapp/urls.py:11
+#, fuzzy
+msgid "^account/$"
+msgstr "गिनती"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "सीएमएस - आपके उपयोगकर्ता खाते में बनाया गया था."
@@ -2004,11 +2013,11 @@ msgstr "अनुमोदन"
 msgid "CMS - Page %s requires approvement."
 msgstr "सीएमएस -%s पेज approvement की आवश्यकता है."
 
-#: utils/page_resolver.py:142
+#: utils/page_resolver.py:148
 msgid "Invalid URL, use /my/url format."
 msgstr "अवैध यूआरएल का प्रयोग करते हैं / मेरी / url प्रारूप."
 
-#: utils/page_resolver.py:168
+#: utils/page_resolver.py:177
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."

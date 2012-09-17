@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 15:35+0200\n"
+"POT-Creation-Date: 2012-09-14 16:12+0200\n"
 "PO-Revision-Date: 2011-03-22 15:24+0000\n"
 "Last-Translator: gleb_chipiga <gleb.chipiga@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -449,7 +449,7 @@ msgstr "Права на копирование"
 msgid "Copy moderation"
 msgstr "Модерация копирования"
 
-#: conf/patch.py:28
+#: conf/patch.py:14
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Наследовать шаблон от ближайшего предка"
 
@@ -784,11 +784,11 @@ msgstr "ограничивает отображение страницы в ме
 msgid "pages"
 msgstr "страницы"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:267
 msgid "Page was copied."
 msgstr "Страница скопирована."
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:689
 msgid "default"
 msgstr "по умолчанию"
 
@@ -1908,47 +1908,47 @@ msgstr ""
 "Тег шаблона не может найти страницу с параметрами поиска `%(page_lookup)s\n"
 "`. URL запроса: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:99 test_utils/cli.py:106
 msgid "English"
 msgstr "Английский"
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "French"
 msgstr "Французский"
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "German"
 msgstr "Немецкий"
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
-msgstr "Бразильский"
+#: test_utils/cli.py:102 test_utils/cli.py:109
+msgid "Brazilian Portuguese"
+msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Dutch"
 msgstr "Нидерландский"
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:127
 msgid "two columns"
 msgstr "две колонки"
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:128
 msgid "three columns"
 msgstr "три колонки"
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:129
 msgid "navigation examples"
 msgstr "примеры навигации"
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:135
 msgid "sidebar column"
 msgstr "боковая колонка"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:141
 msgid "left column"
 msgstr "левая колонка"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:147
 msgid "right column"
 msgstr "правая колонка"
 
@@ -1967,6 +1967,11 @@ msgstr "Статьи"
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr "Пример приложения"
+
+#: test_utils/project/sampleapp/cms_app.py:15
+#, fuzzy
+msgid "Namespaced App"
 msgstr "Пример приложения"
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1993,6 +1998,11 @@ msgstr "Статическое Меню"
 msgid "Static Menu2"
 msgstr "Статическое Меню2"
 
+#: test_utils/project/sampleapp/urls.py:11
+#, fuzzy
+msgid "^account/$"
+msgstr "количество"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - ваш аккаунт создан."
@@ -2014,11 +2024,11 @@ msgstr "утвердить"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Страница %s требует утверждения."
 
-#: utils/page_resolver.py:142
+#: utils/page_resolver.py:148
 msgid "Invalid URL, use /my/url format."
 msgstr "Неправильный URL, используйте /my/url формат."
 
-#: utils/page_resolver.py:168
+#: utils/page_resolver.py:177
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
@@ -2027,6 +2037,9 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#~ msgid "Brazil"
+#~ msgstr "Бразильский"
 
 #, fuzzy
 #~ msgid "Page with redirect url %r already exist"

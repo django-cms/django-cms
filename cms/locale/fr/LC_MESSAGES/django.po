@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 15:33+0200\n"
+"POT-Creation-Date: 2012-09-14 16:10+0200\n"
 "PO-Revision-Date: 2011-12-23 23:33+0000\n"
 "Last-Translator: Chary titouan <>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -453,7 +453,7 @@ msgstr "Copier les permissions"
 msgid "Copy moderation"
 msgstr "Copier la modération"
 
-#: conf/patch.py:28
+#: conf/patch.py:14
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Hériter du modèle du parent le plus proche"
 
@@ -791,11 +791,11 @@ msgstr "limite quand cette page est visible dans le menu"
 msgid "pages"
 msgstr "pages"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:267
 msgid "Page was copied."
 msgstr "La page a été copiée."
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:689
 msgid "default"
 msgstr "par défaut"
 
@@ -1908,50 +1908,50 @@ msgstr ""
 "%(page_lookup)s ». L'URL de la demande était la suivante: http://%(host)s"
 "%(path)s"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:99 test_utils/cli.py:106
 #, fuzzy
 msgid "English"
 msgstr "Dépublier"
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
+#: test_utils/cli.py:102 test_utils/cli.py:109
+msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:127
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:128
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:129
 #, fuzzy
 msgid "navigation examples"
 msgstr "Extension du menu"
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:135
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:141
 #, fuzzy
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:147
 #, fuzzy
 msgid "right column"
 msgstr "background color"
@@ -1971,6 +1971,10 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Namespaced App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1999,6 +2003,11 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
+#: test_utils/project/sampleapp/urls.py:11
+#, fuzzy
+msgid "^account/$"
+msgstr "compte"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - votre compte utilisateur a été créé"
@@ -2020,11 +2029,11 @@ msgstr "approuver"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - la page %s nécessite approbation"
 
-#: utils/page_resolver.py:142
+#: utils/page_resolver.py:148
 msgid "Invalid URL, use /my/url format."
 msgstr "L'URL est invalide, utilisez le format /mot-cle/mot-cle"
 
-#: utils/page_resolver.py:168
+#: utils/page_resolver.py:177
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."

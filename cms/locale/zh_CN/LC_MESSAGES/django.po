@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 15:35+0200\n"
+"POT-Creation-Date: 2012-09-14 16:13+0200\n"
 "PO-Revision-Date: 2011-12-13 08:05+0000\n"
 "Last-Translator: ofive <glacier_05@yahoo.com.cn>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -430,7 +430,7 @@ msgstr "复制权限"
 msgid "Copy moderation"
 msgstr "复制核对选项"
 
-#: conf/patch.py:28
+#: conf/patch.py:14
 msgid "Inherit the template of the nearest ancestor"
 msgstr "继承最近的上级页面模板"
 
@@ -762,11 +762,11 @@ msgstr "该页在菜单可见时限制"
 msgid "pages"
 msgstr "页面"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:267
 msgid "Page was copied."
 msgstr "页面已被复制。"
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:689
 msgid "default"
 msgstr "默认"
 
@@ -1866,50 +1866,50 @@ msgstr ""
 "模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s"
 "%(path)s"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:99 test_utils/cli.py:106
 #, fuzzy
 msgid "English"
 msgstr "取消发表"
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
+#: test_utils/cli.py:102 test_utils/cli.py:109
+msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:103 test_utils/cli.py:110
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:127
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:128
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:129
 #, fuzzy
 msgid "navigation examples"
 msgstr "导航扩展"
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:135
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:141
 #, fuzzy
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:147
 #, fuzzy
 msgid "right column"
 msgstr "background color"
@@ -1929,6 +1929,10 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Namespaced App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1957,6 +1961,11 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
+#: test_utils/project/sampleapp/urls.py:11
+#, fuzzy
+msgid "^account/$"
+msgstr "合计"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - 您的用户帐号已创建。"
@@ -1978,11 +1987,11 @@ msgstr "批准"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - 页面[%s]请求批准。"
 
-#: utils/page_resolver.py:142
+#: utils/page_resolver.py:148
 msgid "Invalid URL, use /my/url format."
 msgstr "无效的URL, 正确格式：/my/url"
 
-#: utils/page_resolver.py:168
+#: utils/page_resolver.py:177
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
