@@ -39,6 +39,7 @@ Advanced
     advanced/sitemap
     advanced/templatetags
     advanced/cli
+    advanced/permissions_reference
 
 
 *****************
