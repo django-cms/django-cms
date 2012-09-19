@@ -54,7 +54,7 @@ def get_page_queryset_from_path(path, preview=False, site=None):
     if not preview:
         pages = pages.published(site)
     else:
-        pages = pages.filter(site_id=site.pk)
+        pages = pages.filter(site=site)
 
     # Check if there are any pages
     if not pages.all_root().exists():
