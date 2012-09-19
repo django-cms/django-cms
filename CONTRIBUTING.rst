@@ -175,8 +175,14 @@ For translators we have a `Transifex account
 the .po files and don't need to install git or mercurial to be able to
 contribute. All changes there will be automatically sent to the project.
 
-Top translations django-cms core:
-    .. image:: https://www.transifex.com/projects/p/django-cms/resource/core/chart/image_png
+
+    .. raw:: html
+
+        Top translations django-cms core:<br/>
+
+        <img border="0" src="https://www.transifex.com/projects/p/django-cms/resource/core/chart/image_png"/>
+
+
 
 .. _fork: http://github.com/divio/django-cms
 .. _Sphinx: http://sphinx.pocoo.org/
