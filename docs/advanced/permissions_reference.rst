@@ -1,6 +1,6 @@
-##########
+###########
 Permissions
-##########
+###########
 
 In django-cms you can set two types of permissions:
 
