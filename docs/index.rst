@@ -71,18 +71,6 @@ Concepts
     concepts/multiple_languages
 
 
-**************************
-Contributing to django CMS
-**************************
-
-.. toctree::
-    :maxdepth: 2
-    :numbered:
-
-    contribution
-
-
-
 Indices and tables
 ==================
 
